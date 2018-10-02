@@ -16,7 +16,7 @@ class ServiceFilterSet(FilterSet):
         Multiple values are separated by a comma.
         """
         filter_args = {
-            f'{field_name}__overlap': value.split(',')
+            f'{field_name}__overlap': value.split(','),
         }
         return queryset.filter(**filter_args)
 

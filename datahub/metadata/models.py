@@ -28,14 +28,14 @@ class Sector(MPTTModel, DisableableModel):
     segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     parent = TreeForeignKey(
         'self', null=True, blank=True, related_name='children', db_index=True,
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
 
     def __str__(self):
         """Human-readable representation."""
         return join_truthy_strings(
             self.segment,
-            '(disabled)' if self.disabled_on else None
+            '(disabled)' if self.disabled_on else None,
         )
 
     @cached_property
