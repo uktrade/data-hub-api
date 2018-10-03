@@ -9,6 +9,14 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
+from datahub.company.constants import BusinessTypeConstant
+from datahub.company.models import CompaniesHouseCompany, Company
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyCoreTeamMemberFactory,
+    CompanyFactory,
+)
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
@@ -16,14 +24,6 @@ from datahub.core.test_utils import (
 )
 from datahub.metadata.models import CompanyClassification
 from datahub.metadata.test.factories import TeamFactory
-from .factories import (
-    AdviserFactory,
-    CompaniesHouseCompanyFactory,
-    CompanyCoreTeamMemberFactory,
-    CompanyFactory,
-)
-from ..constants import BusinessTypeConstant
-from ..models import CompaniesHouseCompany, Company
 
 
 class TestListCompanies(APITestMixin):
