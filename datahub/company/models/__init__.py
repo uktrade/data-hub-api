@@ -1,12 +1,12 @@
-from .adviser import Advisor
-from .company import (
+from datahub.company.models.adviser import Advisor
+from datahub.company.models.company import (
     CompaniesHouseCompany,
     Company,
     CompanyCoreTeamMember,
     CompanyPermission,
     ExportExperienceCategory,
 )
-from .contact import Contact, ContactPermission
+from datahub.company.models.contact import Contact, ContactPermission
 
 __all__ = (
     'Advisor',
