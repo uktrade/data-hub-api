@@ -6,25 +6,25 @@ from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from datahub.core.audit import AuditViewSet
-from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSet
-from datahub.investment.queryset import get_slim_investment_project_queryset
-from datahub.oauth.scopes import Scope
-from .models import (
+from datahub.company.models import (
     Advisor,
     CompaniesHouseCompany,
     Company,
     Contact,
 )
-from .queryset import get_contact_queryset
-from .serializers import (
+from datahub.company.queryset import get_contact_queryset
+from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializer,
     CompanyCoreTeamMemberSerializer,
     CompanySerializer,
     ContactSerializer,
 )
+from datahub.core.audit import AuditViewSet
+from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.viewsets import CoreViewSet
+from datahub.investment.queryset import get_slim_investment_project_queryset
+from datahub.oauth.scopes import Scope
 
 
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
