@@ -9,11 +9,11 @@ from rest_framework.reverse import reverse
 from reversion.models import Version
 
 from datahub.company.models import Contact
+from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.test.factories import TeamFactory
-from .factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
