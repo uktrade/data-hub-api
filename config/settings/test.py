@@ -50,6 +50,10 @@ CACHES = {
 
 CELERY_TASK_ALWAYS_EAGER = True
 
+# Stop WhiteNoise emitting warnings when running tests without running collectstatic first
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_USE_FINDERS = True
+
 ACTIVITY_STREAM_IP_WHITELIST = '1.2.3.4'
 ACTIVITY_STREAM_ACCESS_KEY_ID = 'some-id'
 ACTIVITY_STREAM_SECRET_ACCESS_KEY = 'some-secret'
