@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from .registry import registry
+from datahub.metadata.registry import registry
 
 
 def _create_metadata_view(mapping):
