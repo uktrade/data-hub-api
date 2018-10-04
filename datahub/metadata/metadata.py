@@ -1,7 +1,7 @@
-from . import models
-from .filters import ServiceFilterSet
-from .registry import registry
-from .serializers import SectorSerializer, ServiceSerializer, TeamSerializer
+from datahub.metadata import models
+from datahub.metadata.filters import ServiceFilterSet
+from datahub.metadata.registry import registry
+from datahub.metadata.serializers import SectorSerializer, ServiceSerializer, TeamSerializer
 
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)

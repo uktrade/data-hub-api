@@ -3,8 +3,8 @@ from django.core.exceptions import ImproperlyConfigured
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer
-from ..models import Sector, UKRegion
-from ..registry import MetadataRegistry
+from datahub.metadata.models import Sector, UKRegion
+from datahub.metadata.registry import MetadataRegistry
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
