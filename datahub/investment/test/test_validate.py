@@ -5,7 +5,10 @@ from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.models import InvestmentDeliveryPartner
 from datahub.investment.serializers import (
-    CORE_FIELDS, REQUIREMENTS_FIELDS, TEAM_FIELDS, VALUE_FIELDS,
+    CORE_FIELDS,
+    REQUIREMENTS_FIELDS,
+    TEAM_FIELDS,
+    VALUE_FIELDS,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import validate

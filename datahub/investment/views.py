@@ -15,8 +15,10 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.models import InvestmentProject, InvestmentProjectTeamMember
 from datahub.investment.permissions import (
-    InvestmentProjectModelPermissions, InvestmentProjectTeamMemberModelPermissions,
-    IsAssociatedToInvestmentProjectFilter, IsAssociatedToInvestmentProjectPermission,
+    InvestmentProjectModelPermissions,
+    InvestmentProjectTeamMemberModelPermissions,
+    IsAssociatedToInvestmentProjectFilter,
+    IsAssociatedToInvestmentProjectPermission,
     IsAssociatedToInvestmentProjectTeamMemberPermission,
 )
 from datahub.investment.serializers import IProjectSerializer, IProjectTeamMemberSerializer
