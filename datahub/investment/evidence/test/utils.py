@@ -1,6 +1,6 @@
+from datahub.investment.evidence.models import EvidenceDocument
+from datahub.investment.evidence.test.factories import EvidenceTagFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
-from .factories import EvidenceTagFactory
-from ..models import EvidenceDocument
 
 
 def create_evidence_document(user=None, associated=False, investment_project=None):
