@@ -4,7 +4,7 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 from rest_framework.exceptions import ValidationError
 
-from ..validators import ReconcilablePaymentsValidator
+from datahub.omis.payment.validators import ReconcilablePaymentsValidator
 
 
 class TestReconcilablePaymentsValidator:

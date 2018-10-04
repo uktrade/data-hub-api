@@ -10,10 +10,12 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
-    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderWithAcceptedQuoteFactory,
 )
-from ..factories import PaymentFactory
-from ...constants import PaymentMethod
+from datahub.omis.payment.constants import PaymentMethod
+from datahub.omis.payment.test.factories import PaymentFactory
 
 
 class TestGetPayments(APITestMixin):

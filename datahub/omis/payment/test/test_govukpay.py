@@ -1,6 +1,6 @@
 import pytest
 
-from ..govukpay import govuk_url, GOVUKPayAPIException, PayClient
+from datahub.omis.payment.govukpay import govuk_url, GOVUKPayAPIException, PayClient
 
 
 def test_govuk_url(settings):

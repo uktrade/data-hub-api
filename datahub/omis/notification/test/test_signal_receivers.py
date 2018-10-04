@@ -2,14 +2,18 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.omis.notification.client import notify
+from datahub.omis.notification.constants import Template
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
-    OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
-    OrderPaidFactory, OrderSubscriberFactory,
-    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory,
+    OrderAssigneeCompleteFactory,
+    OrderAssigneeFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderSubscriberFactory,
+    OrderWithAcceptedQuoteFactory,
+    OrderWithOpenQuoteFactory,
 )
-from ..client import notify
-from ..constants import Template
 
 pytestmark = pytest.mark.django_db
 

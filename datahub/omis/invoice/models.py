@@ -5,7 +5,7 @@ from django.db import models
 
 from datahub.core.models import BaseModel
 from datahub.metadata.models import Country
-from .managers import InvoiceManager
+from datahub.omis.invoice.managers import InvoiceManager
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

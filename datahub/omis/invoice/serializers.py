@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from datahub.core.serializers import NestedRelatedField
 from datahub.metadata.models import Country
-from .models import Invoice
+from datahub.omis.invoice.models import Invoice
 
 
 class InvoiceSerializer(serializers.ModelSerializer):

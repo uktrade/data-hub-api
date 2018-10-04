@@ -2,7 +2,12 @@
 
 from django.urls import path, re_path
 
-from .views import AssigneeView, OrderViewSet, PublicOrderViewSet, SubscriberListView
+from datahub.omis.order.views import (
+    AssigneeView,
+    OrderViewSet,
+    PublicOrderViewSet,
+    SubscriberListView,
+)
 
 # internal frontend API
 internal_frontend_urls = [

@@ -2,11 +2,13 @@ import factory
 import pytest
 
 from datahub.company.test.factories import (
-    CompaniesHouseCompanyFactory, CompanyFactory, ContactFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+    ContactFactory,
 )
 from datahub.core import constants
-from .factories import OrderFactory
-from ..utils import populate_billing_data
+from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.utils import populate_billing_data
 
 pytestmark = pytest.mark.django_db
 

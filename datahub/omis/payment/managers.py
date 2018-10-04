@@ -6,8 +6,8 @@ from django.db import models
 from datahub.omis.core.utils import generate_datetime_based_reference
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.validators import OrderInStatusValidator
-from .constants import PaymentGatewaySessionStatus
-from .govukpay import PayClient
+from datahub.omis.payment.constants import PaymentGatewaySessionStatus
+from datahub.omis.payment.govukpay import PayClient
 
 
 class BasePaymentGatewaySessionManager(models.Manager):

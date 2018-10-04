@@ -4,7 +4,7 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
-from ..models import Quote, TermsAndConditions
+from datahub.omis.quote.models import Quote, TermsAndConditions
 
 
 # mark the whole module for db use
