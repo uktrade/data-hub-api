@@ -9,8 +9,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
-from .my_entity_document.models import MyEntityDocument
-from ..models import Document, UPLOAD_STATUSES
+from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.test.my_entity_document.models import MyEntityDocument
 
 
 @pytest.fixture

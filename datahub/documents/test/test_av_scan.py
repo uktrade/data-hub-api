@@ -6,10 +6,10 @@ from requests.exceptions import HTTPError
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 from rest_framework import status
 
-from .factories import DocumentFactory
-from ..av_scan import _multipart_encoder, StreamWrapper, VirusScanException
-from ..models import Document, UPLOAD_STATUSES
-from ..tasks import virus_scan_document
+from datahub.documents.av_scan import _multipart_encoder, StreamWrapper, VirusScanException
+from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.tasks import virus_scan_document
+from datahub.documents.test.factories import DocumentFactory
 
 pytestmark = pytest.mark.django_db
 

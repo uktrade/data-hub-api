@@ -5,8 +5,8 @@ from django.conf import settings
 from requests.exceptions import HTTPError
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-from .exceptions import VirusScanException
-from .utils import get_document_by_pk
+from datahub.documents.exceptions import VirusScanException
+from datahub.documents.utils import get_document_by_pk
 
 logger = getLogger(__name__)
 
