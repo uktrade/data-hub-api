@@ -2,8 +2,8 @@ import uuid
 
 import reversion
 
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.investment.models import InvestmentProject
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):
