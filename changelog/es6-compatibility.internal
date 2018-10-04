@@ -1,1 +1,0 @@
-The index.mapping.single_type Elasticsearch setting is no longer set to improve compatibility with Elasticsearch 6.x.
