@@ -49,8 +49,6 @@ class TestUserView(APITestMixin):
 
         expected_permissions = [
             'admin.add_cats',
-            'admin.read_ipsum',
-            'admin.read_lorem',
             'admin.view_ipsum',
             'admin.view_lorem',
         ]
