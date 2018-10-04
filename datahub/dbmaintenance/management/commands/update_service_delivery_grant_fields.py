@@ -1,6 +1,6 @@
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_decimal, parse_uuid
 from datahub.interaction.models import Interaction
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):

@@ -2,9 +2,9 @@ from logging import getLogger
 
 import reversion
 
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_bool, parse_uuid, parse_uuid_list
 from datahub.investment.models import InvestmentProject
-from ..base import CSVBaseCommand
 
 
 logger = getLogger(__name__)

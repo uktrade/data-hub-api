@@ -1,7 +1,7 @@
 import reversion
 
 from datahub.company.models import Advisor
-from ..base import CSVBaseCommand
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):
