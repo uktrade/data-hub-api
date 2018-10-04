@@ -139,7 +139,7 @@ class Interaction(BaseModel):
         null=True,
         on_delete=models.SET_NULL,
     )
-    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True)
+    notes = models.TextField(max_length=10000, blank=True)
     dit_team = models.ForeignKey(
         'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL,
     )
