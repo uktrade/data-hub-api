@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MyDisableableModelViewset
+from datahub.core.test.support.views import MyDisableableModelViewset
 
 collection = MyDisableableModelViewset.as_view({
     'get': 'list',
