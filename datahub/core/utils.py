@@ -84,10 +84,12 @@ def load_constants_to_database(constants, model):
             if created:
                 logger.info('Creating %s "%s"', model._meta.verbose_name, constant.value.name)
             else:
-                logger.info('Updating name of %s "%s" to "%s"',
-                            model._meta.verbose_name,
-                            model_obj.name,
-                            constant.value.name)
+                logger.info(
+                    'Updating name of %s "%s" to "%s"',
+                    model._meta.verbose_name,
+                    model_obj.name,
+                    constant.value.name,
+                )
 
             model_obj.name = constant.value.name
             model_obj.save()

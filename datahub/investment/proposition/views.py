@@ -53,19 +53,19 @@ class PropositionViewSet(CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ('adviser_id', 'status',)
+    filterset_fields = ('adviser_id', 'status')
 
     lookup_url_kwarg = 'proposition_pk'
 
-    ordering_fields = ('deadline', 'created_on',)
-    ordering = ('-deadline', '-created_on',)
+    ordering_fields = ('deadline', 'created_on')
+    ordering = ('-deadline', '-created_on')
 
     def get_queryset(self):
         """Filters the query set to the specified project."""
         self._check_project_exists()
 
         return self.queryset.filter(
-            investment_project_id=self.kwargs['project_pk']
+            investment_project_id=self.kwargs['project_pk'],
         )
 
     def create(self, request, *args, **kwargs):
@@ -80,7 +80,7 @@ class PropositionViewSet(CoreViewSet):
         instance = serializer.save(**self.get_additional_data(True))
         return Response(
             self.get_serializer(instance=instance).data,
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
 
     def _action(self, method, action_serializer, request, *args, **kwargs):
@@ -101,7 +101,7 @@ class PropositionViewSet(CoreViewSet):
         instance = getattr(serializer, method)()
         return Response(
             self.get_serializer(instance=instance).data,
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
     def complete(self, request, *args, **kwargs):
@@ -157,7 +157,7 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     def get_queryset(self):
         """Returns proposition documents queryset."""
         return PropositionDocument.objects.select_related(
-            'proposition__investment_project'
+            'proposition__investment_project',
         ).filter(
             proposition_id=self.kwargs['proposition_pk'],
             proposition__investment_project_id=self.kwargs['project_pk'],

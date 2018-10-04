@@ -64,7 +64,7 @@ class SearchInvestmentProjectParams:
         ],
         'sector_descends': [
             'sector.id',
-            'sector.ancestors.id'
+            'sector.ancestors.id',
         ],
     }
 
@@ -104,7 +104,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
             'actual_uk_regions__name',
         ),
         investor_company_global_account_manager=get_full_name_expression(
-            'investor_company__one_list_account_owner'
+            'investor_company__one_list_account_owner',
         ),
         client_relationship_manager_name=get_full_name_expression('client_relationship_manager'),
         project_manager_name=get_full_name_expression('project_manager'),

@@ -161,7 +161,7 @@ class OrderSerializer(serializers.ModelSerializer):
                         *ORDER_FIELDS_INVOICE_RELATED,
                         'description', 'service_types', 'sector', 'uk_region',
                         'contacts_not_to_approach', 'contact', 'existing_agents',
-                        'further_info', 'delivery_date'
+                        'further_info', 'delivery_date',
                     },
                     OrderStatus.quote_awaiting_acceptance: {
                         *ORDER_FIELDS_INVOICE_RELATED,
@@ -174,7 +174,7 @@ class OrderSerializer(serializers.ModelSerializer):
                     OrderStatus.paid: {'contact'},
                     OrderStatus.complete: {},  # nothing can be changed
                     OrderStatus.cancelled: {},  # nothing can be changed
-                }
+                },
             ),
             # contact has to work at company
             ContactWorksAtCompanyValidator(),
@@ -188,8 +188,8 @@ class OrderSerializer(serializers.ModelSerializer):
                     'billing_address_county': {'required': False},
                     'billing_address_postcode': {'required': False},
                     'billing_address_country': {'required': True},
-                }
-            )
+                },
+            ),
         )
 
     def validate_service_types(self, service_types):
@@ -207,7 +207,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         if disabled_service_types:
             raise serializers.ValidationError(
-                f'"{", ".join(disabled_service_types)}" disabled.'
+                f'"{", ".join(disabled_service_types)}" disabled.',
             )
 
         return service_types
@@ -223,7 +223,7 @@ class OrderSerializer(serializers.ModelSerializer):
             market = Market.objects.get(pk=country)
         except Market.DoesNotExist:
             raise serializers.ValidationError(
-                f"The OMIS market for country '{country}' doesn't exist."
+                f"The OMIS market for country '{country}' doesn't exist.",
             )
         else:
             if market.was_disabled_on(created_on):
@@ -282,7 +282,7 @@ class CompleteOrderSerializer(OrderSerializer):
     def complete(self):
         """Mark an order as complete."""
         self.instance.complete(
-            by=self.context['current_user']
+            by=self.context['current_user'],
         )
         return self.instance
 
@@ -300,7 +300,7 @@ class CancelOrderSerializer(OrderSerializer):
         """Cancel an order."""
         self.instance.cancel(
             by=self.context['current_user'],
-            reason=self.validated_data['cancellation_reason']
+            reason=self.validated_data['cancellation_reason'],
         )
         return self.instance
 
@@ -373,8 +373,8 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
                 OrderStatus.quote_awaiting_acceptance,
                 OrderStatus.quote_accepted,
                 OrderStatus.paid,
-            )
-        )
+            ),
+        ),
     ]
 
     def save(self, **kwargs):
@@ -408,7 +408,7 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
                 order=order,
                 adviser_id=adviser_id,
                 created_by=modified_by,
-                modified_by=modified_by
+                modified_by=modified_by,
             )
 
 
@@ -452,8 +452,8 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
                 OrderStatus.quote_awaiting_acceptance,
                 OrderStatus.quote_accepted,
                 OrderStatus.paid,
-            )
-        )
+            ),
+        ),
     ]
 
     def validate(self, data):
@@ -552,7 +552,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
                     data = {
                         **data,
                         'order': order,
-                        'modified_by': modified_by
+                        'modified_by': modified_by,
                     }
                     self.child.update(assignee, data)
 
@@ -564,7 +564,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
                 **data,
                 'order': order,
                 'created_by': modified_by,
-                'modified_by': modified_by
+                'modified_by': modified_by,
             }
             self.child.create(data)
 
@@ -579,7 +579,7 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'readonly': ugettext_lazy(
-            'This field cannot be changed at this stage.'
+            'This field cannot be changed at this stage.',
         ),
     }
 
@@ -603,8 +603,8 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                             OrderStatus.draft,
                             OrderStatus.quote_awaiting_acceptance,
                             OrderStatus.quote_accepted,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
 
                 # can't be changed when in quote_awaiting_acceptance, quote_accepted or paid
@@ -616,8 +616,8 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                             OrderStatus.quote_awaiting_acceptance,
                             OrderStatus.quote_accepted,
                             OrderStatus.paid,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
                 # can't be changed when in quote_awaiting_acceptance, quote_accepted or paid
                 ValidationRule(
@@ -628,8 +628,8 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                             OrderStatus.quote_awaiting_acceptance,
                             OrderStatus.quote_accepted,
                             OrderStatus.paid,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
             ),
         )

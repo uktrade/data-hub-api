@@ -83,7 +83,7 @@ class BaseModelAdminMixin:
         if event_on:
             text_parts.extend((
                 f'on {date_filter(event_on)}',
-                f'at {time_filter(event_on)}'
+                f'at {time_filter(event_on)}',
             ))
         if event_by:
             adviser_admin_url = get_change_link(event_by)

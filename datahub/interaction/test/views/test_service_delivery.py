@@ -13,10 +13,10 @@ from datahub.event.test.factories import EventFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from .utils import resolve_data
 from ..factories import (
-    EventServiceDeliveryFactory, ServiceDeliveryFactory
+    EventServiceDeliveryFactory, ServiceDeliveryFactory,
 )
 from ...models import (
-    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus
+    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus,
 )
 
 
@@ -44,8 +44,8 @@ class TestAddServiceDelivery(APITestMixin):
                 'service_delivery_status': partial(random_obj_for_model, ServiceDeliveryStatus),
                 'grant_amount_offered': '9999.99',
                 'net_company_receipt': '8888.99',
-            }
-        )
+            },
+        ),
     )
     def test_add(self, extra_data):
         """Test add a new service delivery."""
@@ -63,7 +63,7 @@ class TestAddServiceDelivery(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
 
-            **resolve_data(extra_data)
+            **resolve_data(extra_data),
         }
         response = self.api_client.post(url, request_data)
 
@@ -86,12 +86,12 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
-                'name': adviser.name
+                'name': adviser.name,
             },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'contact': {
                 'id': str(contact.pk),
@@ -115,16 +115,16 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'modified_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z'
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     @pytest.mark.parametrize(
@@ -133,7 +133,7 @@ class TestAddServiceDelivery(APITestMixin):
             # required fields
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery
+                    'kind': Interaction.KINDS.service_delivery,
                 },
                 {
                     'date': ['This field is required.'],
@@ -143,7 +143,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
-                }
+                },
             ),
 
             # required fields for service delivery
@@ -161,7 +161,7 @@ class TestAddServiceDelivery(APITestMixin):
                 {
                     'is_event': ['This field is required.'],
                     'notes': ['This field is required.'],
-                }
+                },
             ),
 
             # fields not allowed
@@ -179,7 +179,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus
+                        random_obj_for_model, ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
@@ -194,8 +194,8 @@ class TestAddServiceDelivery(APITestMixin):
                     'communication_channel': ['This field is not valid for service deliveries.'],
                     'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.'],
-                    'investment_project': ['This field is only valid for interactions.']
-                }
+                    'investment_project': ['This field is only valid for interactions.'],
+                },
             ),
 
             # event field not allowed for non-event service delivery
@@ -211,7 +211,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus
+                        random_obj_for_model, ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
@@ -221,8 +221,8 @@ class TestAddServiceDelivery(APITestMixin):
                     'event': EventFactory,
                 },
                 {
-                    'event': ['This field is only valid for event service deliveries.']
-                }
+                    'event': ['This field is only valid for event service deliveries.'],
+                },
             ),
 
             # event field required for event service delivery
@@ -237,7 +237,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus
+                        random_obj_for_model, ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
@@ -246,10 +246,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                 },
                 {
-                    'event': ['This field is required.']
-                }
+                    'event': ['This field is required.'],
+                },
             ),
-        )
+        ),
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
@@ -270,10 +270,13 @@ class TestUpdateServiceDelivery(APITestMixin):
         event = EventFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk})
-        response = self.api_client.patch(url, {
-            'is_event': True,
-            'event': event.pk
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'is_event': True,
+                'event': event.pk,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -288,10 +291,13 @@ class TestUpdateServiceDelivery(APITestMixin):
         service_delivery = EventServiceDeliveryFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk})
-        response = self.api_client.patch(url, {
-            'is_event': False,
-            'event': None
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'is_event': False,
+                'event': None,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -303,14 +309,17 @@ class TestUpdateServiceDelivery(APITestMixin):
         interaction = ServiceDeliveryFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, {
-            'grant_amount_offered': '-100.00',
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'grant_amount_offered': '-100.00',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['grant_amount_offered'] == [
-            'Ensure this value is greater than or equal to 0.'
+            'Ensure this value is greater than or equal to 0.',
         ]
 
     def test_fails_with_negative_net_company_receipt(self):
@@ -318,12 +327,15 @@ class TestUpdateServiceDelivery(APITestMixin):
         interaction = ServiceDeliveryFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, {
-            'net_company_receipt': '-100.00',
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'net_company_receipt': '-100.00',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['net_company_receipt'] == [
-            'Ensure this value is greater than or equal to 0.'
+            'Ensure this value is greater than or equal to 0.',
         ]

@@ -48,7 +48,7 @@ class SearchContactParams:
     COMPOSITE_FILTERS = {
         'name': [
             'name',
-            'name_trigram'
+            'name_trigram',
         ],
         'company_name': [
             'company.name',
@@ -98,7 +98,7 @@ class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
         team_of_latest_interaction=get_top_related_expression_subquery(
             DBInteraction.contact.field,
             F('dit_team__name'),
-            ('-date',)
+            ('-date',),
         ),
     )
     field_titles = {

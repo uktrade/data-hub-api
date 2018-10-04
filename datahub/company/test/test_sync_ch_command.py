@@ -71,7 +71,7 @@ def test_empty_registered_address_town():
 def test_present_registered_address_town():
     """Test present registered address town."""
     test_dict = {
-        'registered_address_town': 'Meow town'
+        'registered_address_town': 'Meow town',
     }
 
     result = sync_ch.transform_ch_row(test_dict)
@@ -104,11 +104,14 @@ def test_unzip_and_csv_read_on_the_fly():
             assert len(result) == 201
 
 
-@pytest.mark.parametrize('row,num_results', (
-    ({'company_category': 'Private Limited Company'}, 1),
-    ({'company_category': 'public limited company'}, 1),
-    ({'company_category': 'registered society'}, 0),
-))
+@pytest.mark.parametrize(
+    'row,num_results',
+    (
+        ({'company_category': 'Private Limited Company'}, 1),
+        ({'company_category': 'public limited company'}, 1),
+        ({'company_category': 'registered society'}, 0),
+    ),
+)
 def test_process_row_company_filtering(row, num_results):
     """Tests filtering of companies with an irrelevant type."""
     processed = list(sync_ch.process_row(row))
@@ -169,7 +172,7 @@ def test_process_rows_record():
     }
 
     new_ch_company = CompaniesHouseCompany.objects.get(
-        company_number=new_record_data['company_number']
+        company_number=new_record_data['company_number'],
     )
     actual_new_data = {
         field: getattr(new_ch_company, field) for field in new_record_data

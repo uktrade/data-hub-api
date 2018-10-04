@@ -15,7 +15,7 @@ def field():
             ('option1', 'Option 1'),
             ('option2', 'Option 2'),
             ('option3', 'Option 3'),
-        )
+        ),
     )
 
 
@@ -48,7 +48,7 @@ class TestMultipleChoiceField:
             (['option2', 'option1'], 'Option 2, Option 1'),
             ([], ''),
             (['option2'], 'Option 2'),
-        )
+        ),
     )
     def test_contribute_to_class(self, field, value, display_value):
         """Test that a working get_{field_name}_display method is injected into the model."""

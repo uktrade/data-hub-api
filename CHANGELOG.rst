@@ -1,3 +1,75 @@
+Data Hub API 7.0.0 (2018-10-04)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Contacts** The field ``contactable_by_dit`` was removed from the API. The database column will be deleted with the next release.
+
+  The field ``contactable_by_uk_dit_partners`` was removed from the API. The database column will be deleted with the next release.
+
+  The field ``contactable_by_overseas_dit_partners`` was removed from the API. The database column will be deleted with the next release.
+
+  The field ``contactable_by_email`` was removed from the API. The database column will be deleted with the next release.
+
+  The field ``contactable_by_phone`` was removed from the API. The database column will be deleted with the next release.
+- Business leads table and endpoints are deprecated. Please check the API and Database schema categories for more details.
+
+Features
+--------
+
+- **Interactions** The character limit for the notes field was increased from 4000 to 10,000.
+
+Internal changes
+----------------
+
+- The index.mapping.single_type Elasticsearch setting is no longer set to improve compatibility with Elasticsearch 6.x.
+- Various dependencies were updated.
+
+API
+---
+
+- **Contacts** The field ``contactable_by_dit`` was removed from all contact endpoints.
+
+  The field ``contactable_by_uk_dit_partners`` was removed from all contact endpoints.
+
+  The field ``contactable_by_overseas_dit_partners`` was removed from all contact endpoints.
+
+  The field ``contactable_by_email`` was removed from all contact endpoints.
+
+  The field ``contactable_by_phone`` was removed from all contact endpoints.
+- **Interactions** The character limit for the notes field was increased from 4000 to 10000 for the following endpoints:
+
+  ``GET,POST /v3/interaction``
+
+  ``GET,PATCH /v3/interaction/<uuid:pk>``
+- The following endpoints are deprecated and will be removed on or after October 11:
+
+  ``GET,POST /v3/business-leads``
+
+  ``GET,PATCH /v3/business-leads/<uuid:pk>``
+
+  ``POST /v3/business-leads/<uuid:pk>/archive``
+
+  ``POST /v3/business-leads/<uuid:pk>/unarchive``
+
+Database schema
+---------------
+
+- **Contacts** The column ``company_contact.contactable_by_dit`` was made nullable in preparation for its removal.
+
+  The column ``company_contact.contactable_by_uk_dit_partners`` was made nullable in preparation for its removal.
+
+  The column ``company_contact.contactable_by_overseas_dit_partners`` was made nullable in preparation for its removal.
+
+  The column ``company_contact.contactable_by_email`` was made nullable in preparation for its removal.
+
+  The column ``company_contact.contactable_by_phone`` was made nullable in preparation for its removal.
+- The table ``leads_businesslead`` is deprecated and will be removed on or after October 11.
+
+
 Data Hub API 6.4.0 (2018-09-27)
 ===============================
 

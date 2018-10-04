@@ -66,7 +66,7 @@ class TestNestedRelatedField:
         field = NestedRelatedField(model)
         assert field.to_representation(instance) == {
             'id': str(instance.id),
-            'name': instance.name
+            'name': instance.name,
         }
 
     def test_to_representation_extra_fields(self):
@@ -81,13 +81,13 @@ class TestNestedRelatedField:
                 'test_field',
                 'test2',
                 ('test3', IntegerField()),
-            )
+            ),
         )
         assert field.to_representation(instance) == {
             'id': str(instance.id),
             'test_field': instance.test_field,
             'test2': uuid2_,
-            'test3': 10
+            'test3': 10,
         }
 
     def test_to_representation_extra_fields_with_nested_related(self):
@@ -101,7 +101,7 @@ class TestNestedRelatedField:
             Mock(),
             extra_fields=(
                 'field1',
-            )
+            ),
         )
 
         instance_pk = uuid4()
@@ -110,7 +110,7 @@ class TestNestedRelatedField:
             Mock(),
             extra_fields=(
                 ('nested_instance', nested_field),
-            )
+            ),
         )
         assert field.to_representation(instance) == {
             'id': str(instance.id),
@@ -129,7 +129,7 @@ class TestNestedRelatedField:
             Mock(),
             extra_fields=(
                 'field1',
-            )
+            ),
         )
 
         instance_pk = uuid4()
@@ -138,7 +138,7 @@ class TestNestedRelatedField:
             Mock(),
             extra_fields=(
                 ('nested_instance', nested_field),
-            )
+            ),
         )
         assert field.to_representation(instance) == {
             'id': str(instance.id),
@@ -163,8 +163,10 @@ class TestNestedRelatedField:
         instance.name = 'instance name'
         model.objects.all.return_value = [instance] * 2
         field = NestedRelatedField(model)
-        assert (list(field.get_choices(1).items()) == [(str(instance.id),
-                                                        str(instance))])
+        assert list(field.get_choices(1).items()) == [(
+            str(instance.id),
+            str(instance),
+        )]
 
         @pytest.mark.parametrize(
             'input_website,expected_website', (
@@ -172,7 +174,7 @@ class TestNestedRelatedField:
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
                 ('', ''),
-            )
+            ),
         )
         def test_url_field_input(self, input_website, expected_website):
             """Tests that RelaxedURLField prepends http:// when one is not provided."""
@@ -184,7 +186,7 @@ class TestNestedRelatedField:
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
                 ('', ''),
-            )
+            ),
         )
         def test_url_field_output(self, input_website, expected_website):
             """Tests that RelaxedURLField prepends http:// when one is not stored."""

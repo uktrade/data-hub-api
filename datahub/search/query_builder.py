@@ -25,7 +25,7 @@ def get_basic_search_query(
         ordering=None,
         ignored_entities=(),
         offset=0,
-        limit=100
+        limit=100,
 ):
     """Performs basic search looking for name and then SEARCH_FIELDS in entity.
 
@@ -53,15 +53,17 @@ def get_basic_search_query(
     if permission_query:
         search = search.filter(permission_query)
 
+    ignored_entity_subqueries = [
+        Q('term', _type=entity._doc_type.name) for entity in entities
+        if entity._doc_type.name not in ignored_entities
+    ]
+
     search = search.post_filter(
-        Q('bool', should=[
-            Q('term', _type=entity._doc_type.name) for entity in entities
-            if entity._doc_type.name not in ignored_entities
-        ])
+        Q('bool', should=ignored_entity_subqueries),
     )
     search = _apply_sorting_to_query(search, ordering)
     search.aggs.bucket(
-        'count_by_type', 'terms', field='_type'
+        'count_by_type', 'terms', field='_type',
     )
 
     return search[offset:offset + limit]
@@ -74,7 +76,7 @@ def get_search_by_entity_query(
         permission_filters=None,
         entity=None,
         ordering=None,
-        aggregation_fields=None
+        aggregation_fields=None,
 ):
     """
     Performs filtered search for given terms in given entity.
@@ -188,7 +190,7 @@ def _build_entity_permission_query(permission_filters):
     #  (as you can't meet at least one condition when there are no conditions).
     if len(subqueries) > 0:
         return Bool(
-            should=subqueries
+            should=subqueries,
         )
     return MatchNone()
 
@@ -209,7 +211,7 @@ def _build_term_query(term, fields=None):
             fields=fields,
             type='cross_fields',
             operator='and',
-        )
+        ),
     ]
 
     return Q('bool', should=should_query)
@@ -221,7 +223,7 @@ def _build_exists_query(field, value):
 
     kind = 'must' if value else 'must_not'
     query = {
-        kind: Q('exists', field=real_field)
+        kind: Q('exists', field=real_field),
     }
     return Q('bool', **query)
 
@@ -306,7 +308,7 @@ def _build_must_queries(filters, ranges, composite_field_mapping):
             # process composite filters
             composite_fields = composite_field_mapping[field]
             should_filters = _build_field_queries(
-                {composite_field: value for composite_field in composite_fields}
+                {composite_field: value for composite_field in composite_fields},
             )
         elif isinstance(value, dict):
             should_filters = _build_nested_queries(field, value)
@@ -314,11 +316,11 @@ def _build_must_queries(filters, ranges, composite_field_mapping):
         if should_filters:
             # builds an "or" query for given list of fields
             must_filter.append(
-                Q('bool', should=should_filters, minimum_should_match=1)
+                Q('bool', should=should_filters, minimum_should_match=1),
             )
         else:
             must_filter.append(
-                _build_field_query(field, value)
+                _build_field_query(field, value),
             )
 
     if ranges:
@@ -338,7 +340,7 @@ def _apply_sorting_to_query(query, ordering):
 
     sort_params = {
         'order': order,
-        'missing': '_first' if order == 'asc' else '_last'
+        'missing': '_first' if order == 'asc' else '_last',
     }
 
     # remap field name if necessary
@@ -346,7 +348,7 @@ def _apply_sorting_to_query(query, ordering):
 
     return query.sort(
         {field_name: sort_params},
-        'id'
+        'id',
     )
 
 

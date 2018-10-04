@@ -58,10 +58,13 @@ class TestDocumentViews(APITestMixin):
 
         url = reverse('test-document-collection')
 
-        response = self.api_client.post(url, data={
-            'original_filename': 'test.txt',
-            'my_field': 'cats cannot taste sweet',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+                'my_field': 'cats cannot taste sweet',
+            },
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
@@ -85,9 +88,12 @@ class TestDocumentViews(APITestMixin):
             my_field='cats are lactose intolerant',
         )
 
-        url = reverse('test-document-item', kwargs={
-            'entity_document_pk': entity_document.pk
-        })
+        url = reverse(
+            'test-document-item',
+            kwargs={
+                'entity_document_pk': entity_document.pk,
+            },
+        )
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -107,9 +113,12 @@ class TestDocumentViews(APITestMixin):
         )
         entity_document.document.mark_deletion_pending()
 
-        url = reverse('test-document-item', kwargs={
-            'entity_document_pk': entity_document.pk
-        })
+        url = reverse(
+            'test-document-item',
+            kwargs={
+                'entity_document_pk': entity_document.pk,
+            },
+        )
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -126,16 +135,19 @@ class TestDocumentViews(APITestMixin):
             my_field='cats use whiskers to navigate in the dark',
         )
 
-        url = reverse('test-document-item-callback', kwargs={
-            'entity_document_pk': entity_document.pk
-        })
+        url = reverse(
+            'test-document-item-callback',
+            kwargs={
+                'entity_document_pk': entity_document.pk,
+            },
+        )
 
         response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['status'] == 'virus_scanning_scheduled'
         virus_scan_document.assert_called_once_with(
-            args=(str(entity_document.document.pk),)
+            args=(str(entity_document.document.pk),),
         )
 
     @patch('datahub.documents.tasks.delete_document.apply_async')

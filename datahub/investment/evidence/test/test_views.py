@@ -167,21 +167,27 @@ class TestEvidenceDocumentViews(APITestMixin):
             investment_project.created_by.dit_team = user.dit_team
             investment_project.created_by.save()
 
-        url = reverse('api-v3:investment:evidence-document:document-collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:evidence-document:document-collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, data={
-            'original_filename': 'test.txt',
-            'tags': [tag.pk for tag in evidence_tags],
-        })
+        response = api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+                'tags': [tag.pk for tag in evidence_tags],
+            },
+        )
         response_data = response.json()
 
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -205,7 +211,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'modified_by': None,
             'tags': [
@@ -236,7 +242,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-collection',
             kwargs={
                 'project_pk': investment_project.pk,
-            }
+            },
         )
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -246,7 +252,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -269,7 +275,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'modified_by': None,
             'tags': [
@@ -294,8 +300,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -305,7 +311,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -325,7 +331,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'modified_by': None,
             'tags': [
@@ -352,8 +358,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -362,22 +368,23 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response.json() == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'av_clean,expected_status', (
+        'av_clean,expected_status',
+        (
             (True, status.HTTP_200_OK),
-            (False, status.HTTP_403_FORBIDDEN,)
-        )
+            (False, status.HTTP_403_FORBIDDEN),
+        ),
     )
     @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
     @patch('datahub.documents.models.sign_s3_url')
     def test_document_download(
-        self, sign_s3_url, permissions, associated, allowed, av_clean, expected_status
+        self, sign_s3_url, permissions, associated, allowed, av_clean, expected_status,
     ):
         """Tests download of individual document."""
         sign_s3_url.return_value = 'http://what'
@@ -391,7 +398,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
                 'entity_document_pk': entity_document.pk,
-            }
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -402,7 +409,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -423,7 +430,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                     'id': str(entity_document.created_by.pk),
                     'first_name': entity_document.created_by.first_name,
                     'last_name': entity_document.created_by.last_name,
-                    'name': entity_document.created_by.name
+                    'name': entity_document.created_by.name,
                 },
                 'modified_by': None,
                 'tags': [
@@ -450,7 +457,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
                 'entity_document_pk': entity_document.pk,
-            }
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -460,7 +467,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -473,7 +480,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         virus_scan_document_apply_async,
         permissions,
         associated,
-        allowed
+        allowed,
     ):
         """Tests scheduling virus scan after upload completion.
 
@@ -487,8 +494,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item-callback',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -498,7 +505,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response_data == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -519,7 +526,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'modified_by': None,
             'tags': [
@@ -534,7 +541,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         virus_scan_document_apply_async.assert_called_once_with(
-            args=(str(entity_document.document.pk), )
+            args=(str(entity_document.document.pk), ),
         )
 
     @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
@@ -551,8 +558,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         document_pk = entity_document.document.pk
@@ -563,7 +570,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response.json() == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -581,8 +588,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -597,7 +604,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         delete_document,
         permissions,
         associated,
-        allowed
+        allowed,
     ):
         """Tests document deletion creates user event log."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
@@ -610,8 +617,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         document_pk = entity_document.document.pk
@@ -653,7 +660,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
             assert response.json() == {
-                'detail': 'You do not have permission to perform this action.'
+                'detail': 'You do not have permission to perform this action.',
             }
             return
 
@@ -680,7 +687,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         mark_deletion_pending.side_effect = Exception('No way!')
         user = create_test_user(
             permission_codenames=(EvidenceDocumentPermission.delete_all,),
-            dit_team=TeamFactory()
+            dit_team=TeamFactory(),
         )
         entity_document = create_evidence_document(user, False)
         document = entity_document.document
@@ -691,8 +698,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -709,8 +716,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             'api-v3:investment:evidence-document:document-item-callback',
             kwargs={
                 'project_pk': entity_document.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
@@ -725,5 +732,5 @@ def _get_document_url(entity_document):
         kwargs={
             'project_pk': entity_document.investment_project.pk,
             'entity_document_pk': entity_document.pk,
-        }
+        },
     )

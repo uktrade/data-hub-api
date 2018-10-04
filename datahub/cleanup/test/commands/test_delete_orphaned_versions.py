@@ -8,13 +8,13 @@ from django.core import management
 from django.core.management.base import CommandError
 from reversion.models import Revision, Version
 
+from datahub.cleanup.management.commands import delete_orphaned_versions
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
-from ...management.commands import delete_orphaned_versions
 
 
 MAPPINGS = {

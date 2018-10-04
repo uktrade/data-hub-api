@@ -25,7 +25,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             for method in PaymentMethod
             if method[0] in ('bacs', 'manual')
         ],
-        default=PaymentMethod.bacs
+        default=PaymentMethod.bacs,
     )
 
     class Meta:
@@ -66,5 +66,5 @@ class PaymentGatewaySessionSerializer(serializers.ModelSerializer):
         """Create a payment gateway session."""
         return PaymentGatewaySession.objects.create_from_order(
             self.context['order'],
-            validated_data
+            validated_data,
         )

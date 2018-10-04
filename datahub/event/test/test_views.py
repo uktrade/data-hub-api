@@ -80,13 +80,16 @@ class TestGetEventView(APITestMixin):
                 'id': str(event.lead_team.id),
                 'name': event.lead_team.name,
             },
-            'teams': [{
-                'id': Team.healthcare_uk.value.id,
-                'name': Team.healthcare_uk.value.name,
-            }, {
-                'id': Team.crm.value.id,
-                'name': Team.crm.value.name,
-            }],
+            'teams': [
+                {
+                    'id': Team.healthcare_uk.value.id,
+                    'name': Team.healthcare_uk.value.name,
+                },
+                {
+                    'id': Team.crm.value.id,
+                    'name': Team.crm.value.name,
+                },
+            ],
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
@@ -94,7 +97,7 @@ class TestGetEventView(APITestMixin):
             'service': {
                 'id': Service.trade_enquiry.value.id,
                 'name': Service.trade_enquiry.value.name,
-            }
+            },
         })
 
         assert response_data == expected_response_data
@@ -252,13 +255,16 @@ class TestCreateEventView(APITestMixin):
                 'id': Team.crm.value.id,
                 'name': Team.crm.value.name,
             },
-            'teams': [{
-                'id': Team.healthcare_uk.value.id,
-                'name': Team.healthcare_uk.value.name,
-            }, {
-                'id': Team.crm.value.id,
-                'name': Team.crm.value.name,
-            }],
+            'teams': [
+                {
+                    'id': Team.healthcare_uk.value.id,
+                    'name': Team.healthcare_uk.value.name,
+                },
+                {
+                    'id': Team.crm.value.id,
+                    'name': Team.crm.value.name,
+                },
+            ],
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
@@ -291,7 +297,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'lead_team': ['Lead team must be in teams array.']
+            'lead_team': ['Lead team must be in teams array.'],
         }
 
     def test_create_uk_no_uk_region(self):
@@ -315,7 +321,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'uk_region': ['This field is required.']
+            'uk_region': ['This field is required.'],
         }
 
     def test_create_non_uk_with_uk_region(self):
@@ -340,7 +346,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'uk_region': ['Cannot specify a UK region for a non-UK country.']
+            'uk_region': ['Cannot specify a UK region for a non-UK country.'],
         }
 
     def test_create_end_date_without_start_date(self):
@@ -364,7 +370,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'start_date': ['This field is required.']
+            'start_date': ['This field is required.'],
         }
 
     def test_create_end_date_before_start_date(self):
@@ -389,7 +395,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'end_date': ['End date cannot be before start date.']
+            'end_date': ['End date cannot be before start date.'],
         }
 
     def test_create_omitted_failure(self):
@@ -426,7 +432,7 @@ class TestCreateEventView(APITestMixin):
             'name': '',
             'service': None,
             'start_date': None,
-            'teams': []
+            'teams': [],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -515,13 +521,16 @@ class TestUpdateEventView(APITestMixin):
                 'id': Team.food_from_britain.value.id,
                 'name': Team.food_from_britain.value.name,
             },
-            'teams': [{
-                'id': Team.healthcare_uk.value.id,
-                'name': Team.healthcare_uk.value.name,
-            }, {
-                'id': Team.food_from_britain.value.id,
-                'name': Team.food_from_britain.value.name,
-            }],
+            'teams': [
+                {
+                    'id': Team.healthcare_uk.value.id,
+                    'name': Team.healthcare_uk.value.name,
+                },
+                {
+                    'id': Team.food_from_britain.value.id,
+                    'name': Team.food_from_britain.value.name,
+                },
+            ],
             'related_programmes': [{
                 'id': Programme.great_challenge_fund.value.id,
                 'name': Programme.great_challenge_fund.value.name,
@@ -574,7 +583,7 @@ class TestUpdateEventView(APITestMixin):
 
         response_data = response.json()
         assert response_data == {
-            'lead_team': ['Lead team must be in teams array.']
+            'lead_team': ['Lead team must be in teams array.'],
         }
 
     def test_update_read_only_fields(self):
@@ -582,10 +591,13 @@ class TestUpdateEventView(APITestMixin):
         event = DisabledEventFactory(archived_documents_url_path='old_path')
 
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
-        response = self.api_client.patch(url, data={
-            'archived_documents_url_path': 'new_path',
-            'disabled_on': None,
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'archived_documents_url_path': 'new_path',
+                'disabled_on': None,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'

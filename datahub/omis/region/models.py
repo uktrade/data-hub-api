@@ -11,7 +11,7 @@ class UKRegionalSettings(models.Model):
         UKRegion,
         primary_key=True,
         on_delete=models.CASCADE,
-        related_name='omis_settings'
+        related_name='omis_settings',
     )
     manager_emails = ArrayField(
         models.EmailField(),

@@ -45,27 +45,27 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
                 {
                     'add': {
                         'alias': 'test-read-alias',
-                        'indices': [new_index]
-                    }
+                        'indices': [new_index],
+                    },
                 },
                 {
                     'add': {
                         'alias': 'test-write-alias',
-                        'indices': [new_index]
-                    }
+                        'indices': [new_index],
+                    },
                 },
                 {
                     'remove': {
                         'alias': 'test-write-alias',
-                        'indices': [old_index]
-                    }
+                        'indices': [old_index],
+                    },
                 },
-            ]
-        }
+            ],
+        },
     )
 
     migrate_model_task_mock.apply_async.assert_called_once_with(
-        args=(mock_app.name, target_hash)
+        args=(mock_app.name, target_hash),
     )
 
 
@@ -120,7 +120,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
     mock_client.indices.update_aliases.assert_not_called()
 
     migrate_model_task_mock.apply_async.assert_called_once_with(
-        args=(mock_app.name, target_hash)
+        args=(mock_app.name, target_hash),
     )
 
 

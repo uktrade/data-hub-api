@@ -23,7 +23,7 @@ class TestGetSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.get(url)
 
@@ -41,7 +41,7 @@ class TestGetSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.get(url)
 
@@ -57,9 +57,9 @@ class TestGetSubscriberList(APITestMixin):
                     'name': adviser.dit_team.name,
                     'uk_region': {
                         'id': str(adviser.dit_team.uk_region.pk),
-                        'name': adviser.dit_team.uk_region.name
-                    }
-                }
+                        'name': adviser.dit_team.uk_region.name,
+                    },
+                },
             }
             for adviser in advisers[:2]
         ]
@@ -68,7 +68,7 @@ class TestGetSubscriberList(APITestMixin):
         """Test that calling GET on an invalid order returns 404."""
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'}
+            kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'},
         )
         response = self.api_client.get(url)
 
@@ -87,7 +87,7 @@ class TestChangeSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
 
         response = self.api_client.put(
@@ -104,7 +104,7 @@ class TestChangeSubscriberList(APITestMixin):
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
-        )
+        ),
     )
     def test_change_existing_list(self, allowed_status):
         """
@@ -123,12 +123,12 @@ class TestChangeSubscriberList(APITestMixin):
 
         final_advisers = [
             AdviserFactory(),  # new
-            previous_advisers[1]  # existing
+            previous_advisers[1],  # existing
         ]
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.put(
             url,
@@ -147,7 +147,7 @@ class TestChangeSubscriberList(APITestMixin):
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
-        )
+        ),
     )
     def test_remove_all(self, allowed_status):
         """
@@ -160,7 +160,7 @@ class TestChangeSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.put(url, [])
 
@@ -176,12 +176,12 @@ class TestChangeSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
 
         data = [{'id': adviser.id} for adviser in advisers]
         data.append({
-            'id': '00000000-0000-0000-0000-000000000000'
+            'id': '00000000-0000-0000-0000-000000000000',
         })
 
         response = self.api_client.put(url, data)
@@ -195,7 +195,7 @@ class TestChangeSubscriberList(APITestMixin):
         'disallowed_status', (
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """
@@ -206,7 +206,7 @@ class TestChangeSubscriberList(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:subscriber-list',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
 
         response = self.api_client.put(
@@ -219,5 +219,5 @@ class TestChangeSubscriberList(APITestMixin):
             'detail': (
                 'The action cannot be performed '
                 f'in the current status {OrderStatus[disallowed_status]}.'
-            )
+            ),
         }

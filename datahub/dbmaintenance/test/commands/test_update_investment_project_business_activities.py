@@ -37,12 +37,12 @@ def test_run(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
             'Key': object_key,
-        }
+        },
     )
 
     call_command('update_investment_project_business_activities', bucket, object_key)
@@ -85,12 +85,12 @@ def test_simulate(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
             'Key': object_key,
-        }
+        },
     )
 
     call_command(
@@ -117,7 +117,7 @@ def test_audit_log(s3_stubber):
     project_without_change = InvestmentProjectFactory(business_activities=business_activities[0:1])
     project_with_change = InvestmentProjectFactory(business_activities=[])
     project_already_updated = InvestmentProjectFactory(
-        business_activities=business_activities[0:1]
+        business_activities=business_activities[0:1],
     )
 
     bucket = 'test_bucket'
@@ -131,12 +131,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
             'Key': object_key,
-        }
+        },
     )
 
     call_command('update_investment_project_business_activities', bucket, object_key)

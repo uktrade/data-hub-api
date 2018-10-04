@@ -57,5 +57,5 @@ class ApplicationScopesBackend(BaseScopes):
         Currently returns all available scopes for the app.
         """
         return self.get_available_scopes(
-            application=application, request=request, *args, **kwargs
+            application=application, request=request, *args, **kwargs,
         )

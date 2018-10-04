@@ -16,13 +16,13 @@ class BaseModel(models.Model):
         settings.AUTH_USER_MODEL,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
     modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     class Meta:
@@ -37,7 +37,7 @@ class ArchivableModel(models.Model):
     archived_reason = models.TextField(blank=True, null=True)
     archived_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True,
-        on_delete=models.SET_NULL, related_name='+'
+        on_delete=models.SET_NULL, related_name='+',
     )
 
     class Meta:
@@ -89,7 +89,7 @@ class BaseConstantModel(DisableableModel):
         """Human readable admin name."""
         return join_truthy_strings(
             self.name,
-            '(disabled)' if self.disabled_on else None
+            '(disabled)' if self.disabled_on else None,
         )
 
 

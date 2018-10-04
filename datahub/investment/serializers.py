@@ -19,7 +19,7 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
-    SpecificProgramme
+    SpecificProgramme,
 )
 from datahub.investment.validate import validate
 
@@ -167,11 +167,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     default_error_messages = {
         'only_pm_or_paa_can_move_to_verify_win': ugettext_lazy(
             'Only the Project Manager or Project Assurance Adviser can move the project'
-            ' to the ‘Verify win’ stage.'
+            ' to the ‘Verify win’ stage.',
         ),
         'only_ivt_can_move_to_won': ugettext_lazy(
-            'Only the Investment Verification Team can move the project to the ‘Won’ stage.'
-        )
+            'Only the Investment Verification Team can move the project to the ‘Won’ stage.',
+        ),
     }
 
     incomplete_fields = serializers.SerializerMethodField()
@@ -186,37 +186,37 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
     specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
-        Contact, many=True, required=True, allow_null=False, allow_empty=False
+        Contact, many=True, required=True, allow_null=False, allow_empty=False,
     )
 
     client_relationship_manager = NestedAdviserField(required=True, allow_null=False)
     client_relationship_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
     referral_source_adviser = NestedAdviserField(required=True, allow_null=False)
     referral_source_activity = NestedRelatedField(
-        meta_models.ReferralSourceActivity, required=True, allow_null=False
+        meta_models.ReferralSourceActivity, required=True, allow_null=False,
     )
     referral_source_activity_website = NestedRelatedField(
-        meta_models.ReferralSourceWebsite, required=False, allow_null=True
+        meta_models.ReferralSourceWebsite, required=False, allow_null=True,
     )
     referral_source_activity_marketing = NestedRelatedField(
-        meta_models.ReferralSourceMarketing, required=False, allow_null=True
+        meta_models.ReferralSourceMarketing, required=False, allow_null=True,
     )
     fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
     sector = NestedRelatedField(meta_models.Sector, required=True, allow_null=False)
     business_activities = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=True,
-        allow_null=False, allow_empty=False
+        allow_null=False, allow_empty=False,
     )
     archived_by = NestedAdviserField(read_only=True)
 
     # Value fields
     fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
     average_salary = NestedRelatedField(
-        meta_models.SalaryRange, required=False, allow_null=True
+        meta_models.SalaryRange, required=False, allow_null=True,
     )
     value_complete = serializers.SerializerMethodField()
     associated_non_fdi_r_and_d_project = NestedRelatedField(
-        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
+        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code'),
     )
 
     # Requirements fields
@@ -227,7 +227,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
     strategic_drivers = NestedRelatedField(
-        meta_models.InvestmentStrategicDriver, many=True, required=False
+        meta_models.InvestmentStrategicDriver, many=True, required=False,
     )
     uk_company = NestedRelatedField(Company, required=False, allow_null=True)
     requirements_complete = serializers.SerializerMethodField()
@@ -288,7 +288,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
                 and current_user_id not in allowed_users_ids
             ):
                 errors = {
-                    'stage': self.default_error_messages['only_pm_or_paa_can_move_to_verify_win']
+                    'stage': self.default_error_messages['only_pm_or_paa_can_move_to_verify_win'],
                 }
                 raise serializers.ValidationError(errors)
 
@@ -303,7 +303,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
                 and not current_user.has_perm(permission_name)
             ):
                 errors = {
-                    'stage': self.default_error_messages['only_ivt_can_move_to_won']
+                    'stage': self.default_error_messages['only_ivt_can_move_to_won'],
                 }
                 raise serializers.ValidationError(errors)
 
@@ -316,19 +316,19 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     def get_value_complete(self, instance):
         """Whether the value fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=VALUE_FIELDS, next_stage=True
+            instance=instance, fields=VALUE_FIELDS, next_stage=True,
         )
 
     def get_requirements_complete(self, instance):
         """Whether the requirements fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=REQUIREMENTS_FIELDS, next_stage=True
+            instance=instance, fields=REQUIREMENTS_FIELDS, next_stage=True,
         )
 
     def get_team_complete(self, instance):
         """Whether the team fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=TEAM_FIELDS, next_stage=True
+            instance=instance, fields=TEAM_FIELDS, next_stage=True,
         )
 
     def _update_status(self, data):
@@ -357,7 +357,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         }
         permissions = {
             f'investment.{InvestmentProjectPermission.view_investmentproject_document}':
-                'archived_documents_url_path'
+                'archived_documents_url_path',
         }
         read_only_fields = (
             'allow_blank_estimated_land_date',
@@ -372,7 +372,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
 
 NestedInvestmentProjectField = partial(
     NestedRelatedField, InvestmentProject,
-    extra_fields=('name', 'project_code')
+    extra_fields=('name', 'project_code'),
 )
 
 
@@ -381,8 +381,8 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
 
     default_error_messages = {
         'duplicate_adviser': ugettext_lazy(
-            'You cannot add the same adviser as a team member more than once.'
-        )
+            'You cannot add the same adviser as a team member more than once.',
+        ),
     }
 
     def update(self, instances, validated_data):

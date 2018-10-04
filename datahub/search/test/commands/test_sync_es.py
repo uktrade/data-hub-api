@@ -10,7 +10,7 @@ from ...apps import get_search_apps
 
 @mock.patch(
     'datahub.search.apps.index_exists',
-    mock.Mock(return_value=False)
+    mock.Mock(return_value=False),
 )
 def test_fails_if_index_doesnt_exist():
     """Tests that if the index doesn't exist, sync_es fails."""
@@ -22,7 +22,7 @@ def test_fails_if_index_doesnt_exist():
 @mock.patch('datahub.search.management.commands.sync_es.get_search_apps_by_name')
 @mock.patch(
     'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True)
+    mock.Mock(return_value=True),
 )
 @pytest.mark.django_db
 def test_sync_es(get_search_apps_by_name_mock, sync_es_mock):
@@ -37,12 +37,12 @@ def test_sync_es(get_search_apps_by_name_mock, sync_es_mock):
 
 @pytest.mark.parametrize(
     'search_model',
-    (app.name for app in get_search_apps())
+    (app.name for app in get_search_apps()),
 )
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
     'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True)
+    mock.Mock(return_value=True),
 )
 def test_sync_one_model(sync_app_mock, search_model):
     """
@@ -56,7 +56,7 @@ def test_sync_one_model(sync_app_mock, search_model):
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
     'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True)
+    mock.Mock(return_value=True),
 )
 def test_sync_all_models(sync_app_mock):
     """
@@ -70,7 +70,7 @@ def test_sync_all_models(sync_app_mock):
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
     'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True)
+    mock.Mock(return_value=True),
 )
 def test_sync_invalid_model(sync_app_mock):
     """

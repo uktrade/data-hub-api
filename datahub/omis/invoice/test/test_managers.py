@@ -20,7 +20,7 @@ class TestInvoiceManager:
     def test_create_from_order(
         self,
         mocked_generate_datetime_based_reference,
-        mocked_calculate_payment_due_date
+        mocked_calculate_payment_due_date,
     ):
         """Test that Invoice.objects.create_from_order creates an invoice."""
         payment_due_date = dateutil_parse('2030-01-01').date()

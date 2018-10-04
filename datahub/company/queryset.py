@@ -8,5 +8,5 @@ def get_contact_queryset():
         'company',
         'adviser',
         'address_country',
-        'archived_by'
+        'archived_by',
     )

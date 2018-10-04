@@ -2,8 +2,10 @@ from datahub.interaction.models import Interaction as DBInteraction, Interaction
 from datahub.interaction.permissions import get_allowed_kinds
 from datahub.search.apps import SearchApp
 from datahub.search.interaction.models import Interaction
-from datahub.search.interaction.views import (SearchInteractionAPIView,
-                                              SearchInteractionExportAPIView)
+from datahub.search.interaction.views import (
+    SearchInteractionAPIView,
+    SearchInteractionExportAPIView,
+)
 
 
 class InteractionSearchApp(SearchApp):

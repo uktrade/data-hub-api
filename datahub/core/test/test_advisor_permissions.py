@@ -25,10 +25,14 @@ class TestPermissions(APITestMixin):
         user = create_test_user(dit_team=team)
         token = self.get_token(user=user)
 
-        request = factory.get('/', data={}, content_type='application/json',
-                              Authorization=f'Bearer {token}')
+        request = factory.get(
+            '/',
+            data={},
+            content_type='application/json',
+            Authorization=f'Bearer {token}',
+        )
         my_view = PermissionModelViewset.as_view(
-            actions={'get': 'list'}
+            actions={'get': 'list'},
         )
         response = my_view(request)
 
@@ -41,10 +45,14 @@ class TestPermissions(APITestMixin):
         user = create_test_user(dit_team=TeamFactory())
         token = self.get_token(user=user)
 
-        request = factory.get('/', data={}, content_type='application/json',
-                              Authorization=f'Bearer {token}')
+        request = factory.get(
+            '/',
+            data={},
+            content_type='application/json',
+            Authorization=f'Bearer {token}',
+        )
         my_view = PermissionModelViewset.as_view(
-            actions={'get': 'list'}
+            actions={'get': 'list'},
         )
         response = my_view(request)
 
@@ -58,10 +66,14 @@ class TestPermissions(APITestMixin):
 
         token = self.get_token(user=user)
 
-        request = factory.get('/', data={}, content_type='application/json',
-                              Authorization=f'Bearer {token}')
+        request = factory.get(
+            '/',
+            data={},
+            content_type='application/json',
+            Authorization=f'Bearer {token}',
+        )
         my_view = PermissionModelViewset.as_view(
-            actions={'get': 'list'}
+            actions={'get': 'list'},
         )
         response = my_view(request)
 

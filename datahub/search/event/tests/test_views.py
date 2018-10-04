@@ -36,15 +36,18 @@ class TestSearch(APITestMixin):
         """Tests detailed event search."""
         event_name = '012345catsinspace'
         EventFactory(
-            name=event_name
+            name=event_name,
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'original_query': event_name,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': event_name,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -56,10 +59,13 @@ class TestSearch(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:event')
-        response = self.api_client.post(url, {
-            'offset': 1,
-            'limit': 1,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'offset': 1,
+                'limit': 1,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 1
@@ -79,15 +85,18 @@ class TestSearch(APITestMixin):
         """Tests event_name filter."""
         event_name = '0000000000'
         EventFactory(
-            name=event_name
+            name=event_name,
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'name': event_name[:5],
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'name': event_name[:5],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -98,15 +107,18 @@ class TestSearch(APITestMixin):
         """Tests organiser filter."""
         organiser = AdviserFactory()
         EventFactory(
-            organiser=organiser
+            organiser=organiser,
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'organiser': organiser.id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'organiser': organiser.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -120,15 +132,18 @@ class TestSearch(APITestMixin):
             organiser=AdviserFactory(
                 first_name=organiser_name.split(' ', maxsplit=1)[0],
                 last_name=organiser_name.split(' ', maxsplit=1)[1],
-            )
+            ),
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'organiser_name': '00000',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'organiser_name': '00000',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -145,9 +160,12 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'address_country': country_id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'address_country': country_id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -163,9 +181,12 @@ class TestSearch(APITestMixin):
         EventFactory.create_batch(5, lead_team_id=team.id)
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'lead_team': team.id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'lead_team': team.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
@@ -183,14 +204,17 @@ class TestSearch(APITestMixin):
         team_b = TeamFactory()
         team_c = TeamFactory()
         EventFactory(teams=(team_c,))
-        EventFactory.create_batch(5, teams=(team_a, team_b,))
+        EventFactory.create_batch(5, teams=(team_a, team_b))
         EventFactory.create_batch(5, teams=(team_b,))
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'teams': (team_a.id, team_c.id,)
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'teams': (team_a.id, team_c.id),
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 6
@@ -213,21 +237,25 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'disabled_on': {
-                'exists': False,
-                'after': current_datetime,
+        response = self.api_client.post(
+            url,
+            data={
+                'disabled_on': {
+                    'exists': False,
+                    'after': current_datetime,
+                },
             },
-        })
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 7
         assert len(response.data['results']) == 7
 
         disabled_ons = [result['disabled_on'] for result in response.data['results']]
-        assert all(disabled_on is None or disabled_on == current_datetime.isoformat()
-                   for disabled_on in disabled_ons
-                   )
+        assert all(
+            disabled_on is None or disabled_on == current_datetime.isoformat()
+            for disabled_on in disabled_ons
+        )
 
     def test_search_event_disabled_on_doesnt_exist(self, setup_es):
         """Tests disabled_on is null filter."""
@@ -239,9 +267,12 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'disabled_on_exists': False,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'disabled_on_exists': False,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
@@ -260,9 +291,12 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'disabled_on_exists': True,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'disabled_on_exists': True,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         # We should get at least 5 disabled events, as some already exist
@@ -284,9 +318,12 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'uk_region': uk_region_id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'uk_region': uk_region_id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -304,11 +341,14 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'original_query': '',
-            'start_date_after': start_date,
-            'start_date_before': start_date,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': '',
+                'start_date_after': start_date,
+                'start_date_before': start_date,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -325,11 +365,14 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'start_date_after': start_date_a,
-            'start_date_before': start_date_b,
-            'sortby': 'start_date:desc',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'start_date_after': start_date_a,
+                'start_date_before': start_date_b,
+                'sortby': 'start_date:desc',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -348,12 +391,15 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'original_query': '',
-            'start_date_after': start_date,
-            'start_date_before': start_date,
-            'sortby': 'end_date:desc',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': '',
+                'start_date_after': start_date,
+                'start_date_before': start_date,
+                'sortby': 'end_date:desc',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -372,11 +418,14 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
 
-        response = self.api_client.post(url, {
-            'start_date_after': start_date,
-            'start_date_before': start_date,
-            'sortby': 'modified_on:desc',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'start_date_after': start_date,
+                'start_date_before': start_date,
+                'sortby': 'modified_on:desc',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -395,10 +444,13 @@ class TestBasicSearch(APITestMixin):
         term = ''
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'event'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'event',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 0
@@ -410,10 +462,13 @@ class TestBasicSearch(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': 'abcdefg',
-            'entity': 'event'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': 'abcdefg',
+                'entity': 'event',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -427,9 +482,12 @@ class TestBasicSearch(APITestMixin):
         term = 'there-should-be-no-match'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'event'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'event',
+            },
+        )
 
         assert response.data['count'] == 0

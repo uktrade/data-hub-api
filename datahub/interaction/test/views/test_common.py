@@ -14,7 +14,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Service, Team
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model
+    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
 from datahub.event.test.factories import EventFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -46,9 +46,12 @@ class TestUpdateInteraction(APITestMixin):
         )
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, data={
-            'archived_documents_url_path': 'new_path'
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'archived_documents_url_path': 'new_path',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
@@ -58,14 +61,17 @@ class TestUpdateInteraction(APITestMixin):
         interaction = CompanyInteractionFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, {
-            'date': 'abcd-de-fe',
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'date': 'abcd-de-fe',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['date'] == [
-            'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.'
+            'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.',
         ]
 
 
@@ -81,7 +87,7 @@ class TestListInteractions(APITestMixin):
         interactions = CompanyInteractionFactory.create_batch(2, company=company2)
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, {'company_id': company2.id})
+        response = self.api_client.get(url, data={'company_id': company2.id})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -96,7 +102,7 @@ class TestListInteractions(APITestMixin):
         interactions = CompanyInteractionFactory.create_batch(2, contact=contact2)
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, {'contact_id': contact2.id})
+        response = self.api_client.get(url, data={'contact_id': contact2.id})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -111,13 +117,16 @@ class TestListInteractions(APITestMixin):
         CompanyInteractionFactory.create_batch(3, contact=contact)
         CompanyInteractionFactory.create_batch(3, company=company)
         project_interactions = CompanyInteractionFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, {
-            'investment_project_id': project.id
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'investment_project_id': project.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -136,7 +145,7 @@ class TestListInteractions(APITestMixin):
         service_deliveries = EventServiceDeliveryFactory.create_batch(3, event=event)
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, {'event_id': event.id})
+        response = self.api_client.get(url, data={'event_id': event.id})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -156,7 +165,7 @@ class TestListInteractions(APITestMixin):
             'dit_adviser.first_name',
             'dit_adviser.last_name',
             'subject',
-        )
+        ),
     )
     def test_sorting(self, field):
         """Test sorting interactions by various fields."""
@@ -168,8 +177,8 @@ class TestListInteractions(APITestMixin):
                     lambda i: ContactFactory(
                         company=i.company,
                         first_name='Holly',
-                        last_name='Taylor'
-                    )
+                        last_name='Taylor',
+                    ),
                 ),
                 'dit_adviser__first_name': 'Elaine',
                 'dit_adviser__last_name': 'Johnston',
@@ -182,8 +191,8 @@ class TestListInteractions(APITestMixin):
                     lambda i: ContactFactory(
                         company=i.company,
                         first_name='Conor',
-                        last_name='Webb'
-                    )
+                        last_name='Webb',
+                    ),
                 ),
                 'dit_adviser__first_name': 'Connor',
                 'dit_adviser__last_name': 'Webb',
@@ -196,8 +205,8 @@ class TestListInteractions(APITestMixin):
                     lambda i: ContactFactory(
                         company=i.company,
                         first_name='Suzanne',
-                        last_name='Palmer'
-                    )
+                        last_name='Palmer',
+                    ),
                 ),
                 'dit_adviser__first_name': 'Hayley',
                 'dit_adviser__last_name': 'Hunt',
@@ -210,15 +219,15 @@ class TestListInteractions(APITestMixin):
             creation_time = data.pop('created_on')
             with freeze_time(creation_time):
                 interactions.append(
-                    EventServiceDeliveryFactory(**data)
+                    EventServiceDeliveryFactory(**data),
                 )
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(
             url,
             data={
-                'sortby': field.replace('.', '__')
-            }
+                'sortby': field.replace('.', '__'),
+            },
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -233,7 +242,7 @@ class TestListInteractions(APITestMixin):
             reduce(  # get nested items if needed
                 lambda data, key: data.get(key),
                 field.split('.'),
-                result
+                result,
             )
             for result in response_data['results']
         ]
@@ -244,7 +253,7 @@ class TestListInteractions(APITestMixin):
         (
             ('contact', ContactFactory),
             ('dit_adviser', AdviserFactory),
-        )
+        ),
     )
     def test_sort_by_first_and_last_name(self, field, factory_class):
         """Test sorting interactions by first_name with a secondary last_name sort."""
@@ -257,8 +266,8 @@ class TestListInteractions(APITestMixin):
         interactions = EventServiceDeliveryFactory.create_batch(
             len(people),
             **{
-                field: factory.Iterator(sample(people, k=len(people)))
-            }
+                field: factory.Iterator(sample(people, k=len(people))),
+            },
         )
 
         url = reverse('api-v3:interaction:collection')
@@ -266,7 +275,7 @@ class TestListInteractions(APITestMixin):
             url,
             data={
                 'sortby': f'{field}__first_name,{field}__last_name',
-            }
+            },
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -303,7 +312,7 @@ class TestInteractionVersioning(APITestMixin):
                 'company': CompanyFactory().pk,
                 'contact': ContactFactory().pk,
                 'service': Service.trade_enquiry.value.id,
-                'dit_team': Team.healthcare_uk.value.id
+                'dit_team': Team.healthcare_uk.value.id,
             },
         )
 

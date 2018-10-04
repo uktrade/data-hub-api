@@ -55,7 +55,7 @@ class TestCoreViewSet(APITestMixin):
         force_authenticate(request, self.user)
 
         my_view = InheritedModelViewSet.as_view(
-            actions={'post': 'create'}
+            actions={'post': 'create'},
         )
 
         response = my_view(request)
@@ -74,7 +74,7 @@ class TestCoreViewSet(APITestMixin):
         other_user = get_user_model().objects.create()
         inherited_model = InheritedModel.objects.create(
             created_by=other_user,
-            modified_by=other_user
+            modified_by=other_user,
         )
 
         # create response
@@ -82,7 +82,7 @@ class TestCoreViewSet(APITestMixin):
         force_authenticate(request, self.user)
 
         my_view = InheritedModelViewSet.as_view(
-            actions={'patch': 'partial_update'}
+            actions={'patch': 'partial_update'},
         )
 
         response = my_view(request, pk=inherited_model.pk)
@@ -102,7 +102,7 @@ class TestCoreViewSet(APITestMixin):
         force_authenticate(request, self.user)
 
         my_view = EmptyModelViewSet.as_view(
-            actions={'post': 'create'}
+            actions={'post': 'create'},
         )
 
         response = my_view(request)
@@ -125,7 +125,7 @@ class TestCoreViewSet(APITestMixin):
         force_authenticate(request, self.user)
 
         my_view = EmptyModelViewSet.as_view(
-            actions={'patch': 'partial_update'}
+            actions={'patch': 'partial_update'},
         )
 
         response = my_view(request, pk=empty_model.pk)

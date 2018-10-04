@@ -2,7 +2,7 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.investment.serializers import (
-    IProjectTeamMemberListSerializer, IProjectTeamMemberSerializer
+    IProjectTeamMemberListSerializer, IProjectTeamMemberSerializer,
 )
 from .factories import InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 
@@ -15,7 +15,7 @@ def test_team_member_list_update_remove_all():
     project = InvestmentProjectFactory()
 
     team_members = InvestmentProjectTeamMemberFactory.create_batch(
-        2, investment_project=project
+        2, investment_project=project,
     )
 
     child_serializer = IProjectTeamMemberSerializer()
@@ -30,19 +30,22 @@ def test_team_member_list_update_mixed_changes():
     project = InvestmentProjectFactory()
 
     team_members = InvestmentProjectTeamMemberFactory.create_batch(
-        2, investment_project=project, role='old role'
+        2, investment_project=project, role='old role',
     )
     adviser = AdviserFactory()
 
-    new_team_member_data = [{
-        'investment_project': project,
-        'adviser': team_members[1].adviser,
-        'role': 'new role'
-    }, {
-        'investment_project': project,
-        'adviser': adviser,
-        'role': 'new team member'
-    }]
+    new_team_member_data = [
+        {
+            'investment_project': project,
+            'adviser': team_members[1].adviser,
+            'role': 'new role',
+        },
+        {
+            'investment_project': project,
+            'adviser': adviser,
+            'role': 'new team member',
+        },
+    ]
 
     child_serializer = IProjectTeamMemberSerializer()
     serializer = IProjectTeamMemberListSerializer(child=child_serializer)
@@ -63,18 +66,21 @@ def test_team_member_list_update_change_only():
     project = InvestmentProjectFactory()
 
     team_members = InvestmentProjectTeamMemberFactory.create_batch(
-        2, investment_project=project, role='old role'
+        2, investment_project=project, role='old role',
     )
 
-    new_team_member_data = [{
-        'investment_project': project,
-        'adviser': team_members[0].adviser,
-        'role': 'new role'
-    }, {
-        'investment_project': project,
-        'adviser': team_members[1].adviser,
-        'role': 'new role'
-    }]
+    new_team_member_data = [
+        {
+            'investment_project': project,
+            'adviser': team_members[0].adviser,
+            'role': 'new role',
+        },
+        {
+            'investment_project': project,
+            'adviser': team_members[1].adviser,
+            'role': 'new role',
+        },
+    ]
 
     child_serializer = IProjectTeamMemberSerializer()
     serializer = IProjectTeamMemberListSerializer(child=child_serializer)
@@ -94,15 +100,18 @@ def test_team_member_list_update_add_only():
     """Tests updating adding team members when none previously existed."""
     project = InvestmentProjectFactory()
 
-    new_team_member_data = [{
-        'investment_project': project,
-        'adviser': AdviserFactory(),
-        'role': 'new role'
-    }, {
-        'investment_project': project,
-        'adviser': AdviserFactory(),
-        'role': 'new team member'
-    }]
+    new_team_member_data = [
+        {
+            'investment_project': project,
+            'adviser': AdviserFactory(),
+            'role': 'new role',
+        },
+        {
+            'investment_project': project,
+            'adviser': AdviserFactory(),
+            'role': 'new team member',
+        },
+    ]
 
     child_serializer = IProjectTeamMemberSerializer()
     serializer = IProjectTeamMemberListSerializer(child=child_serializer)

@@ -25,9 +25,9 @@ class TestPayClientCreatePayment:
             '_links': {
                 'next_url': {
                     'href': 'https://payment.example.com/123abc',
-                    'method': 'GET'
+                    'method': 'GET',
                 },
-            }
+            },
         }
         url = govuk_url('payments')
         requests_mock.post(url, status_code=201, json=json_response)
@@ -38,7 +38,7 @@ class TestPayClientCreatePayment:
             amount=1234,
             reference='payment reference',
             description='payment description',
-            return_url='http://return.example.com'
+            return_url='http://return.example.com',
         )
 
         # check response
@@ -51,7 +51,7 @@ class TestPayClientCreatePayment:
             'amount': 1234,
             'reference': 'payment reference',
             'description': 'payment description',
-            'return_url': 'http://return.example.com'
+            'return_url': 'http://return.example.com',
         }
 
     @pytest.mark.parametrize(
@@ -61,8 +61,8 @@ class TestPayClientCreatePayment:
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
-            (500, '500 Server Error')
-        )
+            (500, '500 Server Error'),
+        ),
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -75,7 +75,7 @@ class TestPayClientCreatePayment:
                 amount=1234,
                 reference='payment reference',
                 description='payment description',
-                return_url='http://return.example.com'
+                return_url='http://return.example.com',
             )
         assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
 
@@ -93,9 +93,9 @@ class TestPayClientGetPaymentById:
             '_links': {
                 'next_url': {
                     'href': 'https://payment.example.com/123abc',
-                    'method': 'GET'
+                    'method': 'GET',
                 },
-            }
+            },
         }
         url = govuk_url(f'payments/{payment_id}')
         requests_mock.get(url, status_code=200, json=json_response)
@@ -114,8 +114,8 @@ class TestPayClientGetPaymentById:
         (
             (401, '401 Client Error'),
             (404, '404 Client Error'),
-            (500, '500 Server Error')
-        )
+            (500, '500 Server Error'),
+        ),
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -154,8 +154,8 @@ class TestPayClientCancelPayment:
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
-            (500, '500 Server Error')
-        )
+            (500, '500 Server Error'),
+        ),
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""

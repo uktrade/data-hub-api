@@ -41,9 +41,12 @@ class TestBusinessLeadViews(APITestMixin):
     def test_get_success(self):
         """Tests that getting a single lead."""
         lead = BusinessLeadFactory(created_by=self.user)
-        url = reverse('api-v3:business-leads:lead-item', kwargs={
-            'pk': lead.pk
-        })
+        url = reverse(
+            'api-v3:business-leads:lead-item',
+            kwargs={
+                'pk': lead.pk,
+            },
+        )
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -59,13 +62,13 @@ class TestBusinessLeadViews(APITestMixin):
                 'first_name': self.user.first_name,
                 'id': str(self.user.pk),
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'modified_by': {
                 'first_name': lead.modified_by.first_name,
                 'id': str(lead.modified_by.pk),
                 'last_name': lead.modified_by.last_name,
-                'name': lead.modified_by.name
+                'name': lead.modified_by.name,
             },
             'archived': False,
             'archived_by': None,
@@ -73,7 +76,7 @@ class TestBusinessLeadViews(APITestMixin):
             'archived_reason': None,
             'company': {
                 'id': str(lead.company.pk),
-                'name': lead.company.name
+                'name': lead.company.name,
             },
             'company_name': lead.company_name,
             'contactable_by_dit': False,
@@ -91,7 +94,7 @@ class TestBusinessLeadViews(APITestMixin):
             'notes': None,
             'telephone_alternative': None,
             'telephone_number': '+44 123456789',
-            'trading_name': None
+            'trading_name': None,
         }
 
     def test_create_lead_success(self):
@@ -100,7 +103,7 @@ class TestBusinessLeadViews(APITestMixin):
         request_data = {
             'first_name': 'First name',
             'last_name': 'Last name',
-            'telephone_number': '+44 7000 123456'
+            'telephone_number': '+44 7000 123456',
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -109,7 +112,8 @@ class TestBusinessLeadViews(APITestMixin):
         assert response_data['first_name'] == request_data['first_name']
         assert response_data['last_name'] == request_data['last_name']
         assert (response_data['telephone_number'] == request_data[
-            'telephone_number'])
+            'telephone_number'
+        ])
         assert response_data['created_by']['id'] == str(self.user.pk)
 
     def test_create_lead_failure(self):
@@ -121,65 +125,77 @@ class TestBusinessLeadViews(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'first_name': ['Company name or first name and last name '
-                           'required'],
+            'first_name': [
+                'Company name or first name and last name required',
+            ],
             'last_name': ['Company name or first name and last name required'],
-            'company_name': ['Company name or first name and last name '
-                             'required'],
+            'company_name': [
+                'Company name or first name and last name required',
+            ],
             'email': ['Email address or phone number required'],
-            'telephone_number': ['Email address or phone number required']
+            'telephone_number': ['Email address or phone number required'],
         }
 
     def test_patch_success(self):
         """Tests updating a business lead."""
         lead = BusinessLeadFactory(created_by=self.user)
-        url = reverse('api-v3:business-leads:lead-item', kwargs={
-            'pk': lead.pk
-        })
+        url = reverse(
+            'api-v3:business-leads:lead-item',
+            kwargs={
+                'pk': lead.pk,
+            },
+        )
         request_data = {
             'first_name': 'New first name',
-            'email_alternative': 'altemail@blah.com'
+            'email_alternative': 'altemail@blah.com',
         }
         response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['first_name'] == request_data['first_name']
-        assert (response_data['email_alternative'] == request_data[
-            'email_alternative'])
+        assert response_data['email_alternative'] == request_data['email_alternative']
 
     def test_patch_failure(self):
         """Tests updating a business lead."""
         lead = BusinessLeadFactory(created_by=self.user)
-        url = reverse('api-v3:business-leads:lead-item', kwargs={
-            'pk': lead.pk
-        })
+        url = reverse(
+            'api-v3:business-leads:lead-item',
+            kwargs={
+                'pk': lead.pk,
+            },
+        )
         request_data = {
             'first_name': None,
             'company_name': None,
-            'company': None
+            'company': None,
         }
         response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'first_name': ['Company name or first name and last name '
-                           'required'],
+            'first_name': [
+                'Company name or first name and last name required',
+            ],
             'last_name': ['Company name or first name and last name required'],
-            'company_name': ['Company name or first name and last name '
-                             'required']
+            'company_name': [
+                'Company name or first name and last name required',
+            ],
         }
 
     @freeze_time(FROZEN_TIME)
     def test_archive_success(self):
         """Tests archiving a business lead."""
         lead = BusinessLeadFactory(created_by=self.user)
-        url = reverse('api-v3:business-leads:archive-lead-item', kwargs={
-            'pk': lead.pk
-        })
+        url = reverse(
+            'api-v3:business-leads:archive-lead-item',
+            kwargs={
+                'pk': lead.pk,
+            },
+        )
         request_data = {
-            'reason': 'archive test'
+            'reason': 'archive test',
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -194,11 +210,14 @@ class TestBusinessLeadViews(APITestMixin):
         """Tests unarchiving a business lead."""
         lead = BusinessLeadFactory(
             created_by=self.user, archived=True, archived_by=self.user,
-            archived_reason='unarchive test', archived_on=datetime(2016, 1, 1, tzinfo=utc)
+            archived_reason='unarchive test', archived_on=datetime(2016, 1, 1, tzinfo=utc),
         )
-        url = reverse('api-v3:business-leads:unarchive-lead-item', kwargs={
-            'pk': lead.pk
-        })
+        url = reverse(
+            'api-v3:business-leads:unarchive-lead-item',
+            kwargs={
+                'pk': lead.pk,
+            },
+        )
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK

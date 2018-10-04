@@ -19,7 +19,7 @@ from datahub.company.validators import (
 from datahub.core.constants import Country
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
-    NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
+    NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField,
 )
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
@@ -47,7 +47,7 @@ NestedAdviserField = partial(
         'name',
         'first_name',
         'last_name',
-    )
+    ),
 )
 
 
@@ -58,8 +58,8 @@ NestedAdviserWithTeamField = partial(
         'name',
         'first_name',
         'last_name',
-        ('dit_team', NestedRelatedField('metadata.Team'))
-    )
+        ('dit_team', NestedRelatedField('metadata.Team')),
+    ),
 )
 
 # like NestedAdviserField but includes dit_team with uk_region and country
@@ -71,7 +71,7 @@ NestedAdviserWithTeamGeographyField = partial(
         'first_name',
         'last_name',
         ('dit_team', TeamWithGeographyField()),
-    )
+    ),
 )
 
 
@@ -143,27 +143,23 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
     default_error_messages = {
-        'contact_preferences_required': ugettext_lazy(
-            'A contact should have at least one way of being contacted. Please select either '
-            'email or phone, or both.'
-        ),
         'address_same_as_company_and_has_address': ugettext_lazy(
-            'Please select either address_same_as_company or enter an address manually, not both!'
+            'Please select either address_same_as_company or enter an address manually, not both!',
         ),
         'no_address': ugettext_lazy(
-            'Please select either address_same_as_company or enter an address manually.'
+            'Please select either address_same_as_company or enter an address manually.',
         ),
     }
 
     title = NestedRelatedField(
-        meta_models.Title, required=False, allow_null=True
+        meta_models.Title, required=False, allow_null=True,
     )
     company = NestedRelatedField(
-        Company, required=False, allow_null=True
+        Company, required=False, allow_null=True,
     )
     adviser = NestedAdviserField(read_only=True)
     address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True
+        meta_models.Country, required=False, allow_null=True,
     )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
@@ -196,19 +192,14 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'telephone_alternative',
             'email_alternative',
             'notes',
-            'contactable_by_dit',
-            'contactable_by_uk_dit_partners',
-            'contactable_by_overseas_dit_partners',
             'accepts_dit_email_marketing',
-            'contactable_by_email',
-            'contactable_by_phone',
             'archived',
             'archived_documents_url_path',
             'archived_on',
             'archived_reason',
             'archived_by',
             'created_on',
-            'modified_on'
+            'modified_on',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -216,16 +207,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         validators = [
             NotArchivedValidator(),
             RulesBasedValidator(
-                ValidationRule(
-                    'contact_preferences_required',
-                    OperatorRule('contactable_by_email', bool),
-                    when=OperatorRule('contactable_by_phone', not_),
-                ),
-                ValidationRule(
-                    'contact_preferences_required',
-                    OperatorRule('contactable_by_phone', bool),
-                    when=OperatorRule('contactable_by_email', not_),
-                ),
                 ValidationRule(
                     'address_same_as_company_and_has_address',
                     OperatorRule('address_same_as_company', not_),
@@ -239,12 +220,8 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             ),
             # Note: This is deliberately after RulesBasedValidator, so that
             # address_same_as_company rules run first.
-            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING)
+            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
         ]
-        extra_kwargs = {
-            'contactable_by_email': {'default': True},
-            'contactable_by_phone': {'default': True},
-        }
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
@@ -261,20 +238,20 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
     default_error_messages = {
         'invalid_uk_establishment_number_prefix': ugettext_lazy(
-            'This must be a valid UK establishment number, beginning with BR.'
+            'This must be a valid UK establishment number, beginning with BR.',
         ),
         'invalid_uk_establishment_number_characters': ugettext_lazy(
             'This field can only contain the letters A to Z and numbers (no symbols, punctuation '
-            'or spaces).'
+            'or spaces).',
         ),
         'uk_establishment_not_in_uk': ugettext_lazy(
-            'A UK establishment (branch of non-UK company) must be in the UK.'
+            'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
         'global_headquarters_hq_type_is_not_global_headquarters': ugettext_lazy(
-            'Company to be linked as global headquarters must be a global headquarters.'
+            'Company to be linked as global headquarters must be a global headquarters.',
         ),
         'invalid_global_headquarters': ugettext_lazy(
-            'Global headquarters cannot point to itself.'
+            'Global headquarters cannot point to itself.',
         ),
         'global_headquarters_has_subsidiaries': ugettext_lazy(
             'Subsidiaries have to be unlinked before changing headquarter type.',
@@ -286,47 +263,47 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
     registered_address_country = NestedRelatedField(meta_models.Country)
     trading_name = serializers.CharField(
-        source='alias', required=False, allow_null=True, allow_blank=True, max_length=MAX_LENGTH
+        source='alias', required=False, allow_null=True, allow_blank=True, max_length=MAX_LENGTH,
     )
     trading_address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True
+        meta_models.Country, required=False, allow_null=True,
     )
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
-        meta_models.BusinessType, required=False, allow_null=True
+        meta_models.BusinessType, required=False, allow_null=True,
     )
     classification = NestedRelatedField(
-        meta_models.CompanyClassification, required=False, allow_null=True
+        meta_models.CompanyClassification, required=False, allow_null=True,
     )
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     employee_range = NestedRelatedField(
-        meta_models.EmployeeRange, required=False, allow_null=True
+        meta_models.EmployeeRange, required=False, allow_null=True,
     )
     export_to_countries = NestedRelatedField(
-        meta_models.Country, many=True, required=False
+        meta_models.Country, many=True, required=False,
     )
     future_interest_countries = NestedRelatedField(
-        meta_models.Country, many=True, required=False
+        meta_models.Country, many=True, required=False,
     )
     headquarter_type = NestedRelatedField(
-        meta_models.HeadquarterType, required=False, allow_null=True
+        meta_models.HeadquarterType, required=False, allow_null=True,
     )
     one_list_account_owner = NestedAdviserWithTeamField(
-        required=False, allow_null=True
+        required=False, allow_null=True,
     )
     global_headquarters = NestedRelatedField(
-        'company.Company', required=False, allow_null=True
+        'company.Company', required=False, allow_null=True,
     )
     sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
     turnover_range = NestedRelatedField(
-        meta_models.TurnoverRange, required=False, allow_null=True
+        meta_models.TurnoverRange, required=False, allow_null=True,
     )
     uk_region = NestedRelatedField(
-        meta_models.UKRegion, required=False, allow_null=True
+        meta_models.UKRegion, required=False, allow_null=True,
     )
     export_experience_category = NestedRelatedField(
-        ExportExperienceCategory, required=False, allow_null=True
+        ExportExperienceCategory, required=False, allow_null=True,
     )
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
@@ -349,7 +326,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             ):
                 message = self.error_messages['subsidiary_cannot_be_a_global_headquarters']
                 raise serializers.ValidationError({
-                    'headquarter_type': message
+                    'headquarter_type': message,
                 })
 
         return data
@@ -367,7 +344,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             and self.instance.subsidiaries.exists()
         ):
             raise serializers.ValidationError(
-                self.error_messages['global_headquarters_has_subsidiaries']
+                self.error_messages['global_headquarters_has_subsidiaries'],
             )
 
         return headquarter_type
@@ -381,7 +358,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             # checks if global_headquarters is not pointing to an instance of the model
             if self.instance == global_headquarters:
                 raise serializers.ValidationError(
-                    self.error_messages['invalid_global_headquarters']
+                    self.error_messages['invalid_global_headquarters'],
                 )
 
             # checks if global_headquarters is global_headquarters
@@ -389,7 +366,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 raise serializers.ValidationError(
                     self.error_messages[
                         'global_headquarters_hq_type_is_not_global_headquarters'
-                    ]
+                    ],
                 )
 
         return global_headquarters
@@ -453,32 +430,42 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('uk_region', bool),
-                    when=EqualsRule('registered_address_country',
-                                    Country.united_kingdom.value.id),
+                    when=EqualsRule(
+                        'registered_address_country',
+                        Country.united_kingdom.value.id,
+                    ),
                 ),
                 ValidationRule(
                     'uk_establishment_not_in_uk',
                     EqualsRule('registered_address_country', Country.united_kingdom.value.id),
-                    when=EqualsRule('business_type',
-                                    BusinessTypeConstant.uk_establishment.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
                 ),
                 ValidationRule(
                     'required',
                     OperatorRule('company_number', bool),
-                    when=EqualsRule('business_type',
-                                    BusinessTypeConstant.uk_establishment.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
                 ),
                 ValidationRule(
                     'invalid_uk_establishment_number_characters',
                     OperatorRule('company_number', has_no_invalid_company_number_characters),
-                    when=EqualsRule('business_type',
-                                    BusinessTypeConstant.uk_establishment.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
                 ),
                 ValidationRule(
                     'invalid_uk_establishment_number_prefix',
                     OperatorRule('company_number', has_uk_establishment_number_prefix),
-                    when=EqualsRule('business_type',
-                                    BusinessTypeConstant.uk_establishment.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
                 ),
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),

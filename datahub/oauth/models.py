@@ -10,7 +10,7 @@ class OAuthApplicationScope(models.Model):
     application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, on_delete=models.CASCADE)
     scopes = ArrayField(
         models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH),
-        help_text='Allowed scopes for this application. (Comma separated in Django admin.)'
+        help_text='Allowed scopes for this application. (Comma separated in Django admin.)',
     )
 
     def __str__(self):

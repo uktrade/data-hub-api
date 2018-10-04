@@ -105,7 +105,7 @@ def local_memory_cache(monkeypatch):
     monkeypatch.setitem(
         settings.CACHES,
         'default',
-        {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
+        {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
     )
     monkeypatch.setattr('django.core.cache.caches', CacheHandler())
 
@@ -115,7 +115,7 @@ def synchronous_thread_pool(monkeypatch):
     """Run everything submitted to thread pools executor in sync."""
     monkeypatch.setattr(
         'datahub.core.thread_pool._submit_to_thread_pool',
-        _synchronous_submit_to_thread_pool
+        _synchronous_submit_to_thread_pool,
     )
 
 
@@ -156,7 +156,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize(
             'search_app',
             apps,
-            ids=[app.__class__.__name__ for app in apps]
+            ids=[app.__class__.__name__ for app in apps],
         )
 
 
@@ -222,7 +222,7 @@ def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
     indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
     _setup_es_indexes.delete_by_query(
         indices,
-        body={'query': {'match_all': {}}}
+        body={'query': {'match_all': {}}},
     )
     _setup_es_indexes.indices.refresh()
 

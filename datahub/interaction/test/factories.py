@@ -7,7 +7,7 @@ from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
-    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus
+    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 
@@ -36,7 +36,7 @@ class CompanyInteractionFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.interaction
     communication_channel = factory.LazyFunction(
-        lambda: random_obj_for_model(CommunicationChannel)
+        lambda: random_obj_for_model(CommunicationChannel),
     )
 
 
@@ -46,7 +46,7 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
     kind = Interaction.KINDS.interaction
     investment_project = factory.SubFactory(InvestmentProjectFactory)
     communication_channel = factory.LazyFunction(
-        lambda: random_obj_for_model(CommunicationChannel)
+        lambda: random_obj_for_model(CommunicationChannel),
     )
 
 
@@ -55,13 +55,13 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     service_delivery_status = factory.LazyFunction(
-        lambda: random_obj_for_model(ServiceDeliveryStatus)
+        lambda: random_obj_for_model(ServiceDeliveryStatus),
     )
     grant_amount_offered = factory.Faker(
-        'pydecimal', left_digits=4, right_digits=2, positive=True
+        'pydecimal', left_digits=4, right_digits=2, positive=True,
     )
     net_company_receipt = factory.Faker(
-        'pydecimal', left_digits=4, right_digits=2, positive=True
+        'pydecimal', left_digits=4, right_digits=2, positive=True,
     )
 
     class Meta:
@@ -80,10 +80,10 @@ class PolicyFeedbackFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.policy_feedback
     communication_channel = factory.LazyFunction(
-        lambda: random_obj_for_model(CommunicationChannel)
+        lambda: random_obj_for_model(CommunicationChannel),
     )
     policy_issue_type = factory.LazyFunction(
-        lambda: random_obj_for_model(PolicyIssueType)
+        lambda: random_obj_for_model(PolicyIssueType),
     )
 
     @to_many_field

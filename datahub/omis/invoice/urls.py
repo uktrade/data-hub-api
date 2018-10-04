@@ -8,7 +8,7 @@ internal_frontend_urls = [
     path(
         'order/<uuid:order_pk>/invoice',
         InvoiceViewSet.as_view({'get': 'retrieve'}),
-        name='detail'
+        name='detail',
     ),
 ]
 
@@ -17,6 +17,6 @@ public_urls = [
     re_path(
         r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/invoice$',
         PublicInvoiceViewSet.as_view({'get': 'retrieve'}),
-        name='detail'
+        name='detail',
     ),
 ]

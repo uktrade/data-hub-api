@@ -5,7 +5,7 @@ import uuid
 import factory
 
 from datahub.company.test.factories import (
-    AdviserFactory, CompanyFactory
+    AdviserFactory, CompanyFactory,
 )
 
 

@@ -8,7 +8,7 @@ class ServiceTypeFixtures(Fixture):
     """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
-        'fixtures/service_types.yaml'
+        'fixtures/service_types.yaml',
     ]
 
 
@@ -16,18 +16,18 @@ class CancellationReasonFixtures(Fixture):
     """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
-        'fixtures/cancellation_reasons.yaml'
+        'fixtures/cancellation_reasons.yaml',
     ]
 
 
 registry.register(
     metadata_id='order-service-type',
     model=models.ServiceType,
-    serializer=ConstantModelSerializer
+    serializer=ConstantModelSerializer,
 )
 
 registry.register(
     metadata_id='order-cancellation-reason',
     model=models.CancellationReason,
-    serializer=ConstantModelSerializer
+    serializer=ConstantModelSerializer,
 )

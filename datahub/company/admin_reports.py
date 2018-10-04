@@ -19,7 +19,7 @@ class AllAdvisersReport(QuerySetReport):
             When(dit_team__disabled_on__isnull=True, dit_team__isnull=False, then=True),
             When(dit_team__disabled_on__isnull=False, then=False),
             default=None,
-            output_field=NullBooleanField()
+            output_field=NullBooleanField(),
         ),
     ).order_by(
         'date_joined',

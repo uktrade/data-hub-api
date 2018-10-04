@@ -49,7 +49,7 @@ class SearchInteractionParams:
     COMPOSITE_FILTERS = {
         'contact_name': [
             'contact.name',
-            'contact.name_trigram'
+            'contact.name_trigram',
         ],
         'company_name': [
             'company.name',
@@ -59,7 +59,7 @@ class SearchInteractionParams:
         ],
         'dit_adviser_name': [
             'dit_adviser.name',
-            'dit_adviser.name_trigram'
+            'dit_adviser.name_trigram',
         ],
         'sector_descends': [
             'company_sector.id',

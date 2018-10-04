@@ -34,18 +34,18 @@ class Contact(ArchivableModel, BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.ForeignKey(
-        metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL
+        metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL,
     )
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey(
         'Company', related_name='contacts', null=True, blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     adviser = models.ForeignKey(
         'Advisor', related_name='contacts', null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
@@ -58,7 +58,7 @@ class Contact(ArchivableModel, BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey(
         metadata_models.Country, null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -66,18 +66,11 @@ class Contact(ArchivableModel, BaseModel):
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
-        help_text='Legacy field. File browser path to the archived documents for this contact.'
+        help_text='Legacy field. File browser path to the archived documents for this contact.',
     )
 
     # Marketing preferences
-    contactable_by_dit = models.BooleanField(default=False)
-    contactable_by_uk_dit_partners = models.BooleanField(default=False)
-    contactable_by_overseas_dit_partners = models.BooleanField(default=False)
     accepts_dit_email_marketing = models.BooleanField(default=False)
-
-    # Contact mode preferences
-    contactable_by_email = models.BooleanField(default=True)
-    contactable_by_phone = models.BooleanField(default=True)
 
     class Meta:
         permissions = (

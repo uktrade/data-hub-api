@@ -98,7 +98,7 @@ def get_top_related_expression_subquery(related_field, expression, ordering):
     ).filter(
         **{related_field.name: OuterRef('pk')},
     ).order_by(
-        *ordering
+        *ordering,
     ).values(
         '_annotated_value',
     )[:1]

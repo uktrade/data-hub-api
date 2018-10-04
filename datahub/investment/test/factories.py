@@ -9,12 +9,12 @@ from django.utils.timezone import now
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import (
     InvestmentBusinessActivity, InvestmentProjectStage, InvestmentStrategicDriver,
-    InvestmentType, ReferralSourceActivity, SalaryRange, Sector
+    InvestmentType, ReferralSourceActivity, SalaryRange, Sector,
 )
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.constants import (
-    InvestorType, Involvement, SpecificProgramme
+    InvestorType, Involvement, SpecificProgramme,
 )
 from datahub.investment.models import InvestmentDeliveryPartner, InvestmentProject
 from datahub.metadata.models import UKRegion

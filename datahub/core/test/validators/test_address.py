@@ -37,7 +37,7 @@ class TestAddressValidator:
                 'address1': {'required': True},
                 'address2': {'required': False},
                 'town': {'required': True},
-            }
+            },
         )
 
         validator.set_context(mock.Mock(instance=instance))
@@ -46,7 +46,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'town': ['This field is required.']
+            'town': ['This field is required.'],
         }
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -77,7 +77,7 @@ class TestAddressValidator:
                 'address1': {'required': True},
                 'address2': {'required': False},
                 'town': {'required': True},
-            }
+            },
         )
 
         validator.set_context(mock.Mock(instance=instance))
@@ -115,7 +115,7 @@ class TestAddressValidator:
                 'address1': {'required': True},
                 'address2': {'required': False},
                 'town': {'required': True},
-            }
+            },
         )
 
         validator.set_context(mock.Mock(instance=instance))
@@ -124,7 +124,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'town': ['This field is required.']
+            'town': ['This field is required.'],
         }
 
     def test_defaults(self):

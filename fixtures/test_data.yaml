@@ -275,12 +275,7 @@
     address_town: Willington
     address_postcode: NE28 5JB
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
-    contactable_by_dit: false
-    contactable_by_uk_dit_partners: false
-    contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
-    contactable_by_email: false
-    contactable_by_phone: true
     notes: This is a dummy contact for testing
     created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
@@ -297,12 +292,7 @@
     telephone_number: 67890123432
     email: jenny@cakeman.com
     address_same_as_company: true
-    contactable_by_dit: true
-    contactable_by_uk_dit_partners: true
-    contactable_by_overseas_dit_partners: true
     accepts_dit_email_marketing: true
-    contactable_by_email: true
-    contactable_by_phone: false
     notes: This is a dummy contact for testing
     created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
@@ -318,12 +308,7 @@
     telephone_number: 6 39 15 95 29
     email: dean@cox.com
     address_same_as_company: true
-    contactable_by_dit: true
-    contactable_by_uk_dit_partners: true
-    contactable_by_overseas_dit_partners: true
     accepts_dit_email_marketing: true
-    contactable_by_email: true
-    contactable_by_phone: false
     notes: This is a dummy contact for testing
     created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-06-08T00:00:00Z'
@@ -342,12 +327,7 @@
     address_town: Lefevre
     address_postcode: 15404
     address_country: 82756b9a-5d95-e211-a939-e4115bead28a
-    contactable_by_dit: false
-    contactable_by_uk_dit_partners: false
-    contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
-    contactable_by_email: false
-    contactable_by_phone: true
     notes: This is a dummy contact for testing
     created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-04-05T00:00:00Z'
@@ -366,12 +346,7 @@
     address_town: washington
     address_postcode: ne38 0px
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
-    contactable_by_dit: false
-    contactable_by_uk_dit_partners: false
-    contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
-    contactable_by_email: false
-    contactable_by_phone: true
     notes: This is a dummy contact for testing
     created_on: '2017-04-28T15:00:00Z'
     modified_on: '2016-04-05T00:00:00Z'
@@ -390,12 +365,7 @@
     address_town: california
     address_postcode: 90001
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
-    contactable_by_dit: false
-    contactable_by_uk_dit_partners: false
-    contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
-    contactable_by_email: false
-    contactable_by_phone: true
     notes: This is a dummy contact for testing
     created_on: '2017-04-28T15:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
@@ -414,12 +384,7 @@
     address_town: Ampton
     address_postcode: IP31 2RH
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
-    contactable_by_dit: false
-    contactable_by_uk_dit_partners: false
-    contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
-    contactable_by_email: false
-    contactable_by_phone: true
     notes: This is a dummy contact for testing
     created_on: '2018-02-28T15:00:00Z'
     modified_on: '2018-06-05T00:00:00Z'
