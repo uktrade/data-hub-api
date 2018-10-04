@@ -17,10 +17,13 @@ from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    EventServiceDeliveryFactory,
+)
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-from ..factories import CompanyInteractionFactory, EventServiceDeliveryFactory
-from ...models import CommunicationChannel, Interaction
 
 
 class TestGetInteraction(APITestMixin):

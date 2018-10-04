@@ -3,12 +3,15 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.permissions import BasePermission
 
 from datahub.core.permissions import (
-    get_model_action_for_view_action, IsAssociatedToObjectPermission, ViewBasedModelPermissions,
+    get_model_action_for_view_action,
+    IsAssociatedToObjectPermission,
+    ViewBasedModelPermissions,
 )
 from datahub.core.utils import StrEnum
 from datahub.interaction.models import Interaction
 from datahub.investment.permissions import (
-    InvestmentProjectAssociationCheckerBase, IsAssociatedToInvestmentProjectFilter,
+    InvestmentProjectAssociationCheckerBase,
+    IsAssociatedToInvestmentProjectFilter,
 )
 
 

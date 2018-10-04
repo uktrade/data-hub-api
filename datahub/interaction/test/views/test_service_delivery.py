@@ -10,14 +10,18 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Service, Team
 from datahub.core.test_utils import APITestMixin, random_obj_for_model
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction, PolicyArea,
+    PolicyIssueType,
+    ServiceDeliveryStatus,
+)
+from datahub.interaction.test.factories import (
+    EventServiceDeliveryFactory,
+    ServiceDeliveryFactory,
+)
+from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.test.factories import InvestmentProjectFactory
-from .utils import resolve_data
-from ..factories import (
-    EventServiceDeliveryFactory, ServiceDeliveryFactory,
-)
-from ...models import (
-    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus,
-)
 
 
 class TestAddServiceDelivery(APITestMixin):

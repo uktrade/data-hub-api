@@ -15,16 +15,19 @@ from datahub.core.validators import (
     ValidationRule,
 )
 from datahub.event.models import Event
-from datahub.investment.serializers import NestedInvestmentProjectField
-from datahub.metadata.models import Service, Team
-from .models import (
+from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
     PolicyArea,
     PolicyIssueType,
     ServiceDeliveryStatus,
 )
-from .permissions import HasAssociatedInvestmentProjectValidator, KindPermissionValidator
+from datahub.interaction.permissions import (
+    HasAssociatedInvestmentProjectValidator,
+    KindPermissionValidator,
+)
+from datahub.investment.serializers import NestedInvestmentProjectField
+from datahub.metadata.models import Service, Team
 
 
 class InteractionSerializer(serializers.ModelSerializer):
