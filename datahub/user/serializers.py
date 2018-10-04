@@ -1,12 +1,7 @@
-import re
-
 from rest_framework import serializers
 
 from datahub.company.models.adviser import Advisor
 from datahub.metadata.serializers import TeamSerializer
-
-
-VIEW_PERMISSION_REGEX = re.compile(r'^([^.]*\.)view(_.*)$')
 
 
 class WhoAmISerializer(serializers.ModelSerializer):
