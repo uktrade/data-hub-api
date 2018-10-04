@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
-from ...models import AbstractEntityDocumentModel
+from datahub.documents.models import AbstractEntityDocumentModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

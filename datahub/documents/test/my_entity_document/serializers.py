@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import MyEntityDocument
+from datahub.documents.test.my_entity_document.models import MyEntityDocument
 
 
 class MyEntityDocumentSerializer(serializers.ModelSerializer):
