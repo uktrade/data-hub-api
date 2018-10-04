@@ -12,23 +12,29 @@ from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
-    BaseConstantModel, BaseModel, BaseOrderedConstantModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
 )
 from datahub.core.utils import StrEnum
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
+from datahub.omis.order import validators
+from datahub.omis.order.constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
+from datahub.omis.order.managers import OrderQuerySet
+from datahub.omis.order.signals import (
+    order_cancelled,
+    order_completed,
+    order_paid,
+    quote_accepted,
+    quote_cancelled,
+    quote_generated,
+)
+from datahub.omis.order.utils import populate_billing_data
 from datahub.omis.payment.models import Payment
 from datahub.omis.payment.validators import ReconcilablePaymentsValidator
 from datahub.omis.quote.models import Quote
-from . import validators
-from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
-from .managers import OrderQuerySet
-from .signals import (
-    order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_cancelled, quote_generated,
-)
-from .utils import populate_billing_data
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from datahub.core.test_utils import AdminTestMixin
-from ..models import TermsAndConditions
+from datahub.omis.quote.models import TermsAndConditions
 
 
 class TestTermsAndConditionsAdmin(AdminTestMixin):

@@ -1,8 +1,8 @@
 from django.db import models
 
 from datahub.omis.core.utils import generate_datetime_based_reference
-from . import constants
-from .utils import calculate_payment_due_date
+from datahub.omis.invoice import constants
+from datahub.omis.invoice.utils import calculate_payment_due_date
 
 
 class InvoiceManager(models.Manager):

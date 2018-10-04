@@ -4,15 +4,18 @@ from unittest import mock
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from .factories import HourlyRateFactory, OrderAssigneeFactory, OrderFactory
-from ..constants import VATStatus
-from ..models import Order
-from ..pricing import (
-    _calculate_pricing, calculate_order_pricing,
-    can_pricing_be_calculated, get_pricing_from_order,
-    OrderPricing, should_vat_be_applied,
+from datahub.omis.order.constants import VATStatus
+from datahub.omis.order.models import Order
+from datahub.omis.order.pricing import (
+    _calculate_pricing,
+    calculate_order_pricing,
+    can_pricing_be_calculated,
+    get_pricing_from_order,
+    OrderPricing,
+    should_vat_be_applied,
     update_order_pricing, ZERO_PRICING,
 )
+from datahub.omis.order.test.factories import HourlyRateFactory, OrderAssigneeFactory, OrderFactory
 
 
 class TestGetPricingFromOrder:

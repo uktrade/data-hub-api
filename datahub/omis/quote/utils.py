@@ -11,7 +11,10 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.order.pricing import get_pricing_from_order
-from .constants import QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY, QUOTE_EXPIRY_DAYS_FROM_NOW
+from datahub.omis.quote.constants import (
+    QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY,
+    QUOTE_EXPIRY_DAYS_FROM_NOW,
+)
 
 
 QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
@@ -45,7 +48,7 @@ def generate_quote_reference(order):
             <order.reference>/Q-<(2) lettes>/<(1) number> e.g. GEA962/16/Q-AB1
     :raises RuntimeError: if no reference can be generated.
     """
-    from .models import Quote
+    from datahub.omis.quote.models import Quote
 
     def gen():
         return '{letters}{numbers}'.format(
@@ -124,6 +127,6 @@ def get_latest_terms_and_conditions():
     """
     :returns: the latest TermsAndConditions object if it exists, None otherwise.
     """
-    from .models import TermsAndConditions
+    from datahub.omis.quote.models import TermsAndConditions
 
     return TermsAndConditions.objects.order_by('-created_on').first()

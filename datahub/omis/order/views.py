@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
-from .models import Order
-from .serializers import (
+from datahub.omis.order.models import Order
+from datahub.omis.order.serializers import (
     CancelOrderSerializer,
     CompleteOrderSerializer,
     OrderAssigneeSerializer,
