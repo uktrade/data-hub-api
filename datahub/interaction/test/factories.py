@@ -7,7 +7,11 @@ from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
-    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus,
+    CommunicationChannel,
+    Interaction,
+    PolicyArea,
+    PolicyIssueType,
+    ServiceDeliveryStatus,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 

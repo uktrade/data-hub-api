@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from ..utils import is_feature_flag_active
+from datahub.feature_flag.utils import is_feature_flag_active
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
