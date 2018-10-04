@@ -12,7 +12,7 @@ aws-requests-auth==0.4.2
 backcall==0.1.0           # via ipython
 billiard==3.5.0.4         # via celery
 boto3==1.9.12
-botocore==1.12.14         # via boto3, s3transfer
+botocore==1.12.16         # via boto3, s3transfer
 celery==4.2.1
 certifi==2018.8.24        # via requests
 chardet==3.0.4
@@ -33,7 +33,7 @@ django-oauth-toolkit==1.2.0
 django-pglocks==1.0.2
 django-redis==4.9.0
 django-reversion==3.0.0
-django==2.1
+django==2.1.2
 djangorestframework==3.8.2
 docopt==0.6.2             # via docopt, notifications-python-client
 docutils==0.14            # via botocore, docutils
@@ -63,7 +63,7 @@ incremental==17.5.0       # via towncrier
 ipdb==0.11
 ipython-genutils==0.2.0   # via ipython-genutils, traitlets
 ipython==6.5.0
-jedi==0.12.1              # via ipython
+jedi==0.13.1              # via ipython
 jinja2==2.10              # via towncrier
 jmespath==0.9.3           # via boto3, botocore, jmespath
 kombu==4.2.1              # via celery
@@ -112,7 +112,7 @@ snowballstemmer==1.2.1    # via pydocstyle, snowballstemmer
 sqlparse==0.2.4           # via django-debug-toolbar, sqlparse
 termcolor==1.1.0          # via pytest-sugar, termcolor
 text-unidecode==1.2       # via faker
-toml==0.9.6               # via towncrier
+toml==0.10.0              # via towncrier
 towncrier==18.6.0
 traitlets==4.3.2          # via ipython, traitlets
 urllib3==1.23             # via botocore, elasticsearch, requests
