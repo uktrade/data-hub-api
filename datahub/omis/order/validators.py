@@ -36,7 +36,7 @@ class ContactWorksAtCompanyValidator:
 
         if contact.company != company:
             raise ValidationError({
-                self.contact_field: self.message
+                self.contact_field: self.message,
             })
 
 
@@ -72,7 +72,7 @@ class OrderEditableFieldsValidator:
         field_value = combiner.get_value_auto(field)
         instance_value = DataCombiner(
             self.instance, {},
-            model=self.instance.__class__
+            model=self.instance.__class__,
         ).get_value_auto(field)
 
         # if it's a queryset, evaluate it
@@ -121,20 +121,20 @@ class VATValidator:
         vat_status = data_combiner.get_value('vat_status')
         if not vat_status:
             raise ValidationError({
-                'vat_status': [self.message]
+                'vat_status': [self.message],
             })
 
         if vat_status == VATStatus.eu:
             vat_verified = data_combiner.get_value('vat_verified')
             if vat_verified is None:
                 raise ValidationError({
-                    'vat_verified': [self.message]
+                    'vat_verified': [self.message],
                 })
 
             vat_number = data_combiner.get_value('vat_number')
             if vat_verified and not vat_number:
                 raise ValidationError({
-                    'vat_number': [self.message]
+                    'vat_number': [self.message],
                 })
 
 
@@ -157,17 +157,17 @@ class AssigneesFilledInValidator:
         """Validate that the information about the assignees is set."""
         if not self.instance.assignees.count():
             raise ValidationError({
-                'assignees': [self.no_assignees_message]
+                'assignees': [self.no_assignees_message],
             })
 
         if not self.instance.assignees.filter(is_lead=True).count():
             raise ValidationError({
-                'assignee_lead': [self.no_lead_assignee_message]
+                'assignee_lead': [self.no_lead_assignee_message],
             })
 
         if not self.instance.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
             raise ValidationError({
-                'assignee_time': [self.no_estimated_time_message]
+                'assignee_time': [self.no_estimated_time_message],
             })
 
 
@@ -312,7 +312,7 @@ class OrderInStatusValidator:
 
         if self.instance.status not in self.allowed_statuses:
             raise APIConflictException(
-                self.message.format(self.instance.get_status_display())
+                self.message.format(self.instance.get_status_display()),
             )
 
 
@@ -336,7 +336,7 @@ class CompletableOrderValidator:
         """Validate that the actual_time field for all the assignees is set."""
         if any(assignee.actual_time is None for assignee in self.order.assignees.all()):
             raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: self.message
+                api_settings.NON_FIELD_ERRORS_KEY: self.message,
             })
 
 

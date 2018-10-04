@@ -47,8 +47,11 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, InvestmentProjectModelPermissions,
-                          IsAssociatedToInvestmentProjectPermission)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        InvestmentProjectModelPermissions,
+        IsAssociatedToInvestmentProjectPermission,
+    )
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -89,9 +92,11 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
-    filter_backends = (DjangoFilterBackend,
-                       OrderingFilter,
-                       IsAssociatedToInvestmentProjectFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        IsAssociatedToInvestmentProjectFilter,
+    )
     filterset_fields = ('investor_company_id',)
     ordering = ('-created_on',)
 
@@ -131,7 +136,7 @@ class _SinglePagePaginator(BasePagination):
     def get_paginated_response(self, data):
         return Response({
             'count': len(data),
-            'results': data
+            'results': data,
         })
 
 
@@ -166,7 +171,7 @@ class IProjectTeamMembersViewSet(CoreViewSet):
         """Filters the query set to the specified project."""
         self._check_project_exists()
         return self.queryset.filter(
-            investment_project_id=self.kwargs['project_pk']
+            investment_project_id=self.kwargs['project_pk'],
         ).all()
 
     def get_serializer(self, *args, **kwargs):

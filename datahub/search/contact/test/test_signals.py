@@ -11,7 +11,7 @@ def test_contact_auto_sync_to_es(setup_es):
     """Tests if contact gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_contact'
     ContactFactory(
-        first_name=test_name
+        first_name=test_name,
     )
     setup_es.indices.refresh()
 
@@ -24,7 +24,7 @@ def test_contact_auto_updates_to_es(setup_es):
     """Tests if contact gets updated in Elasticsearch."""
     test_name = 'very_hard_to_find_contact_ii'
     contact = ContactFactory(
-        first_name=test_name
+        first_name=test_name,
     )
     contact.save()
 

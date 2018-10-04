@@ -87,7 +87,7 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
         format_kwargs = {
             'app_label': self.model._meta.app_label,
             'model_name': self.model._meta.model_name,
-            'action': action
+            'action': action,
         }
 
         if request.user.has_perm(self.all_permission_template.format(**format_kwargs)):
@@ -134,7 +134,7 @@ class IsAssociatedToInvestmentProjectPermissionMixin:
         """Returns whether the user has permissions for a view."""
         if self.checker.should_apply_restrictions(request, view.action):
             investment_project = InvestmentProject.objects.get(
-                pk=request.parser_context['kwargs']['project_pk']
+                pk=request.parser_context['kwargs']['project_pk'],
             )
             if not self.checker.is_associated(request, investment_project):
                 return False

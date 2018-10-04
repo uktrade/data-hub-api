@@ -25,5 +25,5 @@ class PathRateThrottle(SimpleRateThrottle):
 
         return self.cache_format % {
             'scope': self.scope,
-            'ident': ident_hash.hexdigest()
+            'ident': ident_hash.hexdigest(),
         }

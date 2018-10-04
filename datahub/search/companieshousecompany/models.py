@@ -14,8 +14,8 @@ class CompaniesHouseCompany(BaseESModel):
     incorporation_date = Date()
     name = fields.SortableText(
         copy_to=[
-            'name_keyword', 'name_trigram'
-        ]
+            'name_keyword', 'name_trigram',
+        ],
     )
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
     name_trigram = fields.TrigramText()

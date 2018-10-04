@@ -29,7 +29,7 @@ def register_base_model(extra_exclude=None, **kwargs):
     if 'exclude' not in kwargs:
         kwargs['exclude'] = (
             *EXCLUDED_BASE_MODEL_FIELDS,
-            *(extra_exclude or ())
+            *(extra_exclude or ()),
         )
 
     return reversion.register(**kwargs)

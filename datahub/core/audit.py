@@ -52,7 +52,7 @@ class AuditViewSet(GenericViewSet):
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.get_comment() or '',
                 'changes': cls._diff_versions(
-                    v_old.field_dict, v_new.field_dict
+                    v_old.field_dict, v_new.field_dict,
                 ),
             })
 

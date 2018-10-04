@@ -1,69 +1,101 @@
-version: 2
+version: 2.1
+
+job_defaults: &job_defaults
+  parameters:
+    es_image:
+      type: string
+
+    publish_coverage:
+      type: boolean
+      default: false
+
+  environment:
+    ACTIVITY_STREAM_IP_WHITELIST: 1.2.3.4
+    ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
+    ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
+    DATABASE_URL: postgresql://postgres@localhost/datahub
+    DATAHUB_SECRET: secret
+    DEBUG: 'True'
+    DJANGO_SECRET_KEY: changeme
+    DJANGO_SETTINGS_MODULE: config.settings.local
+    ES_INDEX_PREFIX: test_index
+    ES5_URL: http://localhost:9200
+    AWS_DEFAULT_REGION: eu-west-2
+    AWS_ACCESS_KEY_ID: foo
+    AWS_SECRET_ACCESS_KEY: bar
+    DEFAULT_BUCKET: baz
+    SSO_ENABLED: 'True'
+    RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
+    RESOURCE_SERVER_AUTH_TOKEN: sso-token
+
+  working_directory: ~/app
+
+  docker:
+    - image: python:3.6
+
+    - image: <<parameters.es_image>>
+
+    - image: postgres:9.6
+      environment:
+        POSTGRES_DB=datahub
+  steps:
+    - checkout
+
+    - restore_cache:
+        name: Restore pip cache
+        keys:
+          - v1-leeloo-{{ checksum "requirements.txt" }}
+          - v1-leeloo-
+        paths:
+          - ~/cache/pip
+
+    - run:
+        name: Install dependencies
+        command: python -m pip install --cache-dir ~/cache/pip -r requirements.txt
+
+    - save_cache:
+        name: Save pip cache
+        key: v1-leeloo-{{ checksum "requirements.txt" }}
+        paths:
+          - ~/cache/pip
+    - run:
+        name: Run Flake8
+        command: python -m flake8
+
+    - run:
+        name: Run tests
+        command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
+
+    - store_test_results:
+        path: test-reports
+
+    - when:
+        condition: <<parameters.publish_coverage>>
+        steps:
+        - run:
+            name: Publish coverage
+            command: |
+              wget -O codecov.sh https://codecov.io/bash
+              bash ./codecov.sh -t ${COV_TOKEN}
+
 jobs:
-  build:
-    docker:
-      - image: python:3.6
 
-      - image: elasticsearch:5.5
+  build_es_55:
+    <<: *job_defaults
 
-      - image: postgres:9.6
-        environment:
-          POSTGRES_DB=datahub
+  build_es_63:
+    <<: *job_defaults
 
-    environment:
-      ACTIVITY_STREAM_IP_WHITELIST: 1.2.3.4
-      ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
-      ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
-      DATABASE_URL: postgresql://postgres@localhost/datahub
-      DATAHUB_SECRET: secret
-      DEBUG: 'True'
-      DJANGO_SECRET_KEY: changeme
-      DJANGO_SETTINGS_MODULE: config.settings.local
-      ES_INDEX_PREFIX: test_index
-      ES5_URL: http://localhost:9200
-      AWS_DEFAULT_REGION: eu-west-2
-      AWS_ACCESS_KEY_ID: foo
-      AWS_SECRET_ACCESS_KEY: bar
-      DEFAULT_BUCKET: baz
-      SSO_ENABLED: 'True'
-      RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
-      RESOURCE_SERVER_AUTH_TOKEN: sso-token
+workflows:
+  version: 2
 
-    working_directory: ~/app
+  Elasticsearch 5.5:
+    jobs:
+      - build_es_55:
+          publish_coverage: true
+          es_image: elasticsearch:5.5
 
-    steps:
-      - checkout
-
-      - restore_cache:
-          name: Restore pip cache
-          keys:
-            - v1-leeloo-{{ checksum "requirements.txt" }}
-            - v1-leeloo-
-          paths:
-            - ~/cache/pip
-
-      - run:
-          name: Install dependencies
-          command: python -m pip install --cache-dir ~/cache/pip -r requirements.txt
-
-      - save_cache:
-          name: Save pip cache
-          key: v1-leeloo-{{ checksum "requirements.txt" }}
-          paths:
-            - ~/cache/pip
-      - run:
-          name: Run Flake8
-          command: python -m flake8
-
-      - run:
-          name: Run tests
-          command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
-
-      - store_test_results:
-          path: test-reports
-
-      - run:
-          name: Publish coverage
-          command: |
-            wget -O codecov.sh https://codecov.io/bash
-            bash ./codecov.sh -t ${COV_TOKEN}
+  Elasticsearch 6.3:
+    jobs:
+      - build_es_63:
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2

@@ -32,7 +32,7 @@ class CancelOrderForm(forms.Form):
     """Admin form to cancel an order."""
 
     reason = forms.ModelChoiceField(
-        queryset=CancellationReason.objects.filter(disabled_on__isnull=True)
+        queryset=CancellationReason.objects.filter(disabled_on__isnull=True),
     )
 
     def __init__(self, order, *args, **kwargs):
@@ -58,7 +58,7 @@ class CancelOrderForm(forms.Form):
         self.order.cancel(
             by=by,
             reason=self.cleaned_data['reason'],
-            force=True
+            force=True,
         )
 
 
@@ -88,7 +88,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         'billing_address_town', 'billing_address_county',
         'billing_address_postcode', 'billing_address_country',
         'archived_documents_url_path',
-        'uk_advisers', 'post_advisers'
+        'uk_advisers', 'post_advisers',
     )
     readonly_fields = fields
 
@@ -103,7 +103,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         if not order.cancelled_on and not order.cancelled_by and not order.cancellation_reason:
             return ''
         description = self._get_description_for_timed_event(
-            order.cancelled_on, order.cancelled_by
+            order.cancelled_on, order.cancelled_by,
         )
 
         return f'{description} because "{order.cancellation_reason}"'
@@ -129,7 +129,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         """
         return format_html_join(
             '', '<p>{0}</p>',
-            ((sub.adviser.name,) for sub in order.subscribers.all())
+            ((sub.adviser.name,) for sub in order.subscribers.all()),
         )
 
     def post_advisers(self, order):
@@ -142,8 +142,8 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
                 assignee.adviser.name,
                 '(lead) ' if assignee.is_lead else '',
                 assignee.estimated_time or mark_safe('<i>unknown</i>'),
-                assignee.actual_time or mark_safe('<i>unknown</i>')
-            ) for assignee in order.assignees.all())
+                assignee.actual_time or mark_safe('<i>unknown</i>'),
+            ) for assignee in order.assignees.all()),
         )
 
     def get_urls(self):
@@ -158,8 +158,10 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
 
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            path('<path:object_id>/cancel/', wrap(self.cancel_order_view),
-                 name='%s_%s_cancel' % info),
+            path(
+                '<path:object_id>/cancel/', wrap(self.cancel_order_view),
+                name='%s_%s_cancel' % info,
+            ),
         ] + urls
 
     @csrf_protect_m
@@ -185,7 +187,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
                     self.log_change(
                         request,
                         obj,
-                        f'Cancelled because {form.cleaned_data["reason"].name}.'
+                        f'Cancelled because {form.cleaned_data["reason"].name}.',
                     )
                     form.cancel(by=request.user)
                     return self.response_cancel(request, obj)
@@ -220,7 +222,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         }
         msg = format_html(
             _('The {name} "{obj}" was cancelled successfully.'),
-            **msg_dict
+            **msg_dict,
         )
         self.message_user(request, msg, messages.SUCCESS)
 

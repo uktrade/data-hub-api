@@ -24,7 +24,7 @@ class TestPaymentGatewaySessionIsFinished:
             (PaymentGatewaySessionStatus.failed, True),
             (PaymentGatewaySessionStatus.cancelled, True),
             (PaymentGatewaySessionStatus.error, True),
-        )
+        ),
     )
     def test_value(self, status, finished):
         """
@@ -52,10 +52,10 @@ class TestPaymentGatewaySessionGetPaymentURL:
                 '_links': {
                     'next_url': {
                         'href': next_url,
-                        'method': 'GET'
+                        'method': 'GET',
                     },
-                }
-            }
+                },
+            },
         )
 
         session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
@@ -75,8 +75,8 @@ class TestPaymentGatewaySessionGetPaymentURL:
                 'payment_id': govuk_payment_id,
                 '_links': {
                     'next_url': None,
-                }
-            }
+                },
+            },
         )
 
         session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
@@ -89,7 +89,7 @@ class TestPaymentGatewaySessionGetPaymentURL:
             PaymentGatewaySessionStatus.failed,
             PaymentGatewaySessionStatus.cancelled,
             PaymentGatewaySessionStatus.error,
-        )
+        ),
     )
     def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_mock):
         """
@@ -98,7 +98,7 @@ class TestPaymentGatewaySessionGetPaymentURL:
         """
         session = PaymentGatewaySession(
             status=session_status,
-            govuk_payment_id='123abc123abc123abc123abc12'
+            govuk_payment_id='123abc123abc123abc123abc12',
         )
         assert session.get_payment_url() == ''
         assert not requests_mock.called
@@ -114,7 +114,7 @@ class TestPaymentGatewaySessionRefresh:
             PaymentGatewaySessionStatus.failed,
             PaymentGatewaySessionStatus.cancelled,
             PaymentGatewaySessionStatus.error,
-        )
+        ),
     )
     def test_already_finished_doesnt_do_anything(self, status, requests_mock):
         """
@@ -132,10 +132,10 @@ class TestPaymentGatewaySessionRefresh:
             PaymentGatewaySessionStatus.created,
             PaymentGatewaySessionStatus.started,
             PaymentGatewaySessionStatus.submitted,
-        )
+        ),
     )
     def test_with_unchanged_govuk_payment_status_doesnt_change_anything(
-        self, status, requests_mock
+        self, status, requests_mock,
     ):
         """
         Test that if the GOV.UK payment status is the same as the payment gateway session one,
@@ -145,8 +145,8 @@ class TestPaymentGatewaySessionRefresh:
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
             url, status_code=200, json={
-                'state': {'status': status, 'finished': False}
-            }
+                'state': {'status': status, 'finished': False},
+            },
         )
 
         assert not session.refresh_from_govuk_payment()
@@ -160,7 +160,7 @@ class TestPaymentGatewaySessionRefresh:
         (
             status[0] for status in PaymentGatewaySessionStatus
             if status[0] != PaymentGatewaySessionStatus.success
-        )
+        ),
     )
     def test_with_different_govuk_payment_status_updates_session(self, status, requests_mock):
         """
@@ -176,8 +176,8 @@ class TestPaymentGatewaySessionRefresh:
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
             url, status_code=200, json={
-                'state': {'status': status}
-            }
+                'state': {'status': status},
+            },
         )
 
         assert session.refresh_from_govuk_payment()
@@ -196,7 +196,7 @@ class TestPaymentGatewaySessionRefresh:
         order = OrderWithAcceptedQuoteFactory()
         session = PaymentGatewaySessionFactory(
             status=PaymentGatewaySessionStatus.created,
-            order=order
+            order=order,
         )
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         response_json = {
@@ -214,7 +214,7 @@ class TestPaymentGatewaySessionRefresh:
                     'line2': 'line 2 address',
                     'postcode': 'SW1A 1AA',
                     'city': 'London',
-                    'country': 'GB'
+                    'country': 'GB',
                 },
                 'card_brand': 'Visa',
             },
@@ -278,8 +278,8 @@ class TestPaymentGatewaySessionRefresh:
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
             url, status_code=200, json={
-                'state': {'status': 'success'}
-            }
+                'state': {'status': 'success'},
+            },
         )
         session.save = mock.MagicMock(side_effect=Exception())
 
@@ -300,8 +300,8 @@ class TestPaymentGatewaySessionRefresh:
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
             url, status_code=200, json={
-                'state': {'status': 'success'}
-            }
+                'state': {'status': 'success'},
+            },
         )
         session.order.mark_as_paid = mock.MagicMock(side_effect=Exception())
 
@@ -326,12 +326,12 @@ class TestPaymentGatewaySessionCancel:
         session = PaymentGatewaySessionFactory()
         requests_mock.post(
             govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
-            status_code=204
+            status_code=204,
         )
         requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
             status_code=200,
-            json={'state': {'status': 'cancelled'}}
+            json={'state': {'status': 'cancelled'}},
         )
 
         session.cancel()
@@ -350,7 +350,7 @@ class TestPaymentGatewaySessionCancel:
         original_session_status = session.status
         requests_mock.post(
             govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
-            status_code=500
+            status_code=500,
         )
 
         with pytest.raises(GOVUKPayAPIException):
@@ -373,11 +373,11 @@ class TestPaymentGatewaySessionCancel:
         original_session_status = session.status
         requests_mock.post(
             govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
-            status_code=204
+            status_code=204,
         )
         requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
-            status_code=500
+            status_code=500,
         )
 
         with pytest.raises(GOVUKPayAPIException):

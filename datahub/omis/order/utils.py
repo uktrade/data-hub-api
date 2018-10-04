@@ -39,7 +39,7 @@ def populate_billing_data(order):
             order_billing_address
             if any(order_billing_address.values())
             else default_billing_address
-        )
+        ),
     }
 
     # set order fields

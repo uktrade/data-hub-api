@@ -63,12 +63,12 @@ def s3_csv_object(s3_stubber, statuses, interactions):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
     return bucket, object_key
 

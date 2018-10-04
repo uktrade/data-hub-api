@@ -15,7 +15,7 @@ def test_sync_app_with_default_batch_size(monkeypatch):
     monkeypatch.setattr('datahub.search.bulk_sync.bulk', bulk_mock)
 
     search_app = create_mock_search_app(
-        queryset=MockQuerySet([Mock(id=1), Mock(id=2)])
+        queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
     )
     sync_app(search_app)
 
@@ -28,7 +28,7 @@ def test_sync_app_with_overridden_batch_size(monkeypatch):
     monkeypatch.setattr('datahub.search.bulk_sync.bulk', bulk_mock)
 
     search_app = create_mock_search_app(
-        queryset=MockQuerySet([Mock(id=1), Mock(id=2)])
+        queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
     )
     sync_app(search_app, batch_size=1)
 
@@ -44,7 +44,7 @@ def test_sync_app_logic(monkeypatch):
         target_mapping_hash='mapping-hash',
         read_indices=('index1', 'index2'),
         write_index='index1',
-        queryset=MockQuerySet([Mock(id=1), Mock(id=2)])
+        queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
     )
     sync_app(search_app, batch_size=1000)
     assert bulk_mock.call_args_list[0][1]['actions'] == [

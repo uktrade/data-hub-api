@@ -19,18 +19,18 @@ class TermsAndConditions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_on = models.DateTimeField(
         db_index=True, auto_now_add=True,
-        help_text='Set automatically.'
+        help_text='Set automatically.',
     )
     name = models.CharField(
         max_length=100,
-        help_text='Only used internally.'
+        help_text='Only used internally.',
     )
     content = models.TextField(
         help_text=(
             'In <a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>. '
             'You can preview the formatted content using an online editor '
             'such as <a href="https://dillinger.io/">dillinger.io</a>'
-        )
+        ),
     )
 
     class Meta:
@@ -52,7 +52,7 @@ class Quote(BaseModel):
         TermsAndConditions,
         null=True, blank=True,
         on_delete=models.PROTECT,
-        related_name='+'
+        related_name='+',
     )
 
     cancelled_on = models.DateTimeField(null=True, blank=True)
@@ -60,7 +60,7 @@ class Quote(BaseModel):
         settings.AUTH_USER_MODEL,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     accepted_on = models.DateTimeField(null=True, blank=True)
@@ -68,7 +68,7 @@ class Quote(BaseModel):
         'company.Contact',
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     expires_on = models.DateField()

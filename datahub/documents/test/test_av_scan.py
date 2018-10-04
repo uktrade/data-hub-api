@@ -25,13 +25,16 @@ def test_virus_scan_document_clean(get_signed_url_mock, requests_mock):
         headers={
             'Content-Type': 'application/json',
             'Content-Length': '1000',
-        }
+        },
     )
-    requests_mock.post('http://av-service/', json={
-        'malware': False,
-        'reason': None,
-        'time': 0.2,
-    })
+    requests_mock.post(
+        'http://av-service/',
+        json={
+            'malware': False,
+            'reason': None,
+            'time': 0.2,
+        },
+    )
 
     virus_scan_document.apply(args=(str(document.id), )).get()
     document.refresh_from_db()
@@ -49,13 +52,16 @@ def test_virus_scan_document_infected(get_signed_url_mock, requests_mock):
         headers={
             'Content-Type': 'application/json',
             'Content-Length': '1000',
-        }
+        },
     )
-    requests_mock.post('http://av-service/', json={
-        'malware': True,
-        'reason': 'File contains ransomware.',
-        'time': 0.1,
-    })
+    requests_mock.post(
+        'http://av-service/',
+        json={
+            'malware': True,
+            'reason': 'File contains ransomware.',
+            'time': 0.1,
+        },
+    )
 
     virus_scan_document.apply(args=(str(document.id), )).get()
     document.refresh_from_db()
@@ -73,11 +79,14 @@ def test_virus_scan_document_bad_response_body(get_signed_url_mock, requests_moc
         headers={
             'Content-Type': 'application/json',
             'Content-Length': '1000',
-        }
+        },
     )
-    requests_mock.post('http://av-service/', json={
-        'too_many_cats': 'never',
-    })
+    requests_mock.post(
+        'http://av-service/',
+        json={
+            'too_many_cats': 'never',
+        },
+    )
 
     error_message = (
         f'Unexpected response from AV service: {{\'too_many_cats\': \'never\'}} '
@@ -86,7 +95,7 @@ def test_virus_scan_document_bad_response_body(get_signed_url_mock, requests_moc
 
     with pytest.raises(
         VirusScanException,
-        match=error_message
+        match=error_message,
     ):
         virus_scan_document.apply(args=(str(document.id), )).get()
 
@@ -107,8 +116,8 @@ def test_virus_scan_document_file_not_found(get_signed_url_mock, requests_mock):
     )
     with pytest.raises(
         VirusScanException,
-        match=f'Unable to download the document with ID {document.pk} '
-              f'for scanning \(status_code\=404\).'
+        match=rf'Unable to download the document with ID {document.pk} '
+              rf'for scanning \(status_code\=404\).',
     ):
         virus_scan_document.apply(args=(str(document.id), )).get()
     document.refresh_from_db()
@@ -126,7 +135,7 @@ def test_virus_scan_document_bad_response_status(get_signed_url_mock, requests_m
         headers={
             'Content-Type': 'application/json',
             'Content-Length': '1000',
-        }
+        },
     )
     requests_mock.post(
         'http://av-service/',

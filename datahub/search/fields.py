@@ -5,7 +5,7 @@ from elasticsearch_dsl import Keyword, Nested, Object, Text
 SortableCaseInsensitiveKeywordText = partial(
     Text,
     analyzer='lowercase_keyword_analyzer',
-    fielddata=True
+    fielddata=True,
 )
 TrigramText = partial(Text, analyzer='trigram_analyzer')
 SortableTrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
@@ -27,9 +27,13 @@ class TextWithKeyword(Text):
 
     def __init__(self, *args, **kwargs):
         """Initialises the field, creating a keyword sub-field."""
-        super().__init__(*args, **kwargs, fields={
-            'keyword': Keyword(ignore_above=self.ES_DEFAULT_IGNORE_ABOVE)
-        })
+        super().__init__(
+            *args,
+            **kwargs,
+            fields={
+                'keyword': Keyword(ignore_above=self.ES_DEFAULT_IGNORE_ABOVE),
+            },
+        )
 
 
 def nested_contact_or_adviser_field(field, include_dit_team=False):
@@ -84,7 +88,7 @@ def nested_company_field(field):
             'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
             'trading_name': SortableCaseInsensitiveKeywordText(
-                copy_to=f'{field}.trading_name_trigram'
+                copy_to=f'{field}.trading_name_trigram',
             ),
             'trading_name_trigram': TrigramText(),
         },
@@ -96,7 +100,7 @@ def nested_ch_company_field():
     """Nested field for lists of objects with id and company_number sub-fields."""
     return Nested(properties={
         'id': Keyword(),
-        'company_number': SortableCaseInsensitiveKeywordText()
+        'company_number': SortableCaseInsensitiveKeywordText(),
     })
 
 
@@ -115,7 +119,7 @@ def nested_sector_field():
 def object_field(*fields):
     """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
     return Object(
-        properties={field: TextWithKeyword() for field in fields}
+        properties={field: TextWithKeyword() for field in fields},
     )
 
 

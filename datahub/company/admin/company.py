@@ -11,7 +11,7 @@ class CompanyCoreTeamMemberInline(admin.TabularInline):
     """Inline admin for CompanyCoreTeamMember"""
 
     model = CompanyCoreTeamMember
-    fields = ('id', 'adviser', )
+    fields = ('id', 'adviser')
     extra = 1
     formfield_overrides = {
         models.UUIDField: {'widget': forms.HiddenInput},
@@ -46,8 +46,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'turnover_range',
                     'classification',
                     'one_list_account_owner',
-                )
-            }
+                ),
+            },
         ),
         (
             'HIERARCHY',
@@ -55,8 +55,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 'fields': (
                     'headquarter_type',
                     'global_headquarters',
-                )
-            }
+                ),
+            },
         ),
         (
             'ADDRESS',
@@ -75,8 +75,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'trading_address_county',
                     'trading_address_postcode',
                     'trading_address_country',
-                )
-            }
+                ),
+            },
         ),
         (
             'EXPORT',
@@ -85,8 +85,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'export_experience_category',
                     'export_to_countries',
                     'future_interest_countries',
-                )
-            }
+                ),
+            },
         ),
         (
             'LEGACY FIELDS',
@@ -94,8 +94,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 'fields': (
                     'reference_code',
                     'archived_documents_url_path',
-                )
-            }
+                ),
+            },
         ),
         (
             'ARCHIVE',
@@ -105,9 +105,9 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'archived_on',
                     'archived_by',
                     'archived_reason',
-                )
-            }
-        )
+                ),
+            },
+        ),
     )
     search_fields = (
         'name',

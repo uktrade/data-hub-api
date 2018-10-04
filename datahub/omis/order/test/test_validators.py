@@ -44,7 +44,7 @@ class TestContactWorksAtCompanyValidator:
         try:
             validator({
                 'contact': new_contact,
-                'company': company
+                'company': company,
             })
         except Exception:
             pytest.fail('Should not raise a validator error.')
@@ -64,7 +64,7 @@ class TestContactWorksAtCompanyValidator:
         with pytest.raises(ValidationError):
             validator({
                 'contact': new_contact,
-                'company': company
+                'company': company,
             })
 
     def test_with_different_field_names(self):
@@ -77,14 +77,14 @@ class TestContactWorksAtCompanyValidator:
 
         validator = ContactWorksAtCompanyValidator(
             contact_field='main_contact',
-            company_field='main_company'
+            company_field='main_company',
         )
         validator.set_context(serializer)
 
         try:
             validator({
                 'main_contact': new_main_contact,
-                'main_company': company
+                'main_company': company,
             })
         except Exception:
             pytest.fail('Should not raise a validator error.')
@@ -105,7 +105,7 @@ class TestAssigneesFilledInValidator:
             validator()
 
         assert exc.value.detail == {
-            'assignees': ['You need to add at least one assignee.']
+            'assignees': ['You need to add at least one assignee.'],
         }
 
     def test_no_lead_assignee_fails(self):
@@ -120,7 +120,7 @@ class TestAssigneesFilledInValidator:
             validator()
 
         assert exc.value.detail == {
-            'assignee_lead': ['You need to set a lead assignee.']
+            'assignee_lead': ['You need to set a lead assignee.'],
         }
 
     def test_no_estimated_time_fails(self):
@@ -138,7 +138,7 @@ class TestAssigneesFilledInValidator:
             validator()
 
         assert exc.value.detail == {
-            'assignee_time': ['The total estimated time cannot be zero.']
+            'assignee_time': ['The total estimated time cannot be zero.'],
         }
 
     def test_non_zero_estimated_time_succeeds(self):
@@ -178,7 +178,7 @@ class TestOrderDetailsFilledInValidator:
             'vat_status': '',
         }
         order_m2m_fields = {
-            'service_types': []
+            'service_types': [],
         }
 
         if values_as_data:
@@ -199,7 +199,7 @@ class TestOrderDetailsFilledInValidator:
         all_fields = list(order_fields) + list(order_m2m_fields)
         assert exc.value.detail == {
             **{field: ['This field is required.'] for field in all_fields},
-            'assignees': ['You need to add at least one assignee.']
+            'assignees': ['You need to add at least one assignee.'],
         }
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -240,16 +240,16 @@ class TestOrderDetailsFilledInValidator:
 
         with mock.patch.object(
             OrderDetailsFilledInValidator,
-            'get_extra_validators'
+            'get_extra_validators',
         ) as get_extra_validators:
 
             # trigger a second validation error on the same field
             get_extra_validators.return_value = [
                 mock.Mock(
                     side_effect=ValidationError({
-                        'description': ['A different error...']
-                    })
-                )
+                        'description': ['A different error...'],
+                    }),
+                ),
             ]
 
             validator = OrderDetailsFilledInValidator()
@@ -257,14 +257,14 @@ class TestOrderDetailsFilledInValidator:
 
             with pytest.raises(ValidationError) as exc:
                 validator({
-                    'description': ''
+                    'description': '',
                 })
 
             assert exc.value.detail == {
                 'description': [
                     'This field is required.',
-                    'A different error...'
-                ]
+                    'A different error...',
+                ],
             }
 
 
@@ -321,8 +321,8 @@ class TestOrderInStatusValidator:
             allowed_statuses=(
                 OrderStatus.draft,
                 OrderStatus.complete,
-                OrderStatus.cancelled
-            )
+                OrderStatus.cancelled,
+            ),
         )
         validator.set_instance(order)
 
@@ -340,8 +340,8 @@ class TestOrderInStatusValidator:
         validator = OrderInStatusValidator(
             allowed_statuses=(
                 OrderStatus.draft,
-                OrderStatus.cancelled
-            )
+                OrderStatus.cancelled,
+            ),
         )
         validator.set_instance(order)
 
@@ -379,9 +379,9 @@ class TestOrderInStatusValidator:
             allowed_statuses=(
                 OrderStatus.draft,
                 OrderStatus.complete,
-                OrderStatus.cancelled
+                OrderStatus.cancelled,
             ),
-            order_required=False
+            order_required=False,
         )
         validator.set_instance(None)
 
@@ -406,7 +406,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': '',
             'vat_number': '',
-            'vat_verified': None
+            'vat_verified': None,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -432,7 +432,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': VATStatus.eu,
             'vat_number': '',
-            'vat_verified': None
+            'vat_verified': None,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -458,7 +458,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': VATStatus.eu,
             'vat_number': '',
-            'vat_verified': True
+            'vat_verified': True,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -484,7 +484,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': VATStatus.eu,
             'vat_number': '0123456789',
-            'vat_verified': True
+            'vat_verified': True,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -511,7 +511,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': VATStatus.eu,
             'vat_number': '',
-            'vat_verified': False
+            'vat_verified': False,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -539,7 +539,7 @@ class TestVATValidator:
         order_fields = {
             'vat_status': vat_status,
             'vat_number': '',
-            'vat_verified': None
+            'vat_verified': None,
         }
 
         order = Order(**(order_fields if not values_as_data else {}))
@@ -563,7 +563,7 @@ class TestCompletableOrderValidator:
         """
         order = mock.MagicMock()
         order.assignees.all.return_value = (
-            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=0)
+            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=0),
         )
         validator = CompletableOrderValidator()
         validator.set_order(order)
@@ -579,7 +579,7 @@ class TestCompletableOrderValidator:
         """
         order = mock.MagicMock()
         order.assignees.all.return_value = (
-            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=None)
+            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=None),
         )
         validator = CompletableOrderValidator()
         validator.set_order(order)
@@ -591,7 +591,7 @@ class TestCompletableOrderValidator:
             'non_field_errors': (
                 'You must set the actual time for all assignees '
                 'to complete this order.'
-            )
+            ),
         }
 
 
@@ -616,7 +616,7 @@ class TestCancellableOrderValidator:
             (OrderStatus.paid, True, True),
             (OrderStatus.complete, True, False),
             (OrderStatus.cancelled, True, False),
-        )
+        ),
     )
     def test_validation(self, order_status, force, should_pass):
         """Test the validator with different order status and force values."""
@@ -637,7 +637,7 @@ class TestCancellableOrderValidator:
     (
         (OrderStatus.draft, OrderStatus.draft, True),
         (OrderStatus.draft, OrderStatus.paid, False),
-    )
+    ),
 )
 def test_order_in_status_rule(order_status, expected_status, res):
     """Tests for OrderInStatusRule."""
@@ -660,43 +660,43 @@ class TestOrderEditableFieldsValidator:
                 OrderStatus.draft,
                 {OrderStatus.draft: {'description'}},
                 {'description': 'lorem ipsum'},
-                True
+                True,
             ),
             # disallowed field => Fail
             (
                 OrderStatus.draft,
                 {OrderStatus.draft: {'contact'}},
                 {'description': 'lorem ipsum'},
-                False
+                False,
             ),
             # status not in mapping => OK
             (
                 OrderStatus.draft,
                 {OrderStatus.paid: {'contact'}},
                 {'description': 'lorem ipsum'},
-                True
+                True,
             ),
             # disallowed field didn't change => OK
             (
                 OrderStatus.draft,
                 {OrderStatus.draft: {'contact'}},
                 {'description': 'original description'},
-                True
+                True,
             ),
             # nothing allowed => Fail
             (
                 OrderStatus.draft,
                 {OrderStatus.draft: {}},
                 {'description': 'lorem ipsum'},
-                False
+                False,
             ),
-        )
+        ),
     )
     def test_validation_with_order(self, order_status, mapping, data, should_pass):
         """Test the validator with different order status, mapping and data."""
         order = Order(
             status=order_status,
-            description='original description'
+            description='original description',
         )
         serializer = mock.Mock(instance=order)
 

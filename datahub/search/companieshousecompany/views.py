@@ -26,6 +26,6 @@ class SearchCompaniesHouseCompanyParams:
 
 class SearchCompaniesHouseCompanyAPIView(
     SearchCompaniesHouseCompanyParams,
-    SearchAPIView
+    SearchAPIView,
 ):
     """Filtered company search view."""

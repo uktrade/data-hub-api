@@ -39,12 +39,12 @@ class CompletePropositionSerializer(serializers.ModelSerializer):
             # if proposition documents are not enabled, "details" field is mandatory
             if self.validated_data['details'] == '':
                 raise ValidationError({
-                    'details': ['This field may not be blank.']
+                    'details': ['This field may not be blank.'],
                 })
 
         self.instance.complete(
             by=self.context['current_user'],
-            details=self.validated_data['details']
+            details=self.validated_data['details'],
         )
         return self.instance
 
@@ -58,14 +58,14 @@ class AbandonPropositionSerializer(serializers.ModelSerializer):
             'details',
         )
         extra_kwargs = {
-            'details': {'allow_blank': False}
+            'details': {'allow_blank': False},
         }
 
     def abandon(self):
         """Abandon a proposition."""
         self.instance.abandon(
             by=self.context['current_user'],
-            details=self.validated_data['details']
+            details=self.validated_data['details'],
         )
         return self.instance
 
@@ -90,7 +90,7 @@ class PropositionDocumentSerializer(serializers.ModelSerializer):
             'url',
             'status',
         )
-        read_only_fields = ('url', 'created_on', )
+        read_only_fields = ('url', 'created_on')
 
     def create(self, validated_data):
         """Create proposition document."""

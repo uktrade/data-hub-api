@@ -39,8 +39,15 @@ class MetadataRegistry:
         """Keeps a local copy of the metadata registered."""
         self.metadata = {}
 
-    def register(self, metadata_id, model, queryset=None, serializer=ConstantModelSerializer,
-                 filterset_fields=None, filterset_class=None):
+    def register(
+        self,
+        metadata_id,
+        model,
+        queryset=None,
+        serializer=ConstantModelSerializer,
+        filterset_fields=None,
+        filterset_class=None,
+    ):
         """Registers a new metadata."""
         if metadata_id in self.metadata:
             raise ImproperlyConfigured(f'Metadata {metadata_id} already registered.')

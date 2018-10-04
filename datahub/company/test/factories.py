@@ -49,7 +49,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     archived = False
     uk_region_id = constants.UKRegion.england.value.id
     export_experience_category = factory.LazyFunction(
-        ExportExperienceCategory.objects.order_by('?').first
+        ExportExperienceCategory.objects.order_by('?').first,
     )
     turnover_range = factory.LazyFunction(lambda: random_obj_for_model(TurnoverRange))
     employee_range = factory.LazyFunction(lambda: random_obj_for_model(EmployeeRange))
@@ -122,7 +122,6 @@ class ContactFactory(factory.django.DjangoModelFactory):
     telephone_number = '123456789'
     address_same_as_company = True
     created_on = now()
-    contactable_by_email = True
     archived_documents_url_path = factory.Faker('uri_path')
 
     class Meta:

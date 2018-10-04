@@ -90,6 +90,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -98,7 +99,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'admin_ip_restrictor.middleware.AdminIPRestrictorMiddleware',
     'datahub.core.reversion.NonAtomicRevisionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -239,9 +239,7 @@ if ES_USE_AWS_AUTH:
 ES_URL = env('ES5_URL')
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
-ES_INDEX_SETTINGS = {
-    'index.mapping.single_type': True,
-}
+ES_INDEX_SETTINGS = {}
 ES_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
 ES_SEARCH_REQUEST_TIMEOUT = env.int('ES_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
 ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
@@ -251,7 +249,6 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
 SEARCH_EXPORT_MAX_RESULTS = 5000
 SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
 DATAHUB_SECRET = env('DATAHUB_SECRET')
-CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)

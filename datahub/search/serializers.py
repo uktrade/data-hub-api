@@ -52,7 +52,7 @@ class SearchSerializer(LimitOffsetSerializer):
 
     SORT_DIRECTIONS = (
         'asc',
-        'desc'
+        'desc',
     )
 
     DEFAULT_ORDERING = None
@@ -79,8 +79,10 @@ class SearchSerializer(LimitOffsetSerializer):
             errors.append(f"'sortby' field is not one of {self.SORT_BY_FIELDS}.")
 
         if sep and order not in self.SORT_DIRECTIONS:
-            errors.append(f"Invalid sort direction '{order}', must be one of "
-                          f'{self.SORT_DIRECTIONS}')
+            errors.append(
+                f"Invalid sort direction '{order}', must be one of "
+                f'{self.SORT_DIRECTIONS}',
+            )
 
         if errors:
             raise serializers.ValidationError(errors)

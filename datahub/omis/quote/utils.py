@@ -50,7 +50,7 @@ def generate_quote_reference(order):
     def gen():
         return '{letters}{numbers}'.format(
             letters=get_random_string(length=2, allowed_chars='ACEFHJKMNPRTUVWXY'),
-            numbers=get_random_string(length=1, allowed_chars='123456789')
+            numbers=get_random_string(length=1, allowed_chars='123456789'),
         )
     return generate_reference(model=Quote, gen=gen, prefix=f'{order.reference}/Q-')
 
@@ -67,7 +67,7 @@ def generate_quote_content(order, expires_on):
             company.registered_address_county,
             company.registered_address_town,
             company.registered_address_postcode,
-            getattr(company.registered_address_country, 'name', None)
+            getattr(company.registered_address_country, 'name', None),
         )
         if field
     )
@@ -87,8 +87,8 @@ def generate_quote_content(order, expires_on):
             'contact_name': escape_markdown(order.contact.name, escape_html=False),
             'contact_email': order.get_current_contact_email(),
             'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
-            'lead_assignee_name': escape_markdown(lead_assignee.adviser.name, escape_html=False)
-        }
+            'lead_assignee_name': escape_markdown(lead_assignee.adviser.name, escape_html=False),
+        },
     )
 
 
@@ -114,8 +114,8 @@ def calculate_quote_expiry_date(order):
         raise ValidationError({
             'delivery_date': [
                 'The calculated expiry date for the quote is in the past. '
-                'You might be able to fix this by changing the delivery date.'
-            ]
+                'You might be able to fix this by changing the delivery date.',
+            ],
         })
     return expiry_date
 

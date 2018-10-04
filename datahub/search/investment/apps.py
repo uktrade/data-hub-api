@@ -3,7 +3,7 @@ from datahub.investment.models import (
     InvestmentProjectPermission,
 )
 from datahub.investment.permissions import (
-    get_association_filters, InvestmentProjectAssociationChecker
+    get_association_filters, InvestmentProjectAssociationChecker,
 )
 from .models import InvestmentProject
 from .views import SearchInvestmentExportAPIView, SearchInvestmentProjectAPIView
@@ -24,7 +24,7 @@ class InvestmentSearchApp(SearchApp):
     export_view = SearchInvestmentExportAPIView
     view_permissions = (
         f'investment.{InvestmentProjectPermission.view_all}',
-        f'investment.{InvestmentProjectPermission.view_associated}'
+        f'investment.{InvestmentProjectPermission.view_associated}',
     )
     export_permission = f'investment.{InvestmentProjectPermission.export}'
     queryset = DBInvestmentProject.objects.select_related(

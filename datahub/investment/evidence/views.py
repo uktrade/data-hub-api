@@ -37,9 +37,9 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
         self._check_project_exists()
 
         return EvidenceDocument.objects.select_related(
-            'investment_project'
+            'investment_project',
         ).prefetch_related(
-            'tags'
+            'tags',
         ).filter(
             investment_project_id=self.kwargs['project_pk'],
         )

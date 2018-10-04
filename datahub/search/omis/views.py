@@ -52,7 +52,7 @@ class SearchOrderParams:
     COMPOSITE_FILTERS = {
         'contact_name': [
             'contact.name',
-            'contact.name_trigram'
+            'contact.name_trigram',
         ],
         'company_name': [
             'company.name',
@@ -84,7 +84,7 @@ class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
         net_refund_in_pounds=Subquery(
             Refund.objects.filter(
                 order=OuterRef('pk'),
-                status=RefundStatus.approved
+                status=RefundStatus.approved,
             ).order_by(
             ).values(
                 'order',
@@ -92,11 +92,11 @@ class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
                 total_refund=Cast(
                     Sum('net_amount'),
                     DecimalField(max_digits=19, decimal_places=2),
-                ) / 100
+                ) / 100,
             ).values(
                 'total_refund',
             ),
-            output_field=DecimalField(max_digits=19, decimal_places=2)
+            output_field=DecimalField(max_digits=19, decimal_places=2),
         ),
         status_name=get_choices_as_case_expression(DBOrder, 'status'),
         link=get_front_end_url_expression('order', 'pk'),

@@ -47,8 +47,10 @@ def perform_virus_scan(document_pk: str, download_url: str):
         - unknown response returned by the AV service
     """
     if not settings.AV_V2_SERVICE_URL:
-        raise VirusScanException(f'Cannot scan document with ID {document_pk}; AV V2 service '
-                                 f'URL not configured')
+        raise VirusScanException(
+            f'Cannot scan document with ID {document_pk}; AV V2 service '
+            f'URL not configured',
+        )
 
     logger.info(f'Virus scanning of Document with ID {document_pk} started.')
 
@@ -68,8 +70,10 @@ def perform_virus_scan(document_pk: str, download_url: str):
     is_file_clean = not result['malware']
     document.mark_as_scanned(is_file_clean, result.get('reason') or '')
 
-    logger.info(f'Virus scanning of Document with ID {document_pk} '
-                f'completed (av_clean={is_file_clean}).')
+    logger.info(
+        f'Virus scanning of Document with ID {document_pk} '
+        f'completed (av_clean={is_file_clean}).',
+    )
 
 
 def _download_and_scan_file(document_pk: str, download_url: str):
@@ -80,7 +84,7 @@ def _download_and_scan_file(document_pk: str, download_url: str):
         except HTTPError as exc:
             raise VirusScanException(
                 f'Unable to download the document with ID {document_pk} '
-                f'for scanning (status_code={exc.response.status_code}).'
+                f'for scanning (status_code={exc.response.status_code}).',
             ) from exc
         content = StreamWrapper(response.raw, response.headers['content-length'])
         return _scan_stream(document_pk, content, response.headers['content-type'])
@@ -92,7 +96,7 @@ def _multipart_encoder(document_pk, content, content_type):
             document_pk,
             content,
             content_type,
-        )
+        ),
     }
     encoder = MultipartEncoder(multipart_fields)
     return encoder
@@ -115,5 +119,5 @@ def _scan_stream(document_pk, content, content_type):
 
     raise VirusScanException(
         f'Unexpected response from AV service: {result} '
-        f'when scanning document with ID {document_pk}'
+        f'when scanning document with ID {document_pk}',
     )

@@ -40,11 +40,12 @@ class Command(CSVBaseCommand):
             return None
         return ReferralSourceWebsite.objects.get(id=referral_source_activity_website_id)
 
-    def _should_update(self,
-                       investment_project,
-                       referral_source_activity,
-                       referral_source_activity_website
-                       ):
+    def _should_update(
+        self,
+        investment_project,
+        referral_source_activity,
+        referral_source_activity_website,
+    ):
         """
         Checks if Investment project should be updated.
 
@@ -66,11 +67,11 @@ class Command(CSVBaseCommand):
         investment_project = InvestmentProject.objects.get(pk=row['id'])
 
         referral_source_activity = self.get_referral_source_activity(
-            row['referral_source_activity_id']
+            row['referral_source_activity_id'],
         )
 
         referral_source_activity_website = self.get_referral_source_activity_website(
-            row['referral_source_activity_website_id']
+            row['referral_source_activity_website_id'],
         )
 
         if self._should_update(
@@ -87,6 +88,6 @@ class Command(CSVBaseCommand):
                         update_fields=(
                             'referral_source_activity',
                             'referral_source_activity_website',
-                        )
+                        ),
                     )
                     reversion.set_comment('ReferralSourceActivityWebsite migration.')

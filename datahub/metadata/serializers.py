@@ -13,7 +13,7 @@ TeamWithGeographyField = partial(
         'name',
         ('uk_region', NestedRelatedField(UKRegion, read_only=True)),
         ('country', NestedRelatedField(Country, read_only=True)),
-    )
+    ),
 )
 
 

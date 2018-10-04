@@ -9,7 +9,7 @@ from datahub.investment.report.models import SPIReport
 class SPIReportAdmin(admin.ModelAdmin):
     """SPI Report admin."""
 
-    fields = ('id', 'created_on',)
+    fields = ('id', 'created_on')
     readonly_fields = fields
 
     list_display = (
@@ -22,12 +22,15 @@ class SPIReportAdmin(admin.ModelAdmin):
 
     def report(self, instance):
         """URL to the report download."""
-        href = reverse('investment-report:download-spi-report', kwargs={
-            'pk': instance.pk,
-        })
+        href = reverse(
+            'investment-report:download-spi-report',
+            kwargs={
+                'pk': instance.pk,
+            },
+        )
         return format_html(
             '<a href="{href}">Click to download.</a>',
-            href=href
+            href=href,
         )
 
     def has_add_permission(self, request):

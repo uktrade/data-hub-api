@@ -15,5 +15,5 @@ def test_market_response():
     assert serializer.data == {
         'id': market.country.pk,
         'name': market.country.name,
-        'disabled_on': market.disabled_on
+        'disabled_on': market.disabled_on,
     }

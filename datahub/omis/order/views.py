@@ -13,7 +13,7 @@ from .serializers import (
     OrderAssigneeSerializer,
     OrderSerializer,
     PublicOrderSerializer,
-    SubscribedAdviserSerializer
+    SubscribedAdviserSerializer,
 )
 
 
@@ -34,13 +34,13 @@ class OrderViewSet(CoreViewSet):
         serializer = CompleteOrderSerializer(
             instance,
             data={},
-            context=self.get_serializer_context()
+            context=self.get_serializer_context(),
         )
         serializer.is_valid(raise_exception=True)
         instance = serializer.complete()
         return Response(
             self.get_serializer(instance=instance).data,
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
     def cancel(self, request, *args, **kwargs):
@@ -49,13 +49,13 @@ class OrderViewSet(CoreViewSet):
         serializer = CancelOrderSerializer(
             instance,
             data=request.data,
-            context=self.get_serializer_context()
+            context=self.get_serializer_context(),
         )
         serializer.is_valid(raise_exception=True)
         instance = serializer.cancel()
         return Response(
             self.get_serializer(instance=instance).data,
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
     def get_serializer_context(self):
@@ -75,10 +75,10 @@ class PublicOrderViewSet(CoreViewSet):
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(
-        include_reopened=True
+        include_reopened=True,
     ).select_related(
         'company',
-        'contact'
+        'contact',
     )
 
 
@@ -128,7 +128,7 @@ class SubscriberListView(APIView):
             context={
                 'order': order,
                 'modified_by': self.request.user,
-            }
+            },
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -183,8 +183,8 @@ class AssigneeView(APIView):
             context={
                 'order': order,
                 'modified_by': self.request.user,
-                'force_delete': force_delete
-            }
+                'force_delete': force_delete,
+            },
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -212,7 +212,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
         """
         try:
             order = self.order_queryset.get(
-                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]}
+                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]},
             )
         except Order.DoesNotExist:
             raise Http404('The specified order does not exist.')

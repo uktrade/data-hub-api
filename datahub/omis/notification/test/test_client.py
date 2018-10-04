@@ -10,7 +10,7 @@ from datahub.core.constants import UKRegion
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderCompleteFactory,
-    OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
+    OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory,
 )
 from datahub.omis.region.models import UKRegionalSettings
 from ..client import notify, send_email
@@ -33,7 +33,7 @@ class TestSendEmail:
         send_email(notify_client, email_address='test@example.com')
 
         notify_client.send_email_notification.assert_called_with(
-            email_address='different_email@example.com'
+            email_address='different_email@example.com',
         )
 
     def test_without_overriding_recipient_email(self, settings):
@@ -47,7 +47,7 @@ class TestSendEmail:
         send_email(notify_client, email_address='test@example.com')
 
         notify_client.send_email_notification.assert_called_with(
-            email_address='test@example.com'
+            email_address='test@example.com',
         )
 
 
@@ -84,7 +84,7 @@ class TestNotifyOrderInfo:
             what_happened='something happened',
             why='to inform you',
             to_email='example@example.com',
-            to_name='example name'
+            to_name='example name',
         )
 
         assert notify.client.send_email_notification.called
@@ -106,7 +106,7 @@ class TestNotifyOrderInfo:
             order,
             what_happened='something happened',
             why='to inform you',
-            to_email='example@example.com'
+            to_email='example@example.com',
         )
 
         assert notify.client.send_email_notification.called
@@ -128,7 +128,7 @@ class TestNotifyOrderInfo:
             order,
             what_happened='something happened',
             why='to inform you',
-            to_name='example name'
+            to_name='example name',
         )
 
         assert notify.client.send_email_notification.called
@@ -155,12 +155,12 @@ class TestNotifyOrderCreated:
         regional_manager_emails = ['reg1@email.com', 'reg2@email.com']
         UKRegionalSettings.objects.create(
             uk_region_id=UKRegion.london.value.id,
-            manager_emails=regional_manager_emails
+            manager_emails=regional_manager_emails,
         )
 
         order = OrderFactory(
             primary_market_id=market.country.pk,
-            uk_region_id=UKRegion.london.value.id
+            uk_region_id=UKRegion.london.value.id,
         )
 
         notify.client.reset_mock()
@@ -259,7 +259,7 @@ class TestNotifyOrderCreated:
         """
         UKRegionalSettings.objects.create(
             uk_region_id=UKRegion.london.value.id,
-            manager_emails=[]
+            manager_emails=[],
         )
 
         order = OrderFactory(uk_region_id=UKRegion.london.value.id)
@@ -291,7 +291,7 @@ class TestNotifyAdviserAdded:
             order=order,
             adviser=adviser,
             by=creator,
-            creation_date=dateutil_parse('2017-05-18')
+            creation_date=dateutil_parse('2017-05-18'),
         )
 
         assert notify.client.send_email_notification.called

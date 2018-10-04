@@ -9,7 +9,7 @@ from ..models import InvestmentProject as ESInvestmentProject
 def test_get_basic_search_query():
     """Tests basic search query."""
     query = get_basic_search_query(
-        'test', entities=(ESInvestmentProject,), offset=5, limit=5
+        'test', entities=(ESInvestmentProject,), offset=5, limit=5,
     )
 
     assert query.to_dict() == {
@@ -20,14 +20,16 @@ def test_get_basic_search_query():
                         'match_phrase': {
                             'name_keyword': {
                                 'query': 'test',
-                                'boost': 2
-                            }
-                        }
-                    }, {
+                                'boost': 2,
+                            },
+                        },
+                    },
+                    {
                         'match_phrase': {
-                            'id': 'test'
-                        }
-                    }, {
+                            'id': 'test',
+                        },
+                    },
+                    {
                         'multi_match': {
                             'query': 'test',
                             'fields': [
@@ -69,38 +71,38 @@ def test_get_basic_search_query():
                                 'trading_name_trigram',
                                 'uk_company.name',
                                 'uk_company.name_trigram',
-                                'uk_region.name_trigram'
+                                'uk_region.name_trigram',
                             ],
                             'type': 'cross_fields',
-                            'operator': 'and'
-                        }
-                    }
-                ]
-            }
+                            'operator': 'and',
+                        },
+                    },
+                ],
+            },
         },
         'post_filter': {
             'bool': {
                 'should': [
                     {
                         'term': {
-                            '_type': 'investment_project'
-                        }
-                    }
-                ]
-            }
+                            '_type': 'investment_project',
+                        },
+                    },
+                ],
+            },
         },
         'aggs': {
             'count_by_type': {
                 'terms': {
-                    'field': '_type'
-                }
-            }
+                    'field': '_type',
+                },
+            },
         },
         'from': 5,
         'size': 5,
         'sort': [
             '_score',
-            'id'
+            'id',
         ],
     }
 
@@ -122,7 +124,7 @@ def test_limited_get_search_by_entity_query():
     query = limit_search_query(
         query,
         offset=5,
-        limit=5
+        limit=5,
     )
 
     assert query.to_dict() == {
@@ -131,23 +133,26 @@ def test_limited_get_search_by_entity_query():
                 'must': [
                     {
                         'term': {
-                            '_type': 'investment_project'
-                        }
-                    }, {
+                            '_type': 'investment_project',
+                        },
+                    },
+                    {
                         'bool': {
                             'should': [
                                 {
                                     'match_phrase': {
                                         'name_keyword': {
                                             'query': 'test',
-                                            'boost': 2
-                                        }
-                                    }
-                                }, {
+                                            'boost': 2,
+                                        },
+                                    },
+                                },
+                                {
                                     'match_phrase': {
-                                        'id': 'test'
-                                    }
-                                }, {
+                                        'id': 'test',
+                                    },
+                                },
+                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
@@ -160,14 +165,14 @@ def test_limited_get_search_by_entity_query():
                                             'project_code_trigram',
                                         ),
                                         'type': 'cross_fields',
-                                        'operator': 'and'
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }
+                                        'operator': 'and',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
         },
         'post_filter': {
             'bool': {
@@ -179,40 +184,42 @@ def test_limited_get_search_by_entity_query():
                                     'match': {
                                         'address_town': {
                                             'query': 'Woodside',
-                                            'operator': 'and'
-                                        }
-                                    }
-                                }
+                                            'operator': 'and',
+                                        },
+                                    },
+                                },
                             ],
-                            'minimum_should_match': 1
-                        }
-                    }, {
+                            'minimum_should_match': 1,
+                        },
+                    },
+                    {
                         'bool': {
                             'should': [
                                 {
                                     'match_phrase': {
                                         'trading_address_country.id':
-                                            '80756b9a-5d95-e211-a939-e4115bead28a'
-                                    }
-                                }
+                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                    },
+                                },
                             ],
-                            'minimum_should_match': 1
-                        }
-                    }, {
+                            'minimum_should_match': 1,
+                        },
+                    },
+                    {
                         'range': {
                             'estimated_land_date': {
                                 'gte': '2017-06-13T09:44:31.062870',
-                                'lte': '2017-06-13T09:44:31.062870'
-                            }
-                        }
-                    }
-                ]
-            }
+                                'lte': '2017-06-13T09:44:31.062870',
+                            },
+                        },
+                    },
+                ],
+            },
         },
         'from': 5,
         'size': 5,
         'sort': [
             '_score',
-            'id'
-        ]
+            'id',
+        ],
     }

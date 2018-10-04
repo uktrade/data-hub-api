@@ -14,10 +14,10 @@ from datahub.core.test_utils import APITestMixin, create_test_user, format_date_
 from datahub.documents.models import Document, UPLOAD_STATUSES
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.proposition.constants import (
-    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus
+    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus,
 )
 from datahub.investment.proposition.models import (
-    Proposition, PropositionDocument, PropositionDocumentPermission, PropositionPermission
+    Proposition, PropositionDocument, PropositionDocumentPermission, PropositionPermission,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -27,14 +27,14 @@ from .factories import PropositionFactory
 NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
         PropositionPermission.view_all,
-        PropositionDocumentPermission.view_all
+        PropositionDocumentPermission.view_all,
     ),
     (
         PropositionPermission.view_all,
         PropositionDocumentPermission.view_all,
         PropositionPermission.view_associated,
         PropositionDocumentPermission.view_associated,
-    )
+    ),
 )
 
 
@@ -48,7 +48,7 @@ NON_RESTRICTED_ADD_PERMISSIONS = (
         PropositionDocumentPermission.add_all,
         PropositionPermission.add_associated,
         PropositionDocumentPermission.add_associated,
-    )
+    ),
 )
 
 
@@ -62,7 +62,7 @@ NON_RESTRICTED_CHANGE_PERMISSIONS = (
         PropositionDocumentPermission.change_all,
         PropositionPermission.change_associated,
         PropositionDocumentPermission.change_associated,
-    )
+    ),
 )
 
 
@@ -75,7 +75,7 @@ NON_RESTRICTED_DELETE_PERMISSIONS = (
         PropositionPermission.delete_all,
         PropositionDocumentPermission.delete_all,
         PropositionDocumentPermission.delete_associated,
-    )
+    ),
 )
 
 
@@ -93,9 +93,12 @@ class TestCreateProposition(APITestMixin):
         """Test creating proposition."""
         investment_project = InvestmentProjectFactory()
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         adviser = create_test_user(
             permission_codenames=permissions,
@@ -153,9 +156,12 @@ class TestCreateProposition(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     def test_cannot_create_proposition_for_non_existent_investment_project(self, permissions):
         """Test user cannot create proposition for non existent investment project."""
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': uuid.uuid4(),
+            },
+        )
 
         adviser = create_test_user(
             permission_codenames=permissions,
@@ -180,9 +186,12 @@ class TestCreateProposition(APITestMixin):
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(created_by=project_creator)
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         adviser = create_test_user(
             permission_codenames=[PropositionPermission.add_associated],
@@ -242,9 +251,12 @@ class TestCreateProposition(APITestMixin):
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(created_by=project_creator)
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         adviser = create_test_user(
             permission_codenames=[PropositionPermission.add_associated],
@@ -263,16 +275,19 @@ class TestCreateProposition(APITestMixin):
         response_data = response.json()
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     def test_cannot_created_with_fields_missing(self):
         """Test that proposition cannot be created without required fields."""
         investment_project = InvestmentProjectFactory()
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -289,31 +304,40 @@ class TestUpdateProposition(APITestMixin):
     """Tests for the update proposition view."""
 
     @pytest.mark.parametrize(
-        'method', ('put', 'patch',),
+        'method', ('put', 'patch'),
     )
     def test_cannot_update_collection(self, method):
         """Test cannot update proposition."""
         investment_project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
         response = getattr(self.api_client, method)(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
-        'method', ('put', 'patch',),
+        'method', ('put', 'patch'),
     )
     def test_cannot_update_item(self, method):
         """Test cannot update given proposition."""
         proposition = PropositionFactory()
         investment_project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': investment_project.pk,
-        })
-        response = getattr(self.api_client, method)(url, {
-            'name': 'hello!',
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': investment_project.pk,
+            },
+        )
+        response = getattr(self.api_client, method)(
+            url,
+            data={
+                'name': 'hello!',
+            },
+        )
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
@@ -327,12 +351,15 @@ class TestListPropositions(APITestMixin):
 
         PropositionFactory.create_batch(3)
         propositions = PropositionFactory.create_batch(
-            3, investment_project=investment_project
+            3, investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -348,9 +375,12 @@ class TestListPropositions(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_user_cannot_list_propositions_for_non_existent_investment_project(self, permissions):
         """Test user cannot list propositions for a non existent investment project."""
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': uuid.uuid4(),
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -366,15 +396,18 @@ class TestListPropositions(APITestMixin):
 
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         propositions = PropositionFactory.create_batch(
-            3, investment_project=investment_project
+            3, investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -396,15 +429,18 @@ class TestListPropositions(APITestMixin):
         """Restricted user cannot list non associated investment project propositions."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         PropositionFactory.create_batch(
-            3, investment_project=investment_project
+            3, investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -418,7 +454,7 @@ class TestListPropositions(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     def test_filtered_by_adviser(self):
@@ -427,7 +463,7 @@ class TestListPropositions(APITestMixin):
         investment_project = InvestmentProjectFactory()
 
         PropositionFactory.create_batch(
-            3, investment_project=investment_project
+            3, investment_project=investment_project,
         )
         propositions = PropositionFactory.create_batch(
             3,
@@ -435,12 +471,17 @@ class TestListPropositions(APITestMixin):
             investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
-        response = self.api_client.get(url, {
-            'adviser_id': adviser.id
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
+        response = self.api_client.get(
+            url, {
+                'adviser_id': adviser.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -455,7 +496,7 @@ class TestListPropositions(APITestMixin):
             PropositionStatus.ongoing,
             PropositionStatus.abandoned,
             PropositionStatus.completed,
-        )
+        ),
     )
     def test_filtered_by_status(self, proposition_status):
         """List of propositions filtered by status."""
@@ -471,12 +512,17 @@ class TestListPropositions(APITestMixin):
             investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection', kwargs={
-            'project_pk': investment_project.pk,
-        })
-        response = self.api_client.get(url, {
-            'status': proposition_status
-        })
+        url = reverse(
+            'api-v3:investment:proposition:collection',
+            kwargs={
+                'project_pk': investment_project.pk,
+            },
+        )
+        response = self.api_client.get(
+            url, {
+                'status': proposition_status,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -490,10 +536,13 @@ class TestGetProposition(APITestMixin):
     def test_fails_without_permissions(self, api_client):
         """Should return 401"""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -502,10 +551,13 @@ class TestGetProposition(APITestMixin):
         """Test get proposition by a non restricted user."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -523,7 +575,7 @@ class TestGetProposition(APITestMixin):
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.ongoing,
@@ -550,16 +602,19 @@ class TestGetProposition(APITestMixin):
         """Test get proposition by a restricted user."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.view_associated,
@@ -582,7 +637,7 @@ class TestGetProposition(APITestMixin):
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.ongoing,
@@ -609,16 +664,19 @@ class TestGetProposition(APITestMixin):
         """Test get non associated ip proposition by a restricted user."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.view_associated,
@@ -631,7 +689,7 @@ class TestGetProposition(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -639,10 +697,13 @@ class TestGetProposition(APITestMixin):
         """Test user cannot get proposition by a non restricted user."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': uuid.uuid4(),
+            },
+        )
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -658,10 +719,13 @@ class TestDeleteProposition(APITestMixin):
     def test_fails_without_permissions(self, api_client):
         """Should return 401"""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = api_client.delete(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -670,10 +734,13 @@ class TestDeleteProposition(APITestMixin):
         """Test that non restricted user cannot delete proposition."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.delete(url)
@@ -698,10 +765,13 @@ class TestCompleteProposition(APITestMixin):
         )
         entity_document.document.mark_as_scanned(True, '')
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
@@ -714,13 +784,13 @@ class TestCompleteProposition(APITestMixin):
             'investment_project': {
                 'name': proposition.investment_project.name,
                 'project_code': proposition.investment_project.project_code,
-                'id': str(proposition.investment_project.pk)
+                'id': str(proposition.investment_project.pk),
             },
             'adviser': {
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.completed,
@@ -740,7 +810,7 @@ class TestCompleteProposition(APITestMixin):
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
-            }
+            },
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
@@ -754,10 +824,13 @@ class TestCompleteProposition(APITestMixin):
             created_by=user,
         )
         entity_document.document.mark_as_scanned(True, '')
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': uuid.uuid4(),
+            },
+        )
 
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
@@ -775,10 +848,10 @@ class TestCompleteProposition(APITestMixin):
             dit_team=project_creator.dit_team,
         )
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -787,10 +860,13 @@ class TestCompleteProposition(APITestMixin):
         )
         entity_document.document.mark_as_scanned(True, '')
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
@@ -803,13 +879,13 @@ class TestCompleteProposition(APITestMixin):
             'investment_project': {
                 'name': proposition.investment_project.name,
                 'project_code': proposition.investment_project.project_code,
-                'id': str(proposition.investment_project.pk)
+                'id': str(proposition.investment_project.pk),
             },
             'adviser': {
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.completed,
@@ -829,7 +905,7 @@ class TestCompleteProposition(APITestMixin):
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
-            }
+            },
         }
 
     def test_restricted_user_cannot_complete_non_associated_ip_proposition(self):
@@ -842,10 +918,10 @@ class TestCompleteProposition(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -854,16 +930,19 @@ class TestCompleteProposition(APITestMixin):
         )
         entity_document.document.mark_as_scanned(True, '')
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
         proposition.refresh_from_db()
@@ -884,7 +963,7 @@ class TestCompleteProposition(APITestMixin):
             dit_team=TeamFactory(),
         )
         proposition = PropositionFactory(
-            status=proposition_status
+            status=proposition_status,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -892,10 +971,13 @@ class TestCompleteProposition(APITestMixin):
             created_by=user,
         )
         entity_document.document.mark_as_scanned(True, '')
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
         response_data = response.json()
@@ -910,10 +992,13 @@ class TestCompleteProposition(APITestMixin):
     def test_cannot_complete_proposition_without_uploading_documents(self):
         """Test cannot complete proposition without uploading documents."""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = self.api_client.post(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -930,10 +1015,13 @@ class TestLegacyCompleteProposition(APITestMixin):
         """Test completing proposition by non restricted user."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -952,13 +1040,13 @@ class TestLegacyCompleteProposition(APITestMixin):
             'investment_project': {
                 'name': proposition.investment_project.name,
                 'project_code': proposition.investment_project.project_code,
-                'id': str(proposition.investment_project.pk)
+                'id': str(proposition.investment_project.pk),
             },
             'adviser': {
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.completed,
@@ -978,7 +1066,7 @@ class TestLegacyCompleteProposition(APITestMixin):
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
-            }
+            },
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
@@ -986,10 +1074,13 @@ class TestLegacyCompleteProposition(APITestMixin):
         """Test user cannot complete proposition for non existent investment project."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': uuid.uuid4(),
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1007,16 +1098,19 @@ class TestLegacyCompleteProposition(APITestMixin):
         """Test completing proposition by a restricted user."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -1040,13 +1134,13 @@ class TestLegacyCompleteProposition(APITestMixin):
             'investment_project': {
                 'name': proposition.investment_project.name,
                 'project_code': proposition.investment_project.project_code,
-                'id': str(proposition.investment_project.pk)
+                'id': str(proposition.investment_project.pk),
             },
             'adviser': {
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.completed,
@@ -1066,23 +1160,26 @@ class TestLegacyCompleteProposition(APITestMixin):
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
-            }
+            },
         }
 
     def test_restricted_user_cannot_complete_non_associated_ip_proposition(self):
         """Test restricted user cannot complete non associated investment project proposition."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -1100,7 +1197,7 @@ class TestLegacyCompleteProposition(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
         proposition.refresh_from_db()
@@ -1115,12 +1212,15 @@ class TestLegacyCompleteProposition(APITestMixin):
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
         proposition = PropositionFactory(
-            status=proposition_status
+            status=proposition_status,
         )
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = self.api_client.post(
             url,
             {
@@ -1139,10 +1239,13 @@ class TestLegacyCompleteProposition(APITestMixin):
     def test_cannot_complete_proposition_without_details(self):
         """Test cannot complete proposition without giving details."""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:complete',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = self.api_client.post(
             url,
             {
@@ -1164,10 +1267,13 @@ class TestAbandonProposition(APITestMixin):
         """Test abandoning proposition by non restricted user."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1192,7 +1298,7 @@ class TestAbandonProposition(APITestMixin):
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.abandoned,
@@ -1220,10 +1326,13 @@ class TestAbandonProposition(APITestMixin):
         """Test user cannot abandon proposition for non existent investment project."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': uuid.uuid4(),
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': uuid.uuid4(),
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1241,16 +1350,19 @@ class TestAbandonProposition(APITestMixin):
         """Test abandoning proposition by restricted user."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -1280,7 +1392,7 @@ class TestAbandonProposition(APITestMixin):
                 'first_name': proposition.adviser.first_name,
                 'last_name': proposition.adviser.last_name,
                 'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+                'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.abandoned,
@@ -1307,16 +1419,19 @@ class TestAbandonProposition(APITestMixin):
         """Test restricted user cannot abandon non associated investment project proposition."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(
@@ -1334,7 +1449,7 @@ class TestAbandonProposition(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
         proposition.refresh_from_db()
@@ -1349,12 +1464,15 @@ class TestAbandonProposition(APITestMixin):
     def test_cannot_abandon_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot abandon proposition that doesn't have ongoing status."""
         proposition = PropositionFactory(
-            status=proposition_status
+            status=proposition_status,
         )
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = self.api_client.post(
             url,
             {
@@ -1373,10 +1491,13 @@ class TestAbandonProposition(APITestMixin):
     def test_cannot_abandon_proposition_without_details(self):
         """Test cannot abandon proposition without giving details."""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:abandon',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
         response = self.api_client.post(
             url,
             {
@@ -1401,17 +1522,23 @@ class TestPropositionDocumentViews(APITestMixin):
 
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, data={
-            'original_filename': 'test.txt',
-        })
+        response = api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+            },
+        )
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
 
@@ -1426,7 +1553,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
@@ -1446,22 +1573,28 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=user
+            created_by=user,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, data={
-            'original_filename': 'test.txt',
-        })
+        response = api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+            },
+        )
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
 
@@ -1476,7 +1609,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
@@ -1490,16 +1623,19 @@ class TestPropositionDocumentViews(APITestMixin):
         """Test that restricted user cannot create non associated document."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            },
+        )
 
         user = create_test_user(
             permission_codenames=(PropositionDocumentPermission.add_associated,),
@@ -1507,29 +1643,38 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, data={
-            'original_filename': 'test.txt',
-        })
+        response = api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+            },
+        )
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     def test_cannot_create_document_for_non_existent_proposition(self):
         """Test that user cannot create document for non existent proposition."""
         investment_project = InvestmentProjectFactory()
 
-        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
-            'proposition_pk': uuid.uuid4(),
-            'project_pk': investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': uuid.uuid4(),
+                'project_pk': investment_project.pk,
+            },
+        )
 
         user = create_test_user(permission_codenames=(PropositionDocumentPermission.add_all,))
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, data={
-            'original_filename': 'test.txt',
-        })
+        response = api_client.post(
+            url,
+            data={
+                'original_filename': 'test.txt',
+            },
+        )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -1556,7 +1701,7 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-            }
+            },
         )
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1573,7 +1718,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'av_clean': True,
             'original_filename': 'test.txt',
@@ -1590,10 +1735,10 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=user
+            created_by=user,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1614,7 +1759,7 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-            }
+            },
         )
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -1629,7 +1774,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'av_clean': True,
             'original_filename': 'test.txt',
@@ -1643,10 +1788,10 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests that restricted user cannot list non associated documents."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1660,7 +1805,7 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-            }
+            },
         )
         user = create_test_user(
             permission_codenames=(PropositionDocumentPermission.view_associated,),
@@ -1671,7 +1816,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -1690,8 +1835,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -1705,7 +1850,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
@@ -1721,10 +1866,10 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=user
+            created_by=user,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1737,8 +1882,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -1751,7 +1896,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
@@ -1768,10 +1913,10 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1785,15 +1930,15 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -1801,7 +1946,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests retrieval of individual document that is pending deletion."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
         entity_document.document.mark_deletion_pending()
 
@@ -1810,8 +1955,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         user = create_test_user(permission_codenames=permissions)
@@ -1823,8 +1968,8 @@ class TestPropositionDocumentViews(APITestMixin):
     @pytest.mark.parametrize(
         'av_clean,expected_status', (
             (True, status.HTTP_200_OK),
-            (False, status.HTTP_403_FORBIDDEN,)
-        )
+            (False, status.HTTP_403_FORBIDDEN),
+        ),
     )
     @patch('datahub.documents.models.sign_s3_url')
     def test_document_download(self, sign_s3_url, av_clean, expected_status):
@@ -1832,7 +1977,7 @@ class TestPropositionDocumentViews(APITestMixin):
         sign_s3_url.return_value = 'http://what'
 
         user = create_test_user(
-            permission_codenames=(PropositionDocumentPermission.view_all,)
+            permission_codenames=(PropositionDocumentPermission.view_all,),
         )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
@@ -1848,7 +1993,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
                 'entity_document_pk': entity_document.pk,
-            }
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -1862,7 +2007,7 @@ class TestPropositionDocumentViews(APITestMixin):
                     'id': str(entity_document.created_by.pk),
                     'first_name': entity_document.created_by.first_name,
                     'last_name': entity_document.created_by.last_name,
-                    'name': entity_document.created_by.name
+                    'name': entity_document.created_by.name,
                 },
                 'original_filename': 'test.txt',
                 'url': _get_document_url(entity_document.proposition, entity_document),
@@ -1877,7 +2022,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests download of individual document when not yet virus scanned."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
 
         url = reverse(
@@ -1886,7 +2031,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
                 'entity_document_pk': entity_document.pk,
-            }
+            },
         )
 
         user = create_test_user(permission_codenames=permissions)
@@ -1900,7 +2045,7 @@ class TestPropositionDocumentViews(APITestMixin):
     def test_document_upload_schedule_virus_scan(
         self,
         virus_scan_document_apply_async,
-        permissions
+        permissions,
     ):
         """Tests scheduling virus scan after upload completion.
 
@@ -1920,8 +2065,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -1937,7 +2082,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
 
             'original_filename': 'test.txt',
@@ -1947,7 +2092,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         virus_scan_document_apply_async.assert_called_once_with(
-            args=(str(entity_document.document.pk), )
+            args=(str(entity_document.document.pk), ),
         )
 
     @patch('datahub.documents.tasks.virus_scan_document.apply_async')
@@ -1963,10 +2108,10 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=user
+            created_by=user,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1979,8 +2124,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
@@ -1996,7 +2141,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'id': str(entity_document.created_by.pk),
                 'first_name': entity_document.created_by.first_name,
                 'last_name': entity_document.created_by.last_name,
-                'name': entity_document.created_by.name
+                'name': entity_document.created_by.name,
             },
 
             'original_filename': 'test.txt',
@@ -2006,7 +2151,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         virus_scan_document_apply_async.assert_called_once_with(
-            args=(str(entity_document.document.pk), )
+            args=(str(entity_document.document.pk), ),
         )
 
     def test_restricted_user_cannot_schedule_virus_scan_for_non_associated_document(self):
@@ -2017,10 +2162,10 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -2034,14 +2179,14 @@ class TestPropositionDocumentViews(APITestMixin):
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
                 'entity_document_pk': entity_document.pk,
-            }
+            },
         )
 
         api_client = self.create_api_client(user=user)
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
         entity_document.document.refresh_from_db()
@@ -2053,7 +2198,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests document deletion."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2064,8 +2209,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         document_pk = entity_document.document.pk
@@ -2085,10 +2230,10 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
-            created_by=user
+            created_by=user,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -2104,8 +2249,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         document_pk = entity_document.document.pk
@@ -2124,10 +2269,10 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
-            created_by=project_creator
+            created_by=project_creator,
         )
         proposition = PropositionFactory(
-            investment_project=investment_project
+            investment_project=investment_project,
         )
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -2143,15 +2288,15 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         api_client = self.create_api_client(user=user)
         response = api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
-            'detail': 'You do not have permission to perform this action.'
+            'detail': 'You do not have permission to perform this action.',
         }
 
         entity_document.document.refresh_from_db()
@@ -2163,7 +2308,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests user can't delete document without permissions."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
         entity_document.document.mark_scan_scheduled()
         entity_document.document.mark_as_scanned(True, 'reason')
@@ -2173,8 +2318,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -2186,7 +2331,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests document deletion creates user event log."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2197,8 +2342,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         document_pk = entity_document.document.pk
@@ -2240,7 +2385,7 @@ class TestPropositionDocumentViews(APITestMixin):
         mark_deletion_pending.side_effect = Exception('No way!')
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2251,12 +2396,12 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
         user = create_test_user(
             permission_codenames=(PropositionDocumentPermission.delete_all,),
-            dit_team=TeamFactory()
+            dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
         with pytest.raises(Exception):
@@ -2268,7 +2413,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests user without permission can't call upload status endpoint."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt'
+            proposition_id=proposition.pk, original_filename='test.txt',
         )
 
         url = reverse(
@@ -2276,8 +2421,8 @@ class TestPropositionDocumentViews(APITestMixin):
             kwargs={
                 'proposition_pk': proposition.pk,
                 'project_pk': proposition.investment_project.pk,
-                'entity_document_pk': entity_document.pk
-            }
+                'entity_document_pk': entity_document.pk,
+            },
         )
 
         response = self.api_client.post(url, data={})
@@ -2291,5 +2436,5 @@ def _get_document_url(proposition, entity_document):
             'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
             'entity_document_pk': entity_document.pk,
-        }
+        },
     )

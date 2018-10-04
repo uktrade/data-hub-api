@@ -13,7 +13,7 @@ from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.proposition.constants import (
-    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus
+    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus,
 )
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -109,15 +109,15 @@ class Proposition(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     investment_project = models.ForeignKey(
-        'investment.InvestmentProject', on_delete=models.CASCADE, related_name='proposition'
+        'investment.InvestmentProject', on_delete=models.CASCADE, related_name='proposition',
     )
     # adviser to whom a proposition is assigned
     adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='+'
+        'company.Advisor', on_delete=models.CASCADE, related_name='+',
     )
     deadline = models.DateField()
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=PropositionStatus, default=PropositionStatus.ongoing
+        max_length=MAX_LENGTH, choices=PropositionStatus, default=PropositionStatus.ongoing,
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -133,7 +133,7 @@ class Proposition(BaseModel):
         """Change status of a proposition."""
         if self.status != PropositionStatus.ongoing:
             raise APIConflictException(
-                f'The action cannot be performed in the current status {self.status}.'
+                f'The action cannot be performed in the current status {self.status}.',
             )
         self.status = status
         self.modified_by = by
@@ -152,7 +152,7 @@ class Proposition(BaseModel):
         if is_feature_flag_active(FEATURE_FLAG_PROPOSITION_DOCUMENT):
             if self.documents.filter(document__status=UPLOAD_STATUSES.virus_scanned).count() == 0:
                 raise ValidationError({
-                    'non_field_errors': ['Proposition has no documents uploaded.']
+                    'non_field_errors': ['Proposition has no documents uploaded.'],
                 })
         self._change_status(PropositionStatus.completed, by, details)
 
@@ -169,15 +169,15 @@ class Proposition(BaseModel):
         permissions = (
             (
                 PropositionPermission.view_associated.value,
-                'Can view proposition for associated investment projects'
+                'Can view proposition for associated investment projects',
             ),
             (
                 PropositionPermission.add_associated.value,
-                'Can add proposition for associated investment projects'
+                'Can add proposition for associated investment projects',
             ),
             (
                 PropositionPermission.change_associated.value,
-                'Can change proposition for associated investment projects'
+                'Can change proposition for associated investment projects',
             ),
         )
         default_permissions = (
@@ -204,19 +204,19 @@ class PropositionDocument(AbstractEntityDocumentModel):
         permissions = (
             (
                 PropositionDocumentPermission.add_associated.value,
-                'Can add proposition document for associated investment projects'
+                'Can add proposition document for associated investment projects',
             ),
             (
                 PropositionDocumentPermission.change_associated.value,
-                'Can change proposition document for associated investment projects'
+                'Can change proposition document for associated investment projects',
             ),
             (
                 PropositionDocumentPermission.delete_associated.value,
-                'Can delete proposition document for associated investment projects'
+                'Can delete proposition document for associated investment projects',
             ),
             (
                 PropositionDocumentPermission.view_associated.value,
-                'Can view proposition document for associated investment projects'
+                'Can view proposition document for associated investment projects',
             ),
         )
         default_permissions = (
@@ -229,8 +229,11 @@ class PropositionDocument(AbstractEntityDocumentModel):
     @property
     def url(self):
         """Returns URL to download endpoint."""
-        return reverse('api-v3:investment:proposition:document-item-download', kwargs={
-            'proposition_pk': self.proposition.pk,
-            'project_pk': self.proposition.investment_project.pk,
-            'entity_document_pk': self.pk,
-        })
+        return reverse(
+            'api-v3:investment:proposition:document-item-download',
+            kwargs={
+                'proposition_pk': self.proposition.pk,
+                'project_pk': self.proposition.investment_project.pk,
+                'entity_document_pk': self.pk,
+            },
+        )

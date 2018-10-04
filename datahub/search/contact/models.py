@@ -26,11 +26,6 @@ class Contact(BaseESModel):
     company = fields.nested_company_field('company')
     company_sector = fields.nested_sector_field()
     company_uk_region = fields.nested_id_name_field()
-    contactable_by_dit = Boolean()
-    contactable_by_email = Boolean()
-    contactable_by_overseas_dit_partners = Boolean()
-    contactable_by_phone = Boolean()
-    contactable_by_uk_dit_partners = Boolean()
     created_by = fields.nested_contact_or_adviser_field('created_by', include_dit_team=True)
     created_on = Date()
     email = fields.SortableCaseInsensitiveKeywordText()
@@ -40,7 +35,7 @@ class Contact(BaseESModel):
             'name',
             'name_keyword',
             'name_trigram',
-        ]
+        ],
     )
     job_title = fields.SortableCaseInsensitiveKeywordText()
     last_name = fields.SortableText(
@@ -48,7 +43,8 @@ class Contact(BaseESModel):
             'name',
             'name_keyword',
             'name_trigram',
-        ])
+        ],
+    )
     modified_on = Date()
     name = fields.SortableText()
     name_keyword = fields.SortableCaseInsensitiveKeywordText()

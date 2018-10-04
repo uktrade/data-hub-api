@@ -33,12 +33,12 @@ def test_run(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_adviser_telephone_number', bucket, object_key)
@@ -67,12 +67,12 @@ def test_simulate(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_adviser_telephone_number', bucket, object_key, simulate=True)
@@ -96,12 +96,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_adviser_telephone_number', bucket, object_key)
