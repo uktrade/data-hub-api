@@ -16,7 +16,12 @@ from django.db import connection, reset_queries, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
-from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
+from datahub.company.ch_constants import (
+    COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING,
+    CSV_FIELD_NAMES,
+    CSV_RELEVANT_FIELDS,
+)
+from datahub.core import constants
 from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
@@ -138,7 +143,7 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
 def transform_ch_row(row):
     """Filter out the irrelevant fields from a CH data row and normalize the data."""
     ret = {}
-    for name in settings.CH_RELEVANT_FIELDS:
+    for name in CSV_RELEVANT_FIELDS:
         ret[name] = row.get(name, '')
 
     if ret['registered_address_1'] != '' and ret['registered_address_town'] == '':
@@ -159,7 +164,7 @@ def transform_ch_row(row):
         ret['incorporation_date'] = None
 
     # Foreign companies are excluded, so we normalise the country to UK
-    ret['registered_address_country_id'] = settings.CH_UNITED_KINGDOM_COUNTRY_ID
+    ret['registered_address_country_id'] = constants.Country.united_kingdom.value.id
 
     return ret
 
@@ -175,7 +180,7 @@ def open_ch_zipped_csv(fp):
             # We need to read that as a text IO for CSV reader to work
             csv_fp = io.TextIOWrapper(raw_csv_fp)
 
-            yield csv.DictReader(csv_fp, fieldnames=settings.CH_CSV_FIELD_NAMES)
+            yield csv.DictReader(csv_fp, fieldnames=CSV_FIELD_NAMES)
 
 
 def iter_ch_csv_from_url(url, tmp_file_creator):
@@ -221,7 +226,7 @@ class CHSynchroniser:
     def run(self, tmp_file_creator, endpoint=None):
         """Runs the synchronisation operation."""
         logger.info('Starting CH load...')
-        endpoint = endpoint or settings.CH_DOWNLOAD_URL
+        endpoint = endpoint or settings.COMPANIESHOUSE_DOWNLOAD_URL
         ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
         logger.info('Found the following Companies House CSV URLs: %s', ch_csv_urls)
 
