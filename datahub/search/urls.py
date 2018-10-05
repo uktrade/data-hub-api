@@ -2,8 +2,8 @@
 
 from django.urls import path
 
-from .apps import get_search_apps
-from .views import SearchBasicAPIView
+from datahub.search.apps import get_search_apps
+from datahub.search.views import SearchBasicAPIView
 
 urlpatterns = [
     path('search', SearchBasicAPIView.as_view(), name='basic'),

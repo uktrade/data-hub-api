@@ -2,8 +2,8 @@ from logging import getLogger, WARNING
 
 from django.core.management.base import BaseCommand, CommandError
 
+from datahub.search.apps import are_apps_initialised, get_search_apps, get_search_apps_by_name
 from datahub.search.bulk_sync import sync_app
-from ...apps import are_apps_initialised, get_search_apps, get_search_apps_by_name
 
 logger = getLogger(__name__)
 

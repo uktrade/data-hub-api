@@ -1,13 +1,13 @@
 import pytest
 from elasticsearch_dsl import Mapping
 
-from datahub.company.test.factories import (
-    CompaniesHouseCompanyFactory,
-)
+from datahub.company.test.factories import CompaniesHouseCompanyFactory
 from datahub.core.test_utils import format_date_or_datetime
-from .. import CompaniesHouseCompanySearchApp
-from ..models import CompaniesHouseCompany as ESCompaniesHouseCompany
-from ... import elasticsearch
+from datahub.search import elasticsearch
+from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
+from datahub.search.companieshousecompany.models import (
+    CompaniesHouseCompany as ESCompaniesHouseCompany,
+)
 
 pytestmark = pytest.mark.django_db
 

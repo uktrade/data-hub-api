@@ -1,7 +1,7 @@
-from .models import ESRelatedModel
-from .views import SearchRelatedModelAPIView
-from ..models import RelatedModel as DBRelatedModel
-from ....apps import SearchApp
+from datahub.search.apps import SearchApp
+from datahub.search.test.search_support.models import RelatedModel as DBRelatedModel
+from datahub.search.test.search_support.relatedmodel.models import ESRelatedModel
+from datahub.search.test.search_support.relatedmodel.views import SearchRelatedModelAPIView
 
 
 class RelatedModelSearchApp(SearchApp):

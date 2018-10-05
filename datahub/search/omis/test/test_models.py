@@ -1,11 +1,15 @@
 import pytest
 
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderCancelledFactory, OrderCompleteFactory,
-    OrderFactory, OrderPaidFactory, OrderSubscriberFactory,
+    OrderAssigneeFactory,
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderSubscriberFactory,
     OrderWithAcceptedQuoteFactory,
 )
-from ..models import Order as ESOrder
+from datahub.search.omis.models import Order as ESOrder
 
 pytestmark = pytest.mark.django_db
 

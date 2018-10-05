@@ -5,17 +5,17 @@ from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubException
-from .search_support.models import SimpleModel
-from .search_support.simplemodel.models import ESSimpleModel
-from ..apps import get_search_app_by_model
-from ..deletion import (
+from datahub.search.apps import get_search_app_by_model
+from datahub.search.deletion import (
     BULK_CHUNK_SIZE,
     BULK_DELETION_TIMEOUT_SECS,
     Collector,
     delete_documents,
     update_es_after_deletions,
 )
-from ..sync_async import sync_object_async
+from datahub.search.sync_async import sync_object_async
+from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')

@@ -11,9 +11,9 @@ from datahub.investment.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from .models import InvestmentProject
-from .serializers import SearchInvestmentProjectSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from datahub.search.investment.models import InvestmentProject
+from datahub.search.investment.serializers import SearchInvestmentProjectSerializer
+from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
 class SearchInvestmentProjectParams:
