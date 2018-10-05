@@ -4,7 +4,7 @@ from celery.task import task
 from django.db import transaction
 from django.utils.timezone import now
 
-from .models import PaymentGatewaySession
+from datahub.omis.payment.models import PaymentGatewaySession
 
 
 @task(ignore_result=True)

@@ -6,13 +6,16 @@ from django.test.client import Client
 from django.urls import reverse
 
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from .factories import (
-    OrderCancelledFactory, OrderCompleteFactory,
-    OrderFactory, OrderPaidFactory,
-    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory,
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.models import CancellationReason, Order, OrderPermission
+from datahub.omis.order.test.factories import (
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderWithAcceptedQuoteFactory,
+    OrderWithOpenQuoteFactory,
 )
-from ..constants import OrderStatus
-from ..models import CancellationReason, Order, OrderPermission
 
 
 class TestCancelOrderAdmin(AdminTestMixin):

@@ -8,8 +8,8 @@ from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-from .models import Payment, PaymentGatewaySession
-from .serializers import PaymentGatewaySessionSerializer, PaymentSerializer
+from datahub.omis.payment.models import Payment, PaymentGatewaySession
+from datahub.omis.payment.serializers import PaymentGatewaySessionSerializer, PaymentSerializer
 
 
 class BasePaymentViewSet(BaseNestedOrderViewSet):

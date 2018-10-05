@@ -2,11 +2,11 @@ from django.http import Http404
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from datahub.oauth.scopes import Scope
+from datahub.omis.invoice.models import Invoice
+from datahub.omis.invoice.serializers import InvoiceSerializer
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-from .models import Invoice
-from .serializers import InvoiceSerializer
 
 
 class BaseInvoiceViewSet(BaseNestedOrderViewSet):

@@ -11,14 +11,18 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.market.models import Market
-from ..factories import (
-    OrderAssigneeCompleteFactory, OrderAssigneeFactory,
-    OrderCancelledFactory, OrderCompleteFactory, OrderFactory,
-    OrderPaidFactory, OrderWithAcceptedQuoteFactory,
+from datahub.omis.order.constants import OrderStatus, VATStatus
+from datahub.omis.order.models import CancellationReason, ServiceType
+from datahub.omis.order.test.factories import (
+    OrderAssigneeCompleteFactory,
+    OrderAssigneeFactory,
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-from ...constants import OrderStatus, VATStatus
-from ...models import CancellationReason, ServiceType
 
 
 # mark the whole module for db use

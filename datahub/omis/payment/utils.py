@@ -1,6 +1,6 @@
 from dateutil.parser import parse as dateutil_parse
 
-from .constants import PaymentMethod
+from datahub.omis.payment.constants import PaymentMethod
 
 
 def trasform_govuk_payment_to_omis_payment_data(govuk_payment):

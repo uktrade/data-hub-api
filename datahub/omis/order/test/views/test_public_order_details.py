@@ -5,9 +5,9 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.test.factories import OrderFactory, OrderWithCancelledQuoteFactory
 from datahub.omis.quote.test.factories import QuoteFactory
-from ..factories import OrderFactory, OrderWithCancelledQuoteFactory
-from ...constants import OrderStatus
 
 
 # mark the whole module for db use

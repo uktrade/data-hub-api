@@ -1,9 +1,9 @@
 import pytest
 
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.models import Order
+from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import CancelledQuoteFactory
-from .factories import OrderFactory
-from ..constants import OrderStatus
-from ..models import Order
 
 
 pytestmark = pytest.mark.django_db

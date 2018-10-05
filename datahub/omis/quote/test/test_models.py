@@ -3,9 +3,12 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
-from datahub.omis.quote.test.factories import AcceptedQuoteFactory, CancelledQuoteFactory
-from .factories import QuoteFactory
-from ..models import Quote
+from datahub.omis.quote.models import Quote
+from datahub.omis.quote.test.factories import (
+    AcceptedQuoteFactory,
+    CancelledQuoteFactory,
+    QuoteFactory,
+)
 
 
 # mark the whole module for db use

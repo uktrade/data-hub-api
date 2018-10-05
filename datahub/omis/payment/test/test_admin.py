@@ -7,9 +7,13 @@ from rest_framework import status
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin
 from datahub.omis.order.test.factories import OrderPaidFactory, OrderWithOpenQuoteFactory
-from .factories import ApprovedRefundFactory, RejectedRefundFactory, RequestedRefundFactory
-from ..constants import PaymentMethod, RefundStatus
-from ..models import Refund
+from datahub.omis.payment.constants import PaymentMethod, RefundStatus
+from datahub.omis.payment.models import Refund
+from datahub.omis.payment.test.factories import (
+    ApprovedRefundFactory,
+    RejectedRefundFactory,
+    RequestedRefundFactory,
+)
 
 
 class TestRefundAdmin(AdminTestMixin):

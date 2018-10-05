@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from .views import PublicQuoteViewSet, QuoteViewSet
+from datahub.omis.quote.views import PublicQuoteViewSet, QuoteViewSet
 
 
 # internal frontend API

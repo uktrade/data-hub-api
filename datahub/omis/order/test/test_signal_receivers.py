@@ -1,8 +1,8 @@
 import pytest
 
-from .factories import OrderAssigneeFactory, OrderFactory
-from ..constants import VATStatus
-from ..pricing import get_pricing_from_order
+from datahub.omis.order.constants import VATStatus
+from datahub.omis.order.pricing import get_pricing_from_order
+from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory
 
 
 pytestmark = pytest.mark.django_db

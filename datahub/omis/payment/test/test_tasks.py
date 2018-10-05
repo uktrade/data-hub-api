@@ -4,10 +4,10 @@ import factory
 import pytest
 from freezegun import freeze_time
 
-from .factories import PaymentGatewaySessionFactory
-from ..constants import PaymentGatewaySessionStatus
-from ..govukpay import govuk_url
-from ..tasks import refresh_pending_payment_gateway_sessions
+from datahub.omis.payment.constants import PaymentGatewaySessionStatus
+from datahub.omis.payment.govukpay import govuk_url
+from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
+from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
 
 
 # mark the whole module for db use
