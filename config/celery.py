@@ -24,7 +24,7 @@ app.autodiscover_tasks()
 # config sentry
 client = Client(
     dsn=os.environ.get('DJANGO_SENTRY_DSN'),
-    environment=os.environ.get('SENTRY_ENVIRONMENT')
+    environment=os.environ.get('SENTRY_ENVIRONMENT'),
 )
 
 # register a custom filter to filter out duplicate logs
