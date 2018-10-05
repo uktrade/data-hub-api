@@ -5,9 +5,9 @@ import reversion
 from django.db.models import Q
 
 from datahub.company.models import Advisor, Company
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 from datahub.metadata.models import CompanyClassification
-from ..base import CSVBaseCommand
 
 
 logger = getLogger(__name__)

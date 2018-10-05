@@ -2,8 +2,8 @@ import reversion
 
 from datahub.company.models import Company
 from datahub.company.serializers import CompanySerializer
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):
