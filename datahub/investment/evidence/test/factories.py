@@ -2,7 +2,7 @@ import uuid
 
 import factory
 
-from ..models import EvidenceTag
+from datahub.investment.evidence.models import EvidenceTag
 
 
 class EvidenceTagFactory(factory.django.DjangoModelFactory):

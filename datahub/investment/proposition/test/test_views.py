@@ -14,15 +14,19 @@ from datahub.core.test_utils import APITestMixin, create_test_user, format_date_
 from datahub.documents.models import Document, UPLOAD_STATUSES
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.proposition.constants import (
-    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus,
+    FEATURE_FLAG_PROPOSITION_DOCUMENT,
+    PropositionStatus,
 )
 from datahub.investment.proposition.models import (
-    Proposition, PropositionDocument, PropositionDocumentPermission, PropositionPermission,
+    Proposition,
+    PropositionDocument,
+    PropositionDocumentPermission,
+    PropositionPermission,
 )
+from datahub.investment.proposition.test.factories import PropositionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
-from .factories import PropositionFactory
 
 NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
