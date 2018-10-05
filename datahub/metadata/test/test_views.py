@@ -8,10 +8,10 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
-from .factories import ServiceFactory
-from .. import urls
-from ..models import Sector, Service
-from ..registry import registry
+from datahub.metadata import urls
+from datahub.metadata.models import Sector, Service
+from datahub.metadata.registry import registry
+from datahub.metadata.test.factories import ServiceFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db

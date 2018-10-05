@@ -2,7 +2,7 @@ from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
 from datahub.core.admin import DisabledOnFilter, ViewAndChangeOnlyAdmin, ViewOnlyAdmin
-from . import models
+from datahub.metadata import models
 
 
 MODELS_TO_REGISTER_DISABLEABLE = (
