@@ -3,10 +3,9 @@ from django.contrib import admin
 from django.urls import include, path
 from oauth2_provider.views import TokenView
 
+from config import api_urls
 from datahub.ping.views import ping
 from datahub.user.views import who_am_i
-
-from . import api_urls
 
 
 unversioned_urls = [
@@ -17,7 +16,13 @@ unversioned_urls = [
     path('metadata/', include('datahub.metadata.urls')),
     path('token/', TokenView.as_view(), name='token'),
     path('whoami/', who_am_i, name='who_am_i'),
-    path('dashboard/', include(('datahub.search.dashboard.urls', 'dashboard'), namespace='dashboard'))
+    path(
+        'dashboard/',
+        include(
+            ('datahub.search.dashboard.urls', 'dashboard'),
+            namespace='dashboard',
+        ),
+    ),
 ]
 
 urlpatterns = [
