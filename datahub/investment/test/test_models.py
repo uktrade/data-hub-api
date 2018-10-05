@@ -11,7 +11,8 @@ from freezegun import freeze_time
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
+    InvestmentProjectFactory,
+    InvestmentProjectTeamMemberFactory,
 )
 
 pytestmark = pytest.mark.django_db

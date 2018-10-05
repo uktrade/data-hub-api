@@ -13,7 +13,8 @@ from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.proposition.constants import (
-    FEATURE_FLAG_PROPOSITION_DOCUMENT, PropositionStatus,
+    FEATURE_FLAG_PROPOSITION_DOCUMENT,
+    PropositionStatus,
 )
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
