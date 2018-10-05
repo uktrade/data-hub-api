@@ -13,9 +13,6 @@ from datetime import timedelta
 import environ
 from celery.schedules import crontab
 
-from .companieshouse import *
-
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 CONFIG_DIR = environ.Path(__file__) - 2
@@ -317,6 +314,10 @@ if REDIS_BASE_URL:
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
+
+# COMPANIESHOUSE
+COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
+
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
