@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from .views import InvoiceViewSet, PublicInvoiceViewSet
+from datahub.omis.invoice.views import InvoiceViewSet, PublicInvoiceViewSet
 
 
 # internal frontend API

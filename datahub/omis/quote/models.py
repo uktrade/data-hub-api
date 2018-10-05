@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.timezone import now
 
 from datahub.core.models import BaseModel
-from .managers import QuoteManager
+from datahub.omis.quote.managers import QuoteManager
 
 
 class TermsAndConditions(models.Model):

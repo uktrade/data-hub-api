@@ -5,12 +5,14 @@ from django.conf import settings
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
 from datahub.omis.market.models import Market
+from datahub.omis.notification.client import Notify
 from datahub.omis.order.test.factories import (
-    OrderCompleteFactory, OrderFactory,
-    OrderPaidFactory, OrderWithOpenQuoteFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderWithOpenQuoteFactory,
 )
 from datahub.omis.region.models import UKRegionalSettings
-from ..client import Notify
 
 
 pytestmark = pytest.mark.django_db

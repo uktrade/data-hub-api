@@ -15,9 +15,9 @@ from datahub.core import constants
 from datahub.core.exceptions import APIConflictException
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.invoice.models import Invoice
-from datahub.omis.payment.models import Payment
-from datahub.omis.quote.models import Quote
-from .factories import (
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.models import CancellationReason
+from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory,
     OrderAssigneeFactory,
     OrderFactory,
@@ -25,8 +25,8 @@ from .factories import (
     OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-from ..constants import OrderStatus
-from ..models import CancellationReason
+from datahub.omis.payment.models import Payment
+from datahub.omis.quote.models import Quote
 
 pytestmark = pytest.mark.django_db
 

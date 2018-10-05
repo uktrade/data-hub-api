@@ -5,14 +5,14 @@ from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.exceptions import APIConflictException
-from .factories import (
+from datahub.omis.order.constants import OrderStatus, VATStatus
+from datahub.omis.order.models import Order
+from datahub.omis.order.test.factories import (
     OrderFactory,
     OrderWithCancelledQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-from ..constants import OrderStatus, VATStatus
-from ..models import Order
-from ..validators import (
+from datahub.omis.order.validators import (
     AssigneesFilledInValidator,
     CancellableOrderValidator,
     CompletableOrderValidator,

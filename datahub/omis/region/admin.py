@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import UKRegionalSettings
+from datahub.omis.region.models import UKRegionalSettings
 
 
 @admin.register(UKRegionalSettings)

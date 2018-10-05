@@ -8,11 +8,13 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test.factories import to_many_field
 from datahub.omis.invoice.models import Invoice
+from datahub.omis.order.constants import OrderStatus, VATStatus
+from datahub.omis.order.models import CancellationReason, ServiceType
 from datahub.omis.quote.test.factories import (
-    AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory,
+    AcceptedQuoteFactory,
+    CancelledQuoteFactory,
+    QuoteFactory,
 )
-from ..constants import OrderStatus, VATStatus
-from ..models import CancellationReason, ServiceType
 
 
 class OrderFactory(factory.django.DjangoModelFactory):

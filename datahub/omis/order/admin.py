@@ -22,8 +22,8 @@ from django.views.decorators.csrf import csrf_protect
 
 from datahub.core.admin import BaseModelAdminMixin, get_change_url, ViewAndChangeOnlyAdmin
 from datahub.core.exceptions import APIConflictException
-from . import validators
-from .models import CancellationReason, Order
+from datahub.omis.order import validators
+from datahub.omis.order.models import CancellationReason, Order
 
 csrf_protect_m = method_decorator(csrf_protect)
 

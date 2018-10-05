@@ -7,8 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from datahub.core.admin import BaseModelAdminMixin
 from datahub.omis.order.constants import OrderStatus
-from .constants import RefundStatus
-from .models import Refund
+from datahub.omis.payment.constants import RefundStatus
+from datahub.omis.payment.models import Refund
 
 
 class RefundForm(forms.ModelForm):

@@ -2,7 +2,7 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from datahub.omis.order.models import Order, OrderAssignee
-from .pricing import update_order_pricing
+from datahub.omis.order.pricing import update_order_pricing
 
 
 @receiver(pre_save, sender=Order)

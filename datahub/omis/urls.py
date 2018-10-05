@@ -1,9 +1,9 @@
 from django.urls import include, path
 
-from .invoice import urls as invoice_urls
-from .order import urls as order_urls
-from .payment import urls as payment_urls
-from .quote import urls as quote_urls
+from datahub.omis.invoice import urls as invoice_urls
+from datahub.omis.order import urls as order_urls
+from datahub.omis.payment import urls as payment_urls
+from datahub.omis.quote import urls as quote_urls
 
 internal_frontend_urls = [
     path('', include((order_urls.internal_frontend_urls, 'order'), namespace='order')),
