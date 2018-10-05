@@ -4,9 +4,9 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
-from django.conf import settings
 from django.db import connection
 
+from datahub.company.ch_constants import CSV_RELEVANT_FIELDS
 from datahub.company.management.commands import sync_ch
 from datahub.company.models import CompaniesHouseCompany
 from datahub.company.test.factories import CompaniesHouseCompanyFactory
@@ -41,7 +41,7 @@ def test_column_filtering():
 
     result = sync_ch.transform_ch_row(test_dict)
 
-    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert set(result.keys()) > set(CSV_RELEVANT_FIELDS)
     assert result['incorporation_date'] == date(1999, 3, 12)
 
 
@@ -51,7 +51,7 @@ def test_missing_registered_address_town():
 
     result = sync_ch.transform_ch_row(test_dict)
 
-    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert set(result.keys()) > set(CSV_RELEVANT_FIELDS)
     assert result['registered_address_town'] == ''
 
 
@@ -64,7 +64,7 @@ def test_empty_registered_address_town():
 
     result = sync_ch.transform_ch_row(test_dict)
 
-    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert set(result.keys()) > set(CSV_RELEVANT_FIELDS)
     assert result['registered_address_town'] == ','
 
 
@@ -76,7 +76,7 @@ def test_present_registered_address_town():
 
     result = sync_ch.transform_ch_row(test_dict)
 
-    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert set(result.keys()) > set(CSV_RELEVANT_FIELDS)
     assert result['registered_address_town'] == 'Meow town'
 
 
@@ -89,7 +89,7 @@ def test_empty_address_town_when_no_address():
 
     result = sync_ch.transform_ch_row(test_dict)
 
-    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert set(result.keys()) > set(CSV_RELEVANT_FIELDS)
     assert result['registered_address_town'] == ''
 
 
