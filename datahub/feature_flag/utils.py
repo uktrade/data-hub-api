@@ -1,4 +1,4 @@
-from .models import FeatureFlag
+from datahub.feature_flag.models import FeatureFlag
 
 
 def is_feature_flag_active(code):

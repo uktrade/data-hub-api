@@ -2,9 +2,14 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, custom_add_permission, custom_change_permission
-from datahub.interaction.models import InteractionPermission, PolicyArea, PolicyIssueType
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    InteractionPermission,
+    PolicyArea,
+    PolicyIssueType,
+)
 from datahub.metadata.admin import DisableableMetadataAdmin, OrderedMetadataAdmin
-from .models import CommunicationChannel, Interaction
 
 
 admin.site.register(CommunicationChannel, DisableableMetadataAdmin)
