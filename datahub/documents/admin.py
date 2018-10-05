@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelAdminMixin
-from . import models
+from datahub.documents import models
 
 
 @admin.register(models.Document)
