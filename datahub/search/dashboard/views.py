@@ -4,10 +4,10 @@ from rest_framework.views import APIView
 
 from datahub.oauth.scopes import Scope
 from datahub.search.contact.apps import ContactSearchApp
+from datahub.search.dashboard.serializers import HomepageSerializer
 from datahub.search.interaction.apps import InteractionSearchApp
 from datahub.search.permissions import has_permissions_for_app
 from datahub.search.query_builder import get_search_by_entity_query, limit_search_query
-from .serializers import HomepageSerializer
 
 
 class IntelligentHomepageView(APIView):

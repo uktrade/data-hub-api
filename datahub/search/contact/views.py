@@ -12,9 +12,9 @@ from datahub.core.query_utils import (
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from .models import Contact
-from .serializers import SearchContactSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from datahub.search.contact.models import Contact
+from datahub.search.contact.serializers import SearchContactSerializer
+from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
 class SearchContactParams:

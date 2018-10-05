@@ -1,4 +1,4 @@
-from ....views import SearchAPIView
+from datahub.search.views import SearchAPIView
 
 
 class SearchRelatedModelAPIView(SearchAPIView):
