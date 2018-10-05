@@ -3,11 +3,15 @@ from datahub.investment.models import (
     InvestmentProjectPermission,
 )
 from datahub.investment.permissions import (
-    get_association_filters, InvestmentProjectAssociationChecker,
+    get_association_filters,
+    InvestmentProjectAssociationChecker,
 )
-from .models import InvestmentProject
-from .views import SearchInvestmentExportAPIView, SearchInvestmentProjectAPIView
-from ..apps import EXCLUDE_ALL, SearchApp
+from datahub.search.apps import EXCLUDE_ALL, SearchApp
+from datahub.search.investment.models import InvestmentProject
+from datahub.search.investment.views import (
+    SearchInvestmentExportAPIView,
+    SearchInvestmentProjectAPIView,
+)
 
 
 class InvestmentSearchApp(SearchApp):

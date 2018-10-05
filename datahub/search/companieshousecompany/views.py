@@ -1,7 +1,7 @@
 from datahub.oauth.scopes import Scope
-from .models import CompaniesHouseCompany
-from .serializers import SearchCompaniesHouseCompanySerializer
-from ..views import SearchAPIView
+from datahub.search.companieshousecompany.models import CompaniesHouseCompany
+from datahub.search.companieshousecompany.serializers import SearchCompaniesHouseCompanySerializer
+from datahub.search.views import SearchAPIView
 
 
 class SearchCompaniesHouseCompanyParams:

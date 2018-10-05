@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
-from ..serializers import (
+from datahub.search.serializers import (
     SearchSerializer,
     SingleOrListField,
 )

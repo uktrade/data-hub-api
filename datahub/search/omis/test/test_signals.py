@@ -1,10 +1,12 @@
 import pytest
 
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory,
-    OrderSubscriberFactory, OrderWithOpenQuoteFactory,
+    OrderAssigneeFactory,
+    OrderFactory,
+    OrderSubscriberFactory,
+    OrderWithOpenQuoteFactory,
 )
-from .. import OrderSearchApp
+from datahub.search.omis import OrderSearchApp
 
 pytestmark = pytest.mark.django_db
 

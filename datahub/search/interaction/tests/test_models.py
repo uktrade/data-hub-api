@@ -1,7 +1,9 @@
 import pytest
 
 from datahub.interaction.test.factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory, ServiceDeliveryFactory,
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+    ServiceDeliveryFactory,
 )
 from datahub.search.interaction.models import Interaction
 

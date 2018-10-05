@@ -2,13 +2,14 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
+    InvestmentProjectFactory,
+    InvestmentProjectTeamMemberFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.investment.models import InvestmentProject
 from datahub.search.query_builder import (
     get_search_by_entity_query,
 )
-from ..models import InvestmentProject
 
 pytestmark = pytest.mark.django_db
 

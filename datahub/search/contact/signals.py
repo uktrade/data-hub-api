@@ -2,9 +2,9 @@ from django.db import transaction
 from django.db.models.signals import post_save
 
 from datahub.company.models import Company as DBCompany, Contact as DBContact
-from .models import Contact as ESContact
-from ..signals import SignalReceiver
-from ..sync_async import sync_object_async
+from datahub.search.contact.models import Contact as ESContact
+from datahub.search.signals import SignalReceiver
+from datahub.search.sync_async import sync_object_async
 
 
 def contact_sync_es(sender, instance, **kwargs):

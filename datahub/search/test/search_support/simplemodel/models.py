@@ -1,7 +1,7 @@
 from elasticsearch_dsl import Keyword
 
-from .... import fields
-from ....models import BaseESModel
+from datahub.search import fields
+from datahub.search.models import BaseESModel
 
 
 class ESSimpleModel(BaseESModel):

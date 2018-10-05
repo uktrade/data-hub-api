@@ -5,9 +5,9 @@ from django.db import transaction
 from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubException
-from .apps import get_search_app_by_model, get_search_apps
-from .elasticsearch import bulk
-from .signals import SignalReceiver
+from datahub.search.apps import get_search_app_by_model, get_search_apps
+from datahub.search.elasticsearch import bulk
+from datahub.search.signals import SignalReceiver
 
 
 BULK_DELETION_TIMEOUT_SECS = 300
