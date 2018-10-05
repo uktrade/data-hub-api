@@ -1,9 +1,9 @@
+from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entity_query,
     limit_search_query,
 )
-from ..models import InvestmentProject as ESInvestmentProject
 
 
 def test_get_basic_search_query():

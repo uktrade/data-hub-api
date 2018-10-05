@@ -6,9 +6,9 @@ from datahub.core.query_utils import (
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from .models import Interaction
-from .serializers import SearchInteractionSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from datahub.search.interaction.models import Interaction
+from datahub.search.interaction.serializers import SearchInteractionSerializer
+from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
 class SearchInteractionParams:

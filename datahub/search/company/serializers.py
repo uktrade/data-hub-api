@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..serializers import SearchSerializer, SingleOrListField, StringUUIDField
+from datahub.search.serializers import SearchSerializer, SingleOrListField, StringUUIDField
 
 
 class SearchCompanySerializer(SearchSerializer):

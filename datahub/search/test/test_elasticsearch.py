@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from django.conf import settings
 
-from .. import elasticsearch
+from datahub.search import elasticsearch
 
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')

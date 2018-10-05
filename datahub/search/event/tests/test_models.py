@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.event.test.factories import EventFactory
-from ..models import Event as ESEvent
+from datahub.search.event.models import Event as ESEvent
 
 pytestmark = pytest.mark.django_db
 
