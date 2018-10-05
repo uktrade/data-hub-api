@@ -1,6 +1,6 @@
 """API URL config."""
 
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 
 from datahub.activity_stream import urls as activity_stream_urls
@@ -26,7 +26,13 @@ v1_urls = router_v1.urls
 # API V3
 
 v3_urls = [
-    path('', include((activity_stream_urls.activity_stream_urls, 'activity-stream'), namespace='activity-stream')),
+    path(
+        '',
+        include(
+            (activity_stream_urls.activity_stream_urls, 'activity-stream'),
+            namespace='activity-stream',
+        ),
+    ),
     path('', include((company_urls.contact_urls, 'contact'), namespace='contact')),
     path('', include((company_urls.company_urls, 'company'), namespace='company')),
     path('', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
@@ -39,6 +45,9 @@ v3_urls = [
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     path(
         'omis/public/',
-        include((omis_urls.public_urls, 'omis-public'), namespace='omis-public')
+        include(
+            (omis_urls.public_urls, 'omis-public'),
+            namespace='omis-public',
+        ),
     ),
 ]
