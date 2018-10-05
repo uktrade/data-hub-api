@@ -3,7 +3,7 @@ from functools import partial
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-from .models import Country, Service, TeamRole, UKRegion
+from datahub.metadata.models import Country, Service, TeamRole, UKRegion
 
 
 TeamWithGeographyField = partial(
