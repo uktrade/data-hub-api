@@ -4,8 +4,8 @@ from celery import shared_task
 from django.db import transaction
 from django_pglocks import advisory_lock
 
-from .av_scan import perform_virus_scan
-from .utils import get_document_by_pk, perform_delete_document
+from datahub.documents.av_scan import perform_virus_scan
+from datahub.documents.utils import get_document_by_pk, perform_delete_document
 
 logger = getLogger(__name__)
 
