@@ -3,7 +3,7 @@ import uuid
 import reversion
 
 from datahub.company.models import Company
-from ..base import CSVBaseCommand
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):

@@ -4,9 +4,9 @@ from uuid import UUID
 import reversion
 
 from datahub.core.constants import InvestmentProjectStage
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_date
 from datahub.investment.models import InvestmentProject
-from ..base import CSVBaseCommand
 
 
 logger = getLogger(__name__)

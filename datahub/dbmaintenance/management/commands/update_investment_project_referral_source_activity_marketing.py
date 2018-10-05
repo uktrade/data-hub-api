@@ -2,9 +2,9 @@ from functools import lru_cache
 
 import reversion
 
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import ReferralSourceActivity, ReferralSourceMarketing
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):

@@ -1,8 +1,8 @@
 from functools import lru_cache
 
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.metadata.models import UKRegion
 from datahub.omis.order.models import Order
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):
