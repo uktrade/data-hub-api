@@ -3,7 +3,7 @@ import environ
 environ.Env.read_env()  # reads the .env file
 env = environ.Env()
 
-from .common import *
+from config.settings.common import *
 
 # We need to prevent Django from initialising datahub.search for tests.
 # Removing SearchConfig stops django from calling .ready() which initialises
