@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from rest_framework import status
 
-from .services import services_to_check
+from datahub.ping.services import services_to_check
 
 PINGDOM_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <pingdom_http_custom_check>
