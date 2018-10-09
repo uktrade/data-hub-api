@@ -4,6 +4,9 @@ from datahub.search import fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'simplemodel'
+
+
 class ESSimpleModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
@@ -24,4 +27,7 @@ class ESSimpleModel(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = 'simplemodel'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE

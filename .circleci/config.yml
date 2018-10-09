@@ -77,25 +77,24 @@ job_defaults: &job_defaults
             command: |
               wget -O codecov.sh https://codecov.io/bash
               bash ./codecov.sh -t ${COV_TOKEN}
-
 jobs:
 
-  build_es_55:
+  build_es_63:
     <<: *job_defaults
 
-  build_es_63:
+  build_es_64:
     <<: *job_defaults
 
 workflows:
   version: 2
 
-  Elasticsearch 5.5:
-    jobs:
-      - build_es_55:
-          publish_coverage: true
-          es_image: elasticsearch:5.5
-
   Elasticsearch 6.3:
     jobs:
       - build_es_63:
+          publish_coverage: true
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+
+  Elasticsearch 6.4:
+    jobs:
+      - build_es_64:
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2

@@ -32,8 +32,8 @@ notifications-python-client==5.2.0
 django-redis==4.9.0
 
 # ES
-elasticsearch==5.5.3
-elasticsearch-dsl==5.4.0
+elasticsearch==6.3.1
+elasticsearch-dsl==6.2.1
 aws-requests-auth==0.4.2
 
 # Celery

@@ -4,6 +4,9 @@ from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'companieshousecompany'
+
+
 class CompaniesHouseCompany(BaseESModel):
     """Elasticsearch representation of CompaniesHouseCompany model."""
 
@@ -48,4 +51,7 @@ class CompaniesHouseCompany(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = 'companieshousecompany'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE

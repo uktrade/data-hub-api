@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
+from elasticsearch_dsl import Keyword, Mapping
 
 from datahub.search import elasticsearch
 
@@ -58,14 +59,11 @@ def test_creates_index(monkeypatch, mock_es_client):
             'testsetting1': 'testval1',
         },
     )
-    mock_mapping = mock.Mock(
-        _collect_analysis=mock.Mock(return_value={}),
-        to_dict=mock.Mock(return_value={'mapping': 'test-mapping'}),
-    )
-
+    mapping = Mapping('test-mapping')
+    mapping.field('test-field', Keyword())
     index = 'test-index'
     connection = mock_es_client.return_value
-    elasticsearch.create_index(index, mock_mapping, alias_names=('alias1', 'alias2'))
+    elasticsearch.create_index(index, mapping, alias_names=('alias1', 'alias2'))
     connection.indices.create.assert_called_once_with(
         index='test-index',
         body={
@@ -133,7 +131,13 @@ def test_creates_index(monkeypatch, mock_es_client):
                 'alias2': {},
             },
             'mappings': {
-                'mapping': 'test-mapping',
+                'test-mapping': {
+                    'properties': {
+                        'test-field': {
+                            'type': 'keyword',
+                        },
+                    },
+                },
             },
         },
     )
