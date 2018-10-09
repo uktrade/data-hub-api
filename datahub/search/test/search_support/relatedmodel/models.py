@@ -5,6 +5,9 @@ from datahub.search import fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'relatedmodel'
+
+
 class ESRelatedModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
@@ -20,4 +23,7 @@ class ESRelatedModel(BaseESModel):
     class Meta:
         """Model configuration."""
 
-        doc_type = 'relatedmodel'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE

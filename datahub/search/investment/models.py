@@ -5,6 +5,9 @@ from datahub.search import fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'investment_project'
+
+
 def _referral_source_adviser_mapping():
     """
     Mapping for referral_source_adviser.
@@ -196,4 +199,7 @@ class InvestmentProject(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = 'investment_project'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE

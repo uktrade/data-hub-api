@@ -37,8 +37,8 @@ django==2.1.2
 djangorestframework==3.8.2
 docopt==0.6.2             # via docopt, notifications-python-client
 docutils==0.14            # via botocore, docutils
-elasticsearch-dsl==5.4.0
-elasticsearch==5.5.3
+elasticsearch-dsl==6.2.1
+elasticsearch==6.3.1
 execnet==1.5.0            # via pytest-xdist
 factory-boy==2.11.1
 faker==0.9.2              # via factory-boy
@@ -59,6 +59,7 @@ greenlet==0.4.15          # via gevent
 gunicorn==19.9.0
 idna==2.7                 # via requests
 incremental==17.5.0       # via towncrier
+ipaddress==1.0.22         # via elasticsearch-dsl
 ipdb==0.11
 ipython-genutils==0.2.0   # via ipython-genutils, traitlets
 ipython==7.0.1
