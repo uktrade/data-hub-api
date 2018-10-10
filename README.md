@@ -330,7 +330,7 @@ Migrate modified mappings:
 ./manage.py migrate_es
 ```
 
-Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch migrations.md) for more detail.
+Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail.
 
 
 ### Companies House
