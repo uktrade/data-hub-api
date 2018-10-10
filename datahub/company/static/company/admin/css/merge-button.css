@@ -1,0 +1,23 @@
+.object-tool-button {
+  background: #999;
+  border:none;
+  border-radius: 15px;
+  color: #fff;
+  cursor: pointer;
+  display: block;
+  float: left;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  line-height: inherit;
+  padding: 3px 12px;
+  text-transform: uppercase;
+}
+
+.object-tool-button:focus, .object-tool-button:hover {
+    background-color: #417690;
+}
+
+.object-tool-button:focus {
+    text-decoration: none;
+}

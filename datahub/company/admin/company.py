@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.db import models
 from reversion.admin import VersionAdmin
 
+from datahub.company.admin.company_merge_list import CompanyMergeViews
 from datahub.company.models import Company, CompanyCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin
 
@@ -133,3 +134,46 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     inlines = (
         CompanyCoreTeamMemberInline,
     )
+
+    def __init__(self, *args, **kwargs):
+        """Initialises the instance."""
+        self.merge_views = CompanyMergeViews(self)
+        super().__init__(*args, **kwargs)
+
+    def get_urls(self):
+        """Gets the URLs for this model."""
+        return [
+            *self.merge_views.get_urls(),
+            *super().get_urls(),
+        ]
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """
+        Change view with additional data added to the context.
+
+        Based on this example in the Django docs:
+        https://docs.djangoproject.com/en/2.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.changelist_view
+        """
+        extra_context = {
+            **({} if extra_context is None else extra_context),
+            **self.merge_views.changelist_context(request),
+        }
+        return super().change_view(
+            request,
+            object_id,
+            form_url=form_url,
+            extra_context=extra_context,
+        )
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Change list view with additional data added to the context.
+
+        Based on this example in the Django docs:
+        https://docs.djangoproject.com/en/2.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.changelist_view
+        """
+        extra_context = {
+            **({} if extra_context is None else extra_context),
+            **self.merge_views.changelist_context(request),
+        }
+        return super().changelist_view(request, extra_context=extra_context)
