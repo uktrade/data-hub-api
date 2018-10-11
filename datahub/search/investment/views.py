@@ -81,7 +81,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
     queryset = DBInvestmentProject.objects.annotate(
         computed_project_code=get_project_code_expression(),
         status_name=get_choices_as_case_expression(DBInvestmentProject, 'status'),
-        link=get_front_end_url_expression('investment-project', 'pk'),
+        link=get_front_end_url_expression('investmentproject', 'pk'),
         date_of_latest_interaction=get_aggregate_subquery(
             DBInvestmentProject,
             Max('interactions__date'),

@@ -9,7 +9,7 @@ from mptt.fields import TreeForeignKey
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
-from datahub.core.utils import StrEnum
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 from datahub.metadata.models import BusinessType
 
@@ -144,6 +144,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this company.',
     )
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     class Meta:
         verbose_name_plural = 'companies'

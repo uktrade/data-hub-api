@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 import pytest
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import utc
 from freezegun import freeze_time
@@ -41,6 +42,14 @@ def test_no_project_code():
     project = InvestmentProjectFactory(cdms_project_code='P-79661656')
     project.cdms_project_code = None
     assert project.project_code is None
+
+
+def test_interaction_get_absolute_url():
+    """Test that InvestmentProject.get_absolute_url() returns the correct URL."""
+    project = InvestmentProjectFactory.build()
+    assert project.get_absolute_url() == (
+        f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}/{project.pk}'
+    )
 
 
 def test_client_relationship_manager_team_none():
