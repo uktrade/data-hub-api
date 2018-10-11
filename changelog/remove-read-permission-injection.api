@@ -1,1 +1,0 @@
-- ``GET /whoami/`` no longer returns the ``read_*`` permissions that were being returned for backwards compatibility following the introduction of ``view_*`` permissions.
