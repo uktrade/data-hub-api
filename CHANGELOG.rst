@@ -1,3 +1,46 @@
+Data Hub API 7.1.0 (2018-10-11)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Contacts** The column ``company_contact.contactable_by_dit`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_uk_dit_partners`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_overseas_dit_partners`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_email`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_phone`` has been deleted from the database.
+- ``GET /whoami/`` no longer returns the ``read_*`` permissions that were being returned for backwards compatibility following the introduction of ``view_*`` permissions.
+
+Internal changes
+----------------
+
+- Various dependencies were updated.
+
+API
+---
+
+- ``GET /whoami/`` no longer returns the ``read_*`` permissions that were being returned for backwards compatibility following the introduction of ``view_*`` permissions.
+
+Database schema
+---------------
+
+- **Contacts** The column ``company_contact.contactable_by_dit`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_uk_dit_partners`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_overseas_dit_partners`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_email`` has been deleted from the database.
+
+  The column ``company_contact.contactable_by_phone`` has been deleted from the database.
+
+
 Data Hub API 7.0.0 (2018-10-04)
 ===============================
 
