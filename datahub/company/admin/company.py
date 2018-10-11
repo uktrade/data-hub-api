@@ -156,7 +156,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         """
         extra_context = {
             **({} if extra_context is None else extra_context),
-            **self.merge_views.changelist_context(request),
+            **self.merge_views.change_context(request),
         }
         return super().change_view(
             request,
