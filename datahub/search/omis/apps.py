@@ -1,7 +1,7 @@
 from datahub.omis.order.models import Order as DBOrder, OrderPermission
-from .models import Order
-from .views import SearchOrderAPIView, SearchOrderExportAPIView
-from ..apps import SearchApp
+from datahub.search.apps import SearchApp
+from datahub.search.omis.models import Order
+from datahub.search.omis.views import SearchOrderAPIView, SearchOrderExportAPIView
 
 
 class OrderSearchApp(SearchApp):

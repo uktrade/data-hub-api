@@ -1,3 +1,3 @@
-from .apps import ContactSearchApp
+from datahub.search.contact.apps import ContactSearchApp
 
 __all__ = ('ContactSearchApp',)

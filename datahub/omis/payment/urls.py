@@ -1,6 +1,10 @@
 from django.urls import path, re_path
 
-from .views import PaymentViewSet, PublicPaymentGatewaySessionViewSet, PublicPaymentViewSet
+from datahub.omis.payment.views import (
+    PaymentViewSet,
+    PublicPaymentGatewaySessionViewSet,
+    PublicPaymentViewSet,
+)
 
 
 # internal frontend API

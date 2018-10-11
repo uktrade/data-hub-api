@@ -1,7 +1,10 @@
-from .models import ESSimpleModel
-from .views import SearchSimpleModelAPIView, SearchSimpleModelExportAPIView
-from ..models import SimpleModel as DBSimpleModel
-from ....apps import SearchApp
+from datahub.search.apps import SearchApp
+from datahub.search.test.search_support.models import SimpleModel as DBSimpleModel
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
+from datahub.search.test.search_support.simplemodel.views import (
+    SearchSimpleModelAPIView,
+    SearchSimpleModelExportAPIView,
+)
 
 
 class SimpleModelSearchApp(SearchApp):

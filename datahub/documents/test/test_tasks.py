@@ -1,9 +1,9 @@
 import pytest
 from django.utils.timezone import now
 
-from .my_entity_document.models import MyEntityDocument
-from ..tasks import delete_document
-from ..utils import get_bucket_name
+from datahub.documents.tasks import delete_document
+from datahub.documents.test.my_entity_document.models import MyEntityDocument
+from datahub.documents.utils import get_bucket_name
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db

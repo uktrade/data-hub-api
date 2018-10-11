@@ -1,6 +1,9 @@
 from datetime import timedelta
 
-from .constants import PAYMENT_DUE_DAYS_BEFORE_DELIVERY, PAYMENT_DUE_DAYS_FROM_NOW
+from datahub.omis.invoice.constants import (
+    PAYMENT_DUE_DAYS_BEFORE_DELIVERY,
+    PAYMENT_DUE_DAYS_FROM_NOW,
+)
 
 
 def calculate_payment_due_date(order):

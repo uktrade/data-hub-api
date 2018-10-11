@@ -1,8 +1,8 @@
 import pytest
 
 from datahub.company.test.factories import ContactFactory
+from datahub.search.contact.models import Contact
 from datahub.search.query_builder import get_basic_search_query
-from ..models import Contact
 
 pytestmark = pytest.mark.django_db
 

@@ -7,8 +7,12 @@ from django.dispatch import receiver
 from datahub.omis.notification.client import notify
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.signals import (
-    order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_cancelled, quote_generated,
+    order_cancelled,
+    order_completed,
+    order_paid,
+    quote_accepted,
+    quote_cancelled,
+    quote_generated,
 )
 
 

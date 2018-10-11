@@ -2,7 +2,7 @@ from unittest import mock
 
 from pytest import raises
 
-from .. import dict_utils
+from datahub.search import dict_utils
 
 
 def test_id_name_dict():

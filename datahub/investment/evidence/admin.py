@@ -1,7 +1,7 @@
 from django.contrib import admin
 
+from datahub.investment.evidence.models import EvidenceTag
 from datahub.metadata.admin import DisableableMetadataAdmin
-from .models import EvidenceTag
 
 
 @admin.register(EvidenceTag)

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.core.exceptions import DataHubException
-from .exceptions import DocumentDeleteException
+from datahub.documents.exceptions import DocumentDeleteException
 
 logger = getLogger(__name__)
 
@@ -81,7 +81,7 @@ def perform_delete_document(document_pk):
 
     :param document_pk: id of the Document
     """
-    from .models import UPLOAD_STATUSES
+    from datahub.documents.models import UPLOAD_STATUSES
 
     document = get_document_by_pk(document_pk)
     if not document:

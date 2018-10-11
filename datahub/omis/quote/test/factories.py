@@ -4,7 +4,7 @@ import factory
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
-from ..models import TermsAndConditions
+from datahub.omis.quote.models import TermsAndConditions
 
 
 class QuoteFactory(factory.django.DjangoModelFactory):

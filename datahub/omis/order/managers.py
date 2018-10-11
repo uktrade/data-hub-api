@@ -1,6 +1,6 @@
 from django.db import models
 
-from .constants import OrderStatus
+from datahub.omis.order.constants import OrderStatus
 
 
 class OrderQuerySet(models.QuerySet):

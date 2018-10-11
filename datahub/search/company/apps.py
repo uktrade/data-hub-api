@@ -1,7 +1,7 @@
 from datahub.company.models import Company as DBCompany, CompanyPermission
-from .models import Company
-from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
-from ..apps import SearchApp
+from datahub.search.apps import SearchApp
+from datahub.search.company.models import Company
+from datahub.search.company.views import SearchCompanyAPIView, SearchCompanyExportAPIView
 
 
 class CompanySearchApp(SearchApp):

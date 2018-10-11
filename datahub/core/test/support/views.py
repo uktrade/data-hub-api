@@ -1,11 +1,12 @@
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
-from datahub.core.test.support.models import PermissionModel
-from datahub.core.test.support.serializers import PermissionModelSerializer
+from datahub.core.test.support.models import MyDisableableModel, PermissionModel
+from datahub.core.test.support.serializers import (
+    MyDisableableModelSerializer,
+    PermissionModelSerializer,
+)
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.test.scopes import TestScope
-from .models import MyDisableableModel
-from .serializers import MyDisableableModelSerializer
 
 
 class MyDisableableModelViewset(CoreViewSet):

@@ -1,8 +1,8 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.search.company.models import Company
 from datahub.search.query_builder import get_basic_search_query
-from ..models import Company
 
 pytestmark = pytest.mark.django_db
 

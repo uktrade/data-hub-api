@@ -2,9 +2,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers, status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from .support.models import EmptyModel, InheritedModel
-from ..test_utils import APITestMixin
-from ..viewsets import CoreViewSet
+from datahub.core.test.support.models import EmptyModel, InheritedModel
+from datahub.core.test_utils import APITestMixin
+from datahub.core.viewsets import CoreViewSet
 
 factory = APIRequestFactory()
 

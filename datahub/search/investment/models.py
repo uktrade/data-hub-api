@@ -1,8 +1,8 @@
 from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Nested, Text
 
-from .. import dict_utils
-from .. import fields
-from ..models import BaseESModel
+from datahub.search import dict_utils
+from datahub.search import fields
+from datahub.search.models import BaseESModel
 
 
 def _referral_source_adviser_mapping():

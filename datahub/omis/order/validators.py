@@ -7,7 +7,7 @@ from rest_framework.settings import api_settings
 from datahub.core.exceptions import APIConflictException
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import AbstractRule, BaseRule
-from .constants import OrderStatus, VATStatus
+from datahub.omis.order.constants import OrderStatus, VATStatus
 
 
 class ContactWorksAtCompanyValidator:

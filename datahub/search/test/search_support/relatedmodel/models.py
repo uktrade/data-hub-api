@@ -1,7 +1,8 @@
 from elasticsearch_dsl import Keyword
 
-from .... import dict_utils, fields
-from ....models import BaseESModel
+from datahub.search import dict_utils
+from datahub.search import fields
+from datahub.search.models import BaseESModel
 
 
 class ESRelatedModel(BaseESModel):

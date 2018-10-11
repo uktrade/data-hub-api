@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-from .models import Quote
-from .serializers import PublicQuoteSerializer, QuoteSerializer
+from datahub.omis.quote.models import Quote
+from datahub.omis.quote.serializers import PublicQuoteSerializer, QuoteSerializer
 
 
 class BaseQuoteViewSet(BaseNestedOrderViewSet):

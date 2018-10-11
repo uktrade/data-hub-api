@@ -10,7 +10,8 @@ from datahub.investment.proposition.models import PropositionDocument
 from datahub.investment.proposition.test.factories import PropositionFactory
 from datahub.investment.report.spi import SPIReport
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, VerifyWinInvestmentProjectFactory,
+    InvestmentProjectFactory,
+    VerifyWinInvestmentProjectFactory,
 )
 from datahub.metadata.models import Team
 

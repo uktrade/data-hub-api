@@ -1,7 +1,7 @@
 from django.db.models.signals import post_delete, pre_delete
 
-from ..models import SimpleModel as DBSimpleModel
-from ....signals import SignalReceiver
+from datahub.search.signals import SignalReceiver
+from datahub.search.test.search_support.models import SimpleModel as DBSimpleModel
 
 
 def dummy_on_delete_callback(sender, instance, **kwargs):

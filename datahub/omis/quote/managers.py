@@ -1,6 +1,6 @@
 from django.db import models
 
-from .utils import (
+from datahub.omis.quote.utils import (
     calculate_quote_expiry_date,
     generate_quote_content,
     generate_quote_reference,

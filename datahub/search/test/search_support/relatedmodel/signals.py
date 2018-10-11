@@ -1,7 +1,10 @@
 from django.db.models.signals import post_save
 
-from ..models import RelatedModel as DBRelatedModel, SimpleModel as DBSimpleModel
-from ....signals import SignalReceiver
+from datahub.search.signals import SignalReceiver
+from datahub.search.test.search_support.models import (
+    RelatedModel as DBRelatedModel,
+    SimpleModel as DBSimpleModel,
+)
 
 
 def _dummy_callback(sender, instance, **kwargs):

@@ -19,17 +19,25 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+    random_obj_for_model,
 )
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentDeliveryPartner, InvestmentProject,
-    InvestmentProjectPermission, InvestmentProjectTeamMember,
+    InvestmentDeliveryPartner,
+    InvestmentProject,
+    InvestmentProjectPermission,
+    InvestmentProjectTeamMember,
 )
 from datahub.investment.test.factories import (
-    ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
-    VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory,
+    ActiveInvestmentProjectFactory,
+    AssignPMInvestmentProjectFactory,
+    InvestmentProjectFactory,
+    InvestmentProjectTeamMemberFactory,
+    VerifyWinInvestmentProjectFactory,
+    WonInvestmentProjectFactory,
 )
 from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory

@@ -1,7 +1,7 @@
 from datahub.oauth.scopes import Scope
-from .models import Event
-from .serializers import SearchEventSerializer
-from ..views import SearchAPIView
+from datahub.search.event.models import Event
+from datahub.search.event.serializers import SearchEventSerializer
+from datahub.search.views import SearchAPIView
 
 
 class SearchEventParams:

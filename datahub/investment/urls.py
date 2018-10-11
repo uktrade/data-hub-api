@@ -5,8 +5,10 @@ from django.urls import include, path
 from datahub.investment.evidence.urls import urlpatterns as evidence_urlpatterns
 from datahub.investment.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.views import (
-    IProjectAuditViewSet, IProjectModifiedSinceViewSet,
-    IProjectTeamMembersViewSet, IProjectViewSet,
+    IProjectAuditViewSet,
+    IProjectModifiedSinceViewSet,
+    IProjectTeamMembersViewSet,
+    IProjectViewSet,
 )
 
 project_collection = IProjectViewSet.as_view({

@@ -8,13 +8,18 @@ from django.conf import settings
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
 from datahub.omis.market.models import Market
+from datahub.omis.notification.client import notify, send_email
+from datahub.omis.notification.constants import Template
 from datahub.omis.order.test.factories import (
-    OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderCompleteFactory,
-    OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory,
+    OrderAssigneeCompleteFactory,
+    OrderAssigneeFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderSubscriberFactory,
+    OrderWithOpenQuoteFactory,
 )
 from datahub.omis.region.models import UKRegionalSettings
-from ..client import notify, send_email
-from ..constants import Template
 
 pytestmark = pytest.mark.django_db
 

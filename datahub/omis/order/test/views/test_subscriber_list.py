@@ -4,8 +4,8 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
-from ..factories import OrderFactory, OrderSubscriberFactory
-from ...constants import OrderStatus
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.test.factories import OrderFactory, OrderSubscriberFactory
 
 
 # mark the whole module for db use
