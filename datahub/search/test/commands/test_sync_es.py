@@ -4,8 +4,8 @@ import pytest
 from django.core import management
 from django.core.management.base import CommandError
 
+from datahub.search.apps import get_search_apps
 from datahub.search.management.commands import sync_es
-from ...apps import get_search_apps
 
 
 @mock.patch(

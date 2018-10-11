@@ -2,9 +2,9 @@ from django.db import transaction
 from django.db.models.signals import post_save
 
 from datahub.event.models import Event as DBEvent
+from datahub.search.event.models import Event as ESEvent
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_async import sync_object_async
-from .models import Event as ESEvent
 
 
 def sync_event_to_es(sender, instance, **kwargs):

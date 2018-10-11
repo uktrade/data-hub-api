@@ -15,16 +15,20 @@ from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
 from datahub.oauth.scopes import Scope
-from datahub.user_event_log.constants import USER_EVENT_TYPES
-from datahub.user_event_log.utils import record_user_event
-from .apps import get_search_apps
-from .permissions import has_permissions_for_app, SearchAndExportPermissions, SearchPermissions
-from .query_builder import (
+from datahub.search.apps import get_search_apps
+from datahub.search.permissions import (
+    has_permissions_for_app,
+    SearchAndExportPermissions,
+    SearchPermissions,
+)
+from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entity_query,
     limit_search_query,
 )
-from .serializers import SearchSerializer
+from datahub.search.serializers import SearchSerializer
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.utils import record_user_event
 
 logger = getLogger(__name__)
 

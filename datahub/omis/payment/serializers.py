@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .constants import PaymentMethod
-from .models import Payment, PaymentGatewaySession
+from datahub.omis.payment.constants import PaymentMethod
+from datahub.omis.payment.models import Payment, PaymentGatewaySession
 
 
 class PaymentListSerializer(serializers.ListSerializer):

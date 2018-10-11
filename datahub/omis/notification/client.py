@@ -8,8 +8,8 @@ from notifications_python_client.notifications import NotificationsAPIClient
 
 from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.omis.market.models import Market
+from datahub.omis.notification.constants import Template
 from datahub.omis.region.models import UKRegionalSettings
-from .constants import Template
 
 
 logger = getLogger(__name__)

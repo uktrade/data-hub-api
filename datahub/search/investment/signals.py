@@ -7,9 +7,9 @@ from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember,
 )
-from .models import InvestmentProject as ESInvestmentProject
-from ..signals import SignalReceiver
-from ..sync_async import sync_object_async
+from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
+from datahub.search.signals import SignalReceiver
+from datahub.search.sync_async import sync_object_async
 
 
 def investment_project_sync_es(sender, instance, **kwargs):

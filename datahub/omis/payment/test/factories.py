@@ -6,8 +6,8 @@ from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.omis.order.test.factories import OrderPaidFactory, OrderWithAcceptedQuoteFactory
-from .. import constants
-from ..models import RefundStatus
+from datahub.omis.payment import constants
+from datahub.omis.payment.models import RefundStatus
 
 
 class PaymentFactory(factory.django.DjangoModelFactory):

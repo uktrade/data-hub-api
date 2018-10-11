@@ -7,8 +7,8 @@ from django.utils.timezone import now
 from model_utils import Choices
 
 from datahub.core.models import ArchivableModel, BaseModel
-from .tasks import virus_scan_document
-from .utils import sign_s3_url
+from datahub.documents.tasks import virus_scan_document
+from datahub.documents.utils import sign_s3_url
 
 logger = getLogger(__name__)
 

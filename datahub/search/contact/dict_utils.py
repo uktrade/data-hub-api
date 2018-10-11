@@ -1,4 +1,4 @@
-from .. import dict_utils
+from datahub.search import dict_utils
 
 
 def computed_address_field(field):

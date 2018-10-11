@@ -5,7 +5,7 @@ from django.utils.timezone import now
 
 from datahub.documents.utils import get_bucket_name, get_s3_client_for_bucket
 from datahub.investment.report.models import SPIReport
-from .spi import write_report
+from datahub.investment.report.spi import write_report
 
 
 def _get_report_key():

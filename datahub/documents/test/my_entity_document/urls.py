@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from .views import MyEntityDocumentViewSet
+from datahub.documents.test.my_entity_document.views import MyEntityDocumentViewSet
 
 my_entity_document_collection = MyEntityDocumentViewSet.as_view({
     'get': 'list',

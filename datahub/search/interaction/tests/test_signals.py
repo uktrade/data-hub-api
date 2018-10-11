@@ -2,7 +2,8 @@ import pytest
 from elasticsearch.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory,
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
 )
 from datahub.search.interaction.apps import InteractionSearchApp
 

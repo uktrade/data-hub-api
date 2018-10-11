@@ -8,15 +8,19 @@ from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import (
-    AdviserFactory, CompaniesHouseCompanyFactory,
-    CompanyFactory, ContactFactory,
+    AdviserFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+    ContactFactory,
 )
 from datahub.core.constants import Country
 from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.test.factories import (
-    HourlyRateFactory, OrderAssigneeFactory, OrderFactory,
+    HourlyRateFactory,
+    OrderAssigneeFactory,
+    OrderFactory,
 )
-from ..utils import (
+from datahub.omis.quote.utils import (
     calculate_quote_expiry_date,
     escape_markdown,
     generate_quote_content,

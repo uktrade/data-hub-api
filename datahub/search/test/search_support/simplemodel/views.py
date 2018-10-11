@@ -1,8 +1,8 @@
 from datahub.oauth.scopes import Scope
-from .models import ESSimpleModel
-from .serializers import SearchSimpleModelSerializer
-from ..models import SimpleModel
-from ....views import SearchAPIView, SearchExportAPIView
+from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
+from datahub.search.test.search_support.simplemodel.serializers import SearchSimpleModelSerializer
+from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
 class SearchSimpleModelParams:

@@ -1,7 +1,7 @@
 from datahub.company.models import Contact as DBContact, ContactPermission
-from .models import Contact
-from .views import SearchContactAPIView, SearchContactExportAPIView
-from ..apps import SearchApp
+from datahub.search.apps import SearchApp
+from datahub.search.contact.models import Contact
+from datahub.search.contact.views import SearchContactAPIView, SearchContactExportAPIView
 
 
 class ContactSearchApp(SearchApp):

@@ -3,8 +3,8 @@ from collections import namedtuple
 from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
-from .constants import VATStatus
-from .validators import VATValidator
+from datahub.omis.order.constants import VATStatus
+from datahub.omis.order.validators import VATValidator
 
 
 OrderPricing = namedtuple(

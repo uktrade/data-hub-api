@@ -11,16 +11,21 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Service, Team
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    InteractionPermission,
+    PolicyArea,
+    PolicyIssueType,
+    ServiceDeliveryStatus,
+)
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+)
+from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-from .utils import resolve_data
-from ..factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory,
-)
-from ...models import (
-    CommunicationChannel, Interaction, InteractionPermission, PolicyArea,
-    PolicyIssueType, ServiceDeliveryStatus,
-)
 
 
 NON_RESTRICTED_VIEW_PERMISSIONS = (

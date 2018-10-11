@@ -10,10 +10,10 @@ from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
-from ..factories import PaymentGatewaySessionFactory
-from ...constants import PaymentGatewaySessionStatus
-from ...govukpay import govuk_url
-from ...models import Payment, PaymentGatewaySession
+from datahub.omis.payment.constants import PaymentGatewaySessionStatus
+from datahub.omis.payment.govukpay import govuk_url
+from datahub.omis.payment.models import Payment, PaymentGatewaySession
+from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
 
 
 class TestPublicCreatePaymentGatewaySession(APITestMixin):

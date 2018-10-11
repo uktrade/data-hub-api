@@ -13,8 +13,15 @@ from datahub.core.test_utils import (
     APITestMixin, format_date_or_datetime, random_obj_for_model,
 )
 from datahub.event.test.factories import EventFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
-from .utils import (
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    PolicyArea,
+    PolicyIssueType,
+    ServiceDeliveryStatus,
+)
+from datahub.interaction.test.factories import PolicyFeedbackFactory
+from datahub.interaction.test.views.utils import (
     create_add_policy_feedback_user,
     create_change_policy_feedback_user,
     create_interaction_user_without_policy_feedback,
@@ -22,14 +29,7 @@ from .utils import (
     create_view_policy_feedback_user,
     resolve_data,
 )
-from ..factories import PolicyFeedbackFactory
-from ...models import (
-    CommunicationChannel,
-    Interaction,
-    PolicyArea,
-    PolicyIssueType,
-    ServiceDeliveryStatus,
-)
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 
 class TestAddPolicyFeedback(APITestMixin):

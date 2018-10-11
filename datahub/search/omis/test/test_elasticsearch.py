@@ -2,13 +2,15 @@ import pytest
 from elasticsearch_dsl import Mapping
 
 from datahub.omis.order.test.factories import (
-    OrderCancelledFactory, OrderCompleteFactory,
-    OrderFactory, OrderPaidFactory,
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
     OrderWithAcceptedQuoteFactory,
 )
-from .. import OrderSearchApp
-from ..models import Order as ESOrder
-from ... import elasticsearch
+from datahub.search import elasticsearch
+from datahub.search.omis import OrderSearchApp
+from datahub.search.omis.models import Order as ESOrder
 
 pytestmark = pytest.mark.django_db
 

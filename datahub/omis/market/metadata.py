@@ -1,7 +1,7 @@
 from datahub.metadata.fixtures import Fixture
 from datahub.metadata.registry import registry
-from . import models
-from .serializers import MarketSerializer
+from datahub.omis.market import models
+from datahub.omis.market.serializers import MarketSerializer
 
 
 class MarketFixtures(Fixture):

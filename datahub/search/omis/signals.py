@@ -6,9 +6,9 @@ from datahub.omis.order.models import (
     OrderAssignee as DBOrderAssignee,
     OrderSubscriber as DBOrderSubscriber,
 )
-from .models import Order as ESOrder
-from ..signals import SignalReceiver
-from ..sync_async import sync_object_async
+from datahub.search.omis.models import Order as ESOrder
+from datahub.search.signals import SignalReceiver
+from datahub.search.sync_async import sync_object_async
 
 
 def order_sync_es(sender, instance, **kwargs):

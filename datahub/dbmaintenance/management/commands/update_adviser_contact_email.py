@@ -1,8 +1,8 @@
 import reversion
 
 from datahub.company.models import Advisor
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_email, parse_uuid
-from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):

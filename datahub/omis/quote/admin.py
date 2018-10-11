@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import TermsAndConditions
+from datahub.omis.quote.models import TermsAndConditions
 
 
 @admin.register(TermsAndConditions)

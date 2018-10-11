@@ -2,8 +2,8 @@
 from django.core.exceptions import PermissionDenied
 
 from datahub.core.viewsets import CoreViewSet
-from .exceptions import TemporarilyUnavailableException
-from .tasks import delete_document
+from datahub.documents.exceptions import TemporarilyUnavailableException
+from datahub.documents.tasks import delete_document
 
 
 class BaseEntityDocumentModelViewSet(CoreViewSet):

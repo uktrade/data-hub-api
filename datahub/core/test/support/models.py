@@ -1,6 +1,6 @@
 from django.db import models
 
-from ...models import BaseConstantModel, BaseModel, DisableableModel
+from datahub.core.models import BaseConstantModel, BaseModel, DisableableModel
 
 
 class MetadataModel(BaseConstantModel):

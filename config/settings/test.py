@@ -3,7 +3,7 @@ import environ
 environ.Env.read_env()  # reads the .env file
 env = environ.Env()
 
-from .common import *
+from config.settings.common import *
 
 # We need to prevent Django from initialising datahub.search for tests.
 # Removing SearchConfig stops django from calling .ready() which initialises
@@ -49,6 +49,10 @@ CACHES = {
 }
 
 CELERY_TASK_ALWAYS_EAGER = True
+
+# Stop WhiteNoise emitting warnings when running tests without running collectstatic first
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_USE_FINDERS = True
 
 ACTIVITY_STREAM_IP_WHITELIST = '1.2.3.4'
 ACTIVITY_STREAM_ACCESS_KEY_ID = 'some-id'

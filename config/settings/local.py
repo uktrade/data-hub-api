@@ -4,7 +4,7 @@ import environ
 environ.Env.read_env()  # reads the .env file
 env = environ.Env()
 
-from .common import *
+from config.settings.common import *
 
 # DRF
 REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += ['rest_framework.authentication.SessionAuthentication']
