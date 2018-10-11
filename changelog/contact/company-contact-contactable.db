@@ -1,9 +1,0 @@
-The column ``company_contact.contactable_by_dit`` has been deleted from the database.
-
-The column ``company_contact.contactable_by_uk_dit_partners`` has been deleted from the database.
-
-The column ``company_contact.contactable_by_overseas_dit_partners`` has been deleted from the database.
-
-The column ``company_contact.contactable_by_email`` has been deleted from the database.
-
-The column ``company_contact.contactable_by_phone`` has been deleted from the database.
