@@ -53,6 +53,7 @@ requests-mock==1.5.2
 django-debug-toolbar==1.10.1
 werkzeug==0.14.1  # Required by runserver_plus - useful for local dev
 pip-tools==3.1.0
+piprot==0.9.10
 towncrier==18.6.0
 
 # Code static analysis

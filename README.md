@@ -330,7 +330,7 @@ Migrate modified mappings:
 ./manage.py migrate_es
 ```
 
-Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch migrations.md) for more detail.
+Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail.
 
 
 ### Companies House
@@ -347,14 +347,6 @@ This downloads the latest data from Companies House, updates the Companies House
 
 ## Dependencies
 
-Direct dependencies are specified in `requirements.in`. `requirements.txt` is a lock file generated using [pip-compile (from pip-tools)](https://github.com/jazzband/pip-tools) and should not be manually edited.
+See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing, 
+adding and upgrading dependencies.
 
-To update the lock file and indirect dependencies, run:
-
-```shell
-pip-compile --upgrade --output-file requirements.txt requirements.in
-```
-
-This must be run whenever `requirements.in` is edited.
-
-Dependencies should still be installed using `requirements.txt`.
