@@ -43,7 +43,7 @@ have been removed which can cause problems.)
 ## How to upgrade dependencies
 
 1. Check for out-of-date dependencies. You can use [piprot](https://github.com/sesh/piprot) for 
-this (must be installed) by running `piprot -o requirements.in`. Alternatively, you can use pip 
+this by running `piprot -o requirements.in`. Alternatively, you can use pip 
 by running `pip list -o`.
 
 2. Update the versions in `requirements.in` to the new desired versions. Make sure you check 
