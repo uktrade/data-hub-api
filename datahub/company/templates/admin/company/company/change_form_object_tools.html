@@ -1,0 +1,15 @@
+{% extends "admin/change_form_object_tools.html" %}
+{% load admin_urls %}
+
+{% block object-tools-items %}
+{% if merge_list_feature_flag %}
+  <li>
+    {% url opts|admin_urlname:'add-to-merge-list' original.pk|admin_urlquote as add_to_merge_list_url %}
+    <form action="{% add_preserved_filters add_to_merge_list_url %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="object-tool-button">Add to merge list</button>
+    </form>
+  </li>
+  {{block.super}}
+{% endif %}
+{% endblock %}

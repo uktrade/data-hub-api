@@ -1,4 +1,5 @@
 {% extends "admin/change_list_object_tools.html" %}
+{% load admin_urls %}
 
 {% block object-tools-items %}
   <li>
@@ -6,5 +7,12 @@
       Export One List
     </a>
   </li>
+  {% if merge_list_feature_flag and has_change_permission and merge_list_count > 0 %}
+    <li>
+      <a href="{% url opts|admin_urlname:'merge-list' %}">
+        View merge list ({{ merge_list_count }})
+      </a>
+    </li>
+  {% endif %}
   {{block.super}}
 {% endblock %}
