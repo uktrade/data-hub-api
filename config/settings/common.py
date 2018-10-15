@@ -324,8 +324,9 @@ DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://loc
 DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
+    'event': f'{DATAHUB_FRONTEND_BASE_URL}/events',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
-    'investment-project': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
+    'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 }
 
