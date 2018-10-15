@@ -3,6 +3,7 @@ from itertools import islice
 from logging import getLogger
 
 import requests
+from django.conf import settings
 
 logger = getLogger(__name__)
 
@@ -93,3 +94,9 @@ def load_constants_to_database(constants, model):
 
             model_obj.name = constant.value.name
             model_obj.save()
+
+
+def get_front_end_url(obj):
+    """Gets the URL for the object in the Data Hub internal front end."""
+    url_prefix = settings.DATAHUB_FRONTEND_URL_PREFIXES[obj._meta.model_name]
+    return f'{url_prefix}/{obj.pk}'

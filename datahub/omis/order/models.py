@@ -16,7 +16,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import StrEnum
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
@@ -303,6 +303,10 @@ class Order(BaseModel):
     def __str__(self):
         """Human-readable representation"""
         return self.reference
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     def get_current_contact_email(self):
         """
