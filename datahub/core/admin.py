@@ -1,9 +1,15 @@
+from urllib.parse import urlencode
+
+from django import forms
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
+from django.contrib.admin.views.main import TO_FIELD_VAR
+from django.core.exceptions import ValidationError
 from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext
 
 
 class DisabledOnFilter(admin.SimpleListFilter):
@@ -108,6 +114,61 @@ class BaseModelAdminMixin:
         obj.modified_by = request.user
 
         super().save_model(request, obj, form, change)
+
+
+class RawIdWidget(forms.TextInput):
+    """
+    A widget for selecting a model object using a change list in a pop-up window.
+
+    This is similar to and based on RawForeignKeyIdWidget, however it is not tied to a
+    particular model field (as RawForeignKeyIdWidget is).
+    """
+
+    template_name = 'admin/widgets/foreign_key_raw_id.html'
+
+    def __init__(self, model, admin_site=admin.site, attrs=None):
+        """Initialises the widget."""
+        self.model = model
+        self.admin_site = admin_site
+        super().__init__(attrs)
+
+    def get_context(self, name, value, attrs):
+        """Gets the template context."""
+        context = super().get_context(name, value, attrs)
+
+        if self.model not in self.admin_site._registry:
+            raise ValueError('The specified model is not registered with the specified admin site')
+
+        changelist_route_name = admin_urlname(self.model._meta, 'changelist')
+
+        related_url = reverse(changelist_route_name, current_app=self.admin_site.name)
+        params = {
+            TO_FIELD_VAR: 'id',
+        }
+        query_string = urlencode(params)
+
+        context['related_url'] = f'{related_url}?{query_string}'
+        context['widget']['attrs']['class'] = 'vForeignKeyRawIdAdminField'
+
+        title_format = gettext('Look up {verbose_name}')
+        context['link_title'] = title_format.format(verbose_name=self.model._meta.verbose_name)
+
+        if context['widget']['value']:
+            context['link_label'], context['link_url'] = self.label_and_url_for_value(value)
+
+        return context
+
+    def label_and_url_for_value(self, value):
+        """Gets the link label and URL for a specified value."""
+        try:
+            obj = self.model.objects.get(pk=value)
+        except (ValueError, self.model.DoesNotExist, ValidationError):
+            return '', ''
+
+        change_route_name = admin_urlname(obj._meta, 'change')
+        url = reverse(change_route_name, args=(obj.pk,), current_app=self.admin_site.name)
+
+        return str(obj), url
 
 
 def custom_add_permission(permission_codename):
