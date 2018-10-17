@@ -50,6 +50,8 @@ class Contact(ArchivableModel, BaseModel):
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
+    # Note: An index on UPPER(email) exists for use with iexact filtering
+    # See the 0038_add_index_contact_email_upper migration
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
