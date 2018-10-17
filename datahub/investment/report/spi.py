@@ -39,6 +39,8 @@ class SPIReport:
 
     SPI1_START = 'Project created on'
     SPI1_END = 'Enquiry processed'
+    SPI1_END_INTERACTION_TYPE = 'Enquiry type'
+    SPI1_END_BY = 'Enquiry processed by'
     SPI2_START = 'Assigned to IST'
     SPI2_END = 'Project manager assigned'
     SPI3 = 'Propositions'
@@ -55,6 +57,8 @@ class SPIReport:
         SPI_NAME: SPI_NAME,
         SPI1_START: SPI1_START,
         SPI1_END: SPI1_END,
+        SPI1_END_INTERACTION_TYPE: SPI1_END_INTERACTION_TYPE,
+        SPI1_END_BY: SPI1_END_BY,
         SPI2_START: SPI2_START,
         SPI2_END: SPI2_END,
         SPI5_START: SPI5_START,
@@ -100,7 +104,9 @@ class SPIReport:
             | self.SPI5_END_SERVICE_IDS
         )
 
-        interactions = Interaction.objects.filter(
+        interactions = Interaction.objects.select_related(
+            'service',
+        ).filter(
             investment_project_id=investment_project.id,
             service_id__in=all_service_ids,
         ).order_by('created_on')
@@ -112,7 +118,11 @@ class SPIReport:
                     str(interaction.service_id) in service_ids
                     and field_name not in data
                 ):
-                    data[field_name] = format_date(interaction.created_on)
+                    data[field_name] = {
+                        'created_by': interaction.created_by.name,
+                        'service_name': interaction.service.name,
+                        'created_on': format_date(interaction.created_on),
+                    }
 
         return data
 
@@ -182,24 +192,27 @@ class SPIReport:
         spi_data[self.SPI_NAME] = investment_project.name
         return spi_data
 
-    def get_spi1(self, investment_project, spi_interaction_dates):
-        """Update data with SPI 1 dates."""
+    def get_spi1(self, investment_project, spi_interactions):
+        """Update data with SPI 1 values."""
         data = {}
 
         data[self.SPI1_START] = format_date(investment_project.created_on)
-        if self.SPI1_END in spi_interaction_dates:
-            data[self.SPI1_END] = spi_interaction_dates[self.SPI1_END]
+        if self.SPI1_END in spi_interactions:
+            spi_interaction = spi_interactions[self.SPI1_END]
+            data[self.SPI1_END] = spi_interaction['created_on']
+            data[self.SPI1_END_INTERACTION_TYPE] = spi_interaction['service_name']
+            data[self.SPI1_END_BY] = spi_interaction['created_by']
 
         return data
 
-    def get_spi2(self, investment_project, spi_interaction_dates):
+    def get_spi2(self, investment_project, spi_interactions):
         """Update data with SPI 2 dates."""
         data = {}
 
         has_ist_pm = self._has_ist_project_manager(investment_project)
 
-        if self.SPI2_START in spi_interaction_dates:
-            data[self.SPI2_START] = spi_interaction_dates[self.SPI2_START]
+        if self.SPI2_START in spi_interactions:
+            data[self.SPI2_START] = spi_interactions[self.SPI2_START]['created_on']
 
         if has_ist_pm and investment_project.project_manager_first_assigned_on:
             data[self.SPI2_END] = format_date(investment_project.project_manager_first_assigned_on)
@@ -216,7 +229,7 @@ class SPIReport:
 
         return data
 
-    def get_spi5(self, investment_project, spi_interaction_dates):
+    def get_spi5(self, investment_project, spi_interactions):
         """Update data with SPI 5 dates."""
         data = {}
 
@@ -229,8 +242,8 @@ class SPIReport:
             if moved_to_won:
                 data[self.SPI5_START] = format_date(moved_to_won)
 
-            if self.SPI5_END in spi_interaction_dates:
-                data[self.SPI5_END] = spi_interaction_dates[self.SPI5_END]
+            if self.SPI5_END in spi_interactions:
+                data[self.SPI5_END] = spi_interactions[self.SPI5_END]['created_on']
 
         return data
 
