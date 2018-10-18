@@ -1,9 +1,0 @@
-The following endpoints were removed:
-
-GET,POST /v3/business-leads
-
-GET,PATCH /v3/business-leads/<uuid:pk>
-
-POST /v3/business-leads/<uuid:pk>/archive
-
-POST /v3/business-leads/<uuid:pk>/unarchive
