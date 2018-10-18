@@ -506,11 +506,46 @@ class TestCreateView(APITestMixin):
 
     def test_create_project_conditional_failure(self):
         """Test creating a project w/ missing conditionally required value."""
+        url = reverse('api-v3:investment:investment-collection')
+        extra_request_data = {
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id,
+            },
+            'estimated_land_date': '2010-01-01',
+        }
+        request_data = self._get_request_data_for_create_project_failure()
+        request_data.update(extra_request_data)
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'fdi_type': ['This field is required.'],
+        }
+
+    def test_create_project_without_estimated_land_date_failure(self):
+        """Test creating a project w/ missing estimated land date and another required field."""
+        url = reverse('api-v3:investment:investment-collection')
+        request_data = self._get_request_data_for_create_project_failure()
+        extra_request_data = {
+            'fdi_type': {
+                'id': constants.FDIType.creation_of_new_site_or_activity.value.id,
+            },
+            'estimated_land_date': None,
+        }
+        request_data.update(extra_request_data)
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'estimated_land_date': ['This field is required.'],
+            'referral_source_activity': ['This field is required.'],
+        }
+
+    def _get_request_data_for_create_project_failure(self):
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory()
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
-        url = reverse('api-v3:investment:investment-collection')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
         request_data = {
@@ -542,23 +577,16 @@ class TestCreateView(APITestMixin):
             'intermediate_company': {
                 'id': str(intermediate_company.id),
             },
-            'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id,
-            },
             'referral_source_adviser': {
                 'id': str(adviser.id),
             },
             'sector': {
                 'id': str(aerospace_id),
             },
+
+
         }
-        response = self.api_client.post(url, data=request_data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-        assert response_data == {
-            'estimated_land_date': ['This field is required.'],
-            'fdi_type': ['This field is required.'],
-        }
+        return request_data
 
 
 class TestRetrieveView(APITestMixin):

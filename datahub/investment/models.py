@@ -18,7 +18,7 @@ from datahub.core.models import (
     BaseConstantModel,
     BaseModel,
 )
-from datahub.core.utils import StrEnum
+from datahub.core.utils import get_front_end_url, StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -399,6 +399,10 @@ class InvestmentProject(
         super().__init__(*args, **kwargs)
         self.__stage_id = self.stage_id
         self.__project_manager_id = self.project_manager_id
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     def save(self, *args, **kwargs):
         """Updates the stage log after saving."""

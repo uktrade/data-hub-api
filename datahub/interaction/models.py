@@ -6,7 +6,7 @@ from model_utils import Choices
 
 from datahub.core import reversion
 from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
-from datahub.core.utils import StrEnum
+from datahub.core.utils import get_front_end_url, StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -195,6 +195,10 @@ class Interaction(BaseModel):
         if self.kind == self.KINDS.service_delivery:
             return bool(self.event)
         return None
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     def __str__(self):
         """Human-readable representation."""

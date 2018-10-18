@@ -59,8 +59,6 @@ def _get_to_many_id(instance):
 
 # Conditional validation rules. Mapping from field names to validation rules.
 CONDITIONAL_VALIDATION_MAPPING = {
-    'estimated_land_date':
-        CondValRule('allow_blank_estimated_land_date', False, Stage.prospect.value),
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
     'other_business_activity':

@@ -10,7 +10,6 @@ from datahub.event import urls as event_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
-from datahub.leads import urls as leads_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
 
@@ -40,7 +39,6 @@ v3_urls = [
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
-    path('', include((leads_urls, 'business-leads'), namespace='business-leads')),
     path('', include((search_urls, 'search'), namespace='search')),
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     path(

@@ -5,6 +5,7 @@ from unittest import mock
 import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
+from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 from freezegun import freeze_time
@@ -755,3 +756,11 @@ class TestOrderAssignee:
         with pytest.raises(ValueError):
             assignee.adviser = AdviserFactory()
             assignee.save()
+
+
+def test_order_get_absolute_url():
+    """Test that Order.get_absolute_url() returns the correct URL."""
+    order = OrderFactory.build()
+    assert order.get_absolute_url() == (
+        f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["order"]}/{order.pk}'
+    )

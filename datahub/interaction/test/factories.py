@@ -22,7 +22,10 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
-    contact = factory.LazyAttribute(lambda i: ContactFactory(company=i.company))
+    contact = factory.SubFactory(
+        ContactFactory,
+        company=factory.SelfAttribute('..company'),
+    )
     subject = factory.Faker('sentence', nb_words=8)
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
