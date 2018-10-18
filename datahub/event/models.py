@@ -5,6 +5,7 @@ from django.db import models
 
 from datahub.core import reversion
 from datahub.core.models import BaseConstantModel, BaseModel, DisableableModel
+from datahub.core.utils import get_front_end_url
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -48,6 +49,10 @@ class Event(BaseModel, DisableableModel):
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this event.',
     )
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     def __str__(self):
         """Human-readable representation"""

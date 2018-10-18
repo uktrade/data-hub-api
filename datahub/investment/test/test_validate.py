@@ -48,25 +48,6 @@ def test_validate_fdi_type():
     assert 'fdi_type' in errors
 
 
-@pytest.mark.parametrize(
-    'allow_blank_estimated_land_date,is_error',
-    (
-        (True, False),
-        (False, True),
-    ),
-)
-def test_validate_estimated_land_date(allow_blank_estimated_land_date, is_error):
-    """Tests estimated_land_date conditional validation."""
-    investment_type_id = constants.InvestmentType.fdi.value.id
-    project = InvestmentProjectFactory(
-        investment_type_id=investment_type_id,
-        allow_blank_estimated_land_date=allow_blank_estimated_land_date,
-        estimated_land_date=None,
-    )
-    errors = validate(instance=project, fields=CORE_FIELDS)
-    assert ('estimated_land_date' in errors) == is_error
-
-
 def test_validate_business_activity_other_instance():
     """Tests other_business_activity conditional validation for a model instance."""
     project = InvestmentProjectFactory(

@@ -92,7 +92,9 @@ class AdminTestMixin:
     @property
     def client(self):
         """Returns an authenticated admin client."""
-        return self.create_client()
+        if not hasattr(self, '_client'):
+            self._client = self.create_client()
+        return self._client
 
     def create_client(self, user=None):
         """Creates a client with admin access."""
@@ -144,7 +146,9 @@ class APITestMixin:
     @property
     def api_client(self):
         """An API client with data-hub:internal-front-end scope."""
-        return self.create_api_client()
+        if not hasattr(self, '_client'):
+            self._api_client = self.create_api_client()
+        return self._api_client
 
     def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes,
                           grant_type=Application.GRANT_PASSWORD, user=None):

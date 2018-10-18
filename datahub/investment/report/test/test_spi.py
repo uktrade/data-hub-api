@@ -119,8 +119,12 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
     assert rows[0]['Project created on'] == investment_project.created_on.isoformat()
     if visible:
         assert rows[0]['Enquiry processed'] == interaction.created_on.isoformat()
+        assert rows[0]['Enquiry processed by'] == interaction.created_by.name
+        assert rows[0]['Enquiry type'] == interaction.service.name
     else:
         assert 'Enquiry processed' not in rows[0]
+        assert 'Enquiry processed by' not in rows[0]
+        assert 'Enquiry type' not in rows[0]
 
 
 @pytest.mark.parametrize(

@@ -5,7 +5,7 @@ from django.db import models
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import StrEnum
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -50,6 +50,8 @@ class Contact(ArchivableModel, BaseModel):
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
+    # Note: An index on UPPER(email) exists for use with iexact filtering
+    # See the 0038_add_index_contact_email_upper migration
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -71,6 +73,10 @@ class Contact(ArchivableModel, BaseModel):
 
     # Marketing preferences
     accepts_dit_email_marketing = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     class Meta:
         permissions = (

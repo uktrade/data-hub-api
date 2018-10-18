@@ -176,13 +176,8 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2015, 1, 1),
                 'company__name': 'Black Group',
-                'contact': factory.LazyAttribute(
-                    lambda i: ContactFactory(
-                        company=i.company,
-                        first_name='Holly',
-                        last_name='Taylor',
-                    ),
-                ),
+                'contact__first_name': 'Holly',
+                'contact__last_name': 'Taylor',
                 'dit_adviser__first_name': 'Elaine',
                 'dit_adviser__last_name': 'Johnston',
                 'subject': 'lorem',
@@ -190,13 +185,8 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2005, 4, 1),
                 'company__name': 'Hicks Ltd',
-                'contact': factory.LazyAttribute(
-                    lambda i: ContactFactory(
-                        company=i.company,
-                        first_name='Conor',
-                        last_name='Webb',
-                    ),
-                ),
+                'contact__first_name': 'Conor',
+                'contact__last_name': 'Webb',
                 'dit_adviser__first_name': 'Connor',
                 'dit_adviser__last_name': 'Webb',
                 'subject': 'ipsum',
@@ -204,13 +194,8 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2019, 1, 1),
                 'company__name': 'Sheppard LLC',
-                'contact': factory.LazyAttribute(
-                    lambda i: ContactFactory(
-                        company=i.company,
-                        first_name='Suzanne',
-                        last_name='Palmer',
-                    ),
-                ),
+                'contact__first_name': 'Suzanne',
+                'contact__last_name': 'Palmer',
                 'dit_adviser__first_name': 'Hayley',
                 'dit_adviser__last_name': 'Hunt',
                 'subject': 'dolor',

@@ -24,7 +24,10 @@ class OrderFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
-    contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
+    contact = factory.SubFactory(
+        ContactFactory,
+        company=factory.SelfAttribute('..company'),
+    )
     primary_market_id = Country.france.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     uk_region_id = UKRegion.england.value.id
