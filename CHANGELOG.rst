@@ -1,3 +1,39 @@
+Data Hub API 7.2.0 (2018-10-18)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- All business leads endpoints were removed from the API.
+
+Features
+--------
+
+- **Investment** SPI report now shows "Enquiry type" (the type of interaction that triggered the end of SPI1) and "Enquiry processed by" (who has created the interaction) columns.
+- When viewing a record in the admin site, a link to the page for the record in the main application is now displayed (when applicable).
+
+Bug fixes
+---------
+
+- **Contacts** The speed of the admin site tool for loading marketing email opt-outs was improved via the creation of an additional database index.
+- **Investment** Estimated land date is now validated when other required fields are missing.
+
+API
+---
+
+- The following endpoints were removed:
+
+  GET,POST /v3/business-leads
+
+  GET,PATCH /v3/business-leads/<uuid:pk>
+
+  POST /v3/business-leads/<uuid:pk>/archive
+
+  POST /v3/business-leads/<uuid:pk>/unarchive
+
+
 Data Hub API 7.1.0 (2018-10-11)
 ===============================
 
