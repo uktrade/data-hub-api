@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 NO_CREDENTIALS_MESSAGE = 'Authentication credentials were not provided.'
 INCORRECT_CREDENTIALS_MESSAGE = 'Incorrect authentication credentials.'
+PAAS_ADDED_X_FORWARDED_FOR_IPS = 2
 
 
 def _lookup_credentials(access_key_id):
@@ -83,6 +84,21 @@ class _ActivityStreamAuthentication(BaseAuthentication):
         If either of these suggest we cannot authenticate, AuthenticationFailed
         is raised, as required in the DRF authentication flow
         """
+        self._check_ip(request)
+        return self._authenticate_by_hawk(request)
+
+    def _check_ip(self, request):
+        """Blocks incoming connections based on IP in X-Forwarded-For
+
+        Ideally, this would be done at the network level. However, this is
+        not possible in PaaS. However, they do always add two IPs, with
+        the first one being the IP connection are made from, so we can
+        check the second-from-the-end with some confidence it hasn't been
+        spoofed.
+
+        This wouldn't be able to be trusted in other environments, but we're
+        not running in non-PaaS environments in production.
+        """
         if 'HTTP_X_FORWARDED_FOR' not in request.META:
             logger.warning(
                 'Failed authentication: no X-Forwarded-For header passed',
@@ -90,15 +106,25 @@ class _ActivityStreamAuthentication(BaseAuthentication):
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
         x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR']
-        remote_address = x_forwarded_for.split(',', maxsplit=1)[0].strip()
-
-        if remote_address not in settings.ACTIVITY_STREAM_IP_WHITELIST:
+        ip_addesses = x_forwarded_for.split(',')
+        if len(ip_addesses) < PAAS_ADDED_X_FORWARDED_FOR_IPS:
             logger.warning(
-                'Failed authentication: the X-Forwarded-For header did not '
-                'start with an IP in the whitelist',
+                'Failed authentication: the X-Forwarded-For header does not '
+                'contain enough IP addresses',
             )
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
+        # PaaS appends 2 IPs, where the IP connected from is the first
+        remote_address = ip_addesses[-PAAS_ADDED_X_FORWARDED_FOR_IPS].strip()
+
+        if remote_address not in settings.ACTIVITY_STREAM_IP_WHITELIST:
+            logger.warning(
+                'Failed authentication: the X-Forwarded-For header was not '
+                'produced by a whitelisted IP',
+            )
+            raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
+
+    def _authenticate_by_hawk(self, request):
         if 'HTTP_AUTHORIZATION' not in request.META:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
