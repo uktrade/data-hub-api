@@ -21,3 +21,19 @@ def get_related_fields(model):
         and not f.concrete
         and not f.field.model._meta.auto_created
     ]
+
+
+def get_self_referential_relations(model):
+    """
+    Returns all fields of `model` that refer back to `model`.
+
+    :param model: model class
+    :returns: list of self-referential fields of `model`
+    """
+    return [
+        f for f in model._meta.get_fields(include_hidden=True)
+        if (f.one_to_many or f.one_to_one or f.many_to_many or f.many_to_one)
+        and not f.auto_created
+        and f.concrete
+        and f.remote_field.model is model
+    ]
