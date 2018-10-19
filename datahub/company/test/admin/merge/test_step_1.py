@@ -105,11 +105,8 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
             ),
         ),
     )
-    def test_error_if_same_company_provided(self, other_company, expected_error):
-        """
-        Test that an error is displayed if the same company is provided as the second
-        company.
-        """
+    def test_error_if_invalid_company_selected(self, other_company, expected_error):
+        """Test that an error is displayed if the an invalid company is selected."""
         company = CompanyFactory()
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
