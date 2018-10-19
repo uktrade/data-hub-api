@@ -12,7 +12,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
-from datahub.cleanup.query_utils import get_related_fields, get_relations_to_delete
+from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import (
     CompanyCoreTeamMemberFactory,
@@ -20,6 +20,7 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.core.exceptions import DataHubException
+from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory

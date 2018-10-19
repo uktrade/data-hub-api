@@ -1,0 +1,23 @@
+"""
+Contains various utilities and helper functions for working with models.
+
+(As we already use a third-party package called model_utils, this module is named model_helpers
+rather than model_utils.)
+"""
+
+
+def get_related_fields(model):
+    """
+    Returns all the fields of `model` that hold the link between referencing objects
+    and the referenced object (`model`).
+
+    :param model: orphaned model class
+    :returns: list of fields of `model` that hold references via dependent objects
+    """
+    return [
+        f for f in model._meta.get_fields(include_hidden=True)
+        if (f.one_to_many or f.one_to_one or f.many_to_many or f.many_to_one)
+        and f.auto_created
+        and not f.concrete
+        and not f.field.model._meta.auto_created
+    ]
