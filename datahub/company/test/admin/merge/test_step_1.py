@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import pytest
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
@@ -74,10 +76,16 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
 
-        changelist_route_name = admin_urlname(Company._meta, 'changelist')
-        changelist_url = reverse(changelist_route_name)
+        select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
+        select_primary_url = reverse(select_primary_route_name)
+        query_args = urlencode(
+            {
+                'company_1': main_company.pk,
+                'company_2': other_company.pk,
+            },
+        )
 
-        assert response.redirect_chain[0][0] == changelist_url
+        assert response.redirect_chain[0][0] == f'{select_primary_url}?{query_args}'
 
     @pytest.mark.parametrize(
         'other_company,expected_error',

@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django import forms
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import unquote
@@ -57,10 +59,16 @@ def merge_select_other_company(model_admin, request, object_id):
     form = SelectOtherCompanyForm(object_id, request.GET or None)
 
     if request.GET and form.is_valid():
-        # The next page is still to be implemented, redirect to the change list for now
-        changelist_route_name = admin_urlname(model_admin.model._meta, 'changelist')
-        changelist_url = reverse(changelist_route_name)
-        return HttpResponseRedirect(changelist_url)
+        select_primary_route_name = admin_urlname(
+            model_admin.model._meta,
+            'merge-select-primary-company',
+        )
+        select_primary_url = reverse(select_primary_route_name)
+        select_primary_args = urlencode({
+            'company_1': unquote(object_id),
+            'company_2': form.cleaned_data['other_company'].pk,
+        })
+        return HttpResponseRedirect(f'{select_primary_url}?{select_primary_args}')
 
     context = {
         **model_admin.admin_site.each_context(request),
