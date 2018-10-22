@@ -7,7 +7,6 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
@@ -329,6 +328,11 @@ class IProjectTeamAbstract(models.Model):
     # field project_manager_first_assigned_on is being used for SPI reporting
     # it contains a datetime when first time a project manager has been assigned
     project_manager_first_assigned_on = models.DateTimeField(null=True, blank=True)
+    # field project_manager_first_assigned_by is being used for SPI reporting
+    # it contains a reference to an Adviser who first time assigned a project manager
+    project_manager_first_assigned_by = models.ForeignKey(
+        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
+    )
     project_assurance_adviser = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
     )
@@ -407,17 +411,9 @@ class InvestmentProject(
     def save(self, *args, **kwargs):
         """Updates the stage log after saving."""
         adding = self._state.adding
-        if (
-            self.__project_manager_id is None
-            and self.project_manager_id
-            and self.project_manager_first_assigned_on is None
-        ):
-            self.project_manager_first_assigned_on = now()
-
         super().save(*args, **kwargs)
 
         self._update_stage_log(adding)
-        self.__project_manager_id = self.project_manager_id
 
     def _update_stage_log(self, adding):
         """Creates a log of changes to stage field.

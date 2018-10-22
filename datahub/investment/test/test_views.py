@@ -1648,12 +1648,16 @@ class TestPartialUpdateView(APITestMixin):
         project.refresh_from_db()
         # project manager already existed so that first assigned date couldn't be captured
         # once project manager is changed it is no longer being the first change
-        # so project_manager_first_assigned_on should be null
+        # so project_manager_first_assigned_on and project_manager_first_assigned_by should be null
         assert project.project_manager_first_assigned_on is None
+        assert project.project_manager_first_assigned_by is None
 
     @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
-    def test_assigning_project_manager_first_time_sets_date(self):
-        """Test that when project manager is first time assigned, a date is being recorded."""
+    def test_assigning_project_manager_first_time_sets_date_and_assigner(self):
+        """
+        Test that when project manager is first time assigned, a date
+        and who assigned is being recorded.
+        """
         crm_team = constants.Team.crm.value
         adviser_1 = AdviserFactory(dit_team_id=crm_team.id)
         adviser_2 = AdviserFactory()
@@ -1690,6 +1694,7 @@ class TestPartialUpdateView(APITestMixin):
         project.refresh_from_db()
         assigned_on = datetime(2017, 4, 30, 11, 25, tzinfo=utc)
         assert project.project_manager_first_assigned_on == assigned_on
+        assert project.project_manager_first_assigned_by == self.user
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
