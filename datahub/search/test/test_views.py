@@ -32,12 +32,14 @@ def setup_data():
     ContactFactory(
         first_name='abc',
         last_name='defg',
-        company=CompanyFactory(name='name0'),
+        company__name='name0',
+        company__alias='trading0',
     )
     ContactFactory(
         first_name='first',
         last_name='last',
-        company=CompanyFactory(name='name1'),
+        company__name='name1',
+        company__alias='trading1',
     )
     InvestmentProjectFactory(
         name='abc defg',
@@ -45,7 +47,7 @@ def setup_data():
         estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(first_name='name 0', last_name='surname 0'),
         project_assurance_adviser=AdviserFactory(first_name='name 1', last_name='surname 1'),
-        investor_company=CompanyFactory(name='name3'),
+        investor_company=CompanyFactory(name='name3', alias='trading3'),
         client_relationship_manager=AdviserFactory(first_name='name 2', last_name='surname 2'),
         referral_source_adviser=AdviserFactory(first_name='name 3', last_name='surname 3'),
         client_contacts=[],
@@ -55,7 +57,7 @@ def setup_data():
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(first_name='name 4', last_name='surname 4'),
         project_assurance_adviser=AdviserFactory(first_name='name 5', last_name='surname 5'),
-        investor_company=CompanyFactory(name='name4'),
+        investor_company=CompanyFactory(name='name4', alias='trading4'),
         client_relationship_manager=AdviserFactory(first_name='name 6', last_name='surname 6'),
         referral_source_adviser=AdviserFactory(first_name='name 7', last_name='surname 7'),
         client_contacts=[],
@@ -65,12 +67,14 @@ def setup_data():
     country_us = constants.Country.united_states.value.id
     CompanyFactory(
         name='abc defg ltd',
+        alias='abc defg trading ltd',
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_uk,
     )
     CompanyFactory(
         name='abc defg us ltd',
+        alias='abc defg us trading ltd',
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
