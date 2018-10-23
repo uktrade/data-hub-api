@@ -1,0 +1,23 @@
+ul {
+    padding-left: 0;
+}
+
+ul>li {
+    list-style-type: none;
+    margin-bottom: 10px;
+}
+
+ul>li input[type=radio] {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+ul>li label {
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+ul>li .error {
+    color: #ba2121;
+}
