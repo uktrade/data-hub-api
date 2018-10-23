@@ -24,7 +24,6 @@ from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.leads.test.factories import BusinessLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
@@ -66,7 +65,6 @@ MAPPINGS = {
             (ShallowInvestmentProjectFactory, 'uk_company'),
             (OrderFactory, 'company'),
             (CompanyFactory, 'global_headquarters'),
-            (BusinessLeadFactory, 'company'),
             (CompanyCoreTeamMemberFactory, 'company'),
         ),
         'implicit_related_models': (),
