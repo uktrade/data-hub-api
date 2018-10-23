@@ -43,6 +43,7 @@ class SPIReport:
     SPI1_END_BY = 'Enquiry processed by'
     SPI2_START = 'Assigned to IST'
     SPI2_END = 'Project manager assigned'
+    SPI2_END_BY = 'Project manager assigned by'
     SPI3 = 'Propositions'
     SPI5_START = 'Project moved to won'
     SPI5_END = 'Aftercare offered on'
@@ -61,6 +62,7 @@ class SPIReport:
         SPI1_END_BY: SPI1_END_BY,
         SPI2_START: SPI2_START,
         SPI2_END: SPI2_END,
+        SPI2_END_BY: SPI2_END_BY,
         SPI5_START: SPI5_START,
         SPI5_END: SPI5_END,
         SPI3: SPI3,
@@ -206,7 +208,7 @@ class SPIReport:
         return data
 
     def get_spi2(self, investment_project, spi_interactions):
-        """Update data with SPI 2 dates."""
+        """Update data with SPI 2 dates and adviser."""
         data = {}
 
         has_ist_pm = self._has_ist_project_manager(investment_project)
@@ -216,6 +218,7 @@ class SPIReport:
 
         if has_ist_pm and investment_project.project_manager_first_assigned_on:
             data[self.SPI2_END] = format_date(investment_project.project_manager_first_assigned_on)
+            data[self.SPI2_END_BY] = investment_project.project_manager_first_assigned_by
 
         return data
 

@@ -1,4 +1,5 @@
 import pytest
+from django.utils.timezone import now
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory, TeamFactory
@@ -164,8 +165,10 @@ def test_interaction_would_start_spi2_or_not(spi_report, ist_adviser, service_id
 def test_assigning_ist_project_manager_ends_spi2(spi_report, ist_adviser):
     """Test if assigning IST project manager would end SPI 2."""
     investment_project = InvestmentProjectFactory()
-    # saving separately so that project_manager_first_assigned_on is updated
     investment_project.project_manager = ist_adviser
+    adviser = AdviserFactory()
+    investment_project.project_manager_first_assigned_on = now()
+    investment_project.project_manager_first_assigned_by = adviser
     investment_project.save()
 
     rows = list(spi_report.rows())
@@ -173,19 +176,22 @@ def test_assigning_ist_project_manager_ends_spi2(spi_report, ist_adviser):
     assert len(rows) == 1
     assigned_on = investment_project.project_manager_first_assigned_on
     assert rows[0]['Project manager assigned'] == assigned_on.isoformat()
+    assert rows[0]['Project manager assigned by'] == adviser
 
 
 def test_assigning_non_ist_project_manager_doesnt_end_spi2(spi_report):
     """Test that non IST project manager wont end SPI 2."""
     investment_project = InvestmentProjectFactory()
-    # saving separately so that project_manager_first_assigned_on is updated
     investment_project.project_manager = AdviserFactory()
+    investment_project.project_manager_first_assigned_on = now()
+    investment_project.project_manager_first_assigned_by = AdviserFactory()
     investment_project.save()
 
     rows = list(spi_report.rows())
 
     assert len(rows) == 1
     assert 'Project manager assigned' not in rows[0]
+    assert 'Project manager assigned by' not in rows[0]
 
 
 def test_earliest_interactions_are_being_selected(spi_report, ist_adviser):

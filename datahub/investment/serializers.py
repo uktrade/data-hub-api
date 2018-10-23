@@ -2,6 +2,7 @@
 from collections import Counter
 from functools import partial
 
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
@@ -244,6 +245,17 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     project_arrived_in_triage_on = serializers.DateField(required=False, allow_null=True)
     proposal_deadline = serializers.DateField(required=False, allow_null=True)
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
+
+    def save(self, **kwargs):
+        """Saves when and who assigned a project manager for the first time."""
+        if (
+            'project_manager' in self.validated_data
+            and (self.instance is None or self.instance.project_manager is None)
+        ):
+            kwargs['project_manager_first_assigned_on'] = now()
+            kwargs['project_manager_first_assigned_by'] = self.context['current_user']
+
+        super().save(**kwargs)
 
     def validate_estimated_land_date(self, value):
         """Validate estimated land date."""

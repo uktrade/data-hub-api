@@ -1,6 +1,7 @@
 """Admin registration for investment models."""
 
 from django.contrib import admin
+from django.utils.timezone import now
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
@@ -61,6 +62,18 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
         'modified_by',
     )
+
+    def save_model(self, request, obj, form, change):
+        """
+        Populate who and when assigned a project manager for the first time.
+        """
+        first_assigned = not change or form.initial['project_manager'] is None
+
+        if obj.project_manager and first_assigned:
+            obj.project_manager_first_assigned_on = now()
+            obj.project_manager_first_assigned_by = request.user
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(InvestmentProjectTeamMember)
