@@ -75,7 +75,27 @@ class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
 
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
-    """Filtered interaction search export view."""
+    """
+    Filtered interaction search export view.
+
+    Note that only some interaction kinds are allowed to be included in exports.
+    (Specifically, policy feedback is not allowed to be exported.)
+
+    This filtering is done on the query set for simplicity, using a whitelist of
+    kinds set in the ALLOWED_KINDS class attribute. (This is in additional to
+    permission-related filtering done in the view when querying Elasticsearch.)
+
+    There is a test (test_interaction_kind_list_is_up_to_date) to make sure that
+    if a new interaction kind is added, whether it should be included in exports
+    is considered. If a new kind is added, it should either be added to
+    ALLOWED KINDS or the aforementioned test should be updated for the kind's
+    exclusion.
+    """
+
+    ALLOWED_KINDS = {
+        DBInteraction.KINDS.interaction,
+        DBInteraction.KINDS.service_delivery,
+    }
 
     queryset = DBInteraction.objects.annotate(
         company_link=get_front_end_url_expression('company', 'company__pk'),
@@ -84,6 +104,8 @@ class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIVie
         dit_adviser_name=get_full_name_expression('dit_adviser'),
         link=get_front_end_url_expression('interaction', 'pk'),
         kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
+    ).filter(
+        kind__in=ALLOWED_KINDS,
     )
     field_titles = {
         'date': 'Date',
