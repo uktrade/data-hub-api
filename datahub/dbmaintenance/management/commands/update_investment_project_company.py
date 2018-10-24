@@ -39,10 +39,12 @@ class Command(CSVBaseCommand):
         :param uk_company_decided: Boolean
         :return: True if investment project needs to be updated
         """
-        return (investment_project.investor_company_id != investor_company_id or
-                investment_project.intermediate_company_id != intermediate_company_id or
-                investment_project.uk_company_id != uk_company_id or
-                investment_project.uk_company_decided != uk_company_decided)
+        return (
+            investment_project.investor_company_id != investor_company_id
+            or investment_project.intermediate_company_id != intermediate_company_id
+            or investment_project.uk_company_id != uk_company_id
+            or investment_project.uk_company_decided != uk_company_decided
+        )
 
     def get_uk_company_decided(self, uk_company_decided):
         """
