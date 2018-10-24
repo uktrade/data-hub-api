@@ -65,7 +65,8 @@ class SelectPrimaryCompanyForm(forms.Form):
         does not have any referencing objects that are not handled during merging (such
         as investment projects or OMIS orders referencing the company).
         """
-        company_index = self.cleaned_data.get('selected_company')
+        cleaned_data = super().clean()
+        company_index = cleaned_data.get('selected_company')
 
         if not company_index:
             return
@@ -79,8 +80,10 @@ class SelectPrimaryCompanyForm(forms.Form):
         if not source_company.is_valid_merge_source:
             raise ValidationError(self.INVALID_SOURCE_COMPANY_MSG)
 
-        self.cleaned_data['source_company'] = source_company
-        self.cleaned_data['target_company'] = target_company
+        cleaned_data['source_company'] = source_company
+        cleaned_data['target_company'] = target_company
+
+        return cleaned_data
 
 
 @feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
