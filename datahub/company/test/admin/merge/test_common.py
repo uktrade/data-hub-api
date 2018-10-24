@@ -31,6 +31,16 @@ class TestCompanyAdminPermissions(AdminTestMixin):
                 False,
                 'post',
             ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
+                False,
+                'get',
+            ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
+                False,
+                'post',
+            ),
         ),
     )
     def test_redirects_to_login_page_if_not_logged_in(self, route_name, needs_arg, method):
@@ -61,6 +71,16 @@ class TestCompanyAdminPermissions(AdminTestMixin):
             ),
             (
                 admin_urlname(Company._meta, 'merge-select-primary-company'),
+                False,
+                'post',
+            ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
+                False,
+                'get',
+            ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
                 False,
                 'post',
             ),
@@ -96,6 +116,16 @@ class TestCompanyAdminPermissions(AdminTestMixin):
             ),
             (
                 admin_urlname(Company._meta, 'merge-select-primary-company'),
+                False,
+                'post',
+            ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
+                False,
+                'get',
+            ),
+            (
+                admin_urlname(Company._meta, 'merge-confirm'),
                 False,
                 'post',
             ),
