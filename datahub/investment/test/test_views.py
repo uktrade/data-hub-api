@@ -418,8 +418,10 @@ class TestCreateView(APITestMixin):
         assert response_data['description'] == request_data['description']
         assert response_data['anonymous_description'] == request_data['anonymous_description']
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
-        assert (response_data['quotable_as_public_case_study'] ==
-                request_data['quotable_as_public_case_study'])
+        assert (
+            response_data['quotable_as_public_case_study']
+            == request_data['quotable_as_public_case_study']
+        )
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
         assert re.match(r'^DHP-\d+$', response_data['project_code'])

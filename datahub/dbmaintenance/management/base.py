@@ -77,7 +77,7 @@ class CSVBaseCommand(BaseCommand):
         """
         try:
             self._process_row(row, **options)
-        except Exception as e:
+        except Exception:
             logger.exception(f'Row {row} - Failed')
             return False
         else:

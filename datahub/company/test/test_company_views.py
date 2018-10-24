@@ -347,19 +347,16 @@ class TestGetCompany(APITestMixin):
         assert response.data['id'] == str(company.pk)
         assert response.data['companies_house_data'] is None
         assert response.data['name'] == company.name
-        assert (response.data['registered_address_1'] ==
-                company.registered_address_1)
+        assert response.data['registered_address_1'] == company.registered_address_1
         assert response.data['registered_address_2'] is None
-        assert (response.data['registered_address_town'] ==
-                company.registered_address_town)
+        assert response.data['registered_address_town'] == company.registered_address_town
         assert response.data['registered_address_country'] == {
             'name': company.registered_address_country.name,
             'id': str(company.registered_address_country.pk),
         }
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
-        assert (response.data['headquarter_type']['id'] ==
-                HeadquarterType.ukhq.value.id)
+        assert response.data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
         assert response.data['classification'] == {
             'id': str(company.classification.pk),
             'name': company.classification.name,
