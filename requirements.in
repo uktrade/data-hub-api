@@ -57,7 +57,7 @@ piprot==0.9.10
 towncrier==18.6.0
 
 # Code static analysis
-flake8==3.5.0
+flake8==3.6.0
 flake8-blind-except==0.1.1
 flake8-commas==2.0.0
 flake8-debugger==3.1.0
