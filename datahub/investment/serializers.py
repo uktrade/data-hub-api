@@ -360,8 +360,10 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
 
         if str(new_stage.id) == InvestmentProjectStage.won.value.id:
             data['status'] = InvestmentProject.STATUSES.won
-        elif (old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id and
-                new_status == InvestmentProject.STATUSES.won):
+        elif (
+            old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
+            and new_status == InvestmentProject.STATUSES.won
+        ):
             data['status'] = InvestmentProject.STATUSES.ongoing
 
     class Meta:
