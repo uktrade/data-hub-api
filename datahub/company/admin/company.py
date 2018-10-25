@@ -148,7 +148,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
 
         return [
             path(
-                '<path:object_id>/merge-select-other-company/',
+                'merge-select-other-company/',
                 self.admin_site.admin_view(partial(merge_select_other_company, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-select-other-company',
