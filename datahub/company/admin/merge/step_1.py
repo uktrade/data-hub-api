@@ -87,7 +87,7 @@ def merge_select_other_company(model_admin, request):
         select_primary_query_string = urlencode(select_primary_args)
         return HttpResponseRedirect(f'{select_primary_url}?{select_primary_query_string}')
 
-    template_name = 'admin/company/company/merge_select_other_company.html'
+    template_name = 'admin/company/company/merge/step_1_select_other_company.html'
     title = gettext_lazy('Merge with another company')
 
     context = {

@@ -9,7 +9,7 @@
 {% block extrastyle %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'company/admin/css/merge-primary-selection.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'company/admin/css/merge/step-2-primary-selection.css' %}">
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
@@ -33,8 +33,8 @@
     <div class="fieldWrapper">
       {{ form.selected_company.errors }}
       <ul id="id_selected_company">
-        {% include 'admin/company/company/merge_primary_selection_radio.html' with company=company_1 other_company=company_2 index='1' opts=opts only %}
-        {% include 'admin/company/company/merge_primary_selection_radio.html' with company=company_2 other_company=company_1 index='2' opts=opts only %}
+        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with company=company_1 other_company=company_2 index='1' opts=opts only %}
+        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with company=company_2 other_company=company_1 index='2' opts=opts only %}
       </ul>
     </div>
 

@@ -51,7 +51,7 @@ def confirm_merge(model_admin, request):
         changelist_url = reverse(changelist_route_name)
         return HttpResponseRedirect(changelist_url)
 
-    template_name = 'admin/company/company/merge_confirm_selection.html'
+    template_name = 'admin/company/company/merge/step_3_confirm_selection.html'
     title = gettext_lazy('Confirm merge')
 
     merger = DuplicateCompanyMerger(source_company, target_company)
