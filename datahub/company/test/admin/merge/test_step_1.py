@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 import pytest
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
@@ -8,6 +6,7 @@ from rest_framework import status
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
+from datahub.core.utils import reverse_with_query_string
 
 
 @pytest.mark.usefixtures('merge_list_feature_flag')
@@ -25,13 +24,15 @@ class TestMergeWithAnotherCompanyLink(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_args = {
+        select_other_query_args = {
             'company_1': company.pk,
         }
-        select_other_query_string = urlencode(select_other_args)
-        select_other_url = reverse(select_other_route_name)
+        select_other_url = reverse_with_query_string(
+            select_other_route_name,
+            select_other_query_args,
+        )
 
-        assert f'{select_other_url}?{select_other_query_string}' in response.rendered_content
+        assert select_other_url in response.rendered_content
 
     def test_link_does_not_exist_with_only_view_permission(self):
         """Test that the link does not exist for a user with only the view company permission."""
@@ -113,14 +114,16 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         other_company = CompanyFactory()
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_args = {
+        select_other_query_args = {
             'company_1': main_company.pk,
         }
-        select_other_query_string = urlencode(select_other_args)
-        select_other_url = reverse(select_other_route_name)
+        select_other_url = reverse_with_query_string(
+            select_other_route_name,
+            select_other_query_args,
+        )
 
         response = self.client.post(
-            f'{select_other_url}?{select_other_query_string}',
+            select_other_url,
             follow=True,
             data={
                 'company_2': str(other_company.pk),
@@ -131,15 +134,16 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         assert len(response.redirect_chain) == 1
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
-        select_primary_url = reverse(select_primary_route_name)
-        query_args = urlencode(
-            {
-                'company_1': main_company.pk,
-                'company_2': other_company.pk,
-            },
+        select_primary_query_args = {
+            'company_1': main_company.pk,
+            'company_2': other_company.pk,
+        }
+        select_primary_url = reverse_with_query_string(
+            select_primary_route_name,
+            select_primary_query_args,
         )
 
-        assert response.redirect_chain[0][0] == f'{select_primary_url}?{query_args}'
+        assert response.redirect_chain[0][0] == select_primary_url
 
     @pytest.mark.parametrize(
         'company_2,expected_error',
@@ -164,16 +168,18 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         company = CompanyFactory()
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_args = {
+        select_other_query_args = {
             'company_1': company.pk,
         }
-        select_other_query_string = urlencode(select_other_args)
-        select_other_url = reverse(select_other_route_name)
+        select_other_url = reverse_with_query_string(
+            select_other_route_name,
+            select_other_query_args,
+        )
 
         value = str(company.pk) if company_2 is self.SAME_COMPANY else company_2
 
         response = self.client.post(
-            f'{select_other_url}?{select_other_query_string}',
+            select_other_url,
             data={
                 'company_2': value,
             },

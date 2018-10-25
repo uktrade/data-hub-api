@@ -3,14 +3,13 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation, ValidationError
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.models import Company
+from datahub.core.utils import reverse_with_query_string
 from datahub.feature_flag.utils import feature_flagged_view
 
 
@@ -120,13 +119,12 @@ def select_primary_company(model_admin, request):
             model_admin.model._meta,
             'merge-confirm',
         )
-        confirm_url = reverse(confirm_route_name)
-        confirm_args = {
+        confirm_query_args = {
             'source_company': form.cleaned_data['source_company'].pk,
             'target_company': form.cleaned_data['target_company'].pk,
         }
-        confirm_query_string = urlencode(confirm_args)
-        return HttpResponseRedirect(f'{confirm_url}?{confirm_query_string}')
+        confirm_url = reverse_with_query_string(confirm_route_name, confirm_query_args)
+        return HttpResponseRedirect(confirm_url)
 
     template_name = 'admin/company/company/merge/step_2_primary_selection.html'
     title = gettext_lazy('Select which company should be retained')

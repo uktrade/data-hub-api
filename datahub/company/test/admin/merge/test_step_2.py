@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 import pytest
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -14,6 +12,7 @@ from datahub.company.test.factories import (
     SubsidiaryFactory,
 )
 from datahub.core.test_utils import AdminTestMixin
+from datahub.core.utils import reverse_with_query_string
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
@@ -146,15 +145,17 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         company_2 = CompanyFactory()
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
-        select_primary_url = reverse(select_primary_route_name)
-
-        query_string = urlencode({
+        select_primary_query_args = {
             'company_1': str(company_1.pk),
             'company_2': str(company_2.pk),
-        })
+        }
+        select_primary_url = reverse_with_query_string(
+            select_primary_route_name,
+            select_primary_query_args,
+        )
 
         response = self.client.post(
-            f'{select_primary_url}?{query_string}',
+            select_primary_url,
             follow=True,
             data={
                 'selected_company': selected_company,
@@ -165,14 +166,16 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         assert len(response.redirect_chain) == 1
 
         confirm_merge_route_name = admin_urlname(Company._meta, 'merge-confirm')
-        confirm_merge_url = reverse(confirm_merge_route_name)
-        query_args = {
+        confirm_merge_query_args = {
             'source_company': (company_1 if selected_company != '1' else company_2).pk,
             'target_company': (company_1 if selected_company == '1' else company_2).pk,
         }
-        query_string = urlencode(query_args)
+        confirm_merge_url = reverse_with_query_string(
+            confirm_merge_route_name,
+            confirm_merge_query_args,
+        )
 
-        assert response.redirect_chain[0][0] == f'{confirm_merge_url}?{query_string}'
+        assert response.redirect_chain[0][0] == confirm_merge_url
 
     @pytest.mark.parametrize('swap', (False, True))
     @pytest.mark.parametrize(
@@ -222,15 +225,17 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         selected_company = 2 if swap else 1
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
-        select_primary_url = reverse(select_primary_route_name)
-
-        query_string = urlencode({
+        select_primary_query_args = {
             'company_1': str(company_1.pk),
             'company_2': str(company_2.pk),
-        })
+        }
+        select_primary_url = reverse_with_query_string(
+            select_primary_route_name,
+            select_primary_query_args,
+        )
 
         response = self.client.post(
-            f'{select_primary_url}?{query_string}',
+            select_primary_url,
             data={
                 'company_1': str(company_1.pk),
                 'company_2': str(company_2.pk),
