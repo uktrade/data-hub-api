@@ -25,9 +25,13 @@ class TestMergeWithAnotherCompanyLink(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_url = reverse(select_other_route_name, args=(company.pk,))
+        select_other_args = {
+            'company_1': company.pk,
+        }
+        select_other_query_string = urlencode(select_other_args)
+        select_other_url = reverse(select_other_route_name)
 
-        assert select_other_url in response.rendered_content
+        assert f'{select_other_url}?{select_other_query_string}' in response.rendered_content
 
     def test_link_does_not_exist_with_only_view_permission(self):
         """Test that the link does not exist for a user with only the view company permission."""
@@ -46,14 +50,60 @@ class TestMergeWithAnotherCompanyLink(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_url = reverse(select_other_route_name, args=(company.pk,))
+        select_other_url = reverse(select_other_route_name)
 
         assert select_other_url not in response.rendered_content
 
 
 @pytest.mark.usefixtures('merge_list_feature_flag')
-class TestMergeWithAnotherCompanyView(AdminTestMixin):
-    """Tests the 'merge with another company' form."""
+class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
+    """Tests GET requests for the 'Merge with another company' view."""
+
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {},
+            {
+                'company_1': '',
+            },
+            {
+                'company_1': '12345',
+            },
+        ),
+    )
+    def test_returns_400_if_invalid_company_passed(self, data):
+        """
+        Test that a 400 is returned when an invalid value is passed in the query string.
+
+        This could only happen if the query string was manipulated, or the referenced company
+        was deleted.
+        """
+        select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
+        select_other_url = reverse(select_other_route_name)
+
+        response = self.client.get(select_other_url, data=data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_returns_200_if_valid_companies_passed(self):
+        """Tests that a 200 is returned if a valid company is passed in the query string."""
+        company_1 = CompanyFactory()
+
+        select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
+        select_other_url = reverse(select_other_route_name)
+
+        response = self.client.get(
+            select_other_url,
+            data={
+                'company_1': str(company_1.pk),
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.usefixtures('merge_list_feature_flag')
+class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
+    """Tests form submission for the 'Merge with another company' view."""
 
     SAME_COMPANY = object()
 
@@ -63,13 +113,17 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
         other_company = CompanyFactory()
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_url = reverse(select_other_route_name, args=(main_company.pk,))
+        select_other_args = {
+            'company_1': main_company.pk,
+        }
+        select_other_query_string = urlencode(select_other_args)
+        select_other_url = reverse(select_other_route_name)
 
-        response = self.client.get(
-            select_other_url,
+        response = self.client.post(
+            f'{select_other_url}?{select_other_query_string}',
             follow=True,
             data={
-                'other_company': str(other_company.pk),
+                'company_2': str(other_company.pk),
             },
         )
 
@@ -88,7 +142,7 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
         assert response.redirect_chain[0][0] == f'{select_primary_url}?{query_args}'
 
     @pytest.mark.parametrize(
-        'other_company,expected_error',
+        'company_2,expected_error',
         (
             (
                 SAME_COMPANY,
@@ -105,19 +159,23 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
             ),
         ),
     )
-    def test_error_if_invalid_company_selected(self, other_company, expected_error):
+    def test_error_if_invalid_company_selected(self, company_2, expected_error):
         """Test that an error is displayed if the an invalid company is selected."""
         company = CompanyFactory()
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
-        select_other_url = reverse(select_other_route_name, args=(company.pk,))
+        select_other_args = {
+            'company_1': company.pk,
+        }
+        select_other_query_string = urlencode(select_other_args)
+        select_other_url = reverse(select_other_route_name)
 
-        value = str(company.pk) if other_company is self.SAME_COMPANY else other_company
+        value = str(company.pk) if company_2 is self.SAME_COMPANY else company_2
 
-        response = self.client.get(
-            select_other_url,
+        response = self.client.post(
+            f'{select_other_url}?{select_other_query_string}',
             data={
-                'other_company': value,
+                'company_2': value,
             },
         )
 
@@ -125,5 +183,5 @@ class TestMergeWithAnotherCompanyView(AdminTestMixin):
 
         form = response.context['form']
 
-        assert 'other_company' in form.errors
-        assert form.errors['other_company'] == [expected_error]
+        assert 'company_2' in form.errors
+        assert form.errors['company_2'] == [expected_error]
