@@ -128,7 +128,7 @@ def select_primary_company(model_admin, request):
         confirm_query_string = urlencode(confirm_args)
         return HttpResponseRedirect(f'{confirm_url}?{confirm_query_string}')
 
-    template_name = 'admin/company/company/merge_primary_selection.html'
+    template_name = 'admin/company/company/merge/step_2_primary_selection.html'
     title = gettext_lazy('Select which company should be retained')
 
     context = {
