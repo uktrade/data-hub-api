@@ -26,7 +26,7 @@ class AbstractRule(ABC):
 class BaseRule(AbstractRule):
     """Base class for rules."""
 
-    def __init__(self, field: str=None):
+    def __init__(self, field: str = None):
         """Sets the field name."""
         self._field = field
 
@@ -90,7 +90,7 @@ class InRule(OperatorRule):
 class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 
-    def __init__(self, rule: AbstractRule, when: AbstractRule=None):
+    def __init__(self, rule: AbstractRule, when: AbstractRule = None):
         """
         Initialises the rule.
 
@@ -176,7 +176,7 @@ class ValidationRule(AbstractValidationRule):
         self,
         error_key: str,
         *rules: AbstractRule,
-        when: AbstractRule=None,
+        when: AbstractRule = None,
     ):
         """
         Initialises a validation rule.

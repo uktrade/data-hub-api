@@ -3,22 +3,7 @@ from secrets import token_urlsafe
 from django.db.models import Exists, OuterRef
 from django.db.models.deletion import CASCADE, get_candidate_relations_to_delete
 
-
-def get_related_fields(model):
-    """
-    Returns all the fields of `model` that hold the link between referencing objects
-    and the referenced object (`model`).
-
-    :param model: orphaned model class
-    :returns: list of fields of `model` that hold references via dependent objects
-    """
-    return [
-        f for f in model._meta.get_fields(include_hidden=True)
-        if (f.one_to_many or f.one_to_one or f.many_to_many or f.many_to_one)
-        and f.auto_created
-        and not f.concrete
-        and not f.field.model._meta.auto_created
-    ]
+from datahub.core.model_helpers import get_related_fields
 
 
 def get_unreferenced_objects_query(model):

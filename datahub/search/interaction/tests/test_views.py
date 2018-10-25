@@ -771,6 +771,22 @@ class TestInteractionEntitySearchView(APITestMixin):
 class TestInteractionExportView(APITestMixin):
     """Tests the interaction export view."""
 
+    def test_interaction_kind_list_is_up_to_date(self):
+        """
+        Check that the list of kinds in the ALLOWED_KINDS attribute is up-to-date.
+
+        If a new interaction kind is added, it needs to be added either to the list of
+        ALLOWED_KINDS on SearchInteractionExportAPIView (if it is allowed to be included in
+        exports), or to the list of excluded kinds in this test (if it is to be excluded from
+        exports).
+        """
+        excluded_kinds = {Interaction.KINDS.policy_feedback}
+        expected_kinds = Interaction.KINDS._db_values - excluded_kinds
+        assert SearchInteractionExportAPIView.ALLOWED_KINDS == expected_kinds, (
+            'A new interaction kind has been added, please update either '
+            'SearchInteractionExportAPIView.ALLOWED_KINDS or this test.'
+        )
+
     @pytest.mark.parametrize(
         'permissions',
         (
@@ -824,11 +840,15 @@ class TestInteractionExportView(APITestMixin):
         orm_ordering,
         policy_feedback_user,
     ):
-        """Test export of interaction search results."""
+        """
+        Test export of interaction search results with a policy feedback user.
+
+        Checks that all interaction kinds except for policy feedback are included in the export.
+        """
         CompanyInteractionFactory()
         EventServiceDeliveryFactory()
         InvestmentProjectInteractionFactory()
-        PolicyFeedbackFactory()
+        policy_feedback = PolicyFeedbackFactory()
         ServiceDeliveryFactory()
 
         setup_es.indices.refresh()
@@ -849,7 +869,12 @@ class TestInteractionExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
 
-        sorted_interactions = Interaction.objects.order_by(orm_ordering, 'pk')
+        sorted_interactions = Interaction.objects.exclude(
+            pk=policy_feedback.pk,
+        ).order_by(
+            orm_ordering,
+            'pk',
+        )
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
         assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())

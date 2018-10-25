@@ -84,7 +84,7 @@ class Command(CSVBaseCommand):
                 new_one_list_account_owner_id=None,
                 simulate=simulate,
             )
-        except Exception as e:
+        except Exception:
             logger.exception(f'Resetting company {company} - Failed')
             return False
         else:

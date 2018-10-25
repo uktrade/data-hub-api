@@ -161,8 +161,8 @@ def test_simulate(s3_stubber):
             investment_projects[i].referral_source_activity == referral_source_activities[i]
         )
         assert (
-            investment_projects[i].referral_source_activity_marketing ==
-            referral_source_marketings[i]
+            investment_projects[i].referral_source_activity_marketing
+            == referral_source_marketings[i]
         )
 
 
