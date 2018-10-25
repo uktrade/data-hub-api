@@ -19,8 +19,8 @@ class Command(CSVBaseCommand):
                 None otherwise
         """
         if (
-            not referral_source_activity_id or
-            referral_source_activity_id.lower().strip() == 'null'
+            not referral_source_activity_id
+            or referral_source_activity_id.lower().strip() == 'null'
         ):
             return None
         return ReferralSourceActivity.objects.get(id=referral_source_activity_id)
@@ -34,8 +34,8 @@ class Command(CSVBaseCommand):
                 None otherwise
         """
         if (
-            not referral_source_activity_website_id or
-            referral_source_activity_website_id.lower().strip() == 'null'
+            not referral_source_activity_website_id
+            or referral_source_activity_website_id.lower().strip() == 'null'
         ):
             return None
         return ReferralSourceWebsite.objects.get(id=referral_source_activity_website_id)
@@ -56,10 +56,10 @@ class Command(CSVBaseCommand):
         :return: True if investment project needs to be updated
         """
         return (
-            investment_project.referral_source_activity_id !=
-            referral_source_activity.id or
-            investment_project.referral_source_activity_website_id !=
-            referral_source_activity_website.id
+            investment_project.referral_source_activity_id
+            != referral_source_activity.id
+            or investment_project.referral_source_activity_website_id
+            != referral_source_activity_website.id
         )
 
     def _process_row(self, row, simulate=False, **options):

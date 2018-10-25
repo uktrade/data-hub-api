@@ -350,3 +350,22 @@ This downloads the latest data from Companies House, updates the Companies House
 See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing, 
 adding and upgrading dependencies.
 
+## Activity Stream
+
+The `/v3/activity-stream/` endpoint is protected by two mechanisms:
+
+* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `ACTIVITY_STREAM_IP_WHITELIST`.
+
+* Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
+
+
+### IP address whitelisting
+
+The authentication blocks requests that do not have a whitelisted IP in the second-from-the-end IP in `X-Forwarded-For` header. In general, this cannot be trusted. However, in PaaS, this can be, and this is the only production environment. Ideally, this would be done at a lower level than HTTP, but this is not possible with the current architecture.
+
+If making requests to this endpoint locally, you must manually add this header.
+
+
+### Hawk authentication
+
+In general, Hawk authentication hashing the HTTP payload and `Content-Type` header, and using a nonce, are both _optional_. Here, as with the Activity Stream endpoints in other DIT projects, both are _required_. `Content-Type` may be the empty string, and if there is no payload, then it should be treated as the empty string.

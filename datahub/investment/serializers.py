@@ -2,6 +2,7 @@
 from collections import Counter
 from functools import partial
 
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
@@ -245,6 +246,17 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     proposal_deadline = serializers.DateField(required=False, allow_null=True)
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
 
+    def save(self, **kwargs):
+        """Saves when and who assigned a project manager for the first time."""
+        if (
+            'project_manager' in self.validated_data
+            and (self.instance is None or self.instance.project_manager is None)
+        ):
+            kwargs['project_manager_first_assigned_on'] = now()
+            kwargs['project_manager_first_assigned_by'] = self.context['current_user']
+
+        super().save(**kwargs)
+
     def validate_estimated_land_date(self, value):
         """Validate estimated land date."""
         if value or (self.instance and self.instance.allow_blank_estimated_land_date):
@@ -348,8 +360,10 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
 
         if str(new_stage.id) == InvestmentProjectStage.won.value.id:
             data['status'] = InvestmentProject.STATUSES.won
-        elif (old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id and
-                new_status == InvestmentProject.STATUSES.won):
+        elif (
+            old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
+            and new_status == InvestmentProject.STATUSES.won
+        ):
             data['status'] = InvestmentProject.STATUSES.ongoing
 
     class Meta:

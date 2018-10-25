@@ -65,6 +65,15 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         model = 'company.Company'
 
 
+class SubsidiaryFactory(CompanyFactory):
+    """Subsidiary factory."""
+
+    global_headquarters = factory.SubFactory(
+        CompanyFactory,
+        headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+    )
+
+
 class CompanyCoreTeamMemberFactory(factory.django.DjangoModelFactory):
     """Company core team member factory."""
 

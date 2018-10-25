@@ -12,7 +12,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
-from datahub.cleanup.query_utils import get_related_fields, get_relations_to_delete
+from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import (
     CompanyCoreTeamMemberFactory,
@@ -20,10 +20,10 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.core.exceptions import DataHubException
+from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.leads.test.factories import BusinessLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
@@ -65,7 +65,6 @@ MAPPINGS = {
             (ShallowInvestmentProjectFactory, 'uk_company'),
             (OrderFactory, 'company'),
             (CompanyFactory, 'global_headquarters'),
-            (BusinessLeadFactory, 'company'),
             (CompanyCoreTeamMemberFactory, 'company'),
         ),
         'implicit_related_models': (),
