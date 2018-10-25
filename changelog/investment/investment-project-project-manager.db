@@ -1,1 +1,0 @@
-The column ``investment_investmentproject.project_manager_first_assigned_by`` has been added. It is nullable and contains a foreign key to the adviser who first time assigned a project manager.

@@ -1,3 +1,38 @@
+Data Hub API 7.3.0 (2018-10-25)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Advisers** The field ``use_cdms_auth`` is deprecated and will be removed on or after 1 November.
+- The table ``leads_businesslead`` was deleted.
+
+Features
+--------
+
+- **Interactions** Policy feedback interactions are now always excluded from interaction exports (regardless of the current user's permissions).
+- **Investment** SPI report now shows "Project manager first assigned by" (who first time assigned a project manager) column.
+
+Internal changes
+----------------
+
+- Various dependencies were updated.
+
+API
+---
+
+- **Interactions** ``POST /v3/search/investment_project/export`` now always excludes policy feedback interactions (regardless of the current user's permissions).
+
+Database schema
+---------------
+
+- **Advisers** The column ``company_advisor.use_cdms_auth`` is deprecated and will be removed on or after 1 November.
+- **Investment** The column ``investment_investmentproject.project_manager_first_assigned_by`` has been added. It is nullable and contains a foreign key to the adviser who first time assigned a project manager.
+- The table ``leads_businesslead`` was deleted.
+
+
 Data Hub API 7.2.0 (2018-10-18)
 ===============================
 
