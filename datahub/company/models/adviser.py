@@ -80,11 +80,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    # TODO: Remove post-schema freeze
-    use_cdms_auth = models.BooleanField(
-        default=False,
-        help_text='No longer used',
-    )
 
     objects = AdviserManager()
 
