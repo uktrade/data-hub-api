@@ -9,6 +9,7 @@ from reversion.admin import VersionAdmin
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
+from datahub.company.admin.merge.step_3 import confirm_merge
 from datahub.company.models import Company, CompanyCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin
 from datahub.feature_flag.utils import is_feature_flag_active
@@ -157,6 +158,12 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 self.admin_site.admin_view(partial(select_primary_company, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-select-primary-company',
+            ),
+            path(
+                'merge-confirm/',
+                self.admin_site.admin_view(partial(confirm_merge, self)),
+                name=f'{model_meta.app_label}_'
+                     f'{model_meta.model_name}_merge-confirm',
             ),
             *super().get_urls(),
         ]

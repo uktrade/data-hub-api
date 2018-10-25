@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
@@ -64,19 +65,25 @@ class SelectPrimaryCompanyForm(forms.Form):
         does not have any referencing objects that are not handled during merging (such
         as investment projects or OMIS orders referencing the company).
         """
-        company_index = self.cleaned_data.get('selected_company')
+        cleaned_data = super().clean()
+        company_index = cleaned_data.get('selected_company')
 
         if not company_index:
             return
 
-        selected_company = self._company_1 if company_index == '1' else self._company_2
-        other_company = self._company_2 if company_index == '1' else self._company_1
+        target_company = self._company_1 if company_index == '1' else self._company_2
+        source_company = self._company_1 if company_index != '1' else self._company_2
 
-        if not selected_company.is_valid_merge_target:
+        if not target_company.is_valid_merge_target:
             raise ValidationError(self.INVALID_TARGET_COMPANY_MSG)
 
-        if not other_company.is_valid_merge_source:
+        if not source_company.is_valid_merge_source:
             raise ValidationError(self.INVALID_SOURCE_COMPANY_MSG)
+
+        cleaned_data['source_company'] = source_company
+        cleaned_data['target_company'] = target_company
+
+        return cleaned_data
 
 
 @feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
@@ -109,10 +116,17 @@ def select_primary_company(model_admin, request):
     form = SelectPrimaryCompanyForm(company_1, company_2, data=data)
 
     if is_post and form.is_valid():
-        # The next page is still to be implemented, redirect to the change list for now
-        changelist_route_name = admin_urlname(model_admin.model._meta, 'changelist')
-        changelist_url = reverse(changelist_route_name)
-        return HttpResponseRedirect(changelist_url)
+        confirm_route_name = admin_urlname(
+            model_admin.model._meta,
+            'merge-confirm',
+        )
+        confirm_url = reverse(confirm_route_name)
+        confirm_args = {
+            'source_company': form.cleaned_data['source_company'].pk,
+            'target_company': form.cleaned_data['target_company'].pk,
+        }
+        confirm_query_string = urlencode(confirm_args)
+        return HttpResponseRedirect(f'{confirm_url}?{confirm_query_string}')
 
     template_name = 'admin/company/company/merge_primary_selection.html'
     title = gettext_lazy('Select which company should be retained')
