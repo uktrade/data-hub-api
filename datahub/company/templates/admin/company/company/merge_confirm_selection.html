@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static datahub_extras %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Merge duplicate companies' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% with source_company_link=source_company|admin_change_link target_company_link=target_company|admin_change_link %}
+<p>
+  {% blocktrans %}
+  You are about to merge {{ source_company_link }} into {{ target_company_link }}.
+  {% endblocktrans %}
+</p>
+<p>{% trans 'This will make the following changes:' %}</p>
+<ul>
+  {% for move_entry in move_entries %}
+  <li>
+    {% verbose_name_for_count move_entry.count move_entry.model_meta as verbose_name %}
+    {% blocktrans with count=move_entry.count %}
+    {{ count }} {{ verbose_name }} will be moved from {{ source_company_link }} to {{ target_company_link }}.
+    {% endblocktrans %}
+  </li>
+  {% endfor %}
+  <li>
+    {% if should_archive_source %}
+      {% blocktrans %}{{ source_company_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
+    {% else %}
+      {% blocktrans %}{{ source_company_link }} will be marked as a duplicate record.{% endblocktrans %}
+    {% endif %}
+  </li>
+</ul>
+
+<p><strong>{% trans 'Once complete, this operation can&rsquo;t be reversed.' %}</strong></p>
+
+<form action="" method="post">
+  {% csrf_token %}
+
+  <div>
+    <input type="submit" value="{% trans 'Merge companies' %}">
+  </div>
+</form>
+{% endwith %}
+{% endblock %}

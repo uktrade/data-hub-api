@@ -164,10 +164,15 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
 
-        changelist_route_name = admin_urlname(Company._meta, 'changelist')
-        changelist_url = reverse(changelist_route_name)
+        confirm_merge_route_name = admin_urlname(Company._meta, 'merge-confirm')
+        confirm_merge_url = reverse(confirm_merge_route_name)
+        query_args = {
+            'source_company': (company_1 if selected_company != '1' else company_2).pk,
+            'target_company': (company_1 if selected_company == '1' else company_2).pk,
+        }
+        query_string = urlencode(query_args)
 
-        assert response.redirect_chain[0][0] == changelist_url
+        assert response.redirect_chain[0][0] == f'{confirm_merge_url}?{query_string}'
 
     @pytest.mark.parametrize('swap', (False, True))
     @pytest.mark.parametrize(
