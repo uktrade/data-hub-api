@@ -1,14 +1,14 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
+{% load i18n admin_urls static datahub_extras %}
 
 {% block extrahead %}
-    {{ block.super }}
-    {{ media }}
+  {{ block.super }}
+  {{ media }}
 {% endblock %}
 
 {% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
@@ -23,8 +23,8 @@
 {% endblock %}
 
 {% block content %}
-  <p>If this company has a duplicate record in the system, you can use this tool to merge the two records. It&rsquo;s not intended to be used to merge companies for other reasons (e.g. following a merger or acquisition).</p>
-  <p>Which company should {{ object }} be merged with?</p>
+  <p>{% blocktrans %}If this company has a duplicate record in the system, you can use this tool to merge the two records. It&rsquo;s not intended to be used to merge companies for other reasons (e.g. following a merger or acquisition).{% endblocktrans %}</p>
+  <p>{% blocktrans with company_1_link=object|admin_change_link %}Which company should {{ company_1_link }} be merged with?{% endblocktrans %}</p>
 
   <form action="" method="post">
     {% csrf_token %}
