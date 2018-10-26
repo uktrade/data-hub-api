@@ -1,0 +1,7 @@
+``GET,POST /v3/company``, ``GET,POST /v3/company/<id>``: New, optional read-only fields named ``transferred_to`` and
+``transfer_reason`` have been added to indicate if a company has had its data transferred to another record and should
+no longer be used. When set, this field contains two sub-fields (``id`` and ``name``) which give details of the company
+that should be used instead. The only possible value for transfer_reason at present is ``duplicate``, which indicates
+that it was a duplicate record.
+
+``GET,POST /v3/company/unarchive``: It is not possible to unarchive a company that has a value in the ``transferred_to`` field.

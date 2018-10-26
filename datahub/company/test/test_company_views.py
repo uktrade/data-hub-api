@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
@@ -16,6 +17,7 @@ from datahub.company.test.factories import (
     CompaniesHouseCompanyFactory,
     CompanyCoreTeamMemberFactory,
     CompanyFactory,
+    DuplicateCompanyFactory,
 )
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
@@ -276,6 +278,10 @@ class TestGetCompany(APITestMixin):
             'contacts': [],
             'created_on': format_date_or_datetime(company.created_on),
             'description': None,
+            'transferred_by': None,
+            'transferred_on': None,
+            'transferred_to': None,
+            'transfer_reason': '',
             'employee_range': {
                 'id': str(company.employee_range.id),
                 'name': company.employee_range.name,
@@ -1234,6 +1240,21 @@ class TestUnarchiveCompany(APITestMixin):
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
+
+    def test_cannot_unarchive_duplicate_company(self):
+        """Test that a duplicate company cannot be unarchived."""
+        company = DuplicateCompanyFactory()
+        url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            api_settings.NON_FIELD_ERRORS_KEY:
+                [
+                    'This record is no longer in use and its data has been transferred to another '
+                    'record for the following reason: Duplicate record.',
+                ],
+        }
 
 
 class TestCompanyVersioning(APITestMixin):
