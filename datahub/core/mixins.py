@@ -13,26 +13,55 @@ class ArchiveSerializer(serializers.Serializer):
 
     reason = serializers.CharField(max_length=MAX_LENGTH)
 
+    def save(self, **kwargs):
+        """Archives the objects."""
+        self.instance.archive(user=self.context['user'], reason=self.validated_data['reason'])
+
+
+class UnarchiveSerializer(serializers.Serializer):
+    """Serializer for unarchive endpoints."""
+
+    def save(self, **kwargs):
+        """Restores an archived object."""
+        self.instance.unarchive()
+
 
 class ArchivableViewSetMixin:
     """To be used with archivable models."""
 
+    archive_validators = []
+    unarchive_validators = []
+
     @action(methods=['post'], detail=True)
     def archive(self, request, pk):
         """Archive the object."""
-        serializer = ArchiveSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        reason = serializer.validated_data['reason']
-
         obj = self.get_object()
-        obj.archive(user=request.user, reason=reason)
-        serializer = self.get_serializer_class()(obj)
-        return Response(data=serializer.data)
+        context = {
+            'user': request.user,
+        }
+        archive_serializer = ArchiveSerializer(
+            instance=obj,
+            data=request.data,
+            context=context,
+            validators=self.archive_validators,
+        )
+        archive_serializer.is_valid(raise_exception=True)
+        archive_serializer.save()
+
+        obj_serializer = self.get_serializer_class()(obj)
+        return Response(data=obj_serializer.data)
 
     @action(methods=['post'], detail=True)
     def unarchive(self, request, pk):
         """Unarchive the object."""
         obj = self.get_object()
-        obj.unarchive()
-        serializer = self.get_serializer_class()(obj)
-        return Response(data=serializer.data)
+        unarchive_serializer = UnarchiveSerializer(
+            instance=obj,
+            data=request.data,
+            validators=self.unarchive_validators,
+        )
+        unarchive_serializer.is_valid(raise_exception=True)
+        unarchive_serializer.save()
+
+        obj_serializer = self.get_serializer_class()(obj)
+        return Response(data=obj_serializer.data)
