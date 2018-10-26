@@ -1,16 +1,16 @@
-{% load admin_urls %}
+{% load i18n datahub_extras %}
 <li>
   <input name="selected_company" value="{{ index }}" required="" id="id_selected_company_radio_{{ index }}" type="radio"
     {% if not company.is_valid_merge_target or not other_company.is_valid_merge_source %}disabled{% endif %}
   >
   <label for="id_selected_company_radio_{{ index }}">
     {% if not company.is_valid_merge_target %}
-      <span class="error">This company can&rsquo;t be selected as it&rsquo;s been archived.</span>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as it&rsquo;s been archived.' %}</span>
       <br>
     {% endif %}
 
     {% if not other_company.is_valid_merge_source %}
-      <span class="error">This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.</span>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.' %}</span>
       <br>
     {% endif %}
 
@@ -18,7 +18,7 @@
     <br>
     {{ company.pk }}
     <br>
-    Created on {{ company.created_on }}
+    {% blocktrans with created_on=company.created_on %}Created on {{ created_on }}{% endblocktrans %}
     <br>
     {% with company.contacts.count as contact_count %}
     {{ contact_count }} contact{{ contact_count|pluralize }}
@@ -28,6 +28,6 @@
     {{ interaction_count }} interaction{{ interaction_count|pluralize }}
     {% endwith %}
     <br>
-    <a href="{% url opts|admin_urlname:'change' company.pk|admin_urlquote %}">View complete record</a>
+    <a href="{{ company|admin_change_url }}">{% trans 'View complete record' %}</a>
   </label>
 </li>
