@@ -14,12 +14,6 @@ from datahub.core.utils import reverse_with_query_string
 from datahub.feature_flag.utils import feature_flagged_view
 
 
-class SelectOtherCompanyStateForm(forms.Form):
-    """Form for validating the query string in the select other company view."""
-
-    company_1 = forms.ModelChoiceField(Company.objects.all())
-
-
 class SelectOtherCompanyForm(forms.Form):
     """Form used for selecting a second company when merging duplicate companies."""
 
@@ -54,20 +48,18 @@ def merge_select_other_company(model_admin, request):
 
     Used to select the second company of the two to merge.
 
-    Note that the ID of the first company is passed in via the query string. The query
-    string is validated using the SelectOtherCompanyStateForm form.
+    Note that the ID of the first company is passed in via the query string.
 
     SelectOtherCompanyForm the form used to validate the POST body.
     """
     if not model_admin.has_change_permission(request):
         raise PermissionDenied
 
-    state_form = SelectOtherCompanyStateForm(request.GET)
+    company_1 = model_admin.get_object(request, request.GET.get('company_1'))
 
-    if not state_form.is_valid():
+    if not company_1:
         raise SuspiciousOperation()
 
-    company_1 = state_form.cleaned_data['company_1']
     is_post = request.method == 'POST'
     data = request.POST if is_post else None
     form = SelectOtherCompanyForm(company_1, data=data)

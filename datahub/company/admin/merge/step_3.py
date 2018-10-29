@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect
@@ -10,15 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.merge import DuplicateCompanyMerger
-from datahub.company.models import Company
 from datahub.feature_flag.utils import feature_flagged_view
-
-
-class ConfirmMergeStateForm(forms.Form):
-    """Form for validating the query string in the confirm merge view."""
-
-    target_company = forms.ModelChoiceField(Company.objects.all())
-    source_company = forms.ModelChoiceField(Company.objects.all())
 
 
 @feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
@@ -30,19 +21,17 @@ def confirm_merge(model_admin, request):
     This view displays the changes that would be made if the merge proceeds, and asks
     the user to confirm if they want to go ahead.
 
-    Note that the source and target companies are passed in via the query string. The
-    ConfirmMergeStateForm form is used to validate the query string.
+    Note that the source and target companies are passed in via the query string.
     """
     if not model_admin.has_change_permission(request):
         raise PermissionDenied
 
-    state_form = ConfirmMergeStateForm(request.GET)
+    target_company = model_admin.get_object(request, request.GET.get('target_company'))
+    source_company = model_admin.get_object(request, request.GET.get('source_company'))
 
-    if not state_form.is_valid():
+    if not (source_company and target_company):
         raise SuspiciousOperation()
 
-    source_company = state_form.cleaned_data['source_company']
-    target_company = state_form.cleaned_data['target_company']
     is_post = request.method == 'POST'
 
     if is_post:
