@@ -1,7 +1,12 @@
 from datahub.metadata import models
 from datahub.metadata.filters import ServiceFilterSet
 from datahub.metadata.registry import registry
-from datahub.metadata.serializers import SectorSerializer, ServiceSerializer, TeamSerializer
+from datahub.metadata.serializers import (
+    InvestmentProjectStageSerializer,
+    SectorSerializer,
+    ServiceSerializer,
+    TeamSerializer,
+)
 
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)
@@ -51,5 +56,9 @@ registry.register(
     model=models.InvestmentStrategicDriver,
 )
 registry.register(metadata_id='salary-range', model=models.SalaryRange)
-registry.register(metadata_id='investment-project-stage', model=models.InvestmentProjectStage)
+registry.register(
+    metadata_id='investment-project-stage',
+    model=models.InvestmentProjectStage,
+    serializer=InvestmentProjectStageSerializer,
+)
 registry.register(metadata_id='fdi-value', model=models.FDIValue)
