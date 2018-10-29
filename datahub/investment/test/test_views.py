@@ -24,7 +24,9 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     random_obj_for_model,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment import views
+from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
 from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
@@ -833,14 +835,22 @@ class TestRetrieveView(APITestMixin):
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is False
 
-    def test_incomplete_fields_prospect(self):
-        """Tests moving an incomplete project to the Assign PM stage."""
+    @pytest.mark.parametrize(
+        'is_flag_active,expected_extra_incomplete_fields',
+        (
+            (False, ()),
+            (True, ('project_manager', 'project_assurance_adviser')),
+        ),
+    )
+    def test_incomplete_fields_prospect(self, is_flag_active, expected_extra_incomplete_fields):
+        """Tests what fields are incomplete and required to move the project to the next stage."""
+        FeatureFlagFactory(is_active=is_flag_active, code=FEATURE_FLAG_STREAMLINED_FLOW)
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert Counter(response_data['incomplete_fields']) == Counter((
+        incomplete_fields = (
             'client_cannot_provide_total_investment',
             'number_new_jobs',
             'total_investment',
@@ -848,7 +858,10 @@ class TestRetrieveView(APITestMixin):
             'client_requirements',
             'strategic_drivers',
             'uk_region_locations',
-        ))
+        )
+        assert Counter(response_data['incomplete_fields']) == Counter(
+            incomplete_fields + expected_extra_incomplete_fields,
+        )
 
     def test_restricted_user_cannot_see_project_if_not_associated(self):
         """Tests that a restricted user cannot view another team's project."""
@@ -1140,6 +1153,21 @@ class TestPartialUpdateView(APITestMixin):
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
         }
+
+    def test_change_stage_assign_pm_with_streamlined_flow(self):
+        """
+        Tests changing a complete prospect project to Assign PM stage when the flow is streamlined.
+        """
+        FeatureFlagFactory(is_active=True, code=FEATURE_FLAG_STREAMLINED_FLOW)
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_assign_pm_success(self):
         """Tests moving a complete project to the Assign PM stage."""
