@@ -1,0 +1,2 @@
+``GET /metadata/investment-project-stage/<uuid:pk>/`` endpoint now includes ``exclude_from_investment_flow``
+field in the response.
