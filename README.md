@@ -238,8 +238,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
 | `ES_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
 | `ES_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
-| `ES_URL`  | Yes | |
 | `ES_VERIFY_CERTS`  | No | |
+| `ES5_URL`  | Required if not using GOV.UK PaaS-supplied Elasticsearch. | |
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enabled asynchronous psycopg2 when the worker class is 'gevent'. |
@@ -265,6 +265,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
+| `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for Elasticsearch and Redis. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 
