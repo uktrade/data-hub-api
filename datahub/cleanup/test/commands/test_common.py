@@ -64,6 +64,7 @@ MAPPINGS = {
             (ShallowInvestmentProjectFactory, 'investor_company'),
             (ShallowInvestmentProjectFactory, 'uk_company'),
             (OrderFactory, 'company'),
+            (CompanyFactory, 'transferred_to'),
             (CompanyFactory, 'global_headquarters'),
             (CompanyCoreTeamMemberFactory, 'company'),
         ),

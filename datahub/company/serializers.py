@@ -277,6 +277,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
+    transferred_to = NestedRelatedField('company.Company', read_only=True)
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange, required=False, allow_null=True,
     )
@@ -395,6 +396,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'archived_by',
             'description',
+            'transferred_by',
+            'transferred_on',
+            'transferred_to',
+            'transfer_reason',
             'website',
             'trading_address_1',
             'trading_address_2',
@@ -423,6 +428,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'archived_on',
             'archived_reason',
             'reference_code',
+            'transfer_reason',
         )
         validators = [
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),

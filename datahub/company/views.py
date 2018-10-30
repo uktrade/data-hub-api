@@ -20,6 +20,7 @@ from datahub.company.serializers import (
     CompanySerializer,
     ContactSerializer,
 )
+from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
@@ -32,6 +33,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
 
     required_scopes = (Scope.internal_front_end,)
     serializer_class = CompanySerializer
+    unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id',)
     ordering_fields = ('name', 'created_on')
@@ -39,6 +41,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'archived_by',
         'business_type',
         'classification',
+        'transferred_to',
         'employee_range',
         'export_experience_category',
         'headquarter_type',

@@ -4,6 +4,8 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 from django.urls import path
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
@@ -11,7 +13,8 @@ from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
 from datahub.company.models import Company, CompanyCoreTeamMember
-from datahub.core.admin import BaseModelAdminMixin
+from datahub.core.admin import BaseModelAdminMixin, get_change_link
+from datahub.core.templatetags.datahub_extras import admin_change_link
 from datahub.feature_flag.utils import is_feature_flag_active
 
 
@@ -106,13 +109,17 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             },
         ),
         (
-            'ARCHIVE',
+            'ARCHIVING AND MERGING',
             {
                 'fields': (
                     'archived',
                     'archived_on',
                     'archived_by',
                     'archived_reason',
+                    'transferred_to_display',
+                    'transferred_by',
+                    'transferred_on',
+                    'transferred_from_display',
                 ),
             },
         ),
@@ -133,6 +140,10 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified',
         'archived_documents_url_path',
         'reference_code',
+        'transferred_to_display',
+        'transferred_by',
+        'transferred_on',
+        'transferred_from_display',
     )
     list_display = (
         'name',
@@ -141,6 +152,21 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     inlines = (
         CompanyCoreTeamMemberInline,
     )
+    # Help text for read-only method fields
+    extra_help_texts = {
+        'transferred_to_display':
+            Company._meta.get_field('transferred_to').help_text,
+        'transferred_from_display':
+            'Other records whose data has been transferred to this record.',
+    }
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Gets the model form used for add and change views.
+
+        Overridden here to add help text for read-only method fields.
+        """
+        return super().get_form(request, obj, help_texts=self.extra_help_texts, **kwargs)
 
     def get_urls(self):
         """Gets the URLs for this model."""
@@ -187,3 +213,22 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             form_url=form_url,
             extra_context=extra_context,
         )
+
+    def transferred_to_display(self, obj):
+        """Link to the company that data for this company has been transferred to."""
+        return get_change_link(obj.transferred_to)
+
+    transferred_to_display.short_description = 'transferred to'
+
+    def transferred_from_display(self, obj):
+        """List of other companies that have had their data transferred to this company."""
+        return format_html_join(
+            mark_safe('<br>'),
+            '{0} ({1})',
+            (
+                (admin_change_link(company), company.transfer_reason.lower())
+                for company in obj.transferred_from.all()
+            ),
+        )
+
+    transferred_from_display.short_description = 'Transferred from'
