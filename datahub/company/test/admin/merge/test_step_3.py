@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 import pytest
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
@@ -8,6 +6,7 @@ from rest_framework import status
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import AdminTestMixin
+from datahub.core.utils import reverse_with_query_string
 
 
 @pytest.mark.usefixtures('merge_list_feature_flag')
@@ -85,16 +84,17 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         target_company = CompanyFactory()
 
         confirm_merge_route_name = admin_urlname(Company._meta, 'merge-confirm')
-        confirm_merge_url = reverse(confirm_merge_route_name)
-
-        query_args = {
+        confirm_merge_query_args = {
             'source_company': str(source_company.pk),
             'target_company': str(target_company.pk),
         }
-        query_string = urlencode(query_args)
+        confirm_merge_url = reverse_with_query_string(
+            confirm_merge_route_name,
+            confirm_merge_query_args,
+        )
 
         response = self.client.post(
-            f'{confirm_merge_url}?{query_string}',
+            confirm_merge_url,
             follow=True,
             data={},
         )
