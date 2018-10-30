@@ -148,19 +148,19 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
 
         return [
             path(
-                '<path:object_id>/merge-select-other-company/',
+                'merge/step-1-select-other-company/',
                 self.admin_site.admin_view(partial(merge_select_other_company, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-select-other-company',
             ),
             path(
-                'merge-select-primary-company/',
+                'merge/step-2-select-primary-company/',
                 self.admin_site.admin_view(partial(select_primary_company, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-select-primary-company',
             ),
             path(
-                'merge-confirm/',
+                'merge/step-3-confirm/',
                 self.admin_site.admin_view(partial(confirm_merge, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-confirm',

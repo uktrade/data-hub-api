@@ -3,33 +3,13 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation, ValidationError
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
-from datahub.company.models import Company
+from datahub.core.utils import reverse_with_query_string
 from datahub.feature_flag.utils import feature_flagged_view
-
-
-class SelectPrimaryCompanyStateForm(forms.Form):
-    """Form for validating the query string in the select primary company view."""
-
-    BOTH_COMPANIES_ARE_THE_SAME_MSG = gettext_lazy(
-        'The two companies to merge cannot be the same.',
-    )
-
-    company_1 = forms.ModelChoiceField(Company.objects.all())
-    company_2 = forms.ModelChoiceField(Company.objects.all())
-
-    def clean(self):
-        """Checks that a different company than the one navigated from has been selected."""
-        company_1 = self.cleaned_data.get('company_1')
-        company_2 = self.cleaned_data.get('company_2')
-        if company_1 and company_1 == company_2:
-            raise ValidationError(self.BOTH_COMPANIES_ARE_THE_SAME_MSG)
 
 
 class SelectPrimaryCompanyForm(forms.Form):
@@ -96,21 +76,19 @@ def select_primary_company(model_admin, request):
     active record and which one should be archived.
 
     Note that the IDs of the two companies to select from are passed in via the
-    query string and the query string is validated using
-    SelectPrimaryCompanyStateForm.
+    query string.
 
     SelectPrimaryCompanyForm is used to validate the POST body on submission of the form.
     """
     if not model_admin.has_change_permission(request):
         raise PermissionDenied
 
-    state_form = SelectPrimaryCompanyStateForm(request.GET)
+    company_1 = model_admin.get_object(request, request.GET.get('company_1'))
+    company_2 = model_admin.get_object(request, request.GET.get('company_2'))
 
-    if not state_form.is_valid():
+    if not (company_1 and company_2):
         raise SuspiciousOperation()
 
-    company_1 = state_form.cleaned_data['company_1']
-    company_2 = state_form.cleaned_data['company_2']
     is_post = request.method == 'POST'
     data = request.POST if is_post else None
     form = SelectPrimaryCompanyForm(company_1, company_2, data=data)
@@ -120,15 +98,14 @@ def select_primary_company(model_admin, request):
             model_admin.model._meta,
             'merge-confirm',
         )
-        confirm_url = reverse(confirm_route_name)
-        confirm_args = {
+        confirm_query_args = {
             'source_company': form.cleaned_data['source_company'].pk,
             'target_company': form.cleaned_data['target_company'].pk,
         }
-        confirm_query_string = urlencode(confirm_args)
-        return HttpResponseRedirect(f'{confirm_url}?{confirm_query_string}')
+        confirm_url = reverse_with_query_string(confirm_route_name, confirm_query_args)
+        return HttpResponseRedirect(confirm_url)
 
-    template_name = 'admin/company/company/merge_primary_selection.html'
+    template_name = 'admin/company/company/merge/step_2_primary_selection.html'
     title = gettext_lazy('Select which company should be retained')
 
     context = {

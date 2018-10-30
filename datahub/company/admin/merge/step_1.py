@@ -1,17 +1,16 @@
-from urllib.parse import urlencode
-
 from django import forms
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.contrib.admin.utils import unquote
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, SuspiciousOperation, ValidationError
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
+from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.models import Company
 from datahub.core.admin import RawIdWidget
+from datahub.core.utils import reverse_with_query_string
 from datahub.feature_flag.utils import feature_flagged_view
 
 
@@ -22,53 +21,66 @@ class SelectOtherCompanyForm(forms.Form):
         'The two companies to merge cannot be the same. Please select a different company.',
     )
 
-    other_company = forms.ModelChoiceField(
+    company_2 = forms.ModelChoiceField(
         Company.objects.all(),
         widget=RawIdWidget(Company),
+        label='Other company',
     )
 
-    def __init__(self, first_company_id, *args, **kwargs):
+    def __init__(self, company_1, *args, **kwargs):
         """Initialises the form, saving the ID of the company already selected."""
         super().__init__(*args, **kwargs)
-        self._first_company_id = first_company_id
+        self._company_1 = company_1
 
-    def clean_other_company(self):
+    def clean_company_2(self):
         """Checks that a different company than the one navigated from has been selected."""
-        other_company = self.cleaned_data['other_company']
-        if str(other_company.pk) == str(self._first_company_id):
+        company_2 = self.cleaned_data['company_2']
+        if company_2 == self._company_1:
             raise ValidationError(self.BOTH_COMPANIES_ARE_THE_SAME_MSG)
-        return other_company
+        return company_2
 
 
 @feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
-def merge_select_other_company(model_admin, request, object_id):
+@method_decorator(csrf_protect)
+def merge_select_other_company(model_admin, request):
     """
     First view as part of the merge duplicate companies process.
 
     Used to select the second company of the two to merge.
 
-    As this does not modify state, the form is submitted using GET rather than POST.
+    Note that the ID of the first company is passed in via the query string.
+
+    SelectOtherCompanyForm the form used to validate the POST body.
     """
     if not model_admin.has_change_permission(request):
         raise PermissionDenied
 
-    template_name = 'admin/company/company/merge_select_other_company.html'
-    title = gettext_lazy('Merge with another company')
+    company_1 = model_admin.get_object(request, request.GET.get('company_1'))
 
-    obj = model_admin.get_object(request, unquote(object_id))
-    form = SelectOtherCompanyForm(object_id, request.GET or None)
+    if not company_1:
+        raise SuspiciousOperation()
 
-    if request.GET and form.is_valid():
+    is_post = request.method == 'POST'
+    data = request.POST if is_post else None
+    form = SelectOtherCompanyForm(company_1, data=data)
+
+    if is_post and form.is_valid():
         select_primary_route_name = admin_urlname(
             model_admin.model._meta,
             'merge-select-primary-company',
         )
-        select_primary_url = reverse(select_primary_route_name)
-        select_primary_args = urlencode({
-            'company_1': unquote(object_id),
-            'company_2': form.cleaned_data['other_company'].pk,
-        })
-        return HttpResponseRedirect(f'{select_primary_url}?{select_primary_args}')
+        select_primary_query_args = {
+            'company_1': company_1.pk,
+            'company_2': form.cleaned_data['company_2'].pk,
+        }
+        select_primary_url = reverse_with_query_string(
+            select_primary_route_name,
+            select_primary_query_args,
+        )
+        return HttpResponseRedirect(select_primary_url)
+
+    template_name = 'admin/company/company/merge/step_1_select_other_company.html'
+    title = gettext_lazy('Merge with another company')
 
     context = {
         **model_admin.admin_site.each_context(request),
@@ -76,6 +88,6 @@ def merge_select_other_company(model_admin, request, object_id):
         'title': title,
         'form': form,
         'media': model_admin.media,
-        'object': obj,
+        'object': company_1,
     }
     return TemplateResponse(request, template_name, context)
