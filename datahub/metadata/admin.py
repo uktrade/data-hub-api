@@ -28,7 +28,6 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
     models.InvestmentType,
-    models.InvestmentProjectStage,
 )
 
 MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
@@ -146,4 +145,13 @@ class SectorAdmin(MPTTModelAdmin):
     list_display = ('segment', 'disabled_on')
     readonly_fields = ('id',)
     search_fields = ('segment', 'pk')
+    list_filter = (DisabledOnFilter,)
+
+
+@admin.register(models.InvestmentProjectStage)
+class InvestmentProjectStageAdmin(ViewOnlyAdmin):
+    """Investment project stage admin."""
+
+    list_display = ('name', 'disabled_on', 'exclude_from_investment_flow')
+    search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
