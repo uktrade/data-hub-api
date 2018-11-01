@@ -17,13 +17,15 @@ FAKE_RESPONSES = {
             'events': [
                 {
                     'data_source': 'companies_house.companies',
+                    'data_source_label': 'Companies House (Companies)',
                     'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
                     'description': 'Accounts next due date',
                 },
                 {
-                    'data_source': 'companies_house.companies',
+                    'data_source': 'dit.export_wins',
+                    'data_source_label': 'DIT (Export Wins)',
                     'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                    'description': 'Accounts filed',
+                    'description': 'Export Win',
                 },
             ],
         },
@@ -105,12 +107,14 @@ class TestDataScienceCompanyAPIClient:
         assert client.get_timeline_events_by_company_number(company_number) == [
             {
                 'data_source': 'companies_house.companies',
+                'data_source_label': 'Companies House (Companies)',
                 'datetime': datetime(2018, 12, 31, tzinfo=utc),
                 'description': 'Accounts next due date',
             },
             {
-                'data_source': 'companies_house.companies',
+                'data_source': 'dit.export_wins',
+                'data_source_label': 'DIT (Export Wins)',
                 'datetime': datetime(2017, 12, 31, tzinfo=utc),
-                'description': 'Accounts filed',
+                'description': 'Export Win',
             },
         ]

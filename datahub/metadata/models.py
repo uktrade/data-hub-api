@@ -181,6 +181,11 @@ class CompanyClassification(BaseOrderedConstantModel):
 class InvestmentProjectStage(BaseOrderedConstantModel):
     """Investment project stage."""
 
+    exclude_from_investment_flow = models.NullBooleanField(
+        help_text=_('If set to True the stage will not be part of the '
+                    'linear flow and will be skipped.'),
+    )
+
 
 class InvestmentType(BaseConstantModel):
     """Investment type (for investment projects)."""

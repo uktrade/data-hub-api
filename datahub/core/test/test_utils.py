@@ -2,11 +2,15 @@ from enum import Enum
 from uuid import UUID
 
 import pytest
+from django.test import override_settings
 
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
-    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks,
+    join_truthy_strings,
+    load_constants_to_database,
+    reverse_with_query_string,
+    slice_iterable_into_chunks,
 )
 
 
@@ -80,3 +84,17 @@ def test_load_constants_to_database():
     }
     actual_items = {(obj.id, obj.name) for obj in MetadataModel.objects.all()}
     assert actual_items == expected_items
+
+
+@pytest.mark.parametrize(
+    'query_args,expected_url',
+    (
+        ({}, '/test-disableable/?'),
+        ({'123': 'abc'}, '/test-disableable/?123=abc'),
+        ({'ab': ['1', '2']}, '/test-disableable/?ab=1&ab=2'),
+    ),
+)
+@override_settings(ROOT_URLCONF='datahub.core.test.support.urls')
+def test_reverse_with_query_string(query_args, expected_url):
+    """Test reverse_with_query_string() for various query arguments."""
+    assert reverse_with_query_string('test-disableable-collection', query_args) == expected_url

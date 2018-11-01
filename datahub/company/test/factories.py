@@ -6,7 +6,7 @@ from django.utils.timezone import now, utc
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Advisor, ExportExperienceCategory
+from datahub.company.models import Advisor, Company, ExportExperienceCategory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.metadata.models import EmployeeRange, HeadquarterType, TurnoverRange
@@ -91,6 +91,15 @@ class ArchivedCompanyFactory(CompanyFactory):
     archived_on = factory.Faker('past_datetime', tzinfo=utc)
     archived_by = factory.LazyFunction(lambda: random_obj_for_model(Advisor))
     archived_reason = factory.Faker('sentence')
+
+
+class DuplicateCompanyFactory(ArchivedCompanyFactory):
+    """Factory for company that has been marked as a duplicate."""
+
+    transferred_by = factory.SubFactory(AdviserFactory)
+    transferred_on = factory.Faker('past_datetime', tzinfo=utc)
+    transferred_to = factory.SubFactory(CompanyFactory)
+    transfer_reason = Company.TRANSFER_REASONS.duplicate
 
 
 def _get_random_company_category():

@@ -247,3 +247,22 @@ class TestSectorView:
         response = api_client.generic(method, url)
 
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+class TestInvestmentProjectStageView:
+    """Tests for the /metadata/investment-project-stage/ view."""
+
+    def test_list(self, api_client):
+        """Test listing of investment project stages"""
+        url = reverse(viewname='investment-project-stage')
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        project_stages = response.json()
+        assert len(project_stages) == 5
+
+        expected_items = ['id', 'name', 'disabled_on', 'exclude_from_investment_flow']
+        first_project_stage = project_stages[0]
+        assert set(first_project_stage.keys()) == set(expected_items)
+        assert first_project_stage['name'] == 'Prospect'
+        assert not first_project_stage['exclude_from_investment_flow']

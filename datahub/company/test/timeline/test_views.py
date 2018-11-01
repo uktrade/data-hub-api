@@ -24,13 +24,15 @@ class TestCompanyTimelineViews(APITestMixin):
             'events': [
                 {
                     'data_source': 'companies_house.companies',
+                    'data_source_label': 'Companies House (Companies)',
                     'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
                     'description': 'Accounts next due date',
                 },
                 {
-                    'data_source': 'companies_house.companies',
+                    'data_source': 'dit.export_wins',
+                    'data_source_label': 'DIT (Export Wins)',
                     'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                    'description': 'Accounts filed',
+                    'description': 'Export Win',
                 },
             ],
         }
@@ -55,13 +57,15 @@ class TestCompanyTimelineViews(APITestMixin):
             'results': [
                 {
                     'data_source': 'companies_house.companies',
+                    'data_source_label': 'Companies House (Companies)',
                     'datetime': '2018-12-31T00:00:00Z',
                     'description': 'Accounts next due date',
                 },
                 {
-                    'data_source': 'companies_house.companies',
+                    'data_source': 'dit.export_wins',
+                    'data_source_label': 'DIT (Export Wins)',
                     'datetime': '2017-12-31T00:00:00Z',
-                    'description': 'Accounts filed',
+                    'description': 'Export Win',
                 },
             ],
         }
@@ -169,13 +173,15 @@ class TestCompanyTimelineViews(APITestMixin):
             'events': [
                 {
                     'data_source_wrong': 'companies_house.companies',
+                    'data_source_label_wrong': 'Companies House (Companies)',
                     'datetime_wrong': 'Mon, 31 Dec 2018 00:00:00 GMT',
                     'description_wrong': 'Accounts next due date',
                 },
                 {
-                    'data_source_wrong': 'companies_house.companies',
+                    'data_source_wrong': 'dit.export_wins',
+                    'data_source_label_wrong': 'DIT (Export Wins)',
                     'datetime_wrong': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                    'description_wrong': 'Accounts filed',
+                    'description_wrong': 'Export Win',
                 },
             ],
         }

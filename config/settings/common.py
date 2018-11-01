@@ -225,15 +225,21 @@ SEARCH_APPS = [
     'datahub.search.omis.OrderSearchApp',
 ]
 
+VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
+
 # Leeloo stuff
-ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
+if 'elasticsearch' in VCAP_SERVICES:
+    ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
+    ES_USE_AWS_AUTH = False
+else:
+    ES_URL = env('ES5_URL')
+    ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
+
 if ES_USE_AWS_AUTH:
     AWS_ELASTICSEARCH_REGION = env('AWS_ELASTICSEARCH_REGION')
     AWS_ELASTICSEARCH_KEY = env('AWS_ELASTICSEARCH_KEY')
     AWS_ELASTICSEARCH_SECRET = env('AWS_ELASTICSEARCH_SECRET')
-    ES_USE_SSL = env.bool('ES_USE_SSL', True)
 
-ES_URL = env('ES5_URL')
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
 ES_INDEX_SETTINGS = {}
@@ -253,7 +259,11 @@ BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 AV_V2_SERVICE_URL = env('AV_V2_SERVICE_URL', default=None)
 
 # CACHE / REDIS
-REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
+if 'redis' in VCAP_SERVICES:
+    REDIS_BASE_URL = VCAP_SERVICES['redis'][0]['credentials']['uri']
+else:
+    REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
+
 if REDIS_BASE_URL:
     REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
     CACHES = {

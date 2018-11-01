@@ -4,6 +4,8 @@ from logging import getLogger
 
 import requests
 from django.conf import settings
+from django.urls import reverse
+from django.utils.http import urlencode
 
 logger = getLogger(__name__)
 
@@ -94,6 +96,16 @@ def load_constants_to_database(constants, model):
 
             model_obj.name = constant.value.name
             model_obj.save()
+
+
+def reverse_with_query_string(viewname, query_args, **kwargs):
+    """
+    Gets the URL for a view (like reverse()) but also takes a dict to be URL encoded in the
+    query string.
+    """
+    query_string = urlencode(query_args, doseq=True)
+    url = reverse(viewname, **kwargs)
+    return f'{url}?{query_string}'
 
 
 def get_front_end_url(obj):
