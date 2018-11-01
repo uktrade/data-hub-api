@@ -1,3 +1,47 @@
+Data Hub API 7.4.0 (2018-11-01)
+===============================
+
+
+
+Features
+--------
+
+- **Companies** Company timeline now includes ``data_source_label`` field that contains human-readable data source description.
+- **Companies** New fields named ``transferred_to`` and ``transfer_reason`` have been added to indicate if a company has had its data
+  transferred to another record and should no longer be used. The field contains a reference to the company that should
+  be used instead. The field cannot be directly changed; it will be set by an upcoming admin tool for merging duplicate
+  companies.
+- **Investment** A new field ``exclude_from_investment_flow`` has been added to the ``InvestmentProjectStage`` metadata to
+  indicate if a stage should be excluded from the investment flow. The field will be used to aid with
+  deprecating and adding new stages.
+
+API
+---
+
+- **Companies** ``GET /v3/company/<uuid:pk>/timeline`` endpoint now includes ``data_source_label`` field in the response. This field contains human-readable data source description.
+- **Companies** ``GET,POST /v3/company``, ``GET,POST /v3/company/<id>``: New, optional read-only fields named ``transferred_to`` and
+  ``transfer_reason`` have been added to indicate if a company has had its data transferred to another record and should
+  no longer be used. When set, this field contains two sub-fields (``id`` and ``name``) which give details of the company
+  that should be used instead. The only possible value for transfer_reason at present is ``duplicate``, which indicates
+  that it was a duplicate record.
+
+  ``GET,POST /v3/company/unarchive``: It is not possible to unarchive a company that has a value in the ``transferred_to`` field.
+- **Investment** ``GET /metadata/investment-project-stage/<uuid:pk>/`` endpoint now includes ``exclude_from_investment_flow``
+  field in the response.
+
+Database schema
+---------------
+
+- **Companies** A new nullable column ``transferred_to`` has been added to the ``company_company`` table as a foreign key to another company
+  record. The column indicates that data about the company has been transferred to another record, and the referenced
+  company is the one that should be used instead.
+
+  A new column ``transfer_reason`` has been added to the ``company_company`` table. This indicates the reason that data
+  about the company was transferred. The current possible values are an empty string, or ``'duplicate'``.
+- **Investment** A new column ``exclude_from_investment_flow`` has been added to the ``metadata_investmentprojectstage`` table.
+  The column indicates if the stage should be excluded from the investment flow timeline.
+
+
 Data Hub API 7.3.0 (2018-10-25)
 ===============================
 

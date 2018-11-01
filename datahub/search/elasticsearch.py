@@ -90,6 +90,7 @@ def configure_connection():
         }
         es_host = urlparse(settings.ES_URL)
         es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
+        use_ssl = es_host.scheme == 'https'
         auth = AWSRequestsAuth(
             aws_access_key=settings.AWS_ELASTICSEARCH_KEY,
             aws_secret_access_key=settings.AWS_ELASTICSEARCH_SECRET,
@@ -100,7 +101,7 @@ def configure_connection():
         connections_default = {
             'hosts': [es_host.netloc],
             'port': es_port,
-            'use_ssl': settings.ES_USE_SSL,
+            'use_ssl': use_ssl,
             'verify_certs': settings.ES_VERIFY_CERTS,
             'http_auth': auth,
             'connection_class': RequestsHttpConnection,

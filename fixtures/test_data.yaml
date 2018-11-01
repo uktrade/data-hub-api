@@ -249,6 +249,29 @@
     archived_by: 7bad8082-4978-4fe8-a018-740257f01637
     archived_reason: 'Company is dissolved'
 
+- model: company.company
+  pk: ca141e78-e19b-4551-9234-66de570d43a6
+  fields:
+    name: Mars Transferred Limited
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    transferred_to: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+    transfer_reason: duplicate
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 82756b9a-5d95-e211-a939-e4115bead28a
+      - 83756b9a-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 First Street
+    registered_address_town: New York
+    registered_address_postcode: 765413
+    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    description: This is a dummy duplicate company for testing
+    created_on: '2017-03-05T12:00:00Z'
+    modified_on: '2017-03-05T12:00:00Z'
+
 - model: company.companycoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
   fields:

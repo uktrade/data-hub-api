@@ -40,3 +40,9 @@ class SectorSerializer(serializers.Serializer):
     parent = NestedRelatedField('metadata.Sector', read_only=True)
     level = serializers.ReadOnlyField()
     disabled_on = serializers.ReadOnlyField()
+
+
+class InvestmentProjectStageSerializer(ConstantModelSerializer):
+    """Investment project stage serializer."""
+
+    exclude_from_investment_flow = serializers.ReadOnlyField()

@@ -4,7 +4,7 @@
 {% block object-tools-items %}
   {% if merge_company_tool_feature_flag and has_change_permission %}
   <li>
-    <a href="{% url opts|admin_urlname:'merge-select-other-company' original.pk|admin_urlquote %}">
+    <a href="{% url opts|admin_urlname:'merge-select-other-company' %}?company_1={{ original.pk|admin_urlquote }}">
       Merge with another company
     </a>
   </li>

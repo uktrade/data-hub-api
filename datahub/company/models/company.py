@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
+from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
@@ -70,6 +71,9 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'trading_address_postcode': {'required': False},
         'trading_address_country': {'required': True},
     }
+    TRANSFER_REASONS = Choices(
+        ('duplicate', 'Duplicate record'),
+    )
     ALLOWED_RELATIONS_FOR_MERGING = (
         ('company', 'Contact', 'company'),
         ('interaction', 'Interaction', 'company'),
@@ -149,6 +153,28 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this company.',
+    )
+    transferred_to = models.ForeignKey(
+        'self',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='transferred_from',
+        help_text='Where data about this company was transferred to.',
+    )
+    transfer_reason = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=TRANSFER_REASONS,
+        help_text='The reason data for this company was transferred.',
+    )
+    transferred_on = models.DateTimeField(blank=True, null=True)
+    transferred_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
     )
 
     def get_absolute_url(self):
