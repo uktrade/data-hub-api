@@ -1,2 +1,0 @@
-A new column ``exclude_from_investment_flow`` has been added to the ``metadata_investmentprojectstage`` table.
-The column indicates if the stage should be excluded from the investment flow timeline.
