@@ -1,7 +1,0 @@
-A new nullable column ``transferred_to`` has been added to the ``company_company`` table as a foreign key to another company
-record. The column indicates that data about the company has been transferred to another record, and the referenced
-company is the one that should be used instead.
-
-A new column ``transfer_reason`` has been added to the ``company_company`` table. This indicates the reason that data
-about the company was transferred. The current possible values are an empty string, or ``'duplicate'``.
-
