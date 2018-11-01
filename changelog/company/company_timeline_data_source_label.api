@@ -1,1 +1,0 @@
-``GET /v3/company/<uuid:pk>/timeline`` endpoint now includes ``data_source_label`` field in the response. This field contains human-readable data source description.
