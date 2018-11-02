@@ -3,6 +3,9 @@ from enum import Enum
 from datahub.core.constants import Constant
 
 
+FEATURE_FLAG_STREAMLINED_FLOW = 'streamlined-investment-flow'
+
+
 class SpecificProgramme(Enum):
     """Specific Investment Programme constants."""
 
