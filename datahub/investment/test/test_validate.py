@@ -3,6 +3,8 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
 from datahub.investment.models import InvestmentDeliveryPartner
 from datahub.investment.serializers import (
     CORE_FIELDS,
@@ -11,7 +13,11 @@ from datahub.investment.serializers import (
     VALUE_FIELDS,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.investment.validate import validate
+from datahub.investment.validate import (
+    _get_desired_stage_order,
+    InvestmentProjectStageValidationConfig,
+    validate,
+)
 from datahub.metadata.models import ReferralSourceActivity, UKRegion
 
 pytestmark = pytest.mark.django_db
@@ -352,3 +358,79 @@ def test_validate_verify_win_instance_with_cond_fields():
     )
     errors = validate(instance=project)
     assert not errors
+
+
+@pytest.fixture
+def set_streamlined_flow_feature_flag_active():
+    """Creates the streamlined flow feature flag."""
+    yield FeatureFlagFactory(code=FEATURE_FLAG_STREAMLINED_FLOW, is_active=True)
+
+
+@pytest.mark.parametrize(
+    'desired_stage,next_stage,expected_stage_order',
+    (
+        (constants.InvestmentProjectStage.prospect.value, None, 200),
+        (constants.InvestmentProjectStage.prospect.value, True, 300),
+        (constants.InvestmentProjectStage.assign_pm.value, None, 300),
+        (constants.InvestmentProjectStage.assign_pm.value, True, 400),
+        (constants.InvestmentProjectStage.active.value, None, 400),
+        (constants.InvestmentProjectStage.active.value, True, 500),
+    ),
+)
+def test_get_desired_stage_order(desired_stage, next_stage, expected_stage_order):
+    """Tests get desired stage order when streamlined investment flow flag is not set."""
+    assert _get_desired_stage_order(desired_stage, next_stage) == expected_stage_order
+
+
+class TestValidationConfig:
+    """Test Investment Project Stage Validation config without any active feature flags."""
+
+    EXPECTED_STAGE = constants.InvestmentProjectStage.assign_pm.value
+
+    def test_get_next_stage_for_prospect(self):
+        """Tests get next investment project stage after prospect."""
+        validation_config = InvestmentProjectStageValidationConfig()
+        assert validation_config._get_next_stage_for_prospect() == self.EXPECTED_STAGE
+
+    def test_required_fields_after_stage(self):
+        """Tests get required fields after stage for all project stages."""
+        validation_config = InvestmentProjectStageValidationConfig()
+        required_fields = validation_config.get_required_fields_after_stage()
+        assert required_fields['number_new_jobs'] == self.EXPECTED_STAGE
+        assert required_fields['strategic_drivers'] == self.EXPECTED_STAGE
+        assert required_fields['project_manager'] == constants.InvestmentProjectStage.active.value
+        assert required_fields['actual_land_date'] == constants.InvestmentProjectStage.won.value
+
+    def test_conditional_rules_after_stage(self):
+        """Tests get conditional rules after stage for all project stages."""
+        verify_win = constants.InvestmentProjectStage.verify_win.value
+        validation_config = InvestmentProjectStageValidationConfig()
+        conditional_fields = validation_config.get_conditional_rules_after_stage()
+        assert conditional_fields['total_investment'].stage == self.EXPECTED_STAGE
+        assert conditional_fields['average_salary'].stage == verify_win
+
+
+@pytest.mark.usefixtures('set_streamlined_flow_feature_flag_active')
+class TestValidationConfigWithStreamlinedFeature(TestValidationConfig):
+    """
+    Test Investment Project Stage validation config with streamlined flow feature flag active.
+    """
+
+    EXPECTED_STAGE = constants.InvestmentProjectStage.active.value
+
+    @pytest.mark.parametrize(
+        'desired_stage,next_stage,expected_stage_order',
+        (
+            (constants.InvestmentProjectStage.prospect.value, None, 200),
+            (constants.InvestmentProjectStage.prospect.value, True, 400),
+            (constants.InvestmentProjectStage.assign_pm.value, None, 300),
+            (constants.InvestmentProjectStage.assign_pm.value, True, 400),
+            (constants.InvestmentProjectStage.active.value, None, 400),
+            (constants.InvestmentProjectStage.active.value, True, 500),
+        ),
+    )
+    def test_get_desired_stage_order_with_streamlined_flow_feature_active(
+            self, desired_stage, next_stage, expected_stage_order,
+    ):
+        """Tests get desired stage order when streamlined investment flow feature is active."""
+        assert _get_desired_stage_order(desired_stage, next_stage) == expected_stage_order
