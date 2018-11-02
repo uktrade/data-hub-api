@@ -1,8 +1,9 @@
 from collections import namedtuple
 
-from datahub.company.models import Contact
-from datahub.interaction.models import Interaction
+from django.db import transaction
 
+from datahub.company.models import Company, Contact
+from datahub.interaction.models import Interaction
 
 MoveEntry = namedtuple(
     'MoveEntry',
@@ -13,10 +14,19 @@ MoveEntry = namedtuple(
 )
 
 
+MergeResult = namedtuple(
+    'MergeResult',
+    [
+        'num_interactions_moved',
+        'num_contacts_moved',
+    ],
+)
+
+
 class DuplicateCompanyMerger:
     """Utility class for merging duplicate companies."""
 
-    def __init__(self, source_company, target_company):
+    def __init__(self, source_company: Company, target_company: Company):
         """Initialises the instance with the source and target companies."""
         self.source_company = source_company
         self.target_company = target_company
@@ -34,6 +44,37 @@ class DuplicateCompanyMerger:
         should_archive_source = not self.source_company.archived
 
         return move_entries, should_archive_source
+
+    def is_merge_allowed(self):
+        """Returns whether the merge is allowed."""
+        return (
+            self.source_company.is_valid_merge_source
+            and self.target_company.is_valid_merge_target
+        )
+
+    @transaction.atomic
+    def perform_merge(self, user):
+        """Merges the source company into the target company."""
+        num_interactions_moved = 0
+        num_contacts_moved = 0
+
+        for interaction in self.source_company.interactions.iterator():
+            interaction.company = self.target_company
+            interaction.save(update_fields=('company',))
+            num_interactions_moved += 1
+
+        for contact in self.source_company.contacts.iterator():
+            contact.company = self.target_company
+            contact.save(update_fields=('company',))
+            num_contacts_moved += 1
+
+        self.source_company.mark_as_transferred(
+            self.target_company,
+            Company.TRANSFER_REASONS.duplicate,
+            user,
+        )
+
+        return MergeResult(num_interactions_moved, num_contacts_moved)
 
     @staticmethod
     def _append_move_entry(to_move, count, model):
