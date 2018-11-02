@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
@@ -216,6 +217,27 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         return all(
             getattr(self, field) for field, rules in field_mapping.items() if rules['required']
         )
+
+    def mark_as_transferred(self, to, reason, user):
+        """
+        Marks a company record as having been transferred to another company record.
+
+        This is used, for example, for marking a company as a duplicate record.
+        """
+        self.transfer_reason = reason
+        self.transferred_by = user
+        self.transferred_on = now()
+        self.transferred_to = to
+
+        display_reason = self.get_transfer_reason_display()
+
+        archived_reason = (
+            f'This record is no longer in use and its data has been transferred to {to} for the '
+            f'following reason: {display_reason}.'
+        )
+
+        # Note: archive() saves the model instance
+        self.archive(user, archived_reason)
 
     @property
     def is_valid_merge_target(self):
