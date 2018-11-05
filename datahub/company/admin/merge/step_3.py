@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
-from datahub.company.merge import DuplicateCompanyMerger
+from datahub.company.merge import DuplicateCompanyMerger, MergeNotAllowedError
 from datahub.company.models import Contact
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
 from datahub.feature_flag.utils import feature_flagged_view
@@ -74,7 +74,9 @@ def confirm_merge(model_admin, request):
 
 
 def _perform_merge(request, merger, model_admin):
-    if not merger.is_valid():
+    try:
+        merge_result = merger.perform_merge(request.user)
+    except MergeNotAllowedError:
         failure_msg = MERGE_FAILURE_MSG.format(
             source_company=merger.source_company,
             target_company=merger.target_company,
@@ -83,8 +85,6 @@ def _perform_merge(request, merger, model_admin):
         return False
 
     reversion.set_comment(REVERSION_REVISION_COMMENT)
-
-    merge_result = merger.perform_merge(request.user)
     success_msg = _build_success_msg(merge_result)
     model_admin.message_user(request, success_msg, django_messages.SUCCESS)
     return True
