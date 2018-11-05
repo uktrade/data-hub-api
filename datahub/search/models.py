@@ -2,7 +2,7 @@ from hashlib import blake2b
 from logging import getLogger
 
 from django.conf import settings
-from elasticsearch_dsl import DocType, MetaField
+from elasticsearch_dsl import Document, MetaField
 
 from datahub.core.exceptions import DataHubException
 from datahub.search.elasticsearch import (
@@ -17,7 +17,7 @@ from datahub.search.utils import get_model_non_mapped_field_names, serialise_map
 logger = getLogger(__name__)
 
 
-class BaseESModel(DocType):
+class BaseESModel(Document):
     """Helps convert Django models to dictionaries."""
 
     MAPPINGS = {}

@@ -6,6 +6,9 @@ from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'interaction'
+
+
 class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
@@ -72,4 +75,7 @@ class Interaction(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = 'interaction'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE
