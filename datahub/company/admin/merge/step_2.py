@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
+from datahub.company.merge import DuplicateCompanyMerger
 from datahub.core.utils import reverse_with_query_string
 from datahub.feature_flag.utils import feature_flagged_view
 
@@ -54,14 +55,16 @@ class SelectPrimaryCompanyForm(forms.Form):
         target_company = self._company_1 if company_index == '1' else self._company_2
         source_company = self._company_1 if company_index != '1' else self._company_2
 
-        if not target_company.is_valid_merge_target:
+        merger = DuplicateCompanyMerger(source_company, target_company)
+
+        if not merger.is_target_valid():
             raise ValidationError(self.INVALID_TARGET_COMPANY_MSG)
 
-        if not source_company.is_valid_merge_source:
+        if not merger.is_source_valid():
             raise ValidationError(self.INVALID_SOURCE_COMPANY_MSG)
 
-        cleaned_data['source_company'] = source_company
         cleaned_data['target_company'] = target_company
+        cleaned_data['source_company'] = source_company
 
         return cleaned_data
 
@@ -110,11 +113,21 @@ def select_primary_company(model_admin, request):
 
     context = {
         **model_admin.admin_site.each_context(request),
-        'company_1': company_1,
-        'company_2': company_2,
+        'option_1': _build_option_context(company_2, company_1),
+        'option_2': _build_option_context(company_1, company_2),
         'form': form,
         'media': model_admin.media,
         'opts': model_admin.model._meta,
         'title': title,
     }
     return TemplateResponse(request, template_name, context)
+
+
+def _build_option_context(source_company, target_company):
+    merger = DuplicateCompanyMerger(source_company, target_company)
+    return {
+        'target': target_company,
+        'is_source_valid': merger.is_source_valid(),
+        'is_target_valid': merger.is_target_valid(),
+        'is_valid': merger.is_valid(),
+    }

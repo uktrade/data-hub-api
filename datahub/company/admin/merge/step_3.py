@@ -74,7 +74,7 @@ def confirm_merge(model_admin, request):
 
 
 def _perform_merge(request, merger, model_admin):
-    if not merger.is_merge_allowed():
+    if not merger.is_valid():
         failure_msg = MERGE_FAILURE_MSG.format(
             source_company=merger.source_company,
             target_company=merger.target_company,
