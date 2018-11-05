@@ -61,6 +61,7 @@ Dependencies:
 -   Python 3.6.x
 -   PostgreSQL 9.6
 -   redis 3.2
+-   Elasticsearch 6.3
 
 1.  Clone the repository:
 
@@ -106,7 +107,7 @@ Dependencies:
 8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:5.5
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     ```
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.

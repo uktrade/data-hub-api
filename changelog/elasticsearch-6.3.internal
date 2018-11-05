@@ -1,0 +1,1 @@
+The Elasticsearch Python client libraries were updated to 6.x versions, as was the Docker image used during development.
