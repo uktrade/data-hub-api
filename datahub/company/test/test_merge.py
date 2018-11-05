@@ -1,11 +1,17 @@
 from datetime import datetime
 from itertools import chain
+from unittest.mock import Mock
 
 import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
-from datahub.company.merge import DuplicateCompanyMerger, MergeResult, MoveEntry
+from datahub.company.merge import (
+    DuplicateCompanyMerger,
+    MergeNotAllowedError,
+    MergeResult,
+    MoveEntry,
+)
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -118,6 +124,20 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_by == user
         assert source_company.transferred_on == merge_time
         assert source_company.transferred_to == target_company
+
+    def test_merge_fails_when_not_allowed(self, monkeypatch):
+        """
+        Test that perform_merge() raises DuplicateCompanyMerger when the merge is not
+        allowed.
+        """
+        monkeypatch.setattr(DuplicateCompanyMerger, 'is_valid', Mock(return_value=False))
+
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+        user = AdviserFactory()
+        merger = DuplicateCompanyMerger(source_company, target_company)
+        with pytest.raises(MergeNotAllowedError):
+            merger.perform_merge(user)
 
 
 def _company_factory(num_interactions, num_contacts):

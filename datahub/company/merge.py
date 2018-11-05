@@ -3,6 +3,7 @@ from collections import namedtuple
 from django.db import transaction
 
 from datahub.company.models import Company, Contact
+from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
 
@@ -28,6 +29,10 @@ MergeResult = namedtuple(
         'num_contacts_moved',
     ],
 )
+
+
+class MergeNotAllowedError(DataHubException):
+    """Merging the specified source company into the specified target company is not allowed."""
 
 
 class DuplicateCompanyMerger:
@@ -80,7 +85,15 @@ class DuplicateCompanyMerger:
 
     @transaction.atomic
     def perform_merge(self, user):
-        """Merges the source company into the target company."""
+        """
+        Merges the source company into the target company.
+
+        is_valid() should be called first to check if the merge is allowed. DataHubException
+        will be raised if the merge is not allowed, and perform_merge() was called anyway.
+        """
+        if not self.is_valid():
+            raise MergeNotAllowedError()
+
         num_interactions_moved = 0
         num_contacts_moved = 0
 
