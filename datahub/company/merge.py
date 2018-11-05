@@ -3,7 +3,14 @@ from collections import namedtuple
 from django.db import transaction
 
 from datahub.company.models import Company, Contact
+from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
+
+ALLOWED_RELATIONS_FOR_MERGING = {
+    Contact.company.field,
+    Interaction.company.field,
+}
+
 
 MoveEntry = namedtuple(
     'MoveEntry',
@@ -45,12 +52,31 @@ class DuplicateCompanyMerger:
 
         return move_entries, should_archive_source
 
-    def is_merge_allowed(self):
+    def is_source_valid(self):
+        """
+        Returns whether the specified source company is a valid merge source.
+
+        This checks whether there are any references to the source company (other than
+        references through the relations specified in ALLOWED_RELATIONS_FOR_MERGING).
+        It also checks if the source company has any references to other companies.
+        Merging is not permitted if either of those types of reference exists.
+        """
+        if not hasattr(self, '_cached_is_source_valid'):
+            self._cached_is_source_valid = self._is_source_valid()
+
+        return self._cached_is_source_valid
+
+    def is_target_valid(self):
+        """
+        Returns whether the specified target company is a valid merge target.
+
+        This checks that the target company isn't archived.
+        """
+        return not self.target_company.archived
+
+    def is_valid(self):
         """Returns whether the merge is allowed."""
-        return (
-            self.source_company.is_valid_merge_source
-            and self.target_company.is_valid_merge_target
-        )
+        return self.is_source_valid() and self.is_target_valid()
 
     @transaction.atomic
     def perform_merge(self, user):
@@ -83,3 +109,24 @@ class DuplicateCompanyMerger:
 
         move_item = MoveEntry(count, model._meta)
         to_move.append(move_item)
+
+    def _is_source_valid(self):
+        # First, check that there are no references to the source company from other objects
+        # (other than via the fields specified in ALLOWED_RELATIONS_FOR_MERGING).
+        relations = get_related_fields(Company)
+
+        has_related_objects = any(
+            getattr(self.source_company, relation.name).count()
+            for relation in relations
+            if relation.remote_field not in ALLOWED_RELATIONS_FOR_MERGING
+        )
+
+        if has_related_objects:
+            return False
+
+        # Then, check that the source company itself doesn't have any references to other
+        # companies.
+        self_referential_fields = get_self_referential_relations(Company)
+        return not any(
+            getattr(self.source_company, field.name) for field in self_referential_fields
+        )
