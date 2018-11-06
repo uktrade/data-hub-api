@@ -1,0 +1,3 @@
+Column ``exclude_from_investment_flow`` on ``metadata_investmentprojectstage`` table is
+no longer nullable and the default value has been set to False. Existing entries have
+all been updated to False with the exception of 'Assign PM' which has been set to True.
