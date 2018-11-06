@@ -24,37 +24,39 @@ class SearchApp:
     # in order to export search results.
     export_permission = None
 
-    def __init__(self, mod):
-        """Create this search app without initialising any ES config."""
-        self.mod = mod
-        self.mod_signals = f'{self.mod}.signals'
-
-    def init_es(self, force_update_mapping=False):
+    @classmethod
+    def init_es(cls, force_update_mapping=False):
         """
         Creates the index and aliases for this app if they don't already exist.
 
         If force_update_mapping is True and the write alias already exists, an attempt
         is made to update the existing mapping in place.
         """
-        self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
+        cls.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
-    def get_signal_receivers(self):
+    @classmethod
+    def get_signal_receivers(cls):
         """Returns the signal receivers for this search app."""
-        return import_module(self.mod_signals).receivers
+        package, _, _ = cls.__module__.rpartition('.')
+        module = f'{package}.signals'
+        return import_module(module).receivers
 
-    def connect_signals(self):
+    @classmethod
+    def connect_signals(cls):
         """
         Connects all signal handlers so DB models can be synced with Elasticsearch on save.
         """
-        for receiver in self.get_signal_receivers():
+        for receiver in cls.get_signal_receivers():
             receiver.connect()
 
-    def disconnect_signals(self):
+    @classmethod
+    def disconnect_signals(cls):
         """Disconnects all signal handlers."""
-        for receiver in self.get_signal_receivers():
+        for receiver in cls.get_signal_receivers():
             receiver.disconnect()
 
-    def get_permission_filters(self, request):
+    @classmethod
+    def get_permission_filters(cls, request):
         """
         Gets filter arguments used to enforce permissions.
 
@@ -121,8 +123,7 @@ def _load_search_app(cls_path):
     """Loads and registers a single search app."""
     mod_path, _, cls_name = cls_path.rpartition('.')
     mod = import_module(mod_path)
-    cls = getattr(mod, cls_name)
-    return cls(mod_path)
+    return getattr(mod, cls_name)
 
 
 class SearchConfig(AppConfig):
