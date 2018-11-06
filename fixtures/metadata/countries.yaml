@@ -1,744 +1,1308 @@
 - model: metadata.country
   pk: 0350bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Madagascar}
+  fields:
+    disabled_on: null
+    name: Madagascar
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 0450bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malawi}
+  fields:
+    disabled_on: null
+    name: Malawi
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 0550bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malaysia}
+  fields:
+    disabled_on: null
+    name: Malaysia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 0650bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Maldives}
+  fields:
+    disabled_on: null
+    name: Maldives
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: 0750bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mali}
+  fields:
+    disabled_on: null
+    name: Mali
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 0850bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malta}
+  fields:
+    disabled_on: null
+    name: Malta
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 0950bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Marshall Islands}
-- model: metadata.country
-  pk: 0a50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Martinique}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Marshall Islands
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
 - model: metadata.country
   pk: 0b50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mauritania}
+  fields:
+    disabled_on: null
+    name: Mauritania
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 0c50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mauritius}
-- model: metadata.country
-  pk: 0d50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mayotte}
+  fields:
+    disabled_on: null
+    name: Mauritius
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 0e50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mexico}
+  fields:
+    disabled_on: null
+    name: Mexico
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 0f50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Micronesia}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Micronesia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 1050bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Moldova}
+  fields:
+    disabled_on: null
+    name: Moldova
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 1150bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Monaco}
+  fields:
+    disabled_on: null
+    name: Monaco
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 1250bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mongolia}
+  fields:
+    disabled_on: null
+    name: Mongolia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 1350bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Montserrat}
+  fields:
+    disabled_on: null
+    name: Montserrat
+    overseas_region: null
 - model: metadata.country
   pk: 1450bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Morocco}
+  fields:
+    disabled_on: null
+    name: Morocco
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1550bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mozambique}
+  fields:
+    disabled_on: null
+    name: Mozambique
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1650bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Namibia}
+  fields:
+    disabled_on: null
+    name: Namibia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1750bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nauru}
+  fields:
+    disabled_on: null
+    name: Nauru
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 1850bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nepal}
+  fields:
+    disabled_on: null
+    name: Nepal
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: 1950bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Netherlands}
+  fields:
+    disabled_on: null
+    name: Netherlands
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 1a0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Saudi Arabia}
+  fields:
+    disabled_on: null
+    name: Saudi Arabia
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 1a50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Netherlands Antilles}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Netherlands Antilles
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 1b0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Senegal}
-- model: metadata.country
-  pk: 1b50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: New Caledonia}
+  fields:
+    disabled_on: null
+    name: Senegal
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1c0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Serbia}
+  fields:
+    disabled_on: null
+    name: Serbia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 1c50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: New Zealand}
+  fields:
+    disabled_on: null
+    name: New Zealand
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 1d0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Seychelles}
+  fields:
+    disabled_on: null
+    name: Seychelles
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1d50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nicaragua}
+  fields:
+    disabled_on: null
+    name: Nicaragua
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 1e0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sierra Leone}
+  fields:
+    disabled_on: null
+    name: Sierra Leone
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 1f0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Singapore}
+  fields:
+    disabled_on: null
+    name: Singapore
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 200be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Slovakia}
+  fields:
+    disabled_on: null
+    name: Slovakia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 210be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Slovenia}
+  fields:
+    disabled_on: null
+    name: Slovenia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 220be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Solomon Islands}
+  fields:
+    disabled_on: null
+    name: Solomon Islands
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 230be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Somalia}
+  fields:
+    disabled_on: null
+    name: Somalia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 240be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: South Africa}
-- model: metadata.country
-  pk: 250be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: South Georgia and South Sandwich Islands}
+  fields:
+    disabled_on: null
+    name: South Africa
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 260be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sri Lanka}
-- model: metadata.country
-  pk: 270be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Helena}
+  fields:
+    disabled_on: null
+    name: Sri Lanka
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: 280be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Kitts and Nevis}
+  fields:
+    disabled_on: null
+    name: St Kitts and Nevis
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 290be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Lucia}
-- model: metadata.country
-  pk: 2a0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Pierre and Miquelon}
+  fields:
+    disabled_on: null
+    name: St Lucia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 2b0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Vincent}
+  fields:
+    disabled_on: null
+    name: St Vincent
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 2c0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sudan}
+  fields:
+    disabled_on: null
+    name: Sudan
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 2d0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Surinam}
-- model: metadata.country
-  pk: 2e0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Svalbard and Jan Mayen Islands}
+  fields:
+    disabled_on: null
+    name: Surinam
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 2f0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Swaziland}
+  fields:
+    disabled_on: null
+    name: Swaziland
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 300be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sweden}
+  fields:
+    disabled_on: null
+    name: Sweden
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 310be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Switzerland}
-- model: metadata.country
-  pk: 34afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Wallis and Futuna}
+  fields:
+    disabled_on: null
+    name: Switzerland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 35afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Occupied Palestinian Territories}
+  fields:
+    disabled_on: null
+    name: Occupied Palestinian Territories
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 36afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Western Sahara}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Western Sahara
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 37afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Yemen}
+  fields:
+    disabled_on: null
+    name: Yemen
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 38afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Zambia}
+  fields:
+    disabled_on: null
+    name: Zambia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 39afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Zimbabwe}
+  fields:
+    disabled_on: null
+    name: Zimbabwe
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 4461b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Niger}
+  fields:
+    disabled_on: null
+    name: Niger
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 4561b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Nigeria}
-- model: metadata.country
-  pk: 4661b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Niue}
-- model: metadata.country
-  pk: 4761b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Norfolk Island}
-- model: metadata.country
-  pk: 4861b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Northern Mariana Islands}
+  fields:
+    disabled_on: null
+    name: Nigeria
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 4961b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Norway}
+  fields:
+    disabled_on: null
+    name: Norway
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 4a61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Oman}
+  fields:
+    disabled_on: null
+    name: Oman
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 4b61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Pakistan}
+  fields:
+    disabled_on: null
+    name: Pakistan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 4c61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Palau}
+  fields:
+    disabled_on: null
+    name: Palau
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 4d61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Panama}
+  fields:
+    disabled_on: null
+    name: Panama
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 4e61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Papua New Guinea}
+  fields:
+    disabled_on: null
+    name: Papua New Guinea
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 4f61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Paraguay}
+  fields:
+    disabled_on: null
+    name: Paraguay
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 5061b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Peru}
+  fields:
+    disabled_on: null
+    name: Peru
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 5161b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Philippines}
-- model: metadata.country
-  pk: 5261b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Pitcairn, Henderson, Ducie and Oeno Islands'}
+  fields:
+    disabled_on: null
+    name: Philippines
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 5361b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Poland}
+  fields:
+    disabled_on: null
+    name: Poland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 5461b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Portugal}
+  fields:
+    disabled_on: null
+    name: Portugal
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 5561b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Puerto Rico}
+  fields:
+    disabled_on: null
+    name: Puerto Rico
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 5661b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Qatar}
+  fields:
+    disabled_on: null
+    name: Qatar
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 56af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Brunei}
+  fields:
+    disabled_on: null
+    name: Brunei
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 5761b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Reunion}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Reunion
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 57af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Bulgaria}
+  fields:
+    disabled_on: null
+    name: Bulgaria
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 5861b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Romania}
+  fields:
+    disabled_on: null
+    name: Romania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 58af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burkina}
+  fields:
+    disabled_on: null
+    name: Burkina
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5961b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Russia}
+  fields:
+    disabled_on: null
+    name: Russia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 59af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burma}
+  fields:
+    disabled_on: null
+    name: Burma
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 5a61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Rwanda}
+  fields:
+    disabled_on: null
+    name: Rwanda
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5aaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burundi}
+  fields:
+    disabled_on: null
+    name: Burundi
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5b61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Samoa}
+  fields:
+    disabled_on: null
+    name: Samoa
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 5baf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cambodia}
+  fields:
+    disabled_on: null
+    name: Cambodia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 5c61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: San Marino}
+  fields:
+    disabled_on: null
+    name: San Marino
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 5caf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cameroon}
+  fields:
+    disabled_on: null
+    name: Cameroon
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5d61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Sao Tome and Principe}
+  fields:
+    disabled_on: null
+    name: Sao Tome and Principe
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5daf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Canada}
+  fields:
+    disabled_on: null
+    name: Canada
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
 - model: metadata.country
   pk: 5eaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cape Verde}
+  fields:
+    disabled_on: null
+    name: Cape Verde
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 5faf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cayman Islands}
+  fields:
+    disabled_on: null
+    name: Cayman Islands
+    overseas_region: null
 - model: metadata.country
   pk: 60af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Central African Republic}
+  fields:
+    disabled_on: null
+    name: Central African Republic
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 61af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Chad}
+  fields:
+    disabled_on: null
+    name: Chad
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 62af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Chile}
+  fields:
+    disabled_on: null
+    name: Chile
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 63af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: China}
-- model: metadata.country
-  pk: 64af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Christmas Island}
-- model: metadata.country
-  pk: 65af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cocos (Keeling) Islands}
+  fields:
+    disabled_on: null
+    name: China
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
 - model: metadata.country
   pk: 66af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Colombia}
+  fields:
+    disabled_on: null
+    name: Colombia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 67af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Comoros}
+  fields:
+    disabled_on: null
+    name: Comoros
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 68af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Congo (Democratic Republic)}
+  fields:
+    disabled_on: null
+    name: Congo (Democratic Republic)
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 69af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Congo}
-- model: metadata.country
-  pk: 6aaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cook Islands}
+  fields:
+    disabled_on: null
+    name: Congo
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 6baf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Costa Rica}
+  fields:
+    disabled_on: null
+    name: Costa Rica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 6caf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Croatia}
+  fields:
+    disabled_on: null
+    name: Croatia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 6d6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Hungary}
+  fields:
+    disabled_on: null
+    name: Hungary
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 6daf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cuba}
+  fields:
+    disabled_on: null
+    name: Cuba
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 6e6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iceland}
+  fields:
+    disabled_on: null
+    name: Iceland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 6eaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cyprus}
+  fields:
+    disabled_on: null
+    name: Cyprus
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 6f6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: India}
+  fields:
+    disabled_on: null
+    name: India
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: 6faf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Czech Republic}
+  fields:
+    disabled_on: null
+    name: Czech Republic
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 706a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Indonesia}
+  fields:
+    disabled_on: null
+    name: Indonesia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 70af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Denmark}
+  fields:
+    disabled_on: null
+    name: Denmark
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 716a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iran}
+  fields:
+    disabled_on: null
+    name: Iran
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 71af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Djibouti}
+  fields:
+    disabled_on: null
+    name: Djibouti
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 726a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iraq}
+  fields:
+    disabled_on: null
+    name: Iraq
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 72af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Dominica}
+  fields:
+    disabled_on: null
+    name: Dominica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 736a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Ireland}
+  fields:
+    disabled_on: null
+    name: Ireland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 73af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Dominican Republic}
+  fields:
+    disabled_on: null
+    name: Dominican Republic
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 746a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Israel}
+  fields:
+    disabled_on: null
+    name: Israel
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 74af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: East Timor}
+  fields:
+    disabled_on: null
+    name: East Timor
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 756a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Ivory Coast}
+  fields:
+    disabled_on: null
+    name: Ivory Coast
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 75af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Ecuador}
+  fields:
+    disabled_on: null
+    name: Ecuador
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 766a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Jamaica}
+  fields:
+    disabled_on: null
+    name: Jamaica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 76af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Egypt}
+  fields:
+    disabled_on: null
+    name: Egypt
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 776a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Jordan}
+  fields:
+    disabled_on: null
+    name: Jordan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 77756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Guernsey}
+  fields:
+    disabled_on: null
+    name: Guernsey
+    overseas_region: null
 - model: metadata.country
   pk: 786a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kazakhstan}
+  fields:
+    disabled_on: null
+    name: Kazakhstan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 78756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Jersey}
+  fields:
+    disabled_on: null
+    name: Jersey
+    overseas_region: null
 - model: metadata.country
   pk: 796a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kenya}
+  fields:
+    disabled_on: null
+    name: Kenya
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 79756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Isle of Man}
+  fields:
+    disabled_on: null
+    name: Isle of Man
+    overseas_region: null
 - model: metadata.country
   pk: 7a6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kiribati}
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Kiribati
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 7a756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Kosovo}
+  fields:
+    disabled_on: null
+    name: Kosovo
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 7b6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Korea (North)}
-- model: metadata.country
-  pk: 7b756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: St Barthelemy}
+  fields:
+    disabled_on: null
+    name: Korea (North)
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 7c6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Korea (South)}
+  fields:
+    disabled_on: null
+    name: Korea (South)
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 7c756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: St Martin}
+  fields:
+    disabled_on: null
+    name: St Martin
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 7d6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kuwait}
+  fields:
+    disabled_on: null
+    name: Kuwait
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 7e6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kyrgyzstan}
+  fields:
+    disabled_on: null
+    name: Kyrgyzstan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 7e756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Sudan, South'}
+  fields:
+    disabled_on: null
+    name: 'Sudan, South'
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 7f6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Laos}
+  fields:
+    disabled_on: null
+    name: Laos
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 7f756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Montenegro}
+  fields:
+    disabled_on: null
+    name: Montenegro
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 806a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Latvia}
+  fields:
+    disabled_on: null
+    name: Latvia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 80756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: United Kingdom}
+  fields:
+    disabled_on: null
+    name: United Kingdom
+    overseas_region: null
 - model: metadata.country
   pk: 816a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lebanon}
+  fields:
+    disabled_on: null
+    name: Lebanon
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 81756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: United States}
+  fields:
+    disabled_on: null
+    name: United States
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
 - model: metadata.country
   pk: 826a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lesotho}
+  fields:
+    disabled_on: null
+    name: Lesotho
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 82756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: France}
+  fields:
+    disabled_on: null
+    name: France
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 836a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Liberia}
+  fields:
+    disabled_on: null
+    name: Liberia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 83756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Germany}
+  fields:
+    disabled_on: null
+    name: Germany
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 846a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Libya}
+  fields:
+    disabled_on: null
+    name: Libya
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 84756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Italy}
+  fields:
+    disabled_on: null
+    name: Italy
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 856a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Liechtenstein}
+  fields:
+    disabled_on: null
+    name: Liechtenstein
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 85756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Japan}
+  fields:
+    disabled_on: null
+    name: Japan
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: 866a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lithuania}
+  fields:
+    disabled_on: null
+    name: Lithuania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 86756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Spain}
+  fields:
+    disabled_on: null
+    name: Spain
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 876a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Luxembourg}
+  fields:
+    disabled_on: null
+    name: Luxembourg
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 87756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Afghanistan}
+  fields:
+    disabled_on: null
+    name: Afghanistan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: 886a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Macao (SAR)}
-- model: metadata.country
-  pk: 88756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Aland Islands}
+  fields:
+    disabled_on: null
+    name: Macao (SAR)
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
 - model: metadata.country
   pk: 896a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Macedonia}
+  fields:
+    disabled_on: null
+    name: Macedonia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 945f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Albania}
+  fields:
+    disabled_on: null
+    name: Albania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 955f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Algeria}
-- model: metadata.country
-  pk: 965f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: American Samoa}
+  fields:
+    disabled_on: null
+    name: Algeria
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 975f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Andorra}
+  fields:
+    disabled_on: null
+    name: Andorra
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: 985f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Angola}
+  fields:
+    disabled_on: null
+    name: Angola
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: 995f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Anguilla}
-- model: metadata.country
-  pk: 9a5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Antarctica}
+  fields:
+    disabled_on: null
+    name: Anguilla
+    overseas_region: null
 - model: metadata.country
   pk: 9b5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Antigua and Barbuda}
+  fields:
+    disabled_on: null
+    name: Antigua and Barbuda
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 9c5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Argentina}
+  fields:
+    disabled_on: null
+    name: Argentina
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: 9d5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Armenia}
-- model: metadata.country
-  pk: 9e5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Aruba}
+  fields:
+    disabled_on: null
+    name: Armenia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: 9f5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Australia}
+  fields:
+    disabled_on: null
+    name: Australia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: a05f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Austria}
+  fields:
+    disabled_on: null
+    name: Austria
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: a15f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Azerbaijan}
+  fields:
+    disabled_on: null
+    name: Azerbaijan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: a25f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bahamas}
+  fields:
+    disabled_on: null
+    name: Bahamas
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: a35f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bahrain}
+  fields:
+    disabled_on: null
+    name: Bahrain
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: a45f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bangladesh}
+  fields:
+    disabled_on: null
+    name: Bangladesh
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: a46ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Syria}
+  fields:
+    disabled_on: null
+    name: Syria
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: a55f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Barbados}
+  fields:
+    disabled_on: null
+    name: Barbados
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: a56ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Taiwan}
+  fields:
+    disabled_on: null
+    name: Taiwan
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: a65f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belarus}
+  fields:
+    disabled_on: null
+    name: Belarus
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: a66ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tajikistan}
+  fields:
+    disabled_on: null
+    name: Tajikistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: a75f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belgium}
+  fields:
+    disabled_on: null
+    name: Belgium
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: a76ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tanzania}
+  fields:
+    disabled_on: null
+    name: Tanzania
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: a85f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belize}
+  fields:
+    disabled_on: null
+    name: Belize
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: a86ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Thailand}
+  fields:
+    disabled_on: null
+    name: Thailand
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: a95f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Benin}
+  fields:
+    disabled_on: null
+    name: Benin
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: a96ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Togo}
+  fields:
+    disabled_on: null
+    name: Togo
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: aa5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bermuda}
-- model: metadata.country
-  pk: aa6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tokelau}
+  fields:
+    disabled_on: null
+    name: Bermuda
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: ab5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bhutan}
+  fields:
+    disabled_on: null
+    name: Bhutan
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
 - model: metadata.country
   pk: ab6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tonga}
+  fields:
+    disabled_on: null
+    name: Tonga
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: ac5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bolivia}
+  fields:
+    disabled_on: null
+    name: Bolivia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: ac6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Trinidad and Tobago}
+  fields:
+    disabled_on: null
+    name: Trinidad and Tobago
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: ad5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bosnia and Herzegovina}
+  fields:
+    disabled_on: null
+    name: Bosnia and Herzegovina
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: ad6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tunisia}
+  fields:
+    disabled_on: null
+    name: Tunisia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: ae5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Botswana}
+  fields:
+    disabled_on: null
+    name: Botswana
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: ae6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turkey}
-- model: metadata.country
-  pk: af5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bouvet Island}
+  fields:
+    disabled_on: null
+    name: Turkey
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: af6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turkmenistan}
+  fields:
+    disabled_on: null
+    name: Turkmenistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: b05f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Brazil}
+  fields:
+    disabled_on: null
+    name: Brazil
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: b06ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turks and Caicos Islands}
-- model: metadata.country
-  pk: b15f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: British Indian Ocean Territory}
+  fields:
+    disabled_on: null
+    name: Turks and Caicos Islands
+    overseas_region: null
 - model: metadata.country
   pk: b16ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tuvalu}
+  fields:
+    disabled_on: null
+    name: Tuvalu
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: b25f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: British Virgin Islands}
+  fields:
+    disabled_on: null
+    name: British Virgin Islands
+    overseas_region: null
 - model: metadata.country
   pk: b26ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uganda}
+  fields:
+    disabled_on: null
+    name: Uganda
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: b36ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Ukraine}
+  fields:
+    disabled_on: null
+    name: Ukraine
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: b46ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: United Arab Emirates}
-- model: metadata.country
-  pk: b56ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: United States Minor Outlying Islands}
+  fields:
+    disabled_on: null
+    name: United Arab Emirates
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
 - model: metadata.country
   pk: b66ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uruguay}
+  fields:
+    disabled_on: null
+    name: Uruguay
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: b76ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uzbekistan}
+  fields:
+    disabled_on: null
+    name: Uzbekistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: b86ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Vanuatu}
+  fields:
+    disabled_on: null
+    name: Vanuatu
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: b96ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Venezuela}
+  fields:
+    disabled_on: null
+    name: Venezuela
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: ba6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Vietnam}
+  fields:
+    disabled_on: null
+    name: Vietnam
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: bb6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Virgin Islands (US)}
+  fields:
+    disabled_on: null
+    name: Virgin Islands (US)
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
 - model: metadata.country
   pk: d2f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: El Salvador}
+  fields:
+    disabled_on: null
+    name: El Salvador
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: d3f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Equatorial Guinea}
+  fields:
+    disabled_on: null
+    name: Equatorial Guinea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: d4f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Eritrea}
+  fields:
+    disabled_on: null
+    name: Eritrea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: d5f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Estonia}
+  fields:
+    disabled_on: null
+    name: Estonia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: d6f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Ethiopia}
+  fields:
+    disabled_on: null
+    name: Ethiopia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: d7f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Falkland Islands}
+  fields:
+    disabled_on: null
+    name: Falkland Islands
+    overseas_region: null
 - model: metadata.country
   pk: d8f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Faroe Islands}
+  fields:
+    disabled_on: null
+    name: Faroe Islands
+    overseas_region: null
 - model: metadata.country
   pk: d9f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Fiji}
+  fields:
+    disabled_on: null
+    name: Fiji
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
 - model: metadata.country
   pk: daf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Finland}
-- model: metadata.country
-  pk: dbf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Guiana}
-- model: metadata.country
-  pk: dcf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Polynesia}
-- model: metadata.country
-  pk: ddf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Southern Territories}
+  fields:
+    disabled_on: null
+    name: Finland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: def682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Gabon}
+  fields:
+    disabled_on: null
+    name: Gabon
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: dff682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Gambia, The'}
+  fields:
+    disabled_on: null
+    name: Gambia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: e0f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Georgia}
+  fields:
+    disabled_on: null
+    name: Georgia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
 - model: metadata.country
   pk: e1f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Ghana}
+  fields:
+    disabled_on: null
+    name: Ghana
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: e2f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Gibraltar}
+  fields:
+    disabled_on: null
+    name: Gibraltar
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: e3f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Greece}
+  fields:
+    disabled_on: null
+    name: Greece
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: e4f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Greenland}
+  fields:
+    disabled_on: null
+    name: Greenland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: e5f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Grenada}
-- model: metadata.country
-  pk: e6f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guadeloupe}
-- model: metadata.country
-  pk: e7f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guam}
+  fields:
+    disabled_on: null
+    name: Grenada
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: e8f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guatemala}
+  fields:
+    disabled_on: null
+    name: Guatemala
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: e9f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guinea}
+  fields:
+    disabled_on: null
+    name: Guinea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: eaf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guinea-Bissau}
+  fields:
+    disabled_on: null
+    name: Guinea-Bissau
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
 - model: metadata.country
   pk: ebf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guyana}
+  fields:
+    disabled_on: null
+    name: Guyana
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: ecf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Haiti}
-- model: metadata.country
-  pk: edf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Heard Island and McDonald Island}
+  fields:
+    disabled_on: null
+    name: Haiti
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: eef682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Vatican City}
+  fields:
+    disabled_on: null
+    name: Vatican City
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
 - model: metadata.country
   pk: eff682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Honduras}
+  fields:
+    disabled_on: null
+    name: Honduras
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
 - model: metadata.country
   pk: f0f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Hong Kong (SAR)}
+  fields:
+    disabled_on: null
+    name: Hong Kong (SAR)
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
