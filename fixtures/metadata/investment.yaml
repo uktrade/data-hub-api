@@ -1,19 +1,19 @@
 # Investmentprojectstage
 - model: metadata.investmentprojectstage
   pk: 8a320cc9-ae2e-443e-9d26-2f36452c2ced
-  fields: {name: "Prospect", order: 200.0}
+  fields: {name: "Prospect", order: 200.0, exclude_from_investment_flow: False}
 - model: metadata.investmentprojectstage
   pk: c9864359-fb1a-4646-a4c1-97d10189fc03
-  fields: {name: "Assign PM", order: 300.0}
+  fields: {name: "Assign PM", order: 300.0, exclude_from_investment_flow: True}
 - model: metadata.investmentprojectstage
   pk: 7606cc19-20da-4b74-aba1-2cec0d753ad8
-  fields: {name: "Active", order: 400.0}
+  fields: {name: "Active", order: 400.0, exclude_from_investment_flow: False}
 - model: metadata.investmentprojectstage
   pk: 49b8f6f3-0c50-4150-a965-2c974f3149e3
-  fields: {name: "Verify win", order: 500.0}
+  fields: {name: "Verify win", order: 500.0, exclude_from_investment_flow: False}
 - model: metadata.investmentprojectstage
   pk: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6
-  fields: {name: "Won", order: 600.0}
+  fields: {name: "Won", order: 600.0, exclude_from_investment_flow: False}
 
 # InvestmentType
 - model: metadata.investmenttype
