@@ -33,8 +33,8 @@
     <div class="fieldWrapper">
       {{ form.selected_company.errors }}
       <ul id="id_selected_company">
-        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with company=company_1 other_company=company_2 index='1' opts=opts only %}
-        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with company=company_2 other_company=company_1 index='2' opts=opts only %}
+        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with option=option_1 index='1' opts=opts only %}
+        {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with option=option_2 index='2' opts=opts only %}
       </ul>
     </div>
 
