@@ -4,7 +4,7 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.test.search_support.models import SimpleModel as DBSimpleModel
 
 
-def dummy_on_delete_callback(sender, instance, **kwargs):
+def dummy_on_delete_callback(instance):
     """
     Function called on_delete and deliberately empty.
     It can be used to check if/when it's called.
