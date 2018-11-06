@@ -88,6 +88,7 @@ class Country(BaseConstantModel):
         related_name='countries',
         on_delete=models.PROTECT,
     )
+    iso_alpha2_code = models.CharField(blank=True, max_length=2)
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
