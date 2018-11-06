@@ -1,0 +1,3 @@
+``GET /metadata/investment-project-stage/<uuid:pk>/`` endpoint no longer returns null values
+for field ``exclude_from_investment_flow``. All existing records now return false with
+the exception of 'Assign PM' which returns true.
