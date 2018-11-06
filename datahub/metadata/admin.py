@@ -9,7 +9,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.FDIType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
-    models.OverseasRegion,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
@@ -28,6 +27,7 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
     models.InvestmentType,
+    models.OverseasRegion,
 )
 
 MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
@@ -95,13 +95,12 @@ admin.site.register(
 
 
 @admin.register(models.Country)
-class CountryAdmin(admin.ModelAdmin):
+class CountryAdmin(ViewOnlyAdmin):
     """Admin for countries."""
 
-    fields = ('pk', 'name', 'overseas_region', 'disabled_on')
-    list_display = ('name', 'overseas_region', 'disabled_on')
-    readonly_fields = ('pk',)
-    search_fields = ('name', 'pk')
+    fields = ('pk', 'name', 'overseas_region', 'disabled_on', 'iso_alpha2_code')
+    list_display = ('name', 'overseas_region', 'disabled_on', 'iso_alpha2_code')
+    search_fields = ('name', 'pk', 'iso_alpha2_code')
     list_filter = (DisabledOnFilter, 'overseas_region')
 
 
