@@ -1,0 +1,1 @@
+A new field `iso_alpha2_code` was added to the `metadata_country` table. It has not been populated yet.
