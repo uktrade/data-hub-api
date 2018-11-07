@@ -9,7 +9,6 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.core.utils import reverse_with_query_string
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestMergeWithAnotherCompanyLink(AdminTestMixin):
     """Tests the 'merge with another company' link on the change form."""
 
@@ -56,7 +55,6 @@ class TestMergeWithAnotherCompanyLink(AdminTestMixin):
         assert select_other_url not in response.rendered_content
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
     """Tests GET requests for the 'Merge with another company' view."""
 
@@ -102,7 +100,6 @@ class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
     """Tests form submission for the 'Merge with another company' view."""
 

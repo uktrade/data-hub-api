@@ -10,11 +10,9 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.merge import DuplicateCompanyMerger, MergeNotAllowedError
 from datahub.company.models import Contact
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
-from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.models import Interaction
 
 
@@ -30,7 +28,6 @@ MERGE_FAILURE_MSG = gettext_lazy(
 )
 
 
-@feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
 @method_decorator(csrf_protect)
 def confirm_merge(model_admin, request):
     """

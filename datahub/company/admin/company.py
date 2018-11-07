@@ -8,14 +8,12 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
-from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
 from datahub.company.models import Company, CompanyCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin, get_change_link
 from datahub.core.templatetags.datahub_extras import admin_change_link
-from datahub.feature_flag.utils import is_feature_flag_active
 
 
 class CompanyCoreTeamMemberInline(admin.TabularInline):
@@ -193,26 +191,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             ),
             *super().get_urls(),
         ]
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """
-        Change view with additional data added to the context.
-
-        Based on this example in the Django docs:
-        https://docs.djangoproject.com/en/2.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.changelist_view
-        """
-        merge_company_tool_feature_flag = is_feature_flag_active(MERGE_COMPANY_TOOL_FEATURE_FLAG)
-        extra_context = {
-            **({} if extra_context is None else extra_context),
-            'merge_company_tool_feature_flag': merge_company_tool_feature_flag,
-        }
-
-        return super().change_view(
-            request,
-            object_id,
-            form_url=form_url,
-            extra_context=extra_context,
-        )
 
     def transferred_to_display(self, obj):
         """Link to the company that data for this company has been transferred to."""

@@ -27,7 +27,6 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestConfirmMergeViewGet(AdminTestMixin):
     """Tests GET requests for the 'Confirm merge' view."""
 
@@ -92,7 +91,6 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestConfirmMergeViewPost(AdminTestMixin):
     """Tests form submission in the 'Confirm merge' view."""
 
