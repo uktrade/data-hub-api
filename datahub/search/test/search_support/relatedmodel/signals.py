@@ -7,7 +7,7 @@ from datahub.search.test.search_support.models import (
 )
 
 
-def _dummy_callback(sender, instance, **kwargs):
+def _dummy_callback(instance):
     """
     Function called post-save and deliberately empty.
     It can be used to check if/when it's called.

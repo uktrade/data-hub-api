@@ -23,6 +23,7 @@ class SignalReceiver:
     def __init__(self, signal, sender, receiver_func):
         """Initialises the instance."""
         self.is_connected = False
+        self.search_app = None
         self.signal = signal
         self.sender = sender
         self._receiver_func = receiver_func
@@ -38,7 +39,7 @@ class SignalReceiver:
     def connect(self):
         """Connects the signal receiver."""
         self.signal.connect(
-            self._receiver_func,
+            self.on_signal_received,
             sender=self.sender,
             dispatch_uid=self._dispatch_uid,
         )
@@ -47,11 +48,15 @@ class SignalReceiver:
     def disconnect(self):
         """Disconnects the signal receiver."""
         self.signal.disconnect(
-            self._receiver_func,
+            self.on_signal_received,
             sender=self.sender,
             dispatch_uid=self._dispatch_uid,
         )
         self.is_connected = False
+
+    def on_signal_received(self, sender, instance, **kwargs):
+        """Callback function passed to the signal."""
+        self._receiver_func(instance)
 
 
 @contextmanager

@@ -38,6 +38,23 @@ def sync_model(search_app_name):
     sync_app(search_app)
 
 
+@shared_task(acks_late=True, max_retries=15, autoretry_for=(Exception,), retry_backoff=1)
+def sync_object_task(search_app_name, pk):
+    """
+    Syncs a single object to Elasticsearch.
+
+    If an error occurs, the task will be automatically retried with an exponential back-off.
+    The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
+    added).
+
+    This task is named sync_object_task to avoid a conflict with sync_object.
+    """
+    from datahub.search.sync_object import sync_object
+
+    search_app = get_search_app(search_app_name)
+    sync_object(search_app, pk)
+
+
 @shared_task(bind=True, acks_late=True, priority=7, max_retries=5, default_retry_delay=60)
 def complete_model_migration(self, search_app_name, new_mapping_hash):
     """

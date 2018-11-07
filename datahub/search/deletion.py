@@ -110,7 +110,7 @@ class Collector:
         for receiver in self.signal_receivers_to_disable:
             receiver.connect()
 
-    def _collect(self, sender, instance, **kwargs):
+    def _collect(self, instance):
         """Logic that gets run on post_delete."""
         model = instance.__class__
         es_model = get_search_app_by_model(model).es_model
