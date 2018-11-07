@@ -16,7 +16,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_async import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.user_event_log.constants import USER_EVENT_TYPES
@@ -649,7 +649,7 @@ class TestSearchExportAPIView(APITestMixin):
 
         simple_obj = SimpleModel(name='test')
         simple_obj.save()
-        sync_object_async(SimpleModelSearchApp, simple_obj.pk)
+        sync_object(SimpleModelSearchApp, simple_obj.pk)
 
         setup_es.indices.refresh()
 

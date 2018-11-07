@@ -1,9 +1,17 @@
 from unittest.mock import MagicMock, Mock
+from uuid import uuid4
 
 import pytest
 
 from datahub.search.apps import get_search_apps
-from datahub.search.tasks import complete_model_migration, sync_all_models, sync_model
+from datahub.search.tasks import (
+    complete_model_migration,
+    sync_all_models,
+    sync_model,
+    sync_object_task,
+)
+from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.utils import create_mock_search_app
 
 
@@ -30,6 +38,30 @@ def test_sync_all_models(monkeypatch):
     sync_all_models.apply()
     tasks_created = {call[1]['args'][0] for call in sync_model_mock.apply_async.call_args_list}
     assert tasks_created == {app.name for app in get_search_apps()}
+
+
+@pytest.mark.django_db
+def test_sync_object_task_syncs(setup_es):
+    """Test that the object task syncs an object to Elasticsearch."""
+    obj = SimpleModel.objects.create()
+    sync_object_task.apply(args=(SimpleModelSearchApp.name, str(obj.pk)))
+    setup_es.indices.refresh()
+
+    assert setup_es.get(
+        index=SimpleModelSearchApp.es_model.get_write_index(),
+        doc_type=SimpleModelSearchApp.name,
+        id=obj.pk,
+    )
+
+
+def test_sync_object_task_retries_on_error(monkeypatch, setup_es):
+    """Test that the object task retries on error."""
+    sync_object_mock = Mock(side_effect=[Exception, None])
+    monkeypatch.setattr('datahub.search.sync_async.sync_object', sync_object_mock)
+
+    sync_object_task.apply(args=(SimpleModelSearchApp.name, str(uuid4())))
+
+    assert sync_object_mock.call_count == 2
 
 
 @pytest.mark.django_db

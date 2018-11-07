@@ -14,14 +14,14 @@ from datahub.search.sync_async import sync_object_async
 def sync_interaction_to_es(instance):
     """Sync interaction to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(InteractionSearchApp, str(instance.pk)),
+        lambda: sync_object_async(InteractionSearchApp, instance.pk),
     )
 
 
 def remove_interaction_from_es(instance):
     """Remove interaction from es."""
     transaction.on_commit(
-        lambda pk=instance.pk: delete_document(ESInteraction, str(pk)),
+        lambda pk=instance.pk: delete_document(ESInteraction, pk),
     )
 
 

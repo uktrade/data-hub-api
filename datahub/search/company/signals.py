@@ -10,7 +10,7 @@ from datahub.search.sync_async import sync_object_async
 def company_sync_es(instance):
     """Sync company to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(CompanySearchApp, str(instance.pk)),
+        lambda: sync_object_async(CompanySearchApp, instance.pk),
     )
 
 
