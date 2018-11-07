@@ -8,7 +8,7 @@ from datahub.omis.order.models import (
 )
 from datahub.search.omis import OrderSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
 def order_sync_es(instance):

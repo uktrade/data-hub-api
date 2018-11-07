@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from datahub.event.models import Event as DBEvent
 from datahub.search.event import EventSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
 def sync_event_to_es(instance):

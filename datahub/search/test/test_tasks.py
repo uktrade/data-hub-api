@@ -57,7 +57,7 @@ def test_sync_object_task_syncs(setup_es):
 def test_sync_object_task_retries_on_error(monkeypatch, setup_es):
     """Test that the object task retries on error."""
     sync_object_mock = Mock(side_effect=[Exception, None])
-    monkeypatch.setattr('datahub.search.sync_async.sync_object', sync_object_mock)
+    monkeypatch.setattr('datahub.search.sync_object.sync_object', sync_object_mock)
 
     sync_object_task.apply(args=(SimpleModelSearchApp.name, str(uuid4())))
 
