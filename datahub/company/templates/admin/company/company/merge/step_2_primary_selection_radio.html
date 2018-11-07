@@ -28,6 +28,8 @@
     {{ interaction_count }} interaction{{ interaction_count|pluralize }}
     {% endwith %}
     <br>
-    <a href="{{ option.target|admin_change_url }}">{% trans 'View complete record' %}</a>
+    {% blocktrans with obj_change_url=option.target|admin_change_url site_url=option.target.get_absolute_url %}
+    <a href="{{ obj_change_url }}">View company on admin site</a> or <a href="{{ site_url }}">view on Data Hub</a>
+    {% endblocktrans %}
   </label>
 </li>
