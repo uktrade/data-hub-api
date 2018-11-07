@@ -7,12 +7,12 @@ from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember,
 )
-from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
+from datahub.search.investment import InvestmentSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
-def investment_project_sync_es(sender, instance, **kwargs):
+def investment_project_sync_es(instance):
     """Sync investment project to the Elasticsearch."""
     def sync_es_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
@@ -20,16 +20,12 @@ def investment_project_sync_es(sender, instance, **kwargs):
         else:
             pk = instance.pk
 
-        sync_object_async(
-            ESInvestmentProject,
-            DBInvestmentProject,
-            str(pk),
-        )
+        sync_object_async(InvestmentSearchApp, pk)
 
     transaction.on_commit(sync_es_wrapper)
 
 
-def investment_project_sync_es_adviser_change(sender, instance, **kwargs):
+def investment_project_sync_es_adviser_change(instance):
     """
     post_save handler for advisers, to make sure that any projects they're linked to are
     resynced.
@@ -47,9 +43,8 @@ def investment_project_sync_es_adviser_change(sender, instance, **kwargs):
 
         for project in queryset:
             sync_object_async(
-                ESInvestmentProject,
-                DBInvestmentProject,
-                str(project.pk),
+                InvestmentSearchApp,
+                project.pk,
             )
 
     transaction.on_commit(sync_es_wrapper)

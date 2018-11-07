@@ -35,7 +35,8 @@ class InteractionSearchApp(SearchApp):
         'event',
     )
 
-    def get_permission_filters(self, request):
+    @classmethod
+    def get_permission_filters(cls, request):
         """
         Gets permission filter arguments.
 
