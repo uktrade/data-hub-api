@@ -20,7 +20,7 @@ def investment_project_sync_es(instance):
         else:
             pk = instance.pk
 
-        sync_object_async(InvestmentSearchApp, str(pk))
+        sync_object_async(InvestmentSearchApp, pk)
 
     transaction.on_commit(sync_es_wrapper)
 
@@ -44,7 +44,7 @@ def investment_project_sync_es_adviser_change(instance):
         for project in queryset:
             sync_object_async(
                 InvestmentSearchApp,
-                str(project.pk),
+                project.pk,
             )
 
     transaction.on_commit(sync_es_wrapper)

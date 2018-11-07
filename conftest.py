@@ -208,7 +208,7 @@ def _setup_es_indexes(_es_client):
 
 
 @pytest.fixture
-def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
+def setup_es(_setup_es_indexes, synchronous_on_commit):
     """Sets up ES and deletes all the records after each run."""
     for search_app in get_search_apps():
         search_app.connect_signals()

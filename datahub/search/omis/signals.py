@@ -14,7 +14,7 @@ from datahub.search.sync_async import sync_object_async
 def order_sync_es(instance):
     """Sync an order to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(OrderSearchApp, str(instance.pk)),
+        lambda: sync_object_async(OrderSearchApp, instance.pk),
     )
 
 

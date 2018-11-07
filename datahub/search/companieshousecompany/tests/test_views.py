@@ -7,7 +7,7 @@ from datahub.company.test.factories import CompaniesHouseCompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_async import sync_object
 
 pytestmark = pytest.mark.django_db
 
@@ -37,7 +37,7 @@ def setup_data(setup_es):
     )
 
     for company in companies:
-        sync_object_async(CompaniesHouseCompanySearchApp, company.pk)
+        sync_object(CompaniesHouseCompanySearchApp, company.pk)
 
     setup_es.indices.refresh()
 
