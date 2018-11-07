@@ -8,7 +8,7 @@ from datahub.search.deletion import delete_document
 from datahub.search.interaction import InteractionSearchApp
 from datahub.search.interaction.models import Interaction as ESInteraction
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
 def sync_interaction_to_es(instance):

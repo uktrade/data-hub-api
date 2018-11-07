@@ -49,7 +49,7 @@ def sync_object_task(search_app_name, pk):
 
     This task is named sync_object_task to avoid a conflict with sync_object.
     """
-    from datahub.search.sync_async import sync_object
+    from datahub.search.sync_object import sync_object
 
     search_app = get_search_app(search_app_name)
     sync_object(search_app, pk)

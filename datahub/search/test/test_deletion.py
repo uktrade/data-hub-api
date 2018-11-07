@@ -12,7 +12,7 @@ from datahub.search.deletion import (
     delete_documents,
     update_es_after_deletions,
 )
-from datahub.search.sync_async import sync_object
+from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.search_support.simplemodel.models import ESSimpleModel

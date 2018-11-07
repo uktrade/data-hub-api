@@ -9,7 +9,7 @@ from datahub.investment.models import (
 )
 from datahub.search.investment import InvestmentSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
 def investment_project_sync_es(instance):
