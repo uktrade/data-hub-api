@@ -220,7 +220,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
-| `BULK_INSERT_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
+| `BULK_INSERT_BATCH_SIZE` | No | Used when loading Companies House records (default=5000). |
+| `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `DATA_SCIENCE_COMPANY_API_URL` | No | URL for the [DT07 reporting service](https://github.com/uktrade/dt07-reporting). |
 | `DATA_SCIENCE_COMPANY_API_ID` | No | API ID for the DT07 reporting service. |
 | `DATA_SCIENCE_COMPANY_API_KEY` | No | API key for the DT07 reporting service. |
