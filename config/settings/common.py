@@ -325,6 +325,8 @@ if REDIS_BASE_URL:
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
 
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
+
 # COMPANIESHOUSE
 COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
 
