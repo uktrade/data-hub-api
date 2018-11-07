@@ -7,11 +7,9 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.models import Company
 from datahub.core.admin import RawIdWidget
 from datahub.core.utils import reverse_with_query_string
-from datahub.feature_flag.utils import feature_flagged_view
 
 
 class SelectOtherCompanyForm(forms.Form):
@@ -40,7 +38,6 @@ class SelectOtherCompanyForm(forms.Form):
         return company_2
 
 
-@feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
 @method_decorator(csrf_protect)
 def merge_select_other_company(model_admin, request):
     """
