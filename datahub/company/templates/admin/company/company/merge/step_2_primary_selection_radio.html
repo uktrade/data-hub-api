@@ -29,7 +29,7 @@
     {% endwith %}
     <br>
     {% blocktrans with obj_change_url=option.target|admin_change_url site_url=option.target.get_absolute_url %}
-    <a href="{{ obj_change_url }}">View company on admin site</a> or <a href="{{ site_url }}">view on Data Hub</a>
+    <a href="{{ obj_change_url }}" target="_blank">View company on admin site</a> or <a href="{{ site_url }}" target="_blank">view on Data Hub</a>
     {% endblocktrans %}
   </label>
 </li>
