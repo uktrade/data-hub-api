@@ -1,1 +1,0 @@
-It's not possible to change `Countries` and `OverseasRegions` from the django admin anymore. They will need to be updated using data migrations instead.
