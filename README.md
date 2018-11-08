@@ -61,6 +61,7 @@ Dependencies:
 -   Python 3.6.x
 -   PostgreSQL 9.6
 -   redis 3.2
+-   Elasticsearch 6.3
 
 1.  Clone the repository:
 
@@ -106,7 +107,7 @@ Dependencies:
 8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:5.5
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     ```
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
@@ -147,8 +148,9 @@ Dependencies:
     celery worker -A config -l info -Q celery,long-running -B
     ```
 
-    Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
-    long-running tasks are running or pending execution.
+    Note that in production the long-running queue is run in a separate worker with the 
+    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks 
+    are running or pending execution.
 
 ## Local development
 
@@ -219,7 +221,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
-| `BULK_INSERT_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
+| `BULK_INSERT_BATCH_SIZE` | No | Used when loading Companies House records (default=5000). |
+| `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `DATA_SCIENCE_COMPANY_API_URL` | No | URL for the [DT07 reporting service](https://github.com/uktrade/dt07-reporting). |
 | `DATA_SCIENCE_COMPANY_API_ID` | No | API ID for the DT07 reporting service. |
 | `DATA_SCIENCE_COMPANY_API_KEY` | No | API key for the DT07 reporting service. |
@@ -233,6 +236,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
+| `ENABLE_CELERY_ES_SYNC_OBJECT` | No | Whether to use Celery (rather than the thread pool) to sync single objects to Elasticsearch (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |

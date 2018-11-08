@@ -16,10 +16,9 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
-from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
-from datahub.search.test.utils import model_has_field_path
+from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.models import UserEvent
 
@@ -96,10 +95,11 @@ class TestValidateViewAttributes:
     def test_validate_remap_fields_exist(self, search_app):
         """Validate that the values of REMAP_FIELDS are valid field paths."""
         view = search_app.view
+        mapping = search_app.es_model._doc_type.mapping
 
         invalid_fields = {
             field for field in view.REMAP_FIELDS.values()
-            if not model_has_field_path(search_app.es_model, field)
+            if not mapping.resolve_field(field)
         }
 
         assert not invalid_fields
@@ -113,12 +113,13 @@ class TestValidateViewAttributes:
     def test_validate_composite_filter_fields(self, search_app):
         """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
         view = search_app.view
+        mapping = search_app.es_model._doc_type.mapping
 
         invalid_fields = {
             field
             for field_list in view.COMPOSITE_FILTERS.values()
             for field in field_list
-            if not model_has_field_path(search_app.es_model, field)
+            if not mapping.resolve_field(field)
             and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
         }
 
@@ -131,6 +132,7 @@ class TestValidateExportViewAttributes:
     def test_validate_sort_by_remappings(self, search_app):
         """Validate that the values of sort_by_remappings are valid field paths."""
         view = search_app.export_view
+        mapping = search_app.es_model._doc_type.mapping
 
         if not view:
             return
@@ -138,7 +140,7 @@ class TestValidateExportViewAttributes:
         invalid_fields = {
             field
             for field in view.sort_by_remappings
-            if not model_has_field_path(search_app.es_model, field)
+            if not mapping.resolve_field(field)
             and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
         }
 
@@ -647,7 +649,7 @@ class TestSearchExportAPIView(APITestMixin):
 
         simple_obj = SimpleModel(name='test')
         simple_obj.save()
-        sync_object_async(ESSimpleModel, SimpleModel, simple_obj.pk)
+        sync_object(SimpleModelSearchApp, simple_obj.pk)
 
         setup_es.indices.refresh()
 

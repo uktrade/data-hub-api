@@ -1,3 +1,49 @@
+Data Hub API 7.5.0 (2018-11-08)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Advisers** The column ``company_advisor.use_cdms_auth`` was deleted from the database.
+
+Features
+--------
+
+- **Investment** First part of the streamlined investment flow. Feature flag ``streamlined-investment-flow`` introduced
+  to control when the project manager information is required and to allow the assign pm stage to be deprecated.
+
+Internal changes
+----------------
+
+- **Investment** A command ``activate_streamlined_investment_flow`` has been added to active the
+  ``streamlined_investment_flow`` feature and update any project at the ``Assign PM`` stage
+  to ``Prospect``.
+- The ``countries.yaml`` fixture was updated to reflect the current production data.
+- It's not possible to change ``Countries`` and ``OverseasRegions`` from the django admin anymore. They will need to be updated using data migrations instead.
+- A setting to sync updates to records to Elasticsearch using Celery (rather than the thread pool) was adding. This
+  will improve performance when many records are updated at once, and increase reliability as failed synchronisation
+  attempts are automatically retried. When the setting is enabled, Redis and Celery must be configured and running to
+  use endpoints that create or update records.
+
+API
+---
+
+- **Investment** ``GET /metadata/investment-project-stage/<uuid:pk>/`` endpoint no longer returns null values
+  for field ``exclude_from_investment_flow``. All existing records now return false with
+  the exception of 'Assign PM' which returns true.
+
+Database schema
+---------------
+
+- **Advisers** The column ``company_advisor.use_cdms_auth`` was deleted from the database.
+- **Investment** Column ``exclude_from_investment_flow`` on ``metadata_investmentprojectstage`` table is
+  no longer nullable and the default value has been set to False. Existing entries have
+  all been updated to False with the exception of 'Assign PM' which has been set to True.
+- A new field ``iso_alpha2_code`` was added to the ``metadata_country`` table. It has not been populated yet.
+
+
 Data Hub API 7.4.0 (2018-11-01)
 ===============================
 

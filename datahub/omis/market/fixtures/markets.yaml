@@ -28,10 +28,6 @@
 - model: omis-market.market
   pk: 0950bdb8-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Martinique
-- model: omis-market.market
-  pk: 0a50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Mauritania
 - model: omis-market.market
   pk: 0b50bdb8-5d95-e211-a939-e4115bead28a
@@ -40,10 +36,6 @@
 - model: omis-market.market
   pk: 0c50bdb8-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: Mayotte
-- model: omis-market.market
-  pk: 0d50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Mexico
 - model: omis-market.market
   pk: 0e50bdb8-5d95-e211-a939-e4115bead28a
@@ -104,10 +96,6 @@
 - model: omis-market.market
   pk: 1b0be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: New Caledonia
-- model: omis-market.market
-  pk: 1b50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Serbia
 - model: omis-market.market
   pk: 1c0be5c4-5d95-e211-a939-e4115bead28a
@@ -152,18 +140,10 @@
 - model: omis-market.market
   pk: 240be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: South Georgia and South Sandwich Islands
-- model: omis-market.market
-  pk: 250be5c4-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Sri Lanka
 - model: omis-market.market
   pk: 260be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: St Helena
-- model: omis-market.market
-  pk: 270be5c4-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: St Kitts and Nevis
 - model: omis-market.market
   pk: 280be5c4-5d95-e211-a939-e4115bead28a
@@ -171,10 +151,6 @@
 # name: St Lucia
 - model: omis-market.market
   pk: 290be5c4-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: St Pierre and Miquelon
-- model: omis-market.market
-  pk: 2a0be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: St Vincent
 - model: omis-market.market
@@ -188,10 +164,6 @@
 - model: omis-market.market
   pk: 2d0be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Svalbard and Jan Mayen Islands
-- model: omis-market.market
-  pk: 2e0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Swaziland
 - model: omis-market.market
   pk: 2f0be5c4-5d95-e211-a939-e4115bead28a
@@ -204,10 +176,6 @@
 - model: omis-market.market
   pk: 310be5c4-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: Wallis and Futuna
-- model: omis-market.market
-  pk: 34afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Occupied Palestinian Territories
 - model: omis-market.market
   pk: 35afd8d0-5d95-e211-a939-e4115bead28a
@@ -236,18 +204,6 @@
 - model: omis-market.market
   pk: 4561b8be-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: Niue
-- model: omis-market.market
-  pk: 4661b8be-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Norfolk Island
-- model: omis-market.market
-  pk: 4761b8be-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Northern Mariana Islands
-- model: omis-market.market
-  pk: 4861b8be-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Norway
 - model: omis-market.market
   pk: 4961b8be-5d95-e211-a939-e4115bead28a
@@ -284,10 +240,6 @@
 - model: omis-market.market
   pk: 5161b8be-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: 'Pitcairn, Henderson, Ducie and Oeno Islands'
-- model: omis-market.market
-  pk: 5261b8be-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Poland
 - model: omis-market.market
   pk: 5361b8be-5d95-e211-a939-e4115bead28a
@@ -388,14 +340,6 @@
 - model: omis-market.market
   pk: 63af72a6-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: Christmas Island
-- model: omis-market.market
-  pk: 64af72a6-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Cocos (Keeling) Islands
-- model: omis-market.market
-  pk: 65af72a6-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Colombia
 - model: omis-market.market
   pk: 66af72a6-5d95-e211-a939-e4115bead28a
@@ -411,10 +355,6 @@
 # name: Congo
 - model: omis-market.market
   pk: 69af72a6-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Cook Islands
-- model: omis-market.market
-  pk: 6aaf72a6-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Costa Rica
 - model: omis-market.market
@@ -540,10 +480,6 @@
 - model: omis-market.market
   pk: 7b6a9ab2-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: St Barthelemy
-- model: omis-market.market
-  pk: 7b756b9a-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Korea (South)
 - model: omis-market.market
   pk: 7c6a9ab2-5d95-e211-a939-e4115bead28a
@@ -640,10 +576,6 @@
 - model: omis-market.market
   pk: 886a9ab2-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Aland Islands
-- model: omis-market.market
-  pk: 88756b9a-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Macedonia
 - model: omis-market.market
   pk: 896a9ab2-5d95-e211-a939-e4115bead28a
@@ -656,10 +588,6 @@
 - model: omis-market.market
   pk: 955f66a0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: American Samoa
-- model: omis-market.market
-  pk: 965f66a0-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Andorra
 - model: omis-market.market
   pk: 975f66a0-5d95-e211-a939-e4115bead28a
@@ -672,10 +600,6 @@
 - model: omis-market.market
   pk: 995f66a0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Antarctica
-- model: omis-market.market
-  pk: 9a5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Antigua and Barbuda
 - model: omis-market.market
   pk: 9b5f66a0-5d95-e211-a939-e4115bead28a
@@ -687,10 +611,6 @@
 # name: Armenia
 - model: omis-market.market
   pk: 9d5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Aruba
-- model: omis-market.market
-  pk: 9e5f66a0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Australia
 - model: omis-market.market
@@ -764,10 +684,6 @@
 - model: omis-market.market
   pk: aa5f66a0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Tokelau
-- model: omis-market.market
-  pk: aa6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Bhutan
 - model: omis-market.market
   pk: ab5f66a0-5d95-e211-a939-e4115bead28a
@@ -800,10 +716,6 @@
 - model: omis-market.market
   pk: ae6ee1ca-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: Bouvet Island
-- model: omis-market.market
-  pk: af5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Turkmenistan
 - model: omis-market.market
   pk: af6ee1ca-5d95-e211-a939-e4115bead28a
@@ -815,10 +727,6 @@
 # name: Turks and Caicos Islands
 - model: omis-market.market
   pk: b06ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: British Indian Ocean Territory
-- model: omis-market.market
-  pk: b15f66a0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Tuvalu
 - model: omis-market.market
@@ -840,10 +748,6 @@
 - model: omis-market.market
   pk: b46ee1ca-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: United States Minor Outlying Islands
-- model: omis-market.market
-  pk: b56ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Uruguay
 - model: omis-market.market
   pk: b66ee1ca-5d95-e211-a939-e4115bead28a
@@ -904,18 +808,6 @@
 - model: omis-market.market
   pk: daf682ac-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: null, manager_email: ''}
-# name: French Guiana
-- model: omis-market.market
-  pk: dbf682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: French Polynesia
-- model: omis-market.market
-  pk: dcf682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: French Southern Territories
-- model: omis-market.market
-  pk: ddf682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Gabon
 - model: omis-market.market
   pk: def682ac-5d95-e211-a939-e4115bead28a
@@ -948,14 +840,6 @@
 - model: omis-market.market
   pk: e5f682ac-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Guadeloupe
-- model: omis-market.market
-  pk: e6f682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Guam
-- model: omis-market.market
-  pk: e7f682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Guatemala
 - model: omis-market.market
   pk: e8f682ac-5d95-e211-a939-e4115bead28a
@@ -975,10 +859,6 @@
 # name: Haiti
 - model: omis-market.market
   pk: ecf682ac-5d95-e211-a939-e4115bead28a
-  fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
-# name: Heard Island and McDonald Island
-- model: omis-market.market
-  pk: edf682ac-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2010-01-01T00:00:00.000000Z', manager_email: ''}
 # name: Vatican City
 - model: omis-market.market

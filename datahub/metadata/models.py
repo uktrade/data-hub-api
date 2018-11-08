@@ -88,6 +88,7 @@ class Country(BaseConstantModel):
         related_name='countries',
         on_delete=models.PROTECT,
     )
+    iso_alpha2_code = models.CharField(blank=True, max_length=2)
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
@@ -181,9 +182,10 @@ class CompanyClassification(BaseOrderedConstantModel):
 class InvestmentProjectStage(BaseOrderedConstantModel):
     """Investment project stage."""
 
-    exclude_from_investment_flow = models.NullBooleanField(
+    exclude_from_investment_flow = models.BooleanField(
         help_text=_('If set to True the stage will not be part of the '
                     'linear flow and will be skipped.'),
+        default=False,
     )
 
 

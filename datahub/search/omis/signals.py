@@ -6,21 +6,21 @@ from datahub.omis.order.models import (
     OrderAssignee as DBOrderAssignee,
     OrderSubscriber as DBOrderSubscriber,
 )
-from datahub.search.omis.models import Order as ESOrder
+from datahub.search.omis import OrderSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
-def order_sync_es(sender, instance, **kwargs):
+def order_sync_es(instance):
     """Sync an order to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(ESOrder, DBOrder, str(instance.pk)),
+        lambda: sync_object_async(OrderSearchApp, instance.pk),
     )
 
 
-def related_order_sync_es(sender, instance, **kwargs):
+def related_order_sync_es(instance):
     """Sync an order linked from the instance to the Elasticsearch."""
-    order_sync_es(sender, instance.order, **kwargs)
+    order_sync_es(instance.order)
 
 
 receivers = (

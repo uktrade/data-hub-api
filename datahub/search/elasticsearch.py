@@ -135,7 +135,7 @@ def create_index(index_name, mapping, alias_names=()):
     Note: If you need to perform multiple alias operations atomically, you should use
     start_alias_transaction() instead of specifying aliases when creating an index.
     """
-    index = Index(index_name)
+    index = Index(index_name, mapping.doc_type)
     for analyzer in ANALYZERS:
         index.analyzer(analyzer)
 
