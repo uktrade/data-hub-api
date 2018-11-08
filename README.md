@@ -148,8 +148,9 @@ Dependencies:
     celery worker -A config -l info -Q celery,long-running -B
     ```
 
-    Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
-    long-running tasks are running or pending execution.
+    Note that in production the long-running queue is run in a separate worker with the 
+    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks 
+    are running or pending execution.
 
 ## Local development
 
