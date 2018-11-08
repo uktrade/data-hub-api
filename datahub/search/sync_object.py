@@ -1,5 +1,8 @@
 from logging import getLogger
 
+from django.conf import settings
+
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.search.bulk_sync import sync_objects
 from datahub.search.migrate_utils import delete_from_secondary_indices_callback
 from datahub.search.tasks import sync_object_task
@@ -38,8 +41,11 @@ def sync_object_async(search_app, pk):
     Syncing an object is migration-safe – if a migration is in progress, the object is
     added to the new index and then deleted from the old index.
     """
-    result = sync_object_task.apply_async(args=(search_app.name, str(pk)))
-    logger.info(
-        f'Task {result.id} scheduled to synchronise object {pk} for search app '
-        f'{search_app.name}',
-    )
+    if settings.ENABLE_CELERY_ES_SYNC_OBJECT:
+        result = sync_object_task.apply_async(args=(search_app.name, str(pk)))
+        logger.info(
+            f'Task {result.id} scheduled to synchronise object {pk} for search app '
+            f'{search_app.name}',
+        )
+    else:
+        submit_to_thread_pool(sync_object, search_app, pk)
