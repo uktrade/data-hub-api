@@ -148,8 +148,9 @@ Dependencies:
     celery worker -A config -l info -Q celery,long-running -B
     ```
 
-    Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
-    long-running tasks are running or pending execution.
+    Note that in production the long-running queue is run in a separate worker with the 
+    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks 
+    are running or pending execution.
 
 ## Local development
 
@@ -235,6 +236,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
+| `ENABLE_CELERY_ES_SYNC_OBJECT` | No | Whether to use Celery (rather than the thread pool) to sync single objects to Elasticsearch (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
