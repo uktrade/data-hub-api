@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-{% with source_company_link=source_company|admin_change_link target_company_link=target_company|admin_change_link %}
+{% with source_company_link=source_company|admin_change_link:True target_company_link=target_company|admin_change_link:True %}
 <p>
   {% blocktrans %}
   You are about to merge {{ source_company_link }} into {{ target_company_link }}.
