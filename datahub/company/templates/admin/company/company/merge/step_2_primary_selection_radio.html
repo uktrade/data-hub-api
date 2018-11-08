@@ -7,12 +7,12 @@
     <strong>{{ option.target.name }}</strong>
     {% if not option.is_target_valid %}
       <br>
-      <span class="error">{% trans 'This company can&rsquo;t be selected as it&rsquo;s been archived.' %}</span>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as the active record as it&rsquo;s been archived.' %}</span>
     {% endif %}
 
     {% if not option.is_source_valid %}
       <br>
-      <span class="error">{% trans 'This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.' %}</span>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as the active record as there are related records that can&rsquo;t be moved from the other company.' %}</span>
     {% endif %}
     <br>
     {{ option.target.pk }}
