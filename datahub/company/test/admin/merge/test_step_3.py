@@ -6,6 +6,7 @@ import pytest
 from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -127,8 +128,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert len(messages) == 1
         assert messages[0].level == django_messages.SUCCESS
         match = re.match(
-            rf'Merge complete – (?P<num_interactions>\d) (?P<interaction_noun>interactions?) '
-            rf'and (?P<num_contacts>\d) (?P<contact_noun>contacts?) moved\.',
+            r'^Merge complete – (?P<num_interactions>\d) (?P<interaction_noun>interactions?)'
+            r' and (?P<num_contacts>\d) (?P<contact_noun>contacts?) moved from'
+            r' <a href="(?P<source_company_url>.*)" target="_blank">(?P<source_company>.*)</a>'
+            r' to'
+            r' <a href="(?P<target_company_url>.*)" target="_blank">(?P<target_company>.*)</a>'
+            r'\.$',
             messages[0].message,
         )
         assert match
@@ -137,6 +142,10 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             'num_contacts': str(len(source_contacts)),
             'interaction_noun': 'interaction' if len(source_interactions) == 1 else 'interactions',
             'contact_noun': 'contact' if len(source_contacts) == 1 else 'contacts',
+            'source_company_url': escape(source_company.get_absolute_url()),
+            'source_company': escape(str(source_company)),
+            'target_company_url': escape(target_company.get_absolute_url()),
+            'target_company': escape(str(target_company)),
         }
 
         for obj in chain(source_interactions, source_contacts):
