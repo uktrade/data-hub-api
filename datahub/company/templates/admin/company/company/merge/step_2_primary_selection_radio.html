@@ -4,17 +4,16 @@
     {% if not option.is_valid %}disabled{% endif %}
   >
   <label for="id_selected_company_radio_{{ index }}">
+    <strong>{{ option.target.name }}</strong>
     {% if not option.is_target_valid %}
-      <span class="error">{% trans 'This company can&rsquo;t be selected as it&rsquo;s been archived.' %}</span>
       <br>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as it&rsquo;s been archived.' %}</span>
     {% endif %}
 
     {% if not option.is_source_valid %}
-      <span class="error">{% trans 'This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.' %}</span>
       <br>
+      <span class="error">{% trans 'This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.' %}</span>
     {% endif %}
-
-    <strong>{{ option.target.name }}</strong>
     <br>
     {{ option.target.pk }}
     <br>
