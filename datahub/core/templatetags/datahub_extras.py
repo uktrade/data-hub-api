@@ -3,6 +3,7 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import quote
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -36,12 +37,22 @@ def admin_change_url(obj):
 
 
 @register.filter
-def admin_change_link(obj):
+def admin_change_link(obj, target_blank=False):
     """
     Template filter to generate the URL to the admin change page for a model object.
 
-    Usage example:
+    Usage examples:
 
+      Normal anchor tag:
       {{ target_company|admin_change_link }}
+
+      With target="_blank":
+      {{ target_company|admin_change_link:True }}
     """
-    return format_html('<a href="{url}">{obj}</a>', url=admin_change_url(obj), obj=obj)
+    extra_attrs = ' target="_blank"' if target_blank else ''
+    return format_html(
+        '<a href="{url}"{extra_attrs}>{obj}</a>',
+        url=admin_change_url(obj),
+        extra_attrs=mark_safe(extra_attrs),
+        obj=obj,
+    )
