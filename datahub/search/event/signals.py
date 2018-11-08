@@ -2,15 +2,15 @@ from django.db import transaction
 from django.db.models.signals import post_save
 
 from datahub.event.models import Event as DBEvent
-from datahub.search.event.models import Event as ESEvent
+from datahub.search.event import EventSearchApp
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object_async
 
 
-def sync_event_to_es(sender, instance, **kwargs):
+def sync_event_to_es(instance):
     """Sync event to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(ESEvent, DBEvent, str(instance.pk)),
+        lambda: sync_object_async(EventSearchApp, instance.pk),
     )
 
 

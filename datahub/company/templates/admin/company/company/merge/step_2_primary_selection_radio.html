@@ -1,33 +1,33 @@
 {% load i18n datahub_extras %}
 <li>
   <input name="selected_company" value="{{ index }}" required="" id="id_selected_company_radio_{{ index }}" type="radio"
-    {% if not company.is_valid_merge_target or not other_company.is_valid_merge_source %}disabled{% endif %}
+    {% if not option.is_valid %}disabled{% endif %}
   >
   <label for="id_selected_company_radio_{{ index }}">
-    {% if not company.is_valid_merge_target %}
+    {% if not option.is_target_valid %}
       <span class="error">{% trans 'This company can&rsquo;t be selected as it&rsquo;s been archived.' %}</span>
       <br>
     {% endif %}
 
-    {% if not other_company.is_valid_merge_source %}
+    {% if not option.is_source_valid %}
       <span class="error">{% trans 'This company can&rsquo;t be selected as there are related records that can&rsquo;t be moved from the other company.' %}</span>
       <br>
     {% endif %}
 
-    <strong>{{ company.name }}</strong>
+    <strong>{{ option.target.name }}</strong>
     <br>
-    {{ company.pk }}
+    {{ option.target.pk }}
     <br>
-    {% blocktrans with created_on=company.created_on %}Created on {{ created_on }}{% endblocktrans %}
+    {% blocktrans with created_on=option.target.created_on %}Created on {{ created_on }}{% endblocktrans %}
     <br>
-    {% with company.contacts.count as contact_count %}
+    {% with option.target.contacts.count as contact_count %}
     {{ contact_count }} contact{{ contact_count|pluralize }}
     {% endwith %}
     <br>
-    {% with company.interactions.count as interaction_count %}
+    {% with option.target.interactions.count as interaction_count %}
     {{ interaction_count }} interaction{{ interaction_count|pluralize }}
     {% endwith %}
     <br>
-    <a href="{{ company|admin_change_url }}">{% trans 'View complete record' %}</a>
+    <a href="{{ option.target|admin_change_url }}">{% trans 'View complete record' %}</a>
   </label>
 </li>

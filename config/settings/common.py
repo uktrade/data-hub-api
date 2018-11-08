@@ -249,6 +249,7 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
     'ES_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
 )
+ENABLE_CELERY_ES_SYNC_OBJECT = env.bool('ENABLE_CELERY_ES_SYNC_OBJECT', default=False)
 SEARCH_EXPORT_MAX_RESULTS = 5000
 SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
 DATAHUB_SECRET = env('DATAHUB_SECRET')
@@ -324,6 +325,8 @@ if REDIS_BASE_URL:
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
+
+CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 
 # COMPANIESHOUSE
 COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'

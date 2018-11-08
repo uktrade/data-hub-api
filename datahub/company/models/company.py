@@ -1,16 +1,15 @@
 """Company models."""
 import uuid
 
-from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
-from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
@@ -73,10 +72,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     }
     TRANSFER_REASONS = Choices(
         ('duplicate', 'Duplicate record'),
-    )
-    ALLOWED_RELATIONS_FOR_MERGING = (
-        ('company', 'Contact', 'company'),
-        ('interaction', 'Interaction', 'company'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -217,45 +212,26 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             getattr(self, field) for field, rules in field_mapping.items() if rules['required']
         )
 
-    @property
-    def is_valid_merge_target(self):
+    def mark_as_transferred(self, to, reason, user):
         """
-        Returns whether it is OK for other companies to be merged into this one.
+        Marks a company record as having been transferred to another company record.
 
-        This is in reference to merging duplicate records and is used by the duplicate company
-        merge tool in the admin site.
+        This is used, for example, for marking a company as a duplicate record.
         """
-        return not self.archived
+        self.transfer_reason = reason
+        self.transferred_by = user
+        self.transferred_on = now()
+        self.transferred_to = to
 
-    @cached_property
-    def is_valid_merge_source(self):
-        """
-        Returns whether this company is allowed to be merged into another company.
+        display_reason = self.get_transfer_reason_display()
 
-        This is in reference to merging duplicate records and is used by the duplicate company
-        merge tool in the admin site.
+        archived_reason = (
+            f'This record is no longer in use and its data has been transferred to {to} for the '
+            f'following reason: {display_reason}.'
+        )
 
-        This checks whether there are any references to this object, other than those through
-        the relations soecified in ALLOWED_RELATIONS_FOR_MERGING. It also checks if this object
-        has any references to other companies. If any of either of those types of references
-        exist, merging is not permitted.
-        """
-        relations = get_related_fields(Company)
-        allowed_relations = {
-            apps.get_model(app_label, model_name)._meta.get_field(field_name).remote_field
-            for app_label, model_name, field_name in self.ALLOWED_RELATIONS_FOR_MERGING
-        }
-
-        for relation in relations:
-            if relation in allowed_relations:
-                continue
-
-            relation_object_count = getattr(self, relation.name).count()
-            if relation_object_count:
-                return False
-
-        self_referential_fields = get_self_referential_relations(Company)
-        return not any(getattr(self, field.name) for field in self_referential_fields)
+        # Note: archive() saves the model instance
+        self.archive(user, archived_reason)
 
 
 class CompanyCoreTeamMember(models.Model):

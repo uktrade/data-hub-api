@@ -269,7 +269,7 @@ class TestSearch(APITestMixin):
         (
             (constants.Country.cayman_islands.value.id, True),
             (constants.Country.montserrat.value.id, True),
-            (constants.Country.st_helena.value.id, False),
+            (constants.Country.azerbaijan.value.id, False),
             (constants.Country.anguilla.value.id, False),
         ),
     )

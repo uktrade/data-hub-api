@@ -2,7 +2,6 @@ import pytest
 from rest_framework import serializers
 
 from datahub.search.serializers import SingleOrListField
-from datahub.search.test.utils import model_has_field_path
 
 
 class TestSingleOrListField:
@@ -41,11 +40,12 @@ class TestSerializerAttributes:
     def test_sort_by_fields(self, search_app):
         """Validate that the values of SORT_BY_FIELDS are valid field paths."""
         view = search_app.view
+        mapping = search_app.es_model._doc_type.mapping
 
         invalid_fields = {
             field
             for field in view.serializer_class.SORT_BY_FIELDS
-            if not model_has_field_path(search_app.es_model, field)
+            if not mapping.resolve_field(field)
         }
 
         assert not invalid_fields

@@ -4,6 +4,9 @@ from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
+DOC_TYPE = 'event'
+
+
 class Event(BaseESModel):
     """Elasticsearch representation of Event model."""
 
@@ -64,4 +67,7 @@ class Event(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = 'event'
+        doc_type = DOC_TYPE
+
+    class Index:
+        doc_type = DOC_TYPE

@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubException
-from datahub.search.apps import get_search_app_by_model
 from datahub.search.deletion import (
     BULK_CHUNK_SIZE,
     BULK_DELETION_TIMEOUT_SECS,
@@ -13,8 +12,9 @@ from datahub.search.deletion import (
     delete_documents,
     update_es_after_deletions,
 )
-from datahub.search.sync_async import sync_object_async
+from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 
 
@@ -80,10 +80,8 @@ def test_collector(monkeypatch, setup_es):
     Test that the collector collects and deletes all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
-    sync_object_async(ESSimpleModel, SimpleModel, str(obj.pk))
+    sync_object(SimpleModelSearchApp, str(obj.pk))
     setup_es.indices.refresh()
-
-    search_app = get_search_app_by_model(SimpleModel)
 
     es_doc = ESSimpleModel.es_document(obj)
 
@@ -125,15 +123,15 @@ def test_collector(monkeypatch, setup_es):
         SimpleModel: [es_doc],
     }
 
-    read_alias = search_app.es_model.get_read_alias()
+    read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 0
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 1
+    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
 
     collector.delete_from_es()
 
     setup_es.indices.refresh()
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 0
+    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
 
 
 @pytest.mark.django_db
@@ -144,16 +142,15 @@ def test_update_es_after_deletions(setup_es):
     all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
-    sync_object_async(ESSimpleModel, SimpleModel, str(obj.pk))
+    sync_object(SimpleModelSearchApp, str(obj.pk))
     setup_es.indices.refresh()
-    search_app = get_search_app_by_model(SimpleModel)
-    read_alias = search_app.es_model.get_read_alias()
+    read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 1
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 1
+    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
 
     with update_es_after_deletions():
         obj.delete()
 
     setup_es.indices.refresh()
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 0
+    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
