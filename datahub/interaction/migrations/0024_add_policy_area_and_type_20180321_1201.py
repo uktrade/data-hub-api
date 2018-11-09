@@ -5,12 +5,21 @@ from django.core.management import call_command
 from django.db import migrations, models
 import django.db.models.deletion
 import uuid
+<<<<<<< HEAD
+=======
+from datahub.core.migration_utils import load_yaml_data_in_migration
+>>>>>>> d7a9b640... Add extra tests
 
 
 def load_initial_metadata(yaml_file_name):
     def inner(apps, schema_editor):
+<<<<<<< HEAD
         call_command(
             'loaddata',
+=======
+        load_yaml_data_in_migration(
+            apps,
+>>>>>>> d7a9b640... Add extra tests
             PurePath(__file__).parent / yaml_file_name
         )
     return inner
