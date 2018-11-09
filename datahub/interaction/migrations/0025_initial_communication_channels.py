@@ -2,12 +2,8 @@
 
 from pathlib import PurePath
 
-from django.core.management import call_command
 from django.db import migrations
-<<<<<<< HEAD
-=======
 from datahub.core.migration_utils import load_yaml_data_in_migration
->>>>>>> d7a9b640... Add extra tests
 
 
 def load_initial_communication_channels(apps, schema_editor):
@@ -16,13 +12,8 @@ def load_initial_communication_channels(apps, schema_editor):
     # only load the fixtures if there aren't any already in the database
     # this is because we don't know if they have been changed via the django admin.
     if not CommunicationChannels.objects.exists():
-<<<<<<< HEAD
-        call_command(
-            'loaddata',
-=======
         load_yaml_data_in_migration(
             apps,
->>>>>>> d7a9b640... Add extra tests
             PurePath(__file__).parent / '0025_initial_communication_channels.yaml'
         )
 
