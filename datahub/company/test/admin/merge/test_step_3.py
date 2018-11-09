@@ -165,6 +165,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             f'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
+        assert source_company.modified_by == self.user
+        assert source_company.modified_on == merge_time
         assert source_company.transfer_reason == Company.TRANSFER_REASONS.duplicate
         assert source_company.transferred_by == self.user
         assert source_company.transferred_on == merge_time
