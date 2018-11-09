@@ -1,8 +1,9 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.apps import apps
 from django_pglocks import advisory_lock
 
-from datahub.search.apps import get_search_app, get_search_apps
+from datahub.search.apps import get_search_app, get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_app
 from datahub.search.migrate_utils import resync_after_migrate
 
@@ -53,6 +54,46 @@ def sync_object_task(search_app_name, pk):
 
     search_app = get_search_app(search_app_name)
     sync_object(search_app, pk)
+
+
+@shared_task(
+    bind=True,
+    acks_late=True,
+    max_retries=15,
+    priority=6,
+    autoretry_for=(Exception,),
+    retry_backoff=1,
+)
+def sync_related_objects_task(
+    self,
+    related_model_label,
+    related_obj_pk,
+    related_obj_field_name,
+):
+    """
+    Syncs objects related to another object via a specified field.
+
+    For example, this task would sync the interactions of a company if given the following
+    arguments:
+        related_model_label='company.Company'
+        related_obj_pk=company.pk
+        related_obj_field_name='interactions'
+
+    Note that a lower priority (higher number) is used for syncing related objects, as syncing
+    them is less important than syncing the primary object that was modified.
+
+    If an error occurs, the task will be automatically retried with an exponential back-off.
+    The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
+    added).
+    """
+    related_model = apps.get_model(related_model_label)
+    related_obj = related_model.objects.get(pk=related_obj_pk)
+    manager = getattr(related_obj, related_obj_field_name)
+    queryset = manager.values_list('pk', flat=True)
+    search_app = get_search_app_by_model(manager.model)
+
+    for pk in queryset:
+        sync_object_task.apply_async(args=(search_app.name, pk), priority=self.priority)
 
 
 @shared_task(bind=True, acks_late=True, priority=7, max_retries=5, default_retry_delay=60)
