@@ -254,8 +254,14 @@
   fields:
     name: Mars Transferred Limited
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
-    transferred_to: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     transfer_reason: duplicate
+    transferred_on: '2018-07-06T15:44:56Z'
+    transferred_by: 7bad8082-4978-4fe8-a018-740257f01637
+    transferred_to: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+    archived: true
+    archived_on: '2018-07-06T15:44:56Z'
+    archived_by: 7bad8082-4978-4fe8-a018-740257f01637
+    archived_reason: 'This record is no longer in use and its data has been transferred to Mars Export Ltd for the following reason: Duplicate record.'
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -270,7 +276,7 @@
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy duplicate company for testing
     created_on: '2017-03-05T12:00:00Z'
-    modified_on: '2017-03-05T12:00:00Z'
+    modified_on: '2018-07-06T15:44:56Z'
 
 - model: company.companycoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
