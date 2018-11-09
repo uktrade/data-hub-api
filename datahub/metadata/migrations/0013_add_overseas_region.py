@@ -5,12 +5,22 @@ from django.core.management import call_command
 from django.db import migrations, models
 import django.db.models.deletion
 import uuid
+<<<<<<< HEAD
 
 
 def load_initial_overseas_regions(apps, schema_editor):
     call_command(
         'loaddata',
         PurePath(__file__).parent / '0013_initial_overseas_region.yaml'
+=======
+from datahub.core.migration_utils import load_yaml_data_in_migration
+
+
+def load_initial_overseas_regions(apps, schema_editor):
+    load_yaml_data_in_migration(
+        apps,
+        PurePath(__file__).parent / '0013_initial_overseas_region.yaml',
+>>>>>>> d7a9b640... Add extra tests
     )
 
 
