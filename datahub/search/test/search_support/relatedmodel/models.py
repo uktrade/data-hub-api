@@ -15,7 +15,7 @@ class ESRelatedModel(BaseESModel):
     simpleton = fields.nested_id_name_field()
 
     MAPPINGS = {
-        'id': dict_utils.id_name_dict,
+        'simpleton': dict_utils.id_name_dict,
     }
 
     SEARCH_FIELDS = ()

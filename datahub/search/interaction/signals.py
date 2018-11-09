@@ -8,7 +8,7 @@ from datahub.search.deletion import delete_document
 from datahub.search.interaction import InteractionSearchApp
 from datahub.search.interaction.models import Interaction as ESInteraction
 from datahub.search.signals import SignalReceiver
-from datahub.search.sync_object import sync_object_async
+from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 
 
 def sync_interaction_to_es(instance):
@@ -27,8 +27,9 @@ def remove_interaction_from_es(instance):
 
 def sync_related_interactions_to_es(instance):
     """Sync related interactions."""
-    for contact in instance.interactions.all():
-        sync_interaction_to_es(contact)
+    transaction.on_commit(
+        lambda: sync_related_objects_async(instance, 'interactions'),
+    )
 
 
 receivers = (
