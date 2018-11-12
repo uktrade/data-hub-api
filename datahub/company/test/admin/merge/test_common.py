@@ -8,7 +8,6 @@ from datahub.company.models import Company, CompanyPermission
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestCompanyAdminPermissions(AdminTestMixin):
     """Test permission handling in various views."""
 

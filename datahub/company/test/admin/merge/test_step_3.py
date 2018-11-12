@@ -6,6 +6,7 @@ import pytest
 from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -26,7 +27,6 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestConfirmMergeViewGet(AdminTestMixin):
     """Tests GET requests for the 'Confirm merge' view."""
 
@@ -91,7 +91,6 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestConfirmMergeViewPost(AdminTestMixin):
     """Tests form submission in the 'Confirm merge' view."""
 
@@ -127,8 +126,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert len(messages) == 1
         assert messages[0].level == django_messages.SUCCESS
         match = re.match(
-            rf'Merge complete – (?P<num_interactions>\d) (?P<interaction_noun>interactions?) '
-            rf'and (?P<num_contacts>\d) (?P<contact_noun>contacts?) moved\.',
+            r'^Merge complete – (?P<num_interactions>\d) (?P<interaction_noun>interactions?)'
+            r' and (?P<num_contacts>\d) (?P<contact_noun>contacts?) moved from'
+            r' <a href="(?P<source_company_url>.*)" target="_blank">(?P<source_company>.*)</a>'
+            r' to'
+            r' <a href="(?P<target_company_url>.*)" target="_blank">(?P<target_company>.*)</a>'
+            r'\.$',
             messages[0].message,
         )
         assert match
@@ -137,6 +140,10 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             'num_contacts': str(len(source_contacts)),
             'interaction_noun': 'interaction' if len(source_interactions) == 1 else 'interactions',
             'contact_noun': 'contact' if len(source_contacts) == 1 else 'contacts',
+            'source_company_url': escape(source_company.get_absolute_url()),
+            'source_company': escape(str(source_company)),
+            'target_company_url': escape(target_company.get_absolute_url()),
+            'target_company': escape(str(target_company)),
         }
 
         for obj in chain(source_interactions, source_contacts):
@@ -156,6 +163,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             f'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
+        assert source_company.modified_by == self.user
+        assert source_company.modified_on == merge_time
         assert source_company.transfer_reason == Company.TRANSFER_REASONS.duplicate
         assert source_company.transferred_by == self.user
         assert source_company.transferred_on == merge_time
