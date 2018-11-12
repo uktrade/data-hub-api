@@ -9,6 +9,7 @@
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'company/admin/css/merge/step-1-select-other-company.css' %}">
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
@@ -23,8 +24,9 @@
 {% endblock %}
 
 {% block content %}
+  {% admin_change_link object target_blank=True as company_1_link %}
   <p>{% blocktrans %}If this company has a duplicate record in the system, you can use this tool to merge the two records. It&rsquo;s not intended to be used to merge companies for other reasons (e.g. following a merger or acquisition).{% endblocktrans %}</p>
-  <p>{% blocktrans with company_1_link=object|admin_change_link %}Which company should {{ company_1_link }} be merged with?{% endblocktrans %}</p>
+  <p>{% blocktrans %}Which company should {{ company_1_link }} be merged with?{% endblocktrans %}</p>
 
   <form action="" method="post">
     {% csrf_token %}

@@ -107,6 +107,7 @@ class DuplicateCompanyMerger:
             contact.save(update_fields=('company',))
             num_contacts_moved += 1
 
+        self.source_company.modified_by = user
         self.source_company.mark_as_transferred(
             self.target_company,
             Company.TRANSFER_REASONS.duplicate,

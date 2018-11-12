@@ -7,10 +7,8 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.merge import DuplicateCompanyMerger
 from datahub.core.utils import reverse_with_query_string
-from datahub.feature_flag.utils import feature_flagged_view
 
 
 class SelectPrimaryCompanyForm(forms.Form):
@@ -69,7 +67,6 @@ class SelectPrimaryCompanyForm(forms.Form):
         return cleaned_data
 
 
-@feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
 @method_decorator(csrf_protect)
 def select_primary_company(model_admin, request):
     """

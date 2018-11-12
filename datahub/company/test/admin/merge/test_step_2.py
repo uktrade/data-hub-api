@@ -17,7 +17,6 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
     """Tests form rendering in the 'Select primary company' view."""
 
@@ -134,7 +133,6 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         assert _html_count_occurrences(expected_radio_2_html, response.rendered_content) == 1
 
 
-@pytest.mark.usefixtures('merge_list_feature_flag')
 class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
     """Tests form submission in the 'Select primary company' view."""
 

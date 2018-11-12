@@ -23,7 +23,8 @@
 {% endblock %}
 
 {% block content %}
-{% with source_company_link=source_company|admin_change_link target_company_link=target_company|admin_change_link %}
+{% admin_change_link source_company target_blank=True as source_company_link %}
+{% admin_change_link target_company target_blank=True as target_company_link %}
 <p>
   {% blocktrans %}
   You are about to merge {{ source_company_link }} into {{ target_company_link }}.
@@ -57,5 +58,4 @@
     <input type="submit" value="{% trans 'Merge companies' %}">
   </div>
 </form>
-{% endwith %}
 {% endblock %}
