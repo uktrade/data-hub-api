@@ -2,14 +2,14 @@
 
 from pathlib import PurePath
 
-from django.core.management import call_command
 from django.db import migrations, models
 import uuid
+from datahub.core.migration_utils import load_yaml_data_in_migration
 
 
 def load_initial_statuses(apps, schema_editor):
-    call_command(
-        'loaddata',
+    load_yaml_data_in_migration(
+        apps,
         PurePath(__file__).parent / '0020_initial_statuses.yaml'
     )
 
