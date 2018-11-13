@@ -17,10 +17,25 @@ def test_admin_change_url():
     assert admin_change_url(book) == f'/admin/support/book/{book.pk}/change/'
 
 
-def test_admin_change_link():
-    """Test that admin_change_url() returns an anchor tag to the change page for an object."""
-    book = BookFactory.build(pk=uuid4())
-    assert admin_change_link(book) == f'<a href="/admin/support/book/{book.pk}/change/">{book}</a>'
+class TestAdminChangeLink:
+    """Tests admin_change_link()."""
+
+    def test_admin_change_link(self):
+        """Test that admin_change_url() returns an anchor tag to the change page for an object."""
+        book = BookFactory.build(pk=uuid4())
+        assert admin_change_link(book) == (
+            f'<a href="/admin/support/book/{book.pk}/change/">{book}</a>'
+        )
+
+    def test_admin_change_link_target_blank(self):
+        """
+        Test that admin_change_url() returns an anchor tag with target="_blank" to the change
+        page for an object.
+        """
+        book = BookFactory.build(pk=uuid4())
+        assert admin_change_link(book, True) == (
+            f'<a href="/admin/support/book/{book.pk}/change/" target="_blank">{book}</a>'
+        )
 
 
 @pytest.mark.parametrize(
