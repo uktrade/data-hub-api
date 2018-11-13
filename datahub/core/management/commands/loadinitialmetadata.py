@@ -13,7 +13,6 @@ EVENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'event' / 'fixtures'
 
 SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
-    SHARED_METADATA_FIXTURE_DIR / 'countries.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'investment.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'referrals.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'teams.yaml',
