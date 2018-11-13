@@ -6,28 +6,28 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.admin.merge.constants import MERGE_COMPANY_TOOL_FEATURE_FLAG
 from datahub.company.merge import DuplicateCompanyMerger, MergeNotAllowedError
 from datahub.company.models import Contact
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
-from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.models import Interaction
 
 
 REVERSION_REVISION_COMMENT = 'Company marked as a duplicate and related records transferred.'
 MERGE_SUCCESS_MSG = gettext_lazy(
     'Merge complete – {num_interactions_moved} {interaction_verbose_name}'
-    ' and {num_contacts_moved} {contact_verbose_name} moved.',
+    ' and {num_contacts_moved} {contact_verbose_name} moved from'
+    ' <a href="{source_company_url}" target="_blank">{source_company}</a> to'
+    ' <a href="{target_company_url}" target="_blank">{target_company}</a>.',
 )
 MERGE_FAILURE_MSG = gettext_lazy(
     'Merging failed – merging {source_company} into {target_company} is not allowed.',
 )
 
 
-@feature_flagged_view(MERGE_COMPANY_TOOL_FEATURE_FLAG)
 @method_decorator(csrf_protect)
 def confirm_merge(model_admin, request):
     """
@@ -85,20 +85,25 @@ def _perform_merge(request, merger, model_admin):
         return False
 
     reversion.set_comment(REVERSION_REVISION_COMMENT)
-    success_msg = _build_success_msg(merge_result)
+    success_msg = _build_success_msg(merger, merge_result)
     model_admin.message_user(request, success_msg, django_messages.SUCCESS)
     return True
 
 
-def _build_success_msg(merge_result):
+def _build_success_msg(merger, merge_result):
     interaction_verbose_name = verbose_name_for_count(
         merge_result.num_interactions_moved,
         Interaction._meta,
     )
     contact_verbose_name = verbose_name_for_count(merge_result.num_contacts_moved, Contact._meta)
-    return MERGE_SUCCESS_MSG.format(
+    return format_html(
+        MERGE_SUCCESS_MSG,
         num_interactions_moved=merge_result.num_interactions_moved,
         num_contacts_moved=merge_result.num_contacts_moved,
         interaction_verbose_name=interaction_verbose_name,
         contact_verbose_name=contact_verbose_name,
+        source_company_url=merger.source_company.get_absolute_url(),
+        source_company=merger.source_company,
+        target_company_url=merger.target_company.get_absolute_url(),
+        target_company=merger.target_company,
     )
