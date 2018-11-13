@@ -86,4 +86,5 @@ python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py sync_es
-python /app/manage.py runserver 0.0.0.0:8000
+python /app/manage.py collectstatic --noinput
+gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0
