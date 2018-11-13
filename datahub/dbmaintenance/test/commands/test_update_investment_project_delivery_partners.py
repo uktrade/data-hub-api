@@ -105,7 +105,7 @@ def test_simulate(s3_stubber, caplog):
         project.refresh_from_db()
 
     assert 'InvestmentProject matching query does not exist' in caplog.text
-    assert '"invalid-uuid" is not a valid UUID.' in caplog.text
+    assert 'Must be a valid UUID.' in caplog.text
     assert len(caplog.records) == 2
 
     assert [list(project.delivery_partners.all()) for project in investment_projects] == [

@@ -52,7 +52,7 @@ def test_run(s3_stubber, caplog):
         contact.refresh_from_db()
 
     assert 'Contact matching query does not exist' in caplog.text
-    assert '"blah" is not a valid boolean' in caplog.text
+    assert 'Must be a valid boolean' in caplog.text
     assert len(caplog.records) == 2
 
     assert [contact.accepts_dit_email_marketing for contact in contacts] == [

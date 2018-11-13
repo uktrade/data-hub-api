@@ -318,7 +318,7 @@ class TestSearchOrder(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
+        assert response.json() == {'primary_market': ['Must be a valid UUID.']}
 
     @pytest.mark.parametrize(
         'sector_level',
