@@ -115,6 +115,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
         'computed_project_code': 'Project reference',
         'name': 'Project name',
         'investor_company__name': 'Investor company',
+        'investor_company__registered_address_town': 'Investor company town or city',
         'investor_company__registered_address_country__name': 'Country of origin',
         'investment_type__name': 'Investment type',
         'status_name': 'Status',
