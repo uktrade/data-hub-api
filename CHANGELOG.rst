@@ -132,7 +132,7 @@ Internal changes
 API
 ---
 
-- **Interactions** ``POST /v3/search/investment_project/export`` now always excludes policy feedback interactions (regardless of the current user's permissions).
+- **Interactions** ``POST /v3/search/interaction/export`` now always excludes policy feedback interactions (regardless of the current user's permissions).
 
 Database schema
 ---------------
