@@ -70,7 +70,7 @@ class InteractionSerializer(serializers.ModelSerializer):
     communication_channel = NestedRelatedField(
         CommunicationChannel, required=False, allow_null=True,
     )
-    is_event = serializers.NullBooleanField(required=False)
+    is_event = serializers.BooleanField(required=False, allow_null=True)
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     modified_by = NestedAdviserField(read_only=True)
