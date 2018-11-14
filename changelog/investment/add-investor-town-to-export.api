@@ -1,0 +1,1 @@
+``POST /v3/search/investment_project/export``: the field 'Investor company town or city' was added to the CSV output.
