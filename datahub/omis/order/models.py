@@ -206,7 +206,7 @@ class Order(BaseModel):
 
     vat_status = models.CharField(max_length=100, choices=VATStatus, blank=True)
     vat_number = models.CharField(max_length=100, blank=True)
-    vat_verified = models.NullBooleanField()
+    vat_verified = models.BooleanField(null=True)
 
     net_cost = models.PositiveIntegerField(
         default=0, help_text='Total hours * hourly rate in pence.',

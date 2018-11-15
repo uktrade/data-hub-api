@@ -831,6 +831,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project reference': project.project_code,
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
+                'Investor company town or city': project.investor_company.registered_address_town,
                 'Country of origin':
                     get_attr_or_none(project, 'investor_company.registered_address_country.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),

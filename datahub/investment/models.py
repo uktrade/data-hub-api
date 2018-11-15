@@ -106,17 +106,17 @@ class IProjectAbstract(models.Model):
     )
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    quotable_as_public_case_study = models.NullBooleanField()
+    quotable_as_public_case_study = models.BooleanField(null=True)
     actual_land_date = models.DateField(blank=True, null=True)
     likelihood_of_landing = models.IntegerField(blank=True, null=True)
     priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
 
-    approved_commitment_to_invest = models.NullBooleanField()
-    approved_fdi = models.NullBooleanField()
-    approved_good_value = models.NullBooleanField()
-    approved_high_value = models.NullBooleanField()
-    approved_landed = models.NullBooleanField()
-    approved_non_fdi = models.NullBooleanField()
+    approved_commitment_to_invest = models.BooleanField(null=True)
+    approved_fdi = models.BooleanField(null=True)
+    approved_good_value = models.BooleanField(null=True)
+    approved_high_value = models.BooleanField(null=True)
+    approved_landed = models.BooleanField(null=True)
+    approved_non_fdi = models.BooleanField(null=True)
 
     stage = models.ForeignKey(
         'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
@@ -236,34 +236,35 @@ class IProjectValueAbstract(models.Model):
         'metadata.FDIValue', related_name='investment_projects', null=True, blank=True,
         on_delete=models.SET_NULL,
     )
-    client_cannot_provide_total_investment = models.NullBooleanField()
+    client_cannot_provide_total_investment = models.BooleanField(null=True)
     total_investment = models.DecimalField(
         null=True, max_digits=19,
         decimal_places=0, blank=True,
     )
-    client_cannot_provide_foreign_investment = models.NullBooleanField()
+    client_cannot_provide_foreign_investment = models.BooleanField(null=True)
     foreign_equity_investment = models.DecimalField(
         null=True, max_digits=19, decimal_places=0, blank=True,
     )
-    government_assistance = models.NullBooleanField()
-    some_new_jobs = models.NullBooleanField()
+    government_assistance = models.BooleanField(null=True)
+    some_new_jobs = models.BooleanField(null=True)
     number_new_jobs = models.IntegerField(null=True, blank=True)
-    will_new_jobs_last_two_years = models.NullBooleanField()
+    will_new_jobs_last_two_years = models.BooleanField(null=True)
     average_salary = models.ForeignKey(
         'metadata.SalaryRange', related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL,
     )
     number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
-    r_and_d_budget = models.NullBooleanField()
-    non_fdi_r_and_d_budget = models.NullBooleanField(
+    r_and_d_budget = models.BooleanField(null=True)
+    non_fdi_r_and_d_budget = models.BooleanField(
+        null=True,
         verbose_name='has associated non-FDI R&D project',
     )
     associated_non_fdi_r_and_d_project = models.ForeignKey(
         'InvestmentProject', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
         verbose_name='associated non-FDI R&D project',
     )
-    new_tech_to_uk = models.NullBooleanField()
-    export_revenue = models.NullBooleanField()
+    new_tech_to_uk = models.BooleanField(null=True)
+    export_revenue = models.BooleanField(null=True)
 
 
 class IProjectRequirementsAbstract(models.Model):
@@ -273,14 +274,14 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
-    site_decided = models.NullBooleanField()
+    site_decided = models.BooleanField(null=True)
     address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_town = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    client_considering_other_countries = models.NullBooleanField()
+    client_considering_other_countries = models.BooleanField(null=True)
 
-    uk_company_decided = models.NullBooleanField()
+    uk_company_decided = models.BooleanField(null=True)
     uk_company = models.ForeignKey(
         'company.Company', related_name='investee_projects',
         null=True, blank=True, on_delete=models.SET_NULL,

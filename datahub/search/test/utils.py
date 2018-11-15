@@ -25,6 +25,15 @@ def create_mock_search_app(
     return mock
 
 
+def doc_exists(es_client, search_app, id_):
+    """Checks if a document exists for a specified search app."""
+    return es_client.exists(
+        index=search_app.es_model.get_write_index(),
+        doc_type=search_app.name,
+        id=id_,
+    )
+
+
 def _create_mock_es_model(
         current_mapping_hash,
         target_mapping_hash,

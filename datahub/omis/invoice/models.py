@@ -65,7 +65,7 @@ class Invoice(BaseModel):
     # the same as the ones on the order.
     vat_status = models.CharField(max_length=100, blank=True)
     vat_number = models.CharField(max_length=100, blank=True)
-    vat_verified = models.NullBooleanField()
+    vat_verified = models.BooleanField(null=True)
 
     net_cost = models.PositiveIntegerField(
         default=0, help_text='Net value in pence.',
