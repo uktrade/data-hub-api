@@ -49,11 +49,30 @@ git push origin release/<version>
 
 In GitHub open a PR to merge `release/<version>` into `master` and assign at least two developers for review.
 
-## Release
+## Release to staging
 
 After the PR has been reviewed, merge it into `master` and delete the merged branch.
 The release will be automatically deployed to staging via Jenkins.
-Releasing to production has to happen manually after it's been tested on staging and approved by the Live Services team.
+Check that everything looks fine before proceeding.
+
+## Release to production
+Releasing to production happens manually but after it has been announced and approved by the Live Services Team.
+
+Post in the `#data-hub` slack channel the following (replace `<version>` with the version number and `<service-manager>` with the person resposible for approvals):
+
+```
+@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-leeloo/blob/master/CHANGELOG.rst. @<service-manager> Are you happy for us to release?
+```
+
+After the approval, the release can be deployed.
+
+In jenkins, go to the _datahub_ tab, the _datahub-api_ project and click on _Build with Parameters_.
+
+Type the following:
+* **environment**: `production`
+* **git commit**: `master`
+
+Click on `build`, follow the deployment and check that everything looks fine after it finishes.
 
 ## Formalise the release
 
@@ -67,11 +86,3 @@ In GitHub, [create a release](https://github.com/uktrade/data-hub-leeloo/release
 And click on _Publish release_.
 
 For more information see the [GitHub documentation](https://help.github.com/articles/creating-releases/).
-
-## Tell everyone
-
-Post in the `#data-hub` slack channel the following (replace `<version>` with the version number):
-
-```
-@here Data Hub API has been updated to version <version>. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-leeloo/blob/master/CHANGELOG.rst.
-```
