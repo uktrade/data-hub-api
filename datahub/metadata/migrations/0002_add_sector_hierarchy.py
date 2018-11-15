@@ -7,12 +7,12 @@ import mptt
 import mptt.fields
 import mptt.managers
 from django.db import migrations, models
-from django.core.management import call_command
+from datahub.core.migration_utils import load_yaml_data_in_migration
 
 
 def load_sectors(apps, schema_editor):
-    call_command(
-        'loaddata',
+    load_yaml_data_in_migration(
+        apps,
         PurePath(__file__).parent / '0002_add_sector_hierarchy.yaml'
     )
 

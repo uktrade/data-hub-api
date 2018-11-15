@@ -1,3 +1,24 @@
+Data Hub API 7.7.0 (2018-11-15)
+===============================
+
+
+
+Features
+--------
+
+- **Investment** Exports of search results now include the town or city of the investor company.
+
+Internal changes
+----------------
+
+- Countries now have defined ISO codes.
+
+API
+---
+
+- **Investment** ``POST /v3/search/investment_project/export``: the field 'Investor company town or city' was added to the CSV output.
+
+
 Data Hub API 7.6.0 (2018-11-12)
 ===============================
 
@@ -132,7 +153,7 @@ Internal changes
 API
 ---
 
-- **Interactions** ``POST /v3/search/investment_project/export`` now always excludes policy feedback interactions (regardless of the current user's permissions).
+- **Interactions** ``POST /v3/search/interaction/export`` now always excludes policy feedback interactions (regardless of the current user's permissions).
 
 Database schema
 ---------------

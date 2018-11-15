@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import call, MagicMock, Mock
 from uuid import uuid4
 
 import pytest
@@ -9,10 +9,12 @@ from datahub.search.tasks import (
     sync_all_models,
     sync_model,
     sync_object_task,
+    sync_related_objects_task,
 )
-from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.models import RelatedModel, SimpleModel
+from datahub.search.test.search_support.relatedmodel import RelatedModelSearchApp
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
-from datahub.search.test.utils import create_mock_search_app
+from datahub.search.test.utils import create_mock_search_app, doc_exists
 
 
 def test_sync_model(monkeypatch):
@@ -47,11 +49,7 @@ def test_sync_object_task_syncs(setup_es):
     sync_object_task.apply(args=(SimpleModelSearchApp.name, str(obj.pk)))
     setup_es.indices.refresh()
 
-    assert setup_es.get(
-        index=SimpleModelSearchApp.es_model.get_write_index(),
-        doc_type=SimpleModelSearchApp.name,
-        id=obj.pk,
-    )
+    assert doc_exists(setup_es, SimpleModelSearchApp, obj.pk)
 
 
 def test_sync_object_task_retries_on_error(monkeypatch, setup_es):
@@ -62,6 +60,31 @@ def test_sync_object_task_retries_on_error(monkeypatch, setup_es):
     sync_object_task.apply(args=(SimpleModelSearchApp.name, str(uuid4())))
 
     assert sync_object_mock.call_count == 2
+
+
+@pytest.mark.django_db
+def test_sync_related_objects_task_syncs(monkeypatch):
+    """Test that related objects are synced to Elasticsearch."""
+    sync_object_task_mock = Mock()
+    monkeypatch.setattr('datahub.search.tasks.sync_object_task', sync_object_task_mock)
+
+    simpleton = SimpleModel.objects.create()
+    relation_1 = RelatedModel.objects.create(simpleton=simpleton)
+    relation_2 = RelatedModel.objects.create(simpleton=simpleton)
+    RelatedModel.objects.create()  # Unrelated object, should not get synced
+
+    sync_related_objects_task.apply(
+        args=(
+            SimpleModel._meta.label,
+            str(simpleton.pk),
+            'relatedmodel_set',
+        ),
+    )
+
+    assert sync_object_task_mock.apply_async.call_args_list == [
+        call(args=(RelatedModelSearchApp.name, relation_1.pk), priority=6),
+        call(args=(RelatedModelSearchApp.name, relation_2.pk), priority=6),
+    ]
 
 
 @pytest.mark.django_db
