@@ -22,7 +22,11 @@ from datahub.company.test.factories import (
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+    random_obj_for_model,
+    random_obj_for_queryset,
 )
 from datahub.metadata.models import CompanyClassification
 from datahub.metadata.test.factories import TeamFactory
@@ -381,7 +385,6 @@ class TestGetCompany(APITestMixin):
             registered_address_town='Fooland',
             registered_address_country_id=None,
             headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification=random_obj_for_model(CompanyClassification),
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -483,12 +486,9 @@ class TestUpdateCompany(APITestMixin):
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
         company = CompanyFactory(
-            name='Foo ltd.',
-            registered_address_1='Hello st.',
-            registered_address_town='Fooland',
-            registered_address_country_id=Country.united_states.value.id,
             reference_code='ORG-345645',
             archived_documents_url_path='old_path',
+            classification=random_obj_for_model(CompanyClassification),
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -497,12 +497,19 @@ class TestUpdateCompany(APITestMixin):
             data={
                 'reference_code': 'XYZ',
                 'archived_documents_url_path': 'new_path',
+                'classification': random_obj_for_queryset(
+                    CompanyClassification.objects.exclude(id=company.classification_id),
+                ).id,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['reference_code'] == 'ORG-345645'
         assert response.data['archived_documents_url_path'] == 'old_path'
+        assert response.data['classification'] == {
+            'id': str(company.classification.id),
+            'name': company.classification.name,
+        }
 
     def test_long_trading_name(self):
         """Test that providing a long trading name doesn't return a 500."""
@@ -748,7 +755,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1012,7 +1018,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1037,7 +1042,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1064,7 +1068,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1094,7 +1097,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1125,7 +1127,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
@@ -1156,7 +1157,6 @@ class TestAddCompany(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
                 'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                'classification': {'id': random_obj_for_model(CompanyClassification).pk},
             },
         )
 
