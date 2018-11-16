@@ -132,6 +132,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     classification = models.ForeignKey(
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL,
+        help_text='One List Tier',
     )
     global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
@@ -233,12 +234,61 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         # Note: archive() saves the model instance
         self.archive(user, archived_reason)
 
+    def get_group_global_headquarters(self):
+        """
+        :returns: the Global Headquarters for the group that this company is part of.
+        """
+        if self.global_headquarters:
+            return self.global_headquarters
+        return self
+
+    def get_onelist_group_core_team(self):
+        """
+        :returns: the Core Team for the group that this company is part of
+            as a list of dicts with `adviser` and `is_global_account_manager`.
+        """
+        group_global_headquarters = self.get_group_global_headquarters()
+        global_account_manager = group_global_headquarters.one_list_account_owner
+
+        core_team = []
+        # add global account manager first
+        if global_account_manager:
+            core_team.append(
+                {
+                    'adviser': global_account_manager,
+                    'is_global_account_manager': True,
+                },
+            )
+
+        # add all other core members excluding the global account manager
+        # who might have already been added
+        team_members = group_global_headquarters.core_team_members.exclude(
+            adviser=global_account_manager,
+        ).select_related(
+            'adviser',
+            'adviser__dit_team',
+            'adviser__dit_team__uk_region',
+            'adviser__dit_team__country',
+        ).order_by(
+            'adviser__first_name',
+            'adviser__last_name',
+        )
+
+        core_team.extend(
+            {
+                'adviser': team_member.adviser,
+                'is_global_account_manager': False,
+            }
+            for team_member in team_members
+        )
+        return core_team
+
 
 class CompanyCoreTeamMember(models.Model):
     """
-    Adviser who is a member of the core team of a company.
+    Adviser who is a member of the Core Team of a company.
 
-    When a company is account managed, a core team is established.
+    When a company is account managed, a Core Team is established.
     This usually includes:
     - one and only one global account manager
     - a local account manager from the country where the company is based
@@ -248,14 +298,14 @@ class CompanyCoreTeamMember(models.Model):
     However, this layout is not always as strict.
     Other roles might exist and a single person can also have multiple roles.
 
-    This team is called "core team" because it's official and does not change
+    This team is called "Core Team" because it's official and does not change
     often. Usually, a wider team around a company is established as well.
     This team includes specialists and other advisers needed for short-term
     and more reactive support.
 
     Company.one_list_account_owner who represents the global account manager
     is kept on the company record for now even though it's in theory part of
-    the core team.
+    the Core Team.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -269,7 +319,7 @@ class CompanyCoreTeamMember(models.Model):
 
     def __str__(self):
         """Human-readable representation."""
-        return f'{self.adviser} - core team member of {self.company}'
+        return f'{self.adviser} - Core Team member of {self.company}'
 
     class Meta:
         unique_together = (
