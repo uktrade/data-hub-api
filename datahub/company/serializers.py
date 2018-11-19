@@ -272,9 +272,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True,
     )
-    classification = NestedRelatedField(
-        meta_models.CompanyClassification, required=False, allow_null=True,
-    )
+    classification = NestedRelatedField(meta_models.CompanyClassification, read_only=True)
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
