@@ -1,0 +1,2 @@
+Column ``country_investment_originates_from`` has been added to ``investment_investmentproject``
+table and is nullable.

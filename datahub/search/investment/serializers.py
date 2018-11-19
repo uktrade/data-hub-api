@@ -22,6 +22,7 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     investment_type = SingleOrListField(child=StringUUIDField(), required=False)
     investor_company = SingleOrListField(child=StringUUIDField(), required=False)
     investor_company_country = SingleOrListField(child=StringUUIDField(), required=False)
+    country_investment_originates_from = SingleOrListField(child=StringUUIDField(), required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     stage = SingleOrListField(child=StringUUIDField(), required=False)
