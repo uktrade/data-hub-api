@@ -62,9 +62,11 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     )
 
 
-class CompanyCoreTeamViewSet(CoreViewSet):
+class GroupCoreTeamViewSet(CoreViewSet):
     """
-    Views for the core team of a company.
+    Views for the Core Team of the group a company is part of.
+    A Core Team is usually assigned to the Global Headquarters and is shared among all
+    members of the group.
 
     The permissions to access this resource are inherited from the company resource.
 
@@ -73,52 +75,15 @@ class CompanyCoreTeamViewSet(CoreViewSet):
     """
 
     required_scopes = (Scope.internal_front_end,)
-    queryset = Company.objects.select_related(
-        'one_list_account_owner',
-        'one_list_account_owner__dit_team',
-        'one_list_account_owner__dit_team__uk_region',
-        'one_list_account_owner__dit_team__country',
-    )
+    queryset = Company.objects
     serializer_class = CompanyCoreTeamMemberSerializer
 
     def list(self, request, *args, **kwargs):
-        """Lists core team members."""
+        """Lists Core Team members."""
         company = self.get_object()
-        global_account_manager = company.one_list_account_owner
+        core_team = company.get_onelist_group_core_team()
 
-        objs = []
-        # add global account manager first
-        if company.one_list_account_owner:
-            objs.append(
-                {
-                    'adviser': global_account_manager,
-                    'is_global_account_manager': True,
-                },
-            )
-
-        # add all other core members excluding the global account manager
-        # who might have already been added
-        team_members = company.core_team_members.exclude(
-            adviser=global_account_manager,
-        ).select_related(
-            'adviser',
-            'adviser__dit_team',
-            'adviser__dit_team__uk_region',
-            'adviser__dit_team__country',
-        ).order_by(
-            'adviser__first_name',
-            'adviser__last_name',
-        )
-
-        objs.extend(
-            {
-                'adviser': team_member.adviser,
-                'is_global_account_manager': False,
-            }
-            for team_member in team_members
-        )
-
-        serializer = self.get_serializer(objs, many=True)
+        serializer = self.get_serializer(core_team, many=True)
         return Response(serializer.data)
 
 

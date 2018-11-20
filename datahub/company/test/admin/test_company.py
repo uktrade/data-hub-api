@@ -23,7 +23,7 @@ class TestChangeCompanyAdmin(AdminTestMixin):
     """Tests for the company admin change form."""
 
     def test_add_core_team_members(self):
-        """Test that core team members can be added to a company."""
+        """Test that Core Team members can be added to a company."""
         team_member_advisers = AdviserFactory.create_batch(2)
         team_size = len(team_member_advisers)
         company = CompanyFactory()
@@ -63,7 +63,7 @@ class TestChangeCompanyAdmin(AdminTestMixin):
         assert company.core_team_members.count() == team_size
 
     def test_delete_core_team_members(self):
-        """Test that core team members can be deleted from a company."""
+        """Test that Core Team members can be deleted from a company."""
         company = CompanyFactory()
         core_team_members = CompanyCoreTeamMemberFactory.create_batch(2, company=company)
         team_size = len(core_team_members)

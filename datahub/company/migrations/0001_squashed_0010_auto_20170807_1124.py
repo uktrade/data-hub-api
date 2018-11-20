@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                 ('account_manager', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companies', to=settings.AUTH_USER_MODEL, help_text='Legacy field, do not use')),
                 ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('business_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.BusinessType')),
-                ('classification', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.CompanyClassification')),
+                ('classification', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.CompanyClassification', help_text='One List Tier')),
                 ('employee_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.EmployeeRange')),
                 ('export_to_countries', models.ManyToManyField(blank=True, related_name='company_export_to_countries', to='metadata.Country')),
                 ('future_interest_countries', models.ManyToManyField(blank=True, related_name='company_future_interest_countries', to='metadata.Country')),
