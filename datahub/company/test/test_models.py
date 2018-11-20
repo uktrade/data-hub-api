@@ -8,6 +8,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
+from datahub.metadata.models import CompanyClassification
 
 
 # mark the whole module for db use
@@ -30,7 +31,7 @@ class TestCompany:
             lambda: CompanyFactory.build(),
             lambda: None,
         ),
-        ids=('as_subsidiary', 'as_global_headquarters'),
+        ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_get_group_global_headquarters(self, build_global_headquarters):
         """
@@ -45,12 +46,66 @@ class TestCompany:
         assert company.get_group_global_headquarters() == expected_group_global_headquarters
 
     @pytest.mark.parametrize(
-        'build_global_headquarters',
+        'build_company',
         (
-            lambda gam: CompanyFactory(one_list_account_owner=gam),
-            lambda gam: None,
+            # subsidiary with Global Headquarters on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(classification=one_list_tier),
+            ),
+            # subsidiary with Global Headquarters not on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(classification=None),
+            ),
+            # single company on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=one_list_tier,
+                global_headquarters=None,
+            ),
+            # single company not on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=None,
+            ),
         ),
-        ids=('as_subsidiary', 'as_global_headquarters'),
+        ids=(
+            'as_subsidiary_of_one_list_company',
+            'as_subsidiary_of_non_one_list_company',
+            'as_one_list_company',
+            'as_non_one_list_company',
+        ),
+    )
+    def test_get_one_list_group_tier(self, build_company):
+        """
+        Test that `get_one_list_group_tier` returns the One List Tier of `self`
+        if company has no `global_headquarters` or the one of its `global_headquarters`
+        otherwise.
+        """
+        one_list_tier = CompanyClassification.objects.first()
+
+        company = build_company(one_list_tier)
+
+        group_global_headquarters = company.global_headquarters or company
+        if not group_global_headquarters.classification:
+            assert not company.get_one_list_group_tier()
+        else:
+            assert company.get_one_list_group_tier() == one_list_tier
+
+    @pytest.mark.parametrize(
+        'build_company',
+        (
+            # as subsidiary
+            lambda gam: CompanyFactory(
+                global_headquarters=CompanyFactory(one_list_account_owner=gam),
+            ),
+            # as single company
+            lambda gam: CompanyFactory(
+                global_headquarters=None,
+                one_list_account_owner=gam,
+            ),
+        ),
+        ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     @pytest.mark.parametrize(
         'with_global_account_manager',
@@ -59,7 +114,7 @@ class TestCompany:
     )
     def test_get_one_list_group_core_team(
         self,
-        build_global_headquarters,
+        build_company,
         with_global_account_manager,
     ):
         """
@@ -74,12 +129,9 @@ class TestCompany:
         )
         global_account_manager = team_member_advisers[0] if with_global_account_manager else None
 
-        global_headquarters = build_global_headquarters(global_account_manager)
-        company = CompanyFactory(
-            global_headquarters=global_headquarters,
-            one_list_account_owner=None if global_headquarters else global_account_manager,
-        )
+        company = build_company(global_account_manager)
         group_global_headquarters = company.global_headquarters or company
+
         CompanyCoreTeamMemberFactory.create_batch(
             len(team_member_advisers),
             company=group_global_headquarters,
