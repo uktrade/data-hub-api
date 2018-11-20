@@ -1332,15 +1332,27 @@ class TestCHCompany(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-class TestCompanyCoreTeam(APITestMixin):
-    """Tests for getting the core team of a company."""
+class TestGroupCoreTeam(APITestMixin):
+    """Tests for getting the Core Team of a company's group."""
 
-    def test_empty_list(self):
+    @pytest.mark.parametrize(
+        'build_global_headquarters',
+        (
+            lambda: CompanyFactory(one_list_account_owner=None),
+            lambda: None,
+        ),
+        ids=('as_subsidiary', 'as_global_headquarters'),
+    )
+    def test_empty_list(self, build_global_headquarters):
         """
-        Test that if company.one_list_account_owner is null and no CompanyCoreTeamMember
-        records for that company exist, the endpoint returns an empty list.
+        Test that if there's no Global Account Manager and no Core Team
+        member for a company's Global Headquarters, the endpoint returns
+        an empty list.
         """
-        company = CompanyFactory(one_list_account_owner=None)
+        company = CompanyFactory(
+            global_headquarters=build_global_headquarters(),
+            one_list_account_owner=None,
+        )
 
         url = reverse(
             'api-v3:company:core-team',
@@ -1351,13 +1363,26 @@ class TestCompanyCoreTeam(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
-    def test_with_only_global_account_manager(self):
+    @pytest.mark.parametrize(
+        'build_global_headquarters',
+        (
+            lambda gam: CompanyFactory(one_list_account_owner=gam),
+            lambda gam: None,
+        ),
+        ids=('as_subsidiary', 'as_global_headquarters'),
+    )
+    def test_with_only_global_account_manager(self, build_global_headquarters):
         """
-        Test that if company.one_list_account_owner is not null and no CompanyCoreTeamMember
-        records for that company exist, the endpoint returns a list with only that adviser in it.
+        Test that if there is a Global Account Manager but no Core Team
+        member for a company's Global Headquarters, the endpoint returns
+        a list with only that adviser in it.
         """
         global_account_manager = AdviserFactory()
-        company = CompanyFactory(one_list_account_owner=global_account_manager)
+        global_headquarters = build_global_headquarters(global_account_manager)
+        company = CompanyFactory(
+            global_headquarters=global_headquarters,
+            one_list_account_owner=None if global_headquarters else global_account_manager,
+        )
 
         url = reverse(
             'api-v3:company:core-team',
@@ -1391,16 +1416,22 @@ class TestCompanyCoreTeam(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
+        'build_global_headquarters',
+        (
+            lambda gam: CompanyFactory(one_list_account_owner=gam),
+            lambda gam: None,
+        ),
+        ids=('as_subsidiary', 'as_global_headquarters'),
+    )
+    @pytest.mark.parametrize(
         'with_global_account_manager',
         (True, False),
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
-    def test_with_core_team_members(self, with_global_account_manager):
+    def test_with_core_team_members(self, build_global_headquarters, with_global_account_manager):
         """
-        Test that if CompanyCoreTeamMember records for this company exist, the endpoint
-        returns a list with all team members in it.
-        company.one_list_account_owner (the global account manager) is included and counted
-        only once if set.
+        Test that if there are Core Team members for a company's Global Headquarters,
+        the endpoint returns a list with these advisers in it.
         """
         team_member_advisers = AdviserFactory.create_batch(
             3,
@@ -1410,10 +1441,15 @@ class TestCompanyCoreTeam(APITestMixin):
         )
         global_account_manager = team_member_advisers[0] if with_global_account_manager else None
 
-        company = CompanyFactory(one_list_account_owner=global_account_manager)
+        global_headquarters = build_global_headquarters(global_account_manager)
+        company = CompanyFactory(
+            global_headquarters=global_headquarters,
+            one_list_account_owner=None if global_headquarters else global_account_manager,
+        )
+        group_global_headquarters = company.global_headquarters or company
         CompanyCoreTeamMemberFactory.create_batch(
             len(team_member_advisers),
-            company=company,
+            company=group_global_headquarters,
             adviser=factory.Iterator(team_member_advisers),
         )
 

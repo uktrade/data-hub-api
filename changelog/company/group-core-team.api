@@ -1,0 +1,1 @@
+`GET  /company/<id>/core-team/` now returns the Core Team for the group that the company is part of. All companies in the group inherit that team from their Global Headquarters.
