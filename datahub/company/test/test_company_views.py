@@ -1332,8 +1332,8 @@ class TestCHCompany(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-class TestGroupCoreTeam(APITestMixin):
-    """Tests for getting the Core Team of a company's group."""
+class TestOneListGroupCoreTeam(APITestMixin):
+    """Tests for getting the One List Core Team of a company's group."""
 
     @pytest.mark.parametrize(
         'build_global_headquarters',

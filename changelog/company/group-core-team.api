@@ -1,4 +1,4 @@
-The Core Team endpoint was changed:
+The One List Core Team endpoint was changed:
 
 ``GET /company/<id>/core-team`` was renamed to ``GET /company/<id>/onelist-group-core-team``. The old ``/core-team`` endpoint still exists but will be completely removed on or after November, 29.
 

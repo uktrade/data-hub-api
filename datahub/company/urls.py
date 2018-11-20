@@ -9,7 +9,7 @@ from datahub.company.views import (
     CompanyViewSet,
     ContactAuditViewSet,
     ContactViewSet,
-    GroupCoreTeamViewSet,
+    OneListGroupCoreTeamViewSet,
 )
 
 # CONTACT
@@ -72,7 +72,7 @@ company_unarchive = CompanyViewSet.as_view({
     'post': 'unarchive',
 })
 
-onelist_group_core_team = GroupCoreTeamViewSet.as_view({
+onelist_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
