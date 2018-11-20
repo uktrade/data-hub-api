@@ -26,7 +26,6 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
     random_obj_for_model,
-    random_obj_for_queryset,
 )
 from datahub.metadata.models import CompanyClassification, Sector
 from datahub.metadata.test.factories import TeamFactory
@@ -278,6 +277,7 @@ class TestGetCompany(APITestMixin):
                 'name': company.business_type.name,
             },
             'classification': None,
+            'one_list_group_tier': None,
             'company_number': '123',
             'contacts': [],
             'created_on': format_date_or_datetime(company.created_on),
@@ -418,6 +418,61 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['website'] == expected_website
 
+    @pytest.mark.parametrize(
+        'build_company',
+        (
+            # subsidiary with Global Headquarters on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(classification=one_list_tier),
+            ),
+            # subsidiary with Global Headquarters not on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(classification=None),
+            ),
+            # single company on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=one_list_tier,
+                global_headquarters=None,
+            ),
+            # single company not on the One List
+            lambda one_list_tier: CompanyFactory(
+                classification=None,
+                global_headquarters=None,
+            ),
+        ),
+        ids=(
+            'as_subsidiary_of_one_list_company',
+            'as_subsidiary_of_non_one_list_company',
+            'as_one_list_company',
+            'as_non_one_list_company',
+        ),
+    )
+    def test_one_list_group_tier(self, build_company):
+        """
+        Test that the endpoint includes the One List Tier
+        of the Global Headquarters in the group.
+        """
+        one_list_tier = CompanyClassification.objects.first()
+        company = build_company(one_list_tier)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        group_global_headquarters = company.global_headquarters or company
+
+        actual_one_list_group_tier = response.json()['one_list_group_tier']
+        if not group_global_headquarters.classification:
+            assert not actual_one_list_group_tier
+        else:
+            assert actual_one_list_group_tier == {
+                'id': str(one_list_tier.id),
+                'name': one_list_tier.name,
+            }
+
 
 class TestUpdateCompany(APITestMixin):
     """Tests for updating a single company."""
@@ -477,10 +532,11 @@ class TestUpdateCompany(APITestMixin):
 
     def test_cannot_update_read_only_fields(self):
         """Test updating read-only fields."""
+        one_list_tier, different_one_list_tier = CompanyClassification.objects.all()[:2]
         company = CompanyFactory(
             reference_code='ORG-345645',
             archived_documents_url_path='old_path',
-            classification=random_obj_for_model(CompanyClassification),
+            classification=one_list_tier,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -489,9 +545,8 @@ class TestUpdateCompany(APITestMixin):
             data={
                 'reference_code': 'XYZ',
                 'archived_documents_url_path': 'new_path',
-                'classification': random_obj_for_queryset(
-                    CompanyClassification.objects.exclude(id=company.classification_id),
-                ).id,
+                'classification': different_one_list_tier.id,
+                'one_list_group_tier': different_one_list_tier.id,
             },
         )
 
@@ -499,6 +554,10 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['reference_code'] == 'ORG-345645'
         assert response.data['archived_documents_url_path'] == 'old_path'
         assert response.data['classification'] == {
+            'id': str(company.classification.id),
+            'name': company.classification.name,
+        }
+        assert response.data['one_list_group_tier'] == {
             'id': str(company.classification.id),
             'name': company.classification.name,
         }
@@ -1336,23 +1395,27 @@ class TestOneListGroupCoreTeam(APITestMixin):
     """Tests for getting the One List Core Team of a company's group."""
 
     @pytest.mark.parametrize(
-        'build_global_headquarters',
+        'build_company',
         (
-            lambda: CompanyFactory(one_list_account_owner=None),
-            lambda: None,
+            # as subsidiary
+            lambda: CompanyFactory(
+                global_headquarters=CompanyFactory(one_list_account_owner=None),
+            ),
+            # as single company
+            lambda: CompanyFactory(
+                global_headquarters=None,
+                one_list_account_owner=None,
+            ),
         ),
-        ids=('as_subsidiary', 'as_global_headquarters'),
+        ids=('as_subsidiary', 'as_non_subsidiary'),
     )
-    def test_empty_list(self, build_global_headquarters):
+    def test_empty_list(self, build_company):
         """
         Test that if there's no Global Account Manager and no Core Team
         member for a company's Global Headquarters, the endpoint returns
         an empty list.
         """
-        company = CompanyFactory(
-            global_headquarters=build_global_headquarters(),
-            one_list_account_owner=None,
-        )
+        company = build_company()
 
         url = reverse(
             'api-v3:company:one-list-group-core-team',
@@ -1364,25 +1427,28 @@ class TestOneListGroupCoreTeam(APITestMixin):
         assert response.json() == []
 
     @pytest.mark.parametrize(
-        'build_global_headquarters',
+        'build_company',
         (
-            lambda gam: CompanyFactory(one_list_account_owner=gam),
-            lambda gam: None,
+            # as subsidiary
+            lambda gam: CompanyFactory(
+                global_headquarters=CompanyFactory(one_list_account_owner=gam),
+            ),
+            # as single company
+            lambda gam: CompanyFactory(
+                global_headquarters=None,
+                one_list_account_owner=gam,
+            ),
         ),
-        ids=('as_subsidiary', 'as_global_headquarters'),
+        ids=('as_subsidiary', 'as_non_subsidiary'),
     )
-    def test_with_only_global_account_manager(self, build_global_headquarters):
+    def test_with_only_global_account_manager(self, build_company):
         """
         Test that if there is a Global Account Manager but no Core Team
         member for a company's Global Headquarters, the endpoint returns
         a list with only that adviser in it.
         """
         global_account_manager = AdviserFactory()
-        global_headquarters = build_global_headquarters(global_account_manager)
-        company = CompanyFactory(
-            global_headquarters=global_headquarters,
-            one_list_account_owner=None if global_headquarters else global_account_manager,
-        )
+        company = build_company(global_account_manager)
 
         url = reverse(
             'api-v3:company:one-list-group-core-team',
@@ -1416,19 +1482,26 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
-        'build_global_headquarters',
+        'build_company',
         (
-            lambda gam: CompanyFactory(one_list_account_owner=gam),
-            lambda gam: None,
+            # as subsidiary
+            lambda gam: CompanyFactory(
+                global_headquarters=CompanyFactory(one_list_account_owner=gam),
+            ),
+            # as single company
+            lambda gam: CompanyFactory(
+                global_headquarters=None,
+                one_list_account_owner=gam,
+            ),
         ),
-        ids=('as_subsidiary', 'as_global_headquarters'),
+        ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     @pytest.mark.parametrize(
         'with_global_account_manager',
         (True, False),
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
-    def test_with_core_team_members(self, build_global_headquarters, with_global_account_manager):
+    def test_with_core_team_members(self, build_company, with_global_account_manager):
         """
         Test that if there are Core Team members for a company's Global Headquarters,
         the endpoint returns a list with these advisers in it.
@@ -1441,11 +1514,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         )
         global_account_manager = team_member_advisers[0] if with_global_account_manager else None
 
-        global_headquarters = build_global_headquarters(global_account_manager)
-        company = CompanyFactory(
-            global_headquarters=global_headquarters,
-            one_list_account_owner=None if global_headquarters else global_account_manager,
-        )
+        company = build_company(global_account_manager)
         group_global_headquarters = company.global_headquarters or company
         CompanyCoreTeamMemberFactory.create_batch(
             len(team_member_advisers),
