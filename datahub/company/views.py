@@ -62,9 +62,9 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     )
 
 
-class GroupCoreTeamViewSet(CoreViewSet):
+class OneListGroupCoreTeamViewSet(CoreViewSet):
     """
-    Views for the Core Team of the group a company is part of.
+    Views for the One List Core Team of the group a company is part of.
     A Core Team is usually assigned to the Global Headquarters and is shared among all
     members of the group.
 

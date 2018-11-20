@@ -22,8 +22,8 @@ pytestmark = pytest.mark.django_db
 class TestChangeCompanyAdmin(AdminTestMixin):
     """Tests for the company admin change form."""
 
-    def test_add_core_team_members(self):
-        """Test that Core Team members can be added to a company."""
+    def test_add_onelist_core_team_members(self):
+        """Test that One List Core Team members can be added to a company."""
         team_member_advisers = AdviserFactory.create_batch(2)
         team_size = len(team_member_advisers)
         company = CompanyFactory()
@@ -62,8 +62,8 @@ class TestChangeCompanyAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert company.core_team_members.count() == team_size
 
-    def test_delete_core_team_members(self):
-        """Test that Core Team members can be deleted from a company."""
+    def test_delete_onelist_core_team_members(self):
+        """Test that One List Core Team members can be deleted from a company."""
         company = CompanyFactory()
         core_team_members = CompanyCoreTeamMemberFactory.create_batch(2, company=company)
         team_size = len(core_team_members)
@@ -109,7 +109,7 @@ class TestOneListLink(AdminTestMixin):
     Tests for the one list export.
     """
 
-    def test_one_list_link_exists(self):
+    def test_onelist_link_exists(self):
         """
         Test that there is a link to export the one list on the company change list.
         """

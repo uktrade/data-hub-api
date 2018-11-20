@@ -480,7 +480,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
 
 class CompanyCoreTeamMemberSerializer(serializers.Serializer):
-    """Core Team Member Serializer."""
+    """One List Core Team Member Serializer."""
 
     adviser = NestedAdviserWithTeamGeographyField()
     is_global_account_manager = serializers.BooleanField()
