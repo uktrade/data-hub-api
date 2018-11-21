@@ -244,7 +244,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     def get_onelist_group_core_team(self):
         """
-        :returns: the Core Team for the group that this company is part of
+        :returns: the One List Core Team for the group that this company is part of
             as a list of dicts with `adviser` and `is_global_account_manager`.
         """
         group_global_headquarters = self.get_group_global_headquarters()
@@ -286,9 +286,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
 class CompanyCoreTeamMember(models.Model):
     """
-    Adviser who is a member of the Core Team of a company.
+    Adviser who is a member of the One List Core Team of a company.
 
-    When a company is account managed, a Core Team is established.
+    When a company is account managed and added to the One List,
+    a Core Team is established.
     This usually includes:
     - one and only one global account manager
     - a local account manager from the country where the company is based
@@ -319,7 +320,7 @@ class CompanyCoreTeamMember(models.Model):
 
     def __str__(self):
         """Human-readable representation."""
-        return f'{self.adviser} - Core Team member of {self.company}'
+        return f'{self.adviser} - One List Core Team member of {self.company}'
 
     class Meta:
         unique_together = (
