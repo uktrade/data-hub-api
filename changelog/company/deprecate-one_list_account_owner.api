@@ -1,0 +1,1 @@
+The field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. Please use ``GET  /company/<id>/one-list-group-core-team`` and get the item in the list with ``is_global_account_manager`` = True instead.
