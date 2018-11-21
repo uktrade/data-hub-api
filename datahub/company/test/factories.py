@@ -75,7 +75,7 @@ class SubsidiaryFactory(CompanyFactory):
 
 
 class CompanyCoreTeamMemberFactory(factory.django.DjangoModelFactory):
-    """Company Core Team member factory."""
+    """One List Company Core Team member factory."""
 
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)

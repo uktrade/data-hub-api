@@ -1332,8 +1332,8 @@ class TestCHCompany(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-class TestGroupCoreTeam(APITestMixin):
-    """Tests for getting the Core Team of a company's group."""
+class TestOneListGroupCoreTeam(APITestMixin):
+    """Tests for getting the One List Core Team of a company's group."""
 
     @pytest.mark.parametrize(
         'build_global_headquarters',
@@ -1355,7 +1355,7 @@ class TestGroupCoreTeam(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:company:core-team',
+            'api-v3:company:onelist-group-core-team',
             kwargs={'pk': company.pk},
         )
         response = self.api_client.get(url)
@@ -1385,7 +1385,7 @@ class TestGroupCoreTeam(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:company:core-team',
+            'api-v3:company:onelist-group-core-team',
             kwargs={'pk': company.pk},
         )
         response = self.api_client.get(url)
@@ -1454,7 +1454,7 @@ class TestGroupCoreTeam(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:company:core-team',
+            'api-v3:company:onelist-group-core-team',
             kwargs={'pk': company.pk},
         )
         response = self.api_client.get(url)
@@ -1490,7 +1490,7 @@ class TestGroupCoreTeam(APITestMixin):
         Test that if the company doesn't exist, the endpoint returns 404.
         """
         url = reverse(
-            'api-v3:company:core-team',
+            'api-v3:company:onelist-group-core-team',
             kwargs={'pk': '00000000-0000-0000-0000-000000000000'},
         )
         response = self.api_client.get(url)
