@@ -100,6 +100,7 @@ class TestListView(APITestMixin):
             'reason_lost',
             'date_lost',
             'country_lost_to',
+            'country_investment_originates_from',
             'investor_company',
             'investor_type',
             'investor_company_country',
@@ -351,7 +352,9 @@ class TestCreateView(APITestMixin):
     def test_create_project_complete_success(self):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
-        investor_company = CompanyFactory()
+        investor_company = CompanyFactory(
+            registered_address_country_id=constants.Country.united_kingdom.value.id,
+        )
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:investment-collection')
@@ -430,6 +433,8 @@ class TestCreateView(APITestMixin):
 
         assert response_data['investment_type']['id'] == request_data['investment_type']['id']
         assert response_data['investor_company']['id'] == str(investor_company.id)
+        united_kingdom_id = constants.Country.united_kingdom.value.id
+        assert response_data['investor_company_country']['id'] == str(united_kingdom_id)
         assert response_data['intermediate_company']['id'] == str(intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']

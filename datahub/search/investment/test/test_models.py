@@ -95,6 +95,7 @@ def test_investment_project_to_dict(setup_es):
         'reason_lost',
         'date_lost',
         'country_lost_to',
+        'country_investment_originates_from',
     }
 
     assert set(result.keys()) == keys
