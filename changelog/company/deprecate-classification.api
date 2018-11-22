@@ -1,1 +1,0 @@
-The field ``classification`` is deprecated and will be removed on or after November, 29. Please use `one_list_group_tier` instead.
