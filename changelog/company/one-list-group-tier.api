@@ -1,0 +1,1 @@
+`GET /v3/company/<uuid:pk>` and `GET /v3/company` now include the read-only field `one_list_group_tier` which is the One List Tier for the group, inherited from the Global Headquarters.
