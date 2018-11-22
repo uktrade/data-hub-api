@@ -57,13 +57,13 @@ class TestCompany:
         (True, False),
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
-    def test_get_onelist_group_core_team(
+    def test_get_one_list_group_core_team(
         self,
         build_global_headquarters,
         with_global_account_manager,
     ):
         """
-        Test that `get_onelist_group_core_team` returns the Core Team of `self` if the company
+        Test that `get_one_list_group_core_team` returns the Core Team of `self` if the company
         has no `global_headquarters` or the one of its `global_headquarters` otherwise.
         """
         team_member_advisers = AdviserFactory.create_batch(
@@ -86,7 +86,7 @@ class TestCompany:
             adviser=factory.Iterator(team_member_advisers),
         )
 
-        core_team = company.get_onelist_group_core_team()
+        core_team = company.get_one_list_group_core_team()
         assert core_team == [
             {
                 'adviser': adviser,

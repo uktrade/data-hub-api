@@ -242,7 +242,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             return self.global_headquarters
         return self
 
-    def get_onelist_group_core_team(self):
+    def get_one_list_group_core_team(self):
         """
         :returns: the One List Core Team for the group that this company is part of
             as a list of dicts with `adviser` and `is_global_account_manager`.

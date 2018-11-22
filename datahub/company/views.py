@@ -81,7 +81,7 @@ class OneListGroupCoreTeamViewSet(CoreViewSet):
     def list(self, request, *args, **kwargs):
         """Lists Core Team members."""
         company = self.get_object()
-        core_team = company.get_onelist_group_core_team()
+        core_team = company.get_one_list_group_core_team()
 
         serializer = self.get_serializer(core_team, many=True)
         return Response(serializer.data)
