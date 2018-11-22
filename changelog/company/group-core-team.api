@@ -1,5 +1,5 @@
 The One List Core Team endpoint was changed:
 
-``GET /company/<id>/core-team`` was renamed to ``GET /company/<id>/onelist-group-core-team``. The old ``/core-team`` endpoint still exists but will be completely removed on or after November, 29.
+``GET /company/<id>/core-team`` was renamed to ``GET /company/<id>/one-list-group-core-team``. The old ``/core-team`` endpoint still exists but will be completely removed on or after November, 29.
 
-``GET /company/<id>/onelist-group-core-team`` now returns the Core Team for the group that the company is part of. All companies in the group inherit that team from their Global Headquarters.
+``GET /company/<id>/one-list-group-core-team`` now returns the Core Team for the group that the company is part of. All companies in the group inherit that team from their Global Headquarters.
