@@ -1,3 +1,50 @@
+Data Hub API 7.8.0 (2018-11-22)
+===============================
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The API field ``classification`` is deprecated and will be removed on or after November, 29. Please use `one_list_group_tier` instead.
+- **Companies** The API field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. Please use ``GET  /company/<uuid:pk>/one-list-group-core-team`` and get the item in the list with ``is_global_account_manager`` = True instead.
+- **Companies** The endpoint ``GET /company/<uuid:pk>/core-team`` is deprecated and will be removed on or after November, 29. Please use ``GET /company/<uuid:pk>/one-list-group-core-team`` instead.
+- The API endpoint ``/metadata/company-classification`` is deprecated as not currently necessary. It will be completely removed on or after November, 29.
+
+Internal changes
+----------------
+
+- **Investment** The permission ``Can change SPI report (change_spireport)`` was renamed to ``Can view SPI report (view_spireport)`` as Django 2.1 supports view permission and SPI report is read only.
+
+API
+---
+
+- **Companies** The field ``classification`` is deprecated and will be removed on or after November, 29. Please use `one_list_group_tier` instead.
+- **Companies** The field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. Please use ``GET  /company/<uuid:pk>/one-list-group-core-team`` and get the item in the list with ``is_global_account_manager`` = True instead.
+- **Companies** The One List Core Team endpoint was changed:
+
+  ``GET /company/<uuid:pk>/core-team`` was renamed to ``GET /company/<uuid:pk>/one-list-group-core-team``. The old ``/core-team`` endpoint still exists but will be completely removed on or after November, 29.
+
+  ``GET /company/<uuid:pk>/one-list-group-core-team`` now returns the Core Team for the group that the company is part of. All companies in the group inherit that team from their Global Headquarters.
+- **Companies** ``GET /v3/company/<uuid:pk>`` and ``GET /v3/company`` now include the read-only field ``one_list_group_tier`` which is the One List Tier for the group, inherited from the Global Headquarters.
+- **Companies** The field `classification` is now read-only in all company endpoints.
+- **Investment** ``POST /v3/investment/`` endpoint now accepts ``country_investment_originates_from`` as an
+  optional property that can be set whilst creating an investment project.
+  The property expects an id of a country.
+
+  ``GET /v3/investment/<uuid:pk>/`` endpoint now includes ``country_investment_originates_from``
+  field in the response.
+
+  ``PATCH /v3/investment/<uuid:pk>/`` endpoint now accepts ``country_investment_originates_from``
+  as an optional property that can be set whilst updating an investment project.
+  The property expects an id of a country.
+- The endpoint ``/metadata/company-classification`` is deprecated as not currently necessary. It will be completely removed on or after November, 29.
+
+Database schema
+---------------
+
+- **Investment** Column ``country_investment_originates_from`` has been added to ``investment_investmentproject``
+  table and is nullable.
+
+
 Data Hub API 7.7.0 (2018-11-15)
 ===============================
 
