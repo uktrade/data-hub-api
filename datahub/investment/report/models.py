@@ -12,18 +12,16 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 class SPIReportPermission(StrEnum):
     """
-    Permission codename constants.
+    Permission codename constant.
 
     The following codename means that the user can view any type of spi report:
 
-    change_spireport
+    view_spireport
 
     SPI reports are programmatically generated.
-
-    TODO: should be replaced with view permission once Django 2.1 is available
     """
 
-    change = 'change_spireport'
+    view = 'view_spireport'
 
 
 class SPIReport(BaseModel):
@@ -36,7 +34,7 @@ class SPIReport(BaseModel):
     class Meta:
         verbose_name = 'SPI report'
         default_permissions = (
-            'change',
+            'view',
         )
 
     def get_absolute_url(self):

@@ -78,6 +78,7 @@ CORE_FIELDS = (
     'created_on',
     'modified_on',
     'comments',
+    'country_investment_originates_from',
 )
 
 VALUE_FIELDS = (
@@ -180,6 +181,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
     country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
+    country_investment_originates_from = NestedRelatedField(
+        meta_models.Country,
+        required=False,
+        allow_null=True,
+    )
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
     investor_company_country = NestedRelatedField(meta_models.Country, read_only=True)
     investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)

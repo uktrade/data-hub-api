@@ -74,6 +74,7 @@ class InvestmentProject(BaseESModel):
     )
     client_requirements = fields.TextWithKeyword()
     comments = fields.EnglishText()
+    country_investment_originates_from = fields.nested_id_name_field()
     country_lost_to = _country_lost_to_mapping()
     created_on = Date()
     created_by = fields.nested_contact_or_adviser_field(
@@ -150,6 +151,7 @@ class InvestmentProject(BaseESModel):
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'client_relationship_manager': dict_utils.adviser_dict_with_team,
         'country_lost_to': dict_utils.id_name_dict,
+        'country_investment_originates_from': dict_utils.id_name_dict,
         'created_by': dict_utils.adviser_dict_with_team,
         'delivery_partners': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
@@ -159,6 +161,7 @@ class InvestmentProject(BaseESModel):
         'intermediate_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
+        'investor_company_country': dict_utils.id_name_dict,
         'investor_type': dict_utils.id_name_dict,
         'level_of_involvement': dict_utils.id_name_dict,
         'project_assurance_adviser': dict_utils.adviser_dict_with_team,
@@ -178,12 +181,6 @@ class InvestmentProject(BaseESModel):
         'uk_region_locations': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
         ],
-    }
-
-    COMPUTED_MAPPINGS = {
-        'investor_company_country': dict_utils.computed_nested_id_name_dict(
-            'investor_company.registered_address_country',
-        ),
     }
 
     SEARCH_FIELDS = (
