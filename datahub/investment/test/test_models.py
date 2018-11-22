@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.investment.test.factories import (
     InvestmentProjectFactory,
@@ -76,16 +76,16 @@ def test_investor_company_country_none():
     manager.
     """
     project = InvestmentProjectFactory(investor_company=None)
-    assert project.investor_company_country is None
+    assert not project.investor_company_country
 
 
 def test_investor_company_country_valid():
-    """
-    Tests client_relationship_manager_team for a project with a client relationship
-    manager.
-    """
-    project = InvestmentProjectFactory()
-    assert project.investor_company_country
+    """Tests investor company country property."""
+    investor_company = CompanyFactory(
+        registered_address_country_id=constants.Country.united_kingdom.value.id,
+    )
+    project = InvestmentProjectFactory(investor_company=investor_company)
+    assert str(project.investor_company_country) == constants.Country.united_kingdom.value.name
 
 
 def test_project_manager_team_none():

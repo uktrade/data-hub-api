@@ -4,8 +4,12 @@ from django.urls import path
 
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
-    CompaniesHouseCompanyViewSet, CompanyAuditViewSet, CompanyCoreTeamViewSet,
-    CompanyViewSet, ContactAuditViewSet, ContactViewSet,
+    CompaniesHouseCompanyViewSet,
+    CompanyAuditViewSet,
+    CompanyViewSet,
+    ContactAuditViewSet,
+    ContactViewSet,
+    OneListGroupCoreTeamViewSet,
 )
 
 # CONTACT
@@ -68,7 +72,7 @@ company_unarchive = CompanyViewSet.as_view({
     'post': 'unarchive',
 })
 
-company_core_team = CompanyCoreTeamViewSet.as_view({
+one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
@@ -87,7 +91,12 @@ company_urls = [
     path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
     path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
-    path('company/<uuid:pk>/core-team', company_core_team, name='core-team'),
+    path('company/<uuid:pk>/core-team', one_list_group_core_team, name='core-team'),
+    path(
+        'company/<uuid:pk>/one-list-group-core-team',
+        one_list_group_core_team,
+        name='one-list-group-core-team',
+    ),
 ]
 
 ch_company_urls = [

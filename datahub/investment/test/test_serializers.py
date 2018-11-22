@@ -1,6 +1,8 @@
 import pytest
 
+
 from datahub.company.test.factories import AdviserFactory
+from datahub.core import constants
 from datahub.investment.serializers import (
     IProjectSerializer,
     IProjectTeamMemberListSerializer,
@@ -152,3 +154,15 @@ class TestIProjectSerializer:
         project_data = {'estimated_land_date': None}
         serializer = IProjectSerializer(project, data=project_data, partial=True)
         assert serializer.is_valid()
+
+    def test_country_investment_originates_from(self):
+        """Tests updating the country the investment originates from on an investment project."""
+        project = InvestmentProjectFactory(investor_company=None)
+        project_data = {
+            'country_investment_originates_from': {'id': constants.Country.argentina.value.id},
+        }
+        serializer = IProjectSerializer(project, data=project_data, partial=True)
+        assert serializer.is_valid()
+        assert str(
+            serializer.validated_data['country_investment_originates_from'],
+        ) == constants.Country.argentina.value.name

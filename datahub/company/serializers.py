@@ -9,8 +9,13 @@ from rest_framework import serializers
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
-    Advisor, CompaniesHouseCompany, Company, CompanyPermission,
-    Contact, ContactPermission, ExportExperienceCategory,
+    Advisor,
+    CompaniesHouseCompany,
+    Company,
+    CompanyPermission,
+    Contact,
+    ContactPermission,
+    ExportExperienceCategory,
 )
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
@@ -19,7 +24,9 @@ from datahub.company.validators import (
 from datahub.core.constants import Country
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
-    NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField,
+    NestedRelatedField,
+    PermittedFieldsModelSerializer,
+    RelaxedURLField,
 )
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
@@ -272,9 +279,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True,
     )
-    classification = NestedRelatedField(
-        meta_models.CompanyClassification, required=False, allow_null=True,
-    )
+    classification = NestedRelatedField(meta_models.CompanyClassification, read_only=True)
+    one_list_group_tier = serializers.SerializerMethodField()
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
@@ -372,6 +378,15 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
         return global_headquarters
 
+    def get_one_list_group_tier(self, obj):
+        """
+        :returns: the One List Tier for the group that company `obj` is part of.
+        """
+        one_list_tier = obj.get_one_list_group_tier()
+
+        field = NestedRelatedField(meta_models.CompanyClassification)
+        return field.to_representation(one_list_tier)
+
     class Meta:
         model = Company
         fields = (
@@ -409,6 +424,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_country',
             'business_type',
             'classification',
+            'one_list_group_tier',
             'companies_house_data',
             'contacts',
             'employee_range',
@@ -482,7 +498,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
 
 class CompanyCoreTeamMemberSerializer(serializers.Serializer):
-    """Core Team Member Serializer."""
+    """One List Core Team Member Serializer."""
 
     adviser = NestedAdviserWithTeamGeographyField()
     is_global_account_manager = serializers.BooleanField()
