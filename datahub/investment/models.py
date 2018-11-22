@@ -134,6 +134,10 @@ class IProjectAbstract(models.Model):
     country_lost_to = models.ForeignKey(
         'metadata.Country', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
     )
+    country_investment_originates_from = models.ForeignKey(
+        'metadata.Country', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
+        help_text='The country from which the investment originates',
+    )
 
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',

@@ -28,6 +28,7 @@ class SearchInvestmentProjectParams:
     FILTER_FIELDS = (
         'adviser',
         'client_relationship_manager',
+        'country_investment_originates_from',
         'created_on_after',
         'created_on_before',
         'estimated_land_date_after',
@@ -48,7 +49,6 @@ class SearchInvestmentProjectParams:
         'client_relationship_manager': 'client_relationship_manager.id',
         'investment_type': 'investment_type.id',
         'investor_company': 'investor_company.id',
-        'investor_company_country': 'investor_company_country.id',
         'sector': 'sector.id',
         'stage': 'stage.id',
         'uk_region_location': 'uk_region_locations.id',
@@ -65,6 +65,14 @@ class SearchInvestmentProjectParams:
         'sector_descends': [
             'sector.id',
             'sector.ancestors.id',
+        ],
+        'investor_company_country': [
+            'investor_company_country.id',
+            'country_investment_originates_from.id',
+        ],
+        'country_investment_originates_from': [
+            'investor_company_country.id',
+            'country_investment_originates_from.id',
         ],
     }
 

@@ -62,6 +62,7 @@ def setup_data(setup_es):
             description='investmentproject2',
             estimated_land_date=datetime.date(2057, 6, 13),
             actual_land_date=datetime.date(2047, 8, 13),
+            country_investment_originates_from_id=constants.Country.ireland.value.id,
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.japan.value.id,
             ),
@@ -88,6 +89,12 @@ def setup_data(setup_es):
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
+        ),
+        InvestmentProjectFactory(
+            name='new project',
+            description='investmentproject4',
+            country_investment_originates_from_id=constants.Country.canada.value.id,
+            estimated_land_date=None,
         ),
     ]
     setup_es.indices.refresh()
@@ -418,6 +425,42 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'delayed project'
+
+    def test_search_investment_project_investor_country_when_investment_origin_set(
+        self, setup_data,
+    ):
+        """Tests investor company country filter when investment origin also set."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'investor_company_country': constants.Country.ireland.value.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['name'] == 'delayed project'
+
+    def test_search_investment_project_investment_origin(
+        self, setup_data,
+    ):
+        """Tests country investment originates from filter."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'country_investment_originates_from': constants.Country.canada.value.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['name'] == 'new project'
 
     def test_search_investment_project_uk_region_location(self, setup_data):
         """Tests uk_region_location filter."""
