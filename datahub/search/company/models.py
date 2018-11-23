@@ -81,7 +81,6 @@ class Company(BaseESModel):
     }
 
     MAPPINGS = {
-        'id': str,
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
         'classification': dict_utils.id_name_dict,
