@@ -19,7 +19,7 @@ from datahub.investment.models import (
     Involvement,
     SpecificProgramme,
 )
-from datahub.metadata.admin import DisableableMetadataAdmin
+from datahub.metadata.admin import DisableableMetadataAdmin, ReadOnlyMetadataAdmin
 
 
 @admin.register(InvestmentProject)
@@ -89,11 +89,13 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
     )
 
 
+admin.site.register(Involvement, ReadOnlyMetadataAdmin)
+
+
 admin.site.register(
     (
         InvestmentDeliveryPartner,
         InvestorType,
-        Involvement,
         SpecificProgramme,
     ),
     DisableableMetadataAdmin,
