@@ -1,0 +1,1 @@
+The ``delete_old_records`` and ``delete_orphans`` management commands were optimised to use less memory and be faster when run without the ``--simulate`` or ``--only-print-queries`` arguments.
