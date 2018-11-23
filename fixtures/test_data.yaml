@@ -227,6 +227,23 @@
     modified_on: '2017-11-26T11:00:00Z'
 
 - model: company.company
+  pk: 960e1fa9-cc25-478c-a548-a2e2047319bb
+  fields:
+    name: One List Subsidiary Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    sector: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    registered_address_1: 100 Fordham Rd
+    registered_address_town: Hainault
+    registered_address_postcode: IG6 7SQ
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    uk_region: 874cd12a-6095-e211-a939-e4115bead28a
+    description: This is a dummy company for testing subsidiaries of One List GHQ
+    archived_documents_url_path: '/documents/123'
+    created_on: '2017-07-23T10:00:00Z'
+    modified_on: '2017-04-07T10:00:00Z'
+    global_headquarters: 375094ac-f79a-43e5-9c88-059a7caa17f0 # One List Corp
+
+- model: company.company
   pk: 346f78a5-1d23-4213-b4c2-bf48246a13c3
   fields:
     name: Archived Ltd
@@ -278,13 +295,13 @@
     created_on: '2017-03-05T12:00:00Z'
     modified_on: '2018-07-06T15:44:56Z'
 
-- model: company.companycoreteammember
+- model: company.onelistcoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
   fields:
     company: 375094ac-f79a-43e5-9c88-059a7caa17f0
     adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
 
-- model: company.companycoreteammember
+- model: company.onelistcoreteammember
   pk: 60c90e67-fdd5-4b2d-9ad0-4b1994bd9b9d
   fields:
     company: 375094ac-f79a-43e5-9c88-059a7caa17f0

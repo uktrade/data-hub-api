@@ -74,14 +74,14 @@ class SubsidiaryFactory(CompanyFactory):
     )
 
 
-class CompanyCoreTeamMemberFactory(factory.django.DjangoModelFactory):
+class OneListCoreTeamMemberFactory(factory.django.DjangoModelFactory):
     """One List Company Core Team member factory."""
 
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
     class Meta:
-        model = 'company.CompanyCoreTeamMember'
+        model = 'company.OneListCoreTeamMember'
 
 
 class ArchivedCompanyFactory(CompanyFactory):
