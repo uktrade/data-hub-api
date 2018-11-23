@@ -15,9 +15,9 @@ from datahub.cleanup.management.commands import delete_old_records, delete_orpha
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import (
-    CompanyCoreTeamMemberFactory,
     CompanyFactory,
     ContactFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
@@ -66,7 +66,7 @@ MAPPINGS = {
             (OrderFactory, 'company'),
             (CompanyFactory, 'transferred_to'),
             (CompanyFactory, 'global_headquarters'),
-            (CompanyCoreTeamMemberFactory, 'company'),
+            (OneListCoreTeamMemberFactory, 'company'),
         ),
         'implicit_related_models': (),
     },

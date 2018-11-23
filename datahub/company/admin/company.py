@@ -11,15 +11,15 @@ from reversion.admin import VersionAdmin
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
-from datahub.company.models import Company, CompanyCoreTeamMember
+from datahub.company.models import Company, OneListCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin, get_change_link
 from datahub.core.templatetags.datahub_extras import admin_change_link
 
 
-class CompanyCoreTeamMemberInline(admin.TabularInline):
-    """Inline admin for CompanyCoreTeamMember"""
+class OneListCoreTeamMemberInline(admin.TabularInline):
+    """Inline admin for OneListCoreTeamMember"""
 
-    model = CompanyCoreTeamMember
+    model = OneListCoreTeamMember
     fields = ('id', 'adviser')
     extra = 1
     formfield_overrides = {
@@ -148,7 +148,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'registered_address_country',
     )
     inlines = (
-        CompanyCoreTeamMemberInline,
+        OneListCoreTeamMemberInline,
     )
     # Help text for read-only method fields
     extra_help_texts = {

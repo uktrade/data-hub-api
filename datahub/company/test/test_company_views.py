@@ -15,9 +15,9 @@ from datahub.company.models import CompaniesHouseCompany, Company
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
-    CompanyCoreTeamMemberFactory,
     CompanyFactory,
     DuplicateCompanyFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.core.constants import Country, HeadquarterType, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
@@ -1516,7 +1516,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
 
         company = build_company(global_account_manager)
         group_global_headquarters = company.global_headquarters or company
-        CompanyCoreTeamMemberFactory.create_batch(
+        OneListCoreTeamMemberFactory.create_batch(
             len(team_member_advisers),
             company=group_global_headquarters,
             adviser=factory.Iterator(team_member_advisers),
