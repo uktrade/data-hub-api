@@ -20,7 +20,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
     result = Interaction.db_object_to_dict(interaction)
 
     assert result == {
-        'id': str(interaction.pk),
+        'id': interaction.pk,
         'kind': interaction.kind,
         'date': interaction.date,
         'company': {
@@ -89,7 +89,7 @@ def test_service_delivery_to_dict(setup_es):
     result = Interaction.db_object_to_dict(interaction)
 
     assert result == {
-        'id': str(interaction.pk),
+        'id': interaction.pk,
         'kind': interaction.kind,
         'date': interaction.date,
         'company': {
@@ -148,4 +148,4 @@ def test_interactions_to_es_documents(setup_es):
 
     result = Interaction.db_objects_to_es_documents(interactions)
 
-    assert {item['_id'] for item in result} == {str(item.pk) for item in interactions}
+    assert {item['_id'] for item in result} == {item.pk for item in interactions}
