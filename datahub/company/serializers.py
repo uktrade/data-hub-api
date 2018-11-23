@@ -497,7 +497,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         }
 
 
-class CompanyCoreTeamMemberSerializer(serializers.Serializer):
+class OneListCoreTeamMemberSerializer(serializers.Serializer):
     """One List Core Team Member Serializer."""
 
     adviser = NestedAdviserWithTeamGeographyField()
