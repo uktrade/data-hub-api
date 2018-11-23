@@ -11,8 +11,8 @@ from datahub.company.admin_reports import OneListReport
 from datahub.company.models import Company
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompanyCoreTeamMemberFactory,
     CompanyFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.core.test_utils import AdminTestMixin
 
@@ -28,7 +28,7 @@ class TestChangeCompanyAdmin(AdminTestMixin):
         team_size = len(team_member_advisers)
         company = CompanyFactory()
 
-        assert company.core_team_members.count() == 0
+        assert company.one_list_core_team_members.count() == 0
 
         url = reverse('admin:company_company_change', args=(company.id,))
 
@@ -43,29 +43,29 @@ class TestChangeCompanyAdmin(AdminTestMixin):
 
         # add inline related field data
         data.update({
-            'core_team_members-TOTAL_FORMS': team_size,
-            'core_team_members-INITIAL_FORMS': 0,
-            'core_team_members-MIN_NUM_FORMS': 0,
-            'core_team_members-MAX_NUM_FORMS': 1000,
+            'one_list_core_team_members-TOTAL_FORMS': team_size,
+            'one_list_core_team_members-INITIAL_FORMS': 0,
+            'one_list_core_team_members-MIN_NUM_FORMS': 0,
+            'one_list_core_team_members-MAX_NUM_FORMS': 1000,
         })
         for index, adviser in enumerate(team_member_advisers):
             team_member_id = uuid.uuid4()
             data.update({
-                f'initial-core_team_members-{index}-id': team_member_id,
-                f'core_team_members-{index}-id': team_member_id,
-                f'core_team_members-{index}-company': company.pk,
-                f'core_team_members-{index}-adviser': adviser.pk,
+                f'initial-one_list_core_team_members-{index}-id': team_member_id,
+                f'one_list_core_team_members-{index}-id': team_member_id,
+                f'one_list_core_team_members-{index}-company': company.pk,
+                f'one_list_core_team_members-{index}-adviser': adviser.pk,
             })
 
         response = self.client.post(url, data, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
-        assert company.core_team_members.count() == team_size
+        assert company.one_list_core_team_members.count() == team_size
 
     def test_delete_one_list_core_team_members(self):
         """Test that One List Core Team members can be deleted from a company."""
         company = CompanyFactory()
-        core_team_members = CompanyCoreTeamMemberFactory.create_batch(2, company=company)
+        core_team_members = OneListCoreTeamMemberFactory.create_batch(2, company=company)
         team_size = len(core_team_members)
 
         url = reverse('admin:company_company_change', args=(company.id,))
@@ -81,27 +81,27 @@ class TestChangeCompanyAdmin(AdminTestMixin):
 
         # add inline related field data
         data.update({
-            'core_team_members-TOTAL_FORMS': team_size,
-            'core_team_members-INITIAL_FORMS': team_size,
-            'core_team_members-MIN_NUM_FORMS': 0,
-            'core_team_members-MAX_NUM_FORMS': 1000,
+            'one_list_core_team_members-TOTAL_FORMS': team_size,
+            'one_list_core_team_members-INITIAL_FORMS': team_size,
+            'one_list_core_team_members-MIN_NUM_FORMS': 0,
+            'one_list_core_team_members-MAX_NUM_FORMS': 1000,
         })
         for index, team_member in enumerate(core_team_members):
             data.update({
-                f'initial-core_team_members-{index}-id': team_member.pk,
-                f'core_team_members-{index}-id': team_member.pk,
-                f'core_team_members-{index}-company': company.pk,
-                f'core_team_members-{index}-adviser': team_member.adviser.pk,
+                f'initial-one_list_core_team_members-{index}-id': team_member.pk,
+                f'one_list_core_team_members-{index}-id': team_member.pk,
+                f'one_list_core_team_members-{index}-company': company.pk,
+                f'one_list_core_team_members-{index}-adviser': team_member.adviser.pk,
 
             })
 
         # mark first one for deletion
-        data['core_team_members-0-DELETE'] = '1'
+        data['one_list_core_team_members-0-DELETE'] = '1'
 
         response = self.client.post(url, data, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
-        assert company.core_team_members.count() == team_size - 1
+        assert company.one_list_core_team_members.count() == team_size - 1
 
 
 class TestOneListLink(AdminTestMixin):

@@ -16,9 +16,9 @@ from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializer,
-    CompanyCoreTeamMemberSerializer,
     CompanySerializer,
     ContactSerializer,
+    OneListCoreTeamMemberSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
@@ -71,12 +71,12 @@ class OneListGroupCoreTeamViewSet(CoreViewSet):
     The permissions to access this resource are inherited from the company resource.
 
     E.g. user only needs `view_company` permission to GET this collection and
-    companycoreteam permissions are ignored for now.
+    onelistcoreteammember permissions are ignored for now.
     """
 
     required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects
-    serializer_class = CompanyCoreTeamMemberSerializer
+    serializer_class = OneListCoreTeamMemberSerializer
 
     def list(self, request, *args, **kwargs):
         """Lists Core Team members."""
