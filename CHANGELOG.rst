@@ -1,3 +1,14 @@
+Data Hub API 7.9.0 (2018-11-23)
+===============================
+
+
+
+Database schema
+---------------
+
+- **Companies** The table ``company_companycoreteammember`` was renamed to ``company_onelistcoreteammember``.
+
+
 Data Hub API 7.8.0 (2018-11-22)
 ===============================
 
