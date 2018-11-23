@@ -289,6 +289,14 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         )
         return core_team
 
+    def get_one_list_group_global_account_manager(self):
+        """
+        :returns: the One List Global Account Manager for the group that this
+            company is part of.
+        """
+        group_global_headquarters = self.get_group_global_headquarters()
+        return group_global_headquarters.one_list_account_owner
+
 
 class OneListCoreTeamMember(models.Model):
     """
