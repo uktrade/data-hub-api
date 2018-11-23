@@ -268,7 +268,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
         # add all other core members excluding the global account manager
         # who might have already been added
-        team_members = group_global_headquarters.core_team_members.exclude(
+        team_members = group_global_headquarters.one_list_core_team_members.exclude(
             adviser=global_account_manager,
         ).select_related(
             'adviser',
@@ -290,7 +290,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         return core_team
 
 
-class CompanyCoreTeamMember(models.Model):
+class OneListCoreTeamMember(models.Model):
     """
     Adviser who is a member of the One List Core Team of a company.
 
@@ -318,10 +318,14 @@ class CompanyCoreTeamMember(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='core_team_members',
+        Company,
+        on_delete=models.CASCADE,
+        related_name='one_list_core_team_members',
     )
     adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='core_team_memberships',
+        'company.Advisor',
+        on_delete=models.CASCADE,
+        related_name='one_list_core_team_memberships',
     )
 
     def __str__(self):

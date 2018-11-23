@@ -4,9 +4,9 @@ from django.conf import settings
 
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompanyCoreTeamMemberFactory,
     CompanyFactory,
     ContactFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.metadata.models import CompanyClassification
 
@@ -132,7 +132,7 @@ class TestCompany:
         company = build_company(global_account_manager)
         group_global_headquarters = company.global_headquarters or company
 
-        CompanyCoreTeamMemberFactory.create_batch(
+        OneListCoreTeamMemberFactory.create_batch(
             len(team_member_advisers),
             company=group_global_headquarters,
             adviser=factory.Iterator(team_member_advisers),
