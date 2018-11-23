@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
+from datahub.investment.models import InvestmentProject
 from datahub.search.serializers import (
     SearchSerializer,
     SingleOrListField,
@@ -28,6 +29,10 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     stage = SingleOrListField(child=StringUUIDField(), required=False)
     status = SingleOrListField(child=serializers.CharField(), required=False)
     uk_region_location = SingleOrListField(child=StringUUIDField(), required=False)
+    level_of_involvement_simplified = SingleOrListField(
+        child=serializers.ChoiceField(choices=InvestmentProject.INVOLVEMENT),
+        required=False,
+    )
 
     SORT_BY_FIELDS = (
         'actual_land_date',

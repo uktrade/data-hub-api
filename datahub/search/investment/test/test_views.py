@@ -25,6 +25,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
+from datahub.investment.constants import Involvement
 from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
     InvestmentProjectFactory,
@@ -56,6 +57,7 @@ def setup_data(setup_es):
                 constants.UKRegion.east_midlands.value.id,
                 constants.UKRegion.isle_of_man.value.id,
             ],
+            level_of_involvement_id=Involvement.hq_and_post_only.value.id,
         ),
         InvestmentProjectFactory(
             name='delayed project',
@@ -73,6 +75,7 @@ def setup_data(setup_es):
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
+            level_of_involvement_id=Involvement.no_involvement.value.id,
         ),
         InvestmentProjectFactory(
             name='won project',
@@ -89,12 +92,14 @@ def setup_data(setup_es):
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
+            level_of_involvement_id=Involvement.hq_only.value.id,
         ),
         InvestmentProjectFactory(
             name='new project',
             description='investmentproject4',
             country_investment_originates_from_id=constants.Country.canada.value.id,
             estimated_land_date=None,
+            level_of_involvement_id=None,
         ),
     ]
     setup_es.indices.refresh()
@@ -392,6 +397,7 @@ class TestSearch(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'estimated_land_date_before': ['Date is in incorrect format.']}
 
     def test_search_investment_project_status(self, setup_data):
         """Tests investment project search status filter."""
@@ -461,6 +467,137 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'new project'
+
+    @pytest.mark.parametrize(
+        'query,expected_results',
+        (
+            (
+                {
+                    'level_of_involvement_simplified': 'unspecified',
+                },
+                [
+                    'new project',
+                ],
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': ['unspecified', 'involved'],
+                },
+                [
+                    'new project',
+                    'abc defg',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': ['not_involved', 'involved'],
+                },
+                [
+                    'abc defg',
+                    'delayed project',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': 'involved',
+                },
+                [
+                    'abc defg',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': 'not_involved',
+                },
+                [
+                    'delayed project',
+                ],
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': ['unspecified', 'not_involved'],
+                },
+                [
+                    'new project',
+                    'delayed project',
+                ],
+            ),
+            (
+                {
+                },
+                [
+                    'abc defg',
+                    'delayed project',
+                    'won project',
+                    'new project',
+                ],
+            ),
+        ),
+    )
+    def test_search_involvement_json(
+        self,
+        setup_data,
+        query,
+        expected_results,
+    ):
+        """Tests the involvement filter."""
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(expected_results)
+        results = response.data['results']
+        assert Counter(result['name'] for result in results) == Counter(expected_results)
+
+    @pytest.mark.parametrize(
+        'query,expected_error',
+        (
+            (
+                {
+                    'level_of_involvement_simplified': 'unspecified1',
+                },
+                {
+                    'level_of_involvement_simplified': ['"unspecified1" is not a valid choice.'],
+                },
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': ['unspecified5', 'great_involvement'],
+                },
+                {
+                    'level_of_involvement_simplified': {
+                        '0': ['"unspecified5" is not a valid choice.'],
+                        '1': ['"great_involvement" is not a valid choice.'],
+                    },
+                },
+            ),
+            (
+                {
+                    'level_of_involvement_simplified': ['not_involved', 'great_involvement'],
+                },
+                {
+                    'level_of_involvement_simplified': {
+                        '1': ['"great_involvement" is not a valid choice.'],
+                    },
+                },
+            ),
+        ),
+    )
+    def test_search_involvement_incorrect_filter_json(
+        self,
+        setup_data,
+        query,
+        expected_error,
+    ):
+        """Tests that involvement filter won't work with incorrect filter value."""
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_error
 
     def test_search_investment_project_uk_region_location(self, setup_data):
         """Tests uk_region_location filter."""
