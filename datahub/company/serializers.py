@@ -299,6 +299,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     one_list_account_owner = NestedAdviserWithTeamField(
         required=False, allow_null=True,
     )
+    one_list_group_global_account_manager = serializers.SerializerMethodField()
     global_headquarters = NestedRelatedField(
         'company.Company', required=False, allow_null=True,
     )
@@ -387,6 +388,15 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         field = NestedRelatedField(meta_models.CompanyClassification)
         return field.to_representation(one_list_tier)
 
+    def get_one_list_group_global_account_manager(self, obj):
+        """
+        :returns: the One List Global Account Manager for the group that company `obj` is part of.
+        """
+        global_account_manager = obj.get_one_list_group_global_account_manager()
+
+        field = NestedAdviserWithTeamGeographyField()
+        return field.to_representation(global_account_manager)
+
     class Meta:
         model = Company
         fields = (
@@ -432,6 +442,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'future_interest_countries',
             'headquarter_type',
             'one_list_account_owner',
+            'one_list_group_global_account_manager',
             'global_headquarters',
             'sector',
             'turnover_range',
