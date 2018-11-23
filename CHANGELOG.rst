@@ -70,6 +70,7 @@ Internal changes
 ----------------
 
 - Countries now have defined ISO codes.
+- Django Rest Framework was updated to version 3.9.0.
 
 API
 ---
@@ -120,6 +121,7 @@ Internal changes
   to ``Prospect``.
 - The ``countries.yaml`` fixture was updated to reflect the current production data.
 - It's not possible to change ``Countries`` and ``OverseasRegions`` from the django admin anymore. They will need to be updated using data migrations instead.
+- The Elasticsearch Python client libraries were updated to 6.x versions, as was the Docker image used during development.
 - A setting to sync updates to records to Elasticsearch using Celery (rather than the thread pool) was adding. This
   will improve performance when many records are updated at once, and increase reliability as failed synchronisation
   attempts are automatically retried. When the setting is enabled, Redis and Celery must be configured and running to
@@ -158,6 +160,12 @@ Features
 - **Investment** A new field ``exclude_from_investment_flow`` has been added to the ``InvestmentProjectStage`` metadata to
   indicate if a stage should be excluded from the investment flow. The field will be used to aid with
   deprecating and adding new stages.
+
+Internal changes
+----------------
+
+- Python was updated from version 3.6.6 to 3.6.7 in deployed environments.
+
 
 API
 ---
