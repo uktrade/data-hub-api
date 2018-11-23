@@ -10,7 +10,11 @@ from datahub.metadata.models import BusinessType
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_migrate, dispatch_uid='company_business_type_post_migrate')
+@receiver(
+    post_migrate,
+    sender=BusinessType._meta.app_config,
+    dispatch_uid='company_business_type_post_migrate',
+)
 def company_business_type_post_migrate(sender, **kwargs):
     """
     Ensures all business types are loaded to the database.
