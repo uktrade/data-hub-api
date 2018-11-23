@@ -132,16 +132,25 @@ class BaseESModel(Document):
             associate_index_with_alias(cls.get_read_alias(), cls.get_write_index())
 
     @classmethod
-    def es_document(cls, db_object, index=None):
-        """Creates Elasticsearch document."""
-        source = cls.db_object_to_dict(db_object)
+    def es_document(cls, db_object, index=None, include_index=True, include_source=True):
+        """
+        Creates a dict representation an Elasticsearch document.
 
-        return {
-            '_index': index or cls.get_write_alias(),
+        include_index and include_source can be set to False when the _index and/or _source keys
+        aren't required (e.g. when using `datahub.search.deletion.delete_documents()`).
+        """
+        doc = {
             '_type': cls._doc_type.name,
-            '_id': source.get('id'),
-            '_source': source,
+            '_id': db_object.pk,
         }
+
+        if include_index:
+            doc['_index'] = index or cls.get_write_alias()
+
+        if include_source:
+            doc['_source'] = cls.db_object_to_dict(db_object)
+
+        return doc
 
     @classmethod
     def db_object_to_dict(cls, db_object):
