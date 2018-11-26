@@ -1,1 +1,0 @@
-*(Correction)* The API field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. The recommended and most efficient way to upgrade is to use the field ``one_list_group_global_account_manager`` instead.
