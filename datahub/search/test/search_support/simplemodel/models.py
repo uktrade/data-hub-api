@@ -15,10 +15,6 @@ class ESSimpleModel(BaseESModel):
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
     name_trigram = fields.TrigramText()
 
-    MAPPINGS = {
-        'id': str,
-    }
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',

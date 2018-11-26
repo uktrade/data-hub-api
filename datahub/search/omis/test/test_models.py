@@ -35,7 +35,7 @@ def test_order_to_dict(Factory):
     result = ESOrder.db_object_to_dict(order)
 
     assert result == {
-        'id': str(order.pk),
+        'id': order.pk,
         'company': {
             'id': str(order.company.pk),
             'name': order.company.name,
@@ -167,4 +167,4 @@ def test_orders_to_es_documents():
 
     result = ESOrder.db_objects_to_es_documents(orders)
 
-    assert {item['_id'] for item in result} == {str(item.pk) for item in orders}
+    assert {item['_id'] for item in result} == {item.pk for item in orders}

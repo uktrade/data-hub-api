@@ -38,7 +38,6 @@ class Interaction(BaseESModel):
     subject_english = fields.EnglishText()
 
     MAPPINGS = {
-        'id': str,
         'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
         'contact': dict_utils.contact_or_adviser_dict,
