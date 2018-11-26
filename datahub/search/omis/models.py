@@ -64,7 +64,6 @@ class Order(BaseESModel):
     billing_address_country = fields.nested_id_name_field()
 
     MAPPINGS = {
-        'id': str,
         'company': dict_utils.company_dict,
         'contact': dict_utils.contact_or_adviser_dict,
         'created_by': dict_utils.adviser_dict_with_team,

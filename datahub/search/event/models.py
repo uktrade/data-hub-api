@@ -37,7 +37,6 @@ class Event(BaseESModel):
     uk_region = fields.nested_id_name_partial_field('uk_region')
 
     MAPPINGS = {
-        'id': str,
         'address_country': dict_utils.id_name_dict,
         'event_type': dict_utils.id_name_dict,
         'lead_team': dict_utils.id_name_dict,

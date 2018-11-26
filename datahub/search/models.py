@@ -132,38 +132,47 @@ class BaseESModel(Document):
             associate_index_with_alias(cls.get_read_alias(), cls.get_write_index())
 
     @classmethod
-    def es_document(cls, dbmodel, index=None):
-        """Creates Elasticsearch document."""
-        source = cls.db_object_to_dict(dbmodel)
+    def es_document(cls, db_object, index=None, include_index=True, include_source=True):
+        """
+        Creates a dict representation an Elasticsearch document.
 
-        return {
-            '_index': index or cls.get_write_alias(),
+        include_index and include_source can be set to False when the _index and/or _source keys
+        aren't required (e.g. when using `datahub.search.deletion.delete_documents()`).
+        """
+        doc = {
             '_type': cls._doc_type.name,
-            '_id': source.get('id'),
-            '_source': source,
+            '_id': db_object.pk,
         }
 
+        if include_index:
+            doc['_index'] = index or cls.get_write_alias()
+
+        if include_source:
+            doc['_source'] = cls.db_object_to_dict(db_object)
+
+        return doc
+
     @classmethod
-    def db_object_to_dict(cls, dbmodel):
+    def db_object_to_dict(cls, db_object):
         """Converts a DB model object to a dictionary suitable for Elasticsearch."""
         mapped_values = (
-            (col, fn, getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
+            (col, fn, getattr(db_object, col)) for col, fn in cls.MAPPINGS.items()
         )
         fields = get_model_non_mapped_field_names(cls)
 
         result = {
             **{col: fn(val) if val is not None else None for col, fn, val in mapped_values},
-            **{col: fn(dbmodel) for col, fn in cls.COMPUTED_MAPPINGS.items()},
-            **{field: getattr(dbmodel, field) for field in fields},
+            **{col: fn(db_object) for col, fn in cls.COMPUTED_MAPPINGS.items()},
+            **{field: getattr(db_object, field) for field in fields},
         }
 
         return result
 
     @classmethod
-    def db_objects_to_es_documents(cls, dbmodels, index=None):
+    def db_objects_to_es_documents(cls, db_objects, index=None):
         """Converts DB model objects to Elasticsearch documents."""
-        for dbmodel in dbmodels:
-            yield cls.es_document(dbmodel, index=index)
+        for db_object in db_objects:
+            yield cls.es_document(db_object, index=index)
 
 
 def _get_write_index(indices):

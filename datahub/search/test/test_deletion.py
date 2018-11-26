@@ -83,7 +83,7 @@ def test_collector(monkeypatch, setup_es):
     sync_object(SimpleModelSearchApp, str(obj.pk))
     setup_es.indices.refresh()
 
-    es_doc = ESSimpleModel.es_document(obj)
+    es_doc = ESSimpleModel.es_document(obj, include_index=False, include_source=False)
 
     assert SimpleModel.objects.count() == 1
 
