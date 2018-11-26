@@ -140,7 +140,6 @@ class InvestmentProject(BaseESModel):
     will_new_jobs_last_two_years = Boolean()
 
     MAPPINGS = {
-        'id': str,
         'actual_uk_regions': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
         ],

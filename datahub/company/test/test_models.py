@@ -147,6 +147,60 @@ class TestCompany:
             for adviser in team_member_advisers
         ]
 
+    @pytest.mark.parametrize(
+        'build_company',
+        (
+            # subsidiary with Global Headquarters on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(
+                    classification=one_list_tier,
+                    one_list_account_owner=gam,
+                ),
+            ),
+            # subsidiary with Global Headquarters not on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(
+                    classification=None,
+                    one_list_account_owner=None,
+                ),
+            ),
+            # single company on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=one_list_tier,
+                one_list_account_owner=gam,
+                global_headquarters=None,
+            ),
+            # single company not on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=None,
+                one_list_account_owner=None,
+            ),
+        ),
+        ids=(
+            'as_subsidiary_of_one_list_company',
+            'as_subsidiary_of_non_one_list_company',
+            'as_one_list_company',
+            'as_non_one_list_company',
+        ),
+    )
+    def test_get_one_list_group_global_account_manager(self, build_company):
+        """
+        Test that `get_one_list_group_global_account_manager` returns
+        the One List Global Account Manager of `self` if the company has no
+        `global_headquarters` or the one of its `global_headquarters` otherwise.
+        """
+        global_account_manager = AdviserFactory()
+        one_list_tier = CompanyClassification.objects.first()
+
+        company = build_company(one_list_tier, global_account_manager)
+
+        group_global_headquarters = company.global_headquarters or company
+        actual_global_account_manager = company.get_one_list_group_global_account_manager()
+        assert group_global_headquarters.one_list_account_owner == actual_global_account_manager
+
 
 class TestContact:
     """Tests for the contact model."""

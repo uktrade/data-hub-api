@@ -308,6 +308,25 @@ class TestGetCompany(APITestMixin):
                     'name': company.one_list_account_owner.dit_team.name,
                 },
             },
+            'one_list_group_global_account_manager': {
+                'id': str(company.one_list_account_owner.pk),
+                'name': company.one_list_account_owner.name,
+                'first_name': company.one_list_account_owner.first_name,
+                'last_name': company.one_list_account_owner.last_name,
+                'dit_team': {
+                    'id': str(company.one_list_account_owner.dit_team.id),
+                    'name': company.one_list_account_owner.dit_team.name,
+                    'uk_region': {
+                        'id': str(company.one_list_account_owner.dit_team.uk_region.pk),
+                        'name': company.one_list_account_owner.dit_team.uk_region.name,
+                    },
+                    'country': {
+                        'id': str(company.one_list_account_owner.dit_team.country.pk),
+                        'name': company.one_list_account_owner.dit_team.country.name,
+                    },
+
+                },
+            },
             'global_headquarters': None,
             'sector': {
                 'id': str(company.sector.id),
@@ -473,6 +492,85 @@ class TestGetCompany(APITestMixin):
                 'name': one_list_tier.name,
             }
 
+    @pytest.mark.parametrize(
+        'build_company',
+        (
+            # subsidiary with Global Headquarters on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(
+                    classification=one_list_tier,
+                    one_list_account_owner=gam,
+                ),
+            ),
+            # subsidiary with Global Headquarters not on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=CompanyFactory(
+                    classification=None,
+                    one_list_account_owner=None,
+                ),
+            ),
+            # single company on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=one_list_tier,
+                one_list_account_owner=gam,
+                global_headquarters=None,
+            ),
+            # single company not on the One List
+            lambda one_list_tier, gam: CompanyFactory(
+                classification=None,
+                global_headquarters=None,
+                one_list_account_owner=None,
+            ),
+        ),
+        ids=(
+            'as_subsidiary_of_one_list_company',
+            'as_subsidiary_of_non_one_list_company',
+            'as_one_list_company',
+            'as_non_one_list_company',
+        ),
+    )
+    def test_one_list_group_global_account_manager(self, build_company):
+        """
+        Test that the endpoint includes the One List Global Account Manager
+        of the Global Headquarters in the group.
+        """
+        global_account_manager = AdviserFactory()
+        one_list_tier = CompanyClassification.objects.first()
+        company = build_company(one_list_tier, global_account_manager)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        group_global_headquarters = company.global_headquarters or company
+
+        actual_global_account_manager = response.json()['one_list_group_global_account_manager']
+        if not group_global_headquarters.one_list_account_owner:
+            assert not actual_global_account_manager
+        else:
+            assert actual_global_account_manager == {
+                'id': str(global_account_manager.pk),
+                'name': global_account_manager.name,
+                'first_name': global_account_manager.first_name,
+                'last_name': global_account_manager.last_name,
+                'dit_team': {
+                    'id': str(global_account_manager.dit_team.id),
+                    'name': global_account_manager.dit_team.name,
+                    'uk_region': {
+                        'id': str(global_account_manager.dit_team.uk_region.pk),
+                        'name': global_account_manager.dit_team.uk_region.name,
+                    },
+                    'country': {
+                        'id': str(global_account_manager.dit_team.country.pk),
+                        'name': global_account_manager.dit_team.country.name,
+                    },
+
+                },
+            }
+
 
 class TestUpdateCompany(APITestMixin):
     """Tests for updating a single company."""
@@ -533,10 +631,12 @@ class TestUpdateCompany(APITestMixin):
     def test_cannot_update_read_only_fields(self):
         """Test updating read-only fields."""
         one_list_tier, different_one_list_tier = CompanyClassification.objects.all()[:2]
+        one_list_gam, different_one_list_gam = AdviserFactory.create_batch(2)
         company = CompanyFactory(
             reference_code='ORG-345645',
             archived_documents_url_path='old_path',
             classification=one_list_tier,
+            one_list_account_owner=one_list_gam,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -547,6 +647,7 @@ class TestUpdateCompany(APITestMixin):
                 'archived_documents_url_path': 'new_path',
                 'classification': different_one_list_tier.id,
                 'one_list_group_tier': different_one_list_tier.id,
+                'one_list_group_global_account_manager': different_one_list_gam.id,
             },
         )
 
@@ -561,6 +662,7 @@ class TestUpdateCompany(APITestMixin):
             'id': str(company.classification.id),
             'name': company.classification.name,
         }
+        assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
 
     @pytest.mark.parametrize(
         'data,expected_error',
