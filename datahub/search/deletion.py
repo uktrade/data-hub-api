@@ -115,7 +115,7 @@ class Collector:
         model = instance.__class__
         es_model = get_search_app_by_model(model).es_model
 
-        es_doc = es_model.es_document(instance)
+        es_doc = es_model.es_document(instance, include_index=False, include_source=False)
         self.deletions[model].append(es_doc)
 
     def _delete_from_es(self):

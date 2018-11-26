@@ -1,8 +1,39 @@
 import inspect
 
+import pytest
 from django.utils.functional import cached_property
 
+from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 from datahub.search.utils import get_model_copy_to_target_field_names, get_model_field_names
+
+
+class TestBaseESModel:
+    """Tests for BaseESModel."""
+
+    @pytest.mark.parametrize('include_index', (False, True))
+    @pytest.mark.parametrize('include_source', (False, True))
+    def test_es_document(self, include_index, include_source):
+        """Test that es_document() creates a dict with the expected keys and values."""
+        obj = SimpleModel(id=5, name='test-name')
+        doc = ESSimpleModel.es_document(
+            obj,
+            include_index=include_index,
+            include_source=include_source,
+        )
+        source = {
+            'id': obj.pk,
+            'name': 'test-name',
+        }
+
+        expected_doc = {
+            '_id': obj.pk,
+            '_type': 'simplemodel',
+            **({'_index': ESSimpleModel.get_write_alias()} if include_index else {}),
+            **({'_source': source} if include_source else {}),
+        }
+
+        assert doc == expected_doc
 
 
 def test_validate_model_fields(search_app):

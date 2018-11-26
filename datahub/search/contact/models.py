@@ -61,7 +61,6 @@ class Contact(BaseESModel):
     title = fields.nested_id_name_field()
 
     MAPPINGS = {
-        'id': str,
         'adviser': dict_utils.contact_or_adviser_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
         'company': dict_utils.company_dict,

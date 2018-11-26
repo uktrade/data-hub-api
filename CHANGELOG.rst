@@ -1,3 +1,30 @@
+Data Hub API 7.10.0 (2018-11-26)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** *(Correction)* The API field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. The recommended and most efficient way to upgrade is to use the field ``one_list_group_global_account_manager`` instead.
+
+Bug fixes
+---------
+
+- The ``delete_old_records`` and ``delete_orphans`` management commands were optimised to use less memory and be faster when run without the ``--simulate`` or ``--only-print-queries`` arguments.
+
+Internal changes
+----------------
+
+- Various dependencies were updated.
+
+API
+---
+
+- **Companies** *(Correction)* The API field ``one_list_account_owner`` is deprecated and will be removed on or after November, 29. The recommended and most efficient way to upgrade is to use the field ``one_list_group_global_account_manager`` instead.
+- **Companies** ``GET /company/<uuid:pk>`` and the other company endpoints now return the read-only field ``one_list_group_global_account_manager`` with details of the One List Global Account Manager for the group that the company is part of. This value is inherited from the Global Headquarters.
+
+
 Data Hub API 7.9.0 (2018-11-23)
 ===============================
 
@@ -70,6 +97,7 @@ Internal changes
 ----------------
 
 - Countries now have defined ISO codes.
+- Django Rest Framework was updated to version 3.9.0.
 
 API
 ---
@@ -120,6 +148,7 @@ Internal changes
   to ``Prospect``.
 - The ``countries.yaml`` fixture was updated to reflect the current production data.
 - It's not possible to change ``Countries`` and ``OverseasRegions`` from the django admin anymore. They will need to be updated using data migrations instead.
+- The Elasticsearch Python client libraries were updated to 6.x versions, as was the Docker image used during development.
 - A setting to sync updates to records to Elasticsearch using Celery (rather than the thread pool) was adding. This
   will improve performance when many records are updated at once, and increase reliability as failed synchronisation
   attempts are automatically retried. When the setting is enabled, Redis and Celery must be configured and running to
@@ -158,6 +187,12 @@ Features
 - **Investment** A new field ``exclude_from_investment_flow`` has been added to the ``InvestmentProjectStage`` metadata to
   indicate if a stage should be excluded from the investment flow. The field will be used to aid with
   deprecating and adding new stages.
+
+Internal changes
+----------------
+
+- Python was updated from version 3.6.6 to 3.6.7 in deployed environments.
+
 
 API
 ---
