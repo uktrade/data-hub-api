@@ -74,6 +74,7 @@ class Company(BaseESModel):
     uk_region = fields.nested_id_name_field()
     uk_based = Boolean()
     vat_number = Keyword(index=False)
+    duns_number = Keyword()
     website = Text()
 
     COMPUTED_MAPPINGS = {

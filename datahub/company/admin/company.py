@@ -46,6 +46,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'alias',
                     'company_number',
                     'vat_number',
+                    'duns_number',
                     'description',
                     'website',
                     'business_type',
@@ -126,6 +127,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'name',
         'id',
         'company_number',
+        'duns_number',
     )
     raw_id_fields = (
         'global_headquarters',
