@@ -11,7 +11,12 @@ from mptt.fields import TreeForeignKey
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
-from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
+from datahub.core.models import (
+    ArchivableModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
+)
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 from datahub.metadata.models import BusinessType
@@ -33,6 +38,10 @@ class ExportExperienceCategory(BaseConstantModel):
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'export experience categories'
+
+
+class OneListTier(BaseOrderedConstantModel):
+    """One List tier."""
 
 
 class CompanyAbstract(models.Model):
