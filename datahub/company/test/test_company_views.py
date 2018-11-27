@@ -351,6 +351,7 @@ class TestGetCompany(APITestMixin):
                 'name': company.uk_region.name,
             },
             'vat_number': '009485769',
+            'duns_number': company.duns_number,
             'website': None,
         }
 
@@ -637,6 +638,7 @@ class TestUpdateCompany(APITestMixin):
             archived_documents_url_path='old_path',
             classification=one_list_tier,
             one_list_account_owner=one_list_gam,
+            duns_number='000000001',
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -648,6 +650,7 @@ class TestUpdateCompany(APITestMixin):
                 'classification': different_one_list_tier.id,
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
+                'duns_number': '000000002',
             },
         )
 
@@ -663,6 +666,7 @@ class TestUpdateCompany(APITestMixin):
             'name': company.classification.name,
         }
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
+        assert response.data['duns_number'] == '000000001'
 
     @pytest.mark.parametrize(
         'data,expected_error',

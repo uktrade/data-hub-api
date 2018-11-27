@@ -53,6 +53,7 @@ def test_company_dbmodel_to_dict(setup_es):
         'uk_based',
         'uk_region',
         'vat_number',
+        'duns_number',
         'website',
     }
 
