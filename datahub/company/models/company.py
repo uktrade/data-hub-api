@@ -2,6 +2,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import integer_validator, MaxLengthValidator, MinLengthValidator
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -78,6 +79,16 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
+    duns_number = models.CharField(
+        blank=True,
+        help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
+        max_length=9,
+        validators=[
+            MinLengthValidator(9),
+            MaxLengthValidator(9),
+            integer_validator,
+        ],
+    )
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name',
     )
