@@ -407,6 +407,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'uk_based',
             'company_number',
             'vat_number',
+            'duns_number',
             'registered_address_1',
             'registered_address_2',
             'registered_address_town',
@@ -456,6 +457,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'reference_code',
             'transfer_reason',
+            'duns_number',
         )
         validators = [
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),

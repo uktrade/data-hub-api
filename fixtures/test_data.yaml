@@ -222,6 +222,7 @@
     description: This is a dummy company for testing the One List
     headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
     classification: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
+    duns_number: '123456789'
     one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
     created_on: '2015-10-26T11:00:00Z'
     modified_on: '2017-11-26T11:00:00Z'
