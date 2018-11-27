@@ -71,6 +71,7 @@ class TestListView(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
+        assert response_data['results'][0]['level_of_involvement_simplified'] == 'not_involved'
         assert response_data['results'][0].keys() == {
             'id',
             'incomplete_fields',
@@ -168,6 +169,7 @@ class TestListView(APITestMixin):
             'project_arrived_in_triage_on',
             'proposal_deadline',
             'stage_log',
+            'level_of_involvement_simplified',
         }
 
     def test_list_is_sorted_by_created_on_desc(self):
