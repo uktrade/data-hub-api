@@ -138,6 +138,7 @@ class InvestmentProject(BaseESModel):
     uk_company_decided = Boolean()
     uk_region_locations = fields.nested_id_name_field()
     will_new_jobs_last_two_years = Boolean()
+    level_of_involvement_simplified = Keyword()
 
     MAPPINGS = {
         'actual_uk_regions': lambda col: [

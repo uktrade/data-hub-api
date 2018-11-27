@@ -79,6 +79,7 @@ CORE_FIELDS = (
     'modified_on',
     'comments',
     'country_investment_originates_from',
+    'level_of_involvement_simplified',
 )
 
 VALUE_FIELDS = (
