@@ -15,6 +15,7 @@ from rest_framework.reverse import reverse
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
+from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -701,3 +702,73 @@ class TestBasicSearch(APITestMixin):
         response = self.api_client.get(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestAutocompleteSearch(APITestMixin):
+    """Tests for autocomplete search views."""
+
+    def test_no_permissions_returns_403(self):
+        """Should return 403"""
+        user = create_test_user(dit_team=TeamFactory())
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v3:search:company-autocomplete-search')
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_searching_with_no_query_returns_no_results(self, setup_data):
+        """Tests case where there is not query provided."""
+        url = reverse('api-v3:search:company-autocomplete-search')
+
+        response = self.api_client.get(url, data={})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 0
+
+    @pytest.mark.parametrize(
+        'query,expected_companies',
+        (
+            ('abc', ['abc defg ltd', 'abc defg us ltd']),
+            ('abv', []),
+            ('ABC', ['abc defg ltd', 'abc defg us ltd']),
+            ('hello', []),
+            ('', []),
+            (1, []),
+            ('abc defg ltd', ['abc defg ltd']),
+            ('defg', ['abc defg ltd', 'abc defg us ltd']),
+            ('us', ['abc defg us ltd']),
+        ),
+    )
+    def test_searching_with_a_query(self, setup_data, query, expected_companies):
+        """Tests case where search queries are provided."""
+        url = reverse('api-v3:search:company-autocomplete-search')
+
+        response = self.api_client.get(url, data={'term': query})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(expected_companies)
+
+        if expected_companies:
+            companies = [result['name'] for result in response.data['results']]
+            assert companies == expected_companies
+
+    @mock.patch(
+        'datahub.search.company.views.'
+        'CompanyAutocompleteSearchListAPIView._get_permission_filters',
+    )
+    def test_raise_datahub_error_when_search_app_has_permission_search_filters(
+        self, mock_get_app_permission_filters,
+    ):
+        """
+        Tests if a search app has permission filters, if so autocomplete is not
+        permitted and a datahub exception error is raised.
+        """
+        mock_get_app_permission_filters.return_value = True
+        url = reverse('api-v3:search:company-autocomplete-search')
+        with pytest.raises(DataHubException) as expected_error:
+            self.api_client.get(url, data={'term': 'query'})
+        assert (
+            str(expected_error.value)
+            == 'Unable to apply filtering for autocomplete search request'
+        )

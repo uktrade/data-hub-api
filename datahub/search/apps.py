@@ -17,6 +17,7 @@ class SearchApp:
     bulk_batch_size = 2000
     view = None
     export_view = None
+    autocomplete_view = None
     queryset = None
     # A sequence of permissions. The user must have one of these permissions to perform searches.
     view_permissions = None
