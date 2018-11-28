@@ -154,7 +154,13 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     classification = models.ForeignKey(
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL,
-        help_text='One List Tier',
+        help_text='Deprecated - Please use One List tier field instead',
+    )
+    one_list_tier = models.ForeignKey(
+        OneListTier,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
     )
     global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
