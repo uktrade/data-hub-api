@@ -5,6 +5,7 @@ from datahub.company.models.company import (
     CompanyPermission,
     ExportExperienceCategory,
     OneListCoreTeamMember,
+    OneListTier,
 )
 from datahub.company.models.contact import Contact, ContactPermission
 
@@ -17,4 +18,5 @@ __all__ = (
     'ContactPermission',
     'ExportExperienceCategory',
     'OneListCoreTeamMember',
+    'OneListTier',
 )
