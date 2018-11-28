@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='duns_number',
-            field=models.CharField(blank=True, help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.', max_length=9, validators=[django.core.validators.MinLengthValidator(9), django.core.validators.MaxLengthValidator(9), django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z'), code='invalid', message='Enter a valid integer.')]),
+            field=models.CharField(blank=True, null=True, default='', help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.', max_length=9, validators=[django.core.validators.MinLengthValidator(9), django.core.validators.MaxLengthValidator(9), django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z'), code='invalid', message='Enter a valid integer.')]),
         ),
     ]
