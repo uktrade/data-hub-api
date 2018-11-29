@@ -1,3 +1,33 @@
+Data Hub API 7.11.0 (2018-11-29)
+================================
+
+
+
+Features
+--------
+
+- **Companies** Editing ``CompanyClassification`` using the Django Admin is temporaneously suspended to allow it to be migrated into the newly created ``OneListTier``.
+- **Companies** The field ``duns_number`` representing the nine-digit D&B unique identifier was added to the Company model and can be updated using the Django Admin.
+- **Investment** New read-only field ``level_of_involvement_simplified`` has been added that contains simplified information about the
+  level of involvement. It has one of three values: ``unspecified``, ``not_involved`` and ``involved`` derived
+  from ``level_of_involvement`` field. This field can be filtered by using the search endpoint.
+- **Investment** ``Involvements`` section in Django admin is now view only as values for level of involvement are not meant to be changed.
+
+API
+---
+
+- **Companies** ``GET /v3/company/<uuid:pk>``, ``GET /v3/company`` and ``POST /v3/search/company`` now return the read-only field ``duns_number`` representing the nine-digit D&B unique identifier.
+- **Investment** ``GET /v3/investment/<uuid:pk>/`` endpoint now includes ``level_of_involvement_simplified`` field in the response.
+
+  ``POST /v3/search/investment_project/``: new filter ``level_of_involvement_simplified`` was added.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.duns_number`` representing the nine-digit D&B unique identifier was added.
+- **Companies** The table ``company_onelisttier`` was added with the intention of replacing ``metadata_companyclassification`` in the near future.
+
+
 Data Hub API 7.10.0 (2018-11-26)
 ================================
 
