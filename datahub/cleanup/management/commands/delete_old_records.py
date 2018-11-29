@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from datahub.cleanup.cleanup_config import ModelCleanupConfig
+from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 
 
@@ -14,11 +14,9 @@ class Command(BaseCleanupCommand):
     )
 
     CONFIGS = {
-        # TODO: Before adding any more configurations, get_unreferenced_objects_query()
-        # and BaseCleanupCommand need to be extended to allow filter conditions for related
-        # models to be given.
-        #
-        # (Interactions does not have any dependent models, hence this has
-        # not been done yet.)
-        'interaction.Interaction': ModelCleanupConfig(relativedelta(years=10), 'date'),
+        'interaction.Interaction': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('date', relativedelta(years=10)),
+            ),
+        ),
     }
