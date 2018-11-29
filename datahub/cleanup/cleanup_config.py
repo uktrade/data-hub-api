@@ -52,6 +52,9 @@ class ModelCleanupConfig(NamedTuple):
     # The filters will be combined using an AND operator, so records will only be
     # cleaned up if they match all of the filters
     filters: Sequence[DatetimeLessThanCleanupFilter]
+    # Fields (e.g. `Company.get_meta('interactions')`) to ignore when checking for
+    # referencing objects
+    excluded_relations: Sequence[Any] = ()
     # Filters that referencing objects must match (where they exist). The keys are
     # model fields e.g. Company._meta.get_field('interactions'). If multiple filters
     # are specified for a field, they are combined using the AND operator

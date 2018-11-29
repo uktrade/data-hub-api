@@ -104,6 +104,7 @@ class BaseCleanupCommand(BaseCommand):
 
         return get_unreferenced_objects_query(
             model,
+            excluded_relations=config.excluded_relations,
             relation_exclusion_filter_mapping=relation_filter_kwargs,
         ).filter(
             _join_cleanup_filters(config.filters),
