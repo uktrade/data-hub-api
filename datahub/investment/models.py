@@ -18,6 +18,7 @@ from datahub.core.models import (
     BaseModel,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.investment import constants
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -87,6 +88,12 @@ class IProjectAbstract(models.Model):
         ('lost', 'Lost'),
         ('abandoned', 'Abandoned'),
         ('won', 'Won'),
+    )
+
+    INVOLVEMENT = Choices(
+        ('unspecified', 'Unspecified'),
+        ('not_involved', 'Not involved'),
+        ('involved', 'Involved'),
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -228,6 +235,18 @@ class IProjectAbstract(models.Model):
         if self.client_relationship_manager:
             return self.client_relationship_manager.dit_team
         return None
+
+    @property
+    def level_of_involvement_simplified(self):
+        """Returns simplified level of involvement for the Investment Project."""
+        if self.level_of_involvement_id is None:
+            return self.INVOLVEMENT.unspecified
+
+        not_involved = uuid.UUID(constants.Involvement.no_involvement.value.id)
+        if self.level_of_involvement_id == not_involved:
+            return self.INVOLVEMENT.not_involved
+
+        return self.INVOLVEMENT.involved
 
 
 class IProjectValueAbstract(models.Model):
