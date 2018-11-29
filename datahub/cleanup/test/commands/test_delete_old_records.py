@@ -11,16 +11,28 @@ from freezegun import freeze_time
 
 
 from datahub.cleanup.management.commands import delete_old_records
+from datahub.cleanup.management.commands.delete_old_records import (
+    INTERACTION_EXPIRY_PERIOD,
+    ORDER_EXPIRY_PERIOD,
+    ORDER_MODIFIED_ON_CUT_OFF,
+)
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.payment.test.factories import (
+    ApprovedRefundFactory,
+    PaymentFactory,
+    PaymentGatewaySessionFactory,
+)
 from datahub.search.apps import get_search_app_by_model
 
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 
-INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - relativedelta(years=10)
+INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
+ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 
 
 MAPPING = {
@@ -36,6 +48,114 @@ MAPPING = {
             },
         ],
         'relations': [],
+    },
+    'order.Order': {
+        'factory': OrderFactory,
+        'implicitly_deletable_models': {
+            'order.Order_service_types',
+            'order.OrderAssignee',
+            'order.OrderSubscriber',
+            'omis-payment.Payment',
+            'omis-payment.Refund',
+            'omis-payment.PaymentGatewaySession',
+        },
+        'expired_object_kwargs': {
+            'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+        },
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': ORDER_MODIFIED_ON_CUT_OFF,
+            },
+            {
+                'created_on': ORDER_DELETE_BEFORE_DATETIME,
+                'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+            {
+                'created_on': ORDER_DELETE_BEFORE_DATETIME,
+                'modified_on': ORDER_MODIFIED_ON_CUT_OFF,
+            },
+        ],
+        'relations': [
+            {
+                'factory': PaymentFactory,
+                'field': 'order',
+                'expired_objects_kwargs': [
+                    {
+                        'received_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'received_on': ORDER_DELETE_BEFORE_DATETIME,
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                    },
+                    {
+                        'received_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF,
+                    },
+                ],
+            },
+            {
+                'factory': ApprovedRefundFactory,
+                'field': 'order',
+                'expired_objects_kwargs': [
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME,
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF,
+                        'level2_approved_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': ORDER_DELETE_BEFORE_DATETIME,
+                    },
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF,
+                        'level2_approved_on': None,
+                    },
+                    {
+                        'created_on': ORDER_DELETE_BEFORE_DATETIME,
+                        'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': None,
+                    },
+                ],
+            },
+            {
+                'factory': PaymentGatewaySessionFactory,
+                'field': 'order',
+                'expired_objects_kwargs': [
+                    {
+                        'modified_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'modified_on': ORDER_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+        ],
     },
 }
 
@@ -57,7 +177,7 @@ def test_mappings(model_label, config):
         mapping = MAPPING[model_label]
         related_models_in_config = {field.field.model for field in config.relation_filter_mapping}
         related_models_in_mapping = {
-            relation['factory']._meta.get_model_class()._meta.label
+            relation['factory']._meta.get_model_class()
             for relation in mapping['relations']
         }
         assert related_models_in_config == related_models_in_mapping, (
