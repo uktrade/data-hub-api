@@ -2,6 +2,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import integer_validator, MaxLengthValidator, MinLengthValidator
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -10,7 +11,12 @@ from mptt.fields import TreeForeignKey
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
-from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
+from datahub.core.models import (
+    ArchivableModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
+)
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 from datahub.metadata.models import BusinessType
@@ -32,6 +38,10 @@ class ExportExperienceCategory(BaseConstantModel):
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'export experience categories'
+
+
+class OneListTier(BaseOrderedConstantModel):
+    """One List tier."""
 
 
 class CompanyAbstract(models.Model):
@@ -78,6 +88,18 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
+    duns_number = models.CharField(
+        blank=True,
+        null=True,
+        default='',
+        help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
+        max_length=9,
+        validators=[
+            MinLengthValidator(9),
+            MaxLengthValidator(9),
+            integer_validator,
+        ],
+    )
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name',
     )

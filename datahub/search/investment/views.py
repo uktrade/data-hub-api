@@ -43,6 +43,7 @@ class SearchInvestmentProjectParams:
         'stage',
         'status',
         'uk_region_location',
+        'level_of_involvement_simplified',
     )
 
     REMAP_FIELDS = {
