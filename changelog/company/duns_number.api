@@ -1,1 +1,0 @@
-``GET /v3/company/<uuid:pk>``, ``GET /v3/company`` and ``POST /v3/search/company`` now return the read-only field ``duns_number`` representing the nine-digit D&B unique identifier.
