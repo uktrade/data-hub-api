@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 
-from datahub.cleanup.cleanup_config import ModelCleanupConfig
+from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 
 
@@ -13,13 +13,26 @@ class Command(BaseCleanupCommand):
     Orphans are `days_before_orphaning` old records without any objects referencing them.
 
     If the argument `simulate=True` is passed in, the command only simulates the action.
+
+    Only one filter is currently supported for each configuration specified in CONFIGS,
+    and relation filters are also not supported. If these are needed, the tests need to be
+    updated to account for such scenarios.
     """
 
     CONFIGS = {
-        'company.Contact': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD),
-        'company.Company': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD),
+        'company.Contact': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
+            ),
+        ),
+        'company.Company': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
+            ),
+        ),
         'event.Event': ModelCleanupConfig(
-            age_threshold=relativedelta(months=18),
-            date_field='end_date',
+            (
+                DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),
+            ),
         ),
     }
