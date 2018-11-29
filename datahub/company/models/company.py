@@ -90,6 +90,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     duns_number = models.CharField(
         blank=True,
+        null=True,
+        default='',
         help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
         max_length=9,
         validators=[
