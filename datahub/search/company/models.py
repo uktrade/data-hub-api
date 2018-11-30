@@ -19,7 +19,6 @@ class Company(BaseESModel):
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.nested_id_name_field()
-    classification = fields.nested_id_name_field()
     companies_house_data = fields.nested_ch_company_field()
     company_number = fields.SortableCaseInsensitiveKeywordText()
     contacts = fields.nested_contact_or_adviser_field('contacts')
@@ -84,7 +83,6 @@ class Company(BaseESModel):
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
-        'classification': dict_utils.id_name_dict,
         'companies_house_data': dict_utils.ch_company_dict,
         'contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'employee_range': dict_utils.id_name_dict,
