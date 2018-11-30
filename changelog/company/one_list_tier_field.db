@@ -1,0 +1,1 @@
+The column ``company_company.one_list_tier_id`` was added and replaces the column ``company_company.classification_id``.

@@ -8,7 +8,7 @@ from rest_framework import status
 
 from datahub.company.admin.company import CompanyAdmin
 from datahub.company.admin_reports import OneListReport
-from datahub.company.models import Company
+from datahub.company.models import Company, OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
@@ -102,6 +102,54 @@ class TestChangeCompanyAdmin(AdminTestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert company.one_list_core_team_members.count() == team_size - 1
+
+    @pytest.mark.parametrize(
+        'get_test_tier_ids',
+        (
+            lambda available_tiers: ('', available_tiers[1]),
+            lambda available_tiers: (available_tiers[0], ''),
+            lambda available_tiers: (available_tiers[0], available_tiers[1]),
+        ),
+    )
+    def test_classification_mirrors_one_list_tier(self, get_test_tier_ids):
+        """
+        Test that classification mirrors one_list_tier when a company is saved.
+        """
+        tiers_ids = OneListTier.objects.values_list('id', flat=True)[:2]
+        initial_tier_id, new_tier_id = get_test_tier_ids(tiers_ids)
+
+        company = CompanyFactory(
+            one_list_tier_id=initial_tier_id,
+            classification_id=initial_tier_id,
+        )
+
+        url = reverse('admin:company_company_change', args=(company.id,))
+
+        data = {
+            'one_list_core_team_members-TOTAL_FORMS': 0,
+            'one_list_core_team_members-INITIAL_FORMS': 0,
+            'one_list_core_team_members-MIN_NUM_FORMS': 0,
+            'one_list_core_team_members-MAX_NUM_FORMS': 1000,
+        }
+
+        # populate data with required field values
+        admin_form = CompanyAdmin(Company, site).get_form(mock.Mock())
+        for field_name, field in admin_form.base_fields.items():
+            if field.required:
+                field_value = getattr(company, field_name)
+                data[field_name] = field.prepare_value(field_value)
+
+        data['one_list_tier'] = new_tier_id
+
+        response = self.client.post(url, data, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company.refresh_from_db()
+        if not new_tier_id:
+            assert not company.classification
+        else:
+            assert company.classification_id == new_tier_id
 
 
 class TestOneListLink(AdminTestMixin):
