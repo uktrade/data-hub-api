@@ -10,13 +10,10 @@ from django.db.transaction import atomic
 from django.template.defaultfilters import capfirst
 
 from datahub.cleanup.query_utils import get_relations_to_delete, get_unreferenced_objects_query
+from datahub.core.exceptions import SimulationRollback
 from datahub.search.deletion import update_es_after_deletions
 
 logger = getLogger(__name__)
-
-
-class SimulationRollback(Exception):
-    """Used to roll back deletions during a simulation."""
 
 
 class BaseCleanupCommand(BaseCommand):
