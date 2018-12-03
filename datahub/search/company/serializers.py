@@ -30,7 +30,6 @@ class SearchCompanySerializer(SearchSerializer):
         'archived',
         'archived_by',
         'business_type.name',
-        'classification.name',
         'companies_house_data.company_number',
         'company_number',
         'created_on',

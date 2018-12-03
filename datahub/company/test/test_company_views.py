@@ -276,7 +276,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'classification': None,
             'one_list_group_tier': None,
             'company_number': '123',
             'contacts': [],
@@ -367,7 +366,6 @@ class TestGetCompany(APITestMixin):
             registered_address_town='Fooland',
             registered_address_country_id=Country.united_states.value.id,
             headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification=random_obj_for_model(CompanyClassification),
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -387,10 +385,6 @@ class TestGetCompany(APITestMixin):
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
         assert response.data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
-        assert response.data['classification'] == {
-            'id': str(company.classification.pk),
-            'name': company.classification.name,
-        }
 
     def test_get_company_without_registered_country(self):
         """Tests the company item view for a company without a registered
@@ -647,7 +641,6 @@ class TestUpdateCompany(APITestMixin):
             data={
                 'reference_code': 'XYZ',
                 'archived_documents_url_path': 'new_path',
-                'classification': different_one_list_tier.id,
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
@@ -657,10 +650,6 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['reference_code'] == 'ORG-345645'
         assert response.data['archived_documents_url_path'] == 'old_path'
-        assert response.data['classification'] == {
-            'id': str(company.classification.id),
-            'name': company.classification.name,
-        }
         assert response.data['one_list_group_tier'] == {
             'id': str(company.classification.id),
             'name': company.classification.name,

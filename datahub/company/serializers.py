@@ -279,7 +279,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True,
     )
-    classification = NestedRelatedField(meta_models.CompanyClassification, read_only=True)
     one_list_group_tier = serializers.SerializerMethodField()
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
@@ -434,7 +433,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_postcode',
             'trading_address_country',
             'business_type',
-            'classification',
             'one_list_group_tier',
             'companies_house_data',
             'contacts',
