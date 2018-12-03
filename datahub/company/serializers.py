@@ -295,9 +295,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
     )
-    one_list_account_owner = NestedAdviserWithTeamField(
-        required=False, allow_null=True,
-    )
     one_list_group_global_account_manager = serializers.SerializerMethodField()
     global_headquarters = NestedRelatedField(
         'company.Company', required=False, allow_null=True,
@@ -440,7 +437,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_to_countries',
             'future_interest_countries',
             'headquarter_type',
-            'one_list_account_owner',
             'one_list_group_global_account_manager',
             'global_headquarters',
             'sector',
