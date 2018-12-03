@@ -274,7 +274,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         """
         :returns: the One List Tier of the group this company is part of.
         """
-        return self.get_group_global_headquarters().classification
+        return self.get_group_global_headquarters().one_list_tier
 
     def get_one_list_group_core_team(self):
         """

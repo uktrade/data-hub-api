@@ -16,6 +16,7 @@ from datahub.company.models import (
     Contact,
     ContactPermission,
     ExportExperienceCategory,
+    OneListTier,
 )
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
@@ -381,7 +382,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         one_list_tier = obj.get_one_list_group_tier()
 
-        field = NestedRelatedField(meta_models.CompanyClassification)
+        field = NestedRelatedField(OneListTier)
         return field.to_representation(one_list_tier)
 
     def get_one_list_group_global_account_manager(self, obj):
