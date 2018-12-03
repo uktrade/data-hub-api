@@ -1,0 +1,1 @@
+It is now possible to unarchive and update status of investment projects using added management command ``update_investment_project_archive_state``.
