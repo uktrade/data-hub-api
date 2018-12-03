@@ -297,16 +297,6 @@ class TestGetCompany(APITestMixin):
             'future_interest_countries': [],
             'headquarter_type': None,
             'modified_on': format_date_or_datetime(company.modified_on),
-            'one_list_account_owner': {
-                'id': str(company.one_list_account_owner.pk),
-                'name': company.one_list_account_owner.name,
-                'first_name': company.one_list_account_owner.first_name,
-                'last_name': company.one_list_account_owner.last_name,
-                'dit_team': {
-                    'id': str(company.one_list_account_owner.dit_team.id),
-                    'name': company.one_list_account_owner.dit_team.name,
-                },
-            },
             'one_list_group_global_account_manager': {
                 'id': str(company.one_list_account_owner.pk),
                 'name': company.one_list_account_owner.name,
