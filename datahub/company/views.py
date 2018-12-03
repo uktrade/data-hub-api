@@ -40,7 +40,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     queryset = Company.objects.select_related(
         'archived_by',
         'business_type',
-        'classification',
+        'one_list_tier',
         'transferred_to',
         'employee_range',
         'export_experience_category',
@@ -54,7 +54,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'global_headquarters__one_list_account_owner__dit_team',
         'global_headquarters__one_list_account_owner__dit_team__uk_region',
         'global_headquarters__one_list_account_owner__dit_team__country',
-        'global_headquarters__classification',
+        'global_headquarters__one_list_tier',
         'registered_address_country',
         'trading_address_country',
         'turnover_range',
