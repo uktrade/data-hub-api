@@ -18,6 +18,7 @@ from datahub.cleanup.management.commands.delete_old_records import (
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.core.exceptions import DataHubException
+from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.payment.test.factories import (
@@ -183,6 +184,36 @@ def test_mappings(model_label, config):
         assert related_models_in_config == related_models_in_mapping, (
             'Missing test cases for relation filters for model  {model_label} detected'
         )
+
+
+@pytest.mark.parametrize('model_label,config', delete_old_records.Command.CONFIGS.items())
+def test_configs(model_label, config):
+    """
+    Test that configs for delete_old_records cover all relations for the model.
+
+    This is to make sure any new relations that are added are not missed from the
+    configurations.
+    """
+    model = apps.get_model(model_label)
+    related_fields = get_related_fields(model)
+
+    field_missing_from_config = (
+        set(related_fields)
+        - (config.relation_filter_mapping or {}).keys()
+        - set(config.excluded_relations)
+    )
+    fields_for_error_message = [_format_field(field) for field in field_missing_from_config]
+    assert not field_missing_from_config, (
+        f'The following related fields are missing from the config for {model_label}: '
+        f'{fields_for_error_message}. Please add them to the ModelCleanupConfig in either '
+        f'relation_filter_mapping or excluded_relations.\n'
+        f'\n'
+        f'Only add the model to excluded_relations if its existence should not affect '
+        f'whether {model_label} objects are be deleted. You can specify an empty filter '
+        f'list in relation_filter_mapping if they should not be filtered.\n'
+        f'\n'
+        f'See ModelCleanupConfig and the delete_old_records command for more details.'
+    )
 
 
 def _generate_run_args():
@@ -392,3 +423,10 @@ def _create_model_obj(factory, **field_value_mapping):
         obj.save()
 
     return obj
+
+
+def _format_field(field):
+    if field.name == '+':
+        return f'{field.field.model.__name__}._meta.get_field({field.field.name!r}).remote_field'
+
+    return f'{field.model.__name__}._meta.get_field({field.name!r})'
