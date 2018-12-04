@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -968,6 +969,10 @@ class TestInvestmentProjectExportView(APITestMixin):
 
         assert {row['Project name'] for row in actual_rows} == expected_names
 
+    def _get_global_account_manager_name(self, project):
+        gam = project.investor_company.get_one_list_group_global_account_manager()
+        return get_attr_or_none(gam, 'name')
+
     @pytest.mark.parametrize(
         'request_sortby,orm_ordering',
         (
@@ -984,6 +989,16 @@ class TestInvestmentProjectExportView(APITestMixin):
         VerifyWinInvestmentProjectFactory()
         won_project = WonInvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory.create_batch(3, investment_project=won_project)
+
+        InvestmentProjectFactory(
+            name='project for subsidiary',
+            investor_company=CompanyFactory(
+                global_headquarters=CompanyFactory(
+                    classification_id=OneListTier.objects.first().id,
+                    one_list_account_owner=AdviserFactory(),
+                ),
+            ),
+        )
 
         setup_es.indices.refresh()
 
@@ -1028,8 +1043,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project manager': get_attr_or_none(project, 'project_manager.name'),
                 'Client relationship manager':
                     get_attr_or_none(project, 'client_relationship_manager.name'),
-                'Global account manager':
-                    get_attr_or_none(project, 'investor_company.one_list_account_owner.name'),
+                'Global account manager': self._get_global_account_manager_name(project),
                 'Project assurance adviser':
                     get_attr_or_none(project, 'project_assurance_adviser.name'),
                 'Other team members': _join_values(project.team_members.all(), 'adviser.name'),

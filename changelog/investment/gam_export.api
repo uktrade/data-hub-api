@@ -1,0 +1,1 @@
+The global account manager field in the ``POST /v3/search/investment_project/export`` response body now inherits the value from the investor company's Global Headquarters in case of subsidiaries.
