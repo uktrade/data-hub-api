@@ -12,6 +12,8 @@ from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
+    CONTACT_EXPIRY_PERIOD,
+    CONTACT_MODIFIED_ON_CUT_OFF,
     INTERACTION_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
@@ -19,6 +21,7 @@ from datahub.cleanup.management.commands.delete_old_records import (
     ORDER_MODIFIED_ON_CUT_OFF,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
+from datahub.company.test.factories import ContactFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
@@ -34,18 +37,86 @@ from datahub.omis.payment.test.factories import (
     PaymentFactory,
     PaymentGatewaySessionFactory,
 )
+from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
 
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 
+CONTACT_DELETE_BEFORE_DATETIME = FROZEN_TIME - CONTACT_EXPIRY_PERIOD
 INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 
 
 MAPPING = {
+    'company.Contact': {
+        'factory': ContactFactory,
+        'implicitly_deletable_models': set(),
+        'expired_objects_kwargs': [
+            {
+                'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': CONTACT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': CONTACT_DELETE_BEFORE_DATETIME,
+                'modified_on': CONTACT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+            {
+                'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': CONTACT_MODIFIED_ON_CUT_OFF,
+            },
+        ],
+        'relations': [
+            {
+                'factory': CompanyInteractionFactory,
+                'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectFactory,
+                'field': 'client_contacts',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': OrderFactory,
+                'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': QuoteFactory,
+                'field': 'accepted_by',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+        ],
+    },
     'interaction.Interaction': {
         'factory': CompanyInteractionFactory,
         'implicitly_deletable_models': set(),
@@ -407,10 +478,14 @@ def test_run(
     total_model_records = 1
 
     if relation_mapping:
+        relation_model = relation_mapping['factory']._meta.get_model_class()
+        relation_field = relation_model._meta.get_field(relation_mapping['field'])
+        relation_factory_arg = [obj] if relation_field.many_to_many else obj
+
         _create_model_obj(
             relation_mapping['factory'],
             **relation_factory_kwargs,
-            **{relation_mapping['field']: obj},
+            **{relation_mapping['field']: relation_factory_arg},
         )
         if relation_mapping['factory']._meta.get_model_class() is model:
             total_model_records += 1
