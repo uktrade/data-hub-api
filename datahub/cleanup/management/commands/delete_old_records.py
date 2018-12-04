@@ -5,10 +5,14 @@ from django.utils.timezone import utc
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
+from datahub.company.models import Contact
 from datahub.investment.models import InvestmentProject
 from datahub.omis.order.models import Order
+from datahub.omis.quote.models import Quote
 
-
+CONTACT_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 22, tzinfo=utc)  # 2014-07-21 + 1 day
+CONTACT_EXPIRY_PERIOD = relativedelta(years=10)
+ARCHIVED_CONTACT_EXPIRY_PERIOD = relativedelta(years=8)
 INTERACTION_EXPIRY_PERIOD = relativedelta(years=10)
 INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF = datetime(2013, 11, 23, tzinfo=utc)  # 2013-11-22 + 1 day
 INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
@@ -33,6 +37,29 @@ class Command(BaseCleanupCommand):
     # If a field should not be excluded, but should not be filtered, it should be added
     # to relation_filter_mapping with an empty list of filters.
     CONFIGS = {
+        # There were multiple large bulk updates of contacts in the legacy system on and just
+        # before 2014-07-21, and so modified-on dates are not reliable prior to
+        # CONTACT_MODIFIED_ON_CUT_OFF.
+        'company.Contact': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', CONTACT_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', CONTACT_MODIFIED_ON_CUT_OFF),
+                DatetimeLessThanCleanupFilter(
+                    'archived_on',
+                    ARCHIVED_CONTACT_EXPIRY_PERIOD,
+                    include_null=True,
+                ),
+            ),
+            relation_filter_mapping={
+                # Contacts are not deleted if they have any related interactions, investment
+                # projects, OMIS orders or OMIS quotes. We wait for those records to expire
+                # before we delete the related contacts.
+                Contact._meta.get_field('interactions'): (),
+                Contact._meta.get_field('investment_projects'): (),
+                Contact._meta.get_field('orders'): (),
+                Quote._meta.get_field('accepted_by').remote_field: (),
+            },
+        ),
         'interaction.Interaction': ModelCleanupConfig(
             (
                 DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),
