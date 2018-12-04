@@ -326,7 +326,7 @@ def test_mappings(model_label, config):
             for relation in mapping['relations']
         }
         assert related_models_in_config == related_models_in_mapping, (
-            'Missing test cases for relation filters for model  {model_label} detected'
+            f'Missing test cases for relation filters for model {model_label} detected'
         )
 
 
