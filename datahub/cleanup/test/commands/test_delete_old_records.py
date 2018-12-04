@@ -13,13 +13,21 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
     INTERACTION_EXPIRY_PERIOD,
+    INVESTMENT_PROJECT_EXPIRY_PERIOD,
+    INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
     ORDER_EXPIRY_PERIOD,
     ORDER_MODIFIED_ON_CUT_OFF,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+)
+from datahub.investment.evidence.test.factories import EvidenceDocumentFactory
+from datahub.investment.proposition.test.factories import PropositionFactory
+from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.payment.test.factories import (
     ApprovedRefundFactory,
@@ -33,6 +41,7 @@ FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 
 INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
+INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 
 
@@ -40,15 +49,148 @@ MAPPING = {
     'interaction.Interaction': {
         'factory': CompanyInteractionFactory,
         'implicitly_deletable_models': set(),
-        'expired_object_kwargs': {
-            'date': INTERACTION_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-        },
+        'expired_objects_kwargs': [
+            {
+                'date': INTERACTION_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
         'unexpired_objects_kwargs': [
             {
                 'date': INTERACTION_DELETE_BEFORE_DATETIME,
             },
         ],
         'relations': [],
+    },
+    'investment.InvestmentProject': {
+        'factory': InvestmentProjectFactory,
+        'implicitly_deletable_models': {
+            'evidence.EvidenceDocument',
+            'investment.InvestmentProjectCode',
+            'investment.InvestmentProjectStageLog',
+            'investment.InvestmentProjectTeamMember',
+            'investment.InvestmentProject_business_activities',
+            'investment.InvestmentProject_client_contacts',
+            'proposition.Proposition',
+        },
+        'expired_objects_kwargs': [
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': None,
+                'date_abandoned': None,
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date':
+                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'date_abandoned': None,
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': None,
+                'date_abandoned':
+                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': None,
+                'date_abandoned': None,
+                'date_lost': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
+                'actual_land_date': None,
+                'date_abandoned': None,
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                'date_abandoned': None,
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': None,
+                'date_abandoned': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                'date_lost': None,
+            },
+            {
+                'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                'actual_land_date': None,
+                'date_abandoned': None,
+                'date_lost': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [
+            {
+                'factory': PropositionFactory,
+                'field': 'investment_project',
+                'expired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': EvidenceDocumentFactory,
+                'field': 'investment_project',
+                'expired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectFactory,
+                'field': 'associated_non_fdi_r_and_d_project',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectInteractionFactory,
+                'field': 'investment_project',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+        ],
     },
     'order.Order': {
         'factory': OrderFactory,
@@ -60,10 +202,12 @@ MAPPING = {
             'omis-payment.Refund',
             'omis-payment.PaymentGatewaySession',
         },
-        'expired_object_kwargs': {
-            'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-            'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
-        },
+        'expired_objects_kwargs': [
+            {
+                'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+        ],
         'unexpired_objects_kwargs': [
             {
                 'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
@@ -219,12 +363,14 @@ def test_configs(model_label, config):
 def _generate_run_args():
     """Flattens MAPPING so it can be used to parametrise the test_run() test."""
     for model_label, mapping in MAPPING.items():
-        expired_object_kwargs = mapping['expired_object_kwargs']
 
-        yield model_label, expired_object_kwargs, None, None, True
+        for kwargs in mapping['expired_objects_kwargs']:
+            yield model_label, kwargs, None, None, True
 
         for kwargs in mapping['unexpired_objects_kwargs']:
             yield model_label, kwargs, None, None, False
+
+        expired_object_kwargs = mapping['expired_objects_kwargs'][0]
 
         for relation_mapping in mapping['relations']:
             for relation_kwargs in relation_mapping['expired_objects_kwargs']:
@@ -322,7 +468,7 @@ def test_simulate(model_name, config, track_return_values, setup_es):
     model_factory = mapping['factory']
 
     for _ in range(3):
-        _create_model_obj(model_factory, **mapping['expired_object_kwargs'])
+        _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
     setup_es.indices.refresh()
 
@@ -372,7 +518,7 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
     model_factory = mapping['factory']
 
     for _ in range(3):
-        _create_model_obj(model_factory, **mapping['expired_object_kwargs'])
+        _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
     management.call_command(command, model_name, only_print_queries=True)
 
@@ -406,7 +552,7 @@ def test_with_es_exception(mocked_bulk):
     mapping = MAPPING[model_name]
     model_factory = MAPPING[model_name]['factory']
 
-    _create_model_obj(model_factory, **mapping['expired_object_kwargs'])
+    _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
     with pytest.raises(DataHubException):
         management.call_command(command, model_name)

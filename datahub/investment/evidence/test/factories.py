@@ -2,7 +2,8 @@ import uuid
 
 import factory
 
-from datahub.investment.evidence.models import EvidenceTag
+from datahub.investment.evidence.models import EvidenceDocument, EvidenceTag
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 
 class EvidenceTagFactory(factory.django.DjangoModelFactory):
@@ -13,3 +14,14 @@ class EvidenceTagFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = EvidenceTag
+
+
+class EvidenceDocumentFactory(factory.django.DjangoModelFactory):
+    """Evidence document factory."""
+
+    original_filename = factory.Faker('file_name')
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
+    comment = factory.Faker('paragraph', nb_sentences=3)
+
+    class Meta:
+        model = EvidenceDocument
