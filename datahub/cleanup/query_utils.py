@@ -1,25 +1,58 @@
 from secrets import token_urlsafe
 
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from django.db.models.deletion import CASCADE, get_candidate_relations_to_delete
 
 from datahub.core.model_helpers import get_related_fields
 
 
-def get_unreferenced_objects_query(model):
+def get_unreferenced_objects_query(
+    model,
+    excluded_relations=(),
+    relation_exclusion_filter_mapping=None,
+):
     """
-    :param model: orphaned model class
+    Generates a query set of unreferenced objects for a model.
+
+    :param model: the model to generate a query set of unreferenced objects
+    :param excluded_relations: related fields on model that should be ignored
+    :param relation_exclusion_filter_mapping:
+        Optional mapping of relations (fields on model) to Q objects.
+        For each relation where a Q object is provided, the Q object is used to exclude
+        objects for that relation prior to checking if any references to the model exist (for
+        that relation).
+
+        Example:
+            This example will not consider interactions dated before 2015-01-01 when getting
+            unreferenced companies.
+
+            get_unreferenced_objects_query(
+                Company,
+                relation_exclusion_filter_mapping={
+                    Company._meta.get_field('interactions'): Q(date__lt=date(2015, 1, 1),
+                }
+            )
+
     :returns: queryset for unreferenced objects
     """
-    fields = get_related_fields(model)
+    if relation_exclusion_filter_mapping is None:
+        relation_exclusion_filter_mapping = {}
+
+    fields = set(get_related_fields(model)) - set(excluded_relations)
 
     identifiers = [f'ann_{token_urlsafe(6)}' for _ in range(len(fields))]
+
+    if relation_exclusion_filter_mapping.keys() - fields:
+        raise ValueError('Invalid fields detected in relation_exclusion_filter_mapping.')
 
     qs = model.objects.all()
     for identifier, field in zip(identifiers, fields):
         related_field = field.field
+        exclusion_filters = relation_exclusion_filter_mapping.get(field, Q())
         subquery = related_field.model.objects.filter(
             **{related_field.attname: OuterRef('pk')},
+        ).exclude(
+            exclusion_filters,
         ).only('pk')
         qs = qs.annotate(**{identifier: Exists(subquery)})
 
