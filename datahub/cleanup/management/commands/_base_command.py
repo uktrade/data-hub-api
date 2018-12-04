@@ -1,13 +1,13 @@
 from contextlib import ExitStack
+from functools import reduce
 from logging import getLogger
+from operator import and_
 
-from dateutil.utils import today
 from django.apps import apps
 from django.core.management import BaseCommand
-from django.db.models import Subquery
+from django.db.models import Q, Subquery
 from django.db.transaction import atomic
 from django.template.defaultfilters import capfirst
-from django.utils.timezone import utc
 
 from datahub.cleanup.query_utils import get_relations_to_delete, get_unreferenced_objects_query
 from datahub.search.deletion import update_es_after_deletions
@@ -95,11 +95,21 @@ class BaseCleanupCommand(BaseCommand):
 
     def _get_query(self, model):
         config = self.CONFIGS[model._meta.label]
+        relation_filter_mapping = config.relation_filter_mapping or {}
 
-        return get_unreferenced_objects_query(model).filter(
-            **{f'{config.date_field}__lt': today(tzinfo=utc) - config.age_threshold},
+        relation_filter_kwargs = {
+            field: _join_cleanup_filters(filters)
+            for field, filters in relation_filter_mapping.items()
+        }
+
+        return get_unreferenced_objects_query(
+            model,
+            excluded_relations=config.excluded_relations,
+            relation_exclusion_filter_mapping=relation_filter_kwargs,
+        ).filter(
+            _join_cleanup_filters(config.filters),
         ).order_by(
-            f'-{config.date_field}',
+            f'-{config.filters[0].date_field}',
         )
 
 
@@ -116,3 +126,7 @@ def _print_query(model, qs, relation=None):
 
     logger.info('SQL:')
     logger.info(qs.query)
+
+
+def _join_cleanup_filters(filters):
+    return reduce(and_, (filter_.as_q() for filter_ in filters), Q())
