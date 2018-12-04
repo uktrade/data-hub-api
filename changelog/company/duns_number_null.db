@@ -1,0 +1,1 @@
+Blank values in the ``company_company.duns_number`` field are now NULLs instead of empty strings.
