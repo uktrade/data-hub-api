@@ -268,7 +268,6 @@ def test_indexed_doc(setup_es):
         'id',
         'modified_on',
         'name',
-        'one_list_account_owner',
         'global_headquarters',
         'reference_code',
         'registered_address_1',
