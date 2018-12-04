@@ -22,6 +22,13 @@ class Command(BaseCleanupCommand):
         'argument.'
     )
 
+    # For each configuration, the combination of excluded_relations and the keys of
+    # relation_filter_mapping should cover all related fields for the model (as
+    # returned by get_related_fields()). This is to make sure that no relation is
+    # missed, and there is a test that checks that all relations are covered.
+    #
+    # If a field should not be excluded, but should not be filtered, it should be added
+    # to relation_filter_mapping with an empty list of filters.
     CONFIGS = {
         'interaction.Interaction': ModelCleanupConfig(
             (
