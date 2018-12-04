@@ -2,13 +2,13 @@ import factory
 import pytest
 from django.conf import settings
 
+from datahub.company.models import OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
 )
-from datahub.metadata.models import CompanyClassification
 
 
 # mark the whole module for db use
@@ -50,22 +50,22 @@ class TestCompany:
         (
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
-                global_headquarters=CompanyFactory(classification=one_list_tier),
+                one_list_tier=None,
+                global_headquarters=CompanyFactory(one_list_tier=one_list_tier),
             ),
             # subsidiary with Global Headquarters not on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
-                global_headquarters=CompanyFactory(classification=None),
+                one_list_tier=None,
+                global_headquarters=CompanyFactory(one_list_tier=None),
             ),
             # single company on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=one_list_tier,
+                one_list_tier=one_list_tier,
                 global_headquarters=None,
             ),
             # single company not on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=None,
             ),
         ),
@@ -82,12 +82,12 @@ class TestCompany:
         if company has no `global_headquarters` or the one of its `global_headquarters`
         otherwise.
         """
-        one_list_tier = CompanyClassification.objects.first()
+        one_list_tier = OneListTier.objects.first()
 
         company = build_company(one_list_tier)
 
         group_global_headquarters = company.global_headquarters or company
-        if not group_global_headquarters.classification:
+        if not group_global_headquarters.one_list_tier:
             assert not company.get_one_list_group_tier()
         else:
             assert company.get_one_list_group_tier() == one_list_tier
@@ -152,29 +152,29 @@ class TestCompany:
         (
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=CompanyFactory(
-                    classification=one_list_tier,
+                    one_list_tier=one_list_tier,
                     one_list_account_owner=gam,
                 ),
             ),
             # subsidiary with Global Headquarters not on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=CompanyFactory(
-                    classification=None,
+                    one_list_tier=None,
                     one_list_account_owner=None,
                 ),
             ),
             # single company on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=one_list_tier,
+                one_list_tier=one_list_tier,
                 one_list_account_owner=gam,
                 global_headquarters=None,
             ),
             # single company not on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=None,
                 one_list_account_owner=None,
             ),
@@ -193,7 +193,7 @@ class TestCompany:
         `global_headquarters` or the one of its `global_headquarters` otherwise.
         """
         global_account_manager = AdviserFactory()
-        one_list_tier = CompanyClassification.objects.first()
+        one_list_tier = OneListTier.objects.first()
 
         company = build_company(one_list_tier, global_account_manager)
 

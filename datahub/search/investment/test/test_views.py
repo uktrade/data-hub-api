@@ -994,7 +994,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             name='project for subsidiary',
             investor_company=CompanyFactory(
                 global_headquarters=CompanyFactory(
-                    classification_id=OneListTier.objects.first().id,
+                    one_list_tier_id=OneListTier.objects.first().id,
                     one_list_account_owner=AdviserFactory(),
                 ),
             ),

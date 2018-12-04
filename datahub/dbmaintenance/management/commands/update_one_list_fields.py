@@ -4,10 +4,9 @@ from logging import getLogger
 import reversion
 from django.db.models import Q
 
-from datahub.company.models import Advisor, Company
+from datahub.company.models import Advisor, Company, OneListTier
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
-from datahub.metadata.models import CompanyClassification
 
 
 logger = getLogger(__name__)
@@ -16,7 +15,7 @@ logger = getLogger(__name__)
 class Command(CSVBaseCommand):
     """
     Command to update:
-    - Company.classification
+    - Company.one_list_tier
     - Company.one_list_account_owner
 
     If --reset-unmatched=true, all the records not in the CSV will have
@@ -32,7 +31,7 @@ class Command(CSVBaseCommand):
             default=False,
             help=(
                 'If true, Data Hub records not present '
-                'in the CSV will have classification and one_list_account_owner set to None.'
+                'in the CSV will have one_list_tier and one_list_account_owner set to None.'
             ),
         )
 
@@ -47,7 +46,7 @@ class Command(CSVBaseCommand):
         # as we process them and reset the remaining items.
         if reset_unmatched:
             qs = Company.objects.filter(
-                Q(classification_id__isnull=False) | Q(one_list_account_owner_id__isnull=False),
+                Q(one_list_tier_id__isnull=False) | Q(one_list_account_owner_id__isnull=False),
             )
             self.companies_to_reset = {company.id: company for company in qs}
         else:
@@ -80,7 +79,7 @@ class Command(CSVBaseCommand):
         try:
             self._update_company(
                 company,
-                new_classification_id=None,
+                new_one_list_tier_id=None,
                 new_one_list_account_owner_id=None,
                 simulate=simulate,
             )
@@ -92,14 +91,14 @@ class Command(CSVBaseCommand):
             return True
 
     @lru_cache(maxsize=None)
-    def get_classification(self, pk):
+    def get_one_list_tier(self, pk):
         """
         :param pk: primary key of the instance to get
-        :returns: CompanyClassification with id == `pk`
+        :returns: OneListTier with id == `pk`
         """
         if not pk:
             return None
-        return CompanyClassification.objects.get(pk=pk)
+        return OneListTier.objects.get(pk=pk)
 
     @lru_cache(maxsize=None)
     def get_adviser(self, pk):
@@ -112,16 +111,16 @@ class Command(CSVBaseCommand):
         return Advisor.objects.get(pk=pk)
 
     def _update_company(
-        self, company, new_classification_id, new_one_list_account_owner_id, simulate,
+        self, company, new_one_list_tier_id, new_one_list_account_owner_id, simulate,
     ):
         """
         Update `company` with the new values.
 
-        :param new_classification_id: new CompanyClassification value
+        :param new_one_list_tier_id: new OneListTier value
         :param new_one_list_account_owner_id: new Advisor value
         :param simulate: True if the change should not be committed to the database
         """
-        company.classification = self.get_classification(new_classification_id)
+        company.one_list_tier = self.get_one_list_tier(new_one_list_tier_id)
         company.one_list_account_owner = self.get_adviser(new_one_list_account_owner_id)
 
         if simulate:
@@ -130,23 +129,23 @@ class Command(CSVBaseCommand):
         with reversion.create_revision():
             company.save(
                 update_fields=(
-                    'classification_id',
+                    'one_list_tier_id',
                     'one_list_account_owner_id',
                 ),
             )
-            reversion.set_comment('Classification and One List account owner correction.')
+            reversion.set_comment('One List tier and One List account owner correction.')
 
-    def _should_update(self, company, classification_id, one_list_account_owner_id):
+    def _should_update(self, company, one_list_tier_id, one_list_account_owner_id):
         """
         Check if `company` should be updated.
 
         :param company: Company to update
-        :param classification_id: new CompanyClassification value
+        :param one_list_tier_id: new OneListTier value
         :param one_list_account_owner_id: new Advisor value
         :return: True if `company` needs updating
         """
         return (
-            company.classification_id != classification_id
+            company.one_list_tier_id != one_list_tier_id
         ) or (
             company.one_list_account_owner_id != one_list_account_owner_id
         )
@@ -158,8 +157,8 @@ class Command(CSVBaseCommand):
         # remove company.pk from the list of companies to reset
         self.companies_to_reset.pop(company.pk, None)
 
-        classification_id = parse_uuid(row['classification_id'])
+        one_list_tier_id = parse_uuid(row['one_list_tier_id'])
         one_list_account_owner_id = parse_uuid(row['one_list_account_owner_id'])
 
-        if self._should_update(company, classification_id, one_list_account_owner_id):
-            self._update_company(company, classification_id, one_list_account_owner_id, simulate)
+        if self._should_update(company, one_list_tier_id, one_list_account_owner_id):
+            self._update_company(company, one_list_tier_id, one_list_account_owner_id, simulate)
