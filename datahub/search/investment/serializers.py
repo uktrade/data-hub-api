@@ -24,6 +24,7 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     investor_company = SingleOrListField(child=StringUUIDField(), required=False)
     investor_company_country = SingleOrListField(child=StringUUIDField(), required=False)
     country_investment_originates_from = SingleOrListField(child=StringUUIDField(), required=False)
+    likelihood_to_land = SingleOrListField(child=StringUUIDField(), required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     stage = SingleOrListField(child=StringUUIDField(), required=False)
@@ -59,6 +60,7 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
         'intermediate_company.name',
         'investment_type.name',
         'investor_company.name',
+        'likelihood_to_land.name',
         'modified_on',
         'name',
         'new_tech_to_uk',
