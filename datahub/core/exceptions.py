@@ -29,3 +29,7 @@ class APIMethodNotAllowedException(APIException):
     status_code = status.HTTP_405_METHOD_NOT_ALLOWED
     default_detail = _('Method is not allowed.')
     default_code = 'method_not_allowed'
+
+
+class SimulationRollback(Exception):
+    """Used to roll back deletions during a simulation."""
