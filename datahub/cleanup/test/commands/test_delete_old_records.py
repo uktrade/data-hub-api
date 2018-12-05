@@ -417,10 +417,14 @@ def test_configs(model_label, config):
         - (config.relation_filter_mapping or {}).keys()
         - set(config.excluded_relations)
     )
-    fields_for_error_message = [_format_field(field) for field in field_missing_from_config]
+    fields_for_error_message = '\n'.join(
+        (_format_field(field) for field in field_missing_from_config),
+    )
     assert not field_missing_from_config, (
-        f'The following related fields are missing from the config for {model_label}: '
-        f'{fields_for_error_message}. Please add them to the ModelCleanupConfig in either '
+        f'The following related fields are missing from the config for {model_label}:\n'
+        f'{fields_for_error_message}.\n'
+        f'\n'
+        f' Please add them to the ModelCleanupConfig in either '
         f'relation_filter_mapping or excluded_relations.\n'
         f'\n'
         f'Only add the model to excluded_relations if its existence should not affect '
