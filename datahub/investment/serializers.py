@@ -20,6 +20,7 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
+    LikelihoodToLand,
     SpecificProgramme,
 )
 from datahub.investment.validate import REQUIRED_MESSAGE, validate
@@ -36,6 +37,7 @@ CORE_FIELDS = (
     'actual_land_date',
     'quotable_as_public_case_study',
     'likelihood_of_landing',
+    'likelihood_to_land',
     'priority',
     'approved_commitment_to_invest',
     'approved_fdi',
@@ -192,6 +194,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
+    likelihood_to_land = NestedRelatedField(LikelihoodToLand, required=False, allow_null=True)
     specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
         Contact, many=True, required=True, allow_null=False, allow_empty=False,
@@ -376,10 +379,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     class Meta:
         model = InvestmentProject
         fields = ALL_FIELDS
-        # DRF defaults to required=False even though this field is non-nullable
-        extra_kwargs = {
-            'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
-        }
         permissions = {
             f'investment.{InvestmentProjectPermission.view_investmentproject_document}':
                 'archived_documents_url_path',
@@ -392,6 +391,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'archived_documents_url_path',
             'comments',
+            'likelihood_of_landing',
         )
 
 
