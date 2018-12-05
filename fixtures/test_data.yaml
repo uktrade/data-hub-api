@@ -229,6 +229,23 @@
     modified_on: '2017-11-26T11:00:00Z'
 
 - model: company.company
+  pk: cc7e2f19-7251-4a41-a27a-f98437720531
+  fields:
+    name: DnB Corp
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 1 Main Road
+    registered_address_town: Rome
+    registered_address_postcode: '001122'
+    registered_address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
+    description: This is a dummy company for testing companies with DnB data
+    duns_number: '000000001'
+    created_on: '2015-10-26T11:00:00Z'
+    modified_on: '2017-11-26T11:00:00Z'
+
+- model: company.company
   pk: 960e1fa9-cc25-478c-a548-a2e2047319bb
   fields:
     name: One List Subsidiary Ltd
