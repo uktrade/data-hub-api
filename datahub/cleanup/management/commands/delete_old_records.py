@@ -5,11 +5,13 @@ from django.utils.timezone import utc
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
-from datahub.company.models import Contact
+from datahub.company.models import Company, Contact
 from datahub.investment.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
 
+COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=utc)  # 2013-08-18 + 1 day
+COMPANY_EXPIRY_PERIOD = relativedelta(years=10)
 CONTACT_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 22, tzinfo=utc)  # 2014-07-21 + 1 day
 CONTACT_EXPIRY_PERIOD = relativedelta(years=10)
 INTERACTION_EXPIRY_PERIOD = relativedelta(years=10)
@@ -36,6 +38,29 @@ class Command(BaseCleanupCommand):
     # If a field should not be excluded, but should not be filtered, it should be added
     # to relation_filter_mapping with an empty list of filters.
     CONFIGS = {
+        # There were multiple large bulk updates of contacts in the legacy system on and just
+        # before 2013-08-18, and so modified-on dates are not reliable prior to
+        # COMPANY_MODIFIED_ON_CUT_OFF.
+        'company.Company': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', COMPANY_MODIFIED_ON_CUT_OFF),
+            ),
+            relation_filter_mapping={
+                # Companies are not deleted if they have any related records via these relations.
+                # Apart from for one_list_core_team_members, we wait for related records to expire
+                # before we delete the relevant companies
+                Company._meta.get_field('contacts'): (),
+                Company._meta.get_field('interactions'): (),
+                Company._meta.get_field('intermediate_investment_projects'): (),
+                Company._meta.get_field('investee_projects'): (),
+                Company._meta.get_field('investor_investment_projects'): (),
+                Company._meta.get_field('one_list_core_team_members'): (),
+                Company._meta.get_field('orders'): (),
+                Company._meta.get_field('subsidiaries'): (),
+                Company._meta.get_field('transferred_from'): (),
+            },
+        ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
         # before 2014-07-21, and so modified-on dates are not reliable prior to
         # CONTACT_MODIFIED_ON_CUT_OFF.

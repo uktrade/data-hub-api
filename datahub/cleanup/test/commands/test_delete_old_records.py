@@ -12,6 +12,8 @@ from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
+    COMPANY_EXPIRY_PERIOD,
+    COMPANY_MODIFIED_ON_CUT_OFF,
     CONTACT_EXPIRY_PERIOD,
     CONTACT_MODIFIED_ON_CUT_OFF,
     INTERACTION_EXPIRY_PERIOD,
@@ -21,7 +23,13 @@ from datahub.cleanup.management.commands.delete_old_records import (
     ORDER_MODIFIED_ON_CUT_OFF,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
-from datahub.company.test.factories import ContactFactory
+from datahub.company.test.factories import (
+    CompanyFactory,
+    ContactFactory,
+    DuplicateCompanyFactory,
+    OneListCoreTeamMemberFactory,
+    SubsidiaryFactory,
+)
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
@@ -44,6 +52,7 @@ from datahub.search.apps import get_search_app_by_model
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 
+COMPANY_DELETE_BEFORE_DATETIME = FROZEN_TIME - COMPANY_EXPIRY_PERIOD
 CONTACT_DELETE_BEFORE_DATETIME = FROZEN_TIME - CONTACT_EXPIRY_PERIOD
 INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
@@ -51,6 +60,131 @@ ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 
 
 MAPPING = {
+    'company.Company': {
+        'factory': CompanyFactory,
+        'implicitly_deletable_models': set(),
+        'expired_objects_kwargs': [
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                'modified_on': COMPANY_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+            },
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_MODIFIED_ON_CUT_OFF,
+            },
+        ],
+        'relations': [
+            {
+                'factory': DuplicateCompanyFactory,
+                'field': 'transferred_to',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': SubsidiaryFactory,
+                'field': 'global_headquarters',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': OneListCoreTeamMemberFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': ContactFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': CompanyInteractionFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectFactory,
+                'field': 'intermediate_company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'client_contacts': [],
+                        'investor_company': None,
+                        'uk_company': None,
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectFactory,
+                'field': 'investor_company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'client_contacts': [],
+                        'intermediate_company': None,
+                        'uk_company': None,
+                    },
+                ],
+            },
+            {
+                'factory': InvestmentProjectFactory,
+                'field': 'uk_company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'client_contacts': [],
+                        'investor_company': None,
+                        'intermediate_company': None,
+                    },
+                ],
+            },
+            {
+                'factory': OrderFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+        ],
+    },
     'company.Contact': {
         'factory': ContactFactory,
         'implicitly_deletable_models': set(),
