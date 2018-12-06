@@ -19,7 +19,6 @@ class Company(BaseESModel):
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.nested_id_name_field()
-    classification = fields.nested_id_name_field()
     companies_house_data = fields.nested_ch_company_field()
     company_number = fields.SortableCaseInsensitiveKeywordText()
     contacts = fields.nested_contact_or_adviser_field('contacts')
@@ -35,7 +34,6 @@ class Company(BaseESModel):
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
     name_trigram = fields.TrigramText()
-    one_list_account_owner = fields.nested_contact_or_adviser_field('one_list_account_owner')
     reference_code = fields.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
@@ -84,7 +82,6 @@ class Company(BaseESModel):
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
-        'classification': dict_utils.id_name_dict,
         'companies_house_data': dict_utils.ch_company_dict,
         'contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'employee_range': dict_utils.id_name_dict,
@@ -93,7 +90,6 @@ class Company(BaseESModel):
         'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
-        'one_list_account_owner': dict_utils.contact_or_adviser_dict,
         'registered_address_country': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
         'trading_address_country': dict_utils.id_name_dict,

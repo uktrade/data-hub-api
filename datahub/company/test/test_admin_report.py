@@ -8,10 +8,10 @@ from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.company.admin_reports import AllAdvisersReport, OneListReport
+from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import AdminTestMixin, create_test_user, random_obj_for_model
-from datahub.metadata.models import CompanyClassification
+from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -45,25 +45,25 @@ class TestReportAdmin(AdminTestMixin):
         CompanyFactory.create_batch(
             2,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            classification=random_obj_for_model(CompanyClassification),
+            one_list_tier=OneListTier.objects.first(),
             one_list_account_owner=AdviserFactory(),
         )
         # ignored because headquarter_type is None
         CompanyFactory(
             headquarter_type=None,
-            classification=random_obj_for_model(CompanyClassification),
+            one_list_tier=OneListTier.objects.first(),
             one_list_account_owner=AdviserFactory(),
         )
-        # ignored because classification is None
+        # ignored because one_list_tier is None
         CompanyFactory(
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            classification=None,
+            one_list_tier=None,
             one_list_account_owner=AdviserFactory(),
         )
         # ignored because one_list_account_owner is None
         CompanyFactory(
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            classification=random_obj_for_model(CompanyClassification),
+            one_list_tier=OneListTier.objects.first(),
             one_list_account_owner=None,
         )
 
@@ -115,34 +115,34 @@ def test_one_list_report_generation():
     companies = CompanyFactory.create_batch(
         2,
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-        classification=factory.Iterator(
-            CompanyClassification.objects.all(),  # keeps the ordering
+        one_list_tier=factory.Iterator(
+            OneListTier.objects.all(),  # keeps the ordering
         ),
         one_list_account_owner=AdviserFactory(),
     )
     # ignored because headquarter_type is None
     CompanyFactory(
         headquarter_type=None,
-        classification=random_obj_for_model(CompanyClassification),
+        one_list_tier=OneListTier.objects.first(),
         one_list_account_owner=AdviserFactory(),
     )
-    # ignored because classification is None
+    # ignored because one_list_tier is None
     CompanyFactory(
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-        classification=None,
+        one_list_tier=None,
         one_list_account_owner=AdviserFactory(),
     )
     # ignored because one_list_account_owner is None
     CompanyFactory(
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-        classification=random_obj_for_model(CompanyClassification),
+        one_list_tier=OneListTier.objects.first(),
         one_list_account_owner=None,
     )
 
     report = OneListReport()
     assert list(report.rows()) == [{
         'name': company.name,
-        'classification__name': company.classification.name,
+        'one_list_tier__name': company.one_list_tier.name,
         'sector__segment': company.sector.segment,
         'primary_contact_name': company.one_list_account_owner.name,
         'one_list_account_owner__telephone_number':

@@ -16,7 +16,6 @@ class CompanySearchApp(SearchApp):
     queryset = DBCompany.objects.select_related(
         'archived_by',
         'business_type',
-        'classification',
         'employee_range',
         'export_experience_category',
         'headquarter_type',

@@ -1,4 +1,4 @@
-from django.db.models import Max
+from django.db.models import Case, Max, When
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
@@ -112,8 +112,14 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
             DBInvestmentProject,
             'actual_uk_regions__name',
         ),
-        investor_company_global_account_manager=get_full_name_expression(
-            'investor_company__one_list_account_owner',
+        investor_company_global_account_manager=Case(
+            When(
+                investor_company__global_headquarters__isnull=False,
+                then=get_full_name_expression(
+                    'investor_company__global_headquarters__one_list_account_owner',
+                ),
+            ),
+            default=get_full_name_expression('investor_company__one_list_account_owner'),
         ),
         client_relationship_manager_name=get_full_name_expression('client_relationship_manager'),
         project_manager_name=get_full_name_expression('project_manager'),

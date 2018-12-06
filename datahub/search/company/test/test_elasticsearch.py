@@ -1,3 +1,8 @@
+import pytest
+
+from datahub.company.test.factories import CompanyFactory
+from datahub.search import elasticsearch
+from datahub.search.company import CompanySearchApp
 from datahub.search.company.models import Company as ESCompany
 from datahub.search.query_builder import (
     get_basic_search_query,
@@ -224,4 +229,72 @@ def test_limited_get_search_by_entity_query():
             '_score',
             'id',
         ],
+    }
+
+
+@pytest.mark.django_db
+def test_indexed_doc(setup_es):
+    """Test the ES data of an indexed company."""
+    company = CompanyFactory()
+
+    doc = ESCompany.es_document(company)
+    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+
+    setup_es.indices.refresh()
+
+    indexed_company = setup_es.get(
+        index=CompanySearchApp.es_model.get_write_index(),
+        doc_type=CompanySearchApp.name,
+        id=company.pk,
+    )
+
+    source = indexed_company.pop('_source')
+    assert set(source.keys()) == {
+        'archived',
+        'archived_by',
+        'archived_on',
+        'archived_reason',
+        'business_type',
+        'companies_house_data',
+        'company_number',
+        'contacts',
+        'created_on',
+        'description',
+        'employee_range',
+        'export_experience_category',
+        'export_to_countries',
+        'future_interest_countries',
+        'headquarter_type',
+        'id',
+        'modified_on',
+        'name',
+        'global_headquarters',
+        'reference_code',
+        'registered_address_1',
+        'registered_address_2',
+        'registered_address_country',
+        'registered_address_county',
+        'registered_address_postcode',
+        'registered_address_town',
+        'sector',
+        'trading_address_1',
+        'trading_address_2',
+        'trading_address_country',
+        'trading_address_county',
+        'trading_address_postcode',
+        'trading_address_town',
+        'trading_name',
+        'turnover_range',
+        'uk_based',
+        'uk_region',
+        'vat_number',
+        'duns_number',
+        'website',
+    }
+    assert indexed_company == {
+        '_id': str(company.pk),
+        '_index': CompanySearchApp.es_model.get_target_index_name(),
+        '_type': CompanySearchApp.name,
+        '_version': indexed_company['_version'],
+        'found': True,
     }
