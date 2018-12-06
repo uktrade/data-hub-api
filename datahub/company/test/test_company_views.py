@@ -11,7 +11,7 @@ from rest_framework.settings import api_settings
 from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import CompaniesHouseCompany, Company
+from datahub.company.models import CompaniesHouseCompany, Company, OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
@@ -27,7 +27,7 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     random_obj_for_model,
 )
-from datahub.metadata.models import CompanyClassification, Sector
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -276,7 +276,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'classification': None,
             'one_list_group_tier': None,
             'company_number': '123',
             'contacts': [],
@@ -298,16 +297,6 @@ class TestGetCompany(APITestMixin):
             'future_interest_countries': [],
             'headquarter_type': None,
             'modified_on': format_date_or_datetime(company.modified_on),
-            'one_list_account_owner': {
-                'id': str(company.one_list_account_owner.pk),
-                'name': company.one_list_account_owner.name,
-                'first_name': company.one_list_account_owner.first_name,
-                'last_name': company.one_list_account_owner.last_name,
-                'dit_team': {
-                    'id': str(company.one_list_account_owner.dit_team.id),
-                    'name': company.one_list_account_owner.dit_team.name,
-                },
-            },
             'one_list_group_global_account_manager': {
                 'id': str(company.one_list_account_owner.pk),
                 'name': company.one_list_account_owner.name,
@@ -367,7 +356,6 @@ class TestGetCompany(APITestMixin):
             registered_address_town='Fooland',
             registered_address_country_id=Country.united_states.value.id,
             headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification=random_obj_for_model(CompanyClassification),
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -387,10 +375,6 @@ class TestGetCompany(APITestMixin):
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
         assert response.data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
-        assert response.data['classification'] == {
-            'id': str(company.classification.pk),
-            'name': company.classification.name,
-        }
 
     def test_get_company_without_registered_country(self):
         """Tests the company item view for a company without a registered
@@ -443,22 +427,22 @@ class TestGetCompany(APITestMixin):
         (
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
-                global_headquarters=CompanyFactory(classification=one_list_tier),
+                one_list_tier=None,
+                global_headquarters=CompanyFactory(one_list_tier=one_list_tier),
             ),
             # subsidiary with Global Headquarters not on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
-                global_headquarters=CompanyFactory(classification=None),
+                one_list_tier=None,
+                global_headquarters=CompanyFactory(one_list_tier=None),
             ),
             # single company on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=one_list_tier,
+                one_list_tier=one_list_tier,
                 global_headquarters=None,
             ),
             # single company not on the One List
             lambda one_list_tier: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=None,
             ),
         ),
@@ -474,7 +458,7 @@ class TestGetCompany(APITestMixin):
         Test that the endpoint includes the One List Tier
         of the Global Headquarters in the group.
         """
-        one_list_tier = CompanyClassification.objects.first()
+        one_list_tier = OneListTier.objects.first()
         company = build_company(one_list_tier)
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -485,7 +469,7 @@ class TestGetCompany(APITestMixin):
         group_global_headquarters = company.global_headquarters or company
 
         actual_one_list_group_tier = response.json()['one_list_group_tier']
-        if not group_global_headquarters.classification:
+        if not group_global_headquarters.one_list_tier:
             assert not actual_one_list_group_tier
         else:
             assert actual_one_list_group_tier == {
@@ -498,29 +482,29 @@ class TestGetCompany(APITestMixin):
         (
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=CompanyFactory(
-                    classification=one_list_tier,
+                    one_list_tier=one_list_tier,
                     one_list_account_owner=gam,
                 ),
             ),
             # subsidiary with Global Headquarters not on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=CompanyFactory(
-                    classification=None,
+                    one_list_tier=None,
                     one_list_account_owner=None,
                 ),
             ),
             # single company on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=one_list_tier,
+                one_list_tier=one_list_tier,
                 one_list_account_owner=gam,
                 global_headquarters=None,
             ),
             # single company not on the One List
             lambda one_list_tier, gam: CompanyFactory(
-                classification=None,
+                one_list_tier=None,
                 global_headquarters=None,
                 one_list_account_owner=None,
             ),
@@ -538,7 +522,7 @@ class TestGetCompany(APITestMixin):
         of the Global Headquarters in the group.
         """
         global_account_manager = AdviserFactory()
-        one_list_tier = CompanyClassification.objects.first()
+        one_list_tier = OneListTier.objects.first()
         company = build_company(one_list_tier, global_account_manager)
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -631,12 +615,12 @@ class TestUpdateCompany(APITestMixin):
 
     def test_cannot_update_read_only_fields(self):
         """Test updating read-only fields."""
-        one_list_tier, different_one_list_tier = CompanyClassification.objects.all()[:2]
+        one_list_tier, different_one_list_tier = OneListTier.objects.all()[:2]
         one_list_gam, different_one_list_gam = AdviserFactory.create_batch(2)
         company = CompanyFactory(
             reference_code='ORG-345645',
             archived_documents_url_path='old_path',
-            classification=one_list_tier,
+            one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
             duns_number='000000001',
         )
@@ -647,7 +631,6 @@ class TestUpdateCompany(APITestMixin):
             data={
                 'reference_code': 'XYZ',
                 'archived_documents_url_path': 'new_path',
-                'classification': different_one_list_tier.id,
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
@@ -657,13 +640,9 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['reference_code'] == 'ORG-345645'
         assert response.data['archived_documents_url_path'] == 'old_path'
-        assert response.data['classification'] == {
-            'id': str(company.classification.id),
-            'name': company.classification.name,
-        }
         assert response.data['one_list_group_tier'] == {
-            'id': str(company.classification.id),
-            'name': company.classification.name,
+            'id': str(company.one_list_tier.id),
+            'name': company.one_list_tier.name,
         }
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response.data['duns_number'] == '000000001'

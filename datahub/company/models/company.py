@@ -91,7 +91,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     duns_number = models.CharField(
         blank=True,
         null=True,
-        default='',
         help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
         max_length=9,
         validators=[
@@ -154,7 +153,13 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     classification = models.ForeignKey(
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL,
-        help_text='One List Tier',
+        help_text='Deprecated - Please use One List tier field instead',
+    )
+    one_list_tier = models.ForeignKey(
+        OneListTier,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
     )
     global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
@@ -268,7 +273,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         """
         :returns: the One List Tier of the group this company is part of.
         """
-        return self.get_group_global_headquarters().classification
+        return self.get_group_global_headquarters().one_list_tier
 
     def get_one_list_group_core_team(self):
         """

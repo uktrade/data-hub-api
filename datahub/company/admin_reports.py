@@ -46,18 +46,18 @@ class OneListReport(QuerySetReport):
     permissions_required = ('company.view_company',)
     queryset = Company.objects.filter(
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-        classification__id__isnull=False,
+        one_list_tier_id__isnull=False,
         one_list_account_owner_id__isnull=False,
     ).annotate(
         primary_contact_name=get_full_name_expression('one_list_account_owner'),
         url=get_front_end_url_expression('company', 'pk'),
     ).order_by(
-        'classification__order',
+        'one_list_tier__order',
         'name',
     )
     field_titles = {
         'name': 'Account Name',
-        'classification__name': 'Tier',
+        'one_list_tier__name': 'Tier',
         'sector__segment': 'Sector',
         'primary_contact_name': 'Primary Contact',
         'one_list_account_owner__telephone_number': 'Contact Number',

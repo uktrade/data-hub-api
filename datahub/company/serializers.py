@@ -16,6 +16,7 @@ from datahub.company.models import (
     Contact,
     ContactPermission,
     ExportExperienceCategory,
+    OneListTier,
 )
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
@@ -279,7 +280,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True,
     )
-    classification = NestedRelatedField(meta_models.CompanyClassification, read_only=True)
     one_list_group_tier = serializers.SerializerMethodField()
     companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
@@ -295,9 +295,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
-    )
-    one_list_account_owner = NestedAdviserWithTeamField(
-        required=False, allow_null=True,
     )
     one_list_group_global_account_manager = serializers.SerializerMethodField()
     global_headquarters = NestedRelatedField(
@@ -385,7 +382,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         one_list_tier = obj.get_one_list_group_tier()
 
-        field = NestedRelatedField(meta_models.CompanyClassification)
+        field = NestedRelatedField(OneListTier)
         return field.to_representation(one_list_tier)
 
     def get_one_list_group_global_account_manager(self, obj):
@@ -434,7 +431,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_postcode',
             'trading_address_country',
             'business_type',
-            'classification',
             'one_list_group_tier',
             'companies_house_data',
             'contacts',
@@ -442,7 +438,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_to_countries',
             'future_interest_countries',
             'headquarter_type',
-            'one_list_account_owner',
             'one_list_group_global_account_manager',
             'global_headquarters',
             'sector',
