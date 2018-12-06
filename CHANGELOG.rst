@@ -1,3 +1,47 @@
+Data Hub API 8.0.0 (2018-12-06)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The field ``classification`` was removed from all company API endpoints.
+- **Companies** The column ``company_company.classification_id`` is deprecated and will be deleted on or after December 13. Please use ``company_company.one_list_tier_id`` with foreign keys to ``company_onelisttier`` instead of ``metadata_companyclassification``. The IDs were preserved so the records in the ``company_onelisttier`` table match the records in the deprecated ``metadata_companyclassification``.
+- **Companies** The field ``one_list_account_owner`` was removed from all company API endpoints, please use ``one_list_group_global_account_manager`` instead.
+- The API endpoint ``/metadata/company-classification`` was removed.
+- The table ``metadata_companyclassification`` is deprecated and will be deleted on or after December 13. Please use ``company_onelisttier`` instead.
+
+Features
+--------
+
+- **Companies** The field ``Company.classification`` was made read-only in the Django Admin and is now populated automatically from ``Company.one_list_tier``.
+- **Investment** Investment projects that have not been updated in the last ten years can now be deleted using the ``delete_old_records`` management command.
+- **OMIS** OMIS orders that have not been updated in the last seven years can now be deleted using the ``delete_old_records`` management command.
+
+Internal changes
+----------------
+
+- **Investment** It is now possible to delete investment projects using added management command ``delete_investment_project``.
+- **Investment** It is now possible to unarchive and update status of investment projects using added management command ``update_investment_project_archive_state``.
+
+API
+---
+
+- **Companies** The field ``classification`` was removed from all company API endpoints.
+- **Companies** The field ``one_list_account_owner`` was removed from all company API endpoints, please use ``one_list_group_global_account_manager`` instead.
+- **Investment** The global account manager field in the ``POST /v3/search/investment_project/export`` response body now inherits the value from the investor company's Global Headquarters in case of subsidiaries.
+- The API endpoint ``/metadata/company-classification`` was removed.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.classification_id`` is deprecated, please check the *Deprecations* section for more details.
+- **Companies** Blank values in the ``company_company.duns_number`` field are now NULLs instead of empty strings.
+- **Companies** The column ``company_company.one_list_tier_id`` was added and replaces the column ``company_company.classification_id``.
+- The table ``metadata_companyclassification`` is deprecated, please check the *Deprecations* section for more details.
+
+
 Data Hub API 7.11.0 (2018-11-29)
 ================================
 
