@@ -1,1 +1,0 @@
-The table ``metadata_companyclassification`` is deprecated and will be deleted on or after December 13. Please use ``company_onelisttier`` instead.

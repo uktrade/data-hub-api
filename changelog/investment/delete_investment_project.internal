@@ -1,1 +1,0 @@
-It is now possible to delete investment projects using added management command ``delete_investment_project``.
