@@ -198,7 +198,6 @@ class TestAddInteraction(APITestMixin):
                     'dit_team': Team.healthcare_uk.value.id,
                 },
                 {
-                    'notes': ['This field is required.'],
                     'communication_channel': ['This field is required.'],
                 },
             ),
