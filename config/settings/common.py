@@ -7,11 +7,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
+import base64
+import os
 import ssl
+import stat
 from datetime import timedelta
+from urllib.parse import urlencode
 
 import environ
 from celery.schedules import crontab
+
+from datahub.core.constants import InvestmentProjectStage
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
@@ -83,7 +89,11 @@ LOCAL_APPS = [
     'datahub.user_event_log',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+MI_APPS = [
+    'datahub.mi_dashboard',
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + MI_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -118,6 +128,42 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+DATABASE_ROUTERS = ('config.settings.db_router.DBRouter',)
+
+# Check if MI database certificates are provided in the environment variables
+# If they are then write them to the storage and update database options.
+# Certificates should be base64 encoded.
+MI_DATABASE_OPTIONS = {}
+MI_DATABASE_SSLROOTCERT = env('MI_DATABASE_SSLROOTCERT', default=None)
+MI_DATABASE_SSLCERT = env('MI_DATABASE_SSLCERT', default=None)
+MI_DATABASE_SSLKEY = env('MI_DATABASE_SSLKEY', default=None)
+MI_CERT_PERMISSIONS = stat.S_IRUSR | stat.S_IWUSR
+
+if MI_DATABASE_SSLROOTCERT and MI_DATABASE_SSLCERT and MI_DATABASE_SSLKEY:
+    MI_DATABASE_SSLROOTCERT_PATH = CONFIG_DIR('settings/mi/server-ca.pem')
+    MI_DATABASE_SSLCERT_PATH = CONFIG_DIR('settings/mi/client-cert.pem')
+    MI_DATABASE_SSLKEY_PATH = CONFIG_DIR('settings/mi/client-key.pem')
+
+    with open(MI_DATABASE_SSLROOTCERT_PATH, 'wb') as f:
+        f.write(base64.b64decode(MI_DATABASE_SSLROOTCERT))
+    os.chmod(MI_DATABASE_SSLROOTCERT_PATH, MI_CERT_PERMISSIONS)
+
+    with open(MI_DATABASE_SSLCERT_PATH, 'wb') as f:
+        f.write(base64.b64decode(MI_DATABASE_SSLCERT))
+    os.chmod(MI_DATABASE_SSLCERT_PATH, MI_CERT_PERMISSIONS)
+
+    with open(MI_DATABASE_SSLKEY_PATH, 'wb') as f:
+        f.write(base64.b64decode(MI_DATABASE_SSLKEY))
+    os.chmod(MI_DATABASE_SSLKEY_PATH, MI_CERT_PERMISSIONS)
+
+    MI_DATABASE_OPTIONS = {
+        'OPTIONS': {
+            'sslmode': 'verify-ca',
+            'sslrootcert': MI_DATABASE_SSLROOTCERT_PATH,
+            'sslcert': MI_DATABASE_SSLCERT_PATH,
+            'sslkey': MI_DATABASE_SSLKEY_PATH,
+        }
+    }
 
 DATABASES = {
     'default': {
@@ -125,6 +171,13 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
+    },
+    'mi': {
+        **env.db('MI_DATABASE_URL'),
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': env.int('MI_DATABASE_DATABASE_CONN_MAX_AGE', 0),
+        'DISABLE_SERVER_SIDE_CURSORS': False,
+        **MI_DATABASE_OPTIONS,
     }
 }
 
@@ -316,6 +369,13 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=0, hour=8),
         }
 
+    if env.bool('ENABLE_MI_DASHBOARD_FEED', False):
+        CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
+            'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
+            'args': ('2018/2019', ),
+            'schedule': crontab(minute=0, hour=2),
+        }
+
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
@@ -325,6 +385,13 @@ CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 # COMPANIESHOUSE
 COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
 
+MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
+    ('sortby', 'estimated_land_date:asc'),
+    ('custom', 'true'),
+    ('stage', InvestmentProjectStage.verify_win.value.id),
+    ('stage', InvestmentProjectStage.won.value.id),
+    ('investor_company_country', ''),
+)
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
@@ -335,6 +402,10 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
     'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
+
+    'mi_fdi_dashboard_country': (
+        f'{DATAHUB_FRONTEND_BASE_URL}/{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}',
+    )
 }
 
 # DT07 reporting service (used for company timeline)

@@ -28,6 +28,7 @@ MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
     models.InvestmentType,
     models.OverseasRegion,
+    models.SectorCluster,
 )
 
 MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
