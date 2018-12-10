@@ -2,6 +2,7 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import integer_validator, MaxLengthValidator, MinLengthValidator
 from django.db import models
 from django.utils.functional import cached_property
@@ -100,8 +101,23 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             integer_validator,
         ],
     )
+    # TODO remove null=True after migrating all records
+    trading_names = ArrayField(
+        models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH),
+        blank=True,
+        null=True,
+        default=list,
+        help_text=(
+            'It will eventually replace alias. '
+            'If you change this please change alias (trading name) as well.'
+        ),
+    )
+    # TODO remove after end of deprecation period
     alias = models.CharField(
-        max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name',
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+        help_text='Trading name. If you change this please change trading names as well.',
     )
     business_type = models.ForeignKey(
         metadata_models.BusinessType, blank=True, null=True,
