@@ -1,3 +1,20 @@
+Data Hub API 8.1.0 (2018-12-10)
+===============================
+
+
+
+Features
+--------
+
+- **Companies** Companies that have not been updated in the last ten years can now be deleted using the ``delete_old_records`` management command.
+- **Contacts** Contacts that have not been updated in the last ten years can now be deleted using the ``delete_old_records`` management command.
+
+Internal changes
+----------------
+
+- Various dependencies were updated.
+
+
 Data Hub API 8.0.0 (2018-12-06)
 ===============================
 
