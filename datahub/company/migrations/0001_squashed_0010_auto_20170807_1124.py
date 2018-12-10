@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
                 ('registered_address_postcode', models.CharField(blank=True, max_length=255, null=True)),
                 ('company_number', models.CharField(blank=True, max_length=255, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('alias', models.CharField(blank=True, help_text='Trading name', max_length=255, null=True)),
+                ('alias', models.CharField(blank=True, help_text='Trading name. If you change this please change trading names as well.', max_length=255, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('website', models.CharField(blank=True, max_length=255, null=True)),
                 ('trading_address_1', models.CharField(blank=True, max_length=255, null=True)),
