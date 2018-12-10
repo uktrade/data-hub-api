@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='policy_issue_type',
-            field=models.ForeignKey(blank=True, help_text='For policy feedback only.', related_name='interactions', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyIssueType'),
+            field=models.ForeignKey(blank=True, help_text='Used for legacy policy feedback interactions only.', related_name='+', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyIssueType'),
         ),
         migrations.RunPython(load_initial_policy_area, reverse_code=migrations.RunPython.noop),
         migrations.RunPython(load_initial_policy_issue_type, reverse_code=migrations.RunPython.noop)

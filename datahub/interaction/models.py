@@ -100,6 +100,8 @@ class Interaction(BaseModel):
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
+        # TODO: Represents legacy policy feedback interactions. To be removed when the data
+        #  has been migrated.
         ('policy_feedback', 'Policy feedback'),
     )
 
@@ -174,20 +176,32 @@ class Interaction(BaseModel):
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
     )
+    # TODO: Remove null=True once existing interactions with a NULL value for this field
+    #   have been updated to have False instead.
+    was_policy_feedback_provided = models.BooleanField(null=True, default=False)
     policy_areas = models.ManyToManyField(
         'PolicyArea',
         blank=True,
-        help_text='For policy feedback only.',
         related_name='interactions',
     )
+    # TODO: Move data to policy_issue_types and remove field once legacy policy feedback
+    #   functionality is removed from the front end.
     policy_issue_type = models.ForeignKey(
         'PolicyIssueType',
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-        help_text='For policy feedback only.',
+        help_text='Used for legacy policy feedback interactions only.',
+        related_name='+',
+    )
+    policy_issue_types = models.ManyToManyField(
+        'PolicyIssueType',
+        blank=True,
         related_name='interactions',
     )
+    # TODO: Remove null=True once existing interactions with a NULL value for this field
+    #   have been updated to have '' instead.
+    policy_feedback_notes = models.TextField(blank=True, null=True, default='')
 
     @property
     def is_event(self):
