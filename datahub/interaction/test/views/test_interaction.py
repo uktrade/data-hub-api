@@ -74,10 +74,21 @@ class TestAddInteraction(APITestMixin):
             {
                 'was_policy_feedback_provided': False,
             },
+            # company interaction with blank notes
+            {
+                'was_policy_feedback_provided': False,
+                'notes': '',
+            },
+            # company interaction with notes
+            {
+                'was_policy_feedback_provided': False,
+                'notes': 'hello',
+            },
             # investment project interaction
             {
                 'was_policy_feedback_provided': False,
                 'investment_project': InvestmentProjectFactory,
+                'notes': 'hello',
             },
             # company interaction without was_policy_feedback_provided explicitly specified
             # (for backwards compatibility)
@@ -108,7 +119,6 @@ class TestAddInteraction(APITestMixin):
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
-            'notes': 'hello',
             'company': company.pk,
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,

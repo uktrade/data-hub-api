@@ -35,13 +35,18 @@ class TestAddServiceDelivery(APITestMixin):
             {
                 'is_event': False,
                 'was_policy_feedback_provided': False,
-                'notes': 'hello',
             },
             # event service delivery
             {
                 'is_event': True,
                 'was_policy_feedback_provided': False,
                 'event': EventFactory,
+            },
+            # non-event service delivery with blank notes
+            {
+                'is_event': False,
+                'was_policy_feedback_provided': False,
+                'notes': '',
             },
             # non-event service delivery with all fields filled in
             {
