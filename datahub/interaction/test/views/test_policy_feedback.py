@@ -79,10 +79,13 @@ class TestAddPolicyFeedback(APITestMixin):
                 'id': str(policy_area.pk),
                 'name': policy_area.name,
             } for policy_area in policy_areas],
+            'policy_feedback_notes': '',
             'policy_issue_type': {
                 'id': str(policy_issue_type.pk),
                 'name': policy_issue_type.name,
             },
+            'policy_issue_types': [],
+            'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(communication_channel.pk),
                 'name': communication_channel.name,
@@ -221,7 +224,11 @@ class TestAddPolicyFeedback(APITestMixin):
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
-
+                    'was_policy_feedback_provided': True,
+                    'policy_feedback_notes': 'Policy feedback notes',
+                    'policy_issue_types': [
+                        partial(random_obj_for_model, PolicyIssueType),
+                    ],
                 },
                 {
                     'is_event': ['This field is only valid for service deliveries.'],
@@ -232,6 +239,36 @@ class TestAddPolicyFeedback(APITestMixin):
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
                     'investment_project': ['This field is only valid for interactions.'],
+                    'was_policy_feedback_provided': [
+                        'This value is only valid for interactions and service deliveries.',
+                    ],
+                },
+            ),
+
+            # was_policy_feedback_provided cannot be True
+            (
+                {
+                    'kind': Interaction.KINDS.policy_feedback,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model,
+                                                     CommunicationChannel),
+                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
+                    'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
+
+                    # values not allowed
+                    'was_policy_feedback_provided': True,
+                },
+                {
+                    'was_policy_feedback_provided': [
+                        'This value is only valid for interactions and service deliveries.',
+                    ],
                 },
             ),
         ),
@@ -314,10 +351,13 @@ class TestUpdatePolicyFeedback(APITestMixin):
                 'id': str(first_policy_area.pk),
                 'name': first_policy_area.name,
             }],
+            'policy_feedback_notes': '',
+            'policy_issue_types': [],
             'policy_issue_type': {
                 'id': str(interaction.policy_issue_type.pk),
                 'name': interaction.policy_issue_type.name,
             },
+            'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,
@@ -416,10 +456,13 @@ class TestGetPolicyFeedback(APITestMixin):
                 'id': str(first_policy_area.pk),
                 'name': first_policy_area.name,
             }],
+            'policy_feedback_notes': '',
             'policy_issue_type': {
                 'id': str(interaction.policy_issue_type.pk),
                 'name': interaction.policy_issue_type.name,
             },
+            'policy_issue_types': [],
+            'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,
