@@ -216,7 +216,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('notes', is_not_blank),
-                    when=OperatorRule('is_event', not_),
+                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
                 ),
             ),
         ]
