@@ -93,6 +93,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         null=True,
         help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
         max_length=9,
+        unique=True,
         validators=[
             MinLengthValidator(9),
             MaxLengthValidator(9),
