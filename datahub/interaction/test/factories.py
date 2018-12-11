@@ -33,6 +33,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
     archived_documents_url_path = factory.Faker('uri_path')
+    was_policy_feedback_provided = False
 
     class Meta:
         model = 'interaction.Interaction'
@@ -45,6 +46,38 @@ class CompanyInteractionFactory(InteractionFactoryBase):
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
     )
+
+
+class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
+    """
+    Factory for creating an interaction relating to a company, with policy feedback
+    additionally provided.
+    """
+
+    kind = Interaction.KINDS.interaction
+    communication_channel = factory.LazyFunction(
+        lambda: random_obj_for_model(CommunicationChannel),
+    )
+    policy_feedback_notes = factory.Faker('paragraph', nb_sentences=10)
+    was_policy_feedback_provided = True
+
+    @to_many_field
+    def policy_areas(self):
+        """
+        Policy areas field.
+
+        Defaults to one random policy area.
+        """
+        return [random_obj_for_model(PolicyArea)]
+
+    @to_many_field
+    def policy_issue_types(self):
+        """
+        Policy issue types field.
+
+        Defaults to one random policy issue type.
+        """
+        return [random_obj_for_model(PolicyIssueType)]
 
 
 class InvestmentProjectInteractionFactory(InteractionFactoryBase):

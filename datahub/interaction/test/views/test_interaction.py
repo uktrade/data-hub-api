@@ -21,6 +21,7 @@ from datahub.interaction.models import (
 )
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    CompanyInteractionFactoryWithPolicyFeedback,
     InvestmentProjectInteractionFactory,
 )
 from datahub.interaction.test.views.utils import resolve_data
@@ -70,12 +71,27 @@ class TestAddInteraction(APITestMixin):
         'extra_data',
         (
             # company interaction
-            {},
+            {
+                'was_policy_feedback_provided': False,
+            },
             # investment project interaction
             {
+                'was_policy_feedback_provided': False,
                 'investment_project': InvestmentProjectFactory,
             },
-
+            # company interaction without was_policy_feedback_provided explicitly specified
+            # (for backwards compatibility)
+            {
+            },
+            # company interaction with policy feedback
+            {
+                'was_policy_feedback_provided': True,
+                'policy_areas': [
+                    partial(random_obj_for_model, PolicyArea),
+                ],
+                'policy_feedback_notes': 'Policy feedback notes',
+                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
+            },
         ),
     )
     def test_add(self, extra_data, permissions):
@@ -113,8 +129,13 @@ class TestAddInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': [],
+            'policy_areas': request_data.get('policy_areas', []),
+            'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
             'policy_issue_type': None,
+            'policy_issue_types':
+                request_data.get('policy_issue_types', []),
+            'was_policy_feedback_provided':
+                request_data.get('was_policy_feedback_provided', False),
             'communication_channel': {
                 'id': str(communication_channel.pk),
                 'name': communication_channel.name,
@@ -127,7 +148,7 @@ class TestAddInteraction(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name,
             },
-            'notes': 'hello',
+            'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -202,6 +223,53 @@ class TestAddInteraction(APITestMixin):
                 },
             ),
 
+            # policy feedback fields required when policy feedback provided
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'was_policy_feedback_provided': True,
+                },
+                {
+                    'policy_areas': ['This field is required.'],
+                    'policy_feedback_notes': ['This field is required.'],
+                    'policy_issue_types': ['This field is required.'],
+                },
+            ),
+
+            # policy feedback fields cannot be blank when policy feedback provided
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'was_policy_feedback_provided': True,
+                    'policy_areas': [],
+                    'policy_feedback_notes': '',
+                    'policy_issue_types': [],
+                },
+                {
+                    'policy_areas': ['This field is required.'],
+                    'policy_feedback_notes': ['This field is required.'],
+                    'policy_issue_types': ['This field is required.'],
+                },
+            ),
+
             # fields not allowed
             (
                 {
@@ -225,7 +293,9 @@ class TestAddInteraction(APITestMixin):
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
+                    'policy_feedback_notes': 'Policy feedback notes.',
                     'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
+                    'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
                 },
                 {
                     'is_event': ['This field is only valid for service deliveries.'],
@@ -235,8 +305,40 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
-                    'policy_areas': ['This field is only valid for policy feedback.'],
+                    'policy_areas': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
+                    'policy_feedback_notes': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
                     'policy_issue_type': ['This field is only valid for policy feedback.'],
+                    'policy_issue_types': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
+                },
+            ),
+
+            # fields where None is not allowed
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    # fields where None is not allowed
+                    'was_policy_feedback_provided': None,
+                    'policy_feedback_notes': None,
+                },
+                {
+                    'was_policy_feedback_provided': ['This field may not be null.'],
+                    'policy_feedback_notes': ['This field may not be null.'],
                 },
             ),
         ),
@@ -359,12 +461,20 @@ class TestAddInteraction(APITestMixin):
 class TestGetInteraction(APITestMixin):
     """Tests for the get interaction view."""
 
+    @pytest.mark.parametrize(
+        'factory',
+        (
+            CompanyInteractionFactory,
+            CompanyInteractionFactoryWithPolicyFeedback,
+            InvestmentProjectInteractionFactory,
+        ),
+    )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_non_restricted_user_can_get_company_interaction(self, permissions):
-        """Test that a non-restricted user can get a company interaction."""
+    def test_non_restricted_user_can_get_interaction(self, permissions, factory):
+        """Test that a non-restricted user can get various types of interaction."""
         requester = create_test_user(permission_codenames=permissions)
-        interaction = CompanyInteractionFactory()
+        interaction = factory()
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
@@ -378,80 +488,21 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': [],
+            'policy_areas': [
+                {
+                    'id': str(policy_area.pk),
+                    'name': policy_area.name,
+                } for policy_area in interaction.policy_areas.all()
+            ],
+            'policy_feedback_notes': interaction.policy_feedback_notes,
             'policy_issue_type': None,
-            'communication_channel': {
-                'id': str(interaction.communication_channel.pk),
-                'name': interaction.communication_channel.name,
-            },
-            'subject': interaction.subject,
-            'date': interaction.date.date().isoformat(),
-            'dit_adviser': {
-                'id': str(interaction.dit_adviser.pk),
-                'first_name': interaction.dit_adviser.first_name,
-                'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name,
-            },
-            'notes': interaction.notes,
-            'company': {
-                'id': str(interaction.company.pk),
-                'name': interaction.company.name,
-            },
-            'contact': {
-                'id': str(interaction.contact.pk),
-                'name': interaction.contact.name,
-                'first_name': interaction.contact.first_name,
-                'last_name': interaction.contact.last_name,
-                'job_title': interaction.contact.job_title,
-            },
-            'event': None,
-            'service': {
-                'id': str(Service.trade_enquiry.value.id),
-                'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
-            },
-            'investment_project': None,
-            'archived_documents_url_path': interaction.archived_documents_url_path,
-            'created_by': {
-                'id': str(interaction.created_by.pk),
-                'first_name': interaction.created_by.first_name,
-                'last_name': interaction.created_by.last_name,
-                'name': interaction.created_by.name,
-            },
-            'modified_by': {
-                'id': str(interaction.modified_by.pk),
-                'first_name': interaction.modified_by.first_name,
-                'last_name': interaction.modified_by.last_name,
-                'name': interaction.modified_by.name,
-            },
-            'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z',
-        }
-
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
-    @freeze_time('2017-04-18 13:25:30.986208')
-    def test_non_restricted_user_can_get_investment_project_interaction(self, permissions):
-        """Test that a non-restricted user can get an investment project interaction."""
-        requester = create_test_user(permission_codenames=permissions)
-        interaction = InvestmentProjectInteractionFactory()
-        api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data == {
-            'id': response_data['id'],
-            'kind': Interaction.KINDS.interaction,
-            'is_event': None,
-            'service_delivery_status': None,
-            'grant_amount_offered': None,
-            'net_company_receipt': None,
-            'policy_areas': [],
-            'policy_issue_type': None,
+            'policy_issue_types': [
+                {
+                    'id': str(policy_issue_type.pk),
+                    'name': policy_issue_type.name,
+                } for policy_issue_type in interaction.policy_issue_types.all()
+            ],
+            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,
@@ -489,7 +540,7 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
                 'project_code': interaction.investment_project.project_code,
-            },
+            } if interaction.investment_project else None,
             'archived_documents_url_path': interaction.archived_documents_url_path,
             'created_by': {
                 'id': str(interaction.created_by.pk),
@@ -531,7 +582,10 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_areas': [],
+            'policy_feedback_notes': '',
             'policy_issue_type': None,
+            'policy_issue_types': [],
+            'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,

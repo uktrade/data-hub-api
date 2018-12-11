@@ -4,6 +4,7 @@ from datahub.core.validators.one_way_required import RequiredUnlessAlreadyBlankV
 from datahub.core.validators.rules_based import (
     AbstractRule,
     AllIsBlankRule,
+    AndRule,
     AnyIsNotBlankRule,
     BaseRule,
     ConditionalRule,
@@ -19,6 +20,7 @@ __all__ = (
     'AbstractRule',
     'AddressValidator',
     'AllIsBlankRule',
+    'AndRule',
     'AnyIsNotBlankRule',
     'BaseRule',
     'ConditionalRule',
