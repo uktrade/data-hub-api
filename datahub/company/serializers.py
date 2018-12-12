@@ -317,6 +317,17 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
+    def __init__(self, *args, **kwargs):
+        """
+        Make some of the fields read_only if the instance has a duns_number set.
+        This is because those values come from an external source
+        and we don't want users to override them.
+        """
+        super().__init__(*args, **kwargs)
+        if self.instance and not isinstance(self.instance, list) and self.instance.duns_number:
+            for field in self.Meta.dnb_read_only_fields:
+                self.fields[field].read_only = True
+
     def validate(self, data):
         """Performs cross-field validation."""
         combiner = DataCombiner(self.instance, data)
@@ -454,6 +465,30 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'transfer_reason',
             'duns_number',
         )
+        dnb_read_only_fields = [
+            'name',
+            'trading_name',
+            'company_number',
+            'vat_number',
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_town',
+            'registered_address_county',
+            'registered_address_postcode',
+            'registered_address_country',
+            'website',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+            'trading_address_country',
+            'business_type',
+            'employee_range',
+            'turnover_range',
+            'headquarter_type',
+            'global_headquarters',
+        ]
         validators = [
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
             RulesBasedValidator(

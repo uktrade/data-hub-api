@@ -12,6 +12,7 @@ from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany, Company, OneListTier
+from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
@@ -19,7 +20,7 @@ from datahub.company.test.factories import (
     DuplicateCompanyFactory,
     OneListCoreTeamMemberFactory,
 )
-from datahub.core.constants import Country, HeadquarterType, UKRegion
+from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
@@ -646,6 +647,76 @@ class TestUpdateCompany(APITestMixin):
         }
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response.data['duns_number'] == '000000001'
+
+    def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
+        """
+        Test that if company.duns_number is not blank, the client cannot update the
+        fields defined by CompanySerializer.Meta.dnb_read_only_fields.
+        """
+        company = CompanyFactory(
+            duns_number='012345678',
+            name='name',
+            alias='trading name',
+            company_number='company number',
+            vat_number='vat number',
+            registered_address_1='registered address 1',
+            registered_address_2='registered address 2',
+            registered_address_town='registered address town',
+            registered_address_county='registered address county',
+            registered_address_postcode='registered address postcode',
+            registered_address_country_id=Country.anguilla.value.id,
+            website='website',
+            trading_address_1='trading address 1',
+            trading_address_2='trading address 2',
+            trading_address_town='trading address town',
+            trading_address_county='trading address county',
+            trading_address_postcode='trading address postcode',
+            trading_address_country_id=Country.argentina.value.id,
+            business_type_id=BusinessTypeConstant.charity.value.id,
+            employee_range_id=EmployeeRange.range_10_to_49.value.id,
+            turnover_range_id=TurnoverRange.range_1_34_to_6_7.value.id,
+            headquarter_type_id=HeadquarterType.ehq.value.id,
+            global_headquarters_id=CompanyFactory(
+                headquarter_type_id=HeadquarterType.ghq.value.id,
+            ).id,
+        )
+
+        data = {
+            'name': 'new name',
+            'trading_name': 'new trading name',
+            'company_number': 'new company number',
+            'vat_number': 'new vat number',
+            'registered_address_1': 'new registered address 1',
+            'registered_address_2': 'new registered address 2',
+            'registered_address_town': 'new registered address town',
+            'registered_address_county': 'new registered address county',
+            'registered_address_postcode': 'new registered address postcode',
+            'registered_address_country': Country.azerbaijan.value.id,
+            'website': 'new website',
+            'trading_address_1': 'new trading address 1',
+            'trading_address_2': 'new trading address 2',
+            'trading_address_town': 'new trading address town',
+            'trading_address_county': 'new trading address county',
+            'trading_address_postcode': 'new trading address postcode',
+            'trading_address_country': Country.canada.value.id,
+            'business_type': BusinessTypeConstant.community_interest_company.value.id,
+            'employee_range': EmployeeRange.range_1_to_9.value.id,
+            'turnover_range': TurnoverRange.range_33_5_plus.value.id,
+            'headquarter_type': HeadquarterType.ghq.value.id,
+            'global_headquarters': company.id,
+        }
+
+        assert set(data.keys()) == set(CompanySerializer.Meta.dnb_read_only_fields), (
+            'It looks like you have changed CompanySerializer.Meta.dnb_read_only_fields, '
+            'please update this test accordingly.'
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        for field, value in data.items():
+            assert response.data[field] != value
 
     @pytest.mark.parametrize(
         'data,expected_error',
