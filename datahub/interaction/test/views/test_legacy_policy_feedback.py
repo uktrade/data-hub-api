@@ -1,3 +1,9 @@
+"""
+These tests are for the legacy policy feedback interaction kind which is deprecated,
+and has been replaced by policy-feedback-specific fields on other kinds of interaction.
+"""
+
+
 from datetime import date
 from functools import partial
 from operator import attrgetter, itemgetter
