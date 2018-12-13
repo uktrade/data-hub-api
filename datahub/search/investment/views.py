@@ -44,6 +44,7 @@ class SearchInvestmentProjectParams:
         'status',
         'uk_region_location',
         'level_of_involvement_simplified',
+        'likelihood_to_land',
     )
 
     REMAP_FIELDS = {
@@ -52,6 +53,7 @@ class SearchInvestmentProjectParams:
         'investor_company': 'investor_company.id',
         'sector': 'sector.id',
         'stage': 'stage.id',
+        'likelihood_to_land': 'likelihood_to_land.id',
         'uk_region_location': 'uk_region_locations.id',
     }
 
@@ -160,4 +162,5 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
         'r_and_d_budget': 'R&D budget',
         'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
         'new_tech_to_uk': 'New to world tech',
+        'likelihood_to_land__name': 'Likelihood to land',
     }

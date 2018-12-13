@@ -97,6 +97,7 @@ class InvestmentProject(BaseESModel):
     investor_type = fields.nested_id_name_field()
     level_of_involvement = fields.nested_id_name_field()
     likelihood_of_landing = Long()
+    likelihood_to_land = fields.id_name_field()
     project_assurance_adviser = fields.nested_contact_or_adviser_field(
         'project_assurance_adviser', include_dit_team=True,
     )
@@ -164,6 +165,7 @@ class InvestmentProject(BaseESModel):
         'investor_company_country': dict_utils.id_name_dict,
         'investor_type': dict_utils.id_name_dict,
         'level_of_involvement': dict_utils.id_name_dict,
+        'likelihood_to_land': dict_utils.id_name_dict,
         'project_assurance_adviser': dict_utils.adviser_dict_with_team,
         'project_code': str,
         'project_manager': dict_utils.adviser_dict_with_team,

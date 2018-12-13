@@ -47,7 +47,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
-    duns_number = factory.Faker('numerify', text='#########')
     uk_region_id = constants.UKRegion.england.value.id
     export_experience_category = factory.LazyFunction(
         ExportExperienceCategory.objects.order_by('?').first,

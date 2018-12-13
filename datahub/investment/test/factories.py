@@ -21,6 +21,7 @@ from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.constants import (
     InvestorType,
     Involvement,
+    LikelihoodToLand,
     SpecificProgramme,
 )
 from datahub.investment.models import InvestmentDeliveryPartner, InvestmentProject
@@ -48,6 +49,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     likelihood_of_landing = 90
+    likelihood_to_land_id = LikelihoodToLand.high.value.id
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
 

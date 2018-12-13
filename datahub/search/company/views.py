@@ -5,8 +5,11 @@ from datahub.core.query_utils import get_front_end_url_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.company.models import Company
-from datahub.search.company.serializers import SearchCompanySerializer
-from datahub.search.views import SearchAPIView, SearchExportAPIView
+from datahub.search.company.serializers import (
+    AutocompleteSearchCompanySerializer,
+    SearchCompanySerializer,
+)
+from datahub.search.views import AutocompleteSearchListAPIView, SearchAPIView, SearchExportAPIView
 
 
 class SearchCompanyParams:
@@ -15,6 +18,7 @@ class SearchCompanyParams:
     required_scopes = (Scope.internal_front_end,)
     entity = Company
     serializer_class = SearchCompanySerializer
+    autocomplete_serializer_class = AutocompleteSearchCompanySerializer
 
     FILTER_FIELDS = (
         'archived',
@@ -73,3 +77,25 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         'turnover_range__name': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
     }
+
+
+class CompanyAutocompleteSearchListAPIView(SearchCompanyParams, AutocompleteSearchListAPIView):
+    """Company autocomplete search view."""
+
+    document_fields = [
+        'id',
+        'name',
+        'trading_name',
+        'trading_address_1',
+        'trading_address_2',
+        'trading_address_town',
+        'trading_address_county',
+        'trading_address_country',
+        'trading_address_postcode',
+        'registered_address_1',
+        'registered_address_2',
+        'registered_address_town',
+        'registered_address_county',
+        'registered_address_country',
+        'registered_address_postcode',
+    ]

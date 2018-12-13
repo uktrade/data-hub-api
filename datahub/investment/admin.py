@@ -17,9 +17,14 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
+    LikelihoodToLand,
     SpecificProgramme,
 )
-from datahub.metadata.admin import DisableableMetadataAdmin, ReadOnlyMetadataAdmin
+from datahub.metadata.admin import (
+    DisableableMetadataAdmin,
+    OrderedMetadataAdmin,
+    ReadOnlyMetadataAdmin,
+)
 
 
 @admin.register(InvestmentProject)
@@ -91,6 +96,7 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
 
 admin.site.register(Involvement, ReadOnlyMetadataAdmin)
 
+admin.site.register(LikelihoodToLand, OrderedMetadataAdmin)
 
 admin.site.register(
     (
