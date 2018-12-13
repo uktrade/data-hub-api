@@ -26,7 +26,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
-from datahub.investment.constants import Involvement
+from datahub.investment.constants import Involvement, LikelihoodToLand
 from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
     InvestmentProjectFactory,
@@ -59,6 +59,7 @@ def setup_data(setup_es):
                 constants.UKRegion.isle_of_man.value.id,
             ],
             level_of_involvement_id=Involvement.hq_and_post_only.value.id,
+            likelihood_to_land_id=LikelihoodToLand.high.value.id,
         ),
         InvestmentProjectFactory(
             name='delayed project',
@@ -77,6 +78,7 @@ def setup_data(setup_es):
                 constants.UKRegion.north_west.value.id,
             ],
             level_of_involvement_id=Involvement.no_involvement.value.id,
+            likelihood_to_land_id=LikelihoodToLand.medium.value.id,
         ),
         InvestmentProjectFactory(
             name='won project',
@@ -94,6 +96,7 @@ def setup_data(setup_es):
                 constants.UKRegion.north_west.value.id,
             ],
             level_of_involvement_id=Involvement.hq_only.value.id,
+            likelihood_to_land_id=None,
         ),
         InvestmentProjectFactory(
             name='new project',
@@ -101,6 +104,7 @@ def setup_data(setup_es):
             country_investment_originates_from_id=constants.Country.canada.value.id,
             estimated_land_date=None,
             level_of_involvement_id=None,
+            likelihood_to_land_id=LikelihoodToLand.low.value.id,
         ),
     ]
     setup_es.indices.refresh()
@@ -524,6 +528,25 @@ class TestSearch(APITestMixin):
                 [
                     'new project',
                     'delayed project',
+                ],
+            ),
+            (
+                {
+                    'likelihood_to_land': LikelihoodToLand.low.value.id,
+                },
+                [
+                    'new project',
+                ],
+            ),
+            (
+                {
+                    'likelihood_to_land': [
+                        LikelihoodToLand.low.value.id,
+                        LikelihoodToLand.medium.value.id,
+                    ],
+                },
+                [
+                    'new project', 'delayed project',
                 ],
             ),
             (
@@ -1061,6 +1084,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Average salary of new jobs': get_attr_or_none(project, 'average_salary.name'),
                 'Safeguarded jobs': project.number_safeguarded_jobs,
                 'Level of involvement': get_attr_or_none(project, 'level_of_involvement.name'),
+                'Likelihood to land': get_attr_or_none(project, 'likelihood_to_land.name'),
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,

@@ -1,0 +1,15 @@
+``POST /v3/investment`` endpoint now accepts ``likelihood_to_land`` as an
+optional property that can be set whilst creating an investment project.
+The property expects a ``investment_likelihoodtoland`` id.
+
+``GET /v3/investment/<uuid:pk>`` endpoint now includes ``likelihood_to_land``
+field in the response.
+
+``PATCH /v3/investment/<uuid:pk>`` endpoint now accepts ``likelihood_to_land``
+as an optional property that can be set whilst updating an investment project.
+The property expects a `metadata_likelihoodtoland` id.
+
+New endpoint ``GET /metadata/likelihood-to-land/`` added that returns
+all possible ``likelihood_to_land`` options.
+
+``POST /v3/search/investment_project/export`` response body now includes ``likelihood_to_land``.
