@@ -1,3 +1,78 @@
+Data Hub API 8.2.0 (2018-12-13)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Investment** The column ``investment_investmentproject.likelihood_of_landing`` is deprecated and will be deleted on or after December, 20.
+  Please use ``investment_investmentproject.likelihood_to_land`` with a foreign key to ``investment_likelihoodtoland`` instead of an integer value.
+
+  The field ``likelihood_of_landing`` is deprecated and will be removed from all investment projects APIs on or before December 20,
+  please use ``likelihood_to_land`` instead.
+
+Features
+--------
+
+- **Companies** Company autocomplete support has been added to be utilised on search pages and forms when there is a need to add a company to another entity such as an investment project or interaction.
+- **Interactions** The notes field is now optional for standard interactions and for service deliveries.
+
+API
+---
+
+- **Companies** New endpoint ``GET /v3/search/company/autocomplete`` which supports a query argument of ``term`` that will
+  return the ``id``, ``name`` and ``trading_name`` of any company matching the search query.
+- **Companies** ``PATCH /v3/company/<uuid:pk>``: the following fields are now read-only if the company has a non-blank ``duns_number`` field:
+
+  - name
+  - trading_name
+  - company_number
+  - vat_number
+  - registered_address_1
+  - registered_address_2
+  - registered_address_town
+  - registered_address_county
+  - registered_address_postcode
+  - registered_address_country
+  - website
+  - trading_address_1
+  - trading_address_2
+  - trading_address_town
+  - trading_address_county
+  - trading_address_postcode
+  - trading_address_country
+  - business_type
+  - employee_range
+  - turnover_range
+  - headquarter_type
+  - global_headquarters
+
+- **Interactions** ``GET,POST /v3/interaction``, ``GET,PATCH /v3/interaction/<id>``: The notes field can now be left blank (as an empty string) for standard interactions and for service deliveries.
+- **Investment** The field ``likelihood_of_landing`` is deprecated and will be removed from all investment projects APIs on or before December 20, please use ``likelihood_to_land`` instead.
+- **Investment** ``POST /v3/investment`` endpoint now accepts ``likelihood_to_land`` as an
+  optional property that can be set whilst creating an investment project.
+  The property expects a ``investment_likelihoodtoland`` id.
+
+  ``GET /v3/investment/<uuid:pk>`` endpoint now includes ``likelihood_to_land``
+  field in the response.
+
+  ``PATCH /v3/investment/<uuid:pk>`` endpoint now accepts ``likelihood_to_land``
+  as an optional property that can be set whilst updating an investment project.
+  The property expects a ``metadata_likelihoodtoland`` id.
+
+  New endpoint ``GET /metadata/likelihood-to-land/`` added that returns
+  all possible ``likelihood_to_land`` options.
+
+  ``POST /v3/search/investment_project/export`` response body now includes ``likelihood_to_land``.
+
+Database schema
+---------------
+
+- **Companies** The field ``company_company.duns_number`` was made unique.
+- **Investment** Column ``likelihood_to_land`` has been added to ``investment_investmentproject`` table and is nullable.
+
+
 Data Hub API 8.1.0 (2018-12-10)
 ===============================
 

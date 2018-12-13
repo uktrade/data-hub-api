@@ -1,5 +1,0 @@
-The column ``investment_investmentproject.likelihood_of_landing`` is deprecated and will be deleted on or after December, 20.
-Please use ``investment_investmentproject.likelihood_to_land`` with a foreign key to ``investment_likelihoodtoland`` instead of an integer value.
-
-The field ``likelihood_of_landing`` is deprecated and will be removed from all investment projects APIs on or before December 20,
-please use ``likelihood_to_land`` instead.
