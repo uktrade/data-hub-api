@@ -16,6 +16,7 @@ from datahub.core.models import (
     ArchivableModel,
     BaseConstantModel,
     BaseModel,
+    BaseOrderedConstantModel,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.investment import constants
@@ -116,6 +117,11 @@ class IProjectAbstract(models.Model):
     quotable_as_public_case_study = models.BooleanField(null=True)
     actual_land_date = models.DateField(blank=True, null=True)
     likelihood_of_landing = models.IntegerField(blank=True, null=True)
+    likelihood_to_land = models.ForeignKey(
+        'investment.LikelihoodToLand', related_name='+',
+        null=True, blank=True, on_delete=models.SET_NULL,
+    )
+
     priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
 
     approved_commitment_to_invest = models.BooleanField(null=True)
@@ -605,3 +611,7 @@ class Involvement(BaseConstantModel):
 
 class InvestmentDeliveryPartner(BaseConstantModel):
     """Investment delivery partners."""
+
+
+class LikelihoodToLand(BaseOrderedConstantModel):
+    """Likelihood to land."""

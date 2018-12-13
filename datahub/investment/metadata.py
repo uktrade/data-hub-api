@@ -32,3 +32,9 @@ registry.register(
     metadata_id='investment-delivery-partner',
     model=models.InvestmentDeliveryPartner,
 )
+
+
+registry.register(
+    metadata_id='likelihood-to-land',
+    model=models.LikelihoodToLand,
+)
