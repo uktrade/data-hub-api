@@ -1,2 +1,0 @@
-New endpoint ``GET /v3/search/company/autocomplete`` which supports a query argument of ``term`` that will
-return the ``id``, ``name`` and ``trading_name`` of any company matching the search query.
