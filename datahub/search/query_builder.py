@@ -107,6 +107,19 @@ def get_search_by_entity_query(
     return s
 
 
+def build_autocomplete_query(es_model, keyword_search, limit, only_return_fields):
+    """Builds the query for autocomplete search and applies source filtering."""
+    index = es_model.get_read_alias()
+    autocomplete_search = es_model.search(index=index)
+    if only_return_fields:
+        autocomplete_search = autocomplete_search.extra(_source={'include': only_return_fields})
+    return autocomplete_search.suggest(
+        'autocomplete',
+        keyword_search,
+        completion={'field': 'suggest', 'size': limit},
+    )
+
+
 def limit_search_query(query, offset=0, limit=100):
     """Limits search query to the page defined by offset and limit."""
     limit = _clip_limit(offset, limit)
