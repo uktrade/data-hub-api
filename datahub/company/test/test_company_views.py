@@ -908,6 +908,39 @@ class TestUpdateCompany(APITestMixin):
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response.data['headquarter_type'] == error
 
+    # TODO: remove after alias is deleted
+    @pytest.mark.parametrize(
+        'old_alias,new_alias',
+        (
+            ('old value', 'old value'),
+            ('old value', 'new value'),
+            ('old value', ''),
+            ('old value', None),
+            ('', 'old value'),
+            ('', ''),
+            ('', None),
+            (None, None),
+            (None, 'new value'),
+            (None, ''),
+        ),
+    )
+    def test_trading_names_is_updated_when_alias_changes(self, old_alias, new_alias):
+        """Test that if alias/trading_name is changed, trading_names is updated as well."""
+        company = CompanyFactory(alias=old_alias)
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'trading_name': new_alias,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company.refresh_from_db()
+        assert company.alias == new_alias
+        assert company.trading_names == ([] if not new_alias else [new_alias])
+
 
 class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
