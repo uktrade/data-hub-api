@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Keyword, Text
+from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
@@ -8,6 +8,40 @@ from datahub.search.models import BaseESModel
 
 
 DOC_TYPE = 'company'
+
+
+def get_suggestions(db_company):
+    """
+    A list of fields used by the completion suggester to
+    find a record when using an autocomplete search.
+
+    https://www.elastic.co/guide/en/elasticsearch/
+    reference/current/search-suggesters-completion.html
+
+    Both the name and trading name of a company are added in full
+    and each word within the names are individually added.
+    Adding the full names should improve the precision of the search and
+    return the company the user is looking for sooner.
+    The parts of the names are added so when searching the order
+    of the search terms that are entered becomes irrelevant.
+
+    Optional weighting could be added here to boost particular suggestions.
+    See above link.
+    """
+    if db_company.archived:
+        return []
+
+    company_name = db_company.name
+    alias = db_company.alias or ''
+
+    data = [
+        *company_name.split(' '),
+        *alias.split(' '),
+        company_name,
+        alias,
+    ]
+
+    return list(filter(None, set(data)))
 
 
 class Company(BaseESModel):
@@ -74,9 +108,11 @@ class Company(BaseESModel):
     vat_number = Keyword(index=False)
     duns_number = Keyword()
     website = Text()
+    suggest = Completion()
 
     COMPUTED_MAPPINGS = {
         'trading_name': attrgetter('alias'),
+        'suggest': get_suggestions,
     }
 
     MAPPINGS = {

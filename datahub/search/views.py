@@ -10,12 +10,15 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from raven.contrib.django.raven_compat.models import client
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
+from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_search_apps
+from datahub.search.execute_query import execute_autocomplete_query
 from datahub.search.permissions import (
     has_permissions_for_app,
     SearchAndExportPermissions,
@@ -328,6 +331,55 @@ class SearchExportAPIView(SearchAPIView):
         prefix = '-' if direction == 'desc' else ''
 
         return f'{prefix}{field}', 'pk'
+
+
+class AutocompleteSearchListAPIView(ListAPIView):
+    """Autocomplete search base list view for type ahead."""
+
+    search_app = None
+    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
+    autocomplete_serializer_class = None
+    results = None
+    default_search_limit = 10
+    document_fields = None
+
+    def get_queryset(self):
+        """Returns a list of elasticsearch documents"""
+        return self.get_search_results()
+
+    def get_serializer_class(self):
+        """Returns the autocomplete serializer"""
+        return self.autocomplete_serializer_class
+
+    def get_search_query_string(self):
+        """Retrieves the query string from the get parameters"""
+        return self.request.GET.get('term', '')
+
+    def get_search_results(self):
+        """Executes the elasticsearch query"""
+        if self.results is None:
+            self.check_permission_filters()
+            self.results = execute_autocomplete_query(
+                self.search_app.es_model,
+                self.get_search_query_string(),
+                self.kwargs.get('limit', self.default_search_limit),
+                only_return_fields=self.document_fields,
+            )
+        return self.results
+
+    def check_permission_filters(self):
+        """
+        Checks for permission filters associated with the search app
+        and if present rasies an error.
+        """
+        permission_filters = self._get_permission_filters()
+        if permission_filters is not None:
+            raise DataHubException(
+                'Unable to apply filtering for autocomplete search request',
+            )
+
+    def _get_permission_filters(self):
+        return self.search_app.get_permission_filters(self.request)
 
 
 def _execute_search_query(query):

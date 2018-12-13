@@ -277,6 +277,7 @@ def test_indexed_doc(setup_es):
         'registered_address_postcode',
         'registered_address_town',
         'sector',
+        'suggest',
         'trading_address_1',
         'trading_address_2',
         'trading_address_country',

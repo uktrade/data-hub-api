@@ -45,6 +45,13 @@ class LimitOffsetSerializer(serializers.Serializer):
     limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
 
 
+class IdNameSerializer(serializers.Serializer):
+    """Serializer to return metadata constant with id and name."""
+
+    id = StringUUIDField()
+    name = serializers.CharField()
+
+
 class SearchSerializer(LimitOffsetSerializer):
     """Serialiser used to validate search POST bodies."""
 
@@ -88,3 +95,13 @@ class SearchSerializer(LimitOffsetSerializer):
             raise serializers.ValidationError(errors)
 
         return val
+
+
+class AutocompleteSearchSerializer(serializers.Serializer):
+    """Base serializer for autocomplete search."""
+
+    id = serializers.UUIDField()
+
+    def to_representation(self, instance):
+        """Uses the _source property instead of the instance if one present."""
+        return super().to_representation(getattr(instance, '_source', instance))
