@@ -1,7 +1,11 @@
 from datahub.company.models import Company as DBCompany, CompanyPermission
 from datahub.search.apps import SearchApp
 from datahub.search.company.models import Company
-from datahub.search.company.views import SearchCompanyAPIView, SearchCompanyExportAPIView
+from datahub.search.company.views import (
+    CompanyAutocompleteSearchListAPIView,
+    SearchCompanyAPIView,
+    SearchCompanyExportAPIView,
+)
 
 
 class CompanySearchApp(SearchApp):
@@ -11,6 +15,7 @@ class CompanySearchApp(SearchApp):
     es_model = Company
     view = SearchCompanyAPIView
     export_view = SearchCompanyExportAPIView
+    autocomplete_view = CompanyAutocompleteSearchListAPIView
     view_permissions = (f'company.{CompanyPermission.view_company}',)
     export_permission = f'company.{CompanyPermission.export_company}'
     queryset = DBCompany.objects.select_related(

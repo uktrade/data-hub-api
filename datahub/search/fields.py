@@ -54,6 +54,16 @@ def nested_contact_or_adviser_field(field, include_dit_team=False):
     )
 
 
+def id_name_field():
+    """Object field with id and name sub-fields."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+        },
+    )
+
+
 def nested_id_name_field():
     """Nested field for lists of objects with id and name sub-fields."""
     return Nested(

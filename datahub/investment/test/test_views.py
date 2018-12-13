@@ -26,7 +26,7 @@ from datahub.core.test_utils import (
 )
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment import views
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
+from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW, LikelihoodToLand
 from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
@@ -86,6 +86,7 @@ class TestListView(APITestMixin):
             'actual_land_date',
             'quotable_as_public_case_study',
             'likelihood_of_landing',
+            'likelihood_to_land',
             'priority',
             'approved_commitment_to_invest',
             'approved_fdi',
@@ -379,6 +380,9 @@ class TestCreateView(APITestMixin):
             'estimated_land_date': '2020-12-12',
             'quotable_as_public_case_study': True,
             'likelihood_of_landing': 60,
+            'likelihood_to_land': {
+                'id': LikelihoodToLand.medium.value.id,
+            },
             'priority': '1_low',
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id,
@@ -429,7 +433,11 @@ class TestCreateView(APITestMixin):
             response_data['quotable_as_public_case_study']
             == request_data['quotable_as_public_case_study']
         )
-        assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
+        assert response_data['likelihood_of_landing'] is None
+        assert (
+            response_data['likelihood_to_land']['id']
+            == request_data['likelihood_to_land']['id']
+        )
         assert response_data['priority'] == request_data['priority']
         assert re.match(r'^DHP-\d+$', response_data['project_code'])
 
@@ -619,6 +627,10 @@ class TestRetrieveView(APITestMixin):
         assert response_data['description'] == project.description
         assert response_data['comments'] == project.comments
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
+        assert response_data['likelihood_to_land'] == {
+            'id': str(project.likelihood_to_land.id),
+            'name': project.likelihood_to_land.name,
+        }
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
         assert response_data['investment_type']['id'] == str(project.investment_type.id)
@@ -1040,33 +1052,22 @@ class TestPartialUpdateView(APITestMixin):
             'fdi_type': ['This field is required.'],
         }
 
-    def test_patch_likelihood_of_landing_too_low(self):
-        """Test updating a project with a likelihood_of_landing below 0."""
+    def test_patch_likelihood_to_land_success(self):
+        """Test successfully updating the likelihood_to_land value of an investment project."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'likelihood_of_landing': -10,
+            'likelihood_to_land': {
+                'id': LikelihoodToLand.medium.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data == {
-            'likelihood_of_landing': ['Ensure this value is greater than or equal to 0.'],
-        }
-
-    def test_patch_likelihood_of_landing_too_high(self):
-        """Test updating a project with a likelihood_of_landing above 100."""
-        project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        request_data = {
-            'likelihood_of_landing': 110,
-        }
-        response = self.api_client.patch(url, data=request_data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-        assert response_data == {
-            'likelihood_of_landing': ['Ensure this value is less than or equal to 100.'],
-        }
+        assert (
+            response_data['likelihood_to_land']['id']
+            == request_data['likelihood_to_land']['id']
+        )
 
     def test_patch_priority_invalid_value(self):
         """Test updating a project with an invalid priority."""
@@ -1741,6 +1742,7 @@ class TestPartialUpdateView(APITestMixin):
             allow_blank_estimated_land_date=False,
             allow_blank_possible_uk_regions=False,
             project_manager_first_assigned_on=None,
+            likelihood_of_landing=90,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1752,6 +1754,7 @@ class TestPartialUpdateView(APITestMixin):
                 'allow_blank_estimated_land_date': True,
                 'allow_blank_possible_uk_regions': True,
                 'project_manager_first_assigned_on': now(),
+                'likelihood_of_landing': 30,
             },
         )
 
@@ -1760,6 +1763,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response.data['comments'] == 'old_comment'
         assert response.data['allow_blank_estimated_land_date'] is False
         assert response.data['allow_blank_possible_uk_regions'] is False
+        assert response.data['likelihood_of_landing'] == project.likelihood_of_landing
 
         project.refresh_from_db()
         assert project.project_manager_first_assigned_on is None
@@ -1974,7 +1978,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
 
         response = self.api_client.patch(
             reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk}),
-            data={'likelihood_of_landing': -10},
+            data={'likelihood_to_land': -10},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(project).count() == 0

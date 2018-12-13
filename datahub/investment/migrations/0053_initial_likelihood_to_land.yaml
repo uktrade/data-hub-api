@@ -1,0 +1,18 @@
+- model: investment.likelihoodtoland
+  pk: 90531272-fc9c-4403-9320-b69e51fbec06
+  fields:
+    disabled_on: null
+    name: High
+    order: 90
+- model: investment.likelihoodtoland
+  pk: 683ca57b-bd69-462c-852f-d2177e35b2eb
+  fields:
+    disabled_on: null
+    name: Medium
+    order: 60
+- model: investment.likelihoodtoland
+  pk: b3515282-dc36-487a-a5af-320cde165575
+  fields:
+    disabled_on: null
+    name: Low
+    order: 30

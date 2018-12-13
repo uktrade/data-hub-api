@@ -25,9 +25,17 @@ class InvestorType(Enum):
 
 
 class Involvement(Enum):
-    """Level of Involvemnet constants."""
+    """Level of Involvement constants."""
 
     no_involvement = Constant('No Involvement', '945f13e9-9a27-4921-8d2d-8daf5a4c59a8')
     hq_and_post_only = Constant('HQ and Post Only', 'bb68ba20-ef54-472d-9a1e-309c1eaa79c4')
     post_only = Constant('Post Only', '1a01c63b-26ad-46eb-b8aa-c925c2395ec9')
     hq_only = Constant('HQ Only', '9c22137d-648e-4ecb-8fe7-652ac6a4f53a')
+
+
+class LikelihoodToLand(Enum):
+    """Likelihood to land constants."""
+
+    low = Constant('Low', 'b3515282-dc36-487a-a5af-320cde165575')
+    medium = Constant('Medium', '683ca57b-bd69-462c-852f-d2177e35b2eb')
+    high = Constant('High', '90531272-fc9c-4403-9320-b69e51fbec06')

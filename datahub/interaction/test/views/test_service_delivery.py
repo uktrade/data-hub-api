@@ -164,7 +164,6 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'is_event': ['This field is required.'],
-                    'notes': ['This field is required.'],
                 },
             ),
 
