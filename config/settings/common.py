@@ -296,11 +296,6 @@ if REDIS_BASE_URL:
     CELERY_BROKER_TRANSPORT_OPTIONS = {
         'visibility_timeout': int(timedelta(hours=9).total_seconds())
     }
-    CELERY_TASK_ROUTES = {
-        'datahub.search.tasks.sync_model': {
-            'queue': 'long-running'
-        }
-    }
     CELERY_BEAT_SCHEDULE = {
         'refresh_pending_payment_gateway_sessions': {
             'task': 'datahub.omis.payment.tasks.refresh_pending_payment_gateway_sessions',
