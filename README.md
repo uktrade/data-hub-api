@@ -230,7 +230,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
-| `DATAHUB_SECRET`  | Yes | |
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
