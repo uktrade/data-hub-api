@@ -424,6 +424,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
             'name',
             'trading_name',
+            'trading_names',
             'uk_based',
             'company_number',
             'vat_number',
@@ -476,6 +477,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
             'transfer_reason',
             'duns_number',
+            'trading_names',
         )
         dnb_read_only_fields = [
             'name',
