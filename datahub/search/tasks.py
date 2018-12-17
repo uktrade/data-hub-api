@@ -26,7 +26,7 @@ def sync_all_models():
         )
 
 
-@shared_task(acks_late=True, priority=9)
+@shared_task(acks_late=True, priority=9, queue='long-running')
 def sync_model(search_app_name):
     """
     Task that syncs a single model to Elasticsearch.
@@ -96,7 +96,14 @@ def sync_related_objects_task(
         sync_object_task.apply_async(args=(search_app.name, pk), priority=self.priority)
 
 
-@shared_task(bind=True, acks_late=True, priority=7, max_retries=5, default_retry_delay=60)
+@shared_task(
+    bind=True,
+    acks_late=True,
+    priority=7,
+    max_retries=5,
+    default_retry_delay=60,
+    queue='long-running',
+)
 def complete_model_migration(self, search_app_name, new_mapping_hash):
     """
     Completes a migration by performing a full resync, updating aliases and removing old indices.
