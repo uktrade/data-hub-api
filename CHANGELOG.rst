@@ -1,3 +1,57 @@
+Data Hub API 8.3.0 (2018-12-17)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``POST /v3/interaction``: omitting the ``was_policy_feedback_provided`` field is deprecated and it will become a mandatory field on or after 27 December 2018.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: the ``policy_issue_type`` field is deprecated and will become read-only on or after 27 December 2018, and removed on or after 7 January 2019.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: the value ``policy_feedback`` for the ``kind`` field is deprecated and will be not be accepted on or after 27 December 2018.
+
+  ``interaction_interaction``: the ``policy_issue_type`` column is deprecated and will be removed on or after 7 January 2019.
+
+  ``interaction_interaction``: the value ``policy_feedback`` for the ``kind`` column is deprecated and ``was_policy_feedback_provided`` should be used to identify policy feedback instead.
+
+Features
+--------
+
+- **Interactions** It's now possible to record policy feedback within a service delivery or standard interaction, with one or
+  more policy issue types, one or more policy areas and free text policy feedback notes. This is intended to
+  replace the existing policy feedback functionality (where policy feedback is a separate type of interaction).
+
+API
+---
+
+- **Interactions** ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: ``was_policy_feedback_provided`` was added as a boolean field.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: ``policy_issue_types`` was added as an array field.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: ``policy_feedback_notes`` was added as a text field.
+
+  ``POST /v3/interaction``: omitting the ``was_policy_feedback_provided`` field is deprecated and it will become a mandatory field on or after 27 December 2018.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: the ``policy_issue_type`` field is deprecated and will become read-only on or after 27 December 2018, and removed on or after 7 January 2019.
+
+  ``GET,POST /v3/interaction, GET,PATCH /v3/interaction/<id>``: the value ``policy_feedback`` for the ``kind`` field is deprecated and will be not be accepted on or after 27 December 2018.
+
+Database schema
+---------------
+
+- **Interactions** ``interaction_interaction``: ``was_policy_feedback_provided`` was added as a nullable boolean column.
+
+  ``interaction_interaction``: ``policy_feedback_notes`` was added as a nullable text column.
+
+  ``interaction_interaction_policy_issue_types`` was added as a new many-to-many table linking ``interaction_interaction`` and ``metadata_policyissuetype``.
+
+  ``interaction_interaction``: the ``policy_issue_type`` column is deprecated and will be removed on or after 7 January 2019.
+
+  ``interaction_interaction``: the value ``policy_feedback`` for the ``kind`` column is deprecated and ``was_policy_feedback_provided`` should be used to identify policy feedback instead.
+
+
 Data Hub API 8.2.0 (2018-12-13)
 ===============================
 
