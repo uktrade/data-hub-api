@@ -1,0 +1,1 @@
+The column ``company_company.alias`` is deprecated and it will be deleted on or after January, 7. Please use ``company_company.trading_names`` instead.

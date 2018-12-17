@@ -329,7 +329,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 self.fields[field].read_only = True
 
     def validate(self, data):
-        """Performs cross-field validation."""
+        """
+        Performs cross-field validation and adds extra fields to data.
+        """
         combiner = DataCombiner(self.instance, data)
 
         if {'global_headquarters', 'headquarter_type'} & data.keys():
@@ -344,6 +346,16 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 raise serializers.ValidationError({
                     'headquarter_type': message,
                 })
+
+        # TODO: refactor after alias is deprecated
+
+        # Save trading_name/alias in trading_names if trading_name/alias has been specified.
+        # If the company has a non-empty duns_number, trading_name/alias becomes
+        # read-only at the moment to avoid trading_names being inadvertently overridden.
+
+        if 'alias' in data:
+            alias = data['alias']
+            data['trading_names'] = [] if not alias else [alias]
 
         return data
 
