@@ -1,5 +1,0 @@
-``interaction_interaction``: ``was_policy_feedback_provided`` was added as a nullable boolean column.
-``interaction_interaction``: ``policy_feedback_notes`` was added as a nullable text column.
-``interaction_interaction_policy_issue_types`` was added as a new many-to-many table linking ``interaction_interaction`` and ``metadata_policyissuetype``.
-``interaction_interaction``: the ``policy_issue_type`` column is deprecated and will be removed on or after 7 January 2019.
-``interaction_interaction``: the value ``policy_feedback`` for the ``kind`` column is deprecated and ``was_policy_feedback_provided`` should be used to identify policy feedback instead.
