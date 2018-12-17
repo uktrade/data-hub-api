@@ -1,0 +1,11 @@
+``GET /v3/search`` now also searches for a company's ``trading_names`` when using the ``term`` param.
+
+``POST /v3/search/company`` now also returns and searches for a company's ``trading_names`` when using the ``name`` param.
+
+``GET /v3/search/company/autocomplete`` now also returns and searches for a company's ``trading_names``
+
+``POST /v3/search/contact`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.
+
+``POST /v3/search/interaction`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.
+
+``POST /v3/search/order`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.

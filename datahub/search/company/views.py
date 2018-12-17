@@ -47,9 +47,22 @@ class SearchCompanyParams:
     }
 
     COMPOSITE_FILTERS = {
-        'name': ['name', 'name_trigram', 'trading_name_trigram'],
-        'country': ['trading_address_country.id', 'registered_address_country.id'],
-        'sector_descends': ['sector.id', 'sector.ancestors.id'],
+        'name': [
+            'name',  # to find 2-letter words
+            'name_trigram',
+            'trading_name',  # to find 2-letter words
+            'trading_name_trigram',
+            'trading_names',  # to find 2-letter words
+            'trading_names_trigram',
+        ],
+        'country': [
+            'trading_address_country.id',
+            'registered_address_country.id',
+        ],
+        'sector_descends': [
+            'sector.id',
+            'sector.ancestors.id',
+        ],
     }
 
 
@@ -86,6 +99,7 @@ class CompanyAutocompleteSearchListAPIView(SearchCompanyParams, AutocompleteSear
         'id',
         'name',
         'trading_name',
+        'trading_names',
         'trading_address_1',
         'trading_address_2',
         'trading_address_town',

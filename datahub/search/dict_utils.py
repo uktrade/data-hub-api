@@ -40,6 +40,7 @@ def company_dict(obj):
         'id': str(obj.id),
         'name': obj.name,
         'trading_name': obj.alias,
+        'trading_names': obj.trading_names,
     }
 
 
