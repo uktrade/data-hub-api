@@ -128,6 +128,10 @@ def company_field(field):
                 copy_to=f'{field}.trading_name_trigram',
             ),
             'trading_name_trigram': TrigramText(),
+            'trading_names': Text(
+                copy_to=f'{field}.trading_names_trigram',
+            ),
+            'trading_names_trigram': TrigramText(),
         },
     )
 
@@ -143,6 +147,11 @@ def nested_company_field(field):
                 copy_to=f'{field}.trading_name_trigram',
             ),
             'trading_name_trigram': TrigramText(),
+            'trading_names': Text(
+                copy_to=f'{field}.trading_names_trigram',
+            ),
+            'trading_names_trigram': TrigramText(),
+
         },
         include_in_parent=True,
     )

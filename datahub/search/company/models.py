@@ -1,3 +1,4 @@
+import itertools
 from operator import attrgetter
 
 from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
@@ -33,12 +34,19 @@ def get_suggestions(db_company):
 
     company_name = db_company.name
     alias = db_company.alias or ''
+    trading_names = db_company.trading_names or []
 
-    data = [
-        *company_name.split(' '),
-        *alias.split(' '),
+    names = [
         company_name,
         alias,
+        *trading_names,
+    ]
+
+    data = [
+        *itertools.chain(
+            *[name.split(' ') for name in names],
+        ),
+        *names,
     ]
 
     return list(filter(None, set(data)))
@@ -102,6 +110,10 @@ class Company(BaseESModel):
     )
     trading_name_keyword = fields.SortableCaseInsensitiveKeywordText()
     trading_name_trigram = fields.TrigramText()
+    trading_names = Text(
+        copy_to=['trading_names_trigram'],
+    )
+    trading_names_trigram = fields.TrigramText()
     turnover_range = fields.nested_id_name_field()
     uk_region = fields.nested_id_name_field()
     uk_based = Boolean()
@@ -135,11 +147,13 @@ class Company(BaseESModel):
     }
 
     SEARCH_FIELDS = (
-        'name',
+        'name',  # to find 2-letter words
         'name_trigram',
         'company_number',
-        'trading_name',
+        'trading_name',  # to find 2-letter words
         'trading_name_trigram',
+        'trading_names',  # to find 2-letter words
+        'trading_names_trigram',
         'reference_code',
         'registered_address_country.name_trigram',
         'registered_address_postcode_trigram',

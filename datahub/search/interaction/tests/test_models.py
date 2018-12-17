@@ -27,6 +27,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
             'id': str(interaction.company.pk),
             'name': interaction.company.name,
             'trading_name': interaction.company.alias,
+            'trading_names': interaction.company.trading_names,
         } if interaction.company else None,
         'company_sector': {
             'id': str(interaction.company.sector.pk),
@@ -96,6 +97,7 @@ def test_service_delivery_to_dict(setup_es):
             'id': str(interaction.company.pk),
             'name': interaction.company.name,
             'trading_name': interaction.company.alias,
+            'trading_names': interaction.company.trading_names,
         },
         'company_sector': {
             'id': str(interaction.company.sector.pk),

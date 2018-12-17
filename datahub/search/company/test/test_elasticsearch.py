@@ -1,4 +1,5 @@
 import pytest
+from elasticsearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.search import elasticsearch
@@ -9,6 +10,348 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
+
+
+def test_mapping(setup_es):
+    """Test the ES mapping for a company."""
+    mapping = Mapping.from_es(
+        CompanySearchApp.es_model.get_write_index(),
+        CompanySearchApp.name,
+    )
+
+    assert mapping.to_dict() == {
+        'company': {
+            'dynamic': 'false',
+            'properties': {
+                'archived': {'type': 'boolean'},
+                'archived_by': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['archived_by.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'archived_on': {'type': 'date'},
+                'archived_reason': {'type': 'text'},
+                'business_type': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'companies_house_data': {
+                    'properties': {
+                        'company_number': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                    },
+                    'type': 'nested',
+                },
+                'company_number': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'contacts': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['contacts.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'created_on': {'type': 'date'},
+                'description': {
+                    'analyzer': 'english_analyzer',
+                    'type': 'text',
+                },
+                'duns_number': {'type': 'keyword'},
+                'employee_range': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'export_experience_category': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'export_to_countries': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'future_interest_countries': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'global_headquarters': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'headquarter_type': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'id': {'type': 'keyword'},
+                'modified_on': {'type': 'date'},
+                'name': {
+                    'copy_to': ['name_keyword', 'name_trigram'],
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'name_keyword': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'name_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'reference_code': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'registered_address_1': {'type': 'text'},
+                'registered_address_2': {'type': 'text'},
+                'registered_address_country': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['registered_address_country.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'registered_address_county': {'type': 'text'},
+                'registered_address_postcode': {
+                    'copy_to': ['registered_address_postcode_trigram'],
+                    'type': 'text',
+                },
+                'registered_address_postcode_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'registered_address_town': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'sector': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'ancestors': {
+                            'include_in_parent': True,
+                            'properties': {'id': {'type': 'keyword'}},
+                            'type': 'nested',
+                        },
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'suggest': {
+                    'analyzer': 'simple',
+                    'max_input_length': 50,
+                    'preserve_position_increments': True,
+                    'preserve_separators': True,
+                    'type': 'completion',
+                },
+                'trading_address_1': {'type': 'text'},
+                'trading_address_2': {'type': 'text'},
+                'trading_address_country': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['trading_address_country.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'trading_address_county': {'type': 'text'},
+                'trading_address_postcode': {
+                    'copy_to': ['trading_address_postcode_trigram'],
+                    'type': 'text',
+                },
+                'trading_address_postcode_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'trading_address_town': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'trading_name': {
+                    'copy_to': ['trading_name_keyword', 'trading_name_trigram'],
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'trading_name_keyword': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'trading_name_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'trading_names': {
+                    'copy_to': ['trading_names_trigram'],
+                    'type': 'text',
+                },
+                'trading_names_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'turnover_range': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'uk_based': {'type': 'boolean'},
+                'uk_region': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'nested',
+                },
+                'vat_number': {
+                    'index': False,
+                    'type': 'keyword',
+                },
+                'website': {'type': 'text'},
+            },
+        },
+    }
 
 
 def test_get_basic_search_query():
@@ -72,6 +415,8 @@ def test_get_basic_search_query():
                                 'trading_address_postcode_trigram',
                                 'trading_name',
                                 'trading_name_trigram',
+                                'trading_names',
+                                'trading_names_trigram',
                                 'uk_company.name',
                                 'uk_company.name_trigram',
                                 'uk_region.name_trigram',
@@ -164,6 +509,8 @@ def test_limited_get_search_by_entity_query():
                                             'company_number',
                                             'trading_name',
                                             'trading_name_trigram',
+                                            'trading_names',
+                                            'trading_names_trigram',
                                             'reference_code',
                                             'registered_address_country.name_trigram',
                                             'registered_address_postcode_trigram',
@@ -235,7 +582,7 @@ def test_limited_get_search_by_entity_query():
 @pytest.mark.django_db
 def test_indexed_doc(setup_es):
     """Test the ES data of an indexed company."""
-    company = CompanyFactory()
+    company = CompanyFactory(trading_names=['a', 'b'])
 
     doc = ESCompany.es_document(company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
@@ -285,6 +632,7 @@ def test_indexed_doc(setup_es):
         'trading_address_postcode',
         'trading_address_town',
         'trading_name',
+        'trading_names',
         'turnover_range',
         'uk_based',
         'uk_region',
