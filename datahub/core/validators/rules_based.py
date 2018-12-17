@@ -154,6 +154,29 @@ class AnyIsNotBlankRule(BaseRule):
         return any(is_not_blank(combiner[field]) for field in self._fields)
 
 
+class AndRule(BaseRule):
+    """
+    Field-less AND rule that can be used to combine other rules in the `when` argument in
+    `ValidationRule.__init__`.
+
+    (It's not intended to be used with the `rules` argument in `ValidationRule.__init__`,
+    as multiple rules can simply be provided instead.)
+    """
+
+    def __init__(self, *rules: AbstractRule):
+        """
+        Initialise the rule.
+
+        :param rules: Sub-rules to combine using the AND operator.
+        """
+        super().__init__()
+        self._rules = rules
+
+    def __call__(self, combiner) -> bool:
+        """Test whether all of the sub-rules pass."""
+        return all(rule(combiner) for rule in self._rules)
+
+
 FieldAndError = namedtuple('FieldAndError', ('field', 'error_key'))
 
 

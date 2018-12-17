@@ -16,4 +16,5 @@ def get_interaction_queryset():
         'policy_issue_type',
     ).prefetch_related(
         'policy_areas',
+        'policy_issue_types',
     )

@@ -38,6 +38,27 @@ class TestGetInteraction(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_nullable_policy_feedback_fields_translated_to_defaults(self):
+        """
+        Test that null values for nullable policy feedback fields are translated to the default
+        values for those fields.
+
+        This is for interactions created before these fields were added. Once those records
+        have been updated to have the default value instead of null, the fields can be made
+        non-nullable and this test removed.
+        """
+        interaction = CompanyInteractionFactory(
+            was_policy_feedback_provided=None,
+            policy_feedback_notes=None,
+        )
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['was_policy_feedback_provided'] is False
+        assert response_data['policy_feedback_notes'] == ''
+
 
 class TestUpdateInteraction(APITestMixin):
     """Base tests for the update interaction view."""

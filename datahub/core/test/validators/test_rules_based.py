@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
+    AndRule,
     ConditionalRule,
     EqualsRule,
     FieldAndError,
@@ -80,6 +81,18 @@ def test_conditional_rule(rule_res, when_res, res):
 
 def _make_stub_rule(field, is_valid):
     return Mock(return_value=is_valid, field=field)
+
+
+@pytest.mark.parametrize('subrule1_res', (True, False))
+@pytest.mark.parametrize('subrule2_res', (True, False))
+def test_and_rule_combines_other_rules(subrule1_res, subrule2_res):
+    """Test that AndRule combines sub-rules using the AND operator."""
+    rule = AndRule(
+        _make_stub_rule('field1', subrule1_res),
+        _make_stub_rule('field2', subrule2_res),
+    )
+    combiner = Mock(spec_set=DataCombiner)
+    assert rule(combiner) == (subrule1_res and subrule2_res)
 
 
 @pytest.mark.parametrize(

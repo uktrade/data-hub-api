@@ -34,20 +34,43 @@ class TestAddServiceDelivery(APITestMixin):
             # non-event service delivery
             {
                 'is_event': False,
-                'notes': 'hello',
+                'was_policy_feedback_provided': False,
             },
             # event service delivery
             {
                 'is_event': True,
+                'was_policy_feedback_provided': False,
                 'event': EventFactory,
+            },
+            # non-event service delivery with blank notes
+            {
+                'is_event': False,
+                'was_policy_feedback_provided': False,
+                'notes': '',
             },
             # non-event service delivery with all fields filled in
             {
                 'is_event': False,
+                'was_policy_feedback_provided': False,
                 'notes': 'hello',
                 'service_delivery_status': partial(random_obj_for_model, ServiceDeliveryStatus),
                 'grant_amount_offered': '9999.99',
                 'net_company_receipt': '8888.99',
+            },
+            # non-event service delivery without was_policy_feedback_provided explicitly specified
+            # (for backwards compatibility)
+            {
+                'is_event': False,
+            },
+            # non-event service delivery with policy feedback
+            {
+                'is_event': False,
+                'was_policy_feedback_provided': True,
+                'policy_areas': [
+                    partial(random_obj_for_model, PolicyArea),
+                ],
+                'policy_feedback_notes': 'Policy feedback notes',
+                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
     )
@@ -82,8 +105,13 @@ class TestAddServiceDelivery(APITestMixin):
             'grant_amount_offered': request_data.get('grant_amount_offered'),
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
-            'policy_areas': [],
+            'policy_areas': request_data.get('policy_areas', []),
+            'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
             'policy_issue_type': None,
+            'policy_issue_types':
+                request_data.get('policy_issue_types', []),
+            'was_policy_feedback_provided':
+                request_data.get('was_policy_feedback_provided', False),
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_adviser': {
@@ -167,6 +195,63 @@ class TestAddServiceDelivery(APITestMixin):
                 },
             ),
 
+            # policy feedback fields cannot be omitted when policy feedback provided
+            (
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'is_event': True,
+                    'event': EventFactory,
+                    'service_delivery_status': partial(
+                        random_obj_for_model, ServiceDeliveryStatus,
+                    ),
+
+                    'was_policy_feedback_provided': True,
+                },
+                {
+                    'policy_areas': ['This field is required.'],
+                    'policy_feedback_notes': ['This field is required.'],
+                    'policy_issue_types': ['This field is required.'],
+                },
+            ),
+
+            # policy feedback fields cannot be blank when policy feedback provided
+            (
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'is_event': True,
+                    'event': EventFactory,
+                    'service_delivery_status': partial(
+                        random_obj_for_model, ServiceDeliveryStatus,
+                    ),
+
+                    'was_policy_feedback_provided': True,
+                    'policy_areas': [],
+                    'policy_feedback_notes': '',
+                    'policy_issue_types': [],
+                },
+                {
+                    'policy_areas': ['This field is required.'],
+                    'policy_feedback_notes': ['This field is required.'],
+                    'policy_issue_types': ['This field is required.'],
+                },
+            ),
+
             # fields not allowed
             (
                 {
@@ -190,14 +275,54 @@ class TestAddServiceDelivery(APITestMixin):
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
+                    'policy_feedback_notes': 'Policy feedback notes.',
                     'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
+                    'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
                     'investment_project': InvestmentProjectFactory,
                 },
                 {
                     'communication_channel': ['This field is not valid for service deliveries.'],
-                    'policy_areas': ['This field is only valid for policy feedback.'],
+                    'policy_areas': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
+                    'policy_feedback_notes': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
                     'policy_issue_type': ['This field is only valid for policy feedback.'],
+                    'policy_issue_types': [
+                        'This field is only valid when policy feedback has been provided.',
+                    ],
                     'investment_project': ['This field is only valid for interactions.'],
+                },
+            ),
+
+            # fields where None is not allowed
+            (
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'is_event': True,
+                    'event': EventFactory,
+                    'service_delivery_status': partial(
+                        random_obj_for_model, ServiceDeliveryStatus,
+                    ),
+                    'grant_amount_offered': '1111.11',
+                    'net_company_receipt': '8888.11',
+
+                    # fields where None is not allowed
+                    'was_policy_feedback_provided': None,
+                    'policy_feedback_notes': None,
+                },
+                {
+                    'was_policy_feedback_provided': ['This field may not be null.'],
+                    'policy_feedback_notes': ['This field may not be null.'],
                 },
             ),
 
