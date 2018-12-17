@@ -14,6 +14,7 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
+from datahub.core.validators.rules_based import AndRule
 from datahub.event.models import Event
 from datahub.interaction.models import (
     CommunicationChannel,
@@ -43,11 +44,17 @@ class InteractionSerializer(serializers.ModelSerializer):
         'invalid_for_non_interaction': ugettext_lazy(
             'This field is only valid for interactions.',
         ),
+        'invalid_for_non_interaction_or_service_delivery': ugettext_lazy(
+            'This value is only valid for interactions and service deliveries.',
+        ),
         'invalid_for_non_event': ugettext_lazy(
             'This field is only valid for event service deliveries.',
         ),
         'invalid_for_non_policy_feedback': ugettext_lazy(
             'This field is only valid for policy feedback.',
+        ),
+        'invalid_when_no_policy_feedback': ugettext_lazy(
+            'This field is only valid when policy feedback has been provided.',
         ),
         'one_policy_area_field': ugettext_lazy(
             'Only one of policy_area and policy_areas should be provided.',
@@ -82,6 +89,36 @@ class InteractionSerializer(serializers.ModelSerializer):
     policy_issue_type = NestedRelatedField(
         PolicyIssueType, required=False, allow_null=True,
     )
+    policy_issue_types = NestedRelatedField(
+        PolicyIssueType,
+        allow_empty=True,
+        many=True,
+        required=False,
+    )
+
+    def to_representation(self, instance):
+        """
+        Converts an instance to a dict, ready to be serialised.
+
+        This is overridden to replace None values for some recently added fields with the
+        default value. This is until existing records have been updated and None values
+        replaced with the default value.
+
+        This overridden method can be removed once the NULL values have been removed and
+        the fields made non-nullable.
+        """
+        data = super().to_representation(instance)
+
+        replace_none_with_default_fields = (
+            'policy_feedback_notes',
+            'was_policy_feedback_provided',
+        )
+
+        for field in replace_none_with_default_fields:
+            if data[field] is None:
+                data[field] = instance._meta.get_field(field).default
+
+        return data
 
     def validate(self, data):
         """
@@ -104,6 +141,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
+            'policy_feedback_notes': {'allow_null': False},
+            'was_policy_feedback_provided': {'allow_null': False},
         }
         fields = (
             'id',
@@ -129,7 +168,12 @@ class InteractionSerializer(serializers.ModelSerializer):
             'notes',
             'archived_documents_url_path',
             'policy_areas',
+            'policy_feedback_notes',
+            # TODO: policy_issue_type will be removed once the legacy policy feedback
+            #   functionality is removed.
             'policy_issue_type',
+            'policy_issue_types',
+            'was_policy_feedback_provided',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -180,9 +224,10 @@ class InteractionSerializer(serializers.ModelSerializer):
                         ],
                     ),
                 ),
+                # TODO: Some policy feedback rules will be removed or simplified when the legacy
+                #   policy feedback functionality is removed.
                 ValidationRule(
                     'invalid_for_non_policy_feedback',
-                    OperatorRule('policy_areas', not_),
                     OperatorRule('policy_issue_type', is_blank),
                     when=InRule(
                         'kind',
@@ -193,15 +238,57 @@ class InteractionSerializer(serializers.ModelSerializer):
                     ),
                 ),
                 ValidationRule(
+                    'invalid_when_no_policy_feedback',
+                    OperatorRule('policy_areas', not_),
+                    when=AndRule(
+                        OperatorRule('was_policy_feedback_provided', not_),
+                        InRule(
+                            'kind',
+                            [
+                                Interaction.KINDS.interaction,
+                                Interaction.KINDS.service_delivery,
+                            ],
+                        ),
+                    ),
+                ),
+                ValidationRule(
+                    'invalid_when_no_policy_feedback',
+                    OperatorRule('policy_issue_types', not_),
+                    OperatorRule('policy_feedback_notes', not_),
+                    when=OperatorRule('was_policy_feedback_provided', not_),
+                ),
+                ValidationRule(
                     'required',
-                    OperatorRule('is_event', is_not_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    OperatorRule('notes', is_not_blank),
+                    OperatorRule('policy_areas', bool),
+                    OperatorRule('policy_issue_type', is_not_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
+                ),
+                ValidationRule(
+                    'invalid_for_non_interaction_or_service_delivery',
+                    OperatorRule('was_policy_feedback_provided', not_),
+                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
                 ),
                 ValidationRule(
                     'required',
                     OperatorRule('policy_areas', bool),
-                    OperatorRule('policy_issue_type', is_not_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
+                    OperatorRule('policy_issue_types', bool),
+                    OperatorRule('policy_feedback_notes', is_not_blank),
+                    when=AndRule(
+                        OperatorRule('was_policy_feedback_provided', bool),
+                        InRule(
+                            'kind',
+                            [
+                                Interaction.KINDS.interaction,
+                                Interaction.KINDS.service_delivery,
+                            ],
+                        ),
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('is_event', is_not_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
                     'required',
@@ -212,11 +299,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'invalid_for_non_event',
                     OperatorRule('event', not_),
                     when=OperatorRule('is_event', not_),
-                ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('notes', is_not_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
                 ),
             ),
         ]

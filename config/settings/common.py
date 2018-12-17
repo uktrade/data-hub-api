@@ -252,7 +252,6 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
 ENABLE_CELERY_ES_SYNC_OBJECT = env.bool('ENABLE_CELERY_ES_SYNC_OBJECT', default=False)
 SEARCH_EXPORT_MAX_RESULTS = 5000
 SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
-DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
@@ -295,11 +294,6 @@ if REDIS_BASE_URL:
     # would affect in particular any long-running tasks using acks_late=True.)
     CELERY_BROKER_TRANSPORT_OPTIONS = {
         'visibility_timeout': int(timedelta(hours=9).total_seconds())
-    }
-    CELERY_TASK_ROUTES = {
-        'datahub.search.tasks.sync_model': {
-            'queue': 'long-running'
-        }
     }
     CELERY_BEAT_SCHEDULE = {
         'refresh_pending_payment_gateway_sessions': {

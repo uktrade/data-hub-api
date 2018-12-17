@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='policy_areas',
-            field=models.ManyToManyField(blank=True, help_text='For policy feedback only.', related_name='interactions', to='interaction.PolicyArea'),
+            field=models.ManyToManyField(blank=True, related_name='interactions', to='interaction.PolicyArea'),
         ),
         migrations.RunPython(copy_policy_areas, migrations.RunPython.noop, elidable=True),
     ]

@@ -39,6 +39,7 @@ aws-requests-auth==0.4.2
 
 # Celery
 celery==4.2.1
+billiard==3.5.0.4  # pinned due to https://github.com/celery/billiard/issues/260
 
 # Testing and dev
 pytest==4.0.1
