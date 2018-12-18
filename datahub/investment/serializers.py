@@ -36,7 +36,6 @@ CORE_FIELDS = (
     'estimated_land_date',
     'actual_land_date',
     'quotable_as_public_case_study',
-    'likelihood_of_landing',
     'likelihood_to_land',
     'priority',
     'approved_commitment_to_invest',
@@ -391,7 +390,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'archived_documents_url_path',
             'comments',
-            'likelihood_of_landing',
         )
 
 
