@@ -58,6 +58,7 @@ class AutocompleteSearchCompanySerializer(AutocompleteSearchSerializer):
 
     name = serializers.CharField()
     trading_name = serializers.CharField()
+    trading_names = serializers.ListField(child=serializers.CharField(), required=False)
     trading_address_1 = serializers.CharField()
     trading_address_2 = serializers.CharField()
     trading_address_town = serializers.CharField()

@@ -40,6 +40,7 @@ def test_order_to_dict(Factory):
             'id': str(order.company.pk),
             'name': order.company.name,
             'trading_name': order.company.alias,
+            'trading_names': order.company.trading_names,
         },
         'contact': {
             'id': str(order.contact.pk),
