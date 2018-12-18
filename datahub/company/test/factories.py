@@ -53,6 +53,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     )
     turnover_range = factory.LazyFunction(lambda: random_obj_for_model(TurnoverRange))
     employee_range = factory.LazyFunction(lambda: random_obj_for_model(EmployeeRange))
+    turnover = 100
+    is_turnover_estimated = True
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
 
