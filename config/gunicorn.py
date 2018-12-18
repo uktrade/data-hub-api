@@ -11,7 +11,7 @@ worker_class = os.environ.get('GUNICORN_WORKER_CLASS', 'gevent')
 worker_connections = os.environ.get('GUNICORN_WORKER_CONNECTIONS', '10')
 
 _enable_async_psycopg2 = (
-    os.environ.get('GUNICORN_ENABLE_ASYNC_PSYCOPG2', '').lower() in ('true', '1')
+    os.environ.get('GUNICORN_ENABLE_ASYNC_PSYCOPG2', 'true').lower() in ('true', '1')
 )
 
 
