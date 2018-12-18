@@ -106,6 +106,8 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'uk_region',
                     'employee_range',
                     'turnover_range',
+                    'turnover',
+                    'is_turnover_estimated',
                     'classification',
                     'one_list_tier',
                     'one_list_account_owner',
