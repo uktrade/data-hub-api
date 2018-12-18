@@ -48,7 +48,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     investor_company = factory.SubFactory(CompanyFactory)
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
-    likelihood_of_landing = 90
     likelihood_to_land_id = LikelihoodToLand.high.value.id
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
