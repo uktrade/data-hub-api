@@ -36,6 +36,22 @@ class TextWithKeyword(Text):
         )
 
 
+def contact_or_adviser_field(field, include_dit_team=False):
+    """Object field for advisers and contacts."""
+    props = {
+        'id': Keyword(),
+        'first_name': SortableCaseInsensitiveKeywordText(),
+        'last_name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
+    }
+
+    if include_dit_team:
+        props['dit_team'] = id_name_field()
+
+    return Object(properties=props)
+
+
 def nested_contact_or_adviser_field(field, include_dit_team=False):
     """Nested field for lists of advisers or contacts."""
     props = {
@@ -75,6 +91,17 @@ def nested_id_name_field():
     )
 
 
+def id_name_partial_field(field):
+    """Object field with id and name sub-fields, and with partial matching on name."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+        },
+    )
+
+
 def nested_id_name_partial_field(field):
     """
     Nested field for lists of objects with id and name sub-fields, and with partial matching on
@@ -87,6 +114,21 @@ def nested_id_name_partial_field(field):
             'name_trigram': TrigramText(),
         },
         include_in_parent=True,
+    )
+
+
+def company_field(field):
+    """Company field."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+            'trading_name': SortableCaseInsensitiveKeywordText(
+                copy_to=f'{field}.trading_name_trigram',
+            ),
+            'trading_name_trigram': TrigramText(),
+        },
     )
 
 
@@ -112,6 +154,23 @@ def nested_ch_company_field():
         'id': Keyword(),
         'company_number': SortableCaseInsensitiveKeywordText(),
     })
+
+
+def sector_field():
+    """Sector field."""
+    ancestors = Object(
+        properties={
+            'id': Keyword(),
+        },
+    )
+
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+            'ancestors': ancestors,
+        },
+    )
 
 
 def nested_sector_field():
