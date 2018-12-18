@@ -1,0 +1,7 @@
+``GET /v3/omis/order/<id>/assignee`` now requires the ``order.view_orderassignee`` permission.
+
+``PATCH /v3/omis/order/<id>/assignee`` now requires the ``order.change_orderassignee`` permission.
+
+``GET /v3/omis/order/<id>/subscriber-list`` now requires the ``order.view_ordersubscriber`` permission.
+
+``PUT /v3/omis/order/<id>/subscriber-list`` now requires the ``order.change_ordersubscriber`` permission.
