@@ -1,0 +1,1 @@
+``GET /v3/company/<uuid:pk>`` now returns the read-only field ``trading_names`` which replaces ``trading_name``.

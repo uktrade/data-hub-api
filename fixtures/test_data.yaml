@@ -232,6 +232,10 @@
   pk: cc7e2f19-7251-4a41-a27a-f98437720531
   fields:
     name: DnB Corp
+    alias: Dun and Bradstreet
+    trading_names:
+        - DnB
+        - D&B
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a

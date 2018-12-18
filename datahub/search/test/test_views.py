@@ -150,38 +150,16 @@ class TestValidateExportViewAttributes:
 class TestSearch(APITestMixin):
     """Tests search views."""
 
-    def test_basic_search_paging(self, setup_es, setup_data):
-        """Tests pagination of results."""
-        setup_es.indices.refresh()
+    def test_basic_search_paging(self, setup_es):
+        """
+        Tests the pagination.
 
-        term = 'abc defg'
+        The sortby is not passed in so records are ordered by id.
+        """
+        total_records = 9
+        page_size = 2
 
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': term,
-                'entity': 'company',
-                'offset': 1,
-                'limit': 1,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert len(response.data['results']) == 1
-
-    @pytest.mark.parametrize(
-        'sortby',
-        (
-            {},
-            {'sortby': 'name:asc'},
-            {'sortby': 'created_on:asc'},
-        ),
-    )
-    def test_basic_search_consistent_paging(self, setup_es, sortby):
-        """Tests if content placement is consistent between pages."""
-        ids = sorted((uuid4() for _ in range(9)))
+        ids = sorted((uuid4() for _ in range(total_records)))
 
         name = 'test record'
 
@@ -194,10 +172,8 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        page_size = 2
-
+        url = reverse('api-v3:search:basic')
         for page in range((len(ids) + page_size - 1) // page_size):
-            url = reverse('api-v3:search:basic')
             response = self.api_client.get(
                 url,
                 data={
@@ -205,7 +181,6 @@ class TestSearch(APITestMixin):
                     'entity': 'company',
                     'offset': page * page_size,
                     'limit': page_size,
-                    **sortby,
                 },
             )
 
@@ -215,7 +190,7 @@ class TestSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
-    def test_invalid_entity(self, setup_es, setup_data):
+    def test_invalid_entity(self, setup_es):
         """Tests case where provided entity is invalid."""
         setup_es.indices.refresh()
 

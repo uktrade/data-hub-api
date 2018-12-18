@@ -214,6 +214,7 @@ class TestGetCompany(APITestMixin):
             company_number=123,
             name='Bar Ltd',
             alias='Xyz trading',
+            trading_names=['Xyz trading', 'Abc trading'],
             vat_number='009485769',
             registered_address_1='Goodbye St',
             registered_address_town='Barland',
@@ -259,6 +260,7 @@ class TestGetCompany(APITestMixin):
             'reference_code': '',
             'name': 'Bar Ltd',
             'trading_name': 'Xyz trading',
+            'trading_names': ['Xyz trading', 'Abc trading'],
             'registered_address_1': 'Goodbye St',
             'registered_address_2': None,
             'registered_address_town': 'Barland',
@@ -624,6 +626,7 @@ class TestUpdateCompany(APITestMixin):
             one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
             duns_number='000000001',
+            trading_names=['a', 'b', 'c'],
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -635,6 +638,7 @@ class TestUpdateCompany(APITestMixin):
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
+                'trading_names': ['d'],
             },
         )
 
@@ -647,6 +651,7 @@ class TestUpdateCompany(APITestMixin):
         }
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response.data['duns_number'] == '000000001'
+        assert response.data['trading_names'] == ['a', 'b', 'c']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -926,6 +931,8 @@ class TestUpdateCompany(APITestMixin):
     )
     def test_trading_names_is_updated_when_alias_changes(self, old_alias, new_alias):
         """Test that if alias/trading_name is changed, trading_names is updated as well."""
+        expected_trading_names = [] if not new_alias else [new_alias]
+
         company = CompanyFactory(alias=old_alias)
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
@@ -936,10 +943,11 @@ class TestUpdateCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
+        assert response.data['trading_names'] == expected_trading_names
 
         company.refresh_from_db()
         assert company.alias == new_alias
-        assert company.trading_names == ([] if not new_alias else [new_alias])
+        assert company.trading_names == expected_trading_names
 
 
 class TestAddCompany(APITestMixin):

@@ -38,6 +38,7 @@ def setup_data(setup_es):
     uk_region = constants.UKRegion.south_east.value.id
     CompanyFactory(
         name='abc defg ltd',
+        trading_names=['helm', 'nop'],
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_uk,
@@ -45,6 +46,7 @@ def setup_data(setup_es):
     )
     CompanyFactory(
         name='abc defg us ltd',
+        trading_names=['helm', 'nop', 'qrs'],
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
@@ -301,19 +303,52 @@ class TestSearch(APITestMixin):
             assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'name,match',
+        'name_term,matched_company_name',
         (
-            ('whiskers', True),
-            ('house lion', True),
-            ('tiger', False),
-            ('panda', False),
+            # name
+            ('whiskers', 'whiskers and tabby'),
+            ('whi', 'whiskers and tabby'),
+            ('his', 'whiskers and tabby'),
+            ('ers', 'whiskers and tabby'),
+            ('1a', '1a'),
+
+            # trading name
+            ('house lion', 'whiskers and tabby'),
+            ('use', 'whiskers and tabby'),
+            ('ion', 'whiskers and tabby'),
+            ('se li', None),
+            ('use lio', 'whiskers and tabby'),
+            ('use ion', 'whiskers and tabby'),
+            ('2a', '1a'),
+
+            # trading names
+            ('maine coon egyptian mau', 'whiskers and tabby'),
+            ('maine', 'whiskers and tabby'),
+            ('mau', 'whiskers and tabby'),
+            ('ine oon', 'whiskers and tabby'),
+            ('ine mau', 'whiskers and tabby'),
+            ('3a', '1a'),
+
+            # non-matches
+            ('whi lorem', None),
+            ('wh', None),
+            ('whe', None),
+            ('tiger', None),
+            ('panda', None),
+            ('moine', None),
         ),
     )
-    def test_composite_name_filter(self, setup_es, name, match):
+    def test_composite_name_filter(self, setup_es, name_term, matched_company_name):
         """Tests composite name filter."""
-        company = CompanyFactory(
+        CompanyFactory(
             name='whiskers and tabby',
             alias='house lion and moggie',
+            trading_names=['Maine Coon', 'Egyptian Mau'],
+        )
+        CompanyFactory(
+            name='1a',
+            alias='2a',
+            trading_names=['3a', '4a'],
         )
         setup_es.indices.refresh()
 
@@ -322,15 +357,17 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'name': name,
+                'name': name_term,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
+
+        match = Company.objects.filter(name=matched_company_name).first()
         if match:
             assert response.data['count'] == 1
             assert len(response.data['results']) == 1
-            assert response.data['results'][0]['id'] == str(company.id)
+            assert response.data['results'][0]['id'] == str(match.id)
         else:
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
@@ -358,85 +395,16 @@ class TestSearch(APITestMixin):
                        for result in response.data['results']}
         assert country_ids == {united_kingdom_id, united_states_id}
 
-    @pytest.mark.parametrize(
-        'company_name,search_name,match',
-        (
-            ('abcdefghijk', 'abc', True),
-            ('abcdefghijk', 'bcd', True),
-            ('abcdefghijk', 'hij', True),
-            ('abcdefghijk', 'cdefgh', True),
-            ('abcdefghijk', 'bcde', True),
-            ('abcdefghijk', 'hijk', True),
-            ('abcdefghijk', 'abcdefghijk', True),
-            ('abcdefghijk', 'abc xyz', False),
-            ('abcdefghijk', 'ab', False),
-            ('abcdefghijk', 'cats', False),
-            ('abcdefghijk', 'xyz', False),
-            ('abcdefghijk', 'abd', False),
-            ('abcdefghijk', 'abdeghk', False),
-            ('abcdefghijk', 'abdeklx', False),
-            ('abcdefghijk', 'abcfgzghijk', False),
-            ('Pallas Hiding', 'pallas', True),
-            ('Pallas Hiding', 'hid', True),
-            ('Pallas Hiding', 'las', True),
-            ('Pallas Hiding', 'Pallas Hiding', True),
-            ('Pallas Hiding', 'Pallas Hid', True),
-            ('Pallas Hiding', 'Pallas Hi', True),
-            ('A & B', 'A & B', True),
-            ('A&B Properties Limited', 'a&b', True),
-        ),
-    )
-    def test_name_filter_match(self, setup_es, company_name, search_name, match):
-        """Tests company name partial search."""
-        company = CompanyFactory(
-            name=company_name,
-        )
-        setup_es.indices.refresh()
+    def test_company_search_paging(self, setup_es):
+        """
+        Tests the pagination.
 
-        url = reverse('api-v3:search:company')
+        The sortby is not passed in so records are ordered by id.
+        """
+        total_records = 9
+        page_size = 2
 
-        response = self.api_client.post(
-            url,
-            data={
-                'name': search_name,
-            },
-        )
-        assert response.status_code == status.HTTP_200_OK
-
-        if match:
-            assert response.data['count'] == 1
-            assert len(response.data['results']) == 1
-            assert response.data['results'][0]['id'] == str(company.id)
-            assert response.data['results'][0]['name'] == company.name
-        else:
-            assert response.data['count'] == 0
-            assert len(response.data['results']) == 0
-
-    def test_null_filter(self, setup_es):
-        """Tests filter with null value."""
-        url = reverse('api-v3:search:company')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'uk_region': None,
-            },
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'uk_region': ['This field may not be null.']}
-
-    @pytest.mark.parametrize(
-        'sortby',
-        (
-            {},
-            {'sortby': 'name:asc'},
-            {'sortby': 'created_on:asc'},
-        ),
-    )
-    def test_company_search_paging(self, setup_es, sortby):
-        """Tests if content placement is consistent between pages."""
-        ids = sorted((uuid4() for _ in range(9)))
+        ids = sorted((uuid4() for _ in range(total_records)))
 
         name = 'test record'
 
@@ -449,18 +417,14 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        page_size = 2
-
+        url = reverse('api-v3:search:company')
         for page in range((len(ids) + page_size - 1) // page_size):
-            url = reverse('api-v3:search:company')
             response = self.api_client.post(
                 url,
                 data={
                     'original_query': name,
-                    'entity': 'company',
                     'offset': page * page_size,
                     'limit': page_size,
-                    **sortby,
                 },
             )
 
@@ -468,16 +432,9 @@ class TestSearch(APITestMixin):
 
             start = page * page_size
             end = start + page_size
-            assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
-
-    def test_company_search_paging_query_params(self, setup_data):
-        """Tests pagination of results."""
-        url = f"{reverse('api-v3:search:company')}?offset=1&limit=1"
-        response = self.api_client.post(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] > 1
-        assert len(response.data['results']) == 1
+            assert [
+                UUID(company['id']) for company in response.data['results']
+            ] == ids[start:end]
 
     @mock.patch('datahub.search.query_builder._add_aggs_to_query')
     def test_company_search_no_aggregations(self, _add_aggs_to_query, setup_data):
@@ -630,25 +587,74 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['name'].startswith(term)
         assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
 
-    def test_search_in_trading_name(self, setup_es):
+    @pytest.mark.parametrize(
+        'name_term,matched_company_name',
+        (
+            # name
+            ('whiskers', 'whiskers and tabby'),
+            ('whi', 'whiskers and tabby'),
+            ('his', 'whiskers and tabby'),
+            ('ers', 'whiskers and tabby'),
+            ('1a', '1a'),
+
+            # trading name
+            ('house lion', 'whiskers and tabby'),
+            ('use', 'whiskers and tabby'),
+            ('ion', 'whiskers and tabby'),
+            ('se li', None),
+            ('use lio', 'whiskers and tabby'),
+            ('use ion', 'whiskers and tabby'),
+            ('2a', '1a'),
+
+            # trading names
+            ('maine coon egyptian mau', 'whiskers and tabby'),
+            ('maine', 'whiskers and tabby'),
+            ('mau', 'whiskers and tabby'),
+            ('ine oon', 'whiskers and tabby'),
+            ('ine mau', 'whiskers and tabby'),
+            ('3a', '1a'),
+
+            # non-matches
+            ('whi lorem', None),
+            ('wh', None),
+            ('whe', None),
+            ('tiger', None),
+            ('panda', None),
+            ('moine', None),
+        ),
+    )
+    def test_search_in_name(self, setup_es, name_term, matched_company_name):
         """Tests basic aggregate companies query."""
-        term = 'NameFiveBiggestWildCats'
-        CompanyFactory(alias=term)
+        CompanyFactory(
+            name='whiskers and tabby',
+            alias='house lion and moggie',
+            trading_names=['Maine Coon', 'Egyptian Mau'],
+        )
+        CompanyFactory(
+            name='1a',
+            alias='2a',
+            trading_names=['3a', '4a'],
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
             url,
             data={
-                'term': term,
+                'term': name_term,
                 'entity': 'company',
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['results'][0]['trading_name'] == term
-        assert [{'count': 1, 'entity': 'company'}] == response.data['aggregations']
+        match = Company.objects.filter(name=matched_company_name).first()
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(match.id)
+            assert [{'count': 1, 'entity': 'company'}] == response.data['aggregations']
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
         'field,value,term,match',
@@ -738,6 +744,9 @@ class TestAutocompleteSearch(APITestMixin):
             ('abc defg ltd', ['abc defg ltd']),
             ('defg', ['abc defg ltd', 'abc defg us ltd']),
             ('us', ['abc defg us ltd']),
+            ('hel', ['abc defg ltd', 'abc defg us ltd']),
+            ('qrs', ['abc defg us ltd']),
+            ('help qrs', []),
         ),
     )
     def test_searching_with_a_query(self, setup_data, query, expected_companies):
