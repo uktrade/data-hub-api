@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import OrderAssignee
 from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, OrderPaidFactory
@@ -15,6 +15,32 @@ pytestmark = pytest.mark.django_db
 
 class TestGetOrderAssignees(APITestMixin):
     """Tests related to getting the list of advisers assigned to an order."""
+
+    def test_access_is_denied_if_without_permissions(self):
+        """Test that a 403 is returned if the user has no permissions."""
+        order = OrderFactory()
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id},
+        )
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_access_allowed_if_with_view_permission(self):
+        """Test that a 200 is returned if the user has the view permission."""
+        order = OrderFactory()
+        user = create_test_user(permission_codenames=['view_orderassignee'])
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id},
+        )
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
 
     def test_empty(self):
         """Test that calling GET returns [] if no-one is assigned."""
@@ -73,6 +99,38 @@ class TestGetOrderAssignees(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestChangeAssigneesPermissions(APITestMixin):
+    """Permission-related tests for changing order assignees."""
+
+    def test_access_is_denied_if_without_permissions(self):
+        """Test that a 403 is returned if the user has no permissions."""
+        order = OrderFactory()
+
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id},
+        )
+        response = api_client.patch(url, data=[])
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_access_allowed_if_with_change_permission(self):
+        """Test that a 200 is returned if the user has the change permission."""
+        order = OrderFactory()
+
+        user = create_test_user(permission_codenames=['change_orderassignee'])
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id},
+        )
+        response = api_client.patch(url, data=[])
+
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
