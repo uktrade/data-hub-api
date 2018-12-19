@@ -459,6 +459,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'companies_house_data',
             'contacts',
             'employee_range',
+            'number_of_employees',
+            'is_number_of_employees_estimated',
             'export_to_countries',
             'future_interest_countries',
             'headquarter_type',
@@ -482,6 +484,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_names',
             'turnover',
             'is_turnover_estimated',
+            'number_of_employees',
+            'is_number_of_employees_estimated',
         )
         dnb_read_only_fields = [
             'name',

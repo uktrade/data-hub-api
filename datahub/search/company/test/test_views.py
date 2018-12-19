@@ -511,12 +511,16 @@ class TestCompanyExportView(APITestMixin):
             3,
             turnover=None,
             is_turnover_estimated=None,
+            number_of_employees=None,
+            is_number_of_employees_estimated=None,
         )
         CompanyFactory.create_batch(
             2,
             hq=True,
             turnover=100,
             is_turnover_estimated=True,
+            number_of_employees=95,
+            is_number_of_employees_estimated=True,
         )
 
         setup_es.indices.refresh()
@@ -550,7 +554,11 @@ class TestCompanyExportView(APITestMixin):
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Archived': company.archived,
                 'Date created': company.created_on,
-                'Number of employees': get_attr_or_none(company, 'employee_range.name'),
+                'Number of employees': (
+                    company.number_of_employees
+                    if company.number_of_employees is not None
+                    else get_attr_or_none(company, 'employee_range.name')
+                ),
                 'Annual turnover': (
                     f'${company.turnover}'
                     if company.turnover is not None
