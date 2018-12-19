@@ -2,6 +2,7 @@ import pytest
 
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    CompanyInteractionFactoryWithPolicyFeedback,
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
@@ -12,7 +13,12 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'factory_cls',
-    (CompanyInteractionFactory, InvestmentProjectInteractionFactory),
+    (
+        CompanyInteractionFactory,
+        InvestmentProjectInteractionFactory,
+        CompanyInteractionFactoryWithPolicyFeedback,
+        lambda: CompanyInteractionFactory(was_policy_feedback_provided=None),
+    ),
 )
 def test_interaction_to_dict(setup_es, factory_cls):
     """Test converting an interaction to a dict."""
@@ -78,6 +84,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
         'service_delivery_status': None,
         'grant_amount_offered': None,
         'net_company_receipt': None,
+        'was_policy_feedback_provided': bool(interaction.was_policy_feedback_provided),
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }
@@ -139,6 +146,7 @@ def test_service_delivery_to_dict(setup_es):
         },
         'grant_amount_offered': interaction.grant_amount_offered,
         'net_company_receipt': interaction.net_company_receipt,
+        'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }

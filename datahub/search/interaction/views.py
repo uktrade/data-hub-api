@@ -34,6 +34,7 @@ class SearchInteractionParams:
         'investment_project',
         'sector_descends',
         'service',
+        'was_policy_feedback_provided',
     )
 
     REMAP_FIELDS = {

@@ -36,6 +36,7 @@ class Interaction(BaseESModel):
         copy_to=['subject_english'],
     )
     subject_english = fields.EnglishText()
+    was_policy_feedback_provided = Boolean()
 
     MAPPINGS = {
         'company': dict_utils.company_dict,
@@ -55,6 +56,8 @@ class Interaction(BaseESModel):
             'investment_project.sector',
         ),
         'is_event': attrgetter('is_event'),
+        # TODO: Remove once Interaction.was_policy_feedback_provided is no longer nullable
+        'was_policy_feedback_provided': lambda obj: bool(obj.was_policy_feedback_provided),
     }
 
     SEARCH_FIELDS = (
