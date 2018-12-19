@@ -37,8 +37,10 @@ _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING = {
 class DjangoCrudPermission(DjangoModelPermissions):
     """Extension of Permission class to include view permissions"""
 
-    perms_map = DjangoModelPermissions.perms_map.copy()
-    perms_map['GET'].append('%(app_label)s.view_%(model_name)s')
+    perms_map = {
+        **DjangoModelPermissions.perms_map,
+        'GET': ['%(app_label)s.view_%(model_name)s'],
+    }
 
 
 class HasPermissions(BasePermission):

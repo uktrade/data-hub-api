@@ -129,6 +129,9 @@
     - - delete_orderassignee
       - order
       - orderassignee
+    - - view_orderassignee
+      - order
+      - orderassignee
     - - add_ordersubscriber
       - order
       - ordersubscriber
@@ -136,6 +139,9 @@
       - order
       - ordersubscriber
     - - delete_ordersubscriber
+      - order
+      - ordersubscriber
+    - - view_ordersubscriber
       - order
       - ordersubscriber
     - - add_investmentproject
@@ -331,6 +337,9 @@
     - - delete_orderassignee
       - order
       - orderassignee
+    - - view_orderassignee
+      - order
+      - orderassignee
     - - add_ordersubscriber
       - order
       - ordersubscriber
@@ -338,6 +347,9 @@
       - order
       - ordersubscriber
     - - delete_ordersubscriber
+      - order
+      - ordersubscriber
+    - - view_ordersubscriber
       - order
       - ordersubscriber
   model: auth.group

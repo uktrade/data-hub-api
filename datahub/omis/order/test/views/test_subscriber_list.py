@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderSubscriberFactory
 
@@ -14,6 +14,32 @@ pytestmark = pytest.mark.django_db
 
 class TestGetSubscriberList(APITestMixin):
     """Get subscriber list test case."""
+
+    def test_access_is_denied_if_without_permissions(self):
+        """Test that a 403 is returned if the user has no permissions."""
+        order = OrderFactory()
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': order.id},
+        )
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_access_allowed_if_with_view_permission(self):
+        """Test that a 200 is returned if the user has the view permission."""
+        order = OrderFactory()
+        user = create_test_user(permission_codenames=['view_ordersubscriber'])
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': order.id},
+        )
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
 
     def test_empty(self):
         """
@@ -77,6 +103,34 @@ class TestGetSubscriberList(APITestMixin):
 
 class TestChangeSubscriberList(APITestMixin):
     """Change subscriber list test case."""
+
+    def test_access_is_denied_if_without_permissions(self):
+        """Test that a 403 is returned if the user has no permissions."""
+        order = OrderFactory()
+
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': order.id},
+        )
+        response = api_client.put(url, data=[])
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_access_allowed_if_with_change_permission(self):
+        """Test that a 200 is returned if the user has the change permission."""
+        order = OrderFactory()
+
+        user = create_test_user(permission_codenames=['change_ordersubscriber'])
+        api_client = self.create_api_client(user=user)
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': order.id},
+        )
+        response = api_client.put(url, data=[])
+
+        assert response.status_code == status.HTTP_200_OK
 
     def test_add_to_empty_list(self):
         """
