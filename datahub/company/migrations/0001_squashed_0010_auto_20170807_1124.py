@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
                 ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('business_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.BusinessType')),
                 ('classification', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.CompanyClassification', help_text='One List Tier')),
-                ('employee_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.EmployeeRange')),
+                ('employee_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.EmployeeRange', help_text='Not used when duns_number is set. In that case, use number_of_employees instead.')),
                 ('export_to_countries', models.ManyToManyField(blank=True, related_name='company_export_to_countries', to='metadata.Country')),
                 ('future_interest_countries', models.ManyToManyField(blank=True, related_name='company_future_interest_countries', to='metadata.Country')),
                 ('headquarter_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.HeadquarterType')),
