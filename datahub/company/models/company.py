@@ -135,6 +135,19 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     employee_range = models.ForeignKey(
         metadata_models.EmployeeRange, blank=True, null=True,
         on_delete=models.SET_NULL,
+        help_text=(
+            'Not used when duns_number is set. In that case, use number_of_employees instead.'
+        ),
+    )
+    number_of_employees = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
+    )
+    is_number_of_employees_estimated = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
     )
     turnover_range = models.ForeignKey(
         metadata_models.TurnoverRange, blank=True, null=True,

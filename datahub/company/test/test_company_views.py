@@ -292,6 +292,8 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.employee_range.id),
                 'name': company.employee_range.name,
             },
+            'number_of_employees': company.number_of_employees,
+            'is_number_of_employees_estimated': company.is_number_of_employees_estimated,
             'export_experience_category': {
                 'id': str(company.export_experience_category.id),
                 'name': company.export_experience_category.name,
@@ -631,6 +633,8 @@ class TestUpdateCompany(APITestMixin):
             trading_names=['a', 'b', 'c'],
             turnover=100,
             is_turnover_estimated=False,
+            number_of_employees=95,
+            is_number_of_employees_estimated=False,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -645,6 +649,8 @@ class TestUpdateCompany(APITestMixin):
                 'trading_names': ['d'],
                 'turnover': 101,
                 'is_turnover_estimated': True,
+                'number_of_employees': 96,
+                'is_number_of_employees_estimated': True,
             },
         )
 
@@ -660,6 +666,8 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['trading_names'] == ['a', 'b', 'c']
         assert response.data['turnover'] == 100
         assert not response.data['is_turnover_estimated']
+        assert response.data['number_of_employees'] == 95
+        assert not response.data['is_number_of_employees_estimated']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
