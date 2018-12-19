@@ -26,6 +26,7 @@ from datahub.core.test_utils import (
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    CompanyInteractionFactoryWithPolicyFeedback,
     EventServiceDeliveryFactory,
     InvestmentProjectInteractionFactory,
     PolicyFeedbackFactory,
@@ -329,6 +330,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'created_on': interaction.created_on.isoformat(),
             'modified_on': interaction.modified_on.isoformat(),
         }]
@@ -675,6 +677,34 @@ class TestInteractionEntitySearchView(APITestMixin):
         results = response_data['results']
         result_ids = {result['service']['id'] for result in results}
         assert result_ids == {str(service_id)}
+
+    @pytest.mark.parametrize('was_policy_feedback_provided', (False, True))
+    def test_filter_by_was_policy_feedback_provided(self, setup_es, was_policy_feedback_provided):
+        """Test filtering interactions by was_policy_feedback_provided."""
+        interactions_without_policy_feedback = CompanyInteractionFactory.create_batch(5)
+        interactions_with_policy_feedback = (
+            CompanyInteractionFactoryWithPolicyFeedback.create_batch(5)
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'was_policy_feedback_provided': was_policy_feedback_provided,
+        }
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        expected_interactions = (
+            interactions_with_policy_feedback if was_policy_feedback_provided
+            else interactions_without_policy_feedback
+        )
+        assert response_data['count'] == len(expected_interactions)
+
+        results = response_data['results']
+        result_ids = {result['id'] for result in results}
+        assert result_ids == {str(interaction.pk) for interaction in expected_interactions}
 
     @pytest.mark.parametrize(
         'data,results',
