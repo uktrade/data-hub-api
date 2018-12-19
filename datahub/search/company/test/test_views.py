@@ -507,8 +507,17 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
-        CompanyFactory.create_batch(3)
-        CompanyFactory.create_batch(2, hq=True)
+        CompanyFactory.create_batch(
+            3,
+            turnover=None,
+            is_turnover_estimated=None,
+        )
+        CompanyFactory.create_batch(
+            2,
+            hq=True,
+            turnover=100,
+            is_turnover_estimated=True,
+        )
 
         setup_es.indices.refresh()
 
@@ -542,7 +551,11 @@ class TestCompanyExportView(APITestMixin):
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': get_attr_or_none(company, 'employee_range.name'),
-                'Annual turnover': get_attr_or_none(company, 'turnover_range.name'),
+                'Annual turnover': (
+                    f'${company.turnover}'
+                    if company.turnover is not None
+                    else get_attr_or_none(company, 'turnover_range.name')
+                ),
                 'Headquarter type':
                     (get_attr_or_none(company, 'headquarter_type.name') or '').upper(),
             }

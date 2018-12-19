@@ -3,7 +3,12 @@ import uuid
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import integer_validator, MaxLengthValidator, MinLengthValidator
+from django.core.validators import (
+    integer_validator,
+    MaxLengthValidator,
+    MinLengthValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -134,6 +139,18 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     turnover_range = models.ForeignKey(
         metadata_models.TurnoverRange, blank=True, null=True,
         on_delete=models.SET_NULL,
+        help_text='Not used when duns_number is set. In that case, use turnover instead.',
+    )
+    turnover = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text='In USD. Only used when duns_number is set.',
+        validators=[MinValueValidator(0)],
+    )
+    is_turnover_estimated = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
     )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,

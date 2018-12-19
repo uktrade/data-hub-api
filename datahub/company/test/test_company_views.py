@@ -337,6 +337,8 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.turnover_range.id),
                 'name': company.turnover_range.name,
             },
+            'turnover': company.turnover,
+            'is_turnover_estimated': company.is_turnover_estimated,
             'uk_based': True,
             'uk_region': {
                 'id': str(company.uk_region.id),
@@ -627,6 +629,8 @@ class TestUpdateCompany(APITestMixin):
             one_list_account_owner=one_list_gam,
             duns_number='000000001',
             trading_names=['a', 'b', 'c'],
+            turnover=100,
+            is_turnover_estimated=False,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -639,6 +643,8 @@ class TestUpdateCompany(APITestMixin):
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
                 'trading_names': ['d'],
+                'turnover': 101,
+                'is_turnover_estimated': True,
             },
         )
 
@@ -652,6 +658,8 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response.data['duns_number'] == '000000001'
         assert response.data['trading_names'] == ['a', 'b', 'c']
+        assert response.data['turnover'] == 100
+        assert not response.data['is_turnover_estimated']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
