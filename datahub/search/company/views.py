@@ -1,4 +1,6 @@
-from django.db.models.functions import Upper
+from django.db.models.expressions import Case, Value, When
+from django.db.models.fields import CharField
+from django.db.models.functions import Concat, Upper
 
 from datahub.company.models import Company as DBCompany
 from datahub.core.query_utils import get_front_end_url_expression
@@ -77,6 +79,15 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         link=get_front_end_url_expression('company', 'pk'),
         upper_headquarter_type_name=Upper('headquarter_type__name'),
         sector_name=get_sector_name_subquery('sector'),
+        # get company.turnover if set else company.turnover_range
+        turnover_value=Case(
+            When(
+                turnover__isnull=False,
+                then=Concat(Value('$'), 'turnover'),
+            ),
+            default='turnover_range__name',
+            output_field=CharField(),
+        ),
     )
     field_titles = {
         'name': 'Name',
@@ -87,7 +98,7 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         'archived': 'Archived',
         'created_on': 'Date created',
         'employee_range__name': 'Number of employees',
-        'turnover_range__name': 'Annual turnover',
+        'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
     }
 

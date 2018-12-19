@@ -466,6 +466,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_headquarters',
             'sector',
             'turnover_range',
+            'turnover',
+            'is_turnover_estimated',
             'uk_region',
             'export_experience_category',
         )
@@ -478,6 +480,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'transfer_reason',
             'duns_number',
             'trading_names',
+            'turnover',
+            'is_turnover_estimated',
         )
         dnb_read_only_fields = [
             'name',

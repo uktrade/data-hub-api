@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
                 ('registered_address_country', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companys', to='metadata.Country')),
                 ('sector', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Sector')),
                 ('trading_address_country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='company_trading_address_country', to='metadata.Country')),
-                ('turnover_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.TurnoverRange')),
+                ('turnover_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.TurnoverRange', help_text='Not used when duns_number is set. In that case, use turnover instead.')),
                 ('uk_region', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.UKRegion')),
             ],
             options={

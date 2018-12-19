@@ -239,6 +239,8 @@
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    turnover: 1000000
+    is_turnover_estimated: True
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     registered_address_1: 1 Main Road
     registered_address_town: Rome
