@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
-from datahub.omis.order.models import Order
+from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.serializers import (
     CancelOrderSerializer,
     CompleteOrderSerializer,
@@ -85,7 +85,8 @@ class PublicOrderViewSet(CoreViewSet):
 class SubscriberListView(APIView):
     """API View for advisers subscribed to an order."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    # queryset is used only by DjangoCrudPermissions (to get the model for the view)
+    queryset = OrderSubscriber.objects.all()
     required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
@@ -139,7 +140,8 @@ class SubscriberListView(APIView):
 class AssigneeView(APIView):
     """API View for advisers assigned to an order."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    # queryset is used only by DjangoCrudPermissions (to get the model for the view)
+    queryset = OrderAssignee.objects.all()
     FORCE_DELETE_PARAM = 'force-delete'
     required_scopes = (Scope.internal_front_end,)
 

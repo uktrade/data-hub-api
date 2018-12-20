@@ -18,7 +18,11 @@ class TestAutocompleteSearchCompanySerializer:
         Tests the serializer can handle the data object within a
         _source parameter as this is how elasticsearch returns the documents.
         """
-        company = CompanyFactory(name='Company name 1', alias='Company trading name 1')
+        company = CompanyFactory(
+            name='Company name 1',
+            alias='Company trading name 1',
+            trading_names=['trading name 1', 'trading name 2'],
+        )
         elasticsearch_company_dict = ESCompany.es_document(company)
 
         assert '_source' in elasticsearch_company_dict
@@ -31,12 +35,17 @@ class TestAutocompleteSearchCompanySerializer:
         assert serializer.data['id'] == str(company.id)
         assert serializer.data['name'] == company.name
         assert serializer.data['trading_name'] == company.alias
+        assert serializer.data['trading_names'] == company.trading_names
 
     def test_serializer_without_source(self):
         """
         Tests the serializer can handle data not within a _source parameter
         """
-        company = CompanyFactory(name='Company name 1', alias='Company trading name 1')
+        company = CompanyFactory(
+            name='Company name 1',
+            alias='Company trading name 1',
+            trading_names=['trading name 1', 'trading name 2'],
+        )
         elasticsearch_company_dict = ESCompany.db_object_to_dict(company)
 
         assert '_source' not in elasticsearch_company_dict
@@ -48,8 +57,9 @@ class TestAutocompleteSearchCompanySerializer:
         assert serializer.data['id'] == str(company.id)
         assert serializer.data['name'] == company.name
         assert serializer.data['trading_name'] == company.alias
+        assert serializer.data['trading_names'] == company.trading_names
 
-    def test_serializer_returns_trading_and_registered_addresses_if(self):
+    def test_serializer_returns_trading_and_registered_addresses(self):
         """Tests the serializer returns both the trading and registered addresses."""
         company = CompanyFactory(
             trading_address_1='Trading address 1',

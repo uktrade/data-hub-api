@@ -84,7 +84,6 @@ def test_investment_project_to_dict(setup_es):
         'proposal_deadline',
         'project_assurance_adviser',
         'team_members',
-        'likelihood_of_landing',
         'likelihood_to_land',
         'project_arrived_in_triage_on',
         'quotable_as_public_case_study',

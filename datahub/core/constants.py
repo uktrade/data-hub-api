@@ -24,6 +24,35 @@ class Country(Enum):
     united_states = Constant('United States', '81756b9a-5d95-e211-a939-e4115bead28a')
 
 
+class SectorCluster(Enum):
+    """Sector clusters."""
+
+    creative_lifestyle_and_learning = Constant(
+        'Creative, Lifestyle and Learning',
+        'ed3671b5-d194-4ee3-9bbf-a04773711dd9',
+    )
+    defence_and_security = Constant(
+        'Defence and Security',
+        '7cdae131-6fc4-4c4c-a977-07f5be64a1c4',
+    )
+    energy_and_infrastructure = Constant(
+        'Energy & Infrastructure',
+        'c79ec2c9-9b31-45a0-9d32-b5cc284dc8d1',
+    )
+    financial_and_professional_services = Constant(
+        'Financial & Professional Services',
+        '7be7a38f-1a77-44bf-abee-3049ba50a6a8',
+    )
+    healthcare_life_sciences_and_bio_economy = Constant(
+        'Healthcare, Life Sciences and Bio-Economy',
+        '0804745e-80b6-4bd1-8101-30e7a431623e',
+    )
+    technology_entrepreneurship_and_advanced_manufacturing = Constant(
+        'Technology, Entrepreneurship and Advanced Manufacturing',
+        '531d3510-3f42-41fd-86b5-fa686fdfe33f',
+    )
+
+
 class Sector(Enum):
     """Sectors (not all of them!)."""
 

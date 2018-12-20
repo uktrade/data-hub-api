@@ -214,6 +214,7 @@ class TestGetCompany(APITestMixin):
             company_number=123,
             name='Bar Ltd',
             alias='Xyz trading',
+            trading_names=['Xyz trading', 'Abc trading'],
             vat_number='009485769',
             registered_address_1='Goodbye St',
             registered_address_town='Barland',
@@ -259,6 +260,7 @@ class TestGetCompany(APITestMixin):
             'reference_code': '',
             'name': 'Bar Ltd',
             'trading_name': 'Xyz trading',
+            'trading_names': ['Xyz trading', 'Abc trading'],
             'registered_address_1': 'Goodbye St',
             'registered_address_2': None,
             'registered_address_town': 'Barland',
@@ -290,6 +292,8 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.employee_range.id),
                 'name': company.employee_range.name,
             },
+            'number_of_employees': company.number_of_employees,
+            'is_number_of_employees_estimated': company.is_number_of_employees_estimated,
             'export_experience_category': {
                 'id': str(company.export_experience_category.id),
                 'name': company.export_experience_category.name,
@@ -335,6 +339,8 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.turnover_range.id),
                 'name': company.turnover_range.name,
             },
+            'turnover': company.turnover,
+            'is_turnover_estimated': company.is_turnover_estimated,
             'uk_based': True,
             'uk_region': {
                 'id': str(company.uk_region.id),
@@ -624,6 +630,11 @@ class TestUpdateCompany(APITestMixin):
             one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
             duns_number='000000001',
+            trading_names=['a', 'b', 'c'],
+            turnover=100,
+            is_turnover_estimated=False,
+            number_of_employees=95,
+            is_number_of_employees_estimated=False,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -635,6 +646,11 @@ class TestUpdateCompany(APITestMixin):
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
+                'trading_names': ['d'],
+                'turnover': 101,
+                'is_turnover_estimated': True,
+                'number_of_employees': 96,
+                'is_number_of_employees_estimated': True,
             },
         )
 
@@ -647,6 +663,11 @@ class TestUpdateCompany(APITestMixin):
         }
         assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response.data['duns_number'] == '000000001'
+        assert response.data['trading_names'] == ['a', 'b', 'c']
+        assert response.data['turnover'] == 100
+        assert not response.data['is_turnover_estimated']
+        assert response.data['number_of_employees'] == 95
+        assert not response.data['is_number_of_employees_estimated']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -907,6 +928,42 @@ class TestUpdateCompany(APITestMixin):
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response.data['headquarter_type'] == error
+
+    # TODO: remove after alias is deleted
+    @pytest.mark.parametrize(
+        'old_alias,new_alias',
+        (
+            ('old value', 'old value'),
+            ('old value', 'new value'),
+            ('old value', ''),
+            ('old value', None),
+            ('', 'old value'),
+            ('', ''),
+            ('', None),
+            (None, None),
+            (None, 'new value'),
+            (None, ''),
+        ),
+    )
+    def test_trading_names_is_updated_when_alias_changes(self, old_alias, new_alias):
+        """Test that if alias/trading_name is changed, trading_names is updated as well."""
+        expected_trading_names = [] if not new_alias else [new_alias]
+
+        company = CompanyFactory(alias=old_alias)
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'trading_name': new_alias,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['trading_names'] == expected_trading_names
+
+        company.refresh_from_db()
+        assert company.alias == new_alias
+        assert company.trading_names == expected_trading_names
 
 
 class TestAddCompany(APITestMixin):

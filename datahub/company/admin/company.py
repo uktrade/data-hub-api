@@ -2,7 +2,9 @@ from functools import partial
 
 from django import forms
 from django.contrib import admin
+from django.contrib.postgres.forms.array import SplitArrayField
 from django.db import models
+from django.forms.fields import CharField
 from django.urls import path
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
@@ -30,10 +32,59 @@ class OneListCoreTeamMemberInline(admin.TabularInline):
     )
 
 
+class CompanyAdminForm(forms.ModelForm):
+    """Admin form for Company."""
+
+    TRADING_NAMES_DEFAULT_FIELD_SIZE = 5
+
+    trading_names = SplitArrayField(
+        base_field=CharField(max_length=255, required=False),
+        size=TRADING_NAMES_DEFAULT_FIELD_SIZE,
+        required=False,
+        remove_trailing_nulls=True,
+        help_text=Company._meta.get_field('trading_names').help_text,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """Initialises the form."""
+        super().__init__(*args, **kwargs)
+        self.set_trading_names_field_size()
+
+    def set_trading_names_field_size(self):
+        """
+        Sets the size of the form field trading_names using the following logic:
+
+        given TRADING_NAMES_DEFAULT_FIELD_SIZE as default size
+        the actual array field size for the specific self.instance is:
+            n = max(
+                TRADING_NAMES_DEFAULT_FIELD_SIZE,
+                (len of instance.trading_names + 1)
+            )
+
+        This creates n separate form fields in the django admin allowing the user to
+        add up to n trading names. If more are required, saving and refreshing the
+        page will add one more form field.
+        """
+        field = self.fields['trading_names']
+        trading_names = self.instance.trading_names or []
+
+        new_field_size = max(
+            field.size,
+            (len(trading_names) + 1),
+        )
+        field.size = new_field_size
+        field.widget.size = new_field_size
+
+    class Meta:
+        model = Company
+        exclude = []  # fields are specified in CompanyAdmin
+
+
 @admin.register(Company)
 class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     """Company admin."""
 
+    form = CompanyAdminForm
     fieldsets = (
         (
             None,
@@ -44,6 +95,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'modified',
                     'name',
                     'alias',
+                    'trading_names',
                     'company_number',
                     'vat_number',
                     'duns_number',
@@ -53,7 +105,11 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'sector',
                     'uk_region',
                     'employee_range',
+                    'number_of_employees',
+                    'is_number_of_employees_estimated',
                     'turnover_range',
+                    'turnover',
+                    'is_turnover_estimated',
                     'classification',
                     'one_list_tier',
                     'one_list_account_owner',

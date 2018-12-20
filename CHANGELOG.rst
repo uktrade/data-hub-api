@@ -1,3 +1,82 @@
+Data Hub API 8.4.0 (2018-12-20)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The column ``company_company.alias`` is deprecated and it will be deleted on or after January, 7. Please use ``company_company.trading_names`` instead.
+- **Companies** The endpont ``/company/<uuid:pk>/core-team`` was deleted, please use ``/company/<uuid:pk>/one-list-group-core-team`` instead.
+- **Companies** The field ``trading_name`` is deprecated from all GET company endpoints and GET/POST search endpoints and will be removed on or after January, 7. Please use the array field ``trading_names`` instead. However, ``trading_name`` is not deprecated when adding/editing a trading name using POST/PATCH as the new ``trading_names`` field is currently read-only.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: the ``net_company_receipt`` field is deprecated for interaction search responses and will be removed on or after 27 December.
+
+  ``GET /v3/search``, ``POST /v3/search/interaction``: the ``grant_amount_offered`` field is deprecated for interaction search responses and will be removed on or after 27 December.
+
+Features
+--------
+
+- **Companies** Companies now have a ``trading names`` field defined as a list of strings. It will eventually replace alias/trading_name.
+- **Interactions** It's now possible to filter interactions by whether they contain policy feedback when searching for interactions.
+- **OMIS** The UK region and sector of an OMIS order can now be edited from the admin site.
+
+Bug fixes
+---------
+
+- **OMIS** Viewing OMIS order assignees (advisers in the market) now requires the ``order.view_orderassignee`` permission.
+
+  Changing OMIS order assignees (advisers in the market) now requires the ``order.change_orderassignee`` permission.
+
+  Viewing OMIS order subscribers (advisers in the UK) now requires the ``order.view_ordersubscriber`` permission.
+
+  Changing OMIS order subscribers (advisers in the UK) now requires the ``order.change_ordersubscriber`` permission.
+
+Internal changes
+----------------
+
+- **Interactions** Nightly MI dashboard pipeline was added. It loads the anonymised Investment Project data to a separate database that powers MI Dashboards.
+- **Interactions** The interaction Elasticsearch mapping was cleaned up substantially by replacing unnecessary nested fields with object fields and not indexing ``is_event``. The removal of nested fields means each interaction is now represented by a single document, instead of 14 documents (as was the case previously).
+
+API
+---
+
+- **Companies** The endpont ``/company/<uuid:pk>/core-team`` was deleted, please use ``/company/<uuid:pk>/one-list-group-core-team`` instead.
+- **Companies** ``GET /v3/company`` and ``GET /v3/company/<uuid:pk>``: The read-only fields ``number_of_employees`` and ``is_number_of_employees_estimated`` were added and will only be set when ``duns_number`` is not empty.
+- **Companies** ``GET /v3/company/<uuid:pk>`` now returns the read-only field ``trading_names`` which replaces ``trading_name``.
+- **Companies** ``GET /v3/search`` now also searches for a company's ``trading_names`` when using the ``term`` param.
+
+  ``POST /v3/search/company`` now also returns and searches for a company's ``trading_names`` when using the ``name`` param.
+
+  ``GET /v3/search/company/autocomplete`` now also returns and searches for a company's ``trading_names``
+
+  ``POST /v3/search/contact`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.
+
+  ``POST /v3/search/interaction`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.
+
+  ``POST /v3/search/order`` now also searches for a company's ``trading_names`` when using the ``company_name`` param.
+- **Companies** ``GET /v3/company`` and ``GET /v3/company/<uuid:pk>``: The read-only fields ``turnover`` and ``is_turnover_estimated`` were added and will only be set when ``duns_number`` is not empty. The value of ``turnover`` is in USD.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: the ``net_company_receipt`` field is deprecated for interaction search responses and will be removed on or after 27 December.
+
+  ``GET /v3/search``, ``POST /v3/search/interaction``: the ``grant_amount_offered`` field is deprecated for interaction search responses and will be removed on or after 27 December.
+- **Interactions** ``POST /v3/search/interaction``: A new boolean filter, ``was_policy_feedback_provided``, was added.
+- **Investment** The field ``likelihood_of_landing`` is deprecated and has been removed from all investment projects APIs, please use ``likelihood_to_land`` instead.
+- **OMIS** ``GET /v3/omis/order/<id>/assignee`` now requires the ``order.view_orderassignee`` permission.
+
+  ``PATCH /v3/omis/order/<id>/assignee`` now requires the ``order.change_orderassignee`` permission.
+
+  ``GET /v3/omis/order/<id>/subscriber-list`` now requires the ``order.view_ordersubscriber`` permission.
+
+  ``PUT /v3/omis/order/<id>/subscriber-list`` now requires the ``order.change_ordersubscriber`` permission.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.alias`` is deprecated and it will be deleted on or after January, 7. Please use ``company_company.trading_names`` instead.
+- **Companies** The columns ``number_of_employees (int NULL)`` and ``is_number_of_employees_estimated (bool NULL)`` were added to the table ``company_company``. They should only be used as replacement for ``employee_range`` when the field ``duns_number`` is set.
+- **Companies** The column ``company_company.trading_names`` was added as nullable varchar[]. It will eventually replace ``company_company.alias``.
+- **Companies** The columns ``turnover (bigint NULL)`` and ``is_turnover_estimated (bool NULL)`` were added to the table ``company_company``. They should only be used as replacement for ``turnover_range`` when the field ``duns_number`` is set.
+
+
 Data Hub API 8.3.0 (2018-12-17)
 ===============================
 

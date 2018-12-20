@@ -26,6 +26,7 @@ from datahub.core.test_utils import (
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    CompanyInteractionFactoryWithPolicyFeedback,
     EventServiceDeliveryFactory,
     InvestmentProjectInteractionFactory,
     PolicyFeedbackFactory,
@@ -287,6 +288,7 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
                 'trading_name': interaction.company.alias,
+                'trading_names': interaction.company.trading_names,
             },
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
@@ -328,6 +330,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'created_on': interaction.created_on.isoformat(),
             'modified_on': interaction.modified_on.isoformat(),
         }]
@@ -379,32 +382,84 @@ class TestInteractionEntitySearchView(APITestMixin):
         results = response_data['results']
         assert results[0]['company']['id'] == str(companies[5].id)
 
-    @pytest.mark.parametrize('attr', ('name', 'alias'))
-    def test_filter_by_company_name(self, setup_es, attr):
+    @pytest.mark.parametrize(
+        'name_term,matched_company_name',
+        (
+            # name
+            ('whiskers', 'whiskers and tabby'),
+            ('whi', 'whiskers and tabby'),
+            ('his', 'whiskers and tabby'),
+            ('ers', 'whiskers and tabby'),
+            ('1a', '1a'),
+
+            # trading name
+            ('house lion', 'whiskers and tabby'),
+            ('use', 'whiskers and tabby'),
+            ('ion', 'whiskers and tabby'),
+            ('se li', None),
+            ('use lio', 'whiskers and tabby'),
+            ('use ion', 'whiskers and tabby'),
+            ('2a', '1a'),
+
+            # trading names
+            ('maine coon egyptian mau', 'whiskers and tabby'),
+            ('maine', 'whiskers and tabby'),
+            ('mau', 'whiskers and tabby'),
+            ('ine oon', 'whiskers and tabby'),
+            ('ine mau', 'whiskers and tabby'),
+            ('3a', '1a'),
+
+            # non-matches
+            ('whi lorem', None),
+            ('wh', None),
+            ('whe', None),
+            ('tiger', None),
+            ('panda', None),
+            ('moine', None),
+        ),
+    )
+    def test_filter_by_company_name(self, setup_es, name_term, matched_company_name):
         """Tests filtering interaction by company name."""
-        companies = CompanyFactory.create_batch(10)
-        CompanyInteractionFactory.create_batch(
-            len(companies),
-            company=factory.Iterator(companies),
+        matching_company1 = CompanyFactory(
+            name='whiskers and tabby',
+            alias='house lion and moggie',
+            trading_names=['Maine Coon', 'Egyptian Mau'],
         )
+        matching_company2 = CompanyFactory(
+            name='1a',
+            alias='2a',
+            trading_names=['3a', '4a'],
+        )
+        non_matching_company = CompanyFactory(
+            name='Pluto and pippo',
+            alias='Epsilon and lippo',
+            trading_names=['eniam nooc', 'naitpyge uam'],
+        )
+        CompanyInteractionFactory(company=matching_company1)
+        CompanyInteractionFactory(company=matching_company2)
+        CompanyInteractionFactory(company=non_matching_company)
 
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
-        request_data = {
-            'company_name': getattr(companies[5], attr),
-        }
-        response = self.api_client.post(url, request_data)
+
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': '',
+                'company_name': name_term,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] > 0
-
-        results = response_data['results']
-        # multiple records can match our filter, let's make sure at least one is exact match
-        assert any(result['company']['id'] == str(companies[5].id) for result in results)
+        match = Interaction.objects.filter(company__name=matched_company_name).first()
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(match.id)
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
 
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
@@ -622,6 +677,34 @@ class TestInteractionEntitySearchView(APITestMixin):
         results = response_data['results']
         result_ids = {result['service']['id'] for result in results}
         assert result_ids == {str(service_id)}
+
+    @pytest.mark.parametrize('was_policy_feedback_provided', (False, True))
+    def test_filter_by_was_policy_feedback_provided(self, setup_es, was_policy_feedback_provided):
+        """Test filtering interactions by was_policy_feedback_provided."""
+        interactions_without_policy_feedback = CompanyInteractionFactory.create_batch(5)
+        interactions_with_policy_feedback = (
+            CompanyInteractionFactoryWithPolicyFeedback.create_batch(5)
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'was_policy_feedback_provided': was_policy_feedback_provided,
+        }
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        expected_interactions = (
+            interactions_with_policy_feedback if was_policy_feedback_provided
+            else interactions_without_policy_feedback
+        )
+        assert response_data['count'] == len(expected_interactions)
+
+        results = response_data['results']
+        result_ids = {result['id'] for result in results}
+        assert result_ids == {str(interaction.pk) for interaction in expected_interactions}
 
     @pytest.mark.parametrize(
         'data,results',

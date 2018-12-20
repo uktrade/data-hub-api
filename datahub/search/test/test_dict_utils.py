@@ -53,7 +53,8 @@ def test_company_dict():
         id=123,
         name='Name',
         alias='Trading',
-        spec_set=('id', 'name', 'alias'),
+        trading_names=['Trading 1', 'Trading 2'],
+        spec_set=('id', 'name', 'alias', 'trading_names'),
     )
 
     res = dict_utils.company_dict(obj)
@@ -62,6 +63,7 @@ def test_company_dict():
         'id': str(obj.id),
         'name': obj.name,
         'trading_name': obj.alias,
+        'trading_names': obj.trading_names,
     }
 
 

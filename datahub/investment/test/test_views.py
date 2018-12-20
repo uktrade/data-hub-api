@@ -85,7 +85,6 @@ class TestListView(APITestMixin):
             'estimated_land_date',
             'actual_land_date',
             'quotable_as_public_case_study',
-            'likelihood_of_landing',
             'likelihood_to_land',
             'priority',
             'approved_commitment_to_invest',
@@ -379,7 +378,6 @@ class TestCreateView(APITestMixin):
             'anonymous_description': 'project anon description',
             'estimated_land_date': '2020-12-12',
             'quotable_as_public_case_study': True,
-            'likelihood_of_landing': 60,
             'likelihood_to_land': {
                 'id': LikelihoodToLand.medium.value.id,
             },
@@ -433,7 +431,6 @@ class TestCreateView(APITestMixin):
             response_data['quotable_as_public_case_study']
             == request_data['quotable_as_public_case_study']
         )
-        assert response_data['likelihood_of_landing'] is None
         assert (
             response_data['likelihood_to_land']['id']
             == request_data['likelihood_to_land']['id']
@@ -626,7 +623,6 @@ class TestRetrieveView(APITestMixin):
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
         assert response_data['comments'] == project.comments
-        assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['likelihood_to_land'] == {
             'id': str(project.likelihood_to_land.id),
             'name': project.likelihood_to_land.name,
@@ -1742,7 +1738,6 @@ class TestPartialUpdateView(APITestMixin):
             allow_blank_estimated_land_date=False,
             allow_blank_possible_uk_regions=False,
             project_manager_first_assigned_on=None,
-            likelihood_of_landing=90,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1754,7 +1749,6 @@ class TestPartialUpdateView(APITestMixin):
                 'allow_blank_estimated_land_date': True,
                 'allow_blank_possible_uk_regions': True,
                 'project_manager_first_assigned_on': now(),
-                'likelihood_of_landing': 30,
             },
         )
 
@@ -1763,7 +1757,6 @@ class TestPartialUpdateView(APITestMixin):
         assert response.data['comments'] == 'old_comment'
         assert response.data['allow_blank_estimated_land_date'] is False
         assert response.data['allow_blank_possible_uk_regions'] is False
-        assert response.data['likelihood_of_landing'] == project.likelihood_of_landing
 
         project.refresh_from_db()
         assert project.project_manager_first_assigned_on is None
