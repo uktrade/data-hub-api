@@ -2,6 +2,16 @@ from functools import partial
 
 from elasticsearch_dsl import Keyword, Nested, Object, Text
 
+from datahub.search.elasticsearch import lowercase_asciifolding_normalizer
+
+# Keyword with normalisation to improve sorting (by keeping e, E, è, ê etc. together).
+# This should be used in preference to SortableCaseInsensitiveKeywordText
+NormalizedKeyword = partial(
+    Keyword,
+    normalizer=lowercase_asciifolding_normalizer,
+)
+# Avoid using as this uses fielddata=True. NormalizedKeyword will have better behaviour
+# for sorting
 SortableCaseInsensitiveKeywordText = partial(
     Text,
     analyzer='lowercase_keyword_analyzer',

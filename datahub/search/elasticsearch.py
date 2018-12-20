@@ -13,6 +13,12 @@ from elasticsearch_dsl.connections import connections
 logger = getLogger(__name__)
 
 
+# Normalises values to improve sorting (by keeping e, E, è, ê etc. together)
+lowercase_asciifolding_normalizer = analysis.normalizer(
+    'lowercase_asciifolding_normalizer',
+    filter=('lowercase', 'asciifolding'),
+)
+
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
