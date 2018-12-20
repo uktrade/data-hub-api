@@ -19,6 +19,10 @@ class BusinessType(BaseConstantModel):
     """Company business type."""
 
 
+class SectorCluster(BaseConstantModel):
+    """Sector cluster."""
+
+
 class Sector(MPTTModel, DisableableModel):
     """Company sector."""
 
@@ -26,6 +30,12 @@ class Sector(MPTTModel, DisableableModel):
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
+    sector_cluster = models.ForeignKey(
+        SectorCluster,
+        null=True, blank=True,
+        related_name="%(class)ss",  # noqa: Q000
+        on_delete=models.PROTECT,
+    )
     parent = TreeForeignKey(
         'self', null=True, blank=True, related_name='children', db_index=True,
         on_delete=models.PROTECT,
