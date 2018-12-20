@@ -70,7 +70,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     search_fields = ('reference',)
     list_filter = ('status',)
 
-    fields = (
+    readonly_fields = (
         'id',
         'reference',
         'created',
@@ -82,8 +82,6 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         'contact_email',
         'contact_phone',
         'primary_market',
-        'sector',
-        'uk_region',
         'status',
         'paid_on',
         'completed',
@@ -120,7 +118,8 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         'uk_advisers',
         'post_advisers',
     )
-    readonly_fields = fields
+    _editable_fields = ('sector', 'uk_region')
+    fields = readonly_fields + _editable_fields
 
     def completed(self, order):
         """:returns: completed on/by details."""
