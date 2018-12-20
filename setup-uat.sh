@@ -3,8 +3,9 @@
 # on circleCI. For more information about how this is used please see
 # https://github.com/uktrade/data-hub-frontend#continuous-integration
 
-dockerize -wait ${POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
+dockerize -wait ${POSTGRES_URL} -wait ${MI_POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
 python /app/manage.py migrate
+python /app/manage.py migrate --database mi
 python /app/manage.py init_es
 python /app/manage.py loadinitialmetadata
 
@@ -86,4 +87,5 @@ python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py sync_es
-python /app/manage.py runserver 0.0.0.0:8000
+python /app/manage.py collectstatic --noinput
+DEBUG=False gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0

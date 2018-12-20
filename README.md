@@ -245,13 +245,18 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `ES5_URL`  | Required if not using GOV.UK PaaS-supplied Elasticsearch. | |
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
-| `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enabled asynchronous psycopg2 when the worker class is 'gevent'. |
+| `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
 | `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
+| `ENABLE_MI_DASHBOARD_FEED` | No | Whether to enable daily MI dashboard feed (default=False). |
+| `MI_DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials) for MI dashboard. |
+| `MI_DATABASE_SSLROOTCERT` | No | base64 encoded root certificate for MI database connection. |
+| `MI_DATABASE_SSLCERT` | No | base64 encoded client certificate for MI database connection. |
+| `MI_DATABASE_SSLKEY` | No | base64 encoded client private key for MI database connection. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |

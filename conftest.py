@@ -21,6 +21,12 @@ from datahub.search.elasticsearch import (
 )
 
 
+def pytest_sessionstart(session):
+    """Enable multi_db support for tests."""
+    from django.test import TransactionTestCase
+    TransactionTestCase.multi_db = True
+
+
 @pytest.fixture(scope='session')
 def django_db_setup(pytestconfig, django_db_setup, django_db_blocker):
     """Fixture for DB setup."""

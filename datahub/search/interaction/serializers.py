@@ -26,6 +26,7 @@ class SearchInteractionSerializer(SearchSerializer):
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
     service = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
+    was_policy_feedback_provided = serializers.BooleanField(required=False)
 
     DEFAULT_ORDERING = 'date:desc'
 

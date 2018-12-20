@@ -53,6 +53,7 @@ class TestCompanyElasticModel:
             'trading_address_postcode',
             'trading_address_town',
             'trading_name',
+            'trading_names',
             'turnover_range',
             'uk_based',
             'uk_region',
@@ -72,32 +73,50 @@ class TestCompanyElasticModel:
         assert len(list(result)) == len(companies)
 
     @pytest.mark.parametrize(
-        'name,trading_name,archived,expected_suggestions',
+        'name,alias,trading_names,archived,expected_suggestions',
         (
             (
                 'Hello Hello uk',
                 'Good Hello us',
+                ['Trading Hello es', 'fr'],
                 False,
-                ['Good Hello us', 'uk', 'us', 'Hello', 'Hello Hello uk', 'Good'],
+                [
+                    'Good', 'uk', 'Hello Hello uk', 'Trading Hello es',
+                    'Trading', 'us', 'es', 'Good Hello us', 'fr', 'Hello',
+                ],
             ),
             (
                 'Hello      gb',
                 None,
+                [],
                 False,
                 ['Hello', 'gb', 'Hello      gb'],
             ),
             (
                 'Hello      gb',
                 None,
+                [],
                 True,
                 [],
             ),
 
         ),
     )
-    def test_company_get_suggestions(self, name, trading_name, archived, expected_suggestions):
+    def test_company_get_suggestions(
+        self,
+        name,
+        alias,
+        trading_names,
+        archived,
+        expected_suggestions,
+    ):
         """Test get an autocomplete search suggestions for a company"""
-        db_company = CompanyFactory(name=name, alias=trading_name, archived=archived)
+        db_company = CompanyFactory(
+            name=name,
+            alias=alias,
+            trading_names=trading_names,
+            archived=archived,
+        )
 
         result = get_suggestions(db_company)
 

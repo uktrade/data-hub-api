@@ -34,6 +34,7 @@ class SearchInteractionParams:
         'investment_project',
         'sector_descends',
         'service',
+        'was_policy_feedback_provided',
     )
 
     REMAP_FIELDS = {
@@ -56,6 +57,8 @@ class SearchInteractionParams:
             'company.name_trigram',
             'company.trading_name',
             'company.trading_name_trigram',
+            'company.trading_names',  # to find 2-letter words
+            'company.trading_names_trigram',
         ],
         'dit_adviser_name': [
             'dit_adviser.name',

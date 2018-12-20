@@ -2,7 +2,13 @@
 import uuid
 
 from django.conf import settings
-from django.core.validators import integer_validator, MaxLengthValidator, MinLengthValidator
+from django.contrib.postgres.fields import ArrayField
+from django.core.validators import (
+    integer_validator,
+    MaxLengthValidator,
+    MinLengthValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -100,8 +106,23 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             integer_validator,
         ],
     )
+    # TODO remove null=True after migrating all records
+    trading_names = ArrayField(
+        models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH),
+        blank=True,
+        null=True,
+        default=list,
+        help_text=(
+            'It will eventually replace alias. '
+            'If you change this please change alias (trading name) as well.'
+        ),
+    )
+    # TODO remove after end of deprecation period
     alias = models.CharField(
-        max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name',
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+        help_text='Trading name. If you change this please change trading names as well.',
     )
     business_type = models.ForeignKey(
         metadata_models.BusinessType, blank=True, null=True,
@@ -114,10 +135,35 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     employee_range = models.ForeignKey(
         metadata_models.EmployeeRange, blank=True, null=True,
         on_delete=models.SET_NULL,
+        help_text=(
+            'Not used when duns_number is set. In that case, use number_of_employees instead.'
+        ),
+    )
+    number_of_employees = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
+    )
+    is_number_of_employees_estimated = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
     )
     turnover_range = models.ForeignKey(
         metadata_models.TurnoverRange, blank=True, null=True,
         on_delete=models.SET_NULL,
+        help_text='Not used when duns_number is set. In that case, use turnover instead.',
+    )
+    turnover = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text='In USD. Only used when duns_number is set.',
+        validators=[MinValueValidator(0)],
+    )
+    is_turnover_estimated = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Only used when duns_number is set.',
     )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,

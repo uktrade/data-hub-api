@@ -69,6 +69,8 @@ def test_get_basic_search_query():
                                 'trading_address_postcode_trigram',
                                 'trading_name',
                                 'trading_name_trigram',
+                                'trading_names',
+                                'trading_names_trigram',
                                 'uk_company.name',
                                 'uk_company.name_trigram',
                                 'uk_region.name_trigram',

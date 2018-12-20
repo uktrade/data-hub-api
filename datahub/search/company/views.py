@@ -1,4 +1,6 @@
-from django.db.models.functions import Upper
+from django.db.models.expressions import Case, Value, When
+from django.db.models.fields import CharField
+from django.db.models.functions import Cast, Concat, Upper
 
 from datahub.company.models import Company as DBCompany
 from datahub.core.query_utils import get_front_end_url_expression
@@ -47,9 +49,22 @@ class SearchCompanyParams:
     }
 
     COMPOSITE_FILTERS = {
-        'name': ['name', 'name_trigram', 'trading_name_trigram'],
-        'country': ['trading_address_country.id', 'registered_address_country.id'],
-        'sector_descends': ['sector.id', 'sector.ancestors.id'],
+        'name': [
+            'name',  # to find 2-letter words
+            'name_trigram',
+            'trading_name',  # to find 2-letter words
+            'trading_name_trigram',
+            'trading_names',  # to find 2-letter words
+            'trading_names_trigram',
+        ],
+        'country': [
+            'trading_address_country.id',
+            'registered_address_country.id',
+        ],
+        'sector_descends': [
+            'sector.id',
+            'sector.ancestors.id',
+        ],
     }
 
 
@@ -64,6 +79,24 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         link=get_front_end_url_expression('company', 'pk'),
         upper_headquarter_type_name=Upper('headquarter_type__name'),
         sector_name=get_sector_name_subquery('sector'),
+        # get company.turnover if set else company.turnover_range
+        turnover_value=Case(
+            When(
+                turnover__isnull=False,
+                then=Concat(Value('$'), 'turnover'),
+            ),
+            default='turnover_range__name',
+            output_field=CharField(),
+        ),
+        # get company.number_of_employees if set else company.employee_range
+        number_of_employees_value=Case(
+            When(
+                number_of_employees__isnull=False,
+                then=Cast('number_of_employees', CharField()),
+            ),
+            default='employee_range__name',
+            output_field=CharField(),
+        ),
     )
     field_titles = {
         'name': 'Name',
@@ -73,8 +106,8 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         'uk_region__name': 'UK region',
         'archived': 'Archived',
         'created_on': 'Date created',
-        'employee_range__name': 'Number of employees',
-        'turnover_range__name': 'Annual turnover',
+        'number_of_employees_value': 'Number of employees',
+        'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
     }
 
@@ -86,6 +119,7 @@ class CompanyAutocompleteSearchListAPIView(SearchCompanyParams, AutocompleteSear
         'id',
         'name',
         'trading_name',
+        'trading_names',
         'trading_address_1',
         'trading_address_2',
         'trading_address_town',

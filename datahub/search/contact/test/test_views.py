@@ -198,25 +198,60 @@ class TestSearch(APITestMixin):
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
-        'term,match',
+        'name_term,matched_company_name',
         (
-            ('whiskers', True),
-            ('house lion', True),
-            ('tiger', False),
-            ('panda', False),
+            # name
+            ('whiskers', 'whiskers and tabby'),
+            ('whi', 'whiskers and tabby'),
+            ('his', 'whiskers and tabby'),
+            ('ers', 'whiskers and tabby'),
+            ('1a', '1a'),
+
+            # trading name
+            ('house lion', 'whiskers and tabby'),
+            ('use', 'whiskers and tabby'),
+            ('ion', 'whiskers and tabby'),
+            ('se li', None),
+            ('use lio', 'whiskers and tabby'),
+            ('use ion', 'whiskers and tabby'),
+            ('2a', '1a'),
+
+            # trading names
+            ('maine coon egyptian mau', 'whiskers and tabby'),
+            ('maine', 'whiskers and tabby'),
+            ('mau', 'whiskers and tabby'),
+            ('ine oon', 'whiskers and tabby'),
+            ('ine mau', 'whiskers and tabby'),
+            ('3a', '1a'),
+
+            # non-matches
+            ('whi lorem', None),
+            ('wh', None),
+            ('whe', None),
+            ('tiger', None),
+            ('panda', None),
+            ('moine', None),
         ),
     )
-    def test_search_contact_by_partial_company_name(self, setup_es, term, match):
-        """Tests filtering by partially matching company name."""
-        matching_company = CompanyFactory(
+    def test_filter_by_company_name(self, setup_es, name_term, matched_company_name):
+        """Tests filtering contact by company name."""
+        matching_company1 = CompanyFactory(
             name='whiskers and tabby',
             alias='house lion and moggie',
+            trading_names=['Maine Coon', 'Egyptian Mau'],
+        )
+        matching_company2 = CompanyFactory(
+            name='1a',
+            alias='2a',
+            trading_names=['3a', '4a'],
         )
         non_matching_company = CompanyFactory(
             name='Pluto and pippo',
             alias='Epsilon and lippo',
+            trading_names=['eniam nooc', 'naitpyge uam'],
         )
-        matching_contact = ContactFactory(company=matching_company)
+        ContactFactory(company=matching_company1)
+        ContactFactory(company=matching_company2)
         ContactFactory(company=non_matching_company)
 
         setup_es.indices.refresh()
@@ -227,15 +262,16 @@ class TestSearch(APITestMixin):
             url,
             data={
                 'original_query': '',
-                'company_name': term,
+                'company_name': name_term,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
+        match = Contact.objects.filter(company__name=matched_company_name).first()
         if match:
             assert response.data['count'] == 1
             assert len(response.data['results']) == 1
-            assert response.data['results'][0]['id'] == str(matching_contact.id)
+            assert response.data['results'][0]['id'] == str(match.id)
         else:
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0

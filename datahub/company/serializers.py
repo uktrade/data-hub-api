@@ -329,7 +329,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 self.fields[field].read_only = True
 
     def validate(self, data):
-        """Performs cross-field validation."""
+        """
+        Performs cross-field validation and adds extra fields to data.
+        """
         combiner = DataCombiner(self.instance, data)
 
         if {'global_headquarters', 'headquarter_type'} & data.keys():
@@ -344,6 +346,16 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 raise serializers.ValidationError({
                     'headquarter_type': message,
                 })
+
+        # TODO: refactor after alias is deprecated
+
+        # Save trading_name/alias in trading_names if trading_name/alias has been specified.
+        # If the company has a non-empty duns_number, trading_name/alias becomes
+        # read-only at the moment to avoid trading_names being inadvertently overridden.
+
+        if 'alias' in data:
+            alias = data['alias']
+            data['trading_names'] = [] if not alias else [alias]
 
         return data
 
@@ -412,6 +424,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
             'name',
             'trading_name',
+            'trading_names',
             'uk_based',
             'company_number',
             'vat_number',
@@ -446,6 +459,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'companies_house_data',
             'contacts',
             'employee_range',
+            'number_of_employees',
+            'is_number_of_employees_estimated',
             'export_to_countries',
             'future_interest_countries',
             'headquarter_type',
@@ -453,6 +468,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_headquarters',
             'sector',
             'turnover_range',
+            'turnover',
+            'is_turnover_estimated',
             'uk_region',
             'export_experience_category',
         )
@@ -464,6 +481,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
             'transfer_reason',
             'duns_number',
+            'trading_names',
+            'turnover',
+            'is_turnover_estimated',
+            'number_of_employees',
+            'is_number_of_employees_estimated',
         )
         dnb_read_only_fields = [
             'name',
