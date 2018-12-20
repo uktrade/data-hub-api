@@ -1,1 +1,0 @@
-The database connection configuration was updated to prevent unnecessary MI database transactions during API requests.
