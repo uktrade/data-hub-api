@@ -1,7 +1,0 @@
-Viewing OMIS order assignees (advisers in the market) now requires the ``order.view_orderassignee`` permission.
-
-Changing OMIS order assignees (advisers in the market) now requires the ``order.change_orderassignee`` permission.
-
-Viewing OMIS order subscribers (advisers in the UK) now requires the ``order.view_ordersubscriber`` permission.
-
-Changing OMIS order subscribers (advisers in the UK) now requires the ``order.change_ordersubscriber`` permission.

@@ -1,1 +1,0 @@
-The endpont ``/company/<uuid:pk>/core-team`` was deleted, please use ``/company/<uuid:pk>/one-list-group-core-team`` instead.

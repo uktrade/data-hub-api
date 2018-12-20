@@ -1,1 +1,0 @@
-The columns ``number_of_employees (int NULL)`` and ``is_number_of_employees_estimated (bool NULL)`` were added to the table ``company_company``. They should only be used as replacement for ``employee_range`` when the field ``duns_number`` is set.

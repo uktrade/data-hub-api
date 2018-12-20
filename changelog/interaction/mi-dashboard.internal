@@ -1,1 +1,0 @@
-Nightly MI dashboard pipeline was added. It loads the anonymised Investment Project data to a separate database that powers MI Dashboards.
