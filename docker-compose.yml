@@ -8,10 +8,11 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
     env_file: docker-compose.env
     depends_on:
       - postgres
+      - mi-postgres
       - es
       - redis
       - celery
@@ -22,7 +23,7 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
     env_file: docker-compose.env
     command: celery worker -A config -l info -Q celery -B
 
@@ -31,6 +32,12 @@ services:
     restart: always
     environment:
       - POSTGRES_DB=datahub
+
+  mi-postgres:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - POSTGRES_DB=mi
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
