@@ -1,3 +1,0 @@
-``GET /v3/search``, ``POST /v3/search/interaction``: the ``net_company_receipt`` field is deprecated for interaction search responses and will be removed on or after 27 December.
-``GET /v3/search``, ``POST /v3/search/interaction``: the ``grant_amount_offered`` field is deprecated for interaction search responses and will be removed on or after 27 December.
-``GET /v3/search``, ``POST /v3/search/interaction``: the ``notes`` field is deprecated for interaction search responses and will be removed on or after 27 December.

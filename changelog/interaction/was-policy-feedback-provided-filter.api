@@ -1,1 +1,0 @@
-``POST /v3/search/interaction``: A new boolean filter, ``was_policy_feedback_provided``, was added.
