@@ -1,1 +1,0 @@
-The field ``trading_name`` is deprecated from all GET company endpoints and GET/POST search endpoints and will be removed on or after January, 7. Please use the array field ``trading_names`` instead. However, ``trading_name`` is not deprecated when adding/editing a trading name using POST/PATCH as the new ``trading_names`` field is currently read-only.

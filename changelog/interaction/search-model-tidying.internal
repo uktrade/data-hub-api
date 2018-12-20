@@ -1,1 +1,0 @@
-The interaction Elasticsearch mapping was cleaned up substantially by replacing unnecessary nested fields with object fields and not indexing `is_event`. The removal of nested fields means each interaction is now represented by a single document, instead of 14 documents (as was the case previously).
