@@ -1,1 +1,0 @@
- ``GET /v3/company`` and ``GET /v3/company/<uuid:pk>``: The read-only fields ``number_of_employees`` and ``is_number_of_employees_estimated`` were added and will only be set when ``duns_number`` is not empty.

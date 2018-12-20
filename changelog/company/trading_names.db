@@ -1,1 +1,0 @@
-The column ``company_company.trading_names`` was added as nullable varchar[]. It will eventually replace ``company_company.alias``.
