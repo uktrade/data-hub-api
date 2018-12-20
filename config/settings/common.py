@@ -174,7 +174,7 @@ DATABASES = {
     },
     'mi': {
         **env.db('MI_DATABASE_URL'),
-        'ATOMIC_REQUESTS': True,
+        'ATOMIC_REQUESTS': False,
         'CONN_MAX_AGE': env.int('MI_DATABASE_DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
         **MI_DATABASE_OPTIONS,
