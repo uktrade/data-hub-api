@@ -14,6 +14,7 @@ from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.test.factories import SectorFactory
+from datahub.mi_dashboard.constants import NO_SECTOR_CLUSTER_ASSIGNED
 from datahub.mi_dashboard.query_utils import (
     get_collapse_status_name_expression,
     get_country_url,
@@ -22,7 +23,6 @@ from datahub.mi_dashboard.query_utils import (
     get_level_of_involvement_simplified_expression,
     get_other_field_if_null_or_empty_expression,
     get_sector_cluster_expression,
-    NO_SECTOR_CLUSTER_ASSIGNED,
 )
 
 pytestmark = pytest.mark.django_db

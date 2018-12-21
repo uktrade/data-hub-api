@@ -17,9 +17,7 @@ from datahub.core.query_utils import NullIf
 from datahub.investment.constants import Involvement
 from datahub.investment.models import IProjectAbstract
 from datahub.metadata.models import Sector
-
-NO_FDI_VALUE_ASSIGNED = 'No FDI value assigned'
-NO_SECTOR_CLUSTER_ASSIGNED = 'No sector cluster assigned'
+from datahub.mi_dashboard.constants import NO_SECTOR_ASSIGNED, NO_SECTOR_CLUSTER_ASSIGNED
 
 
 def get_level_of_involvement_simplified_expression():
@@ -50,7 +48,10 @@ def get_top_level_sector_expression():
         tree_id=OuterRef('sector__tree_id'),
     ).values('segment')
 
-    return Subquery(subquery, output_field=CharField())
+    return Coalesce(
+        Subquery(subquery, output_field=CharField()),
+        Value(NO_SECTOR_ASSIGNED),
+    )
 
 
 def get_sector_cluster_expression(field):
@@ -87,7 +88,7 @@ def get_empty_string_if_null_expression(field):
     return Coalesce(field, Value(''))
 
 
-def get_other_field_if_null_or_empty_expression(field_a, field_b):
+def get_other_field_if_null_or_empty_expression(field_a, field_b, default=None):
     """
     Get other field_b value if field_a is null or empty.
 
@@ -96,7 +97,7 @@ def get_other_field_if_null_or_empty_expression(field_a, field_b):
     return Coalesce(
         NullIf(field_a, Value('')),
         field_b,
-        Value(''),
+        default,
     )
 
 
@@ -128,7 +129,14 @@ def get_country_url():
     with applied filters.
     """
     key = 'mi_fdi_dashboard_country'
-    return Concat(
+    country_url = Concat(
         Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[key]}'),
         Cast('investor_company__registered_address_country__id', CharField()),
+    )
+    return Case(
+        When(
+            investor_company__registered_address_country=None,
+            then=Value(''),
+        ),
+        default=country_url,
     )
