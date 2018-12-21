@@ -23,8 +23,16 @@ class MIInvestmentProject(models.Model):
     actual_land_date = models.DateField(null=True, blank=True)
     project_reference = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     total_investment = models.DecimalField(blank=True, decimal_places=0, max_digits=19, null=True)
+    total_investment_with_zero = models.DecimalField(
+        blank=True,
+        decimal_places=0,
+        max_digits=19,
+        null=True,
+    )
     number_new_jobs = models.IntegerField(null=True)
+    number_new_jobs_with_zero = models.IntegerField(null=True)
     number_safeguarded_jobs = models.IntegerField(null=True)
+    number_safeguarded_jobs_with_zero = models.IntegerField(null=True)
     investor_company_country = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     stage_name = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     sector_name = models.TextField(null=True, blank=True)
