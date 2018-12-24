@@ -1,0 +1,1 @@
+``POST /v3/search/companieshousecompany``: All ``sortby`` options and filters were removed as these were not being used by any client.

@@ -34,6 +34,12 @@ def setup_data(setup_es):
             incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
             company_status='purring',
         ),
+        CompaniesHouseCompanyFactory(
+            name='Pallas Second',
+            company_number='444',
+            incorporation_date=dateutil_parse('2019-09-12T00:00:00Z'),
+            company_status='crying',
+        ),
     )
 
     for company in companies:
@@ -58,59 +64,16 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                {'111', '222', '333'},
+                {'111', '222', '333', '444'},
             ),
             (  # pagination
                 {
                     'limit': 1,
                     'offset': 1,
-                    'sortby': 'name:asc',
+                    'original_query': 'Pallas',
                 },
-                {'222'},
-            ),
-            (  # company number filter
-                {
-                    'company_number': '222',
-                },
-                {'222'},
-            ),
-            (  # incorporation date filter
-                {
-                    'incorporation_date_after': '2014',
-                },
-                {'222', '333'},
-            ),
-            (  # incorporation date filter
-                {
-                    'incorporation_date_before': '2014',
-                },
-                {'111'},
-            ),
-            (  # incorporation date filter
-                {
-                    'incorporation_date_after': '2014',
-                    'incorporation_date_before': '2017',
-                },
-                {'222', '333'},
-            ),
-            (  # incorporation date filter
-                {
-                    'incorporation_date_after': '2010',
-                    'incorporation_date_before': '2015-10-01',
-                },
-                {'111', '222'},
-            ),
-            (  # company status filter
-                {
-                    'company_status': ['purring', 'sleeping'],
-                },
-                {'222', '333'},
-            ),
-            (  # company name filter
-                {
-                    'name': 'pallas',
-                },
-                {'111'},
+                # exact match should come first, and we're offsetting by 1
+                {'444'},
             ),
             (  # original query match
                 {
@@ -136,21 +99,3 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         assert {
             item['company_number'] for item in response.json()['results']
         } == results
-
-    def test_incorrect_date_raise_validation_error(self, setup_data):
-        """Test that if the date is not in a valid format, the API return a validation error."""
-        url = reverse('api-v3:search:companieshousecompany')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'incorporation_date_after': 'invalid',
-                'incorporation_date_before': 'invalid',
-            },
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'incorporation_date_after': ['Date is in incorrect format.'],
-            'incorporation_date_before': ['Date is in incorrect format.'],
-        }
