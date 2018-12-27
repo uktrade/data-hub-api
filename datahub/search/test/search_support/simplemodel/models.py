@@ -11,8 +11,9 @@ class ESSimpleModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
     id = Keyword()
-    name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    name = fields.SortableText(copy_to=['name_keyword', 'name_normalized_keyword', 'name_trigram'])
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_normalized_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
 
     SEARCH_FIELDS = (

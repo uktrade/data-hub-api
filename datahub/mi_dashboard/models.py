@@ -23,8 +23,16 @@ class MIInvestmentProject(models.Model):
     actual_land_date = models.DateField(null=True, blank=True)
     project_reference = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     total_investment = models.DecimalField(blank=True, decimal_places=0, max_digits=19, null=True)
+    total_investment_with_zero = models.DecimalField(
+        blank=True,
+        decimal_places=0,
+        max_digits=19,
+        null=True,
+    )
     number_new_jobs = models.IntegerField(null=True)
+    number_new_jobs_with_zero = models.IntegerField(null=True)
     number_safeguarded_jobs = models.IntegerField(null=True)
+    number_safeguarded_jobs_with_zero = models.IntegerField(null=True)
     investor_company_country = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     stage_name = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     sector_name = models.TextField(null=True, blank=True)
@@ -44,3 +52,10 @@ class MIInvestmentProject(models.Model):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
     )
     estimated_land_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        # The app label is being used for db_router to determine if migrations are allowed
+        # because of that resulting table name would have been prefixed with `datahub.`
+        # We need to avoid that by explicitly naming the table, as our dashboard software
+        # doesn't support table names with a dot.
+        db_table = 'mi_dashboard_miinvestmentproject'

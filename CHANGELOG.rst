@@ -1,3 +1,37 @@
+Data Hub API 8.5.0 (2018-12-27)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- All sorting options and filters in Companies House company search were removed as these were not being used by any client.
+
+Features
+--------
+
+- **Investment** Following fields in ``mi`` database have got their default values changed:
+
+  - ``sector_name`` now has ``No Sector assigned`` default when source field has no value
+  - ``possible_uk_region_names`` now has ``No UK region assigned`` default when source field has no value
+  - ``actual_uk_region_names`` now has ``No UK region assigned`` default when source field has no value
+  - ``uk_region_name`` now has ``No UK region assigned`` default when source fields have no value
+  - ``investor_company_country`` now has an empty string as default when source field has no value
+  - ``country_url`` now has an empty string as default when source field has no value
+
+API
+---
+
+- ``POST /v3/search/companieshousecompany``: All ``sortby`` options and filters were removed as these were not being used by any client.
+
+Database schema
+---------------
+
+- **Investment** The columns ``number_new_jobs_with_zero (int NULL)``, ``number_safeguarded_jobs_with_zero (int NULL)`` and ``total_investment_with_zero (decimal NULL)`` were added to ``mi`` database. These column contain the same values as their counterparts without ``_with_zero`` suffix except instead of NULL a zero should be given.
+- **Investment** The table ``datahub.mi_dashboard_miinvestmentproject`` has been renamed to ``mi_dashboard_miinvestmentproject`` as the dashboard software doesn't support dots in the table names.
+
+
 Data Hub API 8.4.1 (2018-12-20)
 ===============================
 

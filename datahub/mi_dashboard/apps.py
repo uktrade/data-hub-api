@@ -9,6 +9,6 @@ class MIDashboardConfig(AppConfig):
 
     name = 'datahub.mi_dashboard'
 
-    # this label is being used by the db_router to determine if migration is allowed for given
-    # database
+    # This label is being used by the db_router to determine if migration is allowed for given
+    # database. It must be the same as the App name.
     label = 'datahub.mi_dashboard'
