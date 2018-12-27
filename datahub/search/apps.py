@@ -19,6 +19,7 @@ class SearchApp:
     export_view = None
     autocomplete_view = None
     queryset = None
+    exclude_from_global_search = False
     # A sequence of permissions. The user must have one of these permissions to perform searches.
     view_permissions = None
     # A single permission. The user must have this permission and a permission in view_permissions
@@ -87,6 +88,15 @@ def get_search_apps_by_name(app_names=None):
         search_app for search_app in search_apps
         if not app_names or search_app.name in app_names
     ]
+
+
+def get_global_search_apps_as_mapping():
+    """Gets all registered search apps that should be included in global (basic) search."""
+    return {
+        app_name: app
+        for app_name, app in _load_search_apps().items()
+        if not app.exclude_from_global_search
+    }
 
 
 def get_search_app(app_name):
