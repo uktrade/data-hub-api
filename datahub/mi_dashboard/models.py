@@ -52,3 +52,10 @@ class MIInvestmentProject(models.Model):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
     )
     estimated_land_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        # The app label is being used for db_router to determine if migrations are allowed
+        # because of that resulting table name would have been prefixed with `datahub.`
+        # We need to avoid that by explicitly naming the table, as our dashboard software
+        # doesn't support table names with a dot.
+        db_table = 'mi_dashboard_miinvestmentproject'
