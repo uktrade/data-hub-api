@@ -1,1 +1,0 @@
-The columns ``number_new_jobs_with_zero (int NULL)``, ``number_safeguarded_jobs_with_zero (int NULL)`` and ``total_investment_with_zero (decimal NULL)`` were added to ``mi`` database. These column contain the same values as their counterparts without ``_with_zero`` suffix except instead of NULL a zero should be given.

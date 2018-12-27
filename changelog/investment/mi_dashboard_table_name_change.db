@@ -1,1 +1,0 @@
-The table `datahub.mi_dashboard_miinvestmentproject` has been renamed to `mi_dashboard_miinvestmentproject` as the dashboard software doesn't support dots in the table names.
