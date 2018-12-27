@@ -12,6 +12,11 @@ from datahub.core.query_utils import (
 from datahub.investment.models import InvestmentProject
 from datahub.investment.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
+from datahub.mi_dashboard.constants import (
+    NO_FDI_VALUE_ASSIGNED,
+    NO_SECTOR_ASSIGNED,
+    NO_UK_REGION_ASSIGNED,
+)
 from datahub.mi_dashboard.models import MIInvestmentProject
 from datahub.mi_dashboard.query_utils import (
     get_collapse_status_name_expression,
@@ -22,7 +27,6 @@ from datahub.mi_dashboard.query_utils import (
     get_other_field_if_null_or_empty_expression,
     get_sector_cluster_expression,
     get_top_level_sector_expression,
-    NO_FDI_VALUE_ASSIGNED,
 )
 
 
@@ -116,8 +120,11 @@ class ETLInvestmentProjects(ETLBase):
         'actual_land_date',
         'project_reference',
         'total_investment',
+        'total_investment_with_zero',
         'number_new_jobs',
+        'number_new_jobs_with_zero',
         'number_safeguarded_jobs',
+        'number_safeguarded_jobs_with_zero',
         'investor_company_country',
         'stage_name',
         'sector_name',
@@ -134,25 +141,39 @@ class ETLInvestmentProjects(ETLBase):
     def get_source_query(self):
         """Get the query set."""
         return InvestmentProject.objects.annotate(
+            # this contains helper annotations
+            _possible_uk_region_names=get_string_agg_subquery(
+                InvestmentProject,
+                'uk_region_locations__name',
+            ),
+            _actual_uk_region_names=get_string_agg_subquery(
+                InvestmentProject,
+                'actual_uk_regions__name',
+            ),
+        ).annotate(
             project_reference=get_project_code_expression(),
             status_name=get_choices_as_case_expression(InvestmentProject, 'status'),
             status_collapsed=get_collapse_status_name_expression(),
             project_url=get_front_end_url_expression('investmentproject', 'pk'),
-            sector_name=get_sector_name_subquery('sector'),
-            top_level_sector_name=get_top_level_sector_expression(),
-            possible_uk_region_names=get_string_agg_subquery(
-                InvestmentProject,
-                'uk_region_locations__name',
+            sector_name=Coalesce(
+                get_sector_name_subquery('sector'),
+                Value(NO_SECTOR_ASSIGNED),
             ),
-            actual_uk_region_names=get_string_agg_subquery(
-                InvestmentProject,
-                'actual_uk_regions__name',
+            top_level_sector_name=get_top_level_sector_expression(),
+            possible_uk_region_names=Coalesce(
+                '_possible_uk_region_names',
+                Value(NO_UK_REGION_ASSIGNED),
+            ),
+            actual_uk_region_names=Coalesce(
+                '_actual_uk_region_names',
+                Value(NO_UK_REGION_ASSIGNED),
             ),
             project_fdi_value=Coalesce('fdi_value__name', Value(NO_FDI_VALUE_ASSIGNED)),
             sector_cluster=get_sector_cluster_expression('sector'),
             uk_region_name=get_other_field_if_null_or_empty_expression(
-                'actual_uk_region_names',
-                'possible_uk_region_names',
+                '_actual_uk_region_names',
+                '_possible_uk_region_names',
+                default=Value(NO_UK_REGION_ASSIGNED),
             ),
             land_date=Coalesce(
                 'actual_land_date',
@@ -161,7 +182,6 @@ class ETLInvestmentProjects(ETLBase):
             financial_year=get_financial_year_from_land_date_expression(),
             dh_fdi_project_id=F('id'),
             investment_type_name=get_empty_string_if_null_expression('investment_type__name'),
-
             level_of_involvement_name=get_empty_string_if_null_expression(
                 'level_of_involvement__name',
             ),
@@ -170,8 +190,13 @@ class ETLInvestmentProjects(ETLBase):
                 'investor_company__registered_address_country__overseas_region__name',
             ),
             country_url=get_country_url(),
-            investor_company_country=F('investor_company__registered_address_country__name'),
+            investor_company_country=get_empty_string_if_null_expression(
+                'investor_company__registered_address_country__name',
+            ),
             stage_name=F('stage__name'),
+            total_investment_with_zero=Coalesce('total_investment', Value(0)),
+            number_safeguarded_jobs_with_zero=Coalesce('number_safeguarded_jobs', Value(0)),
+            number_new_jobs_with_zero=Coalesce('number_new_jobs', Value(0)),
         )
 
 
