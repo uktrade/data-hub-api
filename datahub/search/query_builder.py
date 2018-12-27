@@ -4,7 +4,7 @@ from itertools import chain
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Query, Term
 
-from datahub.search.apps import EXCLUDE_ALL, get_search_apps
+from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
 FIELD_REMAPPING = {
@@ -23,7 +23,6 @@ def get_basic_search_query(
         entities=None,
         permission_filters_by_entity=None,
         ordering=None,
-        ignored_entities=(),
         offset=0,
         limit=100,
 ):
@@ -38,9 +37,9 @@ def get_basic_search_query(
     """
     limit = _clip_limit(offset, limit)
 
-    all_models = [search_app.es_model for search_app in get_search_apps()]
-    indices = [model.get_read_alias() for model in all_models]
-    fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in all_models))
+    search_apps = tuple(get_global_search_apps_as_mapping().values())
+    indices = [app.es_model.get_read_alias() for app in search_apps]
+    fields = set(chain.from_iterable(app.es_model.SEARCH_FIELDS for app in search_apps))
 
     # Sort the fields so that this function is deterministic
     # and the same query is always generated with the same inputs
@@ -53,13 +52,10 @@ def get_basic_search_query(
     if permission_query:
         search = search.filter(permission_query)
 
-    ignored_entity_subqueries = [
-        Q('term', _type=entity._doc_type.name) for entity in entities
-        if entity._doc_type.name not in ignored_entities
-    ]
+    entity_type_subqueries = [Q('term', _type=entity._doc_type.name) for entity in entities]
 
     search = search.post_filter(
-        Q('bool', should=ignored_entity_subqueries),
+        Q('bool', should=entity_type_subqueries),
     )
     search = _apply_sorting_to_query(search, ordering)
     search.aggs.bucket(
