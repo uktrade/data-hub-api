@@ -17,34 +17,43 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
 
     read_indices, write_index = search_app.es_model.get_read_and_write_indices()
 
-    rows_processed = 0
+    num_source_rows_processed = 0
+    num_objects_synced = 0
     total_rows = search_app.queryset.count()
-    it = search_app.queryset.iterator(chunk_size=batch_size)
+    it = search_app.queryset.values_list('pk', flat=True).iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
+        objs = search_app.queryset.filter(pk__in=batch)
+
         num_actions = sync_objects(
             search_app.es_model,
-            batch,
+            objs,
             read_indices,
             write_index,
             post_batch_callback=post_batch_callback,
         )
 
         emit_progress = (
-            (rows_processed + num_actions) // PROGRESS_INTERVAL
-            - rows_processed // PROGRESS_INTERVAL
+            (num_source_rows_processed + num_actions) // PROGRESS_INTERVAL
+            - num_source_rows_processed // PROGRESS_INTERVAL
             > 0
         )
 
-        rows_processed += num_actions
+        num_source_rows_processed += len(batch)
+        num_objects_synced += num_actions
 
         if emit_progress:
             logger.info(
-                f'{model_name} rows processed: {rows_processed}/{total_rows} '
-                f'{rows_processed*100//total_rows}%',
+                f'{model_name} rows processed: {num_source_rows_processed}/{total_rows} '
+                f'{num_source_rows_processed*100//total_rows}%',
             )
 
-    logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} 100%.')
+    logger.info(f'{model_name} rows processed: {num_source_rows_processed}/{total_rows} 100%.')
+    if num_source_rows_processed != num_objects_synced:
+        logger.warning(
+            f'{num_source_rows_processed - num_objects_synced} deleted objects detected while '
+            f'syncing model {model_name}',
+        )
 
 
 def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
