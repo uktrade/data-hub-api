@@ -29,6 +29,23 @@ class PermissionModel(models.Model):
     """Simple Model with Permission."""
 
 
+def _default_value_for_nullable_with_callable_default():
+    return 'default value'
+
+
+class NullableWithDefaultModel(models.Model):
+    """Model that has a nullable field with a default value."""
+
+    nullable_with_default = models.BooleanField(null=True, default=True)
+    nullable_with_callable_default = models.CharField(
+        null=True,
+        max_length=255,
+        default=_default_value_for_nullable_with_callable_default,
+    )
+    nullable_without_default = models.BooleanField(null=True)
+    non_nullable_with_default = models.BooleanField(default=True)
+
+
 class Person(models.Model):
     """Person model."""
 
