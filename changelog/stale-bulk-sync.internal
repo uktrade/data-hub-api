@@ -1,0 +1,1 @@
+The `migrate_es` and `sync_es` management commands were modified to avoid the use of stale data when copying data to Elasticsearch.
