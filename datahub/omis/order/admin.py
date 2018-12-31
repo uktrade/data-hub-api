@@ -67,7 +67,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     """Admin for orders."""
 
     list_display = ('reference', 'company', 'status', 'created_on', 'modified_on')
-    search_fields = ('reference',)
+    search_fields = ('reference', 'invoice__invoice_number')
     list_filter = ('status',)
 
     readonly_fields = (
@@ -117,6 +117,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         'archived_documents_url_path',
         'uk_advisers',
         'post_advisers',
+        'invoice',
     )
     _editable_fields = ('sector', 'uk_region')
     fields = readonly_fields + _editable_fields
