@@ -36,6 +36,8 @@ from datahub.omis.order.test.factories import (
     OrderWithAcceptedQuoteFactory,
     OrderWithCancelledQuoteFactory,
     OrderWithOpenQuoteFactory,
+    OrderWithoutAssigneesFactory,
+    OrderWithoutLeadAssigneeFactory,
 )
 from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.test.factories import (
@@ -457,6 +459,8 @@ class TestOrderExportView(APITestMixin):
             OrderWithAcceptedQuoteFactory,
             OrderWithCancelledQuoteFactory,
             OrderWithOpenQuoteFactory,
+            OrderWithoutAssigneesFactory,
+            OrderWithoutLeadAssigneeFactory,
             ApprovedRefundFactory,
             ApprovedRefundFactory,
             RequestedRefundFactory,
@@ -529,6 +533,7 @@ class TestOrderExportView(APITestMixin):
                 'Contact link':
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
                     f'/{order.contact.pk}',
+                'Lead adviser': get_attr_or_none(order.get_lead_assignee(), 'adviser.name'),
                 'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
                 'Date created': order.created_on,
                 'Delivery date': order.delivery_date,
