@@ -1,0 +1,1 @@
+The option to synchronise single objects to Elasticsearch using the thread pool was removed. Celery is now used in all cases.
