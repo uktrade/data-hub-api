@@ -8,8 +8,7 @@ from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
 from datahub.search.companieshousecompany.models import (
     CompaniesHouseCompany as ESCompaniesHouseCompany,
 )
-
-pytestmark = pytest.mark.django_db
+from datahub.search.query_builder import get_search_by_entity_query
 
 
 def test_mapping(setup_es):
@@ -24,89 +23,89 @@ def test_mapping(setup_es):
             'dynamic': 'false',
             'properties': {
                 'company_category': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'index': False,
+                    'type': 'keyword',
                 },
                 'company_number': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'company_status': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'index': False,
+                    'type': 'keyword',
                 },
                 'id': {
                     'type': 'keyword',
                 },
                 'incorporation_date': {
+                    'index': False,
                     'type': 'date',
                 },
                 'name': {
-                    'copy_to': ['name_keyword', 'name_trigram'],
-                    'fielddata': True,
                     'type': 'text',
-                },
-                'name_keyword': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
-                },
-                'registered_address_1': {
-                    'type': 'text',
-                },
-                'registered_address_2': {
-                    'type': 'text',
-                },
-                'registered_address_country': {
-                    'include_in_parent': True,
-                    'properties': {
-                        'id': {
+                    'fields': {
+                        'keyword': {
+                            'normalizer': 'lowercase_asciifolding_normalizer',
                             'type': 'keyword',
                         },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                },
+                'registered_address_1': {
+                    'index': False,
+                    'type': 'text',
+                },
+                'registered_address_2': {
+                    'index': False,
+                    'type': 'text',
+                },
+                'registered_address_country': {
+                    'properties': {
+                        'id': {
+                            'index': False,
+                            'type': 'keyword',
+                        },
+                        'name': {
+                            'index': False,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
                 },
                 'registered_address_county': {
+                    'index': False,
                     'type': 'text',
                 },
                 'registered_address_postcode': {
-                    'copy_to': ['registered_address_postcode_trigram'],
                     'type': 'text',
-                },
-                'registered_address_postcode_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
+                    'fields': {
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'registered_address_town': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
+                    'index': False,
                     'type': 'text',
                 },
                 'sic_code_1': {
+                    'index': False,
                     'type': 'text',
                 },
                 'sic_code_2': {
+                    'index': False,
                     'type': 'text',
                 },
                 'sic_code_3': {
+                    'index': False,
                     'type': 'text',
                 },
                 'sic_code_4': {
-                    'type': 'text',
-                },
-                'uri': {
+                    'index': False,
                     'type': 'text',
                 },
             },
@@ -114,6 +113,7 @@ def test_mapping(setup_es):
     }
 
 
+@pytest.mark.django_db
 def test_indexed_doc(setup_es):
     """Test the ES data of an indexed companies house company."""
     ch_company = CompaniesHouseCompanyFactory()
@@ -154,7 +154,70 @@ def test_indexed_doc(setup_es):
             'sic_code_2': ch_company.sic_code_2,
             'sic_code_3': ch_company.sic_code_3,
             'sic_code_4': ch_company.sic_code_4,
-            'uri': ch_company.uri,
             'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
         },
+    }
+
+
+def test_limited_get_search_by_entity_query():
+    """Tests query generation for entity search."""
+    query = get_search_by_entity_query(
+        term='test',
+        entity=ESCompaniesHouseCompany,
+        filter_data={},
+    )
+
+    assert query.to_dict() == {
+        'query': {
+            'bool': {
+                'must': [
+                    {
+                        'term': {
+                            '_type': 'companieshousecompany',
+                        },
+                    },
+                    {
+                        'bool': {
+                            'should': [
+                                {
+                                    'match_phrase': {
+                                        'name_keyword': {
+                                            'query': 'test',
+                                            'boost': 2,
+                                        },
+                                    },
+                                },
+                                {
+                                    'match_phrase': {
+                                        'id': 'test',
+                                    },
+                                },
+                                {
+                                    'multi_match': {
+                                        'query': 'test',
+                                        'fields': (
+                                            'name',
+                                            'name.trigram',
+                                            'company_number',
+                                            'registered_address_postcode.trigram',
+                                            'name_trigram',
+                                            'registered_address_postcode_trigram',
+                                        ),
+                                        'type': 'cross_fields',
+                                        'operator': 'and',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        'post_filter': {
+            'bool': {},
+        },
+        'sort': [
+            '_score',
+            'id',
+        ],
     }

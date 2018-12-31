@@ -1,0 +1,1 @@
+- ``POST /v3/search/companieshousecompany``: The ``uri`` field was removed from responses as this was not being used by any client.
