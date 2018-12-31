@@ -1,6 +1,9 @@
+from django.db.models import Prefetch
+
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectPermission,
+    InvestmentProjectTeamMember,
 )
 from datahub.investment.permissions import (
     get_association_filters,
@@ -54,6 +57,14 @@ class InvestmentSearchApp(SearchApp):
         'specific_programme',
         'stage',
         'uk_company',
+    ).prefetch_related(
+        'actual_uk_regions',
+        'delivery_partners',
+        'uk_region_locations',
+        Prefetch(
+            'team_members',
+            queryset=InvestmentProjectTeamMember.objects.select_related('adviser__dit_team'),
+        ),
     )
 
     @classmethod

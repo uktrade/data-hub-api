@@ -1,3 +1,15 @@
+Data Hub API 8.6.0 (2018-12-31)
+===============================
+
+
+
+Internal changes
+----------------
+
+- The performance of the ``migrate_es`` and ``sync_es`` management commands was improved in some cases by the use of prefetching for to-many fields.
+- The ``migrate_es`` and ``sync_es`` management commands were modified to avoid the use of stale data when copying data to Elasticsearch.
+
+
 Data Hub API 8.5.0 (2018-12-27)
 ===============================
 
