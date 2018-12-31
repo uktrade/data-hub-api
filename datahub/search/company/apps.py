@@ -33,4 +33,8 @@ class CompanySearchApp(SearchApp):
         'trading_address_country',
         'turnover_range',
         'uk_region',
+    ).prefetch_related(
+        'contacts',
+        'export_to_countries',
+        'future_interest_countries',
     )

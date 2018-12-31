@@ -212,21 +212,23 @@ def get_attr_or_none(obj, attr):
 class MockQuerySet:
     """Mock version of QuerySet that represents a fixed set of items."""
 
-    def __init__(self, items):
+    def __init__(self, objects, value_list_fields=None, value_list_flat=None):
         """Initialises the mock query set."""
-        self._items = items
+        self._objects = objects
+        self._value_list_fields = value_list_fields
+        self._value_list_flat = value_list_flat
 
     def __getitem__(self, item):
         """Returns an item."""
-        return self._items[item]
+        return self._results[item]
 
     def __iter__(self):
         """Returns an iterator over the query set items."""
-        return iter(self._items)
+        return iter(self._results)
 
     def __len__(self):
         """Returns the number of items in the query set."""
-        return len(self._items)
+        return len(self._results)
 
     def all(self):
         """Returns self."""
@@ -234,16 +236,16 @@ class MockQuerySet:
 
     def count(self):
         """Returns the number of items in the query set."""
-        return len(self._items)
+        return len(self._results)
 
     def exists(self):
         """Returns whether there are any items in the query set."""
-        return bool(self._items)
+        return bool(self._results)
 
     def get(self, **kwargs):
         """Gets an item matching the given kwargs."""
         matches = [
-            item for item in self._items
+            item for item in self._results
             if all(getattr(item, attr) == val for attr, val in kwargs.items())
         ]
 
@@ -255,13 +257,61 @@ class MockQuerySet:
 
         return matches[0]
 
+    def filter(self, pk__in=()):
+        """
+        Filters the query set.
+
+        Only supports filtering using pk__in at present.
+        """
+        field = self._map_field('pk')
+        filtered_objects = [obj for obj in self._objects if getattr(obj, field) in pk__in]
+        return self._clone(filtered_objects)
+
     def first(self):
         """Returns the first item."""
-        return self._items[0] if self._items else None
+        return self._results[0] if self._results else None
 
     def iterator(self, chunk_size=None):
         """Returns an iterator over the query set items."""
-        return iter(self._items)
+        return iter(self._results)
+
+    def values_list(self, *fields, flat=False):
+        """Creates a clone of the query set with results returned as tuples."""
+        if flat:
+            assert len(fields) == 1
+
+        return self._clone(value_list_fields=fields, value_list_flat=flat)
+
+    def _clone(self, objects=None, **kwargs):
+        clone_args = (
+            objects if objects is not None else self._objects,
+        )
+        clone_kwargs = {
+            'value_list_fields': self._value_list_fields,
+            'value_list_flat': self._value_list_flat,
+            **kwargs,
+        }
+
+        return MockQuerySet(*clone_args, **clone_kwargs)
+
+    @property
+    def _results(self):
+        if self._value_list_fields is None:
+            return self._objects
+
+        if self._value_list_flat:
+            field = self._map_field(self._value_list_fields[0])
+
+            return [getattr(obj, field) for obj in self._objects]
+
+        return [
+            tuple(getattr(obj, field) for field in self._value_list_fields)
+            for obj in self._objects
+        ]
+
+    @staticmethod
+    def _map_field(field):
+        return 'id' if field == 'pk' else field
 
 
 def format_csv_data(rows):
