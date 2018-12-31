@@ -19,4 +19,7 @@ class EventSearchApp(SearchApp):
         'lead_team',
         'uk_region',
         'service',
+    ).prefetch_related(
+        'related_programmes',
+        'teams',
     )

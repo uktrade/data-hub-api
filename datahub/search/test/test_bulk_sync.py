@@ -2,11 +2,13 @@ from unittest.mock import Mock
 
 import pytest
 
+from datahub.company.models import Company
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import MockQuerySet
-from datahub.search.bulk_sync import sync_app
+from datahub.search.bulk_sync import sync_app, sync_objects
+from datahub.search.company import CompanySearchApp
+from datahub.search.signals import disable_search_signal_receivers
 from datahub.search.test.utils import create_mock_search_app
-
-pytestmark = pytest.mark.django_db
 
 
 def test_sync_app_with_default_batch_size(monkeypatch):
@@ -60,3 +62,34 @@ def test_sync_app_logic(monkeypatch):
         },
     ]
     assert bulk_mock.call_count == 1
+
+
+@pytest.mark.django_db
+@disable_search_signal_receivers(Company)
+def test_sync_app_uses_latest_data(monkeypatch, setup_es):
+    """Test that sync_app() picks up updates made to records between batches."""
+    CompanyFactory.create_batch(2, name='old name')
+
+    def sync_objects_side_effect(*args, **kwargs):
+        nonlocal mock_sync_objects
+
+        ret = sync_objects(*args, **kwargs)
+
+        if mock_sync_objects.call_count == 1:
+            Company.objects.update(name='new name')
+
+        return ret
+
+    mock_sync_objects = Mock(side_effect=sync_objects_side_effect)
+    monkeypatch.setattr('datahub.search.bulk_sync.sync_objects', mock_sync_objects)
+    sync_app(CompanySearchApp, batch_size=1)
+
+    setup_es.indices.refresh()
+
+    company = mock_sync_objects.call_args_list[1][0][1][0]
+    fetched_company = setup_es.get(
+        index=CompanySearchApp.es_model.get_read_alias(),
+        doc_type=CompanySearchApp.name,
+        id=company.pk,
+    )
+    assert fetched_company['_source']['name'] == 'new name'

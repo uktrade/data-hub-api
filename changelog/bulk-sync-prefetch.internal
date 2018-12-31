@@ -1,0 +1,1 @@
+The performance of the `migrate_es` and `sync_es` management commands was improved in some cases by the use of prefetching for to-many fields.
