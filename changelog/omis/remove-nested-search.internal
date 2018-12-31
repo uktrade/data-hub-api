@@ -1,0 +1,1 @@
+ All nested fields were replaced with object fields in the OMIS order search model for improved maintainability and performance.
