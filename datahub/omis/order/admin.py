@@ -20,7 +20,12 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.core.admin import BaseModelAdminMixin, get_change_url, ViewAndChangeOnlyAdmin
+from datahub.core.admin import (
+    BaseModelAdminMixin,
+    get_change_link,
+    get_change_url,
+    ViewAndChangeOnlyAdmin,
+)
 from datahub.core.exceptions import APIConflictException
 from datahub.omis.order import validators
 from datahub.omis.order.models import CancellationReason, Order
@@ -67,12 +72,13 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     """Admin for orders."""
 
     list_display = ('reference', 'company', 'status', 'created_on', 'modified_on')
-    search_fields = ('reference',)
+    search_fields = ('reference', 'invoice__invoice_number')
     list_filter = ('status',)
 
     readonly_fields = (
         'id',
         'reference',
+        'invoice_link',
         'created',
         'modified',
         'public_token',
@@ -120,6 +126,14 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     )
     _editable_fields = ('sector', 'uk_region')
     fields = readonly_fields + _editable_fields
+
+    def invoice_link(self, obj):
+        """Returns a link to the invoice change page."""
+        if obj.invoice:
+            return get_change_link(obj.invoice)
+        return ''
+
+    invoice_link.short_description = 'Current invoice'
 
     def completed(self, order):
         """:returns: completed on/by details."""
