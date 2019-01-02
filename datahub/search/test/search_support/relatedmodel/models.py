@@ -12,7 +12,7 @@ class ESRelatedModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
     id = Keyword()
-    simpleton = fields.nested_id_name_field()
+    simpleton = fields.id_name_field()
 
     MAPPINGS = {
         'simpleton': dict_utils.id_name_dict,
