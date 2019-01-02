@@ -9,6 +9,7 @@ from datahub.core.query_utils import (
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order as DBOrder
+from datahub.omis.order.query_utils import get_lead_order_assignee_name_subquery
 from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.models import Refund
 from datahub.search.omis.models import Order
@@ -106,6 +107,7 @@ class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
         company_link=get_front_end_url_expression('company', 'company__pk'),
         contact_name=get_full_name_expression('contact'),
         contact_link=get_front_end_url_expression('contact', 'contact__pk'),
+        lead_adviser=get_lead_order_assignee_name_subquery(),
     )
     field_titles = {
         'reference': 'Order reference',
@@ -123,6 +125,7 @@ class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
         'contact_name': 'Contact',
         'contact__job_title': 'Contact job title',
         'contact_link': 'Contact link',
+        'lead_adviser': 'Lead adviser',
         'created_by__dit_team__name': 'Created by team',
         'created_on': 'Date created',
         'delivery_date': 'Delivery date',
