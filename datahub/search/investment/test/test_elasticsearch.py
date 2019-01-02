@@ -21,7 +21,6 @@ def test_mapping(setup_es):
             'properties': {
                 'actual_land_date': {'type': 'date'},
                 'actual_uk_regions': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -30,7 +29,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'address_1': {'type': 'text'},
                 'address_2': {'type': 'text'},
@@ -60,7 +59,6 @@ def test_mapping(setup_es):
                 'approved_non_fdi': {'type': 'boolean'},
                 'archived': {'type': 'boolean'},
                 'archived_by': {
-                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -84,7 +82,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'archived_on': {'type': 'date'},
                 'archived_reason': {'type': 'text'},
@@ -102,10 +100,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'average_salary': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -114,10 +111,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'business_activities': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -126,12 +122,11 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'client_cannot_provide_foreign_investment': {'type': 'boolean'},
                 'client_cannot_provide_total_investment': {'type': 'boolean'},
                 'client_contacts': {
-                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -155,13 +150,11 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'client_relationship_manager': {
-                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
-                            'include_in_parent': True,
                             'properties': {
                                 'id': {'type': 'keyword'},
                                 'name': {
@@ -170,7 +163,7 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -194,7 +187,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'client_requirements': {
                     'fields': {
@@ -210,7 +203,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'country_investment_originates_from': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -219,7 +211,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'country_lost_to': {
                     'properties': {
@@ -245,10 +237,8 @@ def test_mapping(setup_es):
                     'type': 'object',
                 },
                 'created_by': {
-                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
-                            'include_in_parent': True,
                             'properties': {
                                 'id': {'type': 'keyword'},
                                 'name': {
@@ -257,7 +247,7 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -281,13 +271,12 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'created_on': {'type': 'date'},
                 'date_abandoned': {'type': 'date'},
                 'date_lost': {'type': 'date'},
                 'delivery_partners': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -296,7 +285,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'description': {
                     'analyzer': 'english_analyzer',
@@ -305,7 +294,6 @@ def test_mapping(setup_es):
                 'estimated_land_date': {'type': 'date'},
                 'export_revenue': {'type': 'boolean'},
                 'fdi_type': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -314,10 +302,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'fdi_value': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -326,13 +313,12 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'foreign_equity_investment': {'type': 'double'},
                 'government_assistance': {'type': 'boolean'},
                 'id': {'type': 'keyword'},
                 'intermediate_company': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -341,10 +327,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'investment_type': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -353,10 +338,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'investor_company': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -370,10 +354,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'investor_company_country': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -382,10 +365,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'investor_type': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -394,10 +376,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'level_of_involvement': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -406,7 +387,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'level_of_involvement_simplified': {'type': 'keyword'},
                 'likelihood_to_land': {
@@ -453,10 +434,8 @@ def test_mapping(setup_es):
                 },
                 'project_arrived_in_triage_on': {'type': 'date'},
                 'project_assurance_adviser': {
-                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
-                            'include_in_parent': True,
                             'properties': {
                                 'id': {'type': 'keyword'},
                                 'name': {
@@ -465,7 +444,7 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -489,7 +468,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'project_code': {
                     'analyzer': 'lowercase_keyword_analyzer',
@@ -502,10 +481,8 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'project_manager': {
-                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
-                            'include_in_parent': True,
                             'properties': {
                                 'id': {'type': 'keyword'},
                                 'name': {
@@ -514,7 +491,7 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -538,7 +515,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'proposal_deadline': {'type': 'date'},
                 'quotable_as_public_case_study': {'type': 'boolean'},
@@ -571,7 +548,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'referral_source_activity': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -580,7 +556,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'referral_source_activity_event': {
                     'analyzer': 'lowercase_keyword_analyzer',
@@ -588,7 +564,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'referral_source_activity_marketing': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -597,10 +572,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'referral_source_activity_website': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -609,7 +583,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'referral_source_adviser': {
                     'properties': {
@@ -653,12 +627,10 @@ def test_mapping(setup_es):
                     'type': 'object',
                 },
                 'sector': {
-                    'include_in_parent': True,
                     'properties': {
                         'ancestors': {
-                            'include_in_parent': True,
                             'properties': {'id': {'type': 'keyword'}},
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'id': {'type': 'keyword'},
                         'name': {
@@ -667,12 +639,11 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'site_decided': {'type': 'boolean'},
                 'some_new_jobs': {'type': 'boolean'},
                 'specific_programme': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -681,10 +652,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'stage': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -693,7 +663,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'status': {
                     'analyzer': 'lowercase_keyword_analyzer',
@@ -701,10 +671,8 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'team_members': {
-                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
-                            'include_in_parent': True,
                             'properties': {
                                 'id': {'type': 'keyword'},
                                 'name': {
@@ -713,7 +681,7 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -737,11 +705,10 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'total_investment': {'type': 'double'},
                 'uk_company': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -755,11 +722,10 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'uk_company_decided': {'type': 'boolean'},
                 'uk_region_locations': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -768,7 +734,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'will_new_jobs_last_two_years': {'type': 'boolean'},
             },
