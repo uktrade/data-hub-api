@@ -1,3 +1,29 @@
+Data Hub API 8.7.0 (2019-01-03)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The field ``classification`` was removed from the django definition and the related database column will be deleted with the next release.
+
+Features
+--------
+
+- **OMIS** ``Lead adviser`` is now available in the OMIS CSV extract.
+
+Internal changes
+----------------
+
+- **Companies** All nested fields were replaced with object fields in the company search model for improved maintainability and performance.
+- **Contacts** All nested fields were replaced with object fields in the contact search model for improved maintainability and performance.
+- **Events** All nested fields were replaced with object fields in the event search model for improved maintainability and performance.
+- **OMIS** OMIS order invoices can now be viewed and searched for by invoice number and order reference in the admin site.
+- **OMIS** All nested fields were replaced with object fields in the OMIS order search model for improved maintainability and performance.
+- **OMIS** OMIS orders can now be searched for by the current invoice number for the order in the admin site.
+
+
 Data Hub API 8.6.0 (2018-12-31)
 ===============================
 
