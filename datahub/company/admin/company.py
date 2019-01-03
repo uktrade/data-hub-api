@@ -110,7 +110,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'turnover_range',
                     'turnover',
                     'is_turnover_estimated',
-                    'classification',
                     'one_list_tier',
                     'one_list_account_owner',
                 ),
@@ -196,7 +195,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'created',
         'modified',
         'archived_documents_url_path',
-        'classification',
         'reference_code',
         'transferred_to_display',
         'transferred_by',
@@ -270,15 +268,3 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         )
 
     transferred_from_display.short_description = 'Transferred from'
-
-    def save_model(self, request, obj, form, change):
-        """
-        Makes sure that classification mirrors one_list_tier.
-        The actual fk models are different but the IDs match so the code sets
-        these explicitly instead.
-
-        The save is here and not on the Company model to avoid unintentional
-        overriding of existing values.
-        """
-        obj.classification_id = obj.one_list_tier_id
-        return super().save_model(request, obj, form, change)
