@@ -25,7 +25,6 @@ def test_mapping(setup_es):
             'properties': {
                 'archived': {'type': 'boolean'},
                 'archived_by': {
-                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -49,12 +48,11 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'archived_on': {'type': 'date'},
                 'archived_reason': {'type': 'text'},
                 'business_type': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -63,7 +61,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'companies_house_data': {
                     'properties': {
@@ -74,7 +72,7 @@ def test_mapping(setup_es):
                         },
                         'id': {'type': 'keyword'},
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'company_number': {
                     'analyzer': 'lowercase_keyword_analyzer',
@@ -82,7 +80,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'contacts': {
-                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -106,7 +103,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'created_on': {'type': 'date'},
                 'description': {
@@ -115,7 +112,6 @@ def test_mapping(setup_es):
                 },
                 'duns_number': {'type': 'keyword'},
                 'employee_range': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -124,10 +120,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'export_experience_category': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -136,10 +131,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'export_to_countries': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -148,10 +142,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'future_interest_countries': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -160,10 +153,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'global_headquarters': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -172,10 +164,9 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'headquarter_type': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -184,7 +175,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'id': {'type': 'keyword'},
                 'modified_on': {'type': 'date'},
@@ -210,7 +201,6 @@ def test_mapping(setup_es):
                 'registered_address_1': {'type': 'text'},
                 'registered_address_2': {'type': 'text'},
                 'registered_address_country': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -224,7 +214,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'registered_address_county': {'type': 'text'},
                 'registered_address_postcode': {
@@ -241,12 +231,10 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'sector': {
-                    'include_in_parent': True,
                     'properties': {
                         'ancestors': {
-                            'include_in_parent': True,
                             'properties': {'id': {'type': 'keyword'}},
-                            'type': 'nested',
+                            'type': 'object',
                         },
                         'id': {'type': 'keyword'},
                         'name': {
@@ -255,7 +243,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'suggest': {
                     'analyzer': 'simple',
@@ -267,7 +255,6 @@ def test_mapping(setup_es):
                 'trading_address_1': {'type': 'text'},
                 'trading_address_2': {'type': 'text'},
                 'trading_address_country': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -281,7 +268,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'trading_address_county': {'type': 'text'},
                 'trading_address_postcode': {
@@ -320,7 +307,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'turnover_range': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -329,11 +315,10 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'uk_based': {'type': 'boolean'},
                 'uk_region': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
@@ -342,7 +327,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'vat_number': {
                     'index': False,
