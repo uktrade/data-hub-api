@@ -133,6 +133,24 @@ class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     status = OrderStatus.paid
 
 
+class OrderWithoutAssigneesFactory(OrderFactory):
+    """Order factory without assignees."""
+
+    @to_many_field
+    def assignees(self):
+        """No assignees for this order."""
+        return []
+
+
+class OrderWithoutLeadAssigneeFactory(OrderFactory):
+    """Order factory without assignees."""
+
+    @to_many_field
+    def assignees(self):
+        """Create non-lead assignees."""
+        return OrderAssigneeFactory.create_batch(2, order=self, is_lead=False)
+
+
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 

@@ -167,9 +167,9 @@ def nested_company_field(field):
     )
 
 
-def nested_ch_company_field():
-    """Nested field for lists of objects with id and company_number sub-fields."""
-    return Nested(properties={
+def ch_company_field():
+    """Object field with id and company_number sub-fields."""
+    return Object(properties={
         'id': Keyword(),
         'company_number': SortableCaseInsensitiveKeywordText(),
     })

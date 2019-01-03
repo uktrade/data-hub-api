@@ -57,21 +57,21 @@ class Company(BaseESModel):
 
     id = Keyword()
     archived = Boolean()
-    archived_by = fields.nested_contact_or_adviser_field('archived_by')
+    archived_by = fields.contact_or_adviser_field('archived_by')
     archived_on = Date()
     archived_reason = Text()
-    business_type = fields.nested_id_name_field()
-    companies_house_data = fields.nested_ch_company_field()
+    business_type = fields.id_name_field()
+    companies_house_data = fields.ch_company_field()
     company_number = fields.SortableCaseInsensitiveKeywordText()
-    contacts = fields.nested_contact_or_adviser_field('contacts')
+    contacts = fields.contact_or_adviser_field('contacts')
     created_on = Date()
     description = fields.EnglishText()
-    employee_range = fields.nested_id_name_field()
-    export_experience_category = fields.nested_id_name_field()
-    export_to_countries = fields.nested_id_name_field()
-    future_interest_countries = fields.nested_id_name_field()
-    global_headquarters = fields.nested_id_name_field()
-    headquarter_type = fields.nested_id_name_field()
+    employee_range = fields.id_name_field()
+    export_experience_category = fields.id_name_field()
+    export_to_countries = fields.id_name_field()
+    future_interest_countries = fields.id_name_field()
+    global_headquarters = fields.id_name_field()
+    headquarter_type = fields.id_name_field()
     modified_on = Date()
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
@@ -81,7 +81,7 @@ class Company(BaseESModel):
     registered_address_2 = Text()
     registered_address_town = fields.SortableCaseInsensitiveKeywordText()
     registered_address_county = Text()
-    registered_address_country = fields.nested_id_name_partial_field(
+    registered_address_country = fields.id_name_partial_field(
         'registered_address_country',
     )
     registered_address_postcode = Text(
@@ -90,7 +90,7 @@ class Company(BaseESModel):
         ],
     )
     registered_address_postcode_trigram = fields.TrigramText()
-    sector = fields.nested_sector_field()
+    sector = fields.sector_field()
     trading_address_1 = Text()
     trading_address_2 = Text()
     trading_address_town = fields.SortableCaseInsensitiveKeywordText()
@@ -99,7 +99,7 @@ class Company(BaseESModel):
         copy_to=['trading_address_postcode_trigram'],
     )
     trading_address_postcode_trigram = fields.TrigramText()
-    trading_address_country = fields.nested_id_name_partial_field(
+    trading_address_country = fields.id_name_partial_field(
         'trading_address_country',
     )
     trading_name = fields.SortableText(
@@ -114,8 +114,8 @@ class Company(BaseESModel):
         copy_to=['trading_names_trigram'],
     )
     trading_names_trigram = fields.TrigramText()
-    turnover_range = fields.nested_id_name_field()
-    uk_region = fields.nested_id_name_field()
+    turnover_range = fields.id_name_field()
+    uk_region = fields.id_name_field()
     uk_based = Boolean()
     vat_number = Keyword(index=False)
     duns_number = Keyword()
