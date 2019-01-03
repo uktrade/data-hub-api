@@ -1,0 +1,1 @@
+The field ``classification`` was removed from the django definition and the related database column will be deleted with the next release.
