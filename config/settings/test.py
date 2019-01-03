@@ -28,7 +28,6 @@ ES_INDEX_SETTINGS = {
     'number_of_shards': 1,
     'number_of_replicas': 0,
 }
-ENABLE_CELERY_ES_SYNC_OBJECT = True
 DOCUMENT_BUCKET = 'test-bucket'
 AV_V2_SERVICE_URL = 'http://av-service/'
 
