@@ -14,3 +14,4 @@ class CompaniesHouseCompanySearchApp(SearchApp):
     queryset = DBCompaniesHouseCompany.objects.select_related(
         'registered_address_country',
     )
+    exclude_from_global_search = True
