@@ -65,7 +65,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'registered_address_country': {
-                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword',
@@ -76,7 +75,7 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                    'type': 'nested',
+                    'type': 'object',
                 },
                 'registered_address_county': {
                     'type': 'text',

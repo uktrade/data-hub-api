@@ -1,9 +1,745 @@
+from elasticsearch_dsl import Mapping
+
 from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entity_query,
     limit_search_query,
 )
+
+
+def test_mapping(setup_es):
+    """Test the ES mapping for an investment project."""
+    mapping = Mapping.from_es(
+        ESInvestmentProject.get_write_index(),
+        ESInvestmentProject._doc_type.name,
+    )
+
+    assert mapping.to_dict() == {
+        'investment_project': {
+            'dynamic': 'false',
+            'properties': {
+                'actual_land_date': {'type': 'date'},
+                'actual_uk_regions': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'address_1': {'type': 'text'},
+                'address_2': {'type': 'text'},
+                'address_postcode': {'type': 'text'},
+                'address_town': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'allow_blank_estimated_land_date': {
+                    'index': False,
+                    'type': 'boolean',
+                },
+                'allow_blank_possible_uk_regions': {
+                    'index': False,
+                    'type': 'boolean',
+                },
+                'anonymous_description': {
+                    'analyzer': 'english_analyzer',
+                    'type': 'text',
+                },
+                'approved_commitment_to_invest': {'type': 'boolean'},
+                'approved_fdi': {'type': 'boolean'},
+                'approved_good_value': {'type': 'boolean'},
+                'approved_high_value': {'type': 'boolean'},
+                'approved_landed': {'type': 'boolean'},
+                'approved_non_fdi': {'type': 'boolean'},
+                'archived': {'type': 'boolean'},
+                'archived_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['archived_by.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'archived_on': {'type': 'date'},
+                'archived_reason': {'type': 'text'},
+                'associated_non_fdi_r_and_d_project': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'project_code': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'average_salary': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'business_activities': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'client_cannot_provide_foreign_investment': {'type': 'boolean'},
+                'client_cannot_provide_total_investment': {'type': 'boolean'},
+                'client_contacts': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['client_contacts.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'client_relationship_manager': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {'type': 'keyword'},
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text',
+                                },
+                            },
+                            'type': 'object',
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['client_relationship_manager.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'client_requirements': {
+                    'fields': {
+                        'keyword': {
+                            'ignore_above': 256,
+                            'type': 'keyword',
+                        },
+                    },
+                    'type': 'text',
+                },
+                'comments': {
+                    'analyzer': 'english_analyzer',
+                    'type': 'text',
+                },
+                'country_investment_originates_from': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'country_lost_to': {
+                    'properties': {
+                        'id': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                        'name': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'created_by': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {'type': 'keyword'},
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text',
+                                },
+                            },
+                            'type': 'object',
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['created_by.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'created_on': {'type': 'date'},
+                'date_abandoned': {'type': 'date'},
+                'date_lost': {'type': 'date'},
+                'delivery_partners': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'description': {
+                    'analyzer': 'english_analyzer',
+                    'type': 'text',
+                },
+                'estimated_land_date': {'type': 'date'},
+                'export_revenue': {'type': 'boolean'},
+                'fdi_type': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'fdi_value': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'foreign_equity_investment': {'type': 'double'},
+                'government_assistance': {'type': 'boolean'},
+                'id': {'type': 'keyword'},
+                'intermediate_company': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'investment_type': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'investor_company': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['investor_company.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'investor_company_country': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'investor_type': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'level_of_involvement': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'level_of_involvement_simplified': {'type': 'keyword'},
+                'likelihood_to_land': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'modified_on': {'type': 'date'},
+                'name': {
+                    'copy_to': [
+                        'name_keyword',
+                        'name_trigram',
+                    ],
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'name_keyword': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'name_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'new_tech_to_uk': {'type': 'boolean'},
+                'non_fdi_r_and_d_budget': {'type': 'boolean'},
+                'number_new_jobs': {'type': 'integer'},
+                'number_safeguarded_jobs': {'type': 'long'},
+                'other_business_activity': {
+                    'fields': {
+                        'keyword': {
+                            'ignore_above': 256,
+                            'type': 'keyword',
+                        },
+                    },
+                    'type': 'text',
+                },
+                'project_arrived_in_triage_on': {'type': 'date'},
+                'project_assurance_adviser': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {'type': 'keyword'},
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text',
+                                },
+                            },
+                            'type': 'object',
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['project_assurance_adviser.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'project_code': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'copy_to': ['project_code_trigram'],
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'project_code_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text',
+                },
+                'project_manager': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {'type': 'keyword'},
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text',
+                                },
+                            },
+                            'type': 'object',
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['project_manager.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'proposal_deadline': {'type': 'date'},
+                'quotable_as_public_case_study': {'type': 'boolean'},
+                'r_and_d_budget': {'type': 'boolean'},
+                'reason_abandoned': {
+                    'fields': {
+                        'keyword': {
+                            'ignore_above': 256,
+                            'type': 'keyword',
+                        },
+                    },
+                    'type': 'text',
+                },
+                'reason_delayed': {
+                    'fields': {
+                        'keyword': {
+                            'ignore_above': 256,
+                            'type': 'keyword',
+                        },
+                    },
+                    'type': 'text',
+                },
+                'reason_lost': {
+                    'fields': {
+                        'keyword': {
+                            'ignore_above': 256,
+                            'type': 'keyword',
+                        },
+                    },
+                    'type': 'text',
+                },
+                'referral_source_activity': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'referral_source_activity_event': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'referral_source_activity_marketing': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'referral_source_activity_website': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'referral_source_adviser': {
+                    'properties': {
+                        'first_name': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                        'id': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                        'last_name': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                        'name': {
+                            'fields': {
+                                'keyword': {
+                                    'ignore_above': 256,
+                                    'type': 'keyword',
+                                },
+                            },
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'sector': {
+                    'properties': {
+                        'ancestors': {
+                            'properties': {'id': {'type': 'keyword'}},
+                            'type': 'object',
+                        },
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'site_decided': {'type': 'boolean'},
+                'some_new_jobs': {'type': 'boolean'},
+                'specific_programme': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'stage': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'status': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text',
+                },
+                'team_members': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {'type': 'keyword'},
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text',
+                                },
+                            },
+                            'type': 'object',
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'id': {'type': 'keyword'},
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['team_members.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'total_investment': {'type': 'double'},
+                'uk_company': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['uk_company.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'uk_company_decided': {'type': 'boolean'},
+                'uk_region_locations': {
+                    'properties': {
+                        'id': {'type': 'keyword'},
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
+                'will_new_jobs_last_two_years': {'type': 'boolean'},
+            },
+        },
+    }
 
 
 def test_get_basic_search_query():

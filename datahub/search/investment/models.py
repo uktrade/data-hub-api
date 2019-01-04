@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Nested, Text
+from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
@@ -31,9 +31,9 @@ def _country_lost_to_mapping():
     return fields.object_field('id', 'name')
 
 
-def _nested_investment_project_field():
-    """Nested field for lists of investment projects."""
-    return Nested(properties={
+def _related_investment_project_field():
+    """Field for a related investment project."""
+    return Object(properties={
         'id': Keyword(),
         'name': fields.SortableCaseInsensitiveKeywordText(),
         'project_code': fields.SortableCaseInsensitiveKeywordText(),
@@ -45,7 +45,7 @@ class InvestmentProject(BaseESModel):
 
     id = Keyword()
     actual_land_date = Date()
-    actual_uk_regions = fields.nested_id_name_field()
+    actual_uk_regions = fields.id_name_field()
     address_1 = Text()
     address_2 = Text()
     address_town = fields.SortableCaseInsensitiveKeywordText()
@@ -60,47 +60,47 @@ class InvestmentProject(BaseESModel):
     allow_blank_possible_uk_regions = Boolean(index=False)
     anonymous_description = fields.EnglishText()
     archived = Boolean()
-    archived_by = fields.nested_contact_or_adviser_field('archived_by')
+    archived_by = fields.contact_or_adviser_field('archived_by')
     archived_on = Date()
     archived_reason = Text()
-    associated_non_fdi_r_and_d_project = _nested_investment_project_field()
-    average_salary = fields.nested_id_name_field()
-    business_activities = fields.nested_id_name_field()
+    associated_non_fdi_r_and_d_project = _related_investment_project_field()
+    average_salary = fields.id_name_field()
+    business_activities = fields.id_name_field()
     client_cannot_provide_foreign_investment = Boolean()
     client_cannot_provide_total_investment = Boolean()
-    client_contacts = fields.nested_contact_or_adviser_field('client_contacts')
-    client_relationship_manager = fields.nested_contact_or_adviser_field(
+    client_contacts = fields.contact_or_adviser_field('client_contacts')
+    client_relationship_manager = fields.contact_or_adviser_field(
         'client_relationship_manager', include_dit_team=True,
     )
     client_requirements = fields.TextWithKeyword()
     comments = fields.EnglishText()
-    country_investment_originates_from = fields.nested_id_name_field()
+    country_investment_originates_from = fields.id_name_field()
     country_lost_to = _country_lost_to_mapping()
     created_on = Date()
-    created_by = fields.nested_contact_or_adviser_field(
+    created_by = fields.contact_or_adviser_field(
         'created_by', include_dit_team=True,
     )
     date_abandoned = Date()
     date_lost = Date()
-    delivery_partners = fields.nested_id_name_field()
+    delivery_partners = fields.id_name_field()
     description = fields.EnglishText()
     estimated_land_date = Date()
     export_revenue = Boolean()
-    fdi_type = fields.nested_id_name_field()
-    fdi_value = fields.nested_id_name_field()
+    fdi_type = fields.id_name_field()
+    fdi_value = fields.id_name_field()
     foreign_equity_investment = Double()
     government_assistance = Boolean()
-    intermediate_company = fields.nested_id_name_field()
-    investor_company = fields.nested_id_name_partial_field('investor_company')
-    investor_company_country = fields.nested_id_name_field()
-    investment_type = fields.nested_id_name_field()
-    investor_type = fields.nested_id_name_field()
-    level_of_involvement = fields.nested_id_name_field()
+    intermediate_company = fields.id_name_field()
+    investor_company = fields.id_name_partial_field('investor_company')
+    investor_company_country = fields.id_name_field()
+    investment_type = fields.id_name_field()
+    investor_type = fields.id_name_field()
+    level_of_involvement = fields.id_name_field()
     likelihood_to_land = fields.id_name_field()
-    project_assurance_adviser = fields.nested_contact_or_adviser_field(
+    project_assurance_adviser = fields.contact_or_adviser_field(
         'project_assurance_adviser', include_dit_team=True,
     )
-    project_manager = fields.nested_contact_or_adviser_field(
+    project_manager = fields.contact_or_adviser_field(
         'project_manager', include_dit_team=True,
     )
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
@@ -121,22 +121,22 @@ class InvestmentProject(BaseESModel):
     reason_abandoned = fields.TextWithKeyword()
     reason_delayed = fields.TextWithKeyword()
     reason_lost = fields.TextWithKeyword()
-    referral_source_activity = fields.nested_id_name_field()
+    referral_source_activity = fields.id_name_field()
     referral_source_activity_event = fields.SortableCaseInsensitiveKeywordText()
-    referral_source_activity_marketing = fields.nested_id_name_field()
-    referral_source_activity_website = fields.nested_id_name_field()
+    referral_source_activity_marketing = fields.id_name_field()
+    referral_source_activity_website = fields.id_name_field()
     referral_source_adviser = _referral_source_adviser_mapping()
-    sector = fields.nested_sector_field()
+    sector = fields.sector_field()
     site_decided = Boolean()
     some_new_jobs = Boolean()
-    specific_programme = fields.nested_id_name_field()
-    stage = fields.nested_id_name_field()
+    specific_programme = fields.id_name_field()
+    stage = fields.id_name_field()
     status = fields.SortableCaseInsensitiveKeywordText()
-    team_members = fields.nested_contact_or_adviser_field('team_members', include_dit_team=True)
+    team_members = fields.contact_or_adviser_field('team_members', include_dit_team=True)
     total_investment = Double()
-    uk_company = fields.nested_id_name_partial_field('uk_company')
+    uk_company = fields.id_name_partial_field('uk_company')
     uk_company_decided = Boolean()
-    uk_region_locations = fields.nested_id_name_field()
+    uk_region_locations = fields.id_name_field()
     will_new_jobs_last_two_years = Boolean()
     level_of_involvement_simplified = Keyword()
 
