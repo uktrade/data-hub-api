@@ -44,15 +44,6 @@ class InteractionPermission(StrEnum):
     Note that permissions on other models are independent of permissions on interactions. Also
     note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
     same user,  the *_all_* permission will be the effective one.
-
-    The following permissions grant users additional permissions to manage policy-feedback
-    interactions:
-
-    view_policy_feedback_interaction
-    change_policy_feedback_interaction
-    add_policy_feedback_interaction
-
-    These are not effective without the standard *_all permissions.
     """
 
     view_all = 'view_all_interaction'
@@ -96,13 +87,9 @@ class PolicyIssueType(BaseOrderedConstantModel):
 class Interaction(BaseModel):
     """Interaction."""
 
-    # Note: Kinds should also be added to _KIND_PERMISSION_MAPPING in the permissions module
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
-        # TODO: Represents legacy policy feedback interactions. To be removed when the data
-        #  has been migrated.
-        ('policy_feedback', 'Policy feedback'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
