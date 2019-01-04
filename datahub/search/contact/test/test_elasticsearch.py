@@ -114,14 +114,8 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                         'trading_name': {
-                            'copy_to': ['company.trading_name_trigram'],
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
-                        },
-                        'trading_name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
+                            'index': False,
+                            'type': 'keyword',
                         },
                         'trading_names': {
                             'copy_to': ['company.trading_names_trigram'],
@@ -315,8 +309,6 @@ def test_get_basic_search_query():
                                 'total_cost_string',
                                 'trading_address_country.name_trigram',
                                 'trading_address_postcode_trigram',
-                                'trading_name',
-                                'trading_name_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',

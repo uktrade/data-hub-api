@@ -52,8 +52,6 @@ class SearchCompanyParams:
         'name': [
             'name',  # to find 2-letter words
             'name_trigram',
-            'trading_name',  # to find 2-letter words
-            'trading_name_trigram',
             'trading_names',  # to find 2-letter words
             'trading_names_trigram',
         ],

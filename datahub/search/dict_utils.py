@@ -36,10 +36,15 @@ def company_dict(obj):
     if obj is None:
         return None
 
+    if not obj.trading_names:
+        trading_name = ''
+    else:
+        trading_name = obj.trading_names[0]
+
     return {
         'id': str(obj.id),
         'name': obj.name,
-        'trading_name': obj.alias,
+        'trading_name': trading_name,
         'trading_names': obj.trading_names,
     }
 

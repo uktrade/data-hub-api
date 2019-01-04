@@ -230,13 +230,11 @@ class TestSearchOrder(APITestMixin):
                 {'company_name': 'Venus'},
                 ['efgh'],
             ),
-            (  # search by trading name exact
+            (
+                # search by alias - value ignored
+                # TODO delete when alias is removed
                 {'company_name': 'Earth outsourcing'},
-                ['efgh'],
-            ),
-            (  # search by trading name partial
-                {'company_name': 'Earth'},
-                ['efgh'],
+                [],
             ),
             (  # search by trading names exact
                 {'company_name': 'Maine Coon Egyptian Mau'},
