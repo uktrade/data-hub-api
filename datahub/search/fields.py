@@ -10,7 +10,6 @@ NormalizedKeyword = partial(
     normalizer=lowercase_asciifolding_normalizer,
 )
 TrigramText = partial(Text, analyzer='trigram_analyzer')
-SortableTrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
 EnglishText = partial(Text, analyzer='english_analyzer')
 SortableText = partial(Text, fielddata=True)
 
