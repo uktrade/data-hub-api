@@ -26,7 +26,11 @@ from datahub.core.test_utils import (
 )
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment import views
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW, LikelihoodToLand
+from datahub.investment.constants import (
+    FEATURE_FLAG_STREAMLINED_FLOW,
+    LikelihoodToLand,
+    ProjectManagerRequestStatus,
+)
 from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
@@ -161,6 +165,8 @@ class TestListView(APITestMixin):
             'uk_company',
             'requirements_complete',
             'project_manager',
+            'project_manager_request_status',
+            'project_manager_requested_on',
             'project_assurance_adviser',
             'project_manager_team',
             'project_assurance_team',
@@ -364,6 +370,7 @@ class TestCreateView(APITestMixin):
         new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
         retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
         other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
+        project_manager_request_status_id = ProjectManagerRequestStatus.requested.value.id
         activities = [
             {
                 'id': retail_business_activity_id,
@@ -419,6 +426,9 @@ class TestCreateView(APITestMixin):
             'sector': {
                 'id': str(aerospace_id),
             },
+            'project_manager_request_status': {
+                'id': str(project_manager_request_status_id),
+            },
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_201_CREATED
@@ -452,6 +462,10 @@ class TestCreateView(APITestMixin):
         assert Counter(activity['id'] for activity in response_data[
             'business_activities']) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
+        assert (
+            response_data['project_manager_request_status']['id']
+            == str(project_manager_request_status_id)
+        )
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -1197,6 +1211,56 @@ class TestPartialUpdateView(APITestMixin):
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.parametrize(
+        'request_status,requested_on',
+        (
+            (
+                ProjectManagerRequestStatus.requested,
+                datetime(2017, 4, 28, 17, 35).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            ),
+            (
+                ProjectManagerRequestStatus.assigned,
+                None,
+            ),
+            (
+                ProjectManagerRequestStatus.rejected,
+                None,
+            ),
+            (
+                ProjectManagerRequestStatus.re_requested,
+                None,
+            ),
+            (
+                ProjectManagerRequestStatus.self_assigned,
+                None,
+            ),
+        ),
+    )
+    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+    def test_update_project_manager_request_status(self, request_status, requested_on):
+        """
+        Test updating the project manager request status, if the request type
+        is requested then the project manager requested on date field should also be set.
+
+        """
+        investment_project = InvestmentProjectFactory(
+            name='project name',
+            project_manager_requested_on=None,
+            project_manager_request_status=None,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': investment_project.pk})
+
+        request_data = {
+            'project_manager_request_status': {'id': request_status.value.id},
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['project_manager_request_status']['id'] == request_status.value.id
+        assert response_data['project_manager_request_status']['name'] == request_status.value.name
+        assert response_data['project_manager_requested_on'] == requested_on
+
     def test_change_stage_active_failure(self):
         """Tests moving an incomplete project to the Active stage."""
         project = InvestmentProjectFactory()
@@ -1738,6 +1802,7 @@ class TestPartialUpdateView(APITestMixin):
             allow_blank_estimated_land_date=False,
             allow_blank_possible_uk_regions=False,
             project_manager_first_assigned_on=None,
+            project_manager_requested_on=None,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1749,6 +1814,7 @@ class TestPartialUpdateView(APITestMixin):
                 'allow_blank_estimated_land_date': True,
                 'allow_blank_possible_uk_regions': True,
                 'project_manager_first_assigned_on': now(),
+                'project_manager_requested_on': now(),
             },
         )
 
@@ -1760,6 +1826,7 @@ class TestPartialUpdateView(APITestMixin):
 
         project.refresh_from_db()
         assert project.project_manager_first_assigned_on is None
+        assert project.project_manager_requested_on is None
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""

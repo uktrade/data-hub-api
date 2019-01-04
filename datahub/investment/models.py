@@ -363,8 +363,14 @@ class IProjectTeamAbstract(models.Model):
     project_manager_first_assigned_by = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
     )
+    project_manager_requested_on = models.DateTimeField(null=True, blank=True)
+
     project_assurance_adviser = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
+    )
+    project_manager_request_status = models.ForeignKey(
+        'ProjectManagerRequestStatus', null=True, related_name='+', blank=True,
+        on_delete=models.SET_NULL,
     )
 
     @property
@@ -615,3 +621,7 @@ class InvestmentDeliveryPartner(BaseConstantModel):
 
 class LikelihoodToLand(BaseOrderedConstantModel):
     """Likelihood to land."""
+
+
+class ProjectManagerRequestStatus(BaseConstantModel):
+    """Project manager request status."""
