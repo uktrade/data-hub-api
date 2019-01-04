@@ -12,7 +12,7 @@ class ESSimpleModel(BaseESModel):
 
     id = Keyword()
     name = fields.SortableText(copy_to=['name_keyword', 'name_normalized_keyword', 'name_trigram'])
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_keyword = fields.NormalizedKeyword()
     name_normalized_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
 
