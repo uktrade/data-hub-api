@@ -276,7 +276,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
-                    'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
                     'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
                     'investment_project': InvestmentProjectFactory,
                 },
@@ -288,7 +287,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'policy_feedback_notes': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
-                    'policy_issue_type': ['This field is only valid for policy feedback.'],
                     'policy_issue_types': [
                         'This field is only valid when policy feedback has been provided.',
                     ],

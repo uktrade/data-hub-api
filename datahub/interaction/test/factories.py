@@ -113,24 +113,3 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     event = factory.SubFactory(EventFactory)
-
-
-class PolicyFeedbackFactory(InteractionFactoryBase):
-    """Factory for creating a policy feedback interaction."""
-
-    kind = Interaction.KINDS.policy_feedback
-    communication_channel = factory.LazyFunction(
-        lambda: random_obj_for_model(CommunicationChannel),
-    )
-    policy_issue_type = factory.LazyFunction(
-        lambda: random_obj_for_model(PolicyIssueType),
-    )
-
-    @to_many_field
-    def policy_areas(self):
-        """
-        Policy areas field.
-
-        Defaults to one random policy area.
-        """
-        return [random_obj_for_model(PolicyArea)]
