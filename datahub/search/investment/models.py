@@ -35,8 +35,8 @@ def _related_investment_project_field():
     """Field for a related investment project."""
     return Object(properties={
         'id': Keyword(),
-        'name': fields.SortableCaseInsensitiveKeywordText(),
-        'project_code': fields.SortableCaseInsensitiveKeywordText(),
+        'name': fields.NormalizedKeyword(),
+        'project_code': fields.NormalizedKeyword(),
     })
 
 
@@ -48,7 +48,7 @@ class InvestmentProject(BaseESModel):
     actual_uk_regions = fields.id_name_field()
     address_1 = Text()
     address_2 = Text()
-    address_town = fields.SortableCaseInsensitiveKeywordText()
+    address_town = fields.NormalizedKeyword()
     address_postcode = Text()
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
@@ -104,7 +104,7 @@ class InvestmentProject(BaseESModel):
         'project_manager', include_dit_team=True,
     )
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
     new_tech_to_uk = Boolean()
     non_fdi_r_and_d_budget = Boolean()
@@ -112,7 +112,7 @@ class InvestmentProject(BaseESModel):
     number_safeguarded_jobs = Long()
     modified_on = Date()
     project_arrived_in_triage_on = Date()
-    project_code = fields.SortableCaseInsensitiveKeywordText(copy_to='project_code_trigram')
+    project_code = fields.NormalizedKeyword(copy_to='project_code_trigram')
     project_code_trigram = fields.TrigramText()
     proposal_deadline = Date()
     other_business_activity = fields.TextWithKeyword()
@@ -122,7 +122,7 @@ class InvestmentProject(BaseESModel):
     reason_delayed = fields.TextWithKeyword()
     reason_lost = fields.TextWithKeyword()
     referral_source_activity = fields.id_name_field()
-    referral_source_activity_event = fields.SortableCaseInsensitiveKeywordText()
+    referral_source_activity_event = fields.NormalizedKeyword()
     referral_source_activity_marketing = fields.id_name_field()
     referral_source_activity_website = fields.id_name_field()
     referral_source_adviser = _referral_source_adviser_mapping()
@@ -131,7 +131,7 @@ class InvestmentProject(BaseESModel):
     some_new_jobs = Boolean()
     specific_programme = fields.id_name_field()
     stage = fields.id_name_field()
-    status = fields.SortableCaseInsensitiveKeywordText()
+    status = fields.NormalizedKeyword()
     team_members = fields.contact_or_adviser_field('team_members', include_dit_team=True)
     total_investment = Double()
     uk_company = fields.id_name_partial_field('uk_company')
