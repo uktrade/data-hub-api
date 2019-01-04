@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from logging import getLogger
+from threading import local
 
 from datahub.search.apps import get_search_apps
 
@@ -27,6 +28,7 @@ class SignalReceiver:
         self.signal = signal
         self.sender = sender
         self._receiver_func = receiver_func
+        self._thread_locals = local()
 
     @property
     def _dispatch_uid(self):
@@ -37,7 +39,7 @@ class SignalReceiver:
         )
 
     def connect(self):
-        """Connects the signal receiver."""
+        """Connects the signal receiver (for all threads)."""
         self.signal.connect(
             self.on_signal_received,
             sender=self.sender,
@@ -46,7 +48,7 @@ class SignalReceiver:
         self.is_connected = True
 
     def disconnect(self):
-        """Disconnects the signal receiver."""
+        """Disconnects the signal receiver (for all threads)."""
         self.signal.disconnect(
             self.on_signal_received,
             sender=self.sender,
@@ -54,30 +56,58 @@ class SignalReceiver:
         )
         self.is_connected = False
 
+    def enable(self):
+        """
+        Enables a previously disabled signal receiver for the current thread.
+
+        This only affects connected signal receivers. Connected signal receivers
+        default to being enabled.
+        """
+        self._thread_locals.enabled = True
+
+    def disable(self):
+        """
+        Disables a signal receiver for the current thread.
+
+        This only affects connected signal receivers.
+        """
+        self._thread_locals.enabled = False
+
+    @property
+    def is_enabled(self):
+        """
+        Whether the signal receiver is enabled for the current thread.
+
+        A signal receiver must also be connected for it to receive signals.
+        """
+        return getattr(self._thread_locals, 'enabled', True)
+
     def on_signal_received(self, sender, instance, **kwargs):
         """Callback function passed to the signal."""
-        self._receiver_func(instance)
+        if self.is_enabled:
+            self._receiver_func(instance)
 
 
 @contextmanager
-def disable_search_signal_receivers(model):
+def disable_search_signal_receivers(sender):
     """
-    Context manager that disables search signals receivers for a particular model.
+    Context manager that disables search signals receivers for a particular sender (e.g. a model).
 
-    This disables any signal receivers for that model in all search apps, not just the search
-    app corresponding to that model.
+    This disables any signal receivers for the specified sender in all search apps (and not just
+    the search app corresponding to the specified sender). For example, specifying Company will
+    also stop contacts from being synced when a companies is modified.
     """
     signal_receivers = [
         receiver for search_app in get_search_apps()
         for receiver in search_app.get_signal_receivers()
-        if receiver.sender == model and receiver.is_connected
+        if receiver.sender == sender and receiver.is_enabled
     ]
 
     for receiver in signal_receivers:
-        receiver.disconnect()
+        receiver.disable()
 
     try:
         yield
     finally:
         for receiver in signal_receivers:
-            receiver.connect()
+            receiver.enable()
