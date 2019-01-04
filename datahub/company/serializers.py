@@ -83,6 +83,37 @@ NestedAdviserWithTeamGeographyField = partial(
 )
 
 
+class _ArrayAsSingleItemField(serializers.CharField):
+    """
+    Serialiser field that makes an ArrayField behave like a CharField.
+    Use for temporary backwards compatibility when migrating a CharField to be an ArrayField.
+
+    This isn't intended to be used in any other way as if the ArrayField contains multiple
+    items, only one of them will be returned, and all of them will be overwritten on updates.
+
+    TODO Remove this once trading_name has been removed from the API.
+    """
+
+    def run_validation(self, data=serializers.empty):
+        """
+        Converts a user-provided value to a list containing that value after it has been validated.
+
+        This logic is here instead of in to_internal_value so that we can keep the original
+        validators (for CharField instead of ArrayField).
+        Also, to_internal_value is not called in case of empty data which is problematic.
+        """
+        value = super().run_validation(data)
+        if not value:
+            return []
+        return [value]
+
+    def to_representation(self, value):
+        """Converts a list of values to the representation of the first item."""
+        if not value:
+            return ''
+        return super().to_representation(value[0])
+
+
 class AdviserSerializer(serializers.ModelSerializer):
     """Adviser serializer."""
 
@@ -270,8 +301,12 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     }
 
     registered_address_country = NestedRelatedField(meta_models.Country)
-    trading_name = serializers.CharField(
-        source='alias', required=False, allow_null=True, allow_blank=True, max_length=MAX_LENGTH,
+    trading_name = _ArrayAsSingleItemField(
+        source='trading_names',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        max_length=MAX_LENGTH,
     )
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
@@ -347,15 +382,12 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     'headquarter_type': message,
                 })
 
-        # TODO: refactor after alias is deprecated
+        # TODO: remove after the alias column is deleted
 
-        # Save trading_name/alias in trading_names if trading_name/alias has been specified.
-        # If the company has a non-empty duns_number, trading_name/alias becomes
-        # read-only at the moment to avoid trading_names being inadvertently overridden.
-
-        if 'alias' in data:
-            alias = data['alias']
-            data['trading_names'] = [] if not alias else [alias]
+        # Save the first item in trading_names in alias if specified.
+        if 'trading_names' in data:
+            trading_names = data['trading_names']
+            data['alias'] = '' if not trading_names else trading_names[0]
 
         return data
 
