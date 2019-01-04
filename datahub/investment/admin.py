@@ -18,6 +18,7 @@ from datahub.investment.models import (
     InvestorType,
     Involvement,
     LikelihoodToLand,
+    ProjectManagerRequestStatus,
     SpecificProgramme,
 )
 from datahub.metadata.admin import (
@@ -102,6 +103,7 @@ admin.site.register(
     (
         InvestmentDeliveryPartner,
         InvestorType,
+        ProjectManagerRequestStatus,
         SpecificProgramme,
     ),
     DisableableMetadataAdmin,

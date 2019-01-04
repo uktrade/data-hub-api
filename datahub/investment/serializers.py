@@ -12,6 +12,9 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
+from datahub.investment.constants import (
+    ProjectManagerRequestStatus as ProjectManagerRequestStatusValue,
+)
 from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
@@ -21,6 +24,7 @@ from datahub.investment.models import (
     InvestorType,
     Involvement,
     LikelihoodToLand,
+    ProjectManagerRequestStatus,
     SpecificProgramme,
 )
 from datahub.investment.validate import REQUIRED_MESSAGE, validate
@@ -123,6 +127,8 @@ REQUIREMENTS_FIELDS = (
 )
 
 TEAM_FIELDS = (
+    'project_manager_requested_on',
+    'project_manager_request_status',
     'project_manager',
     'project_assurance_adviser',
     'project_manager_team',
@@ -219,6 +225,10 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     )
     archived_by = NestedAdviserField(read_only=True)
 
+    project_manager_request_status = NestedRelatedField(
+        ProjectManagerRequestStatus, required=False, allow_null=True,
+    )
+
     # Value fields
     fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
     average_salary = NestedRelatedField(
@@ -289,7 +299,21 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         self._check_if_investment_project_can_be_moved_to_won(data)
         self._validate_for_stage(data)
         self._update_status(data)
+        self._track_project_manager_request(data)
         return data
+
+    def _track_project_manager_request(self, data):
+        """
+        If a project manager has been requested track the request by
+        setting the project_manager_requested_on timestamp.
+        """
+        pm_requested = ProjectManagerRequestStatusValue.requested.value.id
+        if (
+            'project_manager_request_status' in data
+            and str(data['project_manager_request_status'].pk) == pm_requested
+            and (self.instance is None or self.instance.project_manager_requested_on is None)
+        ):
+            data['project_manager_requested_on'] = now()
 
     def _check_if_investment_project_can_be_moved_to_verify_win(self, data):
         # only project manager or project assurance adviser can move a project to verify win
@@ -390,6 +414,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'archived_documents_url_path',
             'comments',
+            'project_manager_requested_on',
         )
 
 
