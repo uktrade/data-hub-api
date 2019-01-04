@@ -213,7 +213,6 @@ class TestGetCompany(APITestMixin):
         company = CompanyFactory(
             company_number=123,
             name='Bar Ltd',
-            alias='Xyz trading',
             trading_names=['Xyz trading', 'Abc trading'],
             vat_number='009485769',
             registered_address_1='Goodbye St',
@@ -677,7 +676,6 @@ class TestUpdateCompany(APITestMixin):
         company = CompanyFactory(
             duns_number='012345678',
             name='name',
-            alias='trading name',
             company_number='company number',
             vat_number='vat number',
             registered_address_1='registered address 1',
@@ -929,32 +927,117 @@ class TestUpdateCompany(APITestMixin):
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response.data['headquarter_type'] == error
 
-    # TODO: remove after alias is deleted
+
+class TestTradingNamesAndAliasForCompany(APITestMixin):
+    """
+    Tests related to trading_names, trading_name and alias.
+
+    TODO: They will be eventually deleted after the migration from alias/trading_name to
+    trading_names is completed.
+    """
+
     @pytest.mark.parametrize(
-        'old_alias,new_alias',
         (
-            ('old value', 'old value'),
-            ('old value', 'new value'),
-            ('old value', ''),
-            ('old value', None),
-            ('', 'old value'),
-            ('', ''),
-            ('', None),
-            (None, None),
-            (None, 'new value'),
-            (None, ''),
+            'old_alias',
+            'old_trading_names',
+            'trading_name_api_data',
+            'expected_alias',
+            'expected_trading_names',
+        ),
+        (
+            # help in reading the params below:
+            # (
+            #     'old value', ['old value'],  # setup
+            #     'old value',  # API PATCH data
+            #     'old value', ['old value'],  # expectation
+            # ),
+            (
+                'old value', ['old value'],
+                'old value',
+                'old value', ['old value'],
+            ),
+            (
+                'old value', ['old value'],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                'old value', ['old value'],
+                '',
+                '', [],
+            ),
+            (
+                'old value', ['old value'],
+                None,
+                '', [],
+            ),
+            (
+                '', [],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                '', [],
+                '',
+                '', [],
+            ),
+            (
+                '', [],
+                None,
+                '', [],
+            ),
+            (
+                None, [],
+                None,
+                '', [],
+            ),
+            (
+                None, [],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                None, [],
+                '',
+                '', [],
+            ),
+            (
+                None, None,
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                'old value', ['old value', 'another value'],
+                'new value',
+                'new value', ['new value'],
+            ),
         ),
     )
-    def test_trading_names_is_updated_when_alias_changes(self, old_alias, new_alias):
-        """Test that if alias/trading_name is changed, trading_names is updated as well."""
-        expected_trading_names = [] if not new_alias else [new_alias]
+    def test_values_updated_correctly(
+        self,
+        old_alias,
+        old_trading_names,
+        trading_name_api_data,
+        expected_alias,
+        expected_trading_names,
+    ):
+        """
+        Test that
+        given specific alias and trading_names
+        updating a company using the `trading_name` API data param
+        updates both alias and trading_names correctly.
 
-        company = CompanyFactory(alias=old_alias)
+        TODO: refactor when alias is removed from the database
+        """
+        company = CompanyFactory(
+            alias=old_alias,
+            trading_names=old_trading_names,
+        )
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
-                'trading_name': new_alias,
+                'trading_name': trading_name_api_data,
             },
         )
 
@@ -962,8 +1045,98 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['trading_names'] == expected_trading_names
 
         company.refresh_from_db()
-        assert company.alias == new_alias
+        assert company.alias == expected_alias
         assert company.trading_names == expected_trading_names
+
+    @pytest.mark.parametrize(
+        'trading_names,expected_trading_name,expected_trading_names',
+        (
+            (
+                ['value'],
+                'value',
+                ['value'],
+            ),
+            (
+                # only the first item is returned in trading_name
+                ['value', 'another value'],
+                'value',
+                ['value', 'another value'],
+            ),
+            (
+                [],
+                '',
+                [],
+            ),
+            (
+                None,
+                None,
+                None,
+            ),
+        ),
+    )
+    def test_trading_name_gets_value_from_trading_names(
+        self,
+        trading_names,
+        expected_trading_name,
+        expected_trading_names,
+    ):
+        """
+        Test that the values of trading_name and trading_names in the GET company
+        response API come from the trading_names field and the alias field is
+        therefore ignored.
+
+        TODO: remove when alias is removed from the database
+        """
+        company = CompanyFactory(
+            alias='some other value',  # alias is ignored
+            trading_names=trading_names,
+        )
+        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['trading_name'] == expected_trading_name
+        assert response.data['trading_names'] == expected_trading_names
+
+    @pytest.mark.parametrize(
+        'patch_data',
+        (
+            {
+                'trading_name': 'new value',
+                'trading_names': ['new value'],
+            },
+            {
+                'trading_name': None,
+                'trading_names': None,
+            },
+            {
+                'trading_name': '',
+                'trading_names': [],
+            },
+        ),
+    )
+    def test_updates_not_allowed_if_duns_number_set(self, patch_data):
+        """
+        Test that if a company has a non-empty duns_number,
+        trading_name, trading_names and alias cannot be updated via API.
+        """
+        trading_names = ['value']
+        company = CompanyFactory(
+            duns_number='123456789',
+            alias=trading_names[0],
+            trading_names=trading_names,
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data=patch_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['trading_names'] == trading_names
+        assert response.data['trading_name'] == trading_names[0]
+
+        company.refresh_from_db()
+        assert company.trading_names == trading_names
+        assert company.alias == trading_names[0]
 
 
 class TestAddCompany(APITestMixin):
@@ -1364,7 +1537,7 @@ class TestCompanyVersioning(APITestMixin):
         version = Version.objects.get_for_object(company).first()
         assert version.revision.user == self.user
         assert version.field_dict['name'] == 'Acme'
-        assert version.field_dict['alias'] == 'Trading name'
+        assert version.field_dict['trading_names'] == ['Trading name']
         assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
 
     def test_promoting_a_ch_company_creates_a_new_version(self):
