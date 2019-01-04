@@ -53,8 +53,6 @@ class SearchContactParams:
         'company_name': [
             'company.name',
             'company.name_trigram',
-            'company.trading_name',
-            'company.trading_name_trigram',
             'company.trading_names',  # to find 2-letter words
             'company.trading_names_trigram',
         ],

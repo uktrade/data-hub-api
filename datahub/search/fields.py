@@ -90,10 +90,7 @@ def company_field(field):
             'id': Keyword(),
             'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
-            'trading_name': SortableCaseInsensitiveKeywordText(
-                copy_to=f'{field}.trading_name_trigram',
-            ),
-            'trading_name_trigram': TrigramText(),
+            'trading_name': Keyword(index=False),
             'trading_names': Text(
                 copy_to=f'{field}.trading_names_trigram',
             ),

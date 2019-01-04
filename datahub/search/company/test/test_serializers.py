@@ -34,7 +34,7 @@ class TestAutocompleteSearchCompanySerializer:
         )
         assert serializer.data['id'] == str(company.id)
         assert serializer.data['name'] == company.name
-        assert serializer.data['trading_name'] == company.alias
+        assert serializer.data['trading_name'] == company.trading_names[0]
         assert serializer.data['trading_names'] == company.trading_names
 
     def test_serializer_without_source(self):
@@ -56,7 +56,7 @@ class TestAutocompleteSearchCompanySerializer:
         )
         assert serializer.data['id'] == str(company.id)
         assert serializer.data['name'] == company.name
-        assert serializer.data['trading_name'] == company.alias
+        assert serializer.data['trading_name'] == company.trading_names[0]
         assert serializer.data['trading_names'] == company.trading_names
 
     def test_serializer_returns_trading_and_registered_addresses(self):
