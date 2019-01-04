@@ -48,13 +48,10 @@ class InteractionPermission(StrEnum):
 
     view_all = 'view_all_interaction'
     view_associated_investmentproject = 'view_associated_investmentproject_interaction'
-    view_policy_feedback = 'view_policy_feedback_interaction'
     change_all = 'change_all_interaction'
     change_associated_investmentproject = 'change_associated_investmentproject_interaction'
-    change_policy_feedback = 'change_policy_feedback_interaction'
     add_all = 'add_all_interaction'
     add_associated_investmentproject = 'add_associated_investmentproject_interaction'
-    add_policy_feedback = 'add_policy_feedback_interaction'
     delete = 'delete_interaction'
     export = 'export_interaction'
 
@@ -221,18 +218,6 @@ class Interaction(BaseModel):
             (
                 InteractionPermission.change_associated_investmentproject.value,
                 'Can change interaction for associated investment projects',
-            ),
-            (
-                InteractionPermission.view_policy_feedback.value,
-                'Can view policy feedback interaction',
-            ),
-            (
-                InteractionPermission.add_policy_feedback.value,
-                'Can add policy feedback interaction',
-            ),
-            (
-                InteractionPermission.change_policy_feedback.value,
-                'Can change policy feedback interaction',
             ),
             (
                 InteractionPermission.export.value,
