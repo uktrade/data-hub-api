@@ -50,7 +50,7 @@ class TestListCompanies(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
+        assert response.json()['count'] == 2
 
     def test_filter_by_global_headquarters(self):
         """Test filtering by global_headquarters_id."""
@@ -152,10 +152,11 @@ class TestListCompanies(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
+        response_data = response.json()
+        assert response_data['count'] == 5
         assert all(
             'archived_documents_url_path' not in company
-            for company in response.data['results']
+            for company in response_data['results']
         )
 
     def test_list_companies_with_view_document_permission(self):
@@ -173,10 +174,11 @@ class TestListCompanies(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
+        response_data = response.json()
+        assert response_data['count'] == 5
         assert all(
             company['archived_documents_url_path'] == 'hello world'
-            for company in response.data['results']
+            for company in response_data['results']
         )
 
 
@@ -213,7 +215,6 @@ class TestGetCompany(APITestMixin):
         company = CompanyFactory(
             company_number=123,
             name='Bar Ltd',
-            alias='Xyz trading',
             trading_names=['Xyz trading', 'Abc trading'],
             vat_number='009485769',
             registered_address_1='Goodbye St',
@@ -369,19 +370,20 @@ class TestGetCompany(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(company.pk)
-        assert response.data['companies_house_data'] is None
-        assert response.data['name'] == company.name
-        assert response.data['registered_address_1'] == company.registered_address_1
-        assert response.data['registered_address_2'] is None
-        assert response.data['registered_address_town'] == company.registered_address_town
-        assert response.data['registered_address_country'] == {
+        response_data = response.json()
+        assert response_data['id'] == str(company.pk)
+        assert response_data['companies_house_data'] is None
+        assert response_data['name'] == company.name
+        assert response_data['registered_address_1'] == company.registered_address_1
+        assert response_data['registered_address_2'] is None
+        assert response_data['registered_address_town'] == company.registered_address_town
+        assert response_data['registered_address_country'] == {
             'name': company.registered_address_country.name,
             'id': str(company.registered_address_country.pk),
         }
-        assert response.data['registered_address_county'] is None
-        assert response.data['registered_address_postcode'] is None
-        assert response.data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
+        assert response_data['registered_address_county'] is None
+        assert response_data['registered_address_postcode'] is None
+        assert response_data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
 
     def test_get_company_without_registered_country(self):
         """Tests the company item view for a company without a registered
@@ -402,8 +404,9 @@ class TestGetCompany(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(company.pk)
-        assert response.data['uk_based'] is None
+        response_data = response.json()
+        assert response_data['id'] == str(company.pk)
+        assert response_data['uk_based'] is None
 
     @pytest.mark.parametrize(
         'input_website,expected_website',
@@ -580,7 +583,7 @@ class TestUpdateCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == 'Acme'
+        assert response.json()['name'] == 'Acme'
 
     def test_update_company_with_company_number(self):
         """
@@ -615,10 +618,11 @@ class TestUpdateCompany(APITestMixin):
         response = self.api_client.patch(url, data=update_data)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == update_data['name']
-        assert response.data['registered_address_1'] == update_data['registered_address_1']
-        assert response.data['registered_address_town'] == update_data['registered_address_town']
-        assert response.data['registered_address_country']['id'] == Country.united_states.value.id
+        response_data = response.json()
+        assert response_data['name'] == update_data['name']
+        assert response_data['registered_address_1'] == update_data['registered_address_1']
+        assert response_data['registered_address_town'] == update_data['registered_address_town']
+        assert response_data['registered_address_country']['id'] == Country.united_states.value.id
 
     def test_cannot_update_read_only_fields(self):
         """Test updating read-only fields."""
@@ -655,19 +659,20 @@ class TestUpdateCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['reference_code'] == 'ORG-345645'
-        assert response.data['archived_documents_url_path'] == 'old_path'
-        assert response.data['one_list_group_tier'] == {
+        response_data = response.json()
+        assert response_data['reference_code'] == 'ORG-345645'
+        assert response_data['archived_documents_url_path'] == 'old_path'
+        assert response_data['one_list_group_tier'] == {
             'id': str(company.one_list_tier.id),
             'name': company.one_list_tier.name,
         }
-        assert response.data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
-        assert response.data['duns_number'] == '000000001'
-        assert response.data['trading_names'] == ['a', 'b', 'c']
-        assert response.data['turnover'] == 100
-        assert not response.data['is_turnover_estimated']
-        assert response.data['number_of_employees'] == 95
-        assert not response.data['is_number_of_employees_estimated']
+        assert response_data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
+        assert response_data['duns_number'] == '000000001'
+        assert response_data['trading_names'] == ['a', 'b', 'c']
+        assert response_data['turnover'] == 100
+        assert not response_data['is_turnover_estimated']
+        assert response_data['number_of_employees'] == 95
+        assert not response_data['is_number_of_employees_estimated']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -677,7 +682,6 @@ class TestUpdateCompany(APITestMixin):
         company = CompanyFactory(
             duns_number='012345678',
             name='name',
-            alias='trading name',
             company_number='company number',
             vat_number='vat number',
             registered_address_1='registered address 1',
@@ -736,8 +740,9 @@ class TestUpdateCompany(APITestMixin):
         response = self.api_client.patch(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
         for field, value in data.items():
-            assert response.data[field] != value
+            assert response_data[field] != value
 
     @pytest.mark.parametrize(
         'data,expected_error',
@@ -811,14 +816,15 @@ class TestUpdateCompany(APITestMixin):
                 'global_headquarters': headquarter.id,
             },
         )
+        response_data = response.json()
         if is_valid:
             assert response.status_code == status.HTTP_200_OK
             if hq is not None:
-                assert response.data['global_headquarters']['id'] == str(headquarter.id)
+                assert response_data['global_headquarters']['id'] == str(headquarter.id)
         else:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Company to be linked as global headquarters must be a global headquarters.']
-            assert response.data['global_headquarters'] == error
+            assert response_data['global_headquarters'] == error
 
     def test_remove_global_headquarters_link(self):
         """Tests that we can remove global headquarter link."""
@@ -839,7 +845,7 @@ class TestUpdateCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['global_headquarters'] is None
+        assert response.json()['global_headquarters'] is None
 
         assert global_headquarters.subsidiaries.count() == 0
 
@@ -860,7 +866,7 @@ class TestUpdateCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         error = ['Global headquarters cannot point to itself.']
-        assert response.data['global_headquarters'] == error
+        assert response.json()['global_headquarters'] == error
 
     def test_subsidiary_cannot_become_a_global_headquarters(self):
         """Tests that subsidiary cannot become a global headquarter."""
@@ -884,7 +890,7 @@ class TestUpdateCompany(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         error = ['A company cannot both be and have a global headquarters.']
-        assert response.data['headquarter_type'] == error
+        assert response.json()['headquarter_type'] == error
 
     @pytest.mark.parametrize(
         'headquarter_type_id,changed_to,has_subsidiaries,is_valid',
@@ -919,51 +925,231 @@ class TestUpdateCompany(APITestMixin):
             },
         )
 
+        response_data = response.json()
         if is_valid:
             assert response.status_code == status.HTTP_200_OK
-            assert response.data['id'] == str(company.id)
+            assert response_data['id'] == str(company.id)
             company.refresh_from_db()
             assert str(company.headquarter_type_id) == str(changed_to)
         else:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
-            assert response.data['headquarter_type'] == error
+            assert response_data['headquarter_type'] == error
 
-    # TODO: remove after alias is deleted
+
+class TestTradingNamesAndAliasForCompany(APITestMixin):
+    """
+    Tests related to trading_names, trading_name and alias.
+
+    TODO: They will be eventually deleted after the migration from alias/trading_name to
+    trading_names is completed.
+    """
+
     @pytest.mark.parametrize(
-        'old_alias,new_alias',
         (
-            ('old value', 'old value'),
-            ('old value', 'new value'),
-            ('old value', ''),
-            ('old value', None),
-            ('', 'old value'),
-            ('', ''),
-            ('', None),
-            (None, None),
-            (None, 'new value'),
-            (None, ''),
+            'old_alias',
+            'old_trading_names',
+            'trading_name_api_data',
+            'expected_alias',
+            'expected_trading_names',
+        ),
+        (
+            # help in reading the params below:
+            # (
+            #     'old value', ['old value'],  # setup
+            #     'old value',  # API PATCH data
+            #     'old value', ['old value'],  # expectation
+            # ),
+            (
+                'old value', ['old value'],
+                'old value',
+                'old value', ['old value'],
+            ),
+            (
+                'old value', ['old value'],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                'old value', ['old value'],
+                '',
+                '', [],
+            ),
+            (
+                'old value', ['old value'],
+                None,
+                '', [],
+            ),
+            (
+                '', [],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                '', [],
+                '',
+                '', [],
+            ),
+            (
+                '', [],
+                None,
+                '', [],
+            ),
+            (
+                None, [],
+                None,
+                '', [],
+            ),
+            (
+                None, [],
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                None, [],
+                '',
+                '', [],
+            ),
+            (
+                None, None,
+                'new value',
+                'new value', ['new value'],
+            ),
+            (
+                'old value', ['old value', 'another value'],
+                'new value',
+                'new value', ['new value'],
+            ),
         ),
     )
-    def test_trading_names_is_updated_when_alias_changes(self, old_alias, new_alias):
-        """Test that if alias/trading_name is changed, trading_names is updated as well."""
-        expected_trading_names = [] if not new_alias else [new_alias]
+    def test_values_updated_correctly(
+        self,
+        old_alias,
+        old_trading_names,
+        trading_name_api_data,
+        expected_alias,
+        expected_trading_names,
+    ):
+        """
+        Test that
+        given specific alias and trading_names
+        updating a company using the `trading_name` API data param
+        updates both alias and trading_names correctly.
 
-        company = CompanyFactory(alias=old_alias)
+        TODO: refactor when alias is removed from the database
+        """
+        company = CompanyFactory(
+            alias=old_alias,
+            trading_names=old_trading_names,
+        )
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
-                'trading_name': new_alias,
+                'trading_name': trading_name_api_data,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['trading_names'] == expected_trading_names
+        response_data = response.json()
+        assert response_data['trading_name'] == expected_alias
+        assert response_data['trading_names'] == expected_trading_names
 
         company.refresh_from_db()
-        assert company.alias == new_alias
+        assert company.alias == expected_alias
         assert company.trading_names == expected_trading_names
+
+    @pytest.mark.parametrize(
+        'trading_names,expected_trading_name,expected_trading_names',
+        (
+            (
+                ['value'],
+                'value',
+                ['value'],
+            ),
+            (
+                # only the first item is returned in trading_name
+                ['value', 'another value'],
+                'value',
+                ['value', 'another value'],
+            ),
+            (
+                [],
+                '',
+                [],
+            ),
+            (
+                None,
+                None,
+                None,
+            ),
+        ),
+    )
+    def test_trading_name_gets_value_from_trading_names(
+        self,
+        trading_names,
+        expected_trading_name,
+        expected_trading_names,
+    ):
+        """
+        Test that the values of trading_name and trading_names in the GET company
+        response API come from the trading_names field and the alias field is
+        therefore ignored.
+
+        TODO: remove when alias is removed from the database
+        """
+        company = CompanyFactory(
+            alias='some other value',  # alias is ignored
+            trading_names=trading_names,
+        )
+        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['trading_name'] == expected_trading_name
+        assert response_data['trading_names'] == expected_trading_names
+
+    @pytest.mark.parametrize(
+        'patch_data',
+        (
+            {
+                'trading_name': 'new value',
+                'trading_names': ['new value'],
+            },
+            {
+                'trading_name': None,
+                'trading_names': None,
+            },
+            {
+                'trading_name': '',
+                'trading_names': [],
+            },
+        ),
+    )
+    def test_updates_not_allowed_if_duns_number_set(self, patch_data):
+        """
+        Test that if a company has a non-empty duns_number,
+        trading_name, trading_names and alias cannot be updated via API.
+        """
+        trading_names = ['value']
+        company = CompanyFactory(
+            duns_number='123456789',
+            alias=trading_names[0],
+            trading_names=trading_names,
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data=patch_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['trading_names'] == trading_names
+        assert response_data['trading_name'] == trading_names[0]
+
+        company.refresh_from_db()
+        assert company.trading_names == trading_names
+        assert company.alias == trading_names[0]
 
 
 class TestAddCompany(APITestMixin):
@@ -1112,8 +1298,9 @@ class TestAddCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
         for field, value in expected_response.items():
-            assert response.data[field] == value
+            assert response_data[field] == value
 
     def test_required_fields(self):
         """Test required fields."""
@@ -1232,7 +1419,7 @@ class TestAddCompany(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == expected_error
+        assert response.json() == expected_error
 
 
 class TestArchiveCompany(APITestMixin):
@@ -1245,7 +1432,7 @@ class TestArchiveCompany(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
+        assert response.json() == {
             'reason': ['This field is required.'],
         }
 
@@ -1256,9 +1443,10 @@ class TestArchiveCompany(APITestMixin):
         response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['archived']
-        assert response.data['archived_reason'] == 'foo'
-        assert response.data['id'] == str(company.id)
+        response_data = response.json()
+        assert response_data['archived']
+        assert response_data['archived_reason'] == 'foo'
+        assert response_data['id'] == str(company.id)
 
     def test_archive_company_invalid_address(self):
         """
@@ -1274,8 +1462,9 @@ class TestArchiveCompany(APITestMixin):
         response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['archived']
-        assert response.data['archived_reason'] == 'foo'
+        response_data = response.json()
+        assert response_data['archived']
+        assert response_data['archived_reason'] == 'foo'
 
 
 class TestUnarchiveCompany(APITestMixin):
@@ -1297,7 +1486,7 @@ class TestUnarchiveCompany(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert not response.data['archived']
+        assert not response.json()['archived']
 
     def test_unarchive_company(self):
         """Unarchive a company."""
@@ -1308,9 +1497,10 @@ class TestUnarchiveCompany(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert not response.data['archived']
-        assert response.data['archived_reason'] == ''
-        assert response.data['id'] == str(company.id)
+        response_data = response.json()
+        assert not response_data['archived']
+        assert response_data['archived_reason'] == ''
+        assert response_data['id'] == str(company.id)
 
     def test_cannot_unarchive_duplicate_company(self):
         """Test that a duplicate company cannot be unarchived."""
@@ -1354,17 +1544,18 @@ class TestCompanyVersioning(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'Acme'
-        assert response.data['trading_name'] == 'Trading name'
+        response_data = response.json()
+        assert response_data['name'] == 'Acme'
+        assert response_data['trading_name'] == 'Trading name'
 
-        company = Company.objects.get(pk=response.data['id'])
+        company = Company.objects.get(pk=response_data['id'])
 
         # check version created
         assert Version.objects.get_for_object(company).count() == 1
         version = Version.objects.get_for_object(company).first()
         assert version.revision.user == self.user
         assert version.field_dict['name'] == 'Acme'
-        assert version.field_dict['alias'] == 'Trading name'
+        assert version.field_dict['trading_names'] == ['Trading name']
         assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
 
     def test_promoting_a_ch_company_creates_a_new_version(self):
@@ -1388,7 +1579,7 @@ class TestCompanyVersioning(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
 
-        company = Company.objects.get(pk=response.data['id'])
+        company = Company.objects.get(pk=response.json()['id'])
 
         # check version created
         assert Version.objects.get_for_object(company).count() == 1
@@ -1419,7 +1610,7 @@ class TestCompanyVersioning(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == 'Acme'
+        assert response.json()['name'] == 'Acme'
 
         # check version created
         assert Version.objects.get_for_object(company).count() == 1
@@ -1448,8 +1639,9 @@ class TestCompanyVersioning(APITestMixin):
         response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['archived']
-        assert response.data['archived_reason'] == 'foo'
+        response_data = response.json()
+        assert response_data['archived']
+        assert response_data['archived_reason'] == 'foo'
 
         # check version created
         assert Version.objects.get_for_object(company).count() == 1
@@ -1480,8 +1672,9 @@ class TestCompanyVersioning(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert not response.data['archived']
-        assert response.data['archived_reason'] == ''
+        response_data = response.json()
+        assert not response_data['archived']
+        assert response_data['archived_reason'] == ''
 
         # check version created
         assert Version.objects.get_for_object(company).count() == 1
@@ -1545,7 +1738,7 @@ class TestCHCompany(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == CompaniesHouseCompany.objects.all().count()
+        assert response.json()['count'] == CompaniesHouseCompany.objects.all().count()
 
     def test_get_ch_company(self):
         """Test retrieving a single CH company."""

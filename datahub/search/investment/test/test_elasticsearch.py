@@ -803,8 +803,6 @@ def test_get_basic_search_query():
                                 'total_cost_string',
                                 'trading_address_country.name_trigram',
                                 'trading_address_postcode_trigram',
-                                'trading_name',
-                                'trading_name_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',

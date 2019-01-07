@@ -47,24 +47,52 @@ def test_id_uri_dict():
     }
 
 
-def test_company_dict():
-    """Tests company_dict."""
-    obj = mock.Mock(
-        id=123,
-        name='Name',
-        alias='Trading',
-        trading_names=['Trading 1', 'Trading 2'],
-        spec_set=('id', 'name', 'alias', 'trading_names'),
-    )
+class TestCompanyDict:
+    """Tests for the company_dict function."""
 
-    res = dict_utils.company_dict(obj)
+    def test_complete(self):
+        """Test with all fields filled in."""
+        obj = mock.Mock(
+            id=123,
+            name='Name',
+            alias='Trading',  # ignored - TODO: delete when alias is removed
+            trading_names=['Trading 1', 'Trading 2'],
+            spec_set=('id', 'name', 'alias', 'trading_names'),
+        )
 
-    assert res == {
-        'id': str(obj.id),
-        'name': obj.name,
-        'trading_name': obj.alias,
-        'trading_names': obj.trading_names,
-    }
+        res = dict_utils.company_dict(obj)
+
+        assert res == {
+            'id': str(obj.id),
+            'name': obj.name,
+            'trading_name': obj.trading_names[0],
+            'trading_names': obj.trading_names,
+        }
+
+    def test_minimal(self):
+        """Test with only minimal fields filled in."""
+        obj = mock.Mock(
+            id=123,
+            name='Name',
+            alias='Trading',  # ignored - TODO: delete when alias is removed
+            trading_names=[],
+            spec_set=('id', 'name', 'alias', 'trading_names'),
+        )
+
+        res = dict_utils.company_dict(obj)
+
+        assert res == {
+            'id': str(obj.id),
+            'name': obj.name,
+            'trading_name': '',
+            'trading_names': [],
+        }
+
+    def test_none(self):
+        """Test that if company is None, the resulting dict is None."""
+        res = dict_utils.company_dict(None)
+
+        assert res is None
 
 
 def test_contact_or_adviser_dict():

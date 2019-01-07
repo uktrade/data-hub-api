@@ -172,14 +172,8 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                         'trading_name': {
-                            'copy_to': ['company.trading_name_trigram'],
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
-                        },
-                        'trading_name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
+                            'index': False,
+                            'type': 'keyword',
                         },
                         'trading_names': {
                             'copy_to': ['company.trading_names_trigram'],
@@ -542,7 +536,7 @@ def test_indexed_doc(Factory, setup_es):
             'company': {
                 'id': str(order.company.pk),
                 'name': order.company.name,
-                'trading_name': order.company.alias,
+                'trading_name': order.company.trading_names[0],
                 'trading_names': order.company.trading_names,
             },
             'contact': {

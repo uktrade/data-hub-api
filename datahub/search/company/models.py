@@ -1,5 +1,4 @@
 import itertools
-from operator import attrgetter
 
 from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
 
@@ -33,12 +32,10 @@ def get_suggestions(db_company):
         return []
 
     company_name = db_company.name
-    alias = db_company.alias or ''
     trading_names = db_company.trading_names or []
 
     names = [
         company_name,
-        alias,
         *trading_names,
     ]
 
@@ -102,14 +99,7 @@ class Company(BaseESModel):
     trading_address_country = fields.id_name_partial_field(
         'trading_address_country',
     )
-    trading_name = fields.SortableText(
-        copy_to=[
-            'trading_name_keyword',
-            'trading_name_trigram',
-        ],
-    )
-    trading_name_keyword = fields.SortableCaseInsensitiveKeywordText()
-    trading_name_trigram = fields.TrigramText()
+    trading_name = Keyword(index=False)
     trading_names = Text(
         copy_to=['trading_names_trigram'],
     )
@@ -123,7 +113,7 @@ class Company(BaseESModel):
     suggest = Completion()
 
     COMPUTED_MAPPINGS = {
-        'trading_name': attrgetter('alias'),
+        'trading_name': lambda obj: dict_utils.company_dict(obj)['trading_name'],
         'suggest': get_suggestions,
     }
 
@@ -150,8 +140,6 @@ class Company(BaseESModel):
         'name',  # to find 2-letter words
         'name_trigram',
         'company_number',
-        'trading_name',  # to find 2-letter words
-        'trading_name_trigram',
         'trading_names',  # to find 2-letter words
         'trading_names_trigram',
         'reference_code',
