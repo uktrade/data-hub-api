@@ -285,18 +285,8 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'trading_name': {
-                    'copy_to': ['trading_name_keyword', 'trading_name_trigram'],
-                    'fielddata': True,
-                    'type': 'text',
-                },
-                'trading_name_keyword': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
-                },
-                'trading_name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
+                    'index': False,
+                    'type': 'keyword',
                 },
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
@@ -398,8 +388,6 @@ def test_get_basic_search_query():
                                 'total_cost_string',
                                 'trading_address_country.name_trigram',
                                 'trading_address_postcode_trigram',
-                                'trading_name',
-                                'trading_name_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',
@@ -492,8 +480,6 @@ def test_limited_get_search_by_entity_query():
                                             'name',
                                             'name_trigram',
                                             'company_number',
-                                            'trading_name',
-                                            'trading_name_trigram',
                                             'trading_names',
                                             'trading_names_trigram',
                                             'reference_code',
@@ -567,7 +553,9 @@ def test_limited_get_search_by_entity_query():
 @pytest.mark.django_db
 def test_indexed_doc(setup_es):
     """Test the ES data of an indexed company."""
-    company = CompanyFactory(trading_names=['a', 'b'])
+    company = CompanyFactory(
+        trading_names=['a', 'b'],
+    )
 
     doc = ESCompany.es_document(company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
@@ -632,3 +620,40 @@ def test_indexed_doc(setup_es):
         '_version': indexed_company['_version'],
         'found': True,
     }
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'trading_names',
+    (
+        ['a', 'b'],
+        [],
+        None,
+    ),
+)
+def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
+    """
+    Test that the value of trading_name is calculated from trading_names
+    instead of alias.
+
+    TODO: delete after alias is removed.
+    """
+    company = CompanyFactory(
+        alias='some alias',  # should be ignored
+        trading_names=trading_names,
+    )
+
+    doc = ESCompany.es_document(company)
+    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+
+    setup_es.indices.refresh()
+
+    indexed_company = setup_es.get(
+        index=CompanySearchApp.es_model.get_write_index(),
+        doc_type=CompanySearchApp.name,
+        id=company.pk,
+    )
+
+    source = indexed_company['_source']
+    assert source['trading_names'] == trading_names
+    assert source['trading_name'] == ('' if not trading_names else trading_names[0])
