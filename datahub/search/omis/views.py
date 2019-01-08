@@ -30,6 +30,8 @@ class SearchOrderParams:
         'uk_region',
         'created_on_before',
         'created_on_after',
+        'delivery_date_before',
+        'delivery_date_after',
         'assigned_to_adviser',
         'assigned_to_team',
         'status',
