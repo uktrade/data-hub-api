@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from datahub.core.serializers import RelaxedDateTimeField
+from datahub.core.serializers import RelaxedDateField, RelaxedDateTimeField
 from datahub.search.serializers import (
     SearchSerializer,
     SingleOrListField,
@@ -16,6 +16,8 @@ class SearchOrderSerializer(SearchSerializer):
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_before = RelaxedDateTimeField(required=False)
     created_on_after = RelaxedDateTimeField(required=False)
+    delivery_date_before = RelaxedDateField(required=False)
+    delivery_date_after = RelaxedDateField(required=False)
     assigned_to_adviser = SingleOrListField(child=StringUUIDField(), required=False)
     assigned_to_team = SingleOrListField(child=StringUUIDField(), required=False)
     status = SingleOrListField(child=serializers.CharField(), required=False)

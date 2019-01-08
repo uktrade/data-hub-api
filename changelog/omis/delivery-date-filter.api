@@ -1,0 +1,1 @@
+``POST /v3/search/order``: ``delivery_date_before`` and ``delivery_date_after`` filters were added.
