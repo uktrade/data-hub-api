@@ -158,6 +158,21 @@ class TestSearchOrder(APITestMixin):
                 {'created_on_after': '2017-01-15'},
                 ['efgh'],
             ),
+            (  # filter by delivery_date_before and delivery_date_after
+                {
+                    'delivery_date_before': '2018-02-02',
+                    'delivery_date_after': '2018-02-01',
+                },
+                ['efgh'],
+            ),
+            (  # filter by delivery_date_before only
+                {'delivery_date_before': '2018-01-15'},
+                ['abcd'],
+            ),
+            (  # filter by delivery_date_after only
+                {'delivery_date_after': '2018-01-15'},
+                ['efgh'],
+            ),
             (  # filter by status
                 {'status': 'quote_awaiting_acceptance'},
                 ['efgh'],
