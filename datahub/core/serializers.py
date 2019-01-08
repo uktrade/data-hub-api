@@ -1,3 +1,5 @@
+from functools import partial
+
 from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
@@ -136,6 +138,9 @@ class NestedRelatedField(serializers.RelatedField):
             )
             for item in queryset
         )
+
+
+RelaxedDateField = partial(serializers.DateField, input_formats=('iso-8601', '%Y/%m/%d'))
 
 
 class RelaxedDateTimeField(serializers.Field):
