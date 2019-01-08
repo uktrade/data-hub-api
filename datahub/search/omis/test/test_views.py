@@ -69,6 +69,7 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-01-01').date(),
+            completed_on=dateutil_parse('2018-05-01T13:00:00Z'),
             vat_verified=False,
         )
         OrderSubscriberFactory(
@@ -98,6 +99,7 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-02-01').date(),
+            completed_on=dateutil_parse('2018-06-01T13:00:00Z'),
             vat_verified=False,
         )
         OrderSubscriberFactory(
@@ -142,6 +144,31 @@ class TestSearchOrder(APITestMixin):
             (  # filter by uk region
                 {'uk_region': constants.UKRegion.east_midlands.value.id},
                 ['efgh'],
+            ),
+            (  # filter by completed_on_before and completed_on_after
+               # note that both dates are inclusive
+                {
+                    'completed_on_before': '2018-06-01',
+                    'completed_on_after': '2018-05-01',
+                    'sortby': 'created_on:asc',
+                },
+                ['abcd', 'efgh'],
+            ),
+            (  # filter by completed_on_before only
+                {'completed_on_before': '2018-05-01'},
+                ['abcd'],
+            ),
+            (  # filter by completed_on_before only
+                {'completed_on_before': '2018-04-30'},
+                [],
+            ),
+            (  # filter by completed_on_after only
+                {'completed_on_after': '2018-06-01'},
+                ['efgh'],
+            ),
+            (  # filter by completed_on_after only
+                {'completed_on_after': '2018-06-02'},
+                [],
             ),
             (  # filter by a range of date for created_on
                 {

@@ -28,6 +28,8 @@ class SearchOrderParams:
         'primary_market',
         'sector_descends',
         'uk_region',
+        'completed_on_before',
+        'completed_on_after',
         'created_on_before',
         'created_on_after',
         'delivery_date_before',
