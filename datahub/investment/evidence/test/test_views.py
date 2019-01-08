@@ -646,10 +646,10 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'project_code': entity_document.investment_project.project_code,
             },
             'tags': [
-                {'id': str(tag.id), 'name': tag.name}
-                for tag in entity_document.tags.order_by('name')
+                {'id': str(tag.id), 'name': tag.name} for tag in entity_document.tags.all()
             ],
         }
+        expected_user_event_data['tags'].sort(key=itemgetter('id'))
 
         api_client = self.create_api_client(user=user)
 
@@ -670,12 +670,12 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert UserEvent.objects.count() == 1
 
         user_event = UserEvent.objects.first()
+        user_event.data['tags'].sort(key=itemgetter('id'))
 
         assert user_event.adviser == user
         assert user_event.type == USER_EVENT_TYPES.evidence_document_delete
         assert user_event.timestamp == frozen_time
         assert user_event.api_url_path == url
-        user_event.data['tags'] = sorted(user_event.data['tags'], key=itemgetter('name'))
         assert user_event.data == expected_user_event_data
 
     @patch.object(Document, 'mark_deletion_pending')
