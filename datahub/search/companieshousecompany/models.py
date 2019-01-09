@@ -15,7 +15,7 @@ class CompaniesHouseCompany(BaseESModel):
     company_number = fields.NormalizedKeyword()
     company_status = fields.NormalizedKeyword()
     incorporation_date = Date()
-    name = fields.SortableText(
+    name = Text(
         copy_to=[
             'name_keyword', 'name_trigram',
         ],

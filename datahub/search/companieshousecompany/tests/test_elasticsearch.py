@@ -43,7 +43,6 @@ def test_mapping(setup_es):
                 },
                 'name': {
                     'copy_to': ['name_keyword', 'name_trigram'],
-                    'fielddata': True,
                     'type': 'text',
                     'fields': {
                         'keyword': {
