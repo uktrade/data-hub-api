@@ -182,7 +182,6 @@ def test_mapping(setup_es):
                 },
                 'email_alternative': {'type': 'text'},
                 'first_name': {
-                    'copy_to': ['name', 'name_keyword', 'name_trigram'],
                     'fielddata': True,
                     'type': 'text',
                 },
@@ -192,12 +191,15 @@ def test_mapping(setup_es):
                     'type': 'keyword',
                 },
                 'last_name': {
-                    'copy_to': ['name', 'name_keyword', 'name_trigram'],
                     'fielddata': True,
                     'type': 'text',
                 },
                 'modified_on': {'type': 'date'},
-                'name': {'fielddata': True, 'type': 'text'},
+                'name': {
+                    'fielddata': True,
+                    'type': 'text',
+                    'copy_to': ['name_keyword', 'name_trigram'],
+                },
                 'name_keyword': {
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',

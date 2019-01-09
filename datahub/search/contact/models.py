@@ -33,23 +33,16 @@ class Contact(BaseESModel):
     created_on = Date()
     email = fields.NormalizedKeyword()
     email_alternative = Text()
-    first_name = fields.SortableText(
-        copy_to=[
-            'name',
-            'name_keyword',
-            'name_trigram',
-        ],
-    )
+    first_name = fields.SortableText()
     job_title = fields.NormalizedKeyword()
-    last_name = fields.SortableText(
+    last_name = fields.SortableText()
+    modified_on = Date()
+    name = fields.SortableText(
         copy_to=[
-            'name',
             'name_keyword',
             'name_trigram',
         ],
     )
-    modified_on = Date()
-    name = fields.SortableText()
     name_keyword = fields.NormalizedKeyword()
     # field is being aggregated
     name_trigram = fields.TrigramText()
