@@ -2,6 +2,8 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.viewsets import GenericViewSet
 from reversion.models import Version
 
+from datahub.core.audit_utils import diff_versions
+
 
 class AuditViewSet(GenericViewSet):
     """Generic view set for audit logs.
@@ -36,6 +38,7 @@ class AuditViewSet(GenericViewSet):
         changelog = []
         for v_new, v_old in version_pairs:
             version_creator = v_new.revision.user
+            model_meta_data = v_new.content_type.model_class()._meta
             creator_repr = None
             if version_creator:
                 creator_repr = {
@@ -51,26 +54,11 @@ class AuditViewSet(GenericViewSet):
                 'user': creator_repr,
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.get_comment() or '',
-                'changes': cls._diff_versions(
-                    v_old.field_dict, v_new.field_dict,
+                'changes': diff_versions(
+                    model_meta_data, v_old.field_dict, v_new.field_dict,
                 ),
             })
-
         return changelog
-
-    @staticmethod
-    def _diff_versions(old_version, new_version):
-        changes = {}
-
-        for field_name, new_value in new_version.items():
-            if field_name not in old_version:
-                changes[field_name] = [None, new_value]
-            else:
-                old_value = old_version[field_name]
-                if old_value != new_value:
-                    changes[field_name] = [old_value, new_value]
-
-        return changes
 
 
 class _VersionQuerySetProxy:

@@ -8,28 +8,6 @@ from datahub.core.audit import AuditViewSet
 from datahub.core.test_utils import MockQuerySet
 
 
-def test_audit_log_diff_algo():
-    """Test simple diff algorithm."""
-    given = {
-        'old': {
-            'field1': 'val1',
-            'field2': 'val2',
-        },
-        'new': {
-            'field1': 'val1',
-            'field2': 'new-val',
-            'field3': 'added',
-        },
-    }
-
-    expected = {
-        'field2': ['val2', 'new-val'],
-        'field3': [None, 'added'],
-    }
-
-    assert AuditViewSet._diff_versions(given['old'], given['new']) == expected
-
-
 @pytest.mark.parametrize(
     'num_versions,offset,limit,exp_results,exp_next,exp_previous',
     (
@@ -60,8 +38,8 @@ def test_audit_log_pagination(
             'limit': limit,
         },
     )
-    serializer = AuditViewSet(request=request)
-    response = serializer.create_response(instance)
+    view_set = AuditViewSet(request=request)
+    response = view_set.create_response(instance)
     results = response.data['results']
 
     assert response.data['count'] == max(num_versions - 1, 0)
@@ -79,7 +57,7 @@ class _VersionQuerySetStub(MockQuerySet):
 
     def __init__(self, count):
         """Initialises the instance, creating some stub version instances to return as results."""
-        items = [MagicMock(id=n) for n in range(count)]
+        items = [MagicMock(id=n, field_dict={}) for n in range(count)]
         super().__init__(items)
 
 
