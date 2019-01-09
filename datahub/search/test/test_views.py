@@ -218,10 +218,10 @@ class TestSearch(APITestMixin):
 
     def test_search_results_quality(self, setup_es, setup_data):
         """Tests quality of results."""
-        CompanyFactory(name='The Risk Advisory Group')
-        CompanyFactory(name='The Advisory Group')
-        CompanyFactory(name='The Advisory')
-        CompanyFactory(name='The Advisories')
+        CompanyFactory(name='The Risk Advisory Group', trading_names=[])
+        CompanyFactory(name='The Advisory Group', trading_names=[])
+        CompanyFactory(name='The Advisory', trading_names=[])
+        CompanyFactory(name='The Advisories', trading_names=[])
 
         setup_es.indices.refresh()
 
@@ -248,10 +248,10 @@ class TestSearch(APITestMixin):
 
     def test_search_partial_match(self, setup_es, setup_data):
         """Tests partial matching."""
-        CompanyFactory(name='Veryuniquename1')
-        CompanyFactory(name='Veryuniquename2')
-        CompanyFactory(name='Veryuniquename3')
-        CompanyFactory(name='Veryuniquename4')
+        CompanyFactory(name='Veryuniquename1', trading_names=[])
+        CompanyFactory(name='Veryuniquename2', trading_names=[])
+        CompanyFactory(name='Veryuniquename3', trading_names=[])
+        CompanyFactory(name='Veryuniquename4', trading_names=[])
 
         setup_es.indices.refresh()
 
@@ -279,10 +279,10 @@ class TestSearch(APITestMixin):
 
     def test_search_hyphen_match(self, setup_es, setup_data):
         """Tests hyphen query."""
-        CompanyFactory(name='t-shirt')
-        CompanyFactory(name='tshirt')
-        CompanyFactory(name='electronic shirt')
-        CompanyFactory(name='t and e and a')
+        CompanyFactory(name='t-shirt', trading_names=[])
+        CompanyFactory(name='tshirt', trading_names=[])
+        CompanyFactory(name='electronic shirt', trading_names=[])
+        CompanyFactory(name='t and e and a', trading_names=[])
 
         setup_es.indices.refresh()
 
