@@ -37,7 +37,7 @@ class Contact(BaseESModel):
     job_title = fields.NormalizedKeyword()
     last_name = fields.SortableText()
     modified_on = Date()
-    name = fields.SortableText(
+    name = Text(
         copy_to=[
             'name_keyword',
             'name_trigram',

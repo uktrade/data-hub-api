@@ -70,7 +70,7 @@ class Company(BaseESModel):
     global_headquarters = fields.id_name_field()
     headquarter_type = fields.id_name_field()
     modified_on = Date()
-    name = fields.SortableText(
+    name = Text(
         copy_to=['name_keyword', 'name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),

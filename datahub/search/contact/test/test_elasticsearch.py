@@ -196,7 +196,6 @@ def test_mapping(setup_es):
                 },
                 'modified_on': {'type': 'date'},
                 'name': {
-                    'fielddata': True,
                     'type': 'text',
                     'copy_to': ['name_keyword', 'name_trigram'],
                     'fields': {

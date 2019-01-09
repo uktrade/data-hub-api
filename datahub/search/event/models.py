@@ -25,7 +25,7 @@ class Event(BaseESModel):
     lead_team = fields.id_name_field()
     location_type = fields.id_name_field()
     modified_on = Date()
-    name = fields.SortableText(
+    name = Text(
         copy_to=['name_keyword', 'name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
