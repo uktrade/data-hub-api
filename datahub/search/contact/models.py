@@ -42,6 +42,10 @@ class Contact(BaseESModel):
             'name_keyword',
             'name_trigram',
         ],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
     )
     name_keyword = fields.NormalizedKeyword()
     # field is being aggregated
