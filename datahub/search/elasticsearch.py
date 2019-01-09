@@ -19,12 +19,6 @@ lowercase_asciifolding_normalizer = analysis.normalizer(
     filter=('lowercase', 'asciifolding'),
 )
 
-lowercase_keyword_analyzer = analysis.CustomAnalyzer(
-    'lowercase_keyword_analyzer',
-    tokenizer='keyword',
-    filter=('lowercase',),
-)
-
 # Trigram tokenizer enables us to support partial matching
 trigram = analysis.tokenizer(
     'trigram',
@@ -80,7 +74,6 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 
 
 ANALYZERS = (
-    lowercase_keyword_analyzer,
     trigram_analyzer,
     english_analyzer,
     lowercase_analyzer,

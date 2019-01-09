@@ -5,20 +5,11 @@ from elasticsearch_dsl import Keyword, Object, Text
 from datahub.search.elasticsearch import lowercase_asciifolding_normalizer
 
 # Keyword with normalisation to improve sorting (by keeping e, E, è, ê etc. together).
-# This should be used in preference to SortableCaseInsensitiveKeywordText
 NormalizedKeyword = partial(
     Keyword,
     normalizer=lowercase_asciifolding_normalizer,
 )
-# Avoid using as this uses fielddata=True. NormalizedKeyword will have better behaviour
-# for sorting
-SortableCaseInsensitiveKeywordText = partial(
-    Text,
-    analyzer='lowercase_keyword_analyzer',
-    fielddata=True,
-)
 TrigramText = partial(Text, analyzer='trigram_analyzer')
-SortableTrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
 EnglishText = partial(Text, analyzer='english_analyzer')
 SortableText = partial(Text, fielddata=True)
 
@@ -50,9 +41,9 @@ def contact_or_adviser_field(field, include_dit_team=False):
     """Object field for advisers and contacts."""
     props = {
         'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordText(),
-        'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'first_name': NormalizedKeyword(),
+        'last_name': NormalizedKeyword(),
+        'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
         'name_trigram': TrigramText(),
     }
 
@@ -67,7 +58,7 @@ def id_name_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
+            'name': NormalizedKeyword(),
         },
     )
 
@@ -77,7 +68,7 @@ def id_name_partial_field(field):
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
         },
     )
@@ -88,7 +79,7 @@ def company_field(field):
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
             'trading_name': Keyword(index=False),
             'trading_names': Text(
@@ -103,7 +94,7 @@ def ch_company_field():
     """Object field with id and company_number sub-fields."""
     return Object(properties={
         'id': Keyword(),
-        'company_number': SortableCaseInsensitiveKeywordText(),
+        'company_number': NormalizedKeyword(),
     })
 
 
@@ -118,7 +109,7 @@ def sector_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
+            'name': NormalizedKeyword(),
             'ancestors': ancestors,
         },
     )

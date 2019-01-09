@@ -12,9 +12,9 @@ class Order(BaseESModel):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    reference = fields.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
+    reference = fields.NormalizedKeyword(copy_to=['reference_trigram'])
     reference_trigram = fields.TrigramText()
-    status = fields.SortableCaseInsensitiveKeywordText()
+    status = fields.NormalizedKeyword()
     company = fields.company_field('company')
     contact = fields.contact_or_adviser_field('contact')
     created_by = fields.contact_or_adviser_field('created_by', include_dit_team=True)
@@ -29,7 +29,7 @@ class Order(BaseESModel):
     existing_agents = Text(index=False)
     delivery_date = Date()
     service_types = fields.id_name_field()
-    contact_email = fields.SortableCaseInsensitiveKeywordText()
+    contact_email = fields.NormalizedKeyword()
     contact_phone = Keyword()
     subscribers = fields.contact_or_adviser_field('subscribers', include_dit_team=True)
     assignees = fields.contact_or_adviser_field('assignees', include_dit_team=True)
@@ -54,12 +54,12 @@ class Order(BaseESModel):
 
     billing_company_name = Text()
     billing_contact_name = Text()
-    billing_email = fields.SortableCaseInsensitiveKeywordText()
-    billing_phone = fields.SortableCaseInsensitiveKeywordText()
+    billing_email = fields.NormalizedKeyword()
+    billing_phone = fields.NormalizedKeyword()
     billing_address_1 = Text()
     billing_address_2 = Text()
-    billing_address_town = fields.SortableCaseInsensitiveKeywordText()
-    billing_address_county = fields.SortableCaseInsensitiveKeywordText()
+    billing_address_town = fields.NormalizedKeyword()
+    billing_address_county = fields.NormalizedKeyword()
     billing_address_postcode = Text()
     billing_address_country = fields.id_name_field()
 

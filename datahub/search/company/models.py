@@ -59,7 +59,7 @@ class Company(BaseESModel):
     archived_reason = Text()
     business_type = fields.id_name_field()
     companies_house_data = fields.ch_company_field()
-    company_number = fields.SortableCaseInsensitiveKeywordText()
+    company_number = fields.NormalizedKeyword()
     contacts = fields.contact_or_adviser_field('contacts')
     created_on = Date()
     description = fields.EnglishText()
@@ -71,12 +71,12 @@ class Company(BaseESModel):
     headquarter_type = fields.id_name_field()
     modified_on = Date()
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
-    reference_code = fields.SortableCaseInsensitiveKeywordText()
+    reference_code = fields.NormalizedKeyword()
     registered_address_1 = Text()
     registered_address_2 = Text()
-    registered_address_town = fields.SortableCaseInsensitiveKeywordText()
+    registered_address_town = fields.NormalizedKeyword()
     registered_address_county = Text()
     registered_address_country = fields.id_name_partial_field(
         'registered_address_country',
@@ -90,7 +90,7 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     trading_address_1 = Text()
     trading_address_2 = Text()
-    trading_address_town = fields.SortableCaseInsensitiveKeywordText()
+    trading_address_town = fields.NormalizedKeyword()
     trading_address_county = Text()
     trading_address_postcode = Text(
         copy_to=['trading_address_postcode_trigram'],
