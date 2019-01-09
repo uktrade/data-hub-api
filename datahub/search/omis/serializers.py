@@ -14,6 +14,12 @@ class SearchOrderSerializer(SearchSerializer):
     primary_market = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
+    # Note that completed_on is a DateTime field, but we only allow filtering using whole dates
+    # for simplicity
+    # Elasticsearch sets the time component for completed_on_before to 23:59:59.999
+    # automatically
+    completed_on_before = RelaxedDateField(required=False)
+    completed_on_after = RelaxedDateField(required=False)
     created_on_before = RelaxedDateTimeField(required=False)
     created_on_after = RelaxedDateTimeField(required=False)
     delivery_date_before = RelaxedDateField(required=False)
