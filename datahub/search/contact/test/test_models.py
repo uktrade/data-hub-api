@@ -26,6 +26,7 @@ def test_contact_dbmodel_to_dict(setup_es):
         'archived_by',
         'first_name',
         'last_name',
+        'name',
         'job_title',
         'adviser',
         'primary',
