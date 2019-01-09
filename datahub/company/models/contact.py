@@ -5,7 +5,7 @@ from django.db import models
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -87,7 +87,7 @@ class Contact(ArchivableModel, BaseModel):
     @property
     def name(self):
         """Full name."""
-        return f'{self.first_name} {self.last_name}'
+        return join_truthy_strings(self.first_name, self.last_name)
 
     def __str__(self):
         """Admin displayed human readable name."""
