@@ -1,1 +1,0 @@
-The app ``dnb_match`` and the tables ``dnb_match_dnbmatchingresult``, ``dnb_match_dnbmatchingcsvrecord`` were created to support the D&B matching pieces of work. At this stage, they are to be considered private and not to be used as they may be temporary and can change without notice.
