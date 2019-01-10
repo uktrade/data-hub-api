@@ -32,24 +32,6 @@ AccessToken.objects.create(
     scope='data-hub:internal-front-end',
 )
 
-policy_feedback_group = Group.objects.get(name='Policy feedback')
-
-policy_feedback_staff_user = Advisor.objects.create_user(
-    email='policy_feedback_staff@datahub.com',
-    first_name='Policy Feedback',
-    last_name='Staff',
-    dit_team_id=dit_east_midlands_id,
-)
-
-policy_feedback_staff_user.groups.add(policy_feedback_group)
-
-AccessToken.objects.create(
-    user=policy_feedback_staff_user,
-    token='policyFeedbackStaffToken',
-    expires=now() + datetime.timedelta(days=1),
-    scope='data-hub:internal-front-end',
-)
-
 welsh_government_id = 'bc85aa17-fabd-e511-88b6-e4115bead28a'
 
 da_staff_user = Advisor.objects.create_user(
