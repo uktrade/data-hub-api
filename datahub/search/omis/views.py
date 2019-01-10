@@ -28,8 +28,12 @@ class SearchOrderParams:
         'primary_market',
         'sector_descends',
         'uk_region',
+        'completed_on_before',
+        'completed_on_after',
         'created_on_before',
         'created_on_after',
+        'delivery_date_before',
+        'delivery_date_after',
         'assigned_to_adviser',
         'assigned_to_team',
         'status',
@@ -58,8 +62,6 @@ class SearchOrderParams:
         'company_name': [
             'company.name',
             'company.name_trigram',
-            'company.trading_name',
-            'company.trading_name_trigram',
             'company.trading_names',  # to find 2-letter words
             'company.trading_names_trigram',
         ],

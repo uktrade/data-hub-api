@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Keyword
+from elasticsearch_dsl import Keyword, Text
 
 from datahub.search import fields
 from datahub.search.models import BaseESModel
@@ -11,8 +11,8 @@ class ESSimpleModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
     id = Keyword()
-    name = fields.SortableText(copy_to=['name_keyword', 'name_normalized_keyword', 'name_trigram'])
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name = Text(copy_to=['name_keyword', 'name_normalized_keyword', 'name_trigram'])
+    name_keyword = fields.NormalizedKeyword()
     name_normalized_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
 

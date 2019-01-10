@@ -87,6 +87,9 @@ LOCAL_APPS = [
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.investment.report',
     'datahub.user_event_log',
+
+    # TODO: delete after the whole data cleansing piece of work is complete
+    'datahub.dnb_match',
 ]
 
 MI_APPS = [
@@ -302,7 +305,6 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
     'ES_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
 )
-ENABLE_CELERY_ES_SYNC_OBJECT = env.bool('ENABLE_CELERY_ES_SYNC_OBJECT', default=False)
 SEARCH_EXPORT_MAX_RESULTS = 5000
 SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
 CHAR_FIELD_MAX_LENGTH = 255

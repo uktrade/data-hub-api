@@ -44,26 +44,14 @@ class InteractionPermission(StrEnum):
     Note that permissions on other models are independent of permissions on interactions. Also
     note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
     same user,  the *_all_* permission will be the effective one.
-
-    The following permissions grant users additional permissions to manage policy-feedback
-    interactions:
-
-    view_policy_feedback_interaction
-    change_policy_feedback_interaction
-    add_policy_feedback_interaction
-
-    These are not effective without the standard *_all permissions.
     """
 
     view_all = 'view_all_interaction'
     view_associated_investmentproject = 'view_associated_investmentproject_interaction'
-    view_policy_feedback = 'view_policy_feedback_interaction'
     change_all = 'change_all_interaction'
     change_associated_investmentproject = 'change_associated_investmentproject_interaction'
-    change_policy_feedback = 'change_policy_feedback_interaction'
     add_all = 'add_all_interaction'
     add_associated_investmentproject = 'add_associated_investmentproject_interaction'
-    add_policy_feedback = 'add_policy_feedback_interaction'
     delete = 'delete_interaction'
     export = 'export_interaction'
 
@@ -96,13 +84,9 @@ class PolicyIssueType(BaseOrderedConstantModel):
 class Interaction(BaseModel):
     """Interaction."""
 
-    # Note: Kinds should also be added to _KIND_PERMISSION_MAPPING in the permissions module
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
-        # TODO: Represents legacy policy feedback interactions. To be removed when the data
-        #  has been migrated.
-        ('policy_feedback', 'Policy feedback'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -234,18 +218,6 @@ class Interaction(BaseModel):
             (
                 InteractionPermission.change_associated_investmentproject.value,
                 'Can change interaction for associated investment projects',
-            ),
-            (
-                InteractionPermission.view_policy_feedback.value,
-                'Can view policy feedback interaction',
-            ),
-            (
-                InteractionPermission.add_policy_feedback.value,
-                'Can add policy feedback interaction',
-            ),
-            (
-                InteractionPermission.change_policy_feedback.value,
-                'Can change policy feedback interaction',
             ),
             (
                 InteractionPermission.export.value,

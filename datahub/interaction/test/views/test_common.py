@@ -23,7 +23,47 @@ from datahub.interaction.test.factories import (
     EventServiceDeliveryFactory,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.metadata.models import Service as ServiceModel
 from datahub.metadata.test.factories import TeamFactory
+
+
+class TestAddInteraction(APITestMixin):
+    """Tests for the add interaction view."""
+
+    @pytest.mark.parametrize('kind', ('policy_feedback', 'invalid-kind'))
+    def test_invalid_kind_is_rejected(self, kind):
+        """Test that invalid kind values are rejected."""
+        adviser = self.user
+        contact = ContactFactory()
+        company = contact.company
+
+        data = {
+            'kind': kind,
+            'company': {
+                'id': company.pk,
+            },
+            'contact': {
+                'id': contact.pk,
+            },
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': adviser.pk,
+            },
+            'dit_team': {
+                'id': adviser.dit_team.pk,
+            },
+            'service': {
+                'id': random_obj_for_model(ServiceModel).pk,
+            },
+            'subject': 'whatever',
+        }
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.post(url, data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'kind': [f'"{kind}" is not a valid choice.'],
+        }
 
 
 class TestGetInteraction(APITestMixin):

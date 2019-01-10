@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import call, MagicMock, Mock
 from uuid import uuid4
 
@@ -6,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import IntegerField
 
-from datahub.core.serializers import NestedRelatedField, RelaxedURLField
+from datahub.core.serializers import NestedRelatedField, RelaxedDateField, RelaxedURLField
 
 
 class TestNestedRelatedField:
@@ -191,3 +192,23 @@ class TestNestedRelatedField:
         def test_url_field_output(self, input_website, expected_website):
             """Tests that RelaxedURLField prepends http:// when one is not stored."""
             assert RelaxedURLField().to_representation(input_website) == expected_website
+
+
+class TestRelaxedDateField:
+    """Tests for RelaxedDateField."""
+
+    @pytest.mark.parametrize(
+        'input_value,expected_date',
+        (
+            ('2018-01-10', date(2018, 1, 10)),
+            ('2018-1-10', date(2018, 1, 10)),
+            ('2018-10-1', date(2018, 10, 1)),
+            ('2018/01/10', date(2018, 1, 10)),
+            ('2018/1/10', date(2018, 1, 10)),
+            ('2018/10/1', date(2018, 10, 1)),
+        ),
+    )
+    def test_parses_dates(self, input_value, expected_date):
+        """Test that various input values are parsed and interpreted as the correct date."""
+        field = RelaxedDateField()
+        assert field.to_internal_value(input_value) == expected_date

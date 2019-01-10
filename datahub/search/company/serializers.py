@@ -32,7 +32,6 @@ class SearchCompanySerializer(SearchSerializer):
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
-        'trading_name',
         'archived',
         'archived_by',
         'business_type.name',

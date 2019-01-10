@@ -1,3 +1,53 @@
+Data Hub API 9.0.0 (2019-01-10)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The column ``company_company.classification_id`` was removed from the database.
+- **Interactions** Policy feedback permissions relating to the legacy version of the policy feedback feature were removed.
+- **Interactions** ``POST /v3/interaction``: ``"policy_feedback"`` is no longer accepted as a value for the ``kind`` field.
+- **Investment** ``POST /v3/search/investment_project``: The ``aggregations`` property of responses is deprecated and will be removed on or after 17 January 2019.
+- The model ``metadata.CompanyClassification`` was removed from the django definition and the django admin. The related database table will be deleted with the next release.
+- ``GET /v3/search``: ``companieshousecompany`` is now correctly not accepted in the ``entity`` parameter, and not included in the returned ``aggregations`` array. (Previously, specifying ``companieshousecompany`` in the ``entity`` parameter caused all search models to be searched.) If you want to search Companies House companies, please use ``/v3/search/companieshousecompany`` instead.
+
+Features
+--------
+
+- **OMIS** Less than or equal to and greater than or equal to filters were added for the completed on field to OMIS order search.
+- **OMIS** Less than or equal to and greater than or equal to filters were added for the delivery date field to OMIS order search.
+
+Internal changes
+----------------
+
+- **Companies** The value of the model field ``alias`` is now ignored and the ``trading_name`` API field now gets and saves its value from/into the model field ``trading_names`` instead.
+- **Investment** All nested fields were replaced with object fields in the investment project search model for improved maintainability and performance.
+- The app ``dnb_match`` and the tables ``dnb_match_dnbmatchingresult``, ``dnb_match_dnbmatchingcsvrecord`` were created to support the D&B matching pieces of work. At this stage, they are to be considered private and not to be used as they may be temporary and can change without notice.
+- All nested fields were replaced with object fields in the Companies House company search model for improved maintainability and performance.
+- The option to synchronise single objects to Elasticsearch using the thread pool was removed. Celery is now used in all cases.
+- Various dependencies were updated.
+- Optimisations were made to the search models so improve performance when sorting by text fields and make the sorting order more logical in some cases.
+
+API
+---
+
+- **Companies** GET ``/v3/company/<uuid:pk>/audit`` now returns string representation of any changes made to related objects rather than ids.
+- **Contacts** GET ``/v3/contact/<uuid:pk>/audit`` now returns string representation of any changes made to related objects rather than ids.
+- **Interactions** ``POST: /v3/interaction``: ``"policy_feedback"`` is no longer accepted as a value for the ``kind`` field.
+- **Investment** ``POST /v3/search/investment_project``: The ``aggregations`` property of responses is deprecated and will be removed on or after 17 January 2019.
+- **Investment** GET ``/v3/investment/<uuid:pk>/audit`` now returns string representation of any changes made to related objects rather than ids.
+- **OMIS** ``POST /v3/search/order``: ``completed_on_before`` and ``completed_on_after`` filters were added. These only accept dates without a time component. Timestamps on the dates specified will be included in the results.
+- **OMIS** ``POST /v3/search/order``: ``delivery_date_before`` and ``delivery_date_after`` filters were added.
+- ``GET /v3/search``: ``companieshousecompany`` is now correctly not accepted in the ``entity`` parameter, and not included in the returned ``aggregations`` array. (Previously, specifying ``companieshousecompany`` in the ``entity`` parameter caused all search models to be searched.) If you want to search Companies House companies, please use ``/v3/search/companieshousecompany`` instead.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.classification_id`` was removed from the database.
+
+
 Data Hub API 8.7.0 (2019-01-03)
 ===============================
 

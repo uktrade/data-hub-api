@@ -69,6 +69,7 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-01-01').date(),
+            completed_on=dateutil_parse('2018-05-01T13:00:00Z'),
             vat_verified=False,
         )
         OrderSubscriberFactory(
@@ -98,6 +99,7 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-02-01').date(),
+            completed_on=dateutil_parse('2018-06-01T13:00:00Z'),
             vat_verified=False,
         )
         OrderSubscriberFactory(
@@ -143,6 +145,31 @@ class TestSearchOrder(APITestMixin):
                 {'uk_region': constants.UKRegion.east_midlands.value.id},
                 ['efgh'],
             ),
+            (  # filter by completed_on_before and completed_on_after
+               # note that both dates are inclusive
+                {
+                    'completed_on_before': '2018-06-01',
+                    'completed_on_after': '2018-05-01',
+                    'sortby': 'created_on:asc',
+                },
+                ['abcd', 'efgh'],
+            ),
+            (  # filter by completed_on_before only
+                {'completed_on_before': '2018-05-01'},
+                ['abcd'],
+            ),
+            (  # filter by completed_on_before only
+                {'completed_on_before': '2018-04-30'},
+                [],
+            ),
+            (  # filter by completed_on_after only
+                {'completed_on_after': '2018-06-01'},
+                ['efgh'],
+            ),
+            (  # filter by completed_on_after only
+                {'completed_on_after': '2018-06-02'},
+                [],
+            ),
             (  # filter by a range of date for created_on
                 {
                     'created_on_before': '2017-02-02',
@@ -156,6 +183,21 @@ class TestSearchOrder(APITestMixin):
             ),
             (  # filter by created_on_after only
                 {'created_on_after': '2017-01-15'},
+                ['efgh'],
+            ),
+            (  # filter by delivery_date_before and delivery_date_after
+                {
+                    'delivery_date_before': '2018-02-02',
+                    'delivery_date_after': '2018-02-01',
+                },
+                ['efgh'],
+            ),
+            (  # filter by delivery_date_before only
+                {'delivery_date_before': '2018-01-15'},
+                ['abcd'],
+            ),
+            (  # filter by delivery_date_after only
+                {'delivery_date_after': '2018-01-15'},
                 ['efgh'],
             ),
             (  # filter by status
@@ -230,13 +272,11 @@ class TestSearchOrder(APITestMixin):
                 {'company_name': 'Venus'},
                 ['efgh'],
             ),
-            (  # search by trading name exact
+            (
+                # search by alias - value ignored
+                # TODO delete when alias is removed
                 {'company_name': 'Earth outsourcing'},
-                ['efgh'],
-            ),
-            (  # search by trading name partial
-                {'company_name': 'Earth'},
-                ['efgh'],
+                [],
             ),
             (  # search by trading names exact
                 {'company_name': 'Maine Coon Egyptian Mau'},

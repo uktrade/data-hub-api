@@ -29,12 +29,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactoryWithPolicyFeedback,
     EventServiceDeliveryFactory,
     InvestmentProjectInteractionFactory,
-    PolicyFeedbackFactory,
     ServiceDeliveryFactory,
-)
-from datahub.interaction.test.views.utils import (
-    create_interaction_user_without_policy_feedback,
-    create_view_policy_feedback_user,
 )
 from datahub.investment.test.factories import ActiveInvestmentProjectFactory
 from datahub.metadata.models import Sector
@@ -42,18 +37,6 @@ from datahub.metadata.test.factories import TeamFactory
 from datahub.search.interaction.views import SearchInteractionExportAPIView
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def policy_feedback_user():
-    """User with full interaction and policy feedback permissions."""
-    yield create_view_policy_feedback_user()
-
-
-@pytest.fixture
-def non_policy_feedback_user():
-    """User with interaction permissions without policy feedback permissions."""
-    yield create_interaction_user_without_policy_feedback()
 
 
 @pytest.fixture
@@ -89,14 +72,6 @@ def interactions(setup_es):
     yield data
 
 
-@pytest.fixture
-def policy_feedback_interactions(setup_es):
-    """Policy feedback interaction test data."""
-    interactions = PolicyFeedbackFactory.create_batch(3)
-    setup_es.indices.refresh()
-    yield interactions
-
-
 class TestInteractionEntitySearchView(APITestMixin):
     """Tests interaction search views."""
 
@@ -120,46 +95,6 @@ class TestInteractionEntitySearchView(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == len(interactions)
         expected_ids = Counter(str(interaction.id) for interaction in interactions)
-        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
-
-    def test_non_policy_feedback_user_cannot_access_policy_feedback(
-            self,
-            non_policy_feedback_user,
-            interactions,
-            policy_feedback_interactions,
-    ):
-        """
-        Test that users without specific policy feedback permissions don't get policy
-        feedback search results.
-        """
-        url = reverse('api-v3:search:interaction')
-
-        api_client = self.create_api_client(user=non_policy_feedback_user)
-        response = api_client.post(url, {})
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(interactions)
-        expected_ids = Counter(str(interaction.id) for interaction in interactions)
-        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
-
-    def test_policy_feedback_user_can_access_policy_feedback(
-            self,
-            policy_feedback_user,
-            interactions,
-            policy_feedback_interactions,
-    ):
-        """Test that users with policy feedback permissions get policy feedback search results."""
-        url = reverse('api-v3:search:interaction')
-
-        api_client = self.create_api_client(user=policy_feedback_user)
-        response = api_client.post(url, {})
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        expected_interactions = interactions + policy_feedback_interactions
-        expected_ids = Counter(str(interaction.id) for interaction in expected_interactions)
-        assert response_data['count'] == len(expected_interactions)
         assert Counter([item['id'] for item in response_data['results']]) == expected_ids
 
     def test_limit(self, interactions):
@@ -287,7 +222,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             'company': {
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
-                'trading_name': interaction.company.alias,
+                'trading_name': interaction.company.trading_names[0],
                 'trading_names': interaction.company.trading_names,
             },
             'company_sector': {
@@ -392,14 +327,11 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # trading name
-            ('house lion', 'whiskers and tabby'),
-            ('use', 'whiskers and tabby'),
-            ('ion', 'whiskers and tabby'),
-            ('se li', None),
-            ('use lio', 'whiskers and tabby'),
-            ('use ion', 'whiskers and tabby'),
-            ('2a', '1a'),
+            # alias is ignored
+            # TODO delete after alias is removed
+            ('house lion', None),
+            ('use', None),
+            ('2a', None),
 
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
@@ -854,22 +786,6 @@ class TestInteractionEntitySearchView(APITestMixin):
 class TestInteractionExportView(APITestMixin):
     """Tests the interaction export view."""
 
-    def test_interaction_kind_list_is_up_to_date(self):
-        """
-        Check that the list of kinds in the ALLOWED_KINDS attribute is up-to-date.
-
-        If a new interaction kind is added, it needs to be added either to the list of
-        ALLOWED_KINDS on SearchInteractionExportAPIView (if it is allowed to be included in
-        exports), or to the list of excluded kinds in this test (if it is to be excluded from
-        exports).
-        """
-        excluded_kinds = {Interaction.KINDS.policy_feedback}
-        expected_kinds = Interaction.KINDS._db_values - excluded_kinds
-        assert SearchInteractionExportAPIView.ALLOWED_KINDS == expected_kinds, (
-            'A new interaction kind has been added, please update either '
-            'SearchInteractionExportAPIView.ALLOWED_KINDS or this test.'
-        )
-
     @pytest.mark.parametrize(
         'permissions',
         (
@@ -887,27 +803,6 @@ class TestInteractionExportView(APITestMixin):
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_policy_feedback_excluded_for_non_policy_feedback_user(
-        self,
-        setup_es,
-        non_policy_feedback_user,
-    ):
-        """
-        Test that a user without policy feedback interaction permissions cannot export
-        policy feedback interactions.
-        """
-        PolicyFeedbackFactory()
-
-        api_client = self.create_api_client(user=non_policy_feedback_user)
-        url = reverse('api-v3:search:interaction-export')
-        response = api_client.post(url)
-        assert response.status_code == status.HTTP_200_OK
-
-        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
-
-        assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())
-        assert list(reader) == []
-
     @pytest.mark.parametrize(
         'request_sortby,orm_ordering',
         (
@@ -921,7 +816,6 @@ class TestInteractionExportView(APITestMixin):
         setup_es,
         request_sortby,
         orm_ordering,
-        policy_feedback_user,
     ):
         """
         Test export of interaction search results with a policy feedback user.
@@ -931,7 +825,6 @@ class TestInteractionExportView(APITestMixin):
         CompanyInteractionFactory()
         EventServiceDeliveryFactory()
         InvestmentProjectInteractionFactory()
-        policy_feedback = PolicyFeedbackFactory()
         ServiceDeliveryFactory()
 
         setup_es.indices.refresh()
@@ -941,10 +834,9 @@ class TestInteractionExportView(APITestMixin):
             data['sortby'] = request_sortby
 
         url = reverse('api-v3:search:interaction-export')
-        api_client = self.create_api_client(user=policy_feedback_user)
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = api_client.post(url, data=data)
+            response = self.api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
@@ -952,9 +844,7 @@ class TestInteractionExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
 
-        sorted_interactions = Interaction.objects.exclude(
-            pk=policy_feedback.pk,
-        ).order_by(
+        sorted_interactions = Interaction.objects.all().order_by(
             orm_ordering,
             'pk',
         )
@@ -995,67 +885,3 @@ class TestInteractionExportView(APITestMixin):
         ]
 
         assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
-
-
-class TestInteractionGlobalSearchView(APITestMixin):
-    """Tests basic search view."""
-
-    def test_non_policy_feedback_user_cannot_access_policy_feedback(
-            self,
-            non_policy_feedback_user,
-            interactions,
-            policy_feedback_interactions,
-    ):
-        """
-        Test that users without specific policy feedback permissions don't get policy
-        feedback search results.
-        """
-        url = reverse('api-v3:search:basic')
-
-        api_client = self.create_api_client(user=non_policy_feedback_user)
-        response = api_client.get(
-            url,
-            data={
-                'term': '',
-                'entity': 'interaction',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(interactions)
-        expected_ids = Counter(str(interaction.id) for interaction in interactions)
-        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
-        assert response_data['aggregations'] == [{
-            'count': 5,
-            'entity': 'interaction',
-        }]
-
-    def test_policy_feedback_user_can_access_policy_feedback(
-            self,
-            policy_feedback_user,
-            interactions,
-            policy_feedback_interactions,
-    ):
-        """Test that users with policy feedback permissions get policy feedback search results."""
-        url = reverse('api-v3:search:basic')
-
-        api_client = self.create_api_client(user=policy_feedback_user)
-        response = api_client.get(
-            url,
-            data={
-                'term': '',
-                'entity': 'interaction',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        expected_interactions = interactions + policy_feedback_interactions
-        expected_ids = Counter(str(interaction.id) for interaction in expected_interactions)
-        assert response_data['count'] == len(expected_interactions)
-        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
-        assert response_data['aggregations'] == [{
-            'count': 8,
-            'entity': 'interaction',
-        }]

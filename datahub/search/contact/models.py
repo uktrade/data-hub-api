@@ -16,8 +16,8 @@ class Contact(BaseESModel):
     accepts_dit_email_marketing = Boolean()
     address_1 = Text()
     address_2 = Text()
-    address_town = fields.SortableCaseInsensitiveKeywordText()
-    address_county = fields.SortableCaseInsensitiveKeywordText()
+    address_town = fields.NormalizedKeyword()
+    address_county = fields.NormalizedKeyword()
     address_postcode = Text()
     address_country = fields.id_name_field()
     address_same_as_company = Boolean()
@@ -31,26 +31,31 @@ class Contact(BaseESModel):
     company_uk_region = fields.id_name_field()
     created_by = fields.contact_or_adviser_field('created_by', include_dit_team=True)
     created_on = Date()
-    email = fields.SortableCaseInsensitiveKeywordText()
+    email = fields.NormalizedKeyword()
     email_alternative = Text()
     first_name = fields.SortableText(
-        copy_to=[
-            'name',
-            'name_keyword',
-            'name_trigram',
-        ],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+        },
     )
-    job_title = fields.SortableCaseInsensitiveKeywordText()
+    job_title = fields.NormalizedKeyword()
     last_name = fields.SortableText(
-        copy_to=[
-            'name',
-            'name_keyword',
-            'name_trigram',
-        ],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+        },
     )
     modified_on = Date()
-    name = fields.SortableText()
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name = Text(
+        copy_to=[
+            'name_keyword',
+            'name_trigram',
+        ],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
+    name_keyword = fields.NormalizedKeyword()
     # field is being aggregated
     name_trigram = fields.TrigramText()
     notes = fields.EnglishText()

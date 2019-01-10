@@ -185,10 +185,6 @@ class HeadquarterType(BaseOrderedConstantModel):
     """Headquarter type."""
 
 
-class CompanyClassification(BaseOrderedConstantModel):
-    """Company classification."""
-
-
 class InvestmentProjectStage(BaseOrderedConstantModel):
     """Investment project stage."""
 

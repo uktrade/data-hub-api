@@ -207,14 +207,11 @@ class TestSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # trading name
-            ('house lion', 'whiskers and tabby'),
-            ('use', 'whiskers and tabby'),
-            ('ion', 'whiskers and tabby'),
-            ('se li', None),
-            ('use lio', 'whiskers and tabby'),
-            ('use ion', 'whiskers and tabby'),
-            ('2a', '1a'),
+            # alias is ignored
+            # TODO delete after alias is removed
+            ('house lion', None),
+            ('use', None),
+            ('2a', None),
 
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
