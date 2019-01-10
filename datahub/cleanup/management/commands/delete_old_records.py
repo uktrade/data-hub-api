@@ -60,6 +60,10 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('subsidiaries'): (),
                 Company._meta.get_field('transferred_from'): (),
             },
+            # We want to delete the relations below along with any expired companies
+            excluded_relations=(
+                Company._meta.get_field('dnbmatchingresult'),
+            ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
         # before 2014-07-21, and so modified-on dates are not reliable prior to
