@@ -98,14 +98,8 @@ def cleanup_configs(request):
     yield request.param
 
 
-@pytest.mark.parametrize(
-    'model_name',
-    # Get unique models only – must be in a consistent order for parallelised tests
-    sorted(
-        {model_name for model_name in delete_orphans.Command.CONFIGS},
-    ),
-)
-def test_mappings(model_name):
+@pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
+def test_mappings(model_name, config):
     """
     Test that `MAPPINGS` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new fields and models are added or changed.
@@ -118,7 +112,11 @@ def test_mappings(model_name):
         pytest.fail(f'Please add test cases for deleting orphaned {model}')
 
     related_fields = get_related_fields(model)
-    expected_related_deps = {(field.field.model, field.field.name) for field in related_fields}
+    expected_related_deps = {
+        (field.field.model, field.field.name)
+        for field in related_fields
+        if field not in config.excluded_relations
+    }
     related_deps_in_mapping = {
         (dep_factory._meta.model, dep_field_name)
         for dep_factory, dep_field_name in mapping['dependent_models']
