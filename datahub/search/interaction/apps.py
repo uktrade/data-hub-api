@@ -1,5 +1,4 @@
 from datahub.interaction.models import Interaction as DBInteraction, InteractionPermission
-from datahub.interaction.permissions import get_allowed_kinds
 from datahub.search.apps import SearchApp
 from datahub.search.interaction.models import Interaction
 from datahub.search.interaction.views import (
@@ -34,13 +33,3 @@ class InteractionSearchApp(SearchApp):
         'service_delivery_status',
         'event',
     )
-
-    @classmethod
-    def get_permission_filters(cls, request):
-        """
-        Gets permission filter arguments.
-
-        If a user only has permission to access projects associated to their team, this returns
-        the filters that should be applied to only return those projects.
-        """
-        return [('kind', kind) for kind in get_allowed_kinds(request, 'list')]
