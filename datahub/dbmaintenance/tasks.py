@@ -9,9 +9,10 @@ logger = getLogger(__name__)
 
 
 @shared_task(acks_late=True)
-def replace_null_with_default(model_label, field_name, batch_size=5000):
+def replace_null_with_default(model_label, field_name, default=None, batch_size=5000):
     """
-    Task that replaces NULL values for a model field with the field's default value.
+    Task that replaces NULL values for a model field with the default argument if specified
+    or the field's default value otherwise.
 
     This is designed to perform updates in small batches to avoid lengthy locks on a large
     number of rows.
@@ -19,11 +20,14 @@ def replace_null_with_default(model_label, field_name, batch_size=5000):
     model = apps.get_model(model_label)
     field = model._meta.get_field(field_name)
 
-    if field.default in (NOT_PROVIDED, None):
-        raise ValueError(f'{field_name} does not have a non-null default value')
+    resolved_default = default  # so that the input is not changed
+    if resolved_default is None:
+        if field.default in (NOT_PROVIDED, None):
+            raise ValueError(f'{field_name} does not have a non-null default value')
+        resolved_default = field.default
 
-    if callable(field.default):
-        raise ValueError(f'{field_name} has a callable default which is not supported')
+    if callable(resolved_default):
+        raise ValueError(f'callable defaults for {field_name} are not supported')
 
     if not field.null:
         raise ValueError(f'{field_name} is not nullable')
@@ -39,11 +43,11 @@ def replace_null_with_default(model_label, field_name, batch_size=5000):
     num_updated = model.objects.filter(
         pk__in=Subquery(subquery),
     ).update(
-        **{field_name: field.default},
+        **{field_name: resolved_default},
     )
 
     logger.info(
-        f'NULL replaced with {field.default!r} for {num_updated} objects, model {model_label}, '
+        f'NULL replaced with {resolved_default!r} for {num_updated} objects, model {model_label}, '
         f'field {field_name}',
     )
 
@@ -54,5 +58,5 @@ def replace_null_with_default(model_label, field_name, batch_size=5000):
     # Schedule another task to update another batch of rows
     replace_null_with_default.apply_async(
         args=(model_label, field_name),
-        kwargs={'batch_size': batch_size},
+        kwargs={'default': default, 'batch_size': batch_size},
     )
