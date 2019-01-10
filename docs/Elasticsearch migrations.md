@@ -58,20 +58,36 @@ impact of this should be minimal.
 
 ## Renaming and moving fields
 
-This should be rare, but if a field needs to be renamed or moved (for example, moved 
+This should be uncommon, but if a field needs to be renamed or moved (for example, moved 
 from a top-level field to a multi-field), and the field was used as part of a filter 
 or was a global search field, then there are a couple more steps to do to make sure 
-search continues to work during the migration:
+search continues to work during the transition.
 
-- If the field was used in a filter, use a composite filter (using the 
+If the field is returned in search responses, is a sort-by option, or there is more 
+complex logic relating to the field:
+
+1. Add the new field, keeping the old field in place and existing query logic unchanged.
+2. Add a news fragment deprecating the old field.
+3. Release this, and populate the new field with data by running `./manage.py migrate_es`.
+4. Update query logic (global search fields, filters, sort-by options etc.) to use the new 
+field, and remove the old field once the deprecation period has expired.
+
+In simpler cases, you can avoid the intermediate release by adding and removing the 
+field at the same time (but only do this if you are sure that it is safe):
+
+1. Simultaneously add the new field and remove the old field from the search model.
+2. If the field was used in a filter, use a composite filter (using the 
 `COMPOSITE_FILTERS` attribute on the view) that looks at both the old and new fields.
-- If the field was used in global search, put both the old and new fields in the
+3. If the field was used in global search, put both the old and new fields in the
 search fields for the model (the `SEARCH_FIELDS` attribute on the Elasticsearch model).
-- Add the old field to `PREVIOUS_MAPPING_FIELDS` on the model (otherwise tests will 
-fail as it will think it’s a non-existent field).
 
-Once the migration has been completed, you can remove references to the old field name 
-from those attributes (and return composite filters to normal filters if applicable).
+   (Note: It’s important that both fields don’t exist on the same document at the same time, 
+as this will affect scores calculated during searches.)
+4. Add the old field to `PREVIOUS_MAPPING_FIELDS` on the model (otherwise tests will 
+fail as they will assume it’s a non-existent field).
+5. Release this, and run `./manage.py migrate_es`.
+6. Remove references to the old field from the attributes mentioned in previous steps 
+(and return composite filters to normal filters if applicable).
 
 ## Force-updating an existing mapping
 
