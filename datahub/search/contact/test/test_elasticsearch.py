@@ -184,6 +184,12 @@ def test_mapping(setup_es):
                 'first_name': {
                     'fielddata': True,
                     'type': 'text',
+                    'fields': {
+                        'keyword': {
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
+                        },
+                    },
                 },
                 'id': {'type': 'keyword'},
                 'job_title': {
@@ -193,10 +199,15 @@ def test_mapping(setup_es):
                 'last_name': {
                     'fielddata': True,
                     'type': 'text',
+                    'fields': {
+                        'keyword': {
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
+                        },
+                    },
                 },
                 'modified_on': {'type': 'date'},
                 'name': {
-                    'fielddata': True,
                     'type': 'text',
                     'copy_to': ['name_keyword', 'name_trigram'],
                     'fields': {
