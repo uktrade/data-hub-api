@@ -1,1 +1,0 @@
-The value of the model field ``alias`` is now ignored and the ``trading_name`` API field now gets and saves its value from/into the model field ``trading_names`` instead.
