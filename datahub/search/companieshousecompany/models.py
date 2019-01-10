@@ -19,6 +19,10 @@ class CompaniesHouseCompany(BaseESModel):
         copy_to=[
             'name_keyword', 'name_trigram',
         ],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
     )
     name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()

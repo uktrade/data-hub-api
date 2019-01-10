@@ -168,6 +168,16 @@ def test_mapping(setup_es):
                     'copy_to': ['name_keyword', 'name_trigram'],
                     'fielddata': True,
                     'type': 'text',
+                    'fields': {
+                        'keyword': {
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
+                        },
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'name_keyword': {
                     'normalizer': 'lowercase_asciifolding_normalizer',
