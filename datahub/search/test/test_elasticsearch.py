@@ -71,11 +71,6 @@ def test_creates_index(monkeypatch, mock_es_client):
                 'testsetting1': 'testval1',
                 'analysis': {
                     'analyzer': {
-                        'lowercase_keyword_analyzer': {
-                            'tokenizer': 'keyword',
-                            'filter': ['lowercase'],
-                            'type': 'custom',
-                        },
                         'trigram_analyzer': {
                             'tokenizer': 'trigram',
                             'char_filter': ['special_chars'],

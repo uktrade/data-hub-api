@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
-from datahub.search.apps import get_search_apps
+from datahub.search.apps import get_global_search_apps_as_mapping, get_search_apps
 from datahub.search.execute_query import execute_autocomplete_query
 from datahub.search.permissions import (
     has_permissions_for_app,
@@ -53,32 +53,18 @@ class SearchBasicAPIView(APIView):
 
     DEFAULT_ENTITY = 'company'
 
-    IGNORED_ENTITIES = (
-        'companieshousecompany',
-    )
-
-    def __init__(self, *args, **kwargs):
-        """Initialises self.entity_by_name dynamically."""
-        super().__init__(*args, **kwargs)
-
-        self.entity_by_name = {
-            search_app.name: EntitySearch(
-                search_app.es_model,
-                search_app.name,
-            )
-            for search_app in get_search_apps()
-        }
-
     def get(self, request, format=None):
         """Performs basic search."""
         if 'term' not in request.query_params:
             raise ValidationError('Missing required "term" field.')
         term = request.query_params['term']
 
+        global_search_models = get_global_search_apps_as_mapping()
         entity = request.query_params.get('entity', self.DEFAULT_ENTITY)
-        if entity not in (self.entity_by_name):
+        search_app = global_search_models.get(entity)
+        if not search_app:
             raise ValidationError(
-                f'Entity is not one of {", ".join(self.entity_by_name)}',
+                f'Entity is not one of {", ".join(global_search_models)}',
             )
 
         sortby = request.query_params.get('sortby')
@@ -92,10 +78,9 @@ class SearchBasicAPIView(APIView):
 
         query = get_basic_search_query(
             term=term,
-            entities=(self.entity_by_name[entity].model,),
+            entities=(search_app.es_model,),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
             ordering=sortby,
-            ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
             limit=limit,
         )

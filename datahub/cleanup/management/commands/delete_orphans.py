@@ -2,6 +2,7 @@ from dateutil.relativedelta import relativedelta
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
+from datahub.company.models import Company
 
 
 ORPHAN_AGE_THRESHOLD = relativedelta(months=6)
@@ -28,6 +29,10 @@ class Command(BaseCleanupCommand):
         'company.Company': ModelCleanupConfig(
             (
                 DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
+            ),
+            # We want to delete the relations below along with any orphaned companies
+            excluded_relations=(
+                Company._meta.get_field('dnbmatchingresult'),
             ),
         ),
         'event.Event': ModelCleanupConfig(

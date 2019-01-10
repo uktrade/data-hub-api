@@ -13,8 +13,8 @@ class Event(BaseESModel):
     id = Keyword()
     address_1 = Text()
     address_2 = Text()
-    address_town = fields.SortableCaseInsensitiveKeywordText()
-    address_county = fields.SortableCaseInsensitiveKeywordText()
+    address_town = fields.NormalizedKeyword()
+    address_county = fields.NormalizedKeyword()
     address_postcode = Text(copy_to='address_postcode_trigram')
     address_postcode_trigram = fields.TrigramText()
     address_country = fields.id_name_partial_field('address_country')
@@ -25,8 +25,14 @@ class Event(BaseESModel):
     lead_team = fields.id_name_field()
     location_type = fields.id_name_field()
     modified_on = Date()
-    name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name = Text(
+        copy_to=['name_keyword', 'name_trigram'],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
+    name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
     notes = fields.EnglishText()
     organiser = fields.contact_or_adviser_field('organiser')

@@ -8,6 +8,7 @@ from datahub.core.model_helpers import get_related_fields, get_self_referential_
 from datahub.interaction.models import Interaction
 
 ALLOWED_RELATIONS_FOR_MERGING = {
+    Company._meta.get_field('dnbmatchingresult').remote_field,
     Contact.company.field,
     Interaction.company.field,
 }

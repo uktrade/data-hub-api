@@ -24,7 +24,6 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 )
 
 MODELS_TO_REGISTER_READ_ONLY = (
-    models.CompanyClassification,
     models.BusinessType,
     models.InvestmentType,
     models.OverseasRegion,

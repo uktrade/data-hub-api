@@ -32,7 +32,7 @@ class Interaction(BaseESModel):
     notes = fields.EnglishText()
     service = fields.id_name_field()
     service_delivery_status = fields.id_name_field()
-    subject = fields.SortableCaseInsensitiveKeywordText(
+    subject = fields.NormalizedKeyword(
         copy_to=['subject_english'],
     )
     subject_english = fields.EnglishText()

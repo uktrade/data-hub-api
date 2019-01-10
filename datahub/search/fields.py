@@ -1,24 +1,15 @@
 from functools import partial
 
-from elasticsearch_dsl import Keyword, Nested, Object, Text
+from elasticsearch_dsl import Keyword, Object, Text
 
 from datahub.search.elasticsearch import lowercase_asciifolding_normalizer
 
 # Keyword with normalisation to improve sorting (by keeping e, E, è, ê etc. together).
-# This should be used in preference to SortableCaseInsensitiveKeywordText
 NormalizedKeyword = partial(
     Keyword,
     normalizer=lowercase_asciifolding_normalizer,
 )
-# Avoid using as this uses fielddata=True. NormalizedKeyword will have better behaviour
-# for sorting
-SortableCaseInsensitiveKeywordText = partial(
-    Text,
-    analyzer='lowercase_keyword_analyzer',
-    fielddata=True,
-)
 TrigramText = partial(Text, analyzer='trigram_analyzer')
-SortableTrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
 EnglishText = partial(Text, analyzer='english_analyzer')
 SortableText = partial(Text, fielddata=True)
 
@@ -50,9 +41,9 @@ def contact_or_adviser_field(field, include_dit_team=False):
     """Object field for advisers and contacts."""
     props = {
         'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordText(),
-        'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'first_name': NormalizedKeyword(),
+        'last_name': NormalizedKeyword(),
+        'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
         'name_trigram': TrigramText(),
     }
 
@@ -62,42 +53,13 @@ def contact_or_adviser_field(field, include_dit_team=False):
     return Object(properties=props)
 
 
-def nested_contact_or_adviser_field(field, include_dit_team=False):
-    """Nested field for lists of advisers or contacts."""
-    props = {
-        'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordText(),
-        'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
-        'name_trigram': TrigramText(),
-    }
-
-    if include_dit_team:
-        props['dit_team'] = nested_id_name_field()
-    return Nested(
-        properties=props,
-        include_in_parent=True,
-    )
-
-
 def id_name_field():
     """Object field with id and name sub-fields."""
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
+            'name': NormalizedKeyword(),
         },
-    )
-
-
-def nested_id_name_field():
-    """Nested field for lists of objects with id and name sub-fields."""
-    return Nested(
-        properties={
-            'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
-        },
-        include_in_parent=True,
     )
 
 
@@ -106,24 +68,9 @@ def id_name_partial_field(field):
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
         },
-    )
-
-
-def nested_id_name_partial_field(field):
-    """
-    Nested field for lists of objects with id and name sub-fields, and with partial matching on
-    name.
-    """
-    return Nested(
-        properties={
-            'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
-            'name_trigram': TrigramText(),
-        },
-        include_in_parent=True,
     )
 
 
@@ -132,38 +79,14 @@ def company_field(field):
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
-            'trading_name': SortableCaseInsensitiveKeywordText(
-                copy_to=f'{field}.trading_name_trigram',
-            ),
-            'trading_name_trigram': TrigramText(),
+            'trading_name': Keyword(index=False),
             'trading_names': Text(
                 copy_to=f'{field}.trading_names_trigram',
             ),
             'trading_names_trigram': TrigramText(),
         },
-    )
-
-
-def nested_company_field(field):
-    """Nested field for lists of companies."""
-    return Nested(
-        properties={
-            'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
-            'name_trigram': TrigramText(),
-            'trading_name': SortableCaseInsensitiveKeywordText(
-                copy_to=f'{field}.trading_name_trigram',
-            ),
-            'trading_name_trigram': TrigramText(),
-            'trading_names': Text(
-                copy_to=f'{field}.trading_names_trigram',
-            ),
-            'trading_names_trigram': TrigramText(),
-
-        },
-        include_in_parent=True,
     )
 
 
@@ -171,7 +94,7 @@ def ch_company_field():
     """Object field with id and company_number sub-fields."""
     return Object(properties={
         'id': Keyword(),
-        'company_number': SortableCaseInsensitiveKeywordText(),
+        'company_number': NormalizedKeyword(),
     })
 
 
@@ -186,21 +109,9 @@ def sector_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
+            'name': NormalizedKeyword(),
             'ancestors': ancestors,
         },
-    )
-
-
-def nested_sector_field():
-    """Nested field for lists of sectors."""
-    return Nested(
-        properties={
-            'id': Keyword(),
-            'name': SortableCaseInsensitiveKeywordText(),
-            'ancestors': _nested_ancestor_sector_field(),
-        },
-        include_in_parent=True,
     )
 
 
@@ -208,18 +119,4 @@ def object_field(*fields):
     """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
     return Object(
         properties={field: TextWithKeyword() for field in fields},
-    )
-
-
-def _nested_ancestor_sector_field():
-    """
-    Nested field for ancestral sectors.
-
-    (Note: This should not in fact have been nested, as it only has one property.)
-    """
-    return Nested(
-        properties={
-            'id': Keyword(),
-        },
-        include_in_parent=True,
     )

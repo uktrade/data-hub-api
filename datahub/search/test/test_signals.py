@@ -1,6 +1,8 @@
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock
 
 import pytest
+from django.db import close_old_connections
 
 from datahub.search.apps import get_search_apps
 from datahub.search.signals import disable_search_signal_receivers
@@ -54,6 +56,32 @@ class TestDisableSignalsForModel:
 
         with disable_search_signal_receivers(SimpleModel):
             RelatedModel().save()
+
+        callback_mock.assert_called_once()
+
+    def test_does_not_affect_other_threads(self, setup_es, monkeypatch):
+        """
+        Test that signal receivers are not disabled for other threads.
+
+        This is important when using gevent (e.g. via Gunicorn).
+        """
+        def _task():
+            try:
+                SimpleModel().save()
+            finally:
+                close_old_connections()
+
+        callback_mock = Mock()
+        monkeypatch.setattr(
+            'datahub.search.test.search_support.relatedmodel.signals._dummy_callback',
+            callback_mock,
+        )
+
+        with disable_search_signal_receivers(SimpleModel), \
+                ThreadPoolExecutor() as executor:
+
+            future = executor.submit(_task)
+            future.result()
 
         callback_mock.assert_called_once()
 

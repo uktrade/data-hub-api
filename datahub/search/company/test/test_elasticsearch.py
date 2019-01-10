@@ -27,21 +27,18 @@ def test_mapping(setup_es):
                 'archived_by': {
                     'properties': {
                         'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                         'id': {'type': 'keyword'},
                         'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['archived_by.name_trigram'],
-                            'fielddata': True,
-                            'type': 'text',
+                            'type': 'keyword',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -56,9 +53,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -66,37 +62,32 @@ def test_mapping(setup_es):
                 'companies_house_data': {
                     'properties': {
                         'company_number': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                         'id': {'type': 'keyword'},
                     },
                     'type': 'object',
                 },
                 'company_number': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'contacts': {
                     'properties': {
                         'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                         'id': {'type': 'keyword'},
                         'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['contacts.name_trigram'],
-                            'fielddata': True,
-                            'type': 'text',
+                            'type': 'keyword',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -115,9 +106,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -126,9 +116,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -137,9 +126,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -148,9 +136,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -159,9 +146,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -170,9 +156,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -181,22 +166,29 @@ def test_mapping(setup_es):
                 'modified_on': {'type': 'date'},
                 'name': {
                     'copy_to': ['name_keyword', 'name_trigram'],
-                    'fielddata': True,
                     'type': 'text',
+                    'fields': {
+                        'keyword': {
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
+                        },
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'name_keyword': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
                     'type': 'text',
                 },
                 'reference_code': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'registered_address_1': {'type': 'text'},
                 'registered_address_2': {'type': 'text'},
@@ -204,10 +196,9 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['registered_address_country.name_trigram'],
-                            'fielddata': True,
-                            'type': 'text',
+                            'type': 'keyword',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -226,9 +217,8 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'registered_address_town': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'sector': {
                     'properties': {
@@ -238,9 +228,8 @@ def test_mapping(setup_es):
                         },
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -258,10 +247,9 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['trading_address_country.name_trigram'],
-                            'fielddata': True,
-                            'type': 'text',
+                            'type': 'keyword',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -280,23 +268,12 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'trading_address_town': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
+                    'normalizer': 'lowercase_asciifolding_normalizer',
+                    'type': 'keyword',
                 },
                 'trading_name': {
-                    'copy_to': ['trading_name_keyword', 'trading_name_trigram'],
-                    'fielddata': True,
-                    'type': 'text',
-                },
-                'trading_name_keyword': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
-                    'type': 'text',
-                },
-                'trading_name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
+                    'index': False,
+                    'type': 'keyword',
                 },
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
@@ -310,9 +287,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -322,9 +298,8 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text',
+                            'normalizer': 'lowercase_asciifolding_normalizer',
+                            'type': 'keyword',
                         },
                     },
                     'type': 'object',
@@ -398,8 +373,6 @@ def test_get_basic_search_query():
                                 'total_cost_string',
                                 'trading_address_country.name_trigram',
                                 'trading_address_postcode_trigram',
-                                'trading_name',
-                                'trading_name_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',
@@ -492,8 +465,6 @@ def test_limited_get_search_by_entity_query():
                                             'name',
                                             'name_trigram',
                                             'company_number',
-                                            'trading_name',
-                                            'trading_name_trigram',
                                             'trading_names',
                                             'trading_names_trigram',
                                             'reference_code',
@@ -567,7 +538,9 @@ def test_limited_get_search_by_entity_query():
 @pytest.mark.django_db
 def test_indexed_doc(setup_es):
     """Test the ES data of an indexed company."""
-    company = CompanyFactory(trading_names=['a', 'b'])
+    company = CompanyFactory(
+        trading_names=['a', 'b'],
+    )
 
     doc = ESCompany.es_document(company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
@@ -632,3 +605,40 @@ def test_indexed_doc(setup_es):
         '_version': indexed_company['_version'],
         'found': True,
     }
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'trading_names',
+    (
+        ['a', 'b'],
+        [],
+        None,
+    ),
+)
+def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
+    """
+    Test that the value of trading_name is calculated from trading_names
+    instead of alias.
+
+    TODO: delete after alias is removed.
+    """
+    company = CompanyFactory(
+        alias='some alias',  # should be ignored
+        trading_names=trading_names,
+    )
+
+    doc = ESCompany.es_document(company)
+    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+
+    setup_es.indices.refresh()
+
+    indexed_company = setup_es.get(
+        index=CompanySearchApp.es_model.get_write_index(),
+        doc_type=CompanySearchApp.name,
+        id=company.pk,
+    )
+
+    source = indexed_company['_source']
+    assert source['trading_names'] == trading_names
+    assert source['trading_name'] == ('' if not trading_names else trading_names[0])

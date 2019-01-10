@@ -8,7 +8,12 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
@@ -16,6 +21,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
@@ -32,13 +38,13 @@ def setup_data():
         first_name='abc',
         last_name='defg',
         company__name='name0',
-        company__alias='trading0',
+        company__trading_names=['trading0'],
     )
     ContactFactory(
         first_name='first',
         last_name='last',
         company__name='name1',
-        company__alias='trading1',
+        company__trading_names=['trading1'],
     )
     InvestmentProjectFactory(
         name='abc defg',
@@ -46,7 +52,7 @@ def setup_data():
         estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(first_name='name 0', last_name='surname 0'),
         project_assurance_adviser=AdviserFactory(first_name='name 1', last_name='surname 1'),
-        investor_company=CompanyFactory(name='name3', alias='trading3'),
+        investor_company=CompanyFactory(name='name3', trading_names=['trading3']),
         client_relationship_manager=AdviserFactory(first_name='name 2', last_name='surname 2'),
         referral_source_adviser=AdviserFactory(first_name='name 3', last_name='surname 3'),
         client_contacts=[],
@@ -56,7 +62,7 @@ def setup_data():
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(first_name='name 4', last_name='surname 4'),
         project_assurance_adviser=AdviserFactory(first_name='name 5', last_name='surname 5'),
-        investor_company=CompanyFactory(name='name4', alias='trading4'),
+        investor_company=CompanyFactory(name='name4', trading_names=['trading4']),
         client_relationship_manager=AdviserFactory(first_name='name 6', last_name='surname 6'),
         referral_source_adviser=AdviserFactory(first_name='name 7', last_name='surname 7'),
         client_contacts=[],
@@ -66,14 +72,14 @@ def setup_data():
     country_us = constants.Country.united_states.value.id
     CompanyFactory(
         name='abc defg ltd',
-        alias='abc defg trading ltd',
+        trading_names=['abc defg trading ltd'],
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_uk,
     )
     CompanyFactory(
         name='abc defg us ltd',
-        alias='abc defg us trading ltd',
+        trading_names=['abc defg us trading ltd'],
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
@@ -167,7 +173,7 @@ class TestSearch(APITestMixin):
             len(ids),
             id=factory.Iterator(ids),
             name=name,
-            alias='',
+            trading_names=[],
         )
 
         setup_es.indices.refresh()
@@ -190,7 +196,8 @@ class TestSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
-    def test_invalid_entity(self, setup_es):
+    @pytest.mark.parametrize('entity', ('sloth', 'companieshousecompany'))
+    def test_invalid_entity(self, setup_es, entity):
         """Tests case where provided entity is invalid."""
         setup_es.indices.refresh()
 
@@ -199,11 +206,15 @@ class TestSearch(APITestMixin):
             url,
             data={
                 'term': 'test',
-                'entity': 'sloths',
+                'entity': entity,
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            'Entity is not one of company, contact, event, interaction, investment_project, '
+            'order, simplemodel, relatedmodel',
+        ]
 
     def test_search_results_quality(self, setup_es, setup_data):
         """Tests quality of results."""
@@ -528,6 +539,26 @@ class TestSearch(APITestMixin):
             {'count': 1, 'entity': 'investment_project'},
         ]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
+
+    def test_ignored_models_excluded_from_aggregations(self, setup_es):
+        """That that companieshousecompany is not included in aggregations."""
+        ch_company = CompaniesHouseCompanyFactory()
+        sync_object(CompaniesHouseCompanySearchApp, ch_company.pk)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(
+            url,
+            data={
+                'term': '',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 0
+        assert response_data['aggregations'] == []
 
     @pytest.mark.parametrize(
         'permission,permission_entity',
