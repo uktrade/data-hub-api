@@ -91,7 +91,6 @@ def test_mapping(setup_es):
                         'name_keyword',
                         'name_trigram',
                     ],
-                    'fielddata': True,
                     'type': 'text',
                     'fields': {
                         'keyword': {
