@@ -1,1 +1,0 @@
-``POST /v3/search/order``: ``completed_on_before`` and ``completed_on_after`` filters were added. These only accept dates without a time component. Timestamps on the dates specified will be included in the results.
