@@ -1,1 +1,0 @@
-``POST /v3/search/investment_project``: The ``aggregations`` property of responses is deprecated and will be removed on or after 17 January 2019.

@@ -1,1 +1,0 @@
-The model ``metadata.CompanyClassification`` was removed from the django definition and the django admin. The related database table will be deleted with the next release.
