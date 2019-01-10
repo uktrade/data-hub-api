@@ -61,7 +61,7 @@ def _make_value_friendly(field, value):
     one to many all values need to be retrieved individually.
 
     """
-    if not field or not field.is_relation:
+    if not field or not field.is_relation or not value:
         return value
 
     if field.many_to_many or field.one_to_many:
