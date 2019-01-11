@@ -66,17 +66,10 @@ english_analyzer = analysis.CustomAnalyzer(
     ],
 )
 
-lowercase_analyzer = analysis.CustomAnalyzer(
-    'lowercase_analyzer',
-    tokenizer='standard',
-    filter=('lowercase',),
-)
-
 
 ANALYZERS = (
     trigram_analyzer,
     english_analyzer,
-    lowercase_analyzer,
 )
 
 

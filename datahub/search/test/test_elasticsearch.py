@@ -87,11 +87,6 @@ def test_creates_index(monkeypatch, mock_es_client):
                             ],
                             'type': 'custom',
                         },
-                        'lowercase_analyzer': {
-                            'tokenizer': 'standard',
-                            'filter': ['lowercase'],
-                            'type': 'custom',
-                        },
                     },
                     'tokenizer': {
                         'trigram': {
