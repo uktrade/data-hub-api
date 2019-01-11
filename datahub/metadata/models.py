@@ -165,7 +165,6 @@ class Service(BaseConstantModel):
         ('event', 'Event'),
         ('interaction', 'Interaction'),
         ('investment_project_interaction', 'Investment project interaction'),
-        ('policy_feedback', 'Policy feedback'),
         ('service_delivery', 'Service delivery'),
     )
 
