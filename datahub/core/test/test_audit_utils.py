@@ -82,6 +82,7 @@ def test_get_changes(old_version, new_version, expected_result):
         ('proofreader', 'value', 'fake', 1),
         ('name', 'value', 'value', 0),
         ('authors', ['value1', 'value2'], ['fake', 'fake'], 2),
+        ('authors', None, None, 0),
     ),
 )
 @unittest.mock.patch('datahub.core.audit_utils._get_object_name_for_pk')
