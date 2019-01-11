@@ -154,7 +154,13 @@ class SearchAPIView(APIView):
             'results': [x.to_dict() for x in results.hits],
         }
 
+        response = self.enhance_response(results, response)
+
         return Response(data=response)
+
+    def enhance_response(self, results, response):
+        """Placeholder for a method to enhance the response with custom data."""
+        return response
 
 
 class SearchExportAPIView(SearchAPIView):
