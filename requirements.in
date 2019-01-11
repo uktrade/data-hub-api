@@ -29,8 +29,8 @@ boto3==1.9.71
 notifications-python-client==5.2.0
 
 # REDIS
-django-redis==4.9.1
-redis==2.10.6
+django-redis==4.10.0
+redis==3.0.1
 
 # ES
 elasticsearch==6.3.1

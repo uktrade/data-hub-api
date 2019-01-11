@@ -31,12 +31,12 @@ django-model-utils==3.1.2
 django-mptt==0.9.1
 django-oauth-toolkit==1.2.0
 django-pglocks==1.0.2
-django-redis==4.9.1
+django-redis==4.10.0
 django-reversion==3.0.2
 django==2.1.5
 djangorestframework==3.9.0
-docopt==0.6.2             # via docopt, notifications-python-client
-docutils==0.14            # via botocore, docutils
+docopt==0.6.2             # via notifications-python-client
+docutils==0.14            # via botocore
 elasticsearch-dsl==6.3.1
 elasticsearch==6.3.1
 execnet==1.5.0            # via pytest-xdist
@@ -60,15 +60,15 @@ gunicorn==19.9.0
 idna==2.8                 # via requests
 incremental==17.5.0       # via towncrier
 ipdb==0.11
-ipython-genutils==0.2.0   # via ipython-genutils, traitlets
+ipython-genutils==0.2.0   # via traitlets
 ipython==7.2.0
 jedi==0.13.2              # via ipython
 jinja2==2.10              # via towncrier
-jmespath==0.9.3           # via boto3, botocore, jmespath
+jmespath==0.9.3           # via boto3, botocore
 kombu==4.2.2.post1        # via celery
 lxml==4.2.5
 markupsafe==1.1.0         # via jinja2
-mccabe==0.6.1             # via flake8, mccabe
+mccabe==0.6.1             # via flake8
 mohawk==0.3.4
 monotonic==1.5            # via notifications-python-client
 more-itertools==5.0.0     # via pytest
@@ -103,22 +103,22 @@ python-dateutil==2.7.5
 pytz==2018.7              # via celery, django
 pyyaml==3.13
 raven==6.10.0
-redis==2.10.6
+redis==3.0.1
 requests-futures==0.9.9   # via piprot
 requests-mock==1.5.2
 requests==2.21.0
 requests_toolbelt==0.8.0
 s3transfer==0.1.13        # via boto3
 six==1.12.0               # via django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, mohawk, more-itertools, packaging, pip-tools, piprot, prompt-toolkit, pydocstyle, pytest, pytest-xdist, python-dateutil, requests-mock, traitlets
-snowballstemmer==1.2.1    # via pydocstyle, snowballstemmer
-sqlparse==0.2.4           # via django-debug-toolbar, sqlparse
-termcolor==1.1.0          # via pytest-sugar, termcolor
+snowballstemmer==1.2.1    # via pydocstyle
+sqlparse==0.2.4           # via django-debug-toolbar
+termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.2       # via faker
 toml==0.10.0              # via towncrier
 towncrier==18.6.0
-traitlets==4.3.2          # via ipython, traitlets
+traitlets==4.3.2          # via ipython
 urllib3==1.24.1           # via botocore, elasticsearch, requests
 vine==1.1.4               # via amqp
-wcwidth==0.1.7            # via prompt-toolkit, wcwidth
+wcwidth==0.1.7            # via prompt-toolkit
 werkzeug==0.14.1
 whitenoise==4.1.2
