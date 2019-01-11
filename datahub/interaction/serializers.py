@@ -75,21 +75,12 @@ class InteractionSerializer(serializers.ModelSerializer):
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
     policy_areas = NestedRelatedField(PolicyArea, many=True, required=False, allow_empty=True)
-    policy_issue_type = serializers.SerializerMethodField()
     policy_issue_types = NestedRelatedField(
         PolicyIssueType,
         allow_empty=True,
         many=True,
         required=False,
     )
-
-    def get_policy_issue_type(self, instance):
-        """
-        Returns None for backwards compatibility (this field is no longer used).
-
-        TODO: Remove once no longer referenced in the front end.
-        """
-        return None
 
     def to_representation(self, instance):
         """
@@ -164,9 +155,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
             'policy_areas',
             'policy_feedback_notes',
-            # TODO: policy_issue_type will be removed once the legacy policy feedback
-            #   functionality is removed from the front end.
-            'policy_issue_type',
             'policy_issue_types',
             'was_policy_feedback_provided',
         )
