@@ -36,7 +36,7 @@ class TestNormalizedField(APITestMixin):
         response = api_client.post(
             url,
             data={
-                'sortby': 'name_normalized_keyword',
+                'sortby': 'name.keyword',
             },
         )
         response_data = response.json()

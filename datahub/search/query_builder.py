@@ -8,7 +8,7 @@ from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
 FIELD_REMAPPING = {
-    'name': 'name_keyword',
+    'name': 'name.keyword',
 }
 
 
@@ -211,7 +211,7 @@ def _build_term_query(term, fields=None):
 
     should_query = [
         # Promote exact name match
-        MatchPhrase(name_keyword={'query': term, 'boost': 2}),
+        MatchPhrase(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Exact match by id
         MatchPhrase(id=term),
         # Cross match fields
@@ -250,7 +250,7 @@ def _build_single_field_query(field, value):
         parent_field = field.rsplit('.', maxsplit=1)[0]
         return _build_exists_query(f'{parent_field}_exists', False)
 
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '.keyword')):
         return Q('match_phrase', **{field: value})
 
     field_query = {

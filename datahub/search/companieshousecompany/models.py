@@ -16,15 +16,12 @@ class CompaniesHouseCompany(BaseESModel):
     company_status = fields.NormalizedKeyword()
     incorporation_date = Date()
     name = Text(
-        copy_to=[
-            'name_keyword', 'name_trigram',
-        ],
+        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
     registered_address_1 = Text()
     registered_address_2 = Text()

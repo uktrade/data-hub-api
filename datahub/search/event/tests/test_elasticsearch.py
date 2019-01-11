@@ -88,7 +88,6 @@ def test_mapping(setup_es):
                 'modified_on': {'type': 'date'},
                 'name': {
                     'copy_to': [
-                        'name_keyword',
                         'name_trigram',
                     ],
                     'type': 'text',
@@ -102,10 +101,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_keyword': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
