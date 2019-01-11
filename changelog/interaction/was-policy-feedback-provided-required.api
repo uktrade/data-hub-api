@@ -1,0 +1,1 @@
+``POST /v3/interaction``: ``was_policy_feedback_provided`` can no longer be omitted when creating interactions.

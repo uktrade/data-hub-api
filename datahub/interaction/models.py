@@ -160,9 +160,7 @@ class Interaction(BaseModel):
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
     )
-    # TODO: Remove null=True once existing interactions with a NULL value for this field
-    #   have been updated to have False instead.
-    was_policy_feedback_provided = models.BooleanField(null=True, default=False)
+    was_policy_feedback_provided = models.BooleanField()
     policy_areas = models.ManyToManyField(
         'PolicyArea',
         blank=True,
@@ -173,9 +171,7 @@ class Interaction(BaseModel):
         blank=True,
         related_name='interactions',
     )
-    # TODO: Remove null=True once existing interactions with a NULL value for this field
-    #   have been updated to have '' instead.
-    policy_feedback_notes = models.TextField(blank=True, null=True, default='')
+    policy_feedback_notes = models.TextField(blank=True, default='')
 
     @property
     def is_event(self):

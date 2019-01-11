@@ -72,27 +72,19 @@ class TestAddInteraction(APITestMixin):
         (
             # company interaction
             {
-                'was_policy_feedback_provided': False,
             },
             # company interaction with blank notes
             {
-                'was_policy_feedback_provided': False,
                 'notes': '',
             },
             # company interaction with notes
             {
-                'was_policy_feedback_provided': False,
                 'notes': 'hello',
             },
             # investment project interaction
             {
-                'was_policy_feedback_provided': False,
                 'investment_project': InvestmentProjectFactory,
                 'notes': 'hello',
-            },
-            # company interaction without was_policy_feedback_provided explicitly specified
-            # (for backwards compatibility)
-            {
             },
             # company interaction with policy feedback
             {
@@ -123,6 +115,7 @@ class TestAddInteraction(APITestMixin):
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
+            'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
         }
@@ -212,6 +205,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
+                    'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
 
@@ -226,6 +220,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_adviser': AdviserFactory,
                     'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
                 },
                 {
                     'communication_channel': ['This field is required.'],
@@ -292,6 +287,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
 
                     # fields not allowed
                     'is_event': True,
@@ -388,6 +384,7 @@ class TestAddInteraction(APITestMixin):
                 'investment_project': project.pk,
                 'service': Service.trade_enquiry.value.id,
                 'dit_team': Team.healthcare_uk.value.id,
+                'was_policy_feedback_provided': False,
             },
         )
 
@@ -425,6 +422,7 @@ class TestAddInteraction(APITestMixin):
                 'investment_project': project.pk,
                 'service': Service.trade_enquiry.value.id,
                 'dit_team': Team.healthcare_uk.value.id,
+                'was_policy_feedback_provided': False,
             },
         )
 
@@ -456,6 +454,7 @@ class TestAddInteraction(APITestMixin):
                 'notes': 'hello',
                 'service': Service.trade_enquiry.value.id,
                 'dit_team': Team.healthcare_uk.value.id,
+                'was_policy_feedback_provided': False,
             },
         )
 
