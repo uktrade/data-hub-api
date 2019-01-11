@@ -1,3 +1,14 @@
+Data Hub API 9.0.1 (2019-01-10)
+===============================
+
+
+
+Bug fixes
+---------
+
+- A bug for audit history where a related entity has a null value and cannot be iterated over was fixed.
+
+
 Data Hub API 9.0.0 (2019-01-10)
 ===============================
 
