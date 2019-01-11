@@ -107,7 +107,6 @@ class TestAddServiceDelivery(APITestMixin):
             'communication_channel': None,
             'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_type': None,
             'policy_issue_types':
                 request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided':
