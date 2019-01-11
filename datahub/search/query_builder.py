@@ -109,9 +109,8 @@ def get_search_by_entity_query(
     if permission_query:
         s = s.filter(permission_query)
 
-    s = s.post_filter(
-        Bool(must=must_filter),
-    )
+    s = s.filter(Bool(must=must_filter))
+
     return _apply_sorting_to_query(s, ordering)
 
 

@@ -1,0 +1,1 @@
+``POST /v3/search/order``: The response now contains ``summary`` property that includes a total value of filtered orders' subtotal cost (``total_subtotal_cost``)`.
