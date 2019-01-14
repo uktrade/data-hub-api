@@ -1,3 +1,25 @@
+Data Hub API 9.1.0 (2019-01-14)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** The 'Policy feedback' service is no longer created in new environments.
+- **Interactions** ``GET /v3/interaction, GET /v3/interaction/<id>``: ``policy_issue_type`` was removed from responses.
+
+Internal changes
+----------------
+
+- Python was updated from version 3.6.7 to 3.6.8 in deployed environments.
+
+API
+---
+
+- **Interactions** ``GET /v3/interaction, GET /v3/interaction/<id>``: ``policy_issue_type`` was removed from responses.
+
+
 Data Hub API 9.0.1 (2019-01-10)
 ===============================
 

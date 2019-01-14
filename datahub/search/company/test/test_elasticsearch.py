@@ -165,7 +165,7 @@ def test_mapping(setup_es):
                 'id': {'type': 'keyword'},
                 'modified_on': {'type': 'date'},
                 'name': {
-                    'copy_to': ['name_keyword', 'name_trigram'],
+                    'copy_to': ['name_trigram'],
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -177,10 +177,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_keyword': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
@@ -324,7 +320,7 @@ def test_get_basic_search_query():
                 'should': [
                     {
                         'match_phrase': {
-                            'name_keyword': {
+                            'name.keyword': {
                                 'query': 'test',
                                 'boost': 2,
                             },
@@ -447,7 +443,7 @@ def test_limited_get_search_by_entity_query():
                             'should': [
                                 {
                                     'match_phrase': {
-                                        'name_keyword': {
+                                        'name.keyword': {
                                             'query': 'test',
                                             'boost': 2,
                                         },

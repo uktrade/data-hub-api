@@ -168,16 +168,6 @@ class Interaction(BaseModel):
         blank=True,
         related_name='interactions',
     )
-    # TODO: Move data to policy_issue_types and remove field once legacy policy feedback
-    #   functionality is removed from the front end.
-    policy_issue_type = models.ForeignKey(
-        'PolicyIssueType',
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        help_text='Used for legacy policy feedback interactions only.',
-        related_name='+',
-    )
     policy_issue_types = models.ManyToManyField(
         'PolicyIssueType',
         blank=True,

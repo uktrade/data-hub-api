@@ -1,14 +1,24 @@
 from collections import defaultdict
 from itertools import chain
 
-from elasticsearch_dsl import Q, Search
-from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Query, Term
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import (
+    Bool,
+    Exists,
+    Match,
+    MatchAll,
+    MatchPhrase,
+    MultiMatch,
+    Query,
+    Range,
+    Term,
+)
 
 from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
 FIELD_REMAPPING = {
-    'name': 'name_keyword',
+    'name': 'name.keyword',
 }
 
 
@@ -52,10 +62,10 @@ def get_basic_search_query(
     if permission_query:
         search = search.filter(permission_query)
 
-    entity_type_subqueries = [Q('term', _type=entity._doc_type.name) for entity in entities]
+    entity_type_subqueries = [Term(_type=entity._doc_type.name) for entity in entities]
 
     search = search.post_filter(
-        Q('bool', should=entity_type_subqueries),
+        Bool(should=entity_type_subqueries),
     )
     search = _apply_sorting_to_query(search, ordering)
     search.aggs.bucket(
@@ -80,7 +90,7 @@ def get_search_by_entity_query(
     :param permission_filters: dict of field names and values. These represent rules that records
                                must match one of to be included in the results.
     """
-    query = [Q('term', _type=entity._doc_type.name)]
+    query = [Term(_type=entity._doc_type.name)]
     if term != '':
         query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
 
@@ -89,13 +99,19 @@ def get_search_by_entity_query(
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
-    s = Search(index=entity.get_read_alias()).query('bool', must=query)
+    s = Search(
+        index=entity.get_read_alias(),
+    ).query(
+        Bool(must=query),
+    )
 
     permission_query = _build_entity_permission_query(permission_filters)
     if permission_query:
         s = s.filter(permission_query)
 
-    s = s.post_filter('bool', must=must_filter)
+    s = s.post_filter(
+        Bool(must=must_filter),
+    )
     s = _apply_sorting_to_query(s, ordering)
     if aggregation_fields:
         s = _add_aggs_to_query(s, aggregation_fields)
@@ -207,11 +223,11 @@ def _build_entity_permission_query(permission_filters):
 def _build_term_query(term, fields=None):
     """Builds a term query."""
     if term == '':
-        return Q('match_all')
+        return MatchAll()
 
     should_query = [
         # Promote exact name match
-        MatchPhrase(name_keyword={'query': term, 'boost': 2}),
+        MatchPhrase(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Exact match by id
         MatchPhrase(id=term),
         # Cross match fields
@@ -223,7 +239,7 @@ def _build_term_query(term, fields=None):
         ),
     ]
 
-    return Q('bool', should=should_query)
+    return Bool(should=should_query)
 
 
 def _build_exists_query(field, value):
@@ -232,9 +248,9 @@ def _build_exists_query(field, value):
 
     kind = 'must' if value else 'must_not'
     query = {
-        kind: Q('exists', field=real_field),
+        kind: Exists(field=real_field),
     }
-    return Q('bool', **query)
+    return Bool(**query)
 
 
 def _build_single_field_query(field, value):
@@ -250,14 +266,14 @@ def _build_single_field_query(field, value):
         parent_field = field.rsplit('.', maxsplit=1)[0]
         return _build_exists_query(f'{parent_field}_exists', False)
 
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
-        return Q('match_phrase', **{field: value})
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '.keyword')):
+        return MatchPhrase(**{field: value})
 
     field_query = {
         'query': value,
         'operator': 'and',
     }
-    return Q('match', **{field: field_query})
+    return Match(**{field: field_query})
 
 
 def _build_field_query(field, value):
@@ -267,7 +283,7 @@ def _build_field_query(field, value):
         should_filter = [
             _build_single_field_query(field, single_value) for single_value in value
         ]
-        return Q('bool', should=should_filter, minimum_should_match=1)
+        return Bool(should=should_filter, minimum_should_match=1)
 
     return _build_single_field_query(field, value)
 
@@ -286,7 +302,7 @@ def _build_field_queries(filters):
 def _build_range_queries(filters):
     """Builds range queries."""
     return [
-        Q('range', **{field: value})
+        Range(**{field: value})
         for field, value in filters.items()
     ]
 
@@ -325,7 +341,7 @@ def _build_must_queries(filters, ranges, composite_field_mapping):
         if should_filters:
             # builds an "or" query for given list of fields
             must_filter.append(
-                Q('bool', should=should_filters, minimum_should_match=1),
+                Bool(should=should_filters, minimum_should_match=1),
             )
         else:
             must_filter.append(
