@@ -1,0 +1,3 @@
+The columns ``project_manager_request_status (uuid NULL)`` and ``project_manager_requested_on (timestamp NULL)`` were added to the table ``investment_investmentproject``.
+
+The table ``investment_projectmanagerrequeststatus`` has been added.
