@@ -26,13 +26,12 @@ class Event(BaseESModel):
     location_type = fields.id_name_field()
     modified_on = Date()
     name = Text(
-        copy_to=['name_keyword', 'name_trigram'],
+        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_keyword = fields.NormalizedKeyword()
     name_trigram = fields.TrigramText()
     notes = fields.EnglishText()
     organiser = fields.contact_or_adviser_field('organiser')
