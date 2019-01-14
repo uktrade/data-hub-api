@@ -18,12 +18,6 @@ def load_initial_services(apps, schema_editor):
         )
 
 
-def load_policy_feedback_service(apps, schema_editor):
-    load_yaml_data_in_migration(
-        apps,
-        PurePath(__file__).parent / '0008_add_policy_feedback_service.yaml'
-    )
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -32,5 +26,4 @@ class Migration(migrations.Migration):
 
     operations = [
         RunPython(load_initial_services, RunPython.noop),
-        RunPython(load_policy_feedback_service, RunPython.noop),
     ]
