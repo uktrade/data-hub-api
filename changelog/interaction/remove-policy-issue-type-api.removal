@@ -1,1 +1,0 @@
-``GET /v3/interaction, GET /v3/interaction/<id>``: ``policy_issue_type`` was removed from responses.
