@@ -13,7 +13,6 @@ def get_interaction_queryset():
         'service',
         'service_delivery_status',
         'event',
-        'policy_issue_type',
     ).prefetch_related(
         'policy_areas',
         'policy_issue_types',
