@@ -209,7 +209,6 @@ def test_mapping(setup_es):
                 'modified_on': {'type': 'date'},
                 'name': {
                     'type': 'text',
-                    'copy_to': ['name_trigram'],
                     'fields': {
                         'keyword': {
                             'normalizer': 'lowercase_asciifolding_normalizer',
@@ -220,10 +219,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'notes': {
                     'analyzer': 'english_analyzer',
@@ -288,7 +283,7 @@ def test_get_basic_search_query():
                                 'investor_company.name',
                                 'investor_company.name_trigram',
                                 'name',
-                                'name_trigram',
+                                'name.trigram',
                                 'organiser.name_trigram',
                                 'project_code_trigram',
                                 'reference_code',
@@ -390,7 +385,7 @@ def test_get_limited_search_by_entity_query():
                                         'fields': (
                                             'id',
                                             'name',
-                                            'name_trigram',
+                                            'name.trigram',
                                             'email',
                                             'email_alternative',
                                             'company.name',

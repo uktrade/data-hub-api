@@ -12,16 +12,15 @@ class ESSimpleModel(BaseESModel):
 
     id = Keyword()
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
         },
     )
-    name_trigram = fields.TrigramText()
 
     SEARCH_FIELDS = (
         'name',
-        'name_trigram',
+        'name.trigram',
     )
 
     class Meta:
