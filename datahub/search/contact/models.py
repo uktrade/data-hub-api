@@ -46,14 +46,11 @@ class Contact(BaseESModel):
     )
     modified_on = Date()
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    # field is being aggregated
-    name_trigram = fields.TrigramText()
     notes = fields.EnglishText()
     primary = Boolean()
     telephone_alternative = Text()
@@ -83,7 +80,7 @@ class Contact(BaseESModel):
     SEARCH_FIELDS = (
         'id',
         'name',
-        'name_trigram',
+        'name.trigram',
         'email',
         'email_alternative',
         'company.name',

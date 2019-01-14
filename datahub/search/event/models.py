@@ -26,13 +26,11 @@ class Event(BaseESModel):
     location_type = fields.id_name_field()
     modified_on = Date()
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_trigram = fields.TrigramText()
     notes = fields.EnglishText()
     organiser = fields.contact_or_adviser_field('organiser')
     related_programmes = fields.id_name_partial_field('related_programmes')
@@ -58,7 +56,7 @@ class Event(BaseESModel):
     SEARCH_FIELDS = (
         'id',
         'name',
-        'name_trigram',
+        'name.trigram',
         'address_country.name_trigram',
         'address_postcode_trigram',
         'uk_region.name_trigram',

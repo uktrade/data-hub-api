@@ -48,7 +48,7 @@ class SearchContactParams:
     COMPOSITE_FILTERS = {
         'name': [
             'name',
-            'name_trigram',
+            'name.trigram',
         ],
         'company_name': [
             'company.name',
