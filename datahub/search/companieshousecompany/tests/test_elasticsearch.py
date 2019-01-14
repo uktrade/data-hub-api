@@ -42,7 +42,7 @@ def test_mapping(setup_es):
                     'type': 'date',
                 },
                 'name': {
-                    'copy_to': ['name_keyword', 'name_trigram'],
+                    'copy_to': ['name_trigram'],
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -54,10 +54,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_keyword': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',

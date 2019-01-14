@@ -141,7 +141,6 @@ class TestAddInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_type': None,
             'policy_issue_types':
                 request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided':
@@ -503,7 +502,6 @@ class TestGetInteraction(APITestMixin):
                 } for policy_area in interaction.policy_areas.all()
             ],
             'policy_feedback_notes': interaction.policy_feedback_notes,
-            'policy_issue_type': None,
             'policy_issue_types': [
                 {
                     'id': str(policy_issue_type.pk),
@@ -591,7 +589,6 @@ class TestGetInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_areas': [],
             'policy_feedback_notes': '',
-            'policy_issue_type': None,
             'policy_issue_types': [],
             'was_policy_feedback_provided': False,
             'communication_channel': {

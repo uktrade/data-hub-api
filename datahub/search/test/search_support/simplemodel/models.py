@@ -11,9 +11,12 @@ class ESSimpleModel(BaseESModel):
     """Elasticsearch representation of SimpleModel model."""
 
     id = Keyword()
-    name = Text(copy_to=['name_keyword', 'name_normalized_keyword', 'name_trigram'])
-    name_keyword = fields.NormalizedKeyword()
-    name_normalized_keyword = fields.NormalizedKeyword()
+    name = Text(
+        copy_to=['name_trigram'],
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+        },
+    )
     name_trigram = fields.TrigramText()
 
     SEARCH_FIELDS = (

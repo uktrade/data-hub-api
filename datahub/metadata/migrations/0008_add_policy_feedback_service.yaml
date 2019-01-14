@@ -1,7 +1,0 @@
-- model: metadata.service
-  pk: d89f24c7-e888-46c4-b36a-40ab54b6348b
-  fields:
-    disabled_on: null
-    name: Policy feedback
-    contexts:
-    - policy_feedback
