@@ -42,11 +42,11 @@ class TestQueryBuilder:
                 },
             ),
             (
-                'field_name.name_keyword',
+                'field_name.name.keyword',
                 'field value',
                 {
                     'match_phrase': {
-                        'field_name.name_keyword': 'field value',
+                        'field_name.name.keyword': 'field value',
                     },
                 },
             ),
@@ -165,7 +165,7 @@ class TestQueryBuilder:
                         'should': [
                             {
                                 'match_phrase': {
-                                    'name_keyword': {
+                                    'name.keyword': {
                                         'query': 'hello',
                                         'boost': 2,
                                     },
