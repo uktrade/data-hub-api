@@ -1,13 +1,11 @@
 """Search views."""
 from collections import namedtuple
 from itertools import islice
-from logging import getLogger
 
 from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from raven.contrib.django.raven_compat.models import client
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.generics import ListAPIView
@@ -18,7 +16,7 @@ from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_global_search_apps_as_mapping, get_search_apps
-from datahub.search.execute_query import execute_autocomplete_query
+from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
     SearchAndExportPermissions,
@@ -32,8 +30,6 @@ from datahub.search.query_builder import (
 from datahub.search.serializers import SearchSerializer
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
-
-logger = getLogger(__name__)
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -85,7 +81,7 @@ class SearchBasicAPIView(APIView):
             limit=limit,
         )
 
-        results = _execute_search_query(query)
+        results = execute_search_query(query)
 
         response = {
             'count': results.hits.total,
@@ -200,7 +196,7 @@ class SearchAPIView(APIView):
             limit=validated_data['limit'],
         )
 
-        results = _execute_search_query(limited_query)
+        results = execute_search_query(limited_query)
 
         response = {
             'count': results.hits.total,
@@ -365,20 +361,3 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     def _get_permission_filters(self):
         return self.search_app.get_permission_filters(self.request)
-
-
-def _execute_search_query(query):
-    response = query.params(request_timeout=settings.ES_SEARCH_REQUEST_TIMEOUT).execute()
-
-    if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
-        logger.warning(f'Elasticsearch query took a long time ({response.took/1000:.2f} seconds)')
-        client.captureMessage(
-            'Elasticsearch query took a long time',
-            extra={
-                'query': query.to_dict(),
-                'took': response.took,
-                'timed_out': response.timed_out,
-            },
-        )
-
-    return response
