@@ -7,7 +7,6 @@ from elasticsearch_dsl.query import (
     Exists,
     Match,
     MatchAll,
-    MatchPhrase,
     MultiMatch,
     Query,
     Range,
@@ -227,9 +226,9 @@ def _build_term_query(term, fields=None):
 
     should_query = [
         # Promote exact name match
-        MatchPhrase(**{'name.keyword': {'query': term, 'boost': 2}}),
+        Match(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Exact match by id
-        MatchPhrase(id=term),
+        Match(id=term),
         # Cross match fields
         MultiMatch(
             query=term,
@@ -265,9 +264,6 @@ def _build_single_field_query(field, value):
     if value is None:
         parent_field = field.rsplit('.', maxsplit=1)[0]
         return _build_exists_query(f'{parent_field}_exists', False)
-
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '.keyword')):
-        return MatchPhrase(**{field: value})
 
     field_query = {
         'query': value,
