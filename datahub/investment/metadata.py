@@ -38,3 +38,8 @@ registry.register(
     metadata_id='likelihood-to-land',
     model=models.LikelihoodToLand,
 )
+
+registry.register(
+    metadata_id='project-manager-request-status',
+    model=models.ProjectManagerRequestStatus,
+)

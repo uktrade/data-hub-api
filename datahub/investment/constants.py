@@ -39,3 +39,13 @@ class LikelihoodToLand(Enum):
     low = Constant('Low', 'b3515282-dc36-487a-a5af-320cde165575')
     medium = Constant('Medium', '683ca57b-bd69-462c-852f-d2177e35b2eb')
     high = Constant('High', '90531272-fc9c-4403-9320-b69e51fbec06')
+
+
+class ProjectManagerRequestStatus(Enum):
+    """Project manager request status constants."""
+
+    requested = Constant('Requested', '1fcebb43-244f-47e7-81f8-97790afa6383')
+    rejected = Constant('Rejected', 'ad60c3ba-03d5-47de-b31f-a9f5ad1bc220')
+    assigned = Constant('Assigned', '9fc09623-f84f-450e-994b-3234c6d3248c')
+    re_requested = Constant('Re-requested', '993f31d9-549d-4c0d-95f0-0f86e62e949d')
+    self_assigned = Constant('Self assigned', 'd50b8f0c-20c1-484e-9018-b98e9631b08b')
