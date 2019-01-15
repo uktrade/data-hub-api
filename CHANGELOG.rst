@@ -1,3 +1,38 @@
+Data Hub API 9.2.0 (2019-01-15)
+===============================
+
+
+
+Internal changes
+----------------
+
+- It is now possible to specify the location of SSL CA certificates for Django Redis cache client. Environment variable ``REDIS_SSL_CA_CERTS_PATH`` defaults to '/etc/ssl/certs/ca-certificates.crt'.
+
+API
+---
+
+- **Investment** ``POST /v3/investment`` endpoint now accepts ``project_manager_request_status`` as an
+  optional property that can be set whilst creating an investment project.
+  The property expects a ``investment_projectmanagerrequeststatus`` id.
+
+  ``GET /v3/investment/<uuid:pk>`` endpoint now includes ``project_manager_request_status`` and read-only field
+  ``project_manager_requested_on`` in the response.
+
+  ``PATCH /v3/investment/<uuid:pk>`` endpoint now accepts ``project_manager_request_status``
+  as an optional property that can be set whilst updating an investment project.
+  The property expects a ``investment_projectmanagerrequeststatus`` id.
+
+  New endpoint ``GET /metadata/project-manager-request-status/`` added that returns
+  all possible ``project_manager_request_status`` options.
+
+Database schema
+---------------
+
+- **Investment** The columns ``project_manager_request_status (uuid NULL)`` and ``project_manager_requested_on (timestamp NULL)`` were added to the table ``investment_investmentproject``.
+
+  The table ``investment_projectmanagerrequeststatus`` has been added.
+
+
 Data Hub API 9.1.0 (2019-01-14)
 ===============================
 

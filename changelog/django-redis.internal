@@ -1,1 +1,0 @@
-It is now possible to specify the location of SSL CA certificates for Django Redis cache client. Environment variable ``REDIS_SSL_CA_CERTS_PATH`` defaults to '/etc/ssl/certs/ca-certificates.crt'.
