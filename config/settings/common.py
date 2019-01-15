@@ -327,6 +327,12 @@ if REDIS_BASE_URL:
             'LOCATION': f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {
+                    'ssl_ca_certs': env(
+                        'REDIS_SSL_CA_CERTS_PATH',
+                        default='/etc/ssl/certs/ca-certificates.crt',
+                    ),
+                },
             }
         }
     }
