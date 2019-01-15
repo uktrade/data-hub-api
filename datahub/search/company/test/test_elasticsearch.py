@@ -603,13 +603,11 @@ def test_indexed_doc(setup_es):
 )
 def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
     """
-    Test that the value of trading_name is calculated from trading_names
-    instead of alias.
+    Test that the value of trading_name is calculated from trading_names.
 
-    TODO: delete after alias is removed.
+    TODO: delete after trading_name is completely replaced by trading_names.
     """
     company = CompanyFactory(
-        alias='some alias',  # should be ignored
         trading_names=trading_names,
     )
 
