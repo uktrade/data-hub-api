@@ -56,6 +56,7 @@ class Event(BaseESModel):
     COMPUTED_MAPPINGS = {}
 
     SEARCH_FIELDS = (
+        'id',
         'name',
         'name_trigram',
         'address_country.name_trigram',

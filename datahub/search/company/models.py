@@ -142,6 +142,7 @@ class Company(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'name',  # to find 2-letter words
         'name_trigram',
         'company_number',

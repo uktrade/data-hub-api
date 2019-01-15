@@ -88,6 +88,7 @@ class Order(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'reference_trigram',
         'company.name',
         'company.name_trigram',

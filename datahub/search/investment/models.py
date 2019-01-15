@@ -190,6 +190,7 @@ class InvestmentProject(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'name',
         'name_trigram',
         'uk_company.name',
