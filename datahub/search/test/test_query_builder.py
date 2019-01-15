@@ -178,11 +178,6 @@ class TestQueryBuilder:
                                 },
                             },
                             {
-                                'match': {
-                                    'id': 'hello',
-                                },
-                            },
-                            {
                                 'multi_match': {
                                     'query': 'hello',
                                     'fields': ('country.id', 'sector'),
