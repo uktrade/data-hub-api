@@ -32,6 +32,7 @@ class SearchInteractionParams:
         'date_before',
         'communication_channel',
         'investment_project',
+        'policy_areas',
         'sector_descends',
         'service',
         'was_policy_feedback_provided',
@@ -44,6 +45,7 @@ class SearchInteractionParams:
         'dit_team': 'dit_team.id',
         'communication_channel': 'communication_channel.id',
         'investment_project': 'investment_project.id',
+        'policy_areas': 'policy_areas.id',
         'service': 'service.id',
     }
 

@@ -19,6 +19,23 @@ def test_id_name_dict():
     }
 
 
+def test_id_name_list_of_dicts():
+    """Test that id_name_list_of_dicts returns a list of dicts with ID and name keys."""
+    data = [
+        {'id': '12', 'name': 'test A'},
+        {'id': '99', 'name': 'testing B'},
+    ]
+    objects = [mock.Mock(), mock.Mock()]
+    for obj, data_item in zip(objects, data):
+        obj.configure_mock(**data_item)
+
+    manager = mock.Mock(
+        all=mock.Mock(return_value=objects),
+    )
+
+    assert dict_utils.id_name_list_of_dicts(manager) == data
+
+
 def test_id_type_dict():
     """Tests _id_type_dict."""
     obj = mock.Mock()

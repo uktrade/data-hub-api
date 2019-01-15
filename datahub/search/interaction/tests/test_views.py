@@ -23,7 +23,12 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
-from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    InteractionPermission,
+    PolicyArea,
+)
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
@@ -262,6 +267,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             },
             'investment_project': None,
             'investment_project_sector': None,
+            'policy_areas': [],
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
@@ -580,6 +586,59 @@ class TestInteractionEntitySearchView(APITestMixin):
         results = response_data['results']
         result_ids = {result['communication_channel']['id'] for result in results}
         assert result_ids == {str(communication_channels[1].pk)}
+
+    def test_filter_by_policy_areas(self, setup_es):
+        """Tests filtering interactions by policy area."""
+        policy_areas = list(PolicyArea.objects.order_by('?')[:2])
+        expected_policy_area = policy_areas[0]
+        other_policy_area = policy_areas[1]
+
+        policy_area_factory_values = [
+            [expected_policy_area, other_policy_area],
+            [expected_policy_area, other_policy_area],
+            [expected_policy_area],
+            [expected_policy_area],
+            [expected_policy_area],
+        ]
+
+        expected_interactions = CompanyInteractionFactoryWithPolicyFeedback.create_batch(
+            5,
+            policy_areas=factory.Iterator(policy_area_factory_values),
+        )
+
+        # Unrelated interactions
+        CompanyInteractionFactoryWithPolicyFeedback.create_batch(
+            6,
+            policy_areas=[other_policy_area],
+        )
+        CompanyInteractionFactory.create_batch(6)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'policy_areas': expected_policy_area.pk,
+        }
+        response = self.api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        results = response_data['results']
+        expected_ids = {str(interaction.pk) for interaction in expected_interactions}
+
+        assert response_data['count'] == 5
+        assert Counter(
+            policy_area['id']
+            for result in results
+            for policy_area in result['policy_areas']
+        ) == {
+            str(expected_policy_area.pk): 5,
+            # two interactions had both policy areas
+            str(other_policy_area.pk): 2,
+        }
+        assert {result['id'] for result in results} == expected_ids
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
