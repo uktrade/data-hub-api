@@ -63,6 +63,16 @@ def id_name_field():
     )
 
 
+def id_unindexed_name_field():
+    """Object field with id and unindexed name sub-fields."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Keyword(index=False),
+        },
+    )
+
+
 def id_name_partial_field(field):
     """Object field with id and name sub-fields, and with partial matching on name."""
     return Object(
