@@ -702,7 +702,7 @@ def test_get_basic_search_query():
             'bool': {
                 'should': [
                     {
-                        'match_phrase': {
+                        'match': {
                             'name.keyword': {
                                 'query': 'test',
                                 'boost': 2,
@@ -710,7 +710,7 @@ def test_get_basic_search_query():
                         },
                     },
                     {
-                        'match_phrase': {
+                        'match': {
                             'id': 'test',
                         },
                     },
@@ -825,7 +825,7 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'match_phrase': {
+                                    'match': {
                                         'name.keyword': {
                                             'query': 'test',
                                             'boost': 2,
@@ -833,7 +833,7 @@ def test_limited_get_search_by_entity_query():
                                     },
                                 },
                                 {
-                                    'match_phrase': {
+                                    'match': {
                                         'id': 'test',
                                     },
                                 },
@@ -881,9 +881,11 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'match_phrase': {
-                                        'trading_address_country.id':
-                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                    'match': {
+                                        'trading_address_country.id': {
+                                            'query': '80756b9a-5d95-e211-a939-e4115bead28a',
+                                            'operator': 'and',
+                                        },
                                     },
                                 },
                             ],
