@@ -513,7 +513,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
             'transfer_reason',
             'duns_number',
-            'trading_names',
             'turnover',
             'is_turnover_estimated',
             'number_of_employees',
@@ -522,6 +521,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         dnb_read_only_fields = [
             'name',
             'trading_name',
+            'trading_names',
             'company_number',
             'vat_number',
             'registered_address_1',

@@ -1,0 +1,1 @@
+``PATCH /v3/company/<uuid:pk>``: when updating trading names, the PATCH array field ``trading_names`` should be used instead of the deprecated string field ``trading_name``.
