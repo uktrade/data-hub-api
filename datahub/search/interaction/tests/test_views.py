@@ -262,6 +262,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             },
             'investment_project': None,
             'investment_project_sector': None,
+            'policy_areas': [],
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
