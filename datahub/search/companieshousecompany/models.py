@@ -42,6 +42,7 @@ class CompaniesHouseCompany(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         # to match names like A & B
         'name',
         'name_trigram',

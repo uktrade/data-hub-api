@@ -710,11 +710,6 @@ def test_get_basic_search_query():
                         },
                     },
                     {
-                        'match': {
-                            'id': 'test',
-                        },
-                    },
-                    {
                         'multi_match': {
                             'query': 'test',
                             'fields': [
@@ -733,6 +728,7 @@ def test_get_basic_search_query():
                                 'email_alternative',
                                 'event.name',
                                 'event.name_trigram',
+                                'id',
                                 'investor_company.name',
                                 'investor_company.name_trigram',
                                 'name',
@@ -833,14 +829,10 @@ def test_limited_get_search_by_entity_query():
                                     },
                                 },
                                 {
-                                    'match': {
-                                        'id': 'test',
-                                    },
-                                },
-                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
+                                            'id',
                                             'name',
                                             'name_trigram',
                                             'uk_company.name',

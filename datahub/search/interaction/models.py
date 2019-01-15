@@ -63,6 +63,7 @@ class Interaction(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'company.name',
         'company.name_trigram',
         'contact.name',
