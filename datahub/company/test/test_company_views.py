@@ -572,18 +572,24 @@ class TestUpdateCompany(APITestMixin):
 
     def test_update_company(self):
         """Test company update."""
-        company = CompanyFactory(name='Foo ltd.')
+        company = CompanyFactory(
+            name='Foo ltd.',
+            trading_names=['name 1', 'name 2'],
+        )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
                 'name': 'Acme',
+                'trading_names': ['new name'],
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['name'] == 'Acme'
+        response_data = response.json()
+        assert response_data['name'] == 'Acme'
+        assert response_data['trading_names'] == ['new name']
 
     def test_update_company_with_company_number(self):
         """
@@ -634,7 +640,6 @@ class TestUpdateCompany(APITestMixin):
             one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
             duns_number='000000001',
-            trading_names=['a', 'b', 'c'],
             turnover=100,
             is_turnover_estimated=False,
             number_of_employees=95,
@@ -650,7 +655,6 @@ class TestUpdateCompany(APITestMixin):
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
-                'trading_names': ['d'],
                 'turnover': 101,
                 'is_turnover_estimated': True,
                 'number_of_employees': 96,
@@ -668,7 +672,6 @@ class TestUpdateCompany(APITestMixin):
         }
         assert response_data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
         assert response_data['duns_number'] == '000000001'
-        assert response_data['trading_names'] == ['a', 'b', 'c']
         assert response_data['turnover'] == 100
         assert not response_data['is_turnover_estimated']
         assert response_data['number_of_employees'] == 95
@@ -682,6 +685,7 @@ class TestUpdateCompany(APITestMixin):
         company = CompanyFactory(
             duns_number='012345678',
             name='name',
+            trading_names=['a', 'b', 'c'],
             company_number='company number',
             vat_number='vat number',
             registered_address_1='registered address 1',
@@ -709,6 +713,7 @@ class TestUpdateCompany(APITestMixin):
         data = {
             'name': 'new name',
             'trading_name': 'new trading name',
+            'trading_names': ['new trading name'],
             'company_number': 'new company number',
             'vat_number': 'new vat number',
             'registered_address_1': 'new registered address 1',
@@ -751,6 +756,11 @@ class TestUpdateCompany(APITestMixin):
             (
                 {'trading_name': 'a' * 600},
                 {'trading_name': ['Ensure this field has no more than 255 characters.']},
+            ),
+            # trading names too long
+            (
+                {'trading_names': ['a' * 600]},
+                {'trading_names': {'0': ['Ensure this field has no more than 255 characters.']}},
             ),
             # sector cannot become nullable
             (
