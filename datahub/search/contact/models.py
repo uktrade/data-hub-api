@@ -81,6 +81,7 @@ class Contact(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'name',
         'name_trigram',
         'email',

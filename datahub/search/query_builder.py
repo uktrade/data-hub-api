@@ -227,8 +227,6 @@ def _build_term_query(term, fields=None):
     should_query = [
         # Promote exact name match
         Match(**{'name.keyword': {'query': term, 'boost': 2}}),
-        # Exact match by id
-        Match(id=term),
         # Cross match fields
         MultiMatch(
             query=term,
