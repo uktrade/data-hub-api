@@ -72,9 +72,8 @@ class TestCompanyDict:
         obj = mock.Mock(
             id=123,
             name='Name',
-            alias='Trading',  # ignored - TODO: delete when alias is removed
             trading_names=['Trading 1', 'Trading 2'],
-            spec_set=('id', 'name', 'alias', 'trading_names'),
+            spec_set=('id', 'name', 'trading_names'),
         )
 
         res = dict_utils.company_dict(obj)
@@ -91,9 +90,8 @@ class TestCompanyDict:
         obj = mock.Mock(
             id=123,
             name='Name',
-            alias='Trading',  # ignored - TODO: delete when alias is removed
             trading_names=[],
-            spec_set=('id', 'name', 'alias', 'trading_names'),
+            spec_set=('id', 'name', 'trading_names'),
         )
 
         res = dict_utils.company_dict(obj)

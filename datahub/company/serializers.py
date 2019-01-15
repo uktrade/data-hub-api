@@ -382,13 +382,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     'headquarter_type': message,
                 })
 
-        # TODO: remove after the alias column is deleted
-
-        # Save the first item in trading_names in alias if specified.
-        if 'trading_names' in data:
-            trading_names = data['trading_names']
-            data['alias'] = '' if not trading_names else trading_names[0]
-
         return data
 
     def validate_headquarter_type(self, headquarter_type):
