@@ -207,12 +207,6 @@ class TestSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -234,17 +228,14 @@ class TestSearch(APITestMixin):
         """Tests filtering contact by company name."""
         matching_company1 = CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         matching_company2 = CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         non_matching_company = CompanyFactory(
             name='Pluto and pippo',
-            alias='Epsilon and lippo',
             trading_names=['eniam nooc', 'naitpyge uam'],
         )
         ContactFactory(company=matching_company1)
