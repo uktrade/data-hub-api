@@ -1,0 +1,9 @@
+The table ``investment_investmentactivitytype`` has been added.
+The values of the column ``name`` will initial be ``change``, ``risk``, ``issue``, ``SPI Interaction``
+and ``Internal Interaction``.
+
+The table ``investment_investmentactivity`` has been added.
+The columns are ``id``, ```investment_project_id``, ``revision_id``, ``activity_type`_id`  and ``text``.
+Where ``revision_id`` is a link to a copy of the investment projects data at the time of adding the row.
+Where ``text`` can be used as a note to be associated with a change to a project or as a way to detail
+an activity on the project.
