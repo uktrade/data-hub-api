@@ -639,7 +639,7 @@ class TestUpdateCompany(APITestMixin):
             archived_documents_url_path='old_path',
             one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
-            duns_number='000000001',
+            duns_number=None,
             turnover=100,
             is_turnover_estimated=False,
             number_of_employees=95,
@@ -671,7 +671,7 @@ class TestUpdateCompany(APITestMixin):
             'name': company.one_list_tier.name,
         }
         assert response_data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
-        assert response_data['duns_number'] == '000000001'
+        assert response_data['duns_number'] is None
         assert response_data['turnover'] == 100
         assert not response_data['is_turnover_estimated']
         assert response_data['number_of_employees'] == 95
