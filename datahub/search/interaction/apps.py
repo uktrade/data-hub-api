@@ -34,4 +34,5 @@ class InteractionSearchApp(SearchApp):
         'event',
     ).prefetch_related(
         'policy_areas',
+        'policy_issue_types',
     )
