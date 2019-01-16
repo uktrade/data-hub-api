@@ -20,7 +20,6 @@ class TestAutocompleteSearchCompanySerializer:
         """
         company = CompanyFactory(
             name='Company name 1',
-            alias='Company trading name 1',
             trading_names=['trading name 1', 'trading name 2'],
         )
         elasticsearch_company_dict = ESCompany.es_document(company)
@@ -43,7 +42,6 @@ class TestAutocompleteSearchCompanySerializer:
         """
         company = CompanyFactory(
             name='Company name 1',
-            alias='Company trading name 1',
             trading_names=['trading name 1', 'trading name 2'],
         )
         elasticsearch_company_dict = ESCompany.db_object_to_dict(company)

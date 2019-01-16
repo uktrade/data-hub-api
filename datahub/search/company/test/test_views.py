@@ -312,12 +312,6 @@ class TestSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -339,12 +333,10 @@ class TestSearch(APITestMixin):
         """Tests composite name filter."""
         CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         setup_es.indices.refresh()
@@ -409,7 +401,6 @@ class TestSearch(APITestMixin):
             len(ids),
             id=factory.Iterator(ids),
             name=name,
-            alias='',
             trading_names=[],
         )
 
@@ -616,12 +607,6 @@ class TestBasicSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -643,12 +628,10 @@ class TestBasicSearch(APITestMixin):
         """Tests basic aggregate companies query."""
         CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         setup_es.indices.refresh()

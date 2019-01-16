@@ -55,7 +55,6 @@ def setup_data(setup_es):
     with freeze_time('2017-01-01 13:00:00'):
         company = CompanyFactory(
             name='Mercury trading',
-            alias='Uranus supplies',
             trading_names=[],
         )
         contact = ContactFactory(company=company, first_name='John', last_name='Doe')
@@ -85,7 +84,6 @@ def setup_data(setup_es):
     with freeze_time('2017-02-01 13:00:00'):
         company = CompanyFactory(
             name='Venus Ltd',
-            alias='Earth outsourcing',
             trading_names=['Maine Coon', 'Egyptian Mau', '3a'],
         )
         contact = ContactFactory(company=company, first_name='Jenny', last_name='Cakeman')
@@ -271,12 +269,6 @@ class TestSearchOrder(APITestMixin):
             (  # search by company name partial
                 {'company_name': 'Venus'},
                 ['efgh'],
-            ),
-            (
-                # search by alias - value ignored
-                # TODO delete when alias is removed
-                {'company_name': 'Earth outsourcing'},
-                [],
             ),
             (  # search by trading names exact
                 {'company_name': 'Maine Coon Egyptian Mau'},
