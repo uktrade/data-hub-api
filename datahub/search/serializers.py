@@ -52,7 +52,7 @@ class IdNameSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class SearchSerializer(LimitOffsetSerializer):
+class EntitySearchSerializer(LimitOffsetSerializer):
     """Serialiser used to validate search POST bodies."""
 
     SORT_BY_FIELDS = []

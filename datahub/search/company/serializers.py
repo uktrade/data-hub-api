@@ -2,14 +2,14 @@ from rest_framework import serializers
 
 from datahub.search.serializers import (
     AutocompleteSearchSerializer,
+    EntitySearchSerializer,
     IdNameSerializer,
-    SearchSerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchCompanySerializer(SearchSerializer):
+class SearchCompanySerializer(EntitySearchSerializer):
     """Serialiser used to validate company search POST bodies."""
 
     archived = serializers.BooleanField(required=False)

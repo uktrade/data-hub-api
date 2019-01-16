@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
 from datahub.search.serializers import (
-    SearchSerializer,
+    EntitySearchSerializer,
     SingleOrListField,
     StringUUIDField,
 )
@@ -15,7 +15,7 @@ class NestedDisabledOnOrFilterSerializer(serializers.Serializer):
     after = RelaxedDateTimeField(required=False)
 
 
-class SearchEventSerializer(SearchSerializer):
+class SearchEventSerializer(EntitySearchSerializer):
     """Serialiser used to validate Event search POST bodies.
 
     Nested disabled_on filters use "or" operator. For example if you want to
