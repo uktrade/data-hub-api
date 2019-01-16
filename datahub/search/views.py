@@ -7,7 +7,6 @@ from django.utils.text import capfirst
 from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import empty
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -138,22 +137,7 @@ class SearchAPIView(APIView):
         """Validate and clean data."""
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-
-        # prepare default values
-        cleaned_data = {
-            k: v.default for k, v in serializer.fields.items()
-            if v.default is not empty
-        }
-        if serializer.DEFAULT_ORDERING:
-            cleaned_data['sortby'] = serializer.DEFAULT_ORDERING
-
-        # update with validated data
-        cleaned_data.update({
-            k: v for k, v in validated_data.items()
-            if k in data
-        })
-        return cleaned_data
+        return serializer.validated_data
 
     def get_base_query(self, request, validated_data):
         """Gets a filtered Elasticsearch query for the provided search parameters."""
