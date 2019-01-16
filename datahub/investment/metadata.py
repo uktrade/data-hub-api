@@ -43,3 +43,8 @@ registry.register(
     metadata_id='project-manager-request-status',
     model=models.ProjectManagerRequestStatus,
 )
+
+registry.register(
+    metadata_id='investment-activity-type',
+    model=models.InvestmentActivityType,
+)

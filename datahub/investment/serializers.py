@@ -2,6 +2,8 @@
 from collections import Counter
 from functools import partial
 
+import reversion
+from django.db.transaction import atomic
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
@@ -13,9 +15,12 @@ from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.constants import (
+    InvestmentActivityType as InvestmentActivityTypeValue,
     ProjectManagerRequestStatus as ProjectManagerRequestStatusValue,
 )
 from datahub.investment.models import (
+    InvestmentActivity,
+    InvestmentActivityType,
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
@@ -85,6 +90,7 @@ CORE_FIELDS = (
     'comments',
     'country_investment_originates_from',
     'level_of_involvement_simplified',
+    'note',
 )
 
 VALUE_FIELDS = (
@@ -171,7 +177,100 @@ class NestedInvestmentProjectStageLogSerializer(serializers.ModelSerializer):
         fields = ('stage', 'created_on')
 
 
-class IProjectSerializer(PermittedFieldsModelSerializer):
+def default_activity_type(*args, **kwargs):
+    """Sets the default activity type to `change` if one is not specified."""
+    activity_type_change = InvestmentActivityTypeValue.change.value.id
+    return InvestmentActivityType.objects.get(pk=activity_type_change)
+
+
+class InvestmentActivitySerializer(serializers.ModelSerializer):
+    """Serializer for an Investment Activity."""
+
+    created_by = NestedAdviserField(read_only=True)
+    modified_by = NestedAdviserField(read_only=True)
+    text = serializers.CharField(required=True)
+    activity_type = NestedRelatedField(
+        InvestmentActivityType,
+        default=default_activity_type,
+    )
+
+    class Meta:
+        model = InvestmentActivity
+
+        fields = (
+            'id',
+            'text',
+            'activity_type',
+            'created_by',
+            'created_on',
+            'modified_on',
+            'modified_by',
+        )
+        read_only_fields = (
+            'id',
+            'created_on',
+            'created_by',
+        )
+
+
+class NoteAwareModelSerializer(serializers.ModelSerializer):
+    """Serializer to add an investment note."""
+
+    note = serializers.JSONField(write_only=True, required=False)
+
+    @atomic
+    def create(self, validated_data):
+        """
+        Overrides the create to remove the investment note from the data if one is present.
+        The note is then created using the reversion add meta method. This creates the
+        InvestmentActivity and associates it with the relevant revision.
+        """
+        note = validated_data.pop('note', None)
+        instance = super().create(validated_data)
+        if note:
+            self._create_investment_activity(instance, note)
+        return instance
+
+    @atomic
+    def update(self, instance, validated_data):
+        """
+        Overrides the update to remove the investment note from the data if one is present.
+        The note is then created using the reversion add meta method. This creates the
+        InvestmentActivity and associates it with the relevant revision.
+        """
+        note = validated_data.pop('note', None)
+        if note:
+            self._create_investment_activity(instance, note)
+        return super().update(instance, validated_data)
+
+    def _create_investment_activity(self, instance, note):
+        """
+        Creates the InvestmentActivity and associates it with the relevant revision.
+
+        TODO: Remove the need to associate the note with a revision when the audit history
+        is deprecated and replaced with an activity stream using the InvestmentActivity table.
+
+        """
+        reversion.add_meta(
+            InvestmentActivity,
+            text=note['text'],
+            activity_type_id=note['activity_type'].id,
+            investment_project=instance,
+            created_by=self.context.get('current_user'),
+        )
+
+    def validate_note(self, value):
+        """
+        Validates the note field to make sure it is a dictionary and that the required text
+        field is provided. Supports an optional activity_type field.
+        If activity_type is not set then the default type of change is set.
+        """
+        activity = InvestmentActivitySerializer(data=value)
+        activity.is_valid(True)
+        return activity.validated_data
+
+
+class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerializer):
     """Serialiser for investment project endpoints."""
 
     default_error_messages = {
