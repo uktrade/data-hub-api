@@ -25,6 +25,7 @@ class SearchInteractionSerializer(SearchSerializer):
     communication_channel = SingleOrListField(child=StringUUIDField(), required=False)
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
     policy_areas = SingleOrListField(child=StringUUIDField(), required=False)
+    policy_issue_types = SingleOrListField(child=StringUUIDField(), required=False)
     service = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     was_policy_feedback_provided = serializers.BooleanField(required=False)
