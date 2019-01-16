@@ -26,7 +26,7 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
-from datahub.search.serializers import SearchSerializer
+from datahub.search.serializers import EntitySearchSerializer
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
 
@@ -119,7 +119,7 @@ class SearchAPIView(APIView):
     # filter must exist in FILTER_FIELDS
     COMPOSITE_FILTERS = {}
 
-    serializer_class = SearchSerializer
+    serializer_class = EntitySearchSerializer
     entity = None
 
     http_method_names = ('post',)
