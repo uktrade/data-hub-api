@@ -123,8 +123,6 @@ class SearchAPIView(APIView):
     serializer_class = SearchSerializer
     entity = None
 
-    include_aggregations = False
-
     http_method_names = ('post',)
 
     def _get_filter_data(self, validated_data):
@@ -162,11 +160,6 @@ class SearchAPIView(APIView):
         filter_data = self._get_filter_data(validated_data)
         permission_filters = self.search_app.get_permission_filters(request)
 
-        aggregation_fields = (
-            self.REMAP_FIELDS.get(field, field)
-            for field in self.FILTER_FIELDS
-        ) if self.include_aggregations else None
-
         return get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
@@ -174,7 +167,6 @@ class SearchAPIView(APIView):
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
             ordering=validated_data['sortby'],
-            aggregation_fields=aggregation_fields,
         )
 
     def post(self, request, format=None):
@@ -203,16 +195,6 @@ class SearchAPIView(APIView):
             'results': [x.to_dict() for x in results.hits],
         }
 
-        if self.include_aggregations:
-            aggregations = {}
-            for field in self.FILTER_FIELDS:
-                es_field = self.REMAP_FIELDS.get(field, field)
-                if es_field in results.aggregations:
-                    aggregation = results.aggregations[es_field]
-                    aggregations[field] = [bucket.to_dict() for bucket in aggregation['buckets']]
-
-            response['aggregations'] = aggregations
-
         return Response(data=response)
 
 
@@ -223,7 +205,6 @@ class SearchExportAPIView(SearchAPIView):
     queryset = None
     field_titles = None
     sort_by_remappings = {}
-    include_aggregations = False
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""

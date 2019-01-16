@@ -759,52 +759,6 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
-    def test_search_investment_project_aggregates(self, setup_es):
-        """Tests aggregates in investment project search."""
-        url = reverse('api-v3:search:investment_project')
-
-        InvestmentProjectFactory(
-            name='Pear 1',
-            stage_id=constants.InvestmentProjectStage.active.value.id,
-        )
-        InvestmentProjectFactory(
-            name='Pear 2',
-            stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        )
-        InvestmentProjectFactory(
-            name='Pear 3',
-            stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        )
-        InvestmentProjectFactory(
-            name='Pear 4',
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-
-        setup_es.indices.refresh()
-
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': 'Pear',
-                'stage': [
-                    constants.InvestmentProjectStage.prospect.value.id,
-                    constants.InvestmentProjectStage.active.value.id,
-                ],
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
-        assert len(response.data['results']) == 3
-        assert 'aggregations' in response.data
-
-        stages = [
-            {'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
-            {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
-            {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1},
-        ]
-        assert all(stage in response.data['aggregations']['stage'] for stage in stages)
-
 
 class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
