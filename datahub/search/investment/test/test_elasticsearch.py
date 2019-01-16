@@ -372,9 +372,6 @@ def test_mapping(setup_es):
                 },
                 'modified_on': {'type': 'date'},
                 'name': {
-                    'copy_to': [
-                        'name_trigram',
-                    ],
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -386,10 +383,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'new_tech_to_uk': {'type': 'boolean'},
                 'non_fdi_r_and_d_budget': {'type': 'boolean'},
@@ -732,7 +725,7 @@ def test_get_basic_search_query():
                                 'investor_company.name',
                                 'investor_company.name_trigram',
                                 'name',
-                                'name_trigram',
+                                'name.trigram',
                                 'organiser.name_trigram',
                                 'project_code_trigram',
                                 'reference_code',
@@ -834,7 +827,7 @@ def test_limited_get_search_by_entity_query():
                                         'fields': (
                                             'id',
                                             'name',
-                                            'name_trigram',
+                                            'name.trigram',
                                             'uk_company.name',
                                             'uk_company.name_trigram',
                                             'investor_company.name',
