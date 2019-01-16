@@ -425,17 +425,6 @@ class TestSearch(APITestMixin):
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
 
-    @mock.patch('datahub.search.query_builder._add_aggs_to_query')
-    def test_company_search_no_aggregations(self, _add_aggs_to_query, setup_data):
-        """Tests if no aggregation occurs."""
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(url)
-
-        assert _add_aggs_to_query.call_count == 0
-
-        assert response.status_code == status.HTTP_200_OK
-        assert 'aggregations' not in response.data
-
     def test_search_company_no_filters(self, setup_data):
         """Tests case where there is no filters provided."""
         url = reverse('api-v3:search:company')
