@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from datahub.oauth.scopes import Scope
 from datahub.search.contact.apps import ContactSearchApp
 from datahub.search.dashboard.serializers import HomepageSerializer
+from datahub.search.execute_query import execute_search_query
 from datahub.search.interaction.apps import InteractionSearchApp
 from datahub.search.permissions import has_permissions_for_app
 from datahub.search.query_builder import get_search_by_entity_query, limit_search_query
@@ -48,10 +49,11 @@ def _get_objects(request, limit, search_app, adviser_field):
         },
         ordering='created_on:desc',
     )
-    results = limit_search_query(
+    limited_query = limit_search_query(
         query,
         offset=0,
         limit=limit,
-    ).execute()
+    )
+    results = execute_search_query(limited_query)
 
     return [result.to_dict() for result in results.hits]
