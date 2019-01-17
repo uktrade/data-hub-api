@@ -71,13 +71,11 @@ class Company(BaseESModel):
     headquarter_type = fields.id_name_field()
     modified_on = Date()
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_trigram = fields.TrigramText()
     reference_code = fields.NormalizedKeyword()
     registered_address_1 = Text()
     registered_address_2 = Text()
@@ -142,8 +140,9 @@ class Company(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'name',  # to find 2-letter words
-        'name_trigram',
+        'name.trigram',
         'company_number',
         'trading_names',  # to find 2-letter words
         'trading_names_trigram',

@@ -16,13 +16,11 @@ class CompaniesHouseCompany(BaseESModel):
     company_status = fields.NormalizedKeyword()
     incorporation_date = Date()
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_trigram = fields.TrigramText()
     registered_address_1 = Text()
     registered_address_2 = Text()
     registered_address_town = fields.NormalizedKeyword()
@@ -44,7 +42,7 @@ class CompaniesHouseCompany(BaseESModel):
     SEARCH_FIELDS = (
         # to match names like A & B
         'name',
-        'name_trigram',
+        'name.trigram',
         'company_number',
         'registered_address_postcode_trigram',
     )

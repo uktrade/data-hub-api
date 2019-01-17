@@ -312,12 +312,6 @@ class TestSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -339,12 +333,10 @@ class TestSearch(APITestMixin):
         """Tests composite name filter."""
         CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         setup_es.indices.refresh()
@@ -409,7 +401,6 @@ class TestSearch(APITestMixin):
             len(ids),
             id=factory.Iterator(ids),
             name=name,
-            alias='',
             trading_names=[],
         )
 
@@ -433,17 +424,6 @@ class TestSearch(APITestMixin):
             assert [
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
-
-    @mock.patch('datahub.search.query_builder._add_aggs_to_query')
-    def test_company_search_no_aggregations(self, _add_aggs_to_query, setup_data):
-        """Tests if no aggregation occurs."""
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(url)
-
-        assert _add_aggs_to_query.call_count == 0
-
-        assert response.status_code == status.HTTP_200_OK
-        assert 'aggregations' not in response.data
 
     def test_search_company_no_filters(self, setup_data):
         """Tests case where there is no filters provided."""
@@ -616,12 +596,6 @@ class TestBasicSearch(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -643,12 +617,10 @@ class TestBasicSearch(APITestMixin):
         """Tests basic aggregate companies query."""
         CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         setup_es.indices.refresh()

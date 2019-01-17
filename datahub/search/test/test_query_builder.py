@@ -36,8 +36,11 @@ class TestQueryBuilder:
                 'field_name.id',
                 'field value',
                 {
-                    'match_phrase': {
-                        'field_name.id': 'field value',
+                    'match': {
+                        'field_name.id': {
+                            'query': 'field value',
+                            'operator': 'and',
+                        },
                     },
                 },
             ),
@@ -45,8 +48,11 @@ class TestQueryBuilder:
                 'field_name.name.keyword',
                 'field value',
                 {
-                    'match_phrase': {
-                        'field_name.name.keyword': 'field value',
+                    'match': {
+                        'field_name.name.keyword': {
+                            'query': 'field value',
+                            'operator': 'and',
+                        },
                     },
                 },
             ),
@@ -164,16 +170,11 @@ class TestQueryBuilder:
                     'bool': {
                         'should': [
                             {
-                                'match_phrase': {
+                                'match': {
                                     'name.keyword': {
                                         'query': 'hello',
                                         'boost': 2,
                                     },
-                                },
-                            },
-                            {
-                                'match_phrase': {
-                                    'id': 'hello',
                                 },
                             },
                             {

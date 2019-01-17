@@ -42,7 +42,6 @@ def test_mapping(setup_es):
                     'type': 'date',
                 },
                 'name': {
-                    'copy_to': ['name_trigram'],
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -54,10 +53,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'registered_address_1': {
                     'type': 'text',

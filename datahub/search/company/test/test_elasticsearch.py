@@ -165,7 +165,6 @@ def test_mapping(setup_es):
                 'id': {'type': 'keyword'},
                 'modified_on': {'type': 'date'},
                 'name': {
-                    'copy_to': ['name_trigram'],
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -177,10 +176,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'reference_code': {
                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -319,16 +314,11 @@ def test_get_basic_search_query():
             'bool': {
                 'should': [
                     {
-                        'match_phrase': {
+                        'match': {
                             'name.keyword': {
                                 'query': 'test',
                                 'boost': 2,
                             },
-                        },
-                    },
-                    {
-                        'match_phrase': {
-                            'id': 'test',
                         },
                     },
                     {
@@ -350,10 +340,11 @@ def test_get_basic_search_query():
                                 'email_alternative',
                                 'event.name',
                                 'event.name_trigram',
+                                'id',
                                 'investor_company.name',
                                 'investor_company.name_trigram',
                                 'name',
-                                'name_trigram',
+                                'name.trigram',
                                 'organiser.name_trigram',
                                 'project_code_trigram',
                                 'reference_code',
@@ -442,7 +433,7 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'match_phrase': {
+                                    'match': {
                                         'name.keyword': {
                                             'query': 'test',
                                             'boost': 2,
@@ -450,16 +441,12 @@ def test_limited_get_search_by_entity_query():
                                     },
                                 },
                                 {
-                                    'match_phrase': {
-                                        'id': 'test',
-                                    },
-                                },
-                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
+                                            'id',
                                             'name',
-                                            'name_trigram',
+                                            'name.trigram',
                                             'company_number',
                                             'trading_names',
                                             'trading_names_trigram',
@@ -502,9 +489,11 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'match_phrase': {
-                                        'trading_address_country.id':
-                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                    'match': {
+                                        'trading_address_country.id': {
+                                            'query': '80756b9a-5d95-e211-a939-e4115bead28a',
+                                            'operator': 'and',
+                                        },
                                     },
                                 },
                             ],
@@ -614,13 +603,11 @@ def test_indexed_doc(setup_es):
 )
 def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
     """
-    Test that the value of trading_name is calculated from trading_names
-    instead of alias.
+    Test that the value of trading_name is calculated from trading_names.
 
-    TODO: delete after alias is removed.
+    TODO: delete after trading_name is completely replaced by trading_names.
     """
     company = CompanyFactory(
-        alias='some alias',  # should be ignored
         trading_names=trading_names,
     )
 

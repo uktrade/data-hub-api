@@ -36,7 +36,7 @@ class SearchEventParams:
     }
 
     COMPOSITE_FILTERS = {
-        'name': ['name', 'name_trigram'],
+        'name': ['name', 'name.trigram'],
         'organiser_name': ['organiser.name', 'organiser.name_trigram'],
     }
 

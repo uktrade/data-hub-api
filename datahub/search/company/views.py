@@ -51,7 +51,7 @@ class SearchCompanyParams:
     COMPOSITE_FILTERS = {
         'name': [
             'name',  # to find 2-letter words
-            'name_trigram',
+            'name.trigram',
             'trading_names',  # to find 2-letter words
             'trading_names_trigram',
         ],

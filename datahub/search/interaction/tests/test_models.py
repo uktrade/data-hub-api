@@ -1,3 +1,5 @@
+from operator import attrgetter, itemgetter
+
 import pytest
 
 from datahub.interaction.test.factories import (
@@ -23,7 +25,10 @@ pytestmark = pytest.mark.django_db
 def test_interaction_to_dict(setup_es, factory_cls):
     """Test converting an interaction to a dict."""
     interaction = factory_cls()
+
     result = Interaction.db_object_to_dict(interaction)
+    result['policy_areas'].sort(key=itemgetter('id'))
+    result['policy_issue_types'].sort(key=itemgetter('id'))
 
     assert result == {
         'id': interaction.pk,
@@ -81,6 +86,18 @@ def test_interaction_to_dict(setup_es, factory_cls):
                 'id': str(ancestor.pk),
             } for ancestor in interaction.investment_project.sector.get_ancestors()],
         } if interaction.investment_project else None,
+        'policy_areas': [
+            {
+                'id': str(obj.pk),
+                'name': obj.name,
+            } for obj in sorted(interaction.policy_areas.all(), key=attrgetter('id'))
+        ],
+        'policy_issue_types': [
+            {
+                'id': str(obj.pk),
+                'name': obj.name,
+            } for obj in sorted(interaction.policy_issue_types.all(), key=attrgetter('id'))
+        ],
         'service_delivery_status': None,
         'grant_amount_offered': None,
         'net_company_receipt': None,
@@ -140,6 +157,8 @@ def test_service_delivery_to_dict(setup_es):
         'communication_channel': None,
         'investment_project': None,
         'investment_project_sector': None,
+        'policy_areas': [],
+        'policy_issue_types': [],
         'service_delivery_status': {
             'id': str(interaction.service_delivery_status.pk),
             'name': interaction.service_delivery_status.name,

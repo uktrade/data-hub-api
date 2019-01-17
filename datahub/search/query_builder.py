@@ -7,7 +7,6 @@ from elasticsearch_dsl.query import (
     Exists,
     Match,
     MatchAll,
-    MatchPhrase,
     MultiMatch,
     Query,
     Range,
@@ -82,7 +81,6 @@ def get_search_by_entity_query(
         permission_filters=None,
         entity=None,
         ordering=None,
-        aggregation_fields=None,
 ):
     """
     Performs filtered search for given terms in given entity.
@@ -112,11 +110,7 @@ def get_search_by_entity_query(
     s = s.post_filter(
         Bool(must=must_filter),
     )
-    s = _apply_sorting_to_query(s, ordering)
-    if aggregation_fields:
-        s = _add_aggs_to_query(s, aggregation_fields)
-
-    return s
+    return _apply_sorting_to_query(s, ordering)
 
 
 def build_autocomplete_query(es_model, keyword_search, limit, only_return_fields):
@@ -227,9 +221,7 @@ def _build_term_query(term, fields=None):
 
     should_query = [
         # Promote exact name match
-        MatchPhrase(**{'name.keyword': {'query': term, 'boost': 2}}),
-        # Exact match by id
-        MatchPhrase(id=term),
+        Match(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Cross match fields
         MultiMatch(
             query=term,
@@ -265,9 +257,6 @@ def _build_single_field_query(field, value):
     if value is None:
         parent_field = field.rsplit('.', maxsplit=1)[0]
         return _build_exists_query(f'{parent_field}_exists', False)
-
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '.keyword')):
-        return MatchPhrase(**{field: value})
 
     field_query = {
         'query': value,
@@ -375,14 +364,3 @@ def _apply_sorting_to_query(query, ordering):
         {field_name: sort_params},
         'id',
     )
-
-
-def _add_aggs_to_query(query, aggregation_fields):
-    """Applies aggregates to the query."""
-    for field in aggregation_fields:
-        # skip range and "query" filters as we can't aggregate them
-        if any(field.endswith(x) for x in ('_before', '_after', '_trigram', '_exists')):
-            continue
-
-        query.aggs.bucket(field, 'terms', field=field)
-    return query

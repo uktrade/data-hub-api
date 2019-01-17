@@ -9,6 +9,11 @@ def id_name_dict(obj):
     }
 
 
+def id_name_list_of_dicts(manager):
+    """Creates a list of dicts with ID and name keys from a manager."""
+    return [id_name_dict(obj) for obj in manager.all()]
+
+
 def id_type_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     if obj is None:

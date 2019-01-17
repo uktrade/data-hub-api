@@ -94,7 +94,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'created',
                     'modified',
                     'name',
-                    'alias',
                     'trading_names',
                     'company_number',
                     'vat_number',
