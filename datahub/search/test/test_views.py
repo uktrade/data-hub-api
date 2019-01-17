@@ -211,10 +211,13 @@ class TestSearch(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == [
-            'Entity is not one of company, contact, event, interaction, investment_project, '
-            'order, simplemodel, relatedmodel',
-        ]
+        assert response.json() == {
+            'entity':
+                [
+                    'Entity is not one of company, contact, event, interaction, '
+                    'investment_project, order, simplemodel, relatedmodel',
+                ],
+        }
 
     def test_search_results_quality(self, setup_es, setup_data):
         """Tests quality of results."""

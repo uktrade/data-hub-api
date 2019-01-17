@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
+from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.query_builder import MAX_RESULTS
 
 
@@ -38,13 +39,6 @@ class StringUUIDField(serializers.UUIDField):
         return str(uuid)
 
 
-class LimitOffsetSerializer(serializers.Serializer):
-    """Serialiser used to validate limit/offset values in POST bodies."""
-
-    offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
-    limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
-
-
 class IdNameSerializer(serializers.Serializer):
     """Serializer to return metadata constant with id and name."""
 
@@ -52,8 +46,8 @@ class IdNameSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class EntitySearchSerializer(LimitOffsetSerializer):
-    """Serialiser used to validate search POST bodies."""
+class BaseSearchSerializer(serializers.Serializer):
+    """Base serialiser for basic (global) and entity search."""
 
     SORT_BY_FIELDS = []
 
@@ -64,7 +58,8 @@ class EntitySearchSerializer(LimitOffsetSerializer):
 
     DEFAULT_ORDERING = None
 
-    original_query = serializers.CharField(default='', allow_blank=True)
+    offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
+    limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
     sortby = serializers.CharField(default=None)
 
     def validate_sortby(self, val):
@@ -95,6 +90,33 @@ class EntitySearchSerializer(LimitOffsetSerializer):
             raise serializers.ValidationError(errors)
 
         return val
+
+
+class BasicSearchSerializer(BaseSearchSerializer):
+    """Serialiser used to validate basic (global) search query parameters."""
+
+    SORT_BY_FIELDS = (
+        'created_on',
+        'name',
+    )
+    entity = serializers.CharField(default='company')
+    term = serializers.CharField(required=True, allow_blank=True)
+
+    def validate_entity(self, value):
+        """Validates the provided entity and looks up its corresponding model."""
+        global_search_models = get_global_search_apps_as_mapping()
+        search_app = global_search_models.get(value)
+        if not search_app:
+            raise serializers.ValidationError(
+                f'Entity is not one of {", ".join(global_search_models)}',
+            )
+        return search_app.es_model
+
+
+class EntitySearchSerializer(BaseSearchSerializer):
+    """Serialiser used to validate entity search POST bodies."""
+
+    original_query = serializers.CharField(default='', allow_blank=True)
 
 
 class AutocompleteSearchSerializer(serializers.Serializer):
