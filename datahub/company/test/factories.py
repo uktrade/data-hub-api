@@ -37,9 +37,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Faker('company')
-    alias = factory.Faker('company')
     trading_names = factory.List([
-        factory.SelfAttribute('..alias'),
+        factory.Faker('company'),
         factory.Faker('company'),
     ])
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')

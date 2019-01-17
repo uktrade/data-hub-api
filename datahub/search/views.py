@@ -1,13 +1,11 @@
 """Search views."""
 from collections import namedtuple
 from itertools import islice
-from logging import getLogger
 
 from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from raven.contrib.django.raven_compat.models import client
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.generics import ListAPIView
@@ -18,7 +16,7 @@ from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_global_search_apps_as_mapping, get_search_apps
-from datahub.search.execute_query import execute_autocomplete_query
+from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
     SearchAndExportPermissions,
@@ -32,8 +30,6 @@ from datahub.search.query_builder import (
 from datahub.search.serializers import SearchSerializer
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
-
-logger = getLogger(__name__)
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -85,7 +81,7 @@ class SearchBasicAPIView(APIView):
             limit=limit,
         )
 
-        results = _execute_search_query(query)
+        results = execute_search_query(query)
 
         response = {
             'count': results.hits.total,
@@ -127,8 +123,6 @@ class SearchAPIView(APIView):
     serializer_class = SearchSerializer
     entity = None
 
-    include_aggregations = False
-
     http_method_names = ('post',)
 
     def _get_filter_data(self, validated_data):
@@ -166,11 +160,6 @@ class SearchAPIView(APIView):
         filter_data = self._get_filter_data(validated_data)
         permission_filters = self.search_app.get_permission_filters(request)
 
-        aggregation_fields = (
-            self.REMAP_FIELDS.get(field, field)
-            for field in self.FILTER_FIELDS
-        ) if self.include_aggregations else None
-
         return get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
@@ -178,7 +167,6 @@ class SearchAPIView(APIView):
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
             ordering=validated_data['sortby'],
-            aggregation_fields=aggregation_fields,
         )
 
     def post(self, request, format=None):
@@ -200,22 +188,12 @@ class SearchAPIView(APIView):
             limit=validated_data['limit'],
         )
 
-        results = _execute_search_query(limited_query)
+        results = execute_search_query(limited_query)
 
         response = {
             'count': results.hits.total,
             'results': [x.to_dict() for x in results.hits],
         }
-
-        if self.include_aggregations:
-            aggregations = {}
-            for field in self.FILTER_FIELDS:
-                es_field = self.REMAP_FIELDS.get(field, field)
-                if es_field in results.aggregations:
-                    aggregation = results.aggregations[es_field]
-                    aggregations[field] = [bucket.to_dict() for bucket in aggregation['buckets']]
-
-            response['aggregations'] = aggregations
 
         return Response(data=response)
 
@@ -227,7 +205,6 @@ class SearchExportAPIView(SearchAPIView):
     queryset = None
     field_titles = None
     sort_by_remappings = {}
-    include_aggregations = False
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
@@ -365,20 +342,3 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     def _get_permission_filters(self):
         return self.search_app.get_permission_filters(self.request)
-
-
-def _execute_search_query(query):
-    response = query.params(request_timeout=settings.ES_SEARCH_REQUEST_TIMEOUT).execute()
-
-    if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
-        logger.warning(f'Elasticsearch query took a long time ({response.took/1000:.2f} seconds)')
-        client.captureMessage(
-            'Elasticsearch query took a long time',
-            extra={
-                'query': query.to_dict(),
-                'took': response.took,
-                'timed_out': response.timed_out,
-            },
-        )
-
-    return response

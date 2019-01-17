@@ -209,7 +209,6 @@ def test_mapping(setup_es):
                 'modified_on': {'type': 'date'},
                 'name': {
                     'type': 'text',
-                    'copy_to': ['name_trigram'],
                     'fields': {
                         'keyword': {
                             'normalizer': 'lowercase_asciifolding_normalizer',
@@ -220,10 +219,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'name_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'notes': {
                     'analyzer': 'english_analyzer',
@@ -258,16 +253,11 @@ def test_get_basic_search_query():
             'bool': {
                 'should': [
                     {
-                        'match_phrase': {
+                        'match': {
                             'name.keyword': {
                                 'query': 'test',
                                 'boost': 2,
                             },
-                        },
-                    },
-                    {
-                        'match_phrase': {
-                            'id': 'test',
                         },
                     },
                     {
@@ -289,10 +279,11 @@ def test_get_basic_search_query():
                                 'email_alternative',
                                 'event.name',
                                 'event.name_trigram',
+                                'id',
                                 'investor_company.name',
                                 'investor_company.name_trigram',
                                 'name',
-                                'name_trigram',
+                                'name.trigram',
                                 'organiser.name_trigram',
                                 'project_code_trigram',
                                 'reference_code',
@@ -381,7 +372,7 @@ def test_get_limited_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'match_phrase': {
+                                    'match': {
                                         'name.keyword': {
                                             'query': 'test',
                                             'boost': 2,
@@ -389,16 +380,12 @@ def test_get_limited_search_by_entity_query():
                                     },
                                 },
                                 {
-                                    'match_phrase': {
-                                        'id': 'test',
-                                    },
-                                },
-                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
+                                            'id',
                                             'name',
-                                            'name_trigram',
+                                            'name.trigram',
                                             'email',
                                             'email_alternative',
                                             'company.name',
@@ -435,9 +422,11 @@ def test_get_limited_search_by_entity_query():
                     {
                         'bool': {
                             'should': [{
-                                'match_phrase': {
-                                    'trading_address_country.id':
-                                        '80756b9a-5d95-e211-a939-e4115bead28a',
+                                'match': {
+                                    'trading_address_country.id': {
+                                        'query': '80756b9a-5d95-e211-a939-e4115bead28a',
+                                        'operator': 'and',
+                                    },
                                 },
                             }],
                             'minimum_should_match': 1,

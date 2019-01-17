@@ -23,8 +23,6 @@ class SearchInvestmentProjectParams:
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
 
-    include_aggregations = True
-
     FILTER_FIELDS = (
         'adviser',
         'client_relationship_manager',

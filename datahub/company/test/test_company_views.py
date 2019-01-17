@@ -572,18 +572,24 @@ class TestUpdateCompany(APITestMixin):
 
     def test_update_company(self):
         """Test company update."""
-        company = CompanyFactory(name='Foo ltd.')
+        company = CompanyFactory(
+            name='Foo ltd.',
+            trading_names=['name 1', 'name 2'],
+        )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
                 'name': 'Acme',
+                'trading_names': ['new name'],
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['name'] == 'Acme'
+        response_data = response.json()
+        assert response_data['name'] == 'Acme'
+        assert response_data['trading_names'] == ['new name']
 
     def test_update_company_with_company_number(self):
         """
@@ -633,8 +639,7 @@ class TestUpdateCompany(APITestMixin):
             archived_documents_url_path='old_path',
             one_list_tier=one_list_tier,
             one_list_account_owner=one_list_gam,
-            duns_number='000000001',
-            trading_names=['a', 'b', 'c'],
+            duns_number=None,
             turnover=100,
             is_turnover_estimated=False,
             number_of_employees=95,
@@ -650,7 +655,6 @@ class TestUpdateCompany(APITestMixin):
                 'one_list_group_tier': different_one_list_tier.id,
                 'one_list_group_global_account_manager': different_one_list_gam.id,
                 'duns_number': '000000002',
-                'trading_names': ['d'],
                 'turnover': 101,
                 'is_turnover_estimated': True,
                 'number_of_employees': 96,
@@ -667,8 +671,7 @@ class TestUpdateCompany(APITestMixin):
             'name': company.one_list_tier.name,
         }
         assert response_data['one_list_group_global_account_manager']['id'] == str(one_list_gam.id)
-        assert response_data['duns_number'] == '000000001'
-        assert response_data['trading_names'] == ['a', 'b', 'c']
+        assert response_data['duns_number'] is None
         assert response_data['turnover'] == 100
         assert not response_data['is_turnover_estimated']
         assert response_data['number_of_employees'] == 95
@@ -682,6 +685,7 @@ class TestUpdateCompany(APITestMixin):
         company = CompanyFactory(
             duns_number='012345678',
             name='name',
+            trading_names=['a', 'b', 'c'],
             company_number='company number',
             vat_number='vat number',
             registered_address_1='registered address 1',
@@ -709,6 +713,7 @@ class TestUpdateCompany(APITestMixin):
         data = {
             'name': 'new name',
             'trading_name': 'new trading name',
+            'trading_names': ['new trading name'],
             'company_number': 'new company number',
             'vat_number': 'new vat number',
             'registered_address_1': 'new registered address 1',
@@ -751,6 +756,11 @@ class TestUpdateCompany(APITestMixin):
             (
                 {'trading_name': 'a' * 600},
                 {'trading_name': ['Ensure this field has no more than 255 characters.']},
+            ),
+            # trading names too long
+            (
+                {'trading_names': ['a' * 600]},
+                {'trading_names': {'0': ['Ensure this field has no more than 255 characters.']}},
             ),
             # sector cannot become nullable
             (
@@ -937,109 +947,85 @@ class TestUpdateCompany(APITestMixin):
             assert response_data['headquarter_type'] == error
 
 
-class TestTradingNamesAndAliasForCompany(APITestMixin):
+class TestTradingNamesForCompany(APITestMixin):
     """
-    Tests related to trading_names, trading_name and alias.
+    Tests related to trading_names and trading_name.
 
-    TODO: They will be eventually deleted after the migration from alias/trading_name to
+    TODO: They will be eventually deleted after the migration from trading_name to
     trading_names is completed.
     """
 
     @pytest.mark.parametrize(
         (
-            'old_alias',
             'old_trading_names',
             'trading_name_api_data',
-            'expected_alias',
             'expected_trading_names',
         ),
         (
             # help in reading the params below:
             # (
-            #     'old value', ['old value'],  # setup
+            #     ['old value'],  # setup
             #     'old value',  # API PATCH data
-            #     'old value', ['old value'],  # expectation
+            #     ['old value'],  # expectation
             # ),
             (
-                'old value', ['old value'],
+                ['old value'],
                 'old value',
-                'old value', ['old value'],
+                ['old value'],
             ),
             (
-                'old value', ['old value'],
+                ['old value'],
                 'new value',
-                'new value', ['new value'],
+                ['new value'],
             ),
             (
-                'old value', ['old value'],
+                ['old value'],
                 '',
-                '', [],
+                [],
             ),
             (
-                'old value', ['old value'],
+                ['old value'],
                 None,
-                '', [],
+                [],
             ),
             (
-                '', [],
+                [],
                 'new value',
-                'new value', ['new value'],
+                ['new value'],
             ),
             (
-                '', [],
+                [],
                 '',
-                '', [],
+                [],
             ),
             (
-                '', [],
+                [],
                 None,
-                '', [],
+                [],
             ),
             (
-                None, [],
                 None,
-                '', [],
-            ),
-            (
-                None, [],
                 'new value',
-                'new value', ['new value'],
+                ['new value'],
             ),
             (
-                None, [],
-                '',
-                '', [],
-            ),
-            (
-                None, None,
+                ['old value', 'another value'],
                 'new value',
-                'new value', ['new value'],
-            ),
-            (
-                'old value', ['old value', 'another value'],
-                'new value',
-                'new value', ['new value'],
+                ['new value'],
             ),
         ),
     )
     def test_values_updated_correctly(
         self,
-        old_alias,
         old_trading_names,
         trading_name_api_data,
-        expected_alias,
         expected_trading_names,
     ):
         """
-        Test that
-        given specific alias and trading_names
-        updating a company using the `trading_name` API data param
-        updates both alias and trading_names correctly.
-
-        TODO: refactor when alias is removed from the database
+        Test that given specific trading_names, updating a company using
+        the `trading_name` API data param, updates trading_names correctly.
         """
         company = CompanyFactory(
-            alias=old_alias,
             trading_names=old_trading_names,
         )
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
@@ -1052,11 +1038,9 @@ class TestTradingNamesAndAliasForCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['trading_name'] == expected_alias
         assert response_data['trading_names'] == expected_trading_names
 
         company.refresh_from_db()
-        assert company.alias == expected_alias
         assert company.trading_names == expected_trading_names
 
     @pytest.mark.parametrize(
@@ -1093,13 +1077,9 @@ class TestTradingNamesAndAliasForCompany(APITestMixin):
     ):
         """
         Test that the values of trading_name and trading_names in the GET company
-        response API come from the trading_names field and the alias field is
-        therefore ignored.
-
-        TODO: remove when alias is removed from the database
+        response API come from the trading_names field.
         """
         company = CompanyFactory(
-            alias='some other value',  # alias is ignored
             trading_names=trading_names,
         )
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -1109,47 +1089,6 @@ class TestTradingNamesAndAliasForCompany(APITestMixin):
         response_data = response.json()
         assert response_data['trading_name'] == expected_trading_name
         assert response_data['trading_names'] == expected_trading_names
-
-    @pytest.mark.parametrize(
-        'patch_data',
-        (
-            {
-                'trading_name': 'new value',
-                'trading_names': ['new value'],
-            },
-            {
-                'trading_name': None,
-                'trading_names': None,
-            },
-            {
-                'trading_name': '',
-                'trading_names': [],
-            },
-        ),
-    )
-    def test_updates_not_allowed_if_duns_number_set(self, patch_data):
-        """
-        Test that if a company has a non-empty duns_number,
-        trading_name, trading_names and alias cannot be updated via API.
-        """
-        trading_names = ['value']
-        company = CompanyFactory(
-            duns_number='123456789',
-            alias=trading_names[0],
-            trading_names=trading_names,
-        )
-
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, data=patch_data)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['trading_names'] == trading_names
-        assert response_data['trading_name'] == trading_names[0]
-
-        company.refresh_from_db()
-        assert company.trading_names == trading_names
-        assert company.alias == trading_names[0]
 
 
 class TestAddCompany(APITestMixin):

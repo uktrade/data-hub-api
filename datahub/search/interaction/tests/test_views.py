@@ -23,7 +23,13 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
-from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    InteractionPermission,
+    PolicyArea,
+    PolicyIssueType,
+)
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
@@ -262,6 +268,8 @@ class TestInteractionEntitySearchView(APITestMixin):
             },
             'investment_project': None,
             'investment_project_sector': None,
+            'policy_areas': [],
+            'policy_issue_types': [],
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
@@ -327,12 +335,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
 
-            # alias is ignored
-            # TODO delete after alias is removed
-            ('house lion', None),
-            ('use', None),
-            ('2a', None),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -354,17 +356,14 @@ class TestInteractionEntitySearchView(APITestMixin):
         """Tests filtering interaction by company name."""
         matching_company1 = CompanyFactory(
             name='whiskers and tabby',
-            alias='house lion and moggie',
             trading_names=['Maine Coon', 'Egyptian Mau'],
         )
         matching_company2 = CompanyFactory(
             name='1a',
-            alias='2a',
             trading_names=['3a', '4a'],
         )
         non_matching_company = CompanyFactory(
             name='Pluto and pippo',
-            alias='Epsilon and lippo',
             trading_names=['eniam nooc', 'naitpyge uam'],
         )
         CompanyInteractionFactory(company=matching_company1)
@@ -580,6 +579,69 @@ class TestInteractionEntitySearchView(APITestMixin):
         results = response_data['results']
         result_ids = {result['communication_channel']['id'] for result in results}
         assert result_ids == {str(communication_channels[1].pk)}
+
+    @pytest.mark.parametrize(
+        'field,field_model',
+        (
+            ('policy_areas', PolicyArea),
+            ('policy_issue_types', PolicyIssueType),
+        ),
+    )
+    def test_filter_by_policy_fields(self, setup_es, field, field_model):
+        """
+        Tests filtering interactions by:
+        - policy area
+        - policy issue type
+        """
+        values = list(field_model.objects.order_by('?')[:2])
+        expected_field_value = values[0]
+        other_field_value = values[1]
+
+        factory_values = [
+            [expected_field_value, other_field_value],
+            [expected_field_value, other_field_value],
+            [expected_field_value],
+            [expected_field_value],
+            [expected_field_value],
+        ]
+
+        expected_interactions = CompanyInteractionFactoryWithPolicyFeedback.create_batch(
+            5,
+            **{field: factory.Iterator(factory_values)},
+        )
+
+        # Unrelated interactions
+        CompanyInteractionFactoryWithPolicyFeedback.create_batch(
+            6,
+            **{field: [other_field_value]},
+        )
+        CompanyInteractionFactory.create_batch(6)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            field: expected_field_value.pk,
+        }
+        response = self.api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        results = response_data['results']
+        expected_ids = {str(interaction.pk) for interaction in expected_interactions}
+
+        assert response_data['count'] == 5
+        assert Counter(
+            value['id']
+            for result in results
+            for value in result[field]
+        ) == {
+            str(expected_field_value.pk): 5,
+            # two interactions had both values
+            str(other_field_value.pk): 2,
+        }
+        assert {result['id'] for result in results} == expected_ids
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""

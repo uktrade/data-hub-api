@@ -104,13 +104,11 @@ class InvestmentProject(BaseESModel):
         'project_manager', include_dit_team=True,
     )
     name = Text(
-        copy_to=['name_trigram'],
         fields={
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
     )
-    name_trigram = fields.TrigramText()
     new_tech_to_uk = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     number_new_jobs = Integer()
@@ -190,8 +188,9 @@ class InvestmentProject(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'name',
-        'name_trigram',
+        'name.trigram',
         'uk_company.name',
         'uk_company.name_trigram',
         'investor_company.name',

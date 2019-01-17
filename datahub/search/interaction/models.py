@@ -30,6 +30,8 @@ class Interaction(BaseESModel):
     modified_on = Date()
     net_company_receipt = Double()
     notes = fields.EnglishText()
+    policy_areas = fields.id_unindexed_name_field()
+    policy_issue_types = fields.id_unindexed_name_field()
     service = fields.id_name_field()
     service_delivery_status = fields.id_name_field()
     subject = fields.NormalizedKeyword(
@@ -46,6 +48,8 @@ class Interaction(BaseESModel):
         'dit_team': dict_utils.id_name_dict,
         'event': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
+        'policy_areas': dict_utils.id_name_list_of_dicts,
+        'policy_issue_types': dict_utils.id_name_list_of_dicts,
         'service': dict_utils.id_name_dict,
         'service_delivery_status': dict_utils.id_name_dict,
     }
@@ -61,6 +65,7 @@ class Interaction(BaseESModel):
     }
 
     SEARCH_FIELDS = (
+        'id',
         'company.name',
         'company.name_trigram',
         'contact.name',
