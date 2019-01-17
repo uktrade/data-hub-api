@@ -1,3 +1,34 @@
+Data Hub API 9.3.0 (2019-01-17)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The field ``Company.alias`` was removed from django.
+- **Companies** ``PATCH /v3/company/<uuid:pk>``: the PATCH string field ``trading_name`` is deprecated and will be removed on or after January 24. Please use the array field ``trading_names`` instead.
+- **Interactions** The ``interaction_interaction.policy_issue_type_id`` column was deleted from the database.
+- **Investment** ``POST /v3/search/investment_project``: The ``aggregations`` property of responses was removed.
+- The table ``metadata_companyclassification`` was deleted.
+
+API
+---
+
+- **Companies** ``PATCH /v3/company/<uuid:pk>``: when updating trading names, the PATCH array field ``trading_names`` should be used instead of the deprecated string field ``trading_name``.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: ``policy_areas`` was added to interaction search results.
+- **Interactions** ``POST /v3/search/interaction``: ``policy_areas`` was added as a filter, accepting one or more policy area IDs that results should match one of.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: ``policy_issue_types`` was added to interaction search results.
+- **Interactions** ``POST /v3/search/interaction``: ``policy_issue_types`` was added as a filter, accepting one or more policy issue type IDs that results should match one of.
+- **Investment** ``POST /v3/search/investment_project``: The ``aggregations`` property of responses was removed.
+
+Database schema
+---------------
+
+- **Interactions** The ``interaction_interaction.policy_issue_type_id`` column was deleted from the database.
+- The table ``metadata_companyclassification`` was deleted.
+
+
 Data Hub API 9.2.0 (2019-01-15)
 ===============================
 
