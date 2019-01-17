@@ -1,6 +1,8 @@
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
+from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.query_builder import MAX_RESULTS
 
 
@@ -38,13 +40,6 @@ class StringUUIDField(serializers.UUIDField):
         return str(uuid)
 
 
-class LimitOffsetSerializer(serializers.Serializer):
-    """Serialiser used to validate limit/offset values in POST bodies."""
-
-    offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
-    limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
-
-
 class IdNameSerializer(serializers.Serializer):
     """Serializer to return metadata constant with id and name."""
 
@@ -52,8 +47,8 @@ class IdNameSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class EntitySearchSerializer(LimitOffsetSerializer):
-    """Serialiser used to validate search POST bodies."""
+class BaseSearchSerializer(serializers.Serializer):
+    """Base serialiser for basic (global) and entity search."""
 
     SORT_BY_FIELDS = []
 
@@ -64,7 +59,8 @@ class EntitySearchSerializer(LimitOffsetSerializer):
 
     DEFAULT_ORDERING = None
 
-    original_query = serializers.CharField(default='', allow_blank=True)
+    offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
+    limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
     sortby = serializers.CharField(default=None)
 
     def validate_sortby(self, val):
@@ -95,6 +91,50 @@ class EntitySearchSerializer(LimitOffsetSerializer):
             raise serializers.ValidationError(errors)
 
         return val
+
+
+class _ESModelChoiceField(serializers.Field):
+    """Serialiser field for selecting an ES model by name."""
+
+    default_error_messages = {
+        'invalid_choice': gettext_lazy('"{input}" is not a valid choice.'),
+    }
+
+    def get_default(self):
+        """Gets the default value for the field."""
+        default = super().get_default()
+        if isinstance(default, str):
+            return self.to_internal_value(default)
+
+        return default
+
+    def to_internal_value(self, data):
+        """Translates a model name to a model."""
+        global_search_models = get_global_search_apps_as_mapping()
+        if data not in global_search_models:
+            self.fail('invalid_choice', input=data)
+        return global_search_models[data].es_model
+
+    def to_representation(self, value):
+        """Translates a model to a model name."""
+        return value._doc_type.name
+
+
+class BasicSearchSerializer(BaseSearchSerializer):
+    """Serialiser used to validate basic (global) search query parameters."""
+
+    SORT_BY_FIELDS = (
+        'created_on',
+        'name',
+    )
+    entity = _ESModelChoiceField(default='company')
+    term = serializers.CharField(required=True, allow_blank=True)
+
+
+class EntitySearchSerializer(BaseSearchSerializer):
+    """Serialiser used to validate entity search POST bodies."""
+
+    original_query = serializers.CharField(default='', allow_blank=True)
 
 
 class AutocompleteSearchSerializer(serializers.Serializer):
