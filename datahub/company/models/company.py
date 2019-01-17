@@ -106,11 +106,9 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             integer_validator,
         ],
     )
-    # TODO remove null=True after migrating all records
     trading_names = ArrayField(
         models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH),
         blank=True,
-        null=True,
         default=list,
     )
     business_type = models.ForeignKey(

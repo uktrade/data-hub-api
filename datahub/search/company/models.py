@@ -31,12 +31,9 @@ def get_suggestions(db_company):
     if db_company.archived:
         return []
 
-    company_name = db_company.name
-    trading_names = db_company.trading_names or []
-
     names = [
-        company_name,
-        *trading_names,
+        db_company.name,
+        *db_company.trading_names,
     ]
 
     data = [
