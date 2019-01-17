@@ -1,1 +1,0 @@
-``POST /v3/search/interaction``: ``policy_issue_types`` was added as a filter, accepting one or more policy issue type IDs that results should match one of.

@@ -1,1 +1,0 @@
-``PATCH /v3/company/<uuid:pk>``: the PATCH string field ``trading_name`` is deprecated and will be removed on or after January 24. Please use the array field ``trading_names`` instead.
