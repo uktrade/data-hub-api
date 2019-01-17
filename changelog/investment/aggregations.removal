@@ -1,1 +1,0 @@
-``POST /v3/search/investment_project``: The ``aggregations`` property of responses was removed.
