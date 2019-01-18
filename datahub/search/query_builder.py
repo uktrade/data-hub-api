@@ -16,9 +16,6 @@ from elasticsearch_dsl.query import (
 from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
-FIELD_REMAPPING = {
-    'name': 'name.keyword',
-}
 
 
 class MatchNone(Query):
@@ -349,19 +346,12 @@ def _apply_sorting_to_query(query, ordering):
     if ordering is None:
         return query.sort('_score', 'id')
 
-    tokens = ordering.rsplit(':', maxsplit=1)
-    order = tokens[1] if len(tokens) > 1 else 'asc'
-    field_name = tokens[0]
-
     sort_params = {
-        'order': order,
-        'missing': '_first' if order == 'asc' else '_last',
+        'order': ordering.direction,
+        'missing': '_last' if ordering.is_descending else '_first',
     }
 
-    # remap field name if necessary
-    field_name = FIELD_REMAPPING.get(field_name, field_name)
-
     return query.sort(
-        {field_name: sort_params},
+        {ordering.field: sort_params},
         'id',
     )

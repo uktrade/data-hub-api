@@ -1,4 +1,27 @@
 import json
+from typing import NamedTuple
+
+
+from datahub.core.utils import StrEnum
+
+
+class SortDirection(StrEnum):
+    """A direction for sorting."""
+
+    asc = 'asc'
+    desc = 'desc'
+
+
+class SearchOrdering(NamedTuple):
+    """An ordering for a search (i.e. a sort field and direction)."""
+
+    field: str
+    direction: SortDirection = SortDirection.asc
+
+    @property
+    def is_descending(self):
+        """Returns whether this is a descending sort."""
+        return self.direction == SortDirection.desc
 
 
 def get_model_fields(es_model):

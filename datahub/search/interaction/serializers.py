@@ -6,6 +6,7 @@ from datahub.search.serializers import (
     SingleOrListField,
     StringUUIDField,
 )
+from datahub.search.utils import SearchOrdering, SortDirection
 
 
 class SearchInteractionSerializer(EntitySearchSerializer):
@@ -30,7 +31,7 @@ class SearchInteractionSerializer(EntitySearchSerializer):
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     was_policy_feedback_provided = serializers.BooleanField(required=False)
 
-    DEFAULT_ORDERING = 'date:desc'
+    DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
 
     SORT_BY_FIELDS = (
         'company.name',
