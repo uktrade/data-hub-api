@@ -6,8 +6,6 @@ from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from rest_framework.exceptions import ValidationError
-from rest_framework.fields import empty
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,7 +13,7 @@ from rest_framework.views import APIView
 from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
-from datahub.search.apps import get_global_search_apps_as_mapping, get_search_apps
+from datahub.search.apps import get_search_apps
 from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
@@ -27,7 +25,7 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
-from datahub.search.serializers import SearchSerializer
+from datahub.search.serializers import BasicSearchSerializer, EntitySearchSerializer
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
 
@@ -42,43 +40,19 @@ class SearchBasicAPIView(APIView):
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
 
-    SORT_BY_FIELDS = (
-        'created_on',
-        'name',
-    )
-
-    DEFAULT_ENTITY = 'company'
-
     def get(self, request, format=None):
         """Performs basic search."""
-        if 'term' not in request.query_params:
-            raise ValidationError('Missing required "term" field.')
-        term = request.query_params['term']
-
-        global_search_models = get_global_search_apps_as_mapping()
-        entity = request.query_params.get('entity', self.DEFAULT_ENTITY)
-        search_app = global_search_models.get(entity)
-        if not search_app:
-            raise ValidationError(
-                f'Entity is not one of {", ".join(global_search_models)}',
-            )
-
-        sortby = request.query_params.get('sortby')
-        if sortby:
-            field = sortby.rsplit(':')[0]
-            if field not in self.SORT_BY_FIELDS:
-                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
-
-        offset = int(request.query_params.get('offset', 0))
-        limit = int(request.query_params.get('limit', 100))
+        serializer = BasicSearchSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        validated_params = serializer.validated_data
 
         query = get_basic_search_query(
-            term=term,
-            entities=(search_app.es_model,),
+            term=validated_params['term'],
+            entities=(validated_params['entity'],),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
-            ordering=sortby,
-            offset=offset,
-            limit=limit,
+            ordering=validated_params['sortby'],
+            offset=validated_params['offset'],
+            limit=validated_params['limit'],
         )
 
         results = execute_search_query(query)
@@ -120,7 +94,7 @@ class SearchAPIView(APIView):
     # filter must exist in FILTER_FIELDS
     COMPOSITE_FILTERS = {}
 
-    serializer_class = SearchSerializer
+    serializer_class = EntitySearchSerializer
     entity = None
 
     http_method_names = ('post',)
@@ -138,22 +112,7 @@ class SearchAPIView(APIView):
         """Validate and clean data."""
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-
-        # prepare default values
-        cleaned_data = {
-            k: v.default for k, v in serializer.fields.items()
-            if v.default is not empty
-        }
-        if serializer.DEFAULT_ORDERING:
-            cleaned_data['sortby'] = serializer.DEFAULT_ORDERING
-
-        # update with validated data
-        cleaned_data.update({
-            k: v for k, v in validated_data.items()
-            if k in data
-        })
-        return cleaned_data
+        return serializer.validated_data
 
     def get_base_query(self, request, validated_data):
         """Gets a filtered Elasticsearch query for the provided search parameters."""

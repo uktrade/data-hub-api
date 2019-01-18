@@ -2,13 +2,13 @@ from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
 from datahub.search.serializers import (
-    SearchSerializer,
+    EntitySearchSerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchInteractionSerializer(SearchSerializer):
+class SearchInteractionSerializer(EntitySearchSerializer):
     """Serialiser used to validate interaction search POST bodies."""
 
     kind = SingleOrListField(child=serializers.CharField(), required=False)
