@@ -24,6 +24,8 @@ class SearchContactParams:
     entity = Contact
     serializer_class = SearchContactSerializer
     es_sort_by_remappings = {
+        'first_name': 'first_name.keyword',
+        'last_name': 'last_name.keyword',
         'name': 'name.keyword',
     }
 
