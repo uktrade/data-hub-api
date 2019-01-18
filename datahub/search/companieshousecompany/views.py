@@ -1,6 +1,6 @@
 from datahub.oauth.scopes import Scope
 from datahub.search.companieshousecompany.models import CompaniesHouseCompany
-from datahub.search.serializers import SearchSerializer
+from datahub.search.serializers import EntitySearchSerializer
 from datahub.search.views import SearchAPIView
 
 
@@ -9,4 +9,4 @@ class SearchCompaniesHouseCompanyAPIView(SearchAPIView):
 
     required_scopes = (Scope.internal_front_end,)
     entity = CompaniesHouseCompany
-    serializer_class = SearchSerializer
+    serializer_class = EntitySearchSerializer

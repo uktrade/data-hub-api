@@ -2,13 +2,13 @@ from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateField, RelaxedDateTimeField
 from datahub.search.serializers import (
-    SearchSerializer,
+    EntitySearchSerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchOrderSerializer(SearchSerializer):
+class SearchOrderSerializer(EntitySearchSerializer):
     """Serialiser used to validate OMIS search POST bodies."""
 
     primary_market = SingleOrListField(child=StringUUIDField(), required=False)
