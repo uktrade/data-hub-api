@@ -26,6 +26,7 @@ from datahub.search.query_builder import (
     limit_search_query,
 )
 from datahub.search.serializers import BasicSearchSerializer, EntitySearchSerializer
+from datahub.search.utils import SearchOrdering
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
 
@@ -39,18 +40,22 @@ class SearchBasicAPIView(APIView):
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
+    es_sort_by_remappings = {
+        'name': 'name.keyword',
+    }
 
     def get(self, request, format=None):
         """Performs basic search."""
         serializer = BasicSearchSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         validated_params = serializer.validated_data
+        ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
 
         query = get_basic_search_query(
             term=validated_params['term'],
             entities=(validated_params['entity'],),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
-            ordering=validated_params['sortby'],
+            ordering=ordering,
             offset=validated_params['offset'],
             limit=validated_params['limit'],
         )
@@ -93,6 +98,9 @@ class SearchAPIView(APIView):
     # creates "or" query with a list of fields for given filter name
     # filter must exist in FILTER_FIELDS
     COMPOSITE_FILTERS = {}
+    # Remappings from sortby values in the request to the actual field path in the search model
+    # e.g. 'name' to 'name.keyword'
+    es_sort_by_remappings = {}
 
     serializer_class = EntitySearchSerializer
     entity = None
@@ -118,6 +126,7 @@ class SearchAPIView(APIView):
         """Gets a filtered Elasticsearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
         permission_filters = self.search_app.get_permission_filters(request)
+        ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entity_query(
             entity=self.entity,
@@ -125,7 +134,7 @@ class SearchAPIView(APIView):
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
-            ordering=validated_data['sortby'],
+            ordering=ordering,
         )
 
     def post(self, request, format=None):
@@ -169,7 +178,7 @@ class SearchExportAPIView(SearchAPIView):
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAndExportPermissions)
     queryset = None
     field_titles = None
-    sort_by_remappings = {}
+    db_sort_by_remappings = {}
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
@@ -222,7 +231,7 @@ class SearchExportAPIView(SearchAPIView):
             size=settings.SEARCH_EXPORT_SCROLL_CHUNK_SIZE,
         )
 
-    def _get_rows(self, ids, sort_by):
+    def _get_rows(self, ids, search_ordering):
         """
         Returns an iterable using QuerySet.iterator() over the search results.
 
@@ -232,32 +241,32 @@ class SearchExportAPIView(SearchAPIView):
         At the moment, all rows are fetched in one query (using a server-side cursor) as
         settings.SEARCH_EXPORT_MAX_RESULTS is set to a (relatively) low value.
         """
-        ordering = self._translate_search_sortby_to_django_ordering(sort_by)
+        db_ordering = self._translate_search_ordering_to_django_ordering(search_ordering)
 
         return self.queryset.filter(
             pk__in=ids,
         ).order_by(
-            *ordering,
+            *db_ordering,
         ).values(
             *self.field_titles.keys(),
         ).iterator()
 
-    def _translate_search_sortby_to_django_ordering(self, sort_by):
+    def _translate_search_ordering_to_django_ordering(self, ordering):
         """
         Converts a sort-by value as used in the search API to a tuple of values that can be
         passed to QuerySet.order_by().
 
         Note that this relies on the same field names having been used; if they differ then you
-        should manually specify a remapping in the sort_by_remappings class attribute.
+        should manually specify a remapping in the db_sort_by_remappings class attribute.
         """
-        if not sort_by:
+        if not ordering:
             return ()
 
-        es_field, _, direction = sort_by.partition(':')
-        field = self.sort_by_remappings.get(es_field, es_field.replace('.', '__'))
-        prefix = '-' if direction == 'desc' else ''
+        auto_translated_field = ordering.field.replace('.', '__')
+        db_field = self.db_sort_by_remappings.get(ordering.field, auto_translated_field)
+        prefix = '-' if ordering.is_descending else ''
 
-        return f'{prefix}{field}', 'pk'
+        return f'{prefix}{db_field}', 'pk'
 
 
 class AutocompleteSearchListAPIView(ListAPIView):
@@ -307,3 +316,11 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     def _get_permission_filters(self):
         return self.search_app.get_permission_filters(self.request)
+
+
+def _map_es_ordering(ordering, mapping):
+    if not ordering:
+        return None
+
+    remapped_field = mapping.get(ordering.field, ordering.field)
+    return SearchOrdering(remapped_field, ordering.direction)

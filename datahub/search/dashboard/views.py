@@ -9,6 +9,7 @@ from datahub.search.execute_query import execute_search_query
 from datahub.search.interaction.apps import InteractionSearchApp
 from datahub.search.permissions import has_permissions_for_app
 from datahub.search.query_builder import get_search_by_entity_query, limit_search_query
+from datahub.search.utils import SearchOrdering, SortDirection
 
 
 class IntelligentHomepageView(APIView):
@@ -47,7 +48,7 @@ def _get_objects(request, limit, search_app, adviser_field):
             adviser_field: request.user.id,
             'created_on_exists': True,
         },
-        ordering='created_on:desc',
+        ordering=SearchOrdering('created_on', SortDirection.desc),
     )
     limited_query = limit_search_query(
         query,
