@@ -33,13 +33,13 @@ class Contact(BaseESModel):
     created_on = Date()
     email = fields.NormalizedKeyword()
     email_alternative = Text()
-    first_name = fields.SortableText(
+    first_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
         },
     )
     job_title = fields.NormalizedKeyword()
-    last_name = fields.SortableText(
+    last_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
         },
