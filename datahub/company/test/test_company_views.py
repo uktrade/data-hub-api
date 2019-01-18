@@ -1004,11 +1004,6 @@ class TestTradingNamesForCompany(APITestMixin):
                 [],
             ),
             (
-                None,
-                'new value',
-                ['new value'],
-            ),
-            (
                 ['old value', 'another value'],
                 'new value',
                 ['new value'],
@@ -1061,11 +1056,6 @@ class TestTradingNamesForCompany(APITestMixin):
                 [],
                 '',
                 [],
-            ),
-            (
-                None,
-                None,
-                None,
             ),
         ),
     )
