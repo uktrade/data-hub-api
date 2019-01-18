@@ -60,8 +60,6 @@ class Interaction(BaseESModel):
             'investment_project.sector',
         ),
         'is_event': attrgetter('is_event'),
-        # TODO: Remove once Interaction.was_policy_feedback_provided is no longer nullable
-        'was_policy_feedback_provided': lambda obj: bool(obj.was_policy_feedback_provided),
     }
 
     SEARCH_FIELDS = (
