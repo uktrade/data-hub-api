@@ -19,7 +19,6 @@ pytestmark = pytest.mark.django_db
         CompanyInteractionFactory,
         InvestmentProjectInteractionFactory,
         CompanyInteractionFactoryWithPolicyFeedback,
-        lambda: CompanyInteractionFactory(was_policy_feedback_provided=None),
     ),
 )
 def test_interaction_to_dict(setup_es, factory_cls):
@@ -101,7 +100,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
         'service_delivery_status': None,
         'grant_amount_offered': None,
         'net_company_receipt': None,
-        'was_policy_feedback_provided': bool(interaction.was_policy_feedback_provided),
+        'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }

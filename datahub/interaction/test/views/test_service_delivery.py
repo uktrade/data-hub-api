@@ -34,33 +34,24 @@ class TestAddServiceDelivery(APITestMixin):
             # non-event service delivery
             {
                 'is_event': False,
-                'was_policy_feedback_provided': False,
             },
             # event service delivery
             {
                 'is_event': True,
-                'was_policy_feedback_provided': False,
                 'event': EventFactory,
             },
             # non-event service delivery with blank notes
             {
                 'is_event': False,
-                'was_policy_feedback_provided': False,
                 'notes': '',
             },
             # non-event service delivery with all fields filled in
             {
                 'is_event': False,
-                'was_policy_feedback_provided': False,
                 'notes': 'hello',
                 'service_delivery_status': partial(random_obj_for_model, ServiceDeliveryStatus),
                 'grant_amount_offered': '9999.99',
                 'net_company_receipt': '8888.99',
-            },
-            # non-event service delivery without was_policy_feedback_provided explicitly specified
-            # (for backwards compatibility)
-            {
-                'is_event': False,
             },
             # non-event service delivery with policy feedback
             {
@@ -89,6 +80,7 @@ class TestAddServiceDelivery(APITestMixin):
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
+            'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
         }
@@ -174,6 +166,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
+                    'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
 
@@ -188,6 +181,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_adviser': AdviserFactory,
                     'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
                 },
                 {
                     'is_event': ['This field is required.'],
@@ -270,6 +264,7 @@ class TestAddServiceDelivery(APITestMixin):
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
+                    'was_policy_feedback_provided': False,
 
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
@@ -340,6 +335,7 @@ class TestAddServiceDelivery(APITestMixin):
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
+                    'was_policy_feedback_provided': False,
 
                     # 'is_event' is False so 'event' should be empty
                     'is_event': False,
@@ -366,6 +362,7 @@ class TestAddServiceDelivery(APITestMixin):
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
+                    'was_policy_feedback_provided': False,
 
                     # 'is_event' is False so 'event' should be set
                     'is_event': True,
