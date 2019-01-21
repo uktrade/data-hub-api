@@ -78,6 +78,7 @@ class Command(BaseCleanupCommand):
                 # projects, OMIS orders or OMIS quotes. We wait for those records to expire
                 # before we delete the related contacts.
                 Contact._meta.get_field('interactions'): (),
+                Contact._meta.get_field('interactions_m2m'): (),
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
