@@ -1,3 +1,26 @@
+Data Hub API 9.4.0 (2019-01-21)
+===============================
+
+
+
+Internal changes
+----------------
+
+- ``country_url`` in the MI dashboard pipeline is now formatted correctly.
+
+API
+---
+
+- **Interactions** ``POST /v3/interaction``: ``was_policy_feedback_provided`` can no longer be omitted when creating interactions.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.trading_names`` was made NOT NULL.
+- **Interactions** The ``interaction_interaction.policy_feedback_notes`` column is now non-nullable. (An empty string is used for blank values.)
+- **Interactions** The ``interaction_interaction.was_policy_feedback_provided`` column is now non-nullable.
+
+
 Data Hub API 9.3.0 (2019-01-17)
 ===============================
 
