@@ -44,12 +44,12 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
-    registered_address_postcode = factory.Faker('postcode', locale='en_GB')
+    registered_address_postcode = factory.Faker('postcode')
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
     trading_address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     trading_address_town = 'Woodside'
-    trading_address_postcode = factory.Faker('postcode', locale='en_GB')
+    trading_address_postcode = factory.Faker('postcode')
     trading_address_country_id = constants.Country.united_kingdom.value.id
 
     address_1 = factory.SelfAttribute('.trading_address_1')

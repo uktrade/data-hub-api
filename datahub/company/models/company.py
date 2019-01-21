@@ -185,7 +185,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
 
-    # will eventually become obsolete when the migration to solely address and registred
+    # will eventually become obsolete when the migration to solely address and registered
     # address is completed
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
