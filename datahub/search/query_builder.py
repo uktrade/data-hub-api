@@ -39,6 +39,8 @@ def get_basic_search_query(
 
     Also returns number of results in other entities.
 
+    TODO: entities should be a positional argument and a single ES model instead of a sequence
+
     :param permission_filters_by_entity: List of pairs of entities and corresponding permission
                                          filters. Only entities in this list are included in the
                                          results, and those are entities are also filtered using
