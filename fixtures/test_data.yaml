@@ -1268,6 +1268,7 @@
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 72c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2017-06-03T00:00:00Z'
     modified_on: '2017-06-03T00:00:00Z'
 
@@ -1285,6 +1286,7 @@
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2017-06-05T00:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
 
@@ -1302,6 +1304,7 @@
     dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2018-01-16T00:00:00Z'
     modified_on: '2018-01-16T00:00:00Z'
 
@@ -1319,6 +1322,7 @@
     dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2018-01-16T00:00:00Z'
     modified_on: '2018-01-16T00:00:00Z'
 
@@ -1336,6 +1340,7 @@
     dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2018-01-16T00:00:00Z'
     modified_on: '2018-01-16T00:00:00Z'
 
@@ -1353,6 +1358,7 @@
     dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    was_policy_feedback_provided: false
     created_on: '2018-01-16T00:00:00Z'
     modified_on: '2018-01-16T00:00:00Z'
 
