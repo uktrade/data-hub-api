@@ -598,7 +598,6 @@ def test_indexed_doc(setup_es):
     (
         ['a', 'b'],
         [],
-        None,
     ),
 )
 def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):

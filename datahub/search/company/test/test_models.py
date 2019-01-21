@@ -92,12 +92,6 @@ class TestCompanyElasticModel:
             ),
             (
                 'Hello      gb',
-                None,
-                False,
-                ['Hello', 'gb', 'Hello      gb'],
-            ),
-            (
-                'Hello      gb',
                 [],
                 True,
                 [],

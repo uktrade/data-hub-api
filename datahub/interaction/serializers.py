@@ -82,30 +82,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    def to_representation(self, instance):
-        """
-        Converts an instance to a dict, ready to be serialised.
-
-        This is overridden to replace None values for some recently added fields with the
-        default value. This is until existing records have been updated and None values
-        replaced with the default value.
-
-        This overridden method can be removed once the NULL values have been removed and
-        the fields made non-nullable.
-        """
-        data = super().to_representation(instance)
-
-        replace_none_with_default_fields = (
-            'policy_feedback_notes',
-            'was_policy_feedback_provided',
-        )
-
-        for field in replace_none_with_default_fields:
-            if data[field] is None:
-                data[field] = instance._meta.get_field(field).default
-
-        return data
-
     def validate(self, data):
         """
         Removes the semi-virtual field is_event from the data.
@@ -127,8 +103,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
-            'policy_feedback_notes': {'allow_null': False},
-            'was_policy_feedback_provided': {'allow_null': False},
         }
         fields = (
             'id',
