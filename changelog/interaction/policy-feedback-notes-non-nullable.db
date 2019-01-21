@@ -1,1 +1,0 @@
-The ``interaction_interaction.policy_feedback_notes`` column is now non-nullable. (An empty string is used for blank values.)
