@@ -15,10 +15,4 @@ class Migration(migrations.Migration):
             name='policy_feedback_notes',
             field=models.TextField(blank=True, default=''),
         ),
-        migrations.AlterField(
-            model_name='interaction',
-            name='was_policy_feedback_provided',
-            field=models.BooleanField(default=False),
-            preserve_default=False,
-        ),
     ]
