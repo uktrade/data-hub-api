@@ -8,4 +8,4 @@ class SearchSimpleModelSerializer(EntitySearchSerializer):
 
     name = serializers.CharField(required=False)
 
-    SORT_BY_FIELDS = ('name', 'name.keyword')
+    SORT_BY_FIELDS = ('name',)

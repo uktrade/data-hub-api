@@ -188,23 +188,26 @@ class TestInteractionEntitySearchView(APITestMixin):
         expected_subjects = list(sorted(subjects, key=lambda s: s.lower(), reverse=True))
         assert [item['subject'] for item in response_data['results']] == expected_subjects
 
-    def test_sort_by_invalid_field(self, setup_es):
+    @pytest.mark.parametrize(
+        'sortby,error',
+        (
+            ('date:backwards', '"backwards" is not a valid sort direction.'),
+            ('gyratory:asc', '"gyratory" is not a valid choice for the sort field.'),
+        ),
+    )
+    def test_sort_by_invalid_field(self, setup_es, sortby, error):
         """Tests attempting to sort by an invalid field and direction."""
         url = reverse('api-v3:search:interaction')
 
         request_data = {
-            'sortby': 'gyratory:backwards',
+            'sortby': sortby,
         }
         response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'sortby': [
-                "'sortby' field is not one of ('company.name', 'contact.name', 'date'"
-                ", 'dit_adviser.name', 'dit_team.name', 'id', 'subject').",
-                "Invalid sort direction 'backwards', must be one of ('asc', 'desc')",
-            ],
+            'sortby': [error],
         }
 
     @pytest.mark.parametrize('term', ('exports', 'meeting', 'exports meeting'))

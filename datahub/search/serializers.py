@@ -4,6 +4,7 @@ from rest_framework.settings import api_settings
 
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.query_builder import MAX_RESULTS
+from datahub.search.utils import SearchOrdering, SortDirection
 
 
 class SingleOrListField(serializers.ListField):
@@ -47,50 +48,62 @@ class IdNameSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
+class _ESOrderingField(serializers.Field):
+    """Serialiser field for specifying an ordering for a search."""
+
+    default_error_messages = {
+        'invalid_field': gettext_lazy('"{input}" is not a valid choice for the sort field.'),
+        'invalid_direction': gettext_lazy('"{input}" is not a valid sort direction.'),
+    }
+    default_direction = SortDirection.asc
+
+    def __init__(self, *args, **kwargs):
+        """Initialise the field."""
+        super().__init__(*args, **kwargs)
+        self.choices = None
+
+    def configure(self, choices, default):
+        """Sets the choices and default ordering for the field."""
+        self.choices = choices
+        self.default = default
+
+    def to_internal_value(self, data):
+        """Converts an ordering string to an SearchOrdering."""
+        field, _, direction = data.partition(':')
+
+        if field not in self.choices:
+            self.fail('invalid_field', input=field)
+
+        if direction:
+            try:
+                direction = SortDirection(direction)
+            except ValueError:
+                self.fail('invalid_direction', input=direction)
+        else:
+            direction = self.default_direction
+
+        return SearchOrdering(field, direction)
+
+    def to_representation(self, value):
+        """Converts an SearchOrdering to an ordering string."""
+        return f'{value.field}:{value.direction}'
+
+
 class BaseSearchSerializer(serializers.Serializer):
     """Base serialiser for basic (global) and entity search."""
 
     SORT_BY_FIELDS = []
 
-    SORT_DIRECTIONS = (
-        'asc',
-        'desc',
-    )
-
     DEFAULT_ORDERING = None
 
     offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
     limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
-    sortby = serializers.CharField(default=None)
+    sortby = _ESOrderingField(required=False)
 
-    def validate_sortby(self, val):
-        """
-        Validates the sortby field.
-
-        Called by DRF.
-        """
-        if val is None:
-            if self.DEFAULT_ORDERING is None:
-                return None
-            else:
-                val = self.DEFAULT_ORDERING
-
-        errors = []
-
-        field, sep, order = val.partition(':')
-        if field not in self.SORT_BY_FIELDS:
-            errors.append(f"'sortby' field is not one of {self.SORT_BY_FIELDS}.")
-
-        if sep and order not in self.SORT_DIRECTIONS:
-            errors.append(
-                f"Invalid sort direction '{order}', must be one of "
-                f'{self.SORT_DIRECTIONS}',
-            )
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return val
+    def __init__(self, *args, **kwrags):
+        """Initialises the serialiser and configures the `sortby` field."""
+        super().__init__(*args, **kwrags)
+        self.fields['sortby'].configure(self.SORT_BY_FIELDS, self.DEFAULT_ORDERING)
 
 
 class _ESModelChoiceField(serializers.Field):

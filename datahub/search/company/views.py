@@ -21,6 +21,9 @@ class SearchCompanyParams:
     entity = Company
     serializer_class = SearchCompanySerializer
     autocomplete_serializer_class = AutocompleteSearchCompanySerializer
+    es_sort_by_remappings = {
+        'name': 'name.keyword',
+    }
 
     FILTER_FIELDS = (
         'archived',

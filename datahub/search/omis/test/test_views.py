@@ -113,6 +113,32 @@ def setup_data(setup_es):
         setup_es.indices.refresh()
 
 
+@pytest.fixture
+def setup_subtotal_cost_data(setup_es):
+    """
+    Setup Order data for total subtotal cost test.
+
+    Order will have a reference that is a string representation of the resulting subtotal_cost.
+    Subtotal cost must be three-digit because the test is choosing orders by their
+    reference. The reference filter is built with a trigram so this way we can
+    avoid ambiguity.
+    """
+    subtotal_costs = (100, 200, 300, 400, 500)
+
+    for subtotal_cost in subtotal_costs:
+        order = OrderFactory(
+            reference=str(subtotal_cost),
+            discount_value=0,
+            assignees=[],
+        )
+        OrderAssigneeFactory(
+            order=order,
+            estimated_time=subtotal_cost * 60 // order.hourly_rate.rate_value,
+        )
+
+    setup_es.indices.refresh()
+
+
 class TestSearchOrder(APITestMixin):
     """Test specific search for orders."""
 
@@ -327,6 +353,50 @@ class TestSearchOrder(APITestMixin):
         assert [
             item['reference'] for item in response.json()['results']
         ] == results
+
+    @pytest.mark.parametrize(
+        'post_data,expected_total_subtotal_cost',
+        (
+            (  # no filter => return all records
+                {},
+                1500,
+            ),
+            (
+                {'reference': ['100', '200']},
+                300,
+            ),
+            (  # order with '150' reference doesn't exist
+                {'reference': ['500', '150']},
+                500,
+            ),
+            (
+                {'reference': ['100', '200', '500']},
+                800,
+            ),
+            (  # order with '50' reference doesn't exist
+                {'reference': ['100', '50', '300', '400']},
+                800,
+            ),
+            (  # order with such reference doesn't exist
+                {'reference': '900'},
+                0,
+            ),
+        ),
+    )
+    def test_search_orders_total_net_cost_value(
+        self,
+        setup_subtotal_cost_data,
+        post_data,
+        expected_total_subtotal_cost,
+    ):
+        """Test that search orders result contains correct total subtotal_cost."""
+        url = reverse('api-v3:search:order')
+        response = self.api_client.post(url, post_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        subtotal_cost_total = response_data['summary']['total_subtotal_cost']
+        assert subtotal_cost_total == expected_total_subtotal_cost
 
     def test_filter_by_company_id(self, setup_data):
         """Test that orders can be filtered by company id."""
