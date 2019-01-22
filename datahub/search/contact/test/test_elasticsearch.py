@@ -182,7 +182,6 @@ def test_mapping(setup_es):
                 },
                 'email_alternative': {'type': 'text'},
                 'first_name': {
-                    'fielddata': True,
                     'type': 'text',
                     'fields': {
                         'keyword': {
@@ -197,7 +196,6 @@ def test_mapping(setup_es):
                     'type': 'keyword',
                 },
                 'last_name': {
-                    'fielddata': True,
                     'type': 'text',
                     'fields': {
                         'keyword': {

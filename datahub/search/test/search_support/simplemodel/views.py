@@ -11,6 +11,9 @@ class SearchSimpleModelParams:
     required_scopes = (Scope.internal_front_end,)
     entity = ESSimpleModel
     serializer_class = SearchSimpleModelSerializer
+    es_sort_by_remappings = {
+        'name': 'name.keyword',
+    }
 
     FILTER_FIELDS = ('name',)
 

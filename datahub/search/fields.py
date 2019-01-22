@@ -11,7 +11,6 @@ NormalizedKeyword = partial(
 )
 TrigramText = partial(Text, analyzer='trigram_analyzer')
 EnglishText = partial(Text, analyzer='english_analyzer')
-SortableText = partial(Text, fielddata=True)
 
 
 class TextWithKeyword(Text):

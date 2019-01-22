@@ -22,6 +22,9 @@ class SearchInvestmentProjectParams:
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
+    es_sort_by_remappings = {
+        'name': 'name.keyword',
+    }
 
     FILTER_FIELDS = (
         'adviser',

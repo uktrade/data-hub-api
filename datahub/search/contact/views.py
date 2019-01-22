@@ -23,6 +23,11 @@ class SearchContactParams:
     required_scopes = (Scope.internal_front_end,)
     entity = Contact
     serializer_class = SearchContactSerializer
+    es_sort_by_remappings = {
+        'first_name': 'first_name.keyword',
+        'last_name': 'last_name.keyword',
+        'name': 'name.keyword',
+    }
 
     FILTER_FIELDS = (
         'name',
@@ -70,7 +75,7 @@ class SearchContactAPIView(SearchContactParams, SearchAPIView):
 class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
     """Company search export view."""
 
-    sort_by_remappings = {
+    db_sort_by_remappings = {
         'address_country.name': 'computed_country_name',
     }
     queryset = DBContact.objects.annotate(

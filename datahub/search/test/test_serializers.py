@@ -32,20 +32,3 @@ class TestSingleOrListField:
             field.run_validation(['', ''])
 
         assert excinfo.value.get_codes() == {0: ['blank'], 1: ['blank']}
-
-
-class TestSerializerAttributes:
-    """Validates the field names specified in class attributes on serialiser classes."""
-
-    def test_sort_by_fields(self, search_app):
-        """Validate that the values of SORT_BY_FIELDS are valid field paths."""
-        view = search_app.view
-        mapping = search_app.es_model._doc_type.mapping
-
-        invalid_fields = {
-            field
-            for field in view.serializer_class.SORT_BY_FIELDS
-            if not mapping.resolve_field(field)
-        }
-
-        assert not invalid_fields
