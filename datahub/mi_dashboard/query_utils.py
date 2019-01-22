@@ -105,13 +105,13 @@ def get_financial_year_from_land_date_expression():
     """
     Extract financial year from the land_date field.
 
-    Financial year starts on April the 6th and ends on the 5th April the following year. To
+    Fiscal financial year starts on April the 1th and ends on the 31st March the following year. To
     simplify the calculation of the financial year, we need to offset the date by
-    3 months and 5 days so for example the date 7th April 2015 becomes 2 January 2015 and the
+    3 months so for example the date 7th April 2015 becomes 7th January 2015 and the
     year becomes the start year of the calculated financial year.
     """
     adjusted_land_date = Cast(
-        F('land_date') - Cast(Value('3 months 5 days'), DurationField()),
+        F('land_date') - Cast(Value('3 months'), DurationField()),
         DateField(),
     )
     year = ExtractYear(adjusted_land_date)

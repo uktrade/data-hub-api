@@ -428,8 +428,7 @@ def test_limited_get_search_by_entity_query():
                         'term': {
                             '_type': 'company',
                         },
-                    },
-                    {
+                    }, {
                         'bool': {
                             'should': [
                                 {
@@ -439,8 +438,7 @@ def test_limited_get_search_by_entity_query():
                                             'boost': 2,
                                         },
                                     },
-                                },
-                                {
+                                }, {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
@@ -465,58 +463,59 @@ def test_limited_get_search_by_entity_query():
                         },
                     },
                 ],
-            },
-        },
-        'post_filter': {
-            'bool': {
-                'must': [
+                'filter': [
                     {
                         'bool': {
-                            'should': [
+                            'must': [
                                 {
-                                    'match': {
-                                        'address_town': {
-                                            'query': 'Woodside',
-                                            'operator': 'and',
+                                    'bool': {
+                                        'should': [
+                                            {
+                                                'match': {
+                                                    'address_town': {
+                                                        'query': 'Woodside',
+                                                        'operator': 'and',
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                        'minimum_should_match': 1,
+                                    },
+                                }, {
+                                    'bool': {
+                                        'should': [
+                                            {
+                                                'match': {
+                                                    'trading_address_country.id': {
+                                                        'query':
+                                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                                        'operator': 'and',
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                        'minimum_should_match': 1,
+                                    },
+                                }, {
+                                    'range': {
+                                        'estimated_land_date': {
+                                            'lte': '2017-06-13T09:44:31.062870',
+                                            'gte': '2017-06-13T09:44:31.062870',
                                         },
                                     },
                                 },
                             ],
-                            'minimum_should_match': 1,
-                        },
-                    },
-                    {
-                        'bool': {
-                            'should': [
-                                {
-                                    'match': {
-                                        'trading_address_country.id': {
-                                            'query': '80756b9a-5d95-e211-a939-e4115bead28a',
-                                            'operator': 'and',
-                                        },
-                                    },
-                                },
-                            ],
-                            'minimum_should_match': 1,
-                        },
-                    },
-                    {
-                        'range': {
-                            'estimated_land_date': {
-                                'gte': '2017-06-13T09:44:31.062870',
-                                'lte': '2017-06-13T09:44:31.062870',
-                            },
                         },
                     },
                 ],
             },
         },
-        'from': 5,
-        'size': 5,
         'sort': [
             '_score',
             'id',
         ],
+        'from': 5,
+        'size': 5,
     }
 
 

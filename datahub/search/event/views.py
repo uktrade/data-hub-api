@@ -10,6 +10,9 @@ class SearchEventParams:
     required_scopes = (Scope.internal_front_end,)
     entity = Event
     serializer_class = SearchEventSerializer
+    es_sort_by_remappings = {
+        'name': 'name.keyword',
+    }
 
     FILTER_FIELDS = (
         'address_country',
