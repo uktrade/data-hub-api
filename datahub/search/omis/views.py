@@ -75,6 +75,25 @@ class SearchOrderParams:
 class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
     """Filtered order search view."""
 
+    subtotal_cost_field = 'subtotal_cost'
+
+    def get_base_query(self, request, validated_data):
+        """Enhance entity query with the total subtotal cost."""
+        base_query = super().get_base_query(request, validated_data)
+        base_query.aggs.bucket(self.subtotal_cost_field, 'sum', field=self.subtotal_cost_field)
+        return base_query
+
+    def enhance_response(self, results, response):
+        """Enhance response with total subtotal cost."""
+        summary = {}
+
+        if self.subtotal_cost_field in results.aggregations:
+            total_subtotal_cost = results.aggregations[self.subtotal_cost_field]['value']
+            summary[f'total_{self.subtotal_cost_field}'] = total_subtotal_cost
+
+        response['summary'] = summary
+        return response
+
 
 class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
     """Order search export view."""
