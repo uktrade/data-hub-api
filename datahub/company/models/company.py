@@ -168,6 +168,25 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         metadata_models.UKRegion, blank=True, null=True,
         on_delete=models.SET_NULL,
     )
+
+    # address is the main location for the business, it could be the trading address
+    # or the registered address or a completely different address
+    # TODO make address CharFields NOT NULL
+    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_country = models.ForeignKey(
+        metadata_models.Country,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='company_address_country',
+    )
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
+
+    # will eventually become obsolete when the migration to solely address and registered
+    # address is completed
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -180,6 +199,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         related_name='company_trading_address_country',
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+
     headquarter_type = models.ForeignKey(
         metadata_models.HeadquarterType, blank=True, null=True,
         on_delete=models.SET_NULL,
