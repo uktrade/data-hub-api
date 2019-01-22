@@ -2,6 +2,9 @@ version: 2.1
 
 job_defaults: &job_defaults
   parameters:
+    python_image:
+      type: string
+
     es_image:
       type: string
 
@@ -37,7 +40,7 @@ job_defaults: &job_defaults
   working_directory: ~/app
 
   docker:
-    - image: python:3.6
+    - image: <<parameters.python_image>>
 
     - image: <<parameters.es_image>>
 
@@ -89,28 +92,19 @@ job_defaults: &job_defaults
             command: |
               wget -O codecov.sh https://codecov.io/bash
               bash ./codecov.sh -t ${COV_TOKEN}
+
 jobs:
-
-  build_es_63_pg_96:
-    <<: *job_defaults
-
-  build_es_64_pg_10:
+  default_build:
     <<: *job_defaults
 
 workflows:
   version: 2
 
-  Elasticsearch 6.3 and PostgreSQL 9.6:
+  Default build:
     jobs:
-      - build_es_63_pg_96:
+      - default_build:
           publish_coverage: true
-          postgres_image: postgres:9.6
-          mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
-
-  Elasticsearch 6.4 and PostgreSQL 10:
-    jobs:
-      - build_es_64_pg_10:
+          python_image: python:3.6
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
