@@ -71,7 +71,7 @@ def test_load_investment_projects_2018_2019():
     """
     InvestmentProjectFactory.create_batch(5, actual_land_date=None, estimated_land_date=None)
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2014, 2, 3))
-    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2019, 4, 2))
+    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2019, 3, 28))
     etl = ETLInvestmentProjectsFinancialYear(
         destination=MIInvestmentProject,
         financial_year='2018/2019',
@@ -89,8 +89,8 @@ def test_load_investment_projects_2018_2019():
 
 def test_run_mi_investment_project_etl_pipeline():
     """Tests that run_mi_investment_project_etl_pipeline copy data to FDIDashboard table."""
-    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 6))
-    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 5))
+    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 1))
+    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 3, 31))
 
     financial_year = '2018/2019'
 
