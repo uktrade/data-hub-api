@@ -1,3 +1,35 @@
+Data Hub API 9.5.0 (2019-01-22)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The column ``company_company.alias`` was deleted from the database.
+
+Features
+--------
+
+- **OMIS** Search response for OMIS orders now contains total subtotal cost for given query.
+
+Bug fixes
+---------
+
+- The MI dashboard pipeline now correctly selects the investment projects for given fiscal year.
+- Country URL in the MI dashboard is now assembled correctly.
+
+API
+---
+
+- **OMIS** ``POST /v3/search/order``: The response now contains ``summary`` property that includes a total value of filtered orders' subtotal cost (``total_subtotal_cost``)`.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.alias`` was deleted from the database.
+
+
 Data Hub API 9.4.0 (2019-01-21)
 ===============================
 
