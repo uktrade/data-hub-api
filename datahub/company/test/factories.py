@@ -41,12 +41,22 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         factory.Faker('company'),
         factory.Faker('company'),
     ])
+
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
+    registered_address_postcode = factory.Faker('postcode')
     registered_address_country_id = constants.Country.united_kingdom.value.id
+
     trading_address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     trading_address_town = 'Woodside'
+    trading_address_postcode = factory.Faker('postcode')
     trading_address_country_id = constants.Country.united_kingdom.value.id
+
+    address_1 = factory.SelfAttribute('.trading_address_1')
+    address_town = factory.SelfAttribute('.trading_address_town')
+    address_postcode = factory.SelfAttribute('.trading_address_postcode')
+    address_country_id = factory.SelfAttribute('.trading_address_country_id')
+
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False

@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 import factory
@@ -206,21 +207,19 @@ class TestGetCompany(APITestMixin):
     def test_get_company_with_company_number(self):
         """Tests the company item view for a company with a company number."""
         ch_company = CompaniesHouseCompanyFactory(
-            company_number=123,
-            name='Foo Ltd',
-            registered_address_1='Hello St',
-            registered_address_town='Fooland',
-            registered_address_country_id=Country.united_states.value.id,
+            company_number='123',
+        )
+        ghq = CompanyFactory(
+            global_headquarters=None,
+            one_list_tier=OneListTier.objects.first(),
+            one_list_account_owner=AdviserFactory(),
         )
         company = CompanyFactory(
-            company_number=123,
-            name='Bar Ltd',
+            company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
-            vat_number='009485769',
-            registered_address_1='Goodbye St',
-            registered_address_town='Barland',
-            registered_address_country_id=Country.united_kingdom.value.id,
-            one_list_account_owner=AdviserFactory(),
+            global_headquarters=ghq,
+            one_list_tier=None,
+            one_list_account_owner=None,
         )
         user = create_test_user(
             permission_codenames=(
@@ -238,57 +237,66 @@ class TestGetCompany(APITestMixin):
             'id': str(company.pk),
             'companies_house_data': {
                 'id': ch_company.id,
-                'company_number': '123',
+                'company_number': ch_company.company_number,
                 'company_category': ch_company.company_category,
-                'company_status': '',
+                'company_status': ch_company.company_status,
                 'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
-                'name': 'Foo Ltd',
-                'registered_address_1': 'Hello St',
-                'registered_address_2': None,
-                'registered_address_town': 'Fooland',
-                'registered_address_county': None,
-                'registered_address_postcode': None,
+                'name': ch_company.name,
+                'registered_address_1': ch_company.registered_address_1,
+                'registered_address_2': ch_company.registered_address_2,
+                'registered_address_town': ch_company.registered_address_town,
+                'registered_address_county': ch_company.registered_address_county,
+                'registered_address_postcode': ch_company.registered_address_postcode,
                 'registered_address_country': {
                     'id': str(ch_company.registered_address_country.id),
                     'name': ch_company.registered_address_country.name,
                 },
-                'sic_code_1': '',
-                'sic_code_2': '',
-                'sic_code_3': '',
-                'sic_code_4': '',
-                'uri': '',
+                'sic_code_1': ch_company.sic_code_1,
+                'sic_code_2': ch_company.sic_code_2,
+                'sic_code_3': ch_company.sic_code_3,
+                'sic_code_4': ch_company.sic_code_4,
+                'uri': ch_company.uri,
             },
-            'reference_code': '',
-            'name': 'Bar Ltd',
-            'trading_name': 'Xyz trading',
-            'trading_names': ['Xyz trading', 'Abc trading'],
-            'registered_address_1': 'Goodbye St',
-            'registered_address_2': None,
-            'registered_address_town': 'Barland',
-            'registered_address_county': None,
-            'registered_address_postcode': None,
+            'created_on': format_date_or_datetime(company.created_on),
+            'modified_on': format_date_or_datetime(company.modified_on),
+            'name': company.name,
+            'reference_code': company.reference_code,
+            'company_number': company.company_number,
+            'vat_number': company.vat_number,
+            'duns_number': company.duns_number,
+            'trading_name': company.trading_names[0],
+            'trading_names': company.trading_names,
+            'registered_address_1': company.registered_address_1,
+            'registered_address_2': company.registered_address_2,
+            'registered_address_town': company.registered_address_town,
+            'registered_address_county': company.registered_address_county,
+            'registered_address_postcode': company.registered_address_postcode,
             'registered_address_country': {
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name,
             },
-            'archived': False,
-            'archived_by': None,
-            'archived_documents_url_path': company.archived_documents_url_path,
-            'archived_on': None,
-            'archived_reason': None,
+            'trading_address_1': company.trading_address_1,
+            'trading_address_2': company.trading_address_2,
+            'trading_address_country': {
+                'id': str(company.trading_address_country.id),
+                'name': company.trading_address_country.name,
+            },
+            'trading_address_county': company.trading_address_county,
+            'trading_address_postcode': company.trading_address_postcode,
+            'trading_address_town': company.trading_address_town,
+            'uk_based': (
+                company.registered_address_country.id == uuid.UUID(Country.united_kingdom.value.id)
+            ),
+            'uk_region': {
+                'id': str(company.uk_region.id),
+                'name': company.uk_region.name,
+            },
             'business_type': {
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'one_list_group_tier': None,
-            'company_number': '123',
             'contacts': [],
-            'created_on': format_date_or_datetime(company.created_on),
-            'description': None,
-            'transferred_by': None,
-            'transferred_on': None,
-            'transferred_to': None,
-            'transfer_reason': '',
+            'description': company.description,
             'employee_range': {
                 'id': str(company.employee_range.id),
                 'name': company.employee_range.name,
@@ -301,112 +309,82 @@ class TestGetCompany(APITestMixin):
             },
             'export_to_countries': [],
             'future_interest_countries': [],
-            'headquarter_type': None,
-            'modified_on': format_date_or_datetime(company.modified_on),
-            'one_list_group_global_account_manager': {
-                'id': str(company.one_list_account_owner.pk),
-                'name': company.one_list_account_owner.name,
-                'first_name': company.one_list_account_owner.first_name,
-                'last_name': company.one_list_account_owner.last_name,
-                'dit_team': {
-                    'id': str(company.one_list_account_owner.dit_team.id),
-                    'name': company.one_list_account_owner.dit_team.name,
-                    'uk_region': {
-                        'id': str(company.one_list_account_owner.dit_team.uk_region.pk),
-                        'name': company.one_list_account_owner.dit_team.uk_region.name,
-                    },
-                    'country': {
-                        'id': str(company.one_list_account_owner.dit_team.country.pk),
-                        'name': company.one_list_account_owner.dit_team.country.name,
-                    },
-
-                },
-            },
-            'global_headquarters': None,
+            'headquarter_type': company.headquarter_type,
             'sector': {
                 'id': str(company.sector.id),
                 'name': company.sector.name,
             },
-            'trading_address_1': company.trading_address_1,
-            'trading_address_2': None,
-            'trading_address_country': {
-                'id': str(company.trading_address_country.id),
-                'name': company.trading_address_country.name,
-            },
-            'trading_address_county': None,
-            'trading_address_postcode': None,
-            'trading_address_town': 'Woodside',
             'turnover_range': {
                 'id': str(company.turnover_range.id),
                 'name': company.turnover_range.name,
             },
             'turnover': company.turnover,
             'is_turnover_estimated': company.is_turnover_estimated,
-            'uk_based': True,
-            'uk_region': {
-                'id': str(company.uk_region.id),
-                'name': company.uk_region.name,
+            'website': company.website,
+            'global_headquarters': {
+                'id': str(ghq.id),
+                'name': ghq.name,
             },
-            'vat_number': '009485769',
-            'duns_number': company.duns_number,
-            'website': None,
+            'one_list_group_tier': {
+                'id': str(ghq.one_list_tier.id),
+                'name': ghq.one_list_tier.name,
+            },
+            'one_list_group_global_account_manager': {
+                'id': str(ghq.one_list_account_owner.pk),
+                'name': ghq.one_list_account_owner.name,
+                'first_name': ghq.one_list_account_owner.first_name,
+                'last_name': ghq.one_list_account_owner.last_name,
+                'dit_team': {
+                    'id': str(ghq.one_list_account_owner.dit_team.id),
+                    'name': ghq.one_list_account_owner.dit_team.name,
+                    'uk_region': {
+                        'id': str(ghq.one_list_account_owner.dit_team.uk_region.pk),
+                        'name': ghq.one_list_account_owner.dit_team.uk_region.name,
+                    },
+                    'country': {
+                        'id': str(ghq.one_list_account_owner.dit_team.country.pk),
+                        'name': ghq.one_list_account_owner.dit_team.country.name,
+                    },
+                },
+            },
+            'archived_documents_url_path': company.archived_documents_url_path,
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+            'transferred_by': None,
+            'transferred_on': None,
+            'transferred_to': None,
+            'transfer_reason': '',
         }
 
     def test_get_company_without_company_number(self):
-        """Tests the company item view for a company without a company number.
-
-        Checks that that the registered name and address are coming from the
-        company record.
-        """
-        company = CompanyFactory(
-            name='Foo ltd.',
-            registered_address_1='Hello st.',
-            registered_address_town='Fooland',
-            registered_address_country_id=Country.united_states.value.id,
-            headquarter_type_id=HeadquarterType.ukhq.value.id,
-        )
+        """Tests the company item view for a company without a company number."""
+        company = CompanyFactory()
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['id'] == str(company.pk)
-        assert response_data['companies_house_data'] is None
-        assert response_data['name'] == company.name
-        assert response_data['registered_address_1'] == company.registered_address_1
-        assert response_data['registered_address_2'] is None
-        assert response_data['registered_address_town'] == company.registered_address_town
-        assert response_data['registered_address_country'] == {
-            'name': company.registered_address_country.name,
-            'id': str(company.registered_address_country.pk),
-        }
-        assert response_data['registered_address_county'] is None
-        assert response_data['registered_address_postcode'] is None
-        assert response_data['headquarter_type']['id'] == HeadquarterType.ukhq.value.id
+        assert response.json()['companies_house_data'] is None
 
     def test_get_company_without_registered_country(self):
-        """Tests the company item view for a company without a registered
+        """
+        Tests the company item view for a company without a registered
         company.
 
         Checks that the endpoint returns 200 and the uk_based attribute is
         set to None.
         """
         company = CompanyFactory(
-            name='Foo ltd.',
-            registered_address_1='Hello st.',
-            registered_address_town='Fooland',
             registered_address_country_id=None,
-            headquarter_type_id=HeadquarterType.ukhq.value.id,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['id'] == str(company.pk)
-        assert response_data['uk_based'] is None
+        assert response.json()['uk_based'] is None
 
     @pytest.mark.parametrize(
         'input_website,expected_website',
@@ -1079,6 +1057,310 @@ class TestTradingNamesForCompany(APITestMixin):
         response_data = response.json()
         assert response_data['trading_name'] == expected_trading_name
         assert response_data['trading_names'] == expected_trading_names
+
+
+class TestAddressesForCompany(APITestMixin):
+    """
+    Tests related to saving the value of address fields from trading or registered address fields.
+
+    TODO: delete after the migration to address and registered address is completed
+    """
+
+    @pytest.mark.parametrize(
+        'data,expected_model_values',
+        (
+            # with trading address
+            (
+                {
+                    'registered_address_1': '75',
+                    'registered_address_2': 'Stramford Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Clapham',
+                    'registered_address_postcode': 'SW4 0BG',
+                    'registered_address_country': Country.united_kingdom.value.id,
+
+                    'trading_address_1': '1',
+                    'trading_address_2': 'Hello st.',
+                    'trading_address_town': 'Muckamore',
+                    'trading_address_county': 'Antrim',
+                    'trading_address_postcode': 'BT41 4QE',
+                    'trading_address_country': {'id': Country.ireland.value.id},
+                },
+                {
+                    'address_1': '1',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': uuid.UUID(Country.ireland.value.id),
+                },
+            ),
+
+            # with None values for trading address
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country': {'id': Country.united_kingdom.value.id},
+
+                    'trading_address_1': None,
+                    'trading_address_2': None,
+                    'trading_address_town': None,
+                    'trading_address_county': None,
+                    'trading_address_postcode': None,
+                    'trading_address_country': None,
+                },
+                {
+                    'address_1': '2',
+                    'address_2': 'Main Road',
+                    'address_town': 'London',
+                    'address_county': 'Greenwich',
+                    'address_postcode': 'SE10 9NN',
+                    'address_country_id': uuid.UUID(Country.united_kingdom.value.id),
+                },
+            ),
+
+            # without trading address
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country': {'id': Country.united_kingdom.value.id},
+                },
+                {
+                    'address_1': '2',
+                    'address_2': 'Main Road',
+                    'address_town': 'London',
+                    'address_county': 'Greenwich',
+                    'address_postcode': 'SE10 9NN',
+                    'address_country_id': uuid.UUID(Country.united_kingdom.value.id),
+                },
+            ),
+        ),
+    )
+    def test_add_company_saves_address_correctly(self, data, expected_model_values):
+        """
+        Test that the value of address fields are populated from trading address or
+        registered address whichever is defined.
+        """
+        post_data = {
+            'name': 'Acme',
+            'business_type': BusinessTypeConstant.company.value.id,
+            'sector': random_obj_for_model(Sector).id,
+            'uk_region': UKRegion.england.value.id,
+            **data,
+        }
+
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, data=post_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        company = Company.objects.get(pk=response.json()['id'])
+        for field, value in expected_model_values.items():
+            assert getattr(company, field) == value
+
+    @pytest.mark.parametrize(
+        'initial_model_values,data,expected_model_values',
+        (
+            # address fields populated from trading address fields in data
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country_id': Country.united_kingdom.value.id,
+
+                    'trading_address_1': None,
+                    'trading_address_2': None,
+                    'trading_address_town': None,
+                    'trading_address_county': None,
+                    'trading_address_postcode': None,
+                    'trading_address_country_id': None,
+                },
+                {
+                    'trading_address_1': '1',
+                    'trading_address_2': 'Hello st.',
+                    'trading_address_town': 'Muckamore',
+                    'trading_address_county': 'Antrim',
+                    'trading_address_postcode': 'BT41 4QE',
+                    'trading_address_country': {'id': Country.ireland.value.id},
+                },
+                {
+                    'address_1': '1',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': uuid.UUID(Country.ireland.value.id),
+                },
+            ),
+
+            # address fields populated from registered address fields in data
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country_id': Country.united_kingdom.value.id,
+
+                    'trading_address_1': None,
+                    'trading_address_2': None,
+                    'trading_address_town': None,
+                    'trading_address_county': None,
+                    'trading_address_postcode': None,
+                    'trading_address_country_id': None,
+                },
+                {
+                    'registered_address_1': '1',
+                    'registered_address_2': 'Hello st.',
+                    'registered_address_town': 'Muckamore',
+                    'registered_address_county': 'Antrim',
+                    'registered_address_postcode': 'BT41 4QE',
+                    'registered_address_country': {'id': Country.ireland.value.id},
+                },
+                {
+                    'address_1': '1',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': uuid.UUID(Country.ireland.value.id),
+                },
+            ),
+
+            # address fields populated from trading address fields in the model
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country_id': Country.united_kingdom.value.id,
+
+                    'trading_address_1': '1',
+                    'trading_address_2': 'Hello st.',
+                    'trading_address_town': 'Muckamore',
+                    'trading_address_county': 'Antrim',
+                    'trading_address_postcode': 'BT41 4QE',
+                    'trading_address_country_id': Country.ireland.value.id,
+                },
+                {
+                    'registered_address_1': '3',
+                },
+                {
+                    'address_1': '1',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': uuid.UUID(Country.ireland.value.id),
+                },
+            ),
+
+            # address fields populated from registered address fields in the model
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country_id': Country.united_kingdom.value.id,
+
+                    'trading_address_1': '1',
+                    'trading_address_2': 'Hello st.',
+                    'trading_address_town': 'Muckamore',
+                    'trading_address_county': 'Antrim',
+                    'trading_address_postcode': 'BT41 4QE',
+                    'trading_address_country_id': Country.ireland.value.id,
+                },
+                {
+                    'trading_address_1': '',
+                    'trading_address_2': '',
+                    'trading_address_town': '',
+                    'trading_address_county': '',
+                    'trading_address_postcode': '',
+                    'trading_address_country': None,
+                },
+                {
+                    'address_1': '2',
+                    'address_2': 'Main Road',
+                    'address_town': 'London',
+                    'address_county': 'Greenwich',
+                    'address_postcode': 'SE10 9NN',
+                    'address_country_id': uuid.UUID(Country.united_kingdom.value.id),
+                },
+            ),
+
+            # address is not overridden as no address field was passed in
+            (
+                {
+                    'registered_address_1': '2',
+                    'registered_address_2': 'Main Road',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Greenwich',
+                    'registered_address_postcode': 'SE10 9NN',
+                    'registered_address_country_id': Country.united_kingdom.value.id,
+
+                    'trading_address_1': None,
+                    'trading_address_2': None,
+                    'trading_address_town': None,
+                    'trading_address_county': None,
+                    'trading_address_postcode': None,
+                    'trading_address_country_id': None,
+
+                    'address_1': '11',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': Country.ireland.value.id,
+                },
+                {
+                    'name': 'other name',
+                },
+                {
+
+                    'address_1': '11',
+                    'address_2': 'Hello st.',
+                    'address_town': 'Muckamore',
+                    'address_county': 'Antrim',
+                    'address_postcode': 'BT41 4QE',
+                    'address_country_id': uuid.UUID(Country.ireland.value.id),
+                },
+            ),
+        ),
+    )
+    def test_update_company_saves_address_correctly(
+        self,
+        initial_model_values,
+        data,
+        expected_model_values,
+    ):
+        """
+        Test that the value of address fields are populated from trading address or
+        registered address whichever is defined.
+        """
+        company = CompanyFactory(**initial_model_values)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        company.refresh_from_db()
+        for field, value in expected_model_values.items():
+            assert getattr(company, field) == value
 
 
 class TestAddCompany(APITestMixin):
