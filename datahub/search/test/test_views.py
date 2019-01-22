@@ -132,24 +132,48 @@ class TestValidateViewAttributes:
         assert not invalid_fields
 
 
+class TestValidateViewSortByAttributes:
+    """Validates the various sort by attributes for each view (and the related serialiser)."""
+
+    def test_sort_by_fields(self, search_app):
+        """Validate that all sort by values are valid field paths."""
+        view = search_app.view
+        serializer_class = view.serializer_class
+        mapping = search_app.es_model._doc_type.mapping
+
+        invalid_fields = {
+            field
+            for field in set(serializer_class.SORT_BY_FIELDS)
+            if not mapping.resolve_field(view.es_sort_by_remappings.get(field, field))
+        }
+
+        assert not invalid_fields
+
+    def test_sort_by_remapping_keys_are_sort_by_fields(self, search_app):
+        """
+        Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
+        """
+        serializer_class = search_app.view.serializer_class
+
+        invalid_fields = (
+            search_app.view.es_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+        )
+
+        assert not invalid_fields
+
+
 class TestValidateExportViewAttributes:
     """Validates the field names specified in class attributes on export views."""
 
-    def test_validate_sort_by_remappings(self, search_app):
-        """Validate that the values of sort_by_remappings are valid field paths."""
+    def test_validate_db_sort_by_remappings_keys(self, search_app):
+        """Validate that the keys of db_sort_by_remappings are valid sort by fields."""
         view = search_app.export_view
-        mapping = search_app.es_model._doc_type.mapping
 
         if not view:
             return
 
-        invalid_fields = {
-            field
-            for field in view.sort_by_remappings
-            if not mapping.resolve_field(field)
-            and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
-        }
-
+        serializer_class = view.serializer_class
+        invalid_fields = view.db_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
         assert not invalid_fields
 
 
