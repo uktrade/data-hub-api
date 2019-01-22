@@ -412,7 +412,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 
     'mi_fdi_dashboard_country': (
-        f'{DATAHUB_FRONTEND_BASE_URL}/{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
+        f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
     )
 }
 
