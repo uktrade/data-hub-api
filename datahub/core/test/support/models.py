@@ -46,6 +46,19 @@ class NullableWithDefaultModel(models.Model):
     non_nullable_with_default = models.BooleanField(default=True)
 
 
+class ForeignAndM2MModel(models.Model):
+    """Model with both a foreign key and many-to-many field with the same target model."""
+
+    value = models.ForeignKey(
+        MetadataModel,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    values = models.ManyToManyField(MetadataModel, blank=True, related_name='+')
+
+
 class Person(models.Model):
     """Person model."""
 
