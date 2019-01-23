@@ -1,0 +1,1 @@
+A background task to copy data from Interaction.contact to Interaction.contacts was added. This task is triggered on app start-up. If running Leeloo locally please make sure that Celery is running so that the task runs.
