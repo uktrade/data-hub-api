@@ -17,6 +17,20 @@ class MetadataModelFactory(factory.django.DjangoModelFactory):
         model = 'support.MetadataModel'
 
 
+class ForeignAndM2MModelFactory(factory.django.DjangoModelFactory):
+    """ForeignAndM2MModel factory."""
+
+    value = factory.SubFactory(MetadataModelFactory)
+
+    @to_many_field
+    def values(self):
+        """Post-generation hook for values."""
+        return [self.value] if self.value else []
+
+    class Meta:
+        model = 'support.ForeignAndM2MModel'
+
+
 class PersonFactory(factory.django.DjangoModelFactory):
     """Person factory."""
 

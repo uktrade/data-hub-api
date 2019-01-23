@@ -2,9 +2,21 @@ from logging import getLogger
 
 from celery import shared_task
 from django.apps import apps
-from django.db.models import BooleanField, Case, ExpressionWrapper, NOT_PROVIDED, Q, Subquery, When
+from django.db.models import (
+    BooleanField,
+    Case,
+    Exists,
+    ExpressionWrapper,
+    NOT_PROVIDED,
+    OuterRef,
+    Q,
+    Subquery,
+    When,
+)
 from django.db.models import Value
 from django.db.models.functions import Coalesce
+from django.db.transaction import atomic
+from django_pglocks import advisory_lock
 
 from datahub.company.models import Company
 
@@ -149,3 +161,113 @@ def populate_company_address_fields(batch_size=5000):
     populate_company_address_fields.apply_async(
         kwargs={'batch_size': batch_size},
     )
+
+
+@shared_task(acks_late=True)
+def copy_foreign_key_to_m2m_field(
+    model_label,
+    source_fk_field_name,
+    target_m2m_field_name,
+    batch_size=5000,
+):
+    """
+    Task that copies non-null values from a foreign key to a to-many field (for objects where the
+    to-many field is empty).
+
+    Usage example:
+
+        copy_foreign_key_to_m2m_field.apply_async(
+            args=('interaction.Interaction', 'contact', 'contacts'),
+        )
+
+    Note: This does not create reversion revisions on the model referenced by model_label. For new
+    fields, the new versions would simply show the new field being added, so would not be
+    particularly useful. If you do need revisions to be created, this task is not suitable.
+    """
+    lock_name = (
+        f'leeloo-copy_foreign_key_to_m2m_field-{model_label}-{source_fk_field_name}'
+        f'-{target_m2m_field_name}'
+    )
+
+    with advisory_lock(lock_name, wait=False) as lock_held:
+        if not lock_held:
+            logger.warning(
+                f'Another copy_foreign_key_to_m2m_field task is in progress for '
+                f'({model_label}, {source_fk_field_name}, {target_m2m_field_name}). Aborting...',
+            )
+            return
+
+        num_processed = _copy_foreign_key_to_m2m_field(
+            model_label,
+            source_fk_field_name,
+            target_m2m_field_name,
+            batch_size=batch_size,
+        )
+
+        # If there are definitely no more rows needing processing, return
+        if num_processed < batch_size:
+            return
+
+        # Schedule another task to update another batch of rows.
+        # This must be outside of the atomic block, otherwise it will probably run before the
+        # current changes have been committed.
+        copy_foreign_key_to_m2m_field.apply_async(
+            args=(model_label, source_fk_field_name, target_m2m_field_name),
+            kwargs={'batch_size': batch_size},
+        )
+
+
+@atomic
+def _copy_foreign_key_to_m2m_field(
+    model_label,
+    source_fk_field_name,
+    target_m2m_field_name,
+    batch_size=5000,
+):
+    """
+    The main logic for the copy_foreign_key_to_m2m_field task.
+
+    Processes a single batch in a transaction.
+    """
+    model = apps.get_model(model_label)
+    source_fk_field = model._meta.get_field(source_fk_field_name)
+    target_m2m_field = model._meta.get_field(target_m2m_field_name)
+    m2m_model = target_m2m_field.remote_field.through
+    # e.g. 'interaction_id' for Interaction.contacts
+    m2m_column_name = target_m2m_field.m2m_column_name()
+    # e.g. 'contact_id' for Interaction.contacts
+    m2m_reverse_column_name = target_m2m_field.m2m_reverse_name()
+
+    # Select a batch of rows. The rows are locked to avoid race conditions.
+    batch_queryset = model.objects.select_for_update().annotate(
+        has_m2m_values=Exists(
+            m2m_model.objects.filter(**{m2m_column_name: OuterRef('pk')}),
+        ),
+    ).filter(
+        **{
+            f'{source_fk_field_name}__isnull': False,
+            'has_m2m_values': False,
+        },
+    ).values(
+        'pk',
+        source_fk_field.attname,
+    )[:batch_size]
+
+    objects_to_create = [
+        m2m_model(
+            **{
+                m2m_column_name: row['pk'],
+                m2m_reverse_column_name: row[source_fk_field.attname],
+            },
+        ) for row in batch_queryset
+    ]
+
+    # Create many-to-many objects for the batch
+    created_objects = m2m_model.objects.bulk_create(objects_to_create)
+    num_created = len(created_objects)
+
+    logger.info(
+        f'{num_created} {model_label}.{target_m2m_field_name} many-to-many objects created',
+    )
+
+    return len(objects_to_create)
