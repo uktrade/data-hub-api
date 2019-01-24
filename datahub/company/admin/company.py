@@ -126,7 +126,21 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         (
             'ADDRESS',
             {
+                'description': (
+                    'The address fields are in the process of being migrated. '
+                    'Address is the main location for this business '
+                    '(could be trading, registered or a different address) '
+                    'whilst registered address is the official address '
+                    '(e.g. from companies house).'
+                ),
                 'fields': (
+                    'address_1',
+                    'address_2',
+                    'address_town',
+                    'address_county',
+                    'address_postcode',
+                    'address_country',
+
                     'registered_address_1',
                     'registered_address_2',
                     'registered_address_town',

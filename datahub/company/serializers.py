@@ -275,6 +275,26 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     have to enter company numbers for UK establishments manually.
     """
 
+    # TODO: delete after the migration to address and registered address is completed
+    ADDRESS_FIELDS_MAPPING = {
+        'trading': {
+            'address_1': 'trading_address_1',
+            'address_2': 'trading_address_2',
+            'address_town': 'trading_address_town',
+            'address_county': 'trading_address_county',
+            'address_postcode': 'trading_address_postcode',
+            'address_country': 'trading_address_country',
+        },
+        'registered': {
+            'address_1': 'registered_address_1',
+            'address_2': 'registered_address_2',
+            'address_town': 'registered_address_town',
+            'address_county': 'registered_address_county',
+            'address_postcode': 'registered_address_postcode',
+            'address_country': 'registered_address_country',
+        },
+    }
+
     default_error_messages = {
         'invalid_uk_establishment_number_prefix': ugettext_lazy(
             'This must be a valid UK establishment number, beginning with BR.',
@@ -382,7 +402,46 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     'headquarter_type': message,
                 })
 
+        self._populate_address_fields(combiner, data)
+
         return data
+
+    def _populate_address_fields(self, combiner, data):
+        """
+        Populates the address_* fields with the values from trading address or
+        registered address whichever is defined.
+
+        It's only triggered when any of the address fields are specified so that we don't
+        accidentally run this logic when changing any other field.
+        Doing this will allow us to implement a variant that updates the addresses
+        in a different way.
+
+        TODO: delete after the migration to address and registered address is completed
+        """
+        all_address_field_names = {
+            field
+            for mapping in self.ADDRESS_FIELDS_MAPPING.values()
+            for field in mapping.values()
+        }
+
+        # was any address field specified?
+        if not all_address_field_names & data.keys():
+            return
+
+        trading_fields_mapping = Company.TRADING_ADDRESS_VALIDATION_MAPPING
+
+        has_valid_trading_address = all(
+            combiner.get_value(field_name)
+            for field_name, rules in trading_fields_mapping.items()
+            if rules['required']
+        )
+
+        mapping_source = 'trading' if has_valid_trading_address else 'registered'
+
+        mapping = self.ADDRESS_FIELDS_MAPPING[mapping_source]
+        for target_field_name, source_field_name in mapping.items():
+            target_value = combiner.get_value(source_field_name)
+            data[target_field_name] = target_value
 
     def validate_headquarter_type(self, headquarter_type):
         """Raises an exception if company is a global hq and has subsidiaries."""
