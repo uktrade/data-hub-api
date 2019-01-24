@@ -6,6 +6,7 @@ from django.conf import settings
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, FDIValue, Sector, SectorCluster, UKRegion
 from datahub.dbmaintenance.utils import parse_uuid
+from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import SectorFactory
 from datahub.mi_dashboard.constants import (
@@ -29,8 +30,8 @@ def test_load_investment_projects():
     InvestmentProjectFactory.create_batch(10)
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 10) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 10, 0) == (updated, created, deleted)
 
     dashboard = MIInvestmentProject.objects.values(*etl.COLUMNS).all()
     for row in dashboard:
@@ -43,8 +44,8 @@ def test_investment_projects_get_updated():
     investment_projects = InvestmentProjectFactory.create_batch(10)
     extract = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = extract.load()
-    assert (0, 10) == (updated, created)
+    updated, created, deleted = extract.load()
+    assert (0, 10, 0) == (updated, created, deleted)
 
     dashboard = MIInvestmentProject.objects.values(*extract.COLUMNS).all()
     for row in dashboard:
@@ -55,8 +56,8 @@ def test_investment_projects_get_updated():
         investment_project.number_new_jobs = 100000000
         investment_project.save()
 
-    updated, created = extract.load()
-    assert (10, 0) == (updated, created)
+    updated, created, deleted = extract.load()
+    assert (10, 0, 0) == (updated, created, deleted)
 
     dashboard = MIInvestmentProject.objects.values(*extract.COLUMNS).all()
     for row in dashboard:
@@ -77,8 +78,8 @@ def test_load_investment_projects_2018_2019():
         financial_year='2018/2019',
     )
 
-    updated, created = etl.load()
-    assert (0, 5) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 5, 0) == (updated, created, deleted)
 
     dashboard = MIInvestmentProject.objects.values(*etl.COLUMNS).all()
     for row in dashboard:
@@ -88,20 +89,55 @@ def test_load_investment_projects_2018_2019():
 
 
 def test_run_mi_investment_project_etl_pipeline():
-    """Tests that run_mi_investment_project_etl_pipeline copy data to FDIDashboard table."""
+    """Tests that run_mi_investment_project_etl_pipeline copy data to MIInvestmentProject table."""
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 1))
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 3, 31))
 
     financial_year = '2018/2019'
 
-    updated, created = run_mi_investment_project_etl_pipeline(financial_year)
-    assert (0, 5) == (updated, created)
+    updated, created, deleted = run_mi_investment_project_etl_pipeline(financial_year)
+    assert (0, 5, 0) == (updated, created, deleted)
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
     dashboard = MIInvestmentProject.objects.values(*ETLInvestmentProjects.COLUMNS).all()
     for row in dashboard:
         source_row = etl.get_rows().get(pk=row['dh_fdi_project_id'])
         assert source_row['financial_year'] == financial_year
+        assert source_row == row
+
+
+def test_etl_pipeline_deletes_projects_absent_from_the_source():
+    """
+    Tests that run_mi_investment_project_etl_pipeline deletes projects from MIInvestmentProject
+    if corresponding records no longer exist in the source.
+    """
+    rows_to_remove = InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 1))
+    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 3, 31))
+
+    financial_year = '2018/2019'
+
+    updated, created, deleted = run_mi_investment_project_etl_pipeline(financial_year)
+    assert (0, 5, 0) == (updated, created, deleted)
+
+    etl = ETLInvestmentProjects(destination=MIInvestmentProject)
+    dashboard = MIInvestmentProject.objects.values(*ETLInvestmentProjects.COLUMNS).all()
+    for row in dashboard:
+        source_row = etl.get_rows().get(pk=row['dh_fdi_project_id'])
+        assert source_row == row
+
+    ids_to_remove = (row.id for row in rows_to_remove)
+    InvestmentProject.objects.filter(pk__in=ids_to_remove).delete()
+
+    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 5))
+
+    updated, created, deleted = run_mi_investment_project_etl_pipeline(financial_year)
+    assert (0, 5, 5) == (updated, created, deleted)
+
+    etl = ETLInvestmentProjects(destination=MIInvestmentProject)
+    dashboard = MIInvestmentProject.objects.values(*ETLInvestmentProjects.COLUMNS).all()
+    for row in dashboard:
+        source_row = etl.get_rows().get(pk=row['dh_fdi_project_id'])
+        assert row['actual_land_date'] == date(2018, 4, 5)
         assert source_row == row
 
 
@@ -119,8 +155,8 @@ def test_project_fdi_value(fdi_value_id, expected):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['project_fdi_value'] == expected
@@ -143,8 +179,8 @@ def test_investor_company_country(country_id, expected):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['investor_company_country'] == expected
@@ -167,8 +203,8 @@ def test_country_url(country_id):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     if country_id is None:
         expected = ''
@@ -195,8 +231,8 @@ def test_total_investment(total_investment, expected):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['total_investment'] == total_investment
@@ -218,8 +254,8 @@ def test_number_safeguarded_jobs(number_safeguarded_jobs, expected):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['number_safeguarded_jobs'] == number_safeguarded_jobs
@@ -241,8 +277,8 @@ def test_number_new_jobs(number_new_jobs, expected):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['number_new_jobs'] == number_new_jobs
@@ -266,8 +302,8 @@ def test_land_date(actual_land_date, estimated_land_date, expected_land_date):
     )
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['actual_land_date'] == actual_land_date
@@ -302,8 +338,8 @@ def test_sector_cluster(sector_cluster_id, expected):
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['sector_cluster'] == expected
@@ -327,8 +363,8 @@ def test_top_level_sector(sector_id, expected):
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
 
@@ -354,8 +390,8 @@ def test_possible_uk_region_names(uk_region_id, expected):
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
 
@@ -380,8 +416,8 @@ def test_actual_uk_region_names(uk_region_id, expected):
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
 
@@ -419,8 +455,8 @@ def test_uk_region_name(actual_uk_region_id, possible_uk_region_id, expected):
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
-    updated, created = etl.load()
-    assert (0, 1) == (updated, created)
+    updated, created, deleted = etl.load()
+    assert (0, 1, 0) == (updated, created, deleted)
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['uk_region_name'] == expected

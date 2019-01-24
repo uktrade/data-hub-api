@@ -1,4 +1,5 @@
-from typing import Tuple, Type
+from typing import List, Tuple, Type
+from uuid import UUID
 
 from django.db.models import F, Model, Value
 from django.db.models.functions import Coalesce
@@ -53,13 +54,22 @@ class ETLBase:
     COLUMNS = {}
 
     def __init__(self, destination: Type[Model], **kwargs):
-        """Initialise the destination.
+        """
+        Initialise the destination.
 
         Destination model needs to have all the columns specified in the COLUMNS.
 
         :param destination: Model object where the data will be loaded.
         """
         self.destination = destination
+
+    def get_model(self) -> Model:
+        """
+        Get the source model.
+
+        :returns: a source model.
+        """
+        raise NotImplementedError
 
     def get_source_query(self) -> QuerySet:
         """
@@ -77,17 +87,40 @@ class ETLBase:
         """
         return self.get_source_query().values(*self.COLUMNS)
 
-    def load(self) -> Tuple[int, int]:
+    def get_ids(self) -> List[UUID]:
+        """
+        Get ID of rows ready to load.
+
+        :returns: a list of ID values.
+        """
+        return self.get_source_query().values(self.get_model()._meta.pk.name)
+
+    def clean(self) -> int:
+        """
+        Delete rows that are no longer in the source query.
+
+        :returns: a number of deleted records
+        """
+        # we need to materialise ids query so that Django doesn't attempt
+        # to create a query across the different databases
+        ids = (row['id'] for row in self.get_ids())
+        deleted, _ = self.destination.objects.exclude(pk__in=ids).delete()
+
+        return deleted
+
+    def load(self) -> Tuple[int, int, int]:
         """
         Load data to the destination table.
 
         Existing records should be updated.
 
         :raises: AssertionError if row.keys() != COLUMNS
-        :returns: a tuple with number of updated and created records
+        :returns: a tuple with number of updated, created and deleted records
         """
         updated = 0
         created = 0
+        deleted = self.clean()
+
         for row in self.get_rows().iterator():
             assert row.keys() == self.COLUMNS, 'Row keys do not match COLUMNS.'
 
@@ -99,7 +132,7 @@ class ETLBase:
             updated += int(not is_created)
             created += int(is_created)
 
-        return updated, created
+        return updated, created, deleted
 
 
 class ETLInvestmentProjects(ETLBase):
@@ -138,9 +171,13 @@ class ETLInvestmentProjects(ETLBase):
         'estimated_land_date',
     }
 
+    def get_model(self):
+        """Get the model."""
+        return InvestmentProject
+
     def get_source_query(self):
         """Get the query set."""
-        return InvestmentProject.objects.annotate(
+        return self.get_model().objects.annotate(
             # this contains helper annotations
             _possible_uk_region_names=get_string_agg_subquery(
                 InvestmentProject,
