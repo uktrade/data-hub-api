@@ -93,7 +93,7 @@ class ETLBase:
 
         :returns: a list of ID values.
         """
-        return self.get_source_query().values(self.get_model()._meta.pk.name)
+        return self.get_source_query().values_list('pk', flat=True)
 
     def clean(self) -> int:
         """
@@ -103,7 +103,7 @@ class ETLBase:
         """
         # we need to materialise ids query so that Django doesn't attempt
         # to create a query across the different databases
-        ids = (row['id'] for row in self.get_ids())
+        ids = list(self.get_ids())
         deleted, _ = self.destination.objects.exclude(pk__in=ids).delete()
 
         return deleted
