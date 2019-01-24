@@ -381,7 +381,7 @@ if REDIS_BASE_URL:
         CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
             'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
             'args': ('2018/2019', ),
-            'schedule': crontab(minute=0, hour=3),
+            'schedule': crontab(minute=0, hour=1),
         }
 
     CELERY_WORKER_LOG_FORMAT = (
