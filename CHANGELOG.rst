@@ -1,3 +1,34 @@
+Data Hub API 9.6.0 (2019-01-24)
+===============================
+
+
+
+Database schema
+---------------
+
+- **Companies** The following fields were added:
+
+  ``"address_1" varchar(255)``
+
+  ``"address_2" varchar(255)``
+
+  ``"address_country_id" uuid``
+
+  ``"address_county" varchar(255)``
+
+  ``"address_postcode" varchar(255)``
+
+  ``"address_town" varchar(255)``
+
+  The system will be migrated from using the ``registered_address_*`` and ``trading_address_*`` fields to ``address_*`` (main location for the business) and ``registered_address_*`` (official address) fields instead.
+  However, you should not use the new address fields yet and migration steps will be communicated in future release notes.
+- **Interactions** The table ``interaction_interaction_contacts`` table with columns ``("id" serial NOT NULL PRIMARY KEY, "interaction_id" uuid NOT NULL, "contact_id" uuid NOT NULL)`` was added.
+
+  This is a many-to-many table linking interactions with contacts.
+
+  The table had not been fully populated with data yet; continue to use ``interaction_interaction.contact_id`` for the time being.
+
+
 Data Hub API 9.5.0 (2019-01-22)
 ===============================
 
