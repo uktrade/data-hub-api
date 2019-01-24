@@ -1,1 +1,0 @@
-The table ``interaction_interaction_contacts`` table with columns ``("id" serial NOT NULL PRIMARY KEY, "interaction_id" uuid NOT NULL, "contact_id" uuid NOT NULL)`` was added. This is a many-to-many table linking interactions with contacts. The table had not been fully populated with data yet; continue to use ``interaction_interaction.contact_id`` for the time being.
