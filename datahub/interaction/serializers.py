@@ -91,6 +91,11 @@ class InteractionSerializer(serializers.ModelSerializer):
         """
         if 'is_event' in data:
             del data['is_event']
+
+        if 'contact' in data:
+            # Note: null contacts are not allowed in the API
+            data['contacts'] = [data['contact']]
+
         return data
 
     class Meta:

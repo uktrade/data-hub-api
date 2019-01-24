@@ -35,6 +35,15 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     archived_documents_url_path = factory.Faker('uri_path')
     was_policy_feedback_provided = False
 
+    @to_many_field
+    def contacts(self):
+        """
+        Contacts field.
+
+        Defaults to the contact from the contact field.
+        """
+        return [self.contact] if self.contact else []
+
     class Meta:
         model = 'interaction.Interaction'
 

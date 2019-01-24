@@ -28,7 +28,7 @@ services:
     command: celery worker -A config -l info -Q celery -B
 
   postgres:
-    image: postgres:9.6
+    image: postgres:10
     restart: always
     environment:
       - POSTGRES_DB=datahub
@@ -40,7 +40,7 @@ services:
       - POSTGRES_DB=mi
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
     restart: always
     ports:
       - "9200:9200"

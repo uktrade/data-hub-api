@@ -59,9 +59,9 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 Dependencies:
 
 -   Python 3.6.x
--   PostgreSQL 9.6
+-   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
--   Elasticsearch 6.3
+-   Elasticsearch 6.4
 
 1.  Clone the repository:
 
