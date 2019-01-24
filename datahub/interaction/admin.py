@@ -61,4 +61,18 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
+        'contacts',
     )
+
+    def save_model(self, request, obj, form, change):
+        """
+        Saves the object, populating contacts from contact.
+
+        TODO: Remove once the migration from contact to contacts is complete.
+        """
+        if 'contact' in form.cleaned_data:
+            contact = form.cleaned_data['contact']
+            contacts = [contact] if contact else []
+            obj.contacts.set(contacts)
+
+        super().save_model(request, obj, form, change)
