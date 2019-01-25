@@ -1,0 +1,1 @@
+A celery task to populate company address fields from trading and registered address fields was added to allow data to be migrated.
