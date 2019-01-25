@@ -183,7 +183,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         on_delete=models.PROTECT,
         related_name='company_address_country',
     )
-    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     # will eventually become obsolete when the migration to solely address and registered
     # address is completed
