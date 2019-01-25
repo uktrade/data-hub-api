@@ -59,3 +59,7 @@ class MIInvestmentProject(models.Model):
         # We need to avoid that by explicitly naming the table, as our dashboard software
         # doesn't support table names with a dot.
         db_table = 'mi_dashboard_miinvestmentproject'
+
+        indexes = [
+            models.Index(fields=('financial_year',)),
+        ]
