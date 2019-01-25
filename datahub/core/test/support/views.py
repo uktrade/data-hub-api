@@ -1,7 +1,8 @@
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
-from datahub.core.test.support.models import MyDisableableModel, PermissionModel
+from datahub.core.test.support.models import MultiAddressModel, MyDisableableModel, PermissionModel
 from datahub.core.test.support.serializers import (
+    MultiAddressModelSerializer,
     MyDisableableModelSerializer,
     PermissionModelSerializer,
 )
@@ -24,3 +25,11 @@ class PermissionModelViewset(CoreViewSet):
     serializer_class = PermissionModelSerializer
     required_scopes = ()
     queryset = PermissionModel.objects.all()
+
+
+class MultiAddressModelViewset(CoreViewSet):
+    """MultiAddressModel view set."""
+
+    permission_classes = []
+    serializer_class = MultiAddressModelSerializer
+    queryset = MultiAddressModel.objects.all()
