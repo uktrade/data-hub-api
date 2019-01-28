@@ -380,8 +380,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_MI_DASHBOARD_FEED', False):
         CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
             'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
-            'args': ('2018/2019', ),
-            'schedule': crontab(minute=0, hour=2),
+            'schedule': crontab(minute=0, hour=1),
         }
 
     CELERY_WORKER_LOG_FORMAT = (
@@ -392,6 +391,11 @@ CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 
 # COMPANIESHOUSE
 COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
+
+MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD = env.int(
+    'MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD',
+    default=10 * 60,  # seconds
+)
 
 MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
     ('sortby', 'estimated_land_date:asc'),

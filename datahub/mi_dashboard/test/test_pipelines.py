@@ -17,7 +17,6 @@ from datahub.mi_dashboard.constants import (
 from datahub.mi_dashboard.models import MIInvestmentProject
 from datahub.mi_dashboard.pipelines import (
     ETLInvestmentProjects,
-    ETLInvestmentProjectsFinancialYear,
     run_mi_investment_project_etl_pipeline,
 )
 
@@ -65,43 +64,18 @@ def test_investment_projects_get_updated():
         assert source_row == row
 
 
-def test_load_investment_projects_2018_2019():
-    """
-    Tests that investment projects for financial year 2018/2019 are loaded to FDIDashboard table.
-    """
-    InvestmentProjectFactory.create_batch(5, actual_land_date=None, estimated_land_date=None)
-    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2014, 2, 3))
-    InvestmentProjectFactory.create_batch(5, actual_land_date=date(2019, 3, 28))
-    etl = ETLInvestmentProjectsFinancialYear(
-        destination=MIInvestmentProject,
-        financial_year='2018/2019',
-    )
-
-    updated, created = etl.load()
-    assert (0, 5) == (updated, created)
-
-    dashboard = MIInvestmentProject.objects.values(*etl.COLUMNS).all()
-    for row in dashboard:
-        source_row = etl.get_rows().get(pk=row['dh_fdi_project_id'])
-        assert source_row['financial_year'] == '2018/2019'
-        assert source_row == row
-
-
 def test_run_mi_investment_project_etl_pipeline():
     """Tests that run_mi_investment_project_etl_pipeline copy data to FDIDashboard table."""
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 1))
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 3, 31))
 
-    financial_year = '2018/2019'
-
-    updated, created = run_mi_investment_project_etl_pipeline(financial_year)
-    assert (0, 5) == (updated, created)
+    updated, created = run_mi_investment_project_etl_pipeline()
+    assert (0, 10) == (updated, created)
 
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
     dashboard = MIInvestmentProject.objects.values(*ETLInvestmentProjects.COLUMNS).all()
     for row in dashboard:
         source_row = etl.get_rows().get(pk=row['dh_fdi_project_id'])
-        assert source_row['financial_year'] == financial_year
         assert source_row == row
 
 

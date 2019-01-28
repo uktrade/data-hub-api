@@ -200,24 +200,7 @@ class ETLInvestmentProjects(ETLBase):
         )
 
 
-class ETLInvestmentProjectsFinancialYear(ETLInvestmentProjects):
-    """Extract, Transform and Load Investment Projects for financial year 2018/2019."""
-
-    def __init__(self, destination: Type[Model], financial_year: str):
-        """Initialise the pipeline with desired financial year, e.g. '2018/2019'."""
-        super().__init__(destination)
-        self.financial_year = financial_year
-
-    def get_source_query(self):
-        """Get the query set."""
-        qs = super().get_source_query()
-        return qs.filter(financial_year=self.financial_year)
-
-
-def run_mi_investment_project_etl_pipeline(financial_year: str):
+def run_mi_investment_project_etl_pipeline():
     """Runs FDI dashboard data load."""
-    pipeline = ETLInvestmentProjectsFinancialYear(
-        destination=MIInvestmentProject,
-        financial_year=financial_year,
-    )
+    pipeline = ETLInvestmentProjects(destination=MIInvestmentProject)
     return pipeline.load()
