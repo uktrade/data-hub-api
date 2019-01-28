@@ -212,9 +212,9 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 
 | Variable name | Required | Description |
 | ------------- | ------------- | ------------- |
-| `ACTIVITY_STREAM_ACCESS_KEY_ID` | Yes | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication. |
-| `ACTIVITY_STREAM_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the activity stream endpoint. |
-| `ACTIVITY_STREAM_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
+| `ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID` | Yes | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication. |
+| `ACTIVITY_STREAM_INCOMING_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the activity stream endpoint. |
+| `ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
@@ -364,9 +364,9 @@ adding and upgrading dependencies.
 
 The `/v3/activity-stream/` endpoint is protected by two mechanisms:
 
-* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `ACTIVITY_STREAM_IP_WHITELIST`.
+* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `ACTIVITY_STREAM_INCOMING_IP_WHITELIST`.
 
-* Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
+* Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY`.
 
 
 ### IP address whitelisting

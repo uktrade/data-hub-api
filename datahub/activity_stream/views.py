@@ -21,30 +21,30 @@ PAAS_ADDED_X_FORWARDED_FOR_IPS = 2
 
 def _lookup_credentials(access_key_id):
     """Raises a HawkFail if the passed ID is not equal to
-    settings.ACTIVITY_STREAM_ACCESS_KEY_ID
+    settings.ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID
     """
     if not constant_time_compare(
         access_key_id,
-        settings.ACTIVITY_STREAM_ACCESS_KEY_ID,
+        settings.ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID,
     ):
         raise HawkFail(f'No Hawk ID of {access_key_id}')
 
     return {
-        'id': settings.ACTIVITY_STREAM_ACCESS_KEY_ID,
-        'key': settings.ACTIVITY_STREAM_SECRET_ACCESS_KEY,
+        'id': settings.ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID,
+        'key': settings.ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY,
         'algorithm': 'sha256',
     }
 
 
 def _seen_nonce(access_key_id, nonce, _):
     """Returns if the passed access_key_id/nonce combination has been
-    used within settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS
+    used within settings.ACTIVITY_STREAM_INCOMING_NONCE_EXPIRY_SECONDS
     """
     cache_key = f'activity_stream:{access_key_id}:{nonce}'
 
     # cache.add only adds key if it isn't present
     seen_cache_key = not cache.add(
-        cache_key, True, timeout=settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS,
+        cache_key, True, timeout=settings.ACTIVITY_STREAM_INCOMING_NONCE_EXPIRY_SECONDS,
     )
 
     if seen_cache_key:
@@ -117,7 +117,7 @@ class _ActivityStreamAuthentication(BaseAuthentication):
         # PaaS appends 2 IPs, where the IP connected from is the first
         remote_address = ip_addesses[-PAAS_ADDED_X_FORWARDED_FOR_IPS].strip()
 
-        if remote_address not in settings.ACTIVITY_STREAM_IP_WHITELIST:
+        if remote_address not in settings.ACTIVITY_STREAM_INCOMING_IP_WHITELIST:
             logger.warning(
                 'Failed authentication: the X-Forwarded-For header was not '
                 'produced by a whitelisted IP',
