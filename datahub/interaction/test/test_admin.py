@@ -20,9 +20,9 @@ class TestInteractionAdmin(AdminTestMixin):
     """
 
     def test_add(self):
-        """Test that adding an interaction also sets the contacts field."""
+        """Test that adding an interaction also sets the contact field."""
         company = CompanyFactory()
-        contact = ContactFactory()
+        contacts = ContactFactory.create_batch(2, company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
         url = reverse(admin_urlname(Interaction._meta, 'add'))
@@ -35,7 +35,7 @@ class TestInteractionAdmin(AdminTestMixin):
             'date_1': '00:00:00',
             'dit_adviser': self.user.pk,
             'company': company.pk,
-            'contact': contact.pk,
+            'contacts': ','.join(str(contact.pk) for contact in contacts),
             'service': random_obj_for_model(Service).pk,
             'dit_team': random_obj_for_model(Team).pk,
             'was_policy_feedback_provided': False,
@@ -47,16 +47,15 @@ class TestInteractionAdmin(AdminTestMixin):
         assert Interaction.objects.count() == 1
         interaction = Interaction.objects.first()
 
-        assert interaction.contact == contact
-        assert list(interaction.contacts.all()) == [contact]
+        assert interaction.contact == contacts[0]
+        assert set(interaction.contacts.all()) == set(contacts)
 
     def test_update_contact_to_non_null(self):
         """
-        Test that updating an interaction with a non-null contact also sets the contacts
-        field.
+        Test that updating an interaction with a value in contacts also sets the contact field.
         """
-        interaction = CompanyInteractionFactory(contacts=[])
-        new_contact = ContactFactory(company=interaction.company)
+        interaction = CompanyInteractionFactory()
+        new_contacts = ContactFactory.create_batch(2, company=interaction.company)
 
         url = get_change_url(interaction)
         data = {
@@ -78,19 +77,19 @@ class TestInteractionAdmin(AdminTestMixin):
             'event': '',
 
             # Changed values
-            'contact': new_contact.pk,
+            'contacts': ','.join(str(contact.pk) for contact in new_contacts),
         }
-        response = self.client.post(url, data=data, follow=True)
+        response = self.client.post(url, data, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
 
         interaction.refresh_from_db()
-        assert interaction.contact == new_contact
-        assert list(interaction.contacts.all()) == [new_contact]
+        assert interaction.contact == new_contacts[0]
+        assert set(interaction.contacts.all()) == set(new_contacts)
 
     def test_update_contact_to_null(self):
-        """Test that updating an interaction with a null contact clears the contacts field."""
-        interaction = CompanyInteractionFactory(contacts=[])
+        """Test that removing all contacts from an interaction clears the contact field."""
+        interaction = CompanyInteractionFactory()
 
         url = get_change_url(interaction)
         data = {
@@ -112,7 +111,7 @@ class TestInteractionAdmin(AdminTestMixin):
             'event': '',
 
             # Changed values
-            'contact': '',
+            'contacts': '',
         }
         response = self.client.post(url, data=data, follow=True)
 

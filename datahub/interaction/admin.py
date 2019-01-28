@@ -2,6 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, custom_add_permission, custom_change_permission
+from datahub.core.query_utils import get_full_name_expression, get_string_agg_subquery
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -32,7 +33,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'date',
         'created_on',
         'company',
-        'contact',
+        'get_contact_names',
         'investment_project',
     )
     list_filter = (
@@ -43,7 +44,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'event',
         'dit_adviser',
         'investment_project',
-        'contact',
+        'contacts',
     )
     readonly_fields = (
         'archived_documents_url_path',
@@ -52,7 +53,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     list_select_related = (
         'company',
-        'contact',
         'investment_project',
         'investment_project__investor_company',
     )
@@ -61,8 +61,25 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
-        'contacts',
+        'contact',
     )
+
+    def get_queryset(self, request):
+        """Annotates the query set with contact names as a comma-separated string."""
+        queryset = super().get_queryset(request)
+        return queryset.annotate(
+            contact_names=get_string_agg_subquery(
+                Interaction,
+                get_full_name_expression('contacts'),
+            ),
+        )
+
+    def get_contact_names(self, obj):
+        """Returns contact names for the interaction as a comma-separated string."""
+        return obj.contact_names
+
+    get_contact_names.short_description = 'contacts'
+    get_contact_names.admin_order_field = 'contact_names'
 
     def save_model(self, request, obj, form, change):
         """
@@ -70,9 +87,8 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
 
         TODO: Remove once the migration from contact to contacts is complete.
         """
-        if 'contact' in form.cleaned_data:
-            contact = form.cleaned_data['contact']
-            contacts = [contact] if contact else []
-            obj.contacts.set(contacts)
+        if 'contacts' in form.cleaned_data:
+            contacts = form.cleaned_data['contacts']
+            obj.contact = contacts[0] if contacts else None
 
         super().save_model(request, obj, form, change)
