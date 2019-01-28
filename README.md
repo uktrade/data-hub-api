@@ -256,6 +256,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `MI_DATABASE_SSLROOTCERT` | No | base64 encoded root certificate for MI database connection. |
 | `MI_DATABASE_SSLCERT` | No | base64 encoded client certificate for MI database connection. |
 | `MI_DATABASE_SSLKEY` | No | base64 encoded client private key for MI database connection. |
+| `MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about long transfer duration (default=600). |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
