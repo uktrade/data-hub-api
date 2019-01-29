@@ -1,3 +1,21 @@
+Data Hub API 9.7.0 (2019-01-29)
+===============================
+
+
+
+Features
+--------
+
+- The MI dashboard pipeline task now loads all investment projects instead of only for current financial year.
+
+Internal changes
+----------------
+
+- **Companies** A celery task to populate company address fields from trading and registered address fields was added to allow data to be migrated.
+- The MI dashboard pipeline was rescheduled to run at around 1 AM each night.
+- Various dependencies were updated.
+
+
 Data Hub API 9.6.0 (2019-01-24)
 ===============================
 
