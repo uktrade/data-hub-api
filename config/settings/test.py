@@ -78,3 +78,5 @@ DOCUMENT_BUCKETS = {
         'aws_region': 'eu-west-2',
     }
 }
+
+ENABLE_APP_READY_DATA_MIGRATIONS = False
