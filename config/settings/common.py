@@ -321,18 +321,23 @@ else:
 
 if REDIS_BASE_URL:
     REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
+    if REDIS_BASE_URL.startswith('rediss://'):
+        _REDIS_CONNECTION_POOL_KWARGS = {
+            'ssl_ca_certs': env(
+                'REDIS_SSL_CA_CERTS_PATH',
+                default='/etc/ssl/certs/ca-certificates.crt',
+            ),
+        }
+    else:
+        _REDIS_CONNECTION_POOL_KWARGS = {}
+
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'CONNECTION_POOL_KWARGS': {
-                    'ssl_ca_certs': env(
-                        'REDIS_SSL_CA_CERTS_PATH',
-                        default='/etc/ssl/certs/ca-certificates.crt',
-                    ),
-                },
+                'CONNECTION_POOL_KWARGS': _REDIS_CONNECTION_POOL_KWARGS
             }
         }
     }
@@ -481,3 +486,7 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     }
 }
+
+ENABLE_APP_READY_DATA_MIGRATIONS = True
+APP_READY_DATA_MIGRATION_DELAY_SECS = 10 * 60
+
