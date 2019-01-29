@@ -22,6 +22,7 @@ job_defaults: &job_defaults
     ACTIVITY_STREAM_INCOMING_IP_WHITELIST: 1.2.3.4
     ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY: some-secret
+    ACTIVITY_STREAM_OUTGOING_URL: http://activity.stream/
     DATABASE_URL: postgresql://postgres@localhost/datahub
     MI_DATABASE_URL: postgresql://postgres@mi-postgres/mi
     DEBUG: 'True'
