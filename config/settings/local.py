@@ -63,5 +63,3 @@ LOGGING = {
         },
     },
 }
-
-APP_READY_DATA_MIGRATION_DELAY_SECS = 0

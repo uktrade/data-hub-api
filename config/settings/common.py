@@ -486,7 +486,3 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     }
 }
-
-ENABLE_APP_READY_DATA_MIGRATIONS = True
-APP_READY_DATA_MIGRATION_DELAY_SECS = 10 * 60
-
