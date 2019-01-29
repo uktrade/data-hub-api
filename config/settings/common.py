@@ -321,18 +321,23 @@ else:
 
 if REDIS_BASE_URL:
     REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
+    if REDIS_BASE_URL.startswith('rediss://'):
+        _REDIS_CONNECTION_POOL_KWARGS = {
+            'ssl_ca_certs': env(
+                'REDIS_SSL_CA_CERTS_PATH',
+                default='/etc/ssl/certs/ca-certificates.crt',
+            ),
+        }
+    else:
+        _REDIS_CONNECTION_POOL_KWARGS = {}
+
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'CONNECTION_POOL_KWARGS': {
-                    'ssl_ca_certs': env(
-                        'REDIS_SSL_CA_CERTS_PATH',
-                        default='/etc/ssl/certs/ca-certificates.crt',
-                    ),
-                },
+                'CONNECTION_POOL_KWARGS': _REDIS_CONNECTION_POOL_KWARGS
             }
         }
     }
@@ -380,8 +385,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_MI_DASHBOARD_FEED', False):
         CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
             'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
-            'args': ('2018/2019', ),
-            'schedule': crontab(minute=0, hour=2),
+            'schedule': crontab(minute=0, hour=1),
         }
 
     CELERY_WORKER_LOG_FORMAT = (
@@ -392,6 +396,11 @@ CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 
 # COMPANIESHOUSE
 COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
+
+MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD = env.int(
+    'MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD',
+    default=10 * 60,  # seconds
+)
 
 MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
     ('sortby', 'estimated_land_date:asc'),
