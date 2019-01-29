@@ -62,7 +62,7 @@ class OneListReport(QuerySetReport):
         'primary_contact_name': 'Primary Contact',
         'one_list_account_owner__telephone_number': 'Contact Number',
         'one_list_account_owner__contact_email': 'E-mail',
-        'registered_address_country__name': 'Home Market',
-        'registered_address_town': 'Town/City',
+        'address_country__name': 'Home Market',
+        'address_town': 'Town/City',
         'url': 'Data Hub URL',
     }

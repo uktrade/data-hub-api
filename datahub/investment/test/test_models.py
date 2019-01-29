@@ -82,7 +82,7 @@ def test_investor_company_country_none():
 def test_investor_company_country_valid():
     """Tests investor company country property."""
     investor_company = CompanyFactory(
-        registered_address_country_id=constants.Country.united_kingdom.value.id,
+        address_country_id=constants.Country.united_kingdom.value.id,
     )
     project = InvestmentProjectFactory(investor_company=investor_company)
     assert str(project.investor_company_country) == constants.Country.united_kingdom.value.name

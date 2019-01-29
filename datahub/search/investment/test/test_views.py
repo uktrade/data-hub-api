@@ -51,7 +51,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2011, 6, 13),
             actual_land_date=datetime.date(2010, 8, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_states.value.id,
+                address_country_id=constants.Country.united_states.value.id,
             ),
             status=InvestmentProject.STATUSES.ongoing,
             uk_region_locations=[
@@ -68,7 +68,7 @@ def setup_data(setup_es):
             actual_land_date=datetime.date(2047, 8, 13),
             country_investment_originates_from_id=constants.Country.ireland.value.id,
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.japan.value.id,
+                address_country_id=constants.Country.japan.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -86,7 +86,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2027, 9, 13),
             actual_land_date=datetime.date(2022, 11, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_kingdom.value.id,
+                address_country_id=constants.Country.united_kingdom.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -998,9 +998,9 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project reference': project.project_code,
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
-                'Investor company town or city': project.investor_company.registered_address_town,
+                'Investor company town or city': project.investor_company.address_town,
                 'Country of origin':
-                    get_attr_or_none(project, 'investor_company.registered_address_country.name'),
+                    get_attr_or_none(project, 'investor_company.address_country.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),

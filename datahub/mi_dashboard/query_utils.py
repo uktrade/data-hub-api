@@ -131,11 +131,11 @@ def get_country_url():
     key = 'mi_fdi_dashboard_country'
     country_url = Concat(
         Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[key]}'),
-        Cast('investor_company__registered_address_country__id', CharField()),
+        Cast('investor_company__address_country__id', CharField()),
     )
     return Case(
         When(
-            investor_company__registered_address_country=None,
+            investor_company__address_country=None,
             then=Value(''),
         ),
         default=country_url,

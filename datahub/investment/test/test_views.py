@@ -361,7 +361,7 @@ class TestCreateView(APITestMixin):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory(
-            registered_address_country_id=constants.Country.united_kingdom.value.id,
+            address_country_id=constants.Country.united_kingdom.value.id,
         )
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
@@ -651,8 +651,8 @@ class TestRetrieveView(APITestMixin):
             'name': investor_company.name,
         }
         assert response_data['investor_company_country'] == {
-            'id': str(investor_company.registered_address_country.id),
-            'name': investor_company.registered_address_country.name,
+            'id': str(investor_company.address_country.id),
+            'name': investor_company.address_country.name,
         }
         client_relationship_manager = project.client_relationship_manager
         assert response_data['client_relationship_manager'] == {

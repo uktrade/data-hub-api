@@ -138,7 +138,7 @@ def test_project_fdi_value(fdi_value_id, expected):
 def test_investor_company_country(country_id, expected):
     """Tests that if investor country is not set investor_company_country is empty."""
     investor_company = CompanyFactory(
-        registered_address_country_id=country_id,
+        address_country_id=country_id,
     )
     InvestmentProjectFactory(
         investor_company=investor_company,
@@ -162,7 +162,7 @@ def test_investor_company_country(country_id, expected):
 def test_country_url(country_id):
     """Tests that if investor country is not set country url is empty."""
     investor_company = CompanyFactory(
-        registered_address_country_id=country_id,
+        address_country_id=country_id,
     )
     InvestmentProjectFactory(
         investor_company=investor_company,
