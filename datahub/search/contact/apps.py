@@ -23,6 +23,7 @@ class ContactSearchApp(SearchApp):
         'company__sector__parent',
         'company__sector__parent__parent',
         'company__uk_region',
+        'company__address_country',
         'company__registered_address_country',
         'company__trading_address_country',
     )

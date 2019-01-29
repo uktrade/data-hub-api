@@ -140,7 +140,7 @@ class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
         'primary_market__name': 'Market',
         'uk_region__name': 'UK region',
         'company__name': 'Company',
-        'company__registered_address_country__name': 'Company country',
+        'company__address_country__name': 'Company country',
         'company__uk_region__name': 'Company UK region',
         'company_link': 'Company link',
         'contact_name': 'Contact',
