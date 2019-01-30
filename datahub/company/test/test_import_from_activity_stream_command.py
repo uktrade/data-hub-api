@@ -51,6 +51,20 @@ def test_import_uses_hawk_authentication(requests_mock):
 
 
 @pytest.mark.django_db
+def test_import_raises_exception_on_http_error_code(requests_mock):
+    """Tests that the import raises an exception on a HTTP error"""
+    first_page_url = os.environ['ACTIVITY_STREAM_OUTGOING_URL']
+
+    requests_mock.get(first_page_url, status_code=400)
+    with pytest.raises(Exception):
+        call_command('import_from_activity_stream')
+
+    requests_mock.get(first_page_url, status_code=500)
+    with pytest.raises(Exception):
+        call_command('import_from_activity_stream')
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     'existing_company_numbers,as_paginated_company_numbers',
     (

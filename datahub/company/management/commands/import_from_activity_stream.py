@@ -1,14 +1,16 @@
 import json
 from logging import getLogger
 
-import mohawk
-import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from datahub.company.models.company import (
     Company,
+)
+from datahub.core.api_client import (
+    APIClient,
+    HawkAuth,
 )
 
 
@@ -43,29 +45,19 @@ class Command(BaseCommand):
                 },
             },
         }).encode('utf-8')
-        content_type = 'application/json'
 
-        credentials = {
-            'id': settings.ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID,
-            'key': settings.ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY,
-            'algorithm': 'sha256',
-        }
+        access_key_id = settings.ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID
+        secret_key = settings.ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY
+        hawk_auth = HawkAuth(access_key_id, secret_key, verify_response=False)
 
         while next_url:
             logger.info('Fetching page of companies: %s %s', next_url, query)
 
             # Fetch companies that should exist...
-            auth_header = mohawk.Sender(
-                credentials,
-                next_url,
-                'GET',
-                content=query,
-                content_type=content_type,
-            ).request_header
-            response_page = requests.get(next_url, headers={
-                'Authorization': auth_header,
-                'Content-Type': content_type,
-            }, data=query).json()
+            api_client = APIClient(next_url, hawk_auth)
+            response_page = api_client.request('GET', '', data=query, headers={
+                'Content-Type': 'application/json',
+            }).json()
             company_numbers_that_should_exist = set(
                 item['object']['attributedTo']['dit:companiesHouseNumber']
                 for item in response_page['orderedItems']
