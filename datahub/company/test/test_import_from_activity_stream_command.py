@@ -1,9 +1,15 @@
 import os
+from unittest.mock import (
+    patch,
+)
 
 import factory
 import pytest
 from django.core.management import (
     call_command,
+)
+from freezegun import (
+    freeze_time,
 )
 
 from datahub.company.models.company import (
@@ -12,6 +18,36 @@ from datahub.company.models.company import (
 from datahub.company.test.factories import (
     CompanyFactory,
 )
+
+
+@pytest.mark.django_db
+def test_import_uses_hawk_authentication(requests_mock):
+    """Tests that the import uses Hawk authentication"""
+    first_page_url = os.environ['ACTIVITY_STREAM_OUTGOING_URL']
+    second_page_url = 'http://any.domain/second-page'
+
+    requests_mock.get(first_page_url, json=_activity_stream_page([], {
+        'next': second_page_url,
+    }))
+    requests_mock.get(second_page_url, json=_activity_stream_page([], {}))
+
+    with \
+            freeze_time('2014-01-05'), \
+            patch('os.urandom', side_effect=[b'abcdefghij', b'klmnopqrst']):
+        call_command('import_from_activity_stream')
+
+    # A bit brittle, but should only fail incorrectly if the query changes.
+    # Other failures would indicate broken production code
+    assert requests_mock.request_history[0].headers['Authorization'] == (
+        'Hawk mac="leEJ6VOZEKhaMgkYwQq896kntnnbteDxvaY4RTPXVPA=", '
+        'hash="dS+ssqlhGsDWmIyuB0Hp50MegDTXquYnjMGsQcLFJLk=", '
+        'id="some-outgoing-id", ts="1388880000", nonce="YWJjZG"'
+    )
+    assert requests_mock.request_history[1].headers['Authorization'] == (
+        'Hawk mac="TNndfzO/Lt5KiHdb7qYLu7ofgeNchjs8LjIpbd+ASUU=", '
+        'hash="IE2cO/h4K12HFJexL6Qia8r5tmQ/7LzRfogctPjL+UI=", '
+        'id="some-outgoing-id", ts="1388880000", nonce="a2xtbm"'
+    )
 
 
 @pytest.mark.django_db

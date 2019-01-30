@@ -216,6 +216,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `ACTIVITY_STREAM_INCOMING_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the activity stream endpoint. |
 | `ACTIVITY_STREAM_INCOMING_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_INCOMING_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
 | `ACTIVITY_STREAM_OUTGOING_URL` | Yes | The URL of the the activity stream used to import into Data Hub |
+| `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID` | Yes | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when importing data into Data Hub from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when importing data into Data Hub from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |

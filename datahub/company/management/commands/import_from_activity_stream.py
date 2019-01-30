@@ -1,6 +1,7 @@
 import json
 from logging import getLogger
 
+import mohawk
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -44,11 +45,25 @@ class Command(BaseCommand):
         }).encode('utf-8')
         content_type = 'application/json'
 
+        credentials = {
+            'id': settings.ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID,
+            'key': settings.ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY,
+            'algorithm': 'sha256',
+        }
+
         while next_url:
             logger.info('Fetching page of companies: %s %s', next_url, query)
 
             # Fetch companies that should exist...
+            auth_header = mohawk.Sender(
+                credentials,
+                next_url,
+                'GET',
+                content=query,
+                content_type=content_type,
+            ).request_header
             response_page = requests.get(next_url, headers={
+                'Authorization': auth_header,
                 'Content-Type': content_type,
             }, data=query).json()
             company_numbers_that_should_exist = set(
