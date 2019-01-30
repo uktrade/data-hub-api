@@ -4,7 +4,6 @@ from collections import Counter
 from csv import DictReader
 from io import StringIO
 from itertools import chain
-from operator import attrgetter
 from uuid import UUID
 
 import factory
@@ -24,6 +23,7 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
+    join_attr_values,
     random_obj_for_queryset,
 )
 from datahub.investment.constants import Involvement, LikelihoodToLand
@@ -874,11 +874,6 @@ class TestSearchPermissions(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
 
-def _join_values(iterable, attr='name', separator=', '):
-    getter = attrgetter(attr)
-    return separator.join(sorted(getter(value) for value in iterable))
-
-
 class TestInvestmentProjectExportView(APITestMixin):
     """Tests the investment project export view."""
 
@@ -1023,10 +1018,10 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Global account manager': self._get_global_account_manager_name(project),
                 'Project assurance adviser':
                     get_attr_or_none(project, 'project_assurance_adviser.name'),
-                'Other team members': _join_values(project.team_members.all(), 'adviser.name'),
-                'Delivery partners': _join_values(project.delivery_partners.all()),
-                'Possible UK regions': _join_values(project.uk_region_locations.all()),
-                'Actual UK regions': _join_values(project.actual_uk_regions.all()),
+                'Other team members': join_attr_values(project.team_members.all(), 'adviser.name'),
+                'Delivery partners': join_attr_values(project.delivery_partners.all()),
+                'Possible UK regions': join_attr_values(project.uk_region_locations.all()),
+                'Actual UK regions': join_attr_values(project.actual_uk_regions.all()),
                 'Specific investment programme':
                     get_attr_or_none(project, 'specific_programme.name'),
                 'Referral source activity':

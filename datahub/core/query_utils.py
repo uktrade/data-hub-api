@@ -17,6 +17,16 @@ class ConcatWS(Func):
     function = 'concat_ws'
 
 
+class PreferNullConcat(Func):
+    """
+    Concatenates a sequence of expressions, but evaluates to NULL if any one expression does
+    (in PostgreSQL).
+    """
+
+    template = '%(expressions)s'
+    arg_joiner = ' || '
+
+
 class NullIf(Func):
     """
     Returns None if a field equals a particular expression.
@@ -122,27 +132,49 @@ def get_choices_as_case_expression(model, field_name):
     return Case(*whens, default=field.name)
 
 
-def get_full_name_expression(field_name=None):
+def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
     """
     Gets an SQL expression that returns the full name for a contact or adviser.
 
     Can both be used directly on a Contact or Adviser query set and on related fields.
 
     Usage examples:
+
+        # Effectively '{Contact.first_name} {Contact.last_name}'
         Contact.objects.annotate(
             name=get_full_name_expression(),
         )
+
+        # Effectively '{Contact.first_name} {Contact.last_name} ({Contact.job_title})'
+        # (but the job title would be omitted if blank or NULL)
+        Contact.objects.annotate(
+            name=get_full_name_expression(bracketed_field_name='job_title'),
+        )
+
+        # Effectively '{Interaction.dit_adviser.first_name} {Interaction.dit_adviser.last_name}'
         Interaction.objects.annotate(
-            dit_adviser_name=get_full_name_expression('dit_adviser'),
+            dit_adviser_name=get_full_name_expression(person_field_name='dit_adviser'),
         )
     """
-    if field_name is None:
-        return _full_name_concat('first_name', 'last_name')
+    if person_field_name is None:
+        return _full_name_concat(
+            'first_name',
+            'last_name',
+            bracketed_field=bracketed_field_name,
+        )
+
+    evaluated_bracketed_field_name = (
+        f'{person_field_name}__{bracketed_field_name}' if bracketed_field_name else None
+    )
 
     return Case(
         When(
-            **{f'{field_name}__isnull': False},
-            then=_full_name_concat(f'{field_name}__first_name', f'{field_name}__last_name'),
+            **{f'{person_field_name}__isnull': False},
+            then=_full_name_concat(
+                f'{person_field_name}__first_name',
+                f'{person_field_name}__last_name',
+                bracketed_field=evaluated_bracketed_field_name,
+            ),
         ),
         default=None,
     )
@@ -158,9 +190,18 @@ def get_front_end_url_expression(model_name, pk_expression):
     return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
 
 
-def _full_name_concat(first_name_field, last_name_field):
-    return ConcatWS(
-        Value(' '),
+def _full_name_concat(first_name_field, last_name_field, bracketed_field=None):
+    parts = [
         NullIf(first_name_field, Value('')),
         NullIf(last_name_field, Value('')),
-    )
+    ]
+
+    if bracketed_field:
+        bracketed_expression = PreferNullConcat(
+            Value('('),
+            NullIf(bracketed_field, Value('')),
+            Value(')'),
+        )
+        parts.append(bracketed_expression)
+
+    return ConcatWS(Value(' '), *parts)

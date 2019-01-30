@@ -314,6 +314,17 @@ class MockQuerySet:
         return 'id' if field == 'pk' else field
 
 
+def join_attr_values(iterable, attr='name', separator=', '):
+    """
+    Takes all values of a specified attribute for the items of an iterable, sorts the values and
+    joins them using a separator.
+
+    attr can also be a dotted path (to specify sub-attributes).
+    """
+    getter = attrgetter(attr)
+    return separator.join(sorted(getter(value) for value in iterable))
+
+
 def format_csv_data(rows):
     """
     Converts source data into formatted strings as should be written to CSV exports.

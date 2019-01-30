@@ -36,6 +36,7 @@ class PersonFactory(factory.django.DjangoModelFactory):
 
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
+    country = factory.Faker('country')
 
     class Meta:
         model = 'support.Person'

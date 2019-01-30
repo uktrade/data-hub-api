@@ -64,6 +64,7 @@ class Person(models.Model):
 
     first_name = models.TextField()
     last_name = models.TextField()
+    country = models.TextField(null=True, blank=True)
 
 
 class Book(models.Model):
