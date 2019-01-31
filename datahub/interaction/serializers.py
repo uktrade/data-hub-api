@@ -23,6 +23,7 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
+from datahub.interaction.validators import ContactsBelongToCompanyValidator
 from datahub.investment.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 
@@ -210,6 +211,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         )
         validators = [
             HasAssociatedInvestmentProjectValidator(),
+            ContactsBelongToCompanyValidator(),
             RulesBasedValidator(
                 # Because contacts could come from either contact or contacts, this has to be at
                 # the object level
