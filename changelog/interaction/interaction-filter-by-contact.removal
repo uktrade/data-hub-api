@@ -1,0 +1,2 @@
+``GET /v3/interaction``: The ``contact_id`` query parameter is deprecated and will be removed on or after
+21 February 2019. Please use ``contacts__id`` instead.
