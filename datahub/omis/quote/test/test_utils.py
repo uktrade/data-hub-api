@@ -110,11 +110,18 @@ class TestGenerateQuoteContent:
         it's formatted correctly.
         """
         company = CompanyFactory(
-            registered_address_1='line 1',
+            address_1='line 1',
+            address_2=None,
+            address_town='London',
+            address_county=None,
+            address_postcode='SW1A 1AA',
+            address_country_id=None,
+
+            registered_address_1='',
             registered_address_2=None,
-            registered_address_town='London',
+            registered_address_town='',
             registered_address_county=None,
-            registered_address_postcode='SW1A 1AA',
+            registered_address_postcode='',
             registered_address_country_id=None,
         )
         order = OrderFactory(
