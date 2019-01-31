@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.order.pricing import get_pricing_from_order
+from datahub.omis.order.utils import compose_official_address
 from datahub.omis.quote.constants import (
     QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY,
     QUOTE_EXPIRY_DAYS_FROM_NOW,
@@ -63,14 +64,15 @@ def generate_quote_content(order, expires_on):
     :returns: the content of the quote populated with the given order details.
     """
     company = order.company
-    company_address = ', '.join(
+    company_address = compose_official_address(company)
+    company_address_formatted = ', '.join(
         field for field in (
-            company.registered_address_1,
-            company.registered_address_2,
-            company.registered_address_county,
-            company.registered_address_town,
-            company.registered_address_postcode,
-            getattr(company.registered_address_country, 'name', None),
+            company_address.line_1,
+            company_address.line_2,
+            company_address.county,
+            company_address.town,
+            company_address.postcode,
+            getattr(company_address.country, 'name', None),
         )
         if field
     )
@@ -86,7 +88,7 @@ def generate_quote_content(order, expires_on):
             'order_delivery_date': order.delivery_date,
             'subtotal_cost': pricing.subtotal_cost,
             'quote_expires_on': expires_on,
-            'company_address': escape_markdown(company_address, escape_html=False),
+            'company_address': escape_markdown(company_address_formatted, escape_html=False),
             'contact_name': escape_markdown(order.contact.name, escape_html=False),
             'contact_email': order.get_current_contact_email(),
             'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
