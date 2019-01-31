@@ -101,7 +101,7 @@ class TestAddInteraction(APITestMixin):
         """Test add a new interaction."""
         adviser = create_test_user(permission_codenames=permissions)
         company = CompanyFactory()
-        contact = ContactFactory()
+        contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
         url = reverse('api-v3:interaction:collection')
@@ -391,7 +391,7 @@ class TestAddInteraction(APITestMixin):
             dit_team=project_creator.dit_team,  # same dit team as the project creator
         )
         company = CompanyFactory()
-        contact = ContactFactory()
+        contact = ContactFactory(company=company)
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(

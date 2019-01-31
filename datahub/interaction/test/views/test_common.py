@@ -25,6 +25,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     EventServiceDeliveryFactory,
 )
+from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import Service as ServiceModel
 from datahub.metadata.test.factories import TeamFactory
@@ -77,7 +78,7 @@ class TestAddInteraction(APITestMixin):
         TODO: remove once the contacts field has fully replaced the contact field.
         """
         company = CompanyFactory()
-        contact = ContactFactory()
+        contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
         url = reverse('api-v3:interaction:collection')
@@ -195,6 +196,45 @@ class TestAddInteraction(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'non_field_errors': ['Only one of contact and contacts should be provided.'],
+        }
+
+    def test_error_returned_if_contacts_dont_belong_to_company(self):
+        """
+        Test that an error is returned if the contacts don't belong to the specified company.
+        """
+        company = CompanyFactory()
+        contacts = [ContactFactory(), ContactFactory(company=company)]
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.KINDS.interaction,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': {
+                'id': self.user.pk,
+            },
+            'company': {
+                'id': company.pk,
+            },
+            'contacts': [{
+                'id': contact.pk,
+            } for contact in contacts],
+            'service': {
+                'id': random_obj_for_model(ServiceModel).pk,
+            },
+            'dit_team': {
+                'id': self.user.dit_team.pk,
+            },
+            'was_policy_feedback_provided': False,
+        }
+
+        api_client = self.create_api_client()
+        response = api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['The interaction contacts must belong to the specified company.'],
         }
 
 
@@ -319,6 +359,59 @@ class TestUpdateInteraction(APITestMixin):
         assert response.json() == {
             'non_field_errors': ['Only one of contact and contacts should be provided.'],
         }
+
+    @pytest.mark.parametrize(
+        'request_data',
+        (
+            {
+                'company': CompanyFactory,
+            },
+            {
+                'contacts': [ContactFactory],
+            },
+        ),
+    )
+    def test_error_returned_if_contacts_dont_belong_to_company(self, request_data):
+        """
+        Test that an error is returned if an update makes the contacts and company
+        fields inconsistent.
+        """
+        interaction = CompanyInteractionFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        resolved_data = resolve_data(request_data)
+        response = self.api_client.patch(url, data=resolved_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['The interaction contacts must belong to the specified company.'],
+        }
+
+    @pytest.mark.parametrize('include_company', (True, False))
+    @pytest.mark.parametrize('include_contacts', (True, False))
+    def test_inconsistent_interaction_can_be_updated(self, include_company, include_contacts):
+        """
+        Test that an interaction with inconsistent company and contact fields can still be
+        updated.
+        """
+        interaction = CompanyInteractionFactory(
+            company=CompanyFactory(),
+            notes='old notes',
+        )
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        data = {'notes': 'new notes'}
+
+        if include_company:
+            data['company'] = {'id': interaction.company.pk}
+
+        if include_contacts:
+            data['contacts'] = [{'id': contact.pk} for contact in interaction.contacts.all()]
+
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['notes'] == data['notes']
 
 
 class TestListInteractions(APITestMixin):
@@ -550,6 +643,8 @@ class TestInteractionVersioning(APITestMixin):
         """Test that creating an interaction creates a new version."""
         assert Version.objects.count() == 0
 
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
         response = self.api_client.post(
             reverse('api-v3:interaction:collection'),
             data={
@@ -559,8 +654,8 @@ class TestInteractionVersioning(APITestMixin):
                 'date': date.today().isoformat(),
                 'dit_adviser': AdviserFactory().pk,
                 'notes': 'hello',
-                'company': CompanyFactory().pk,
-                'contact': ContactFactory().pk,
+                'company': company.pk,
+                'contacts': [contact.pk],
                 'service': Service.trade_enquiry.value.id,
                 'dit_team': Team.healthcare_uk.value.id,
                 'was_policy_feedback_provided': False,
