@@ -69,7 +69,7 @@ class TestAddServiceDelivery(APITestMixin):
         """Test add a new service delivery."""
         adviser = AdviserFactory()
         company = CompanyFactory()
-        contact = ContactFactory()
+        contact = ContactFactory(company=company)
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': Interaction.KINDS.service_delivery,
