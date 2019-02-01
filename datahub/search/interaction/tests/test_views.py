@@ -3,6 +3,7 @@ from collections import Counter
 from csv import DictReader
 from datetime import datetime
 from io import StringIO
+from operator import attrgetter, itemgetter
 from uuid import UUID
 
 import factory
@@ -224,7 +225,12 @@ class TestInteractionEntitySearchView(APITestMixin):
         response_data = response.json()
         interaction = interactions[0]
         assert response_data['count'] == 1
-        assert response_data['results'] == [{
+        results = response_data['results']
+
+        for result in results:
+            result['contacts'].sort(key=itemgetter('id'))
+
+        assert results == [{
             'id': str(interaction.pk),
             'kind': interaction.kind,
             'date': interaction.date.isoformat(),
@@ -247,6 +253,15 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'name': interaction.contact.name,
                 'last_name': interaction.contact.last_name,
             },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'first_name': contact.first_name,
+                    'name': contact.name,
+                    'last_name': contact.last_name,
+                }
+                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+            ],
             'is_event': None,
             'event': None,
             'service': {

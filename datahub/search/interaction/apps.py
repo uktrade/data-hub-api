@@ -33,6 +33,7 @@ class InteractionSearchApp(SearchApp):
         'service_delivery_status',
         'event',
     ).prefetch_related(
+        'contacts',
         'policy_areas',
         'policy_issue_types',
     )
