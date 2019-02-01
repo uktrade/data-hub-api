@@ -11,7 +11,7 @@ def id_name_dict(obj):
 
 def id_name_list_of_dicts(manager):
     """Creates a list of dicts with ID and name keys from a manager."""
-    return [id_name_dict(obj) for obj in manager.all()]
+    return _list_of_dicts(id_name_dict, manager)
 
 
 def id_type_dict(obj):
@@ -72,6 +72,11 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
         else:
             data['dit_team'] = {}
     return data
+
+
+def contact_or_adviser_list_of_dicts(manager):
+    """Creates a list of dicts from a manager for contacts or advisers."""
+    return _list_of_dicts(contact_or_adviser_dict, manager)
 
 
 def adviser_dict_with_team(obj):
@@ -144,3 +149,8 @@ def sector_dict(obj):
             'id': str(ancestor.id),
         } for ancestor in obj.get_ancestors()],
     }
+
+
+def _list_of_dicts(dict_factory, manager):
+    """Creates a list of dicts with ID and name keys from a manager."""
+    return [dict_factory(obj) for obj in manager.all()]
