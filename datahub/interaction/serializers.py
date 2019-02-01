@@ -79,6 +79,9 @@ class InteractionSerializer(serializers.ModelSerializer):
         'one_contact_field': ugettext_lazy(
             'Only one of contact and contacts should be provided.',
         ),
+        'too_many_contacts_for_event_service_delivery': ugettext_lazy(
+            'Only one contact can be provided for event service deliveries.',
+        ),
     }
 
     company = NestedRelatedField(Company)
@@ -267,6 +270,11 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('event', bool),
+                    when=OperatorRule('is_event', bool),
+                ),
+                ValidationRule(
+                    'too_many_contacts_for_event_service_delivery',
+                    OperatorRule('contacts', lambda value: len(value) <= 1),
                     when=OperatorRule('is_event', bool),
                 ),
                 ValidationRule(
