@@ -105,6 +105,7 @@ class ETLBase:
 class ETLInvestmentProjects(ETLBase):
     """Extract, Transform and Load Investment Projects."""
 
+    # Columns must exist both in the source query and the destination model.
     COLUMNS = {
         'dh_fdi_project_id',
         'sector_cluster',
