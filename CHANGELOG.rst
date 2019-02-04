@@ -1,3 +1,40 @@
+Data Hub API 9.8.0 (2019-02-04)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET,POST /v3/interaction``, ``GET,PATCH /v3/interaction/<id>``: The ``contact`` field is deprecated and will be removed on or after 24 February 2019. Please use ``contacts`` instead.
+- **Interactions** The ``interaction_interaction.contact_id`` column is deprecated and will be removed on or after 4 March 2019. Please use the ``interaction_interaction_contacts`` many-to-many table instead.
+- **Interactions** ``GET /v3/interaction``: The ``contact_id`` query parameter is deprecated and will be removed on or after
+  24 February 2019. Please use ``contacts__id`` instead.
+
+Features
+--------
+
+- **Interactions** The admin site now displays multiple contacts for interactions.
+
+API
+---
+
+- **Interactions** ``POST /v3/interaction``, ``PATCH /v3/interaction/<id>``: Additional validation was added to make sure that all
+  ``contacts`` belong to the specified ``company``. This validation only occurs when an interaction is created, or the
+  ``contacts`` or ``company`` field is updated.
+- **Interactions** ``GET,POST /v3/interaction``, ``GET,PATCH /v3/interaction/<id>``: ``contacts`` was added as an array field to replace the ``contact`` field.
+  The ``contact`` and ``contacts`` field will mirror each other (except that ``contact`` will only return a single contact). The ``contact``
+  field is deprecated and will be removed on or after 24 February 2019.
+- **Interactions** ``GET /v3/interaction``: ``contacts__id`` was added as a query parameter to support filtering by contact ID for
+  interactions with multiple contacts. The previous ``contact_id`` filter is deprecated and will be removed on or after
+  24 February 2019.
+
+Database schema
+---------------
+
+- **Interactions** The ``interaction_interaction.contact_id`` column is deprecated and will be removed on or after 4 March 2019. Please use the ``interaction_interaction_contacts`` many-to-many table instead.
+
+
 Data Hub API 9.7.0 (2019-01-29)
 ===============================
 
