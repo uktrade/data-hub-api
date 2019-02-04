@@ -211,3 +211,24 @@ class TestContact:
         assert contact.get_absolute_url() == (
             f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}'
         )
+
+    @pytest.mark.parametrize(
+        'first_name,last_name,company_factory,expected_output',
+        (
+            ('First', 'Last', lambda: CompanyFactory(name='Company'), 'First Last (Company)'),
+            ('', 'Last', lambda: CompanyFactory(name='Company'), 'Last (Company)'),
+            ('First', '', lambda: CompanyFactory(name='Company'), 'First (Company)'),
+            ('First', 'Last', lambda: None, 'First Last'),
+            ('First', 'Last', lambda: CompanyFactory(name=''), 'First Last'),
+            ('', '', lambda: CompanyFactory(name='Company'), '(no name) (Company)'),
+            ('', '', lambda: None, '(no name)'),
+        ),
+    )
+    def test_str(self, first_name, last_name, company_factory, expected_output):
+        """Test the human-friendly string representation of a Contact object."""
+        contact = ContactFactory.build(
+            first_name=first_name,
+            last_name=last_name,
+            company=company_factory(),
+        )
+        assert str(contact) == expected_output
