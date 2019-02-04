@@ -469,6 +469,8 @@
     date: '2017-06-01T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     service_delivery_status: ~
     grant_amount_offered: ~
@@ -489,6 +491,8 @@
     date: '2017-06-03T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     service_delivery_status: ~
     grant_amount_offered: ~
@@ -509,6 +513,8 @@
     date: '2017-06-05T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
     service: f56eb92b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
@@ -533,6 +539,8 @@
     date: '2018-04-06T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
     service: 360bba2b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
@@ -562,6 +570,8 @@
     date: '2018-06-06T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
     service: f56eb92b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
@@ -591,6 +601,8 @@
     date: '2017-09-05T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
+    contacts:
+      - 9b1138ab-ec7b-497f-b8c3-27fed21694ef
     event: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
     service: 9584b82b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
@@ -616,6 +628,8 @@
     date: '2017-09-15T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
     service: 380bba2b-3499-e211-a939-e4115bead28a
     service_delivery_status: 45329c18-6095-e211-a939-e4115bead28a
@@ -1262,6 +1276,8 @@
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Discussed site details
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
@@ -1280,6 +1296,8 @@
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Provided funding information
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
@@ -1298,6 +1316,8 @@
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contact: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+    contacts:
+      - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
     service: 9484b82b-3499-e211-a939-e4115bead28a
     subject: Chat about tigers
     dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
@@ -1316,6 +1336,8 @@
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contact: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+    contacts:
+      - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
     service: 9484b82b-3499-e211-a939-e4115bead28a
     subject: Chat about monkeys
     dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
@@ -1334,6 +1356,8 @@
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contact: 6791d583-7a52-418f-a0d3-d8d527f20d43
+    contacts:
+      - 6791d583-7a52-418f-a0d3-d8d527f20d43
     service: 0796b92b-3499-e211-a939-e4115bead28a
     subject: Email about golf balls
     dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
@@ -1352,6 +1376,8 @@
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contact: 6791d583-7a52-418f-a0d3-d8d527f20d43
+    contacts:
+      - 6791d583-7a52-418f-a0d3-d8d527f20d43
     service: 0796b92b-3499-e211-a939-e4115bead28a
     subject: Website feedback about lawn mowers
     dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
