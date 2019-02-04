@@ -1,3 +1,0 @@
-``POST /v3/interaction``, ``PATCH /v3/interaction/<id>``: Additional validation was added to make sure that all
-``contacts`` belong to the specified ``company``. This validation only occurs when an interaction is created, or the
-``contacts`` or ``company`` field is updated.

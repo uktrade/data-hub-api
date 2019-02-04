@@ -1,3 +1,0 @@
-``GET /v3/interaction``: ``contacts__id`` was added as a query parameter to support filtering by contact ID for
-interactions with multiple contacts. The previous ``contact_id`` filter is deprecated and will be removed on or after
-21 February 2019.
