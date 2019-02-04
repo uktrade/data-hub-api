@@ -91,4 +91,5 @@ class Contact(ArchivableModel, BaseModel):
 
     def __str__(self):
         """Admin displayed human readable name."""
-        return self.name
+        company_desc = f'({self.company})' if self.company and self.company.name else ''
+        return join_truthy_strings(self.name or '(no name)', company_desc)
