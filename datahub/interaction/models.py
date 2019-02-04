@@ -103,7 +103,7 @@ class Interaction(BaseModel):
     # migration to a to-many field is complete
     contact = models.ForeignKey(
         'company.Contact',
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='+',
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -111,7 +111,7 @@ class Interaction(BaseModel):
     contacts = models.ManyToManyField(
         'company.Contact',
         # TODO: change related_name to interactions once this field has fully replaced contact
-        related_name='interactions_m2m',
+        related_name='%(class)ss',
         blank=True,
     )
     event = models.ForeignKey(

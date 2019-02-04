@@ -525,8 +525,11 @@ class TestContactExportView(APITestMixin):
         ArchivedContactFactory.create_batch(2)
         ContactWithOwnAddressFactory.create_batch(2)
         ContactFactory.create_batch(2)
-        contact_with_interactions = ContactFactory()
-        CompanyInteractionFactory.create_batch(10, contact=contact_with_interactions)
+        # This is to test date of and team of latest interaction a bit more thoroughly
+        CompanyInteractionFactory.create_batch(
+            10,
+            contacts=[ContactFactory(), ContactFactory(), ContactFactory()],
+        )
         CompanyInteractionFactory.create_batch(10)
 
         setup_es.indices.refresh()

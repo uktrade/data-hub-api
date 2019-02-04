@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='contacts',
-            field=models.ManyToManyField(blank=True, related_name='interactions_m2m', to='company.Contact'),
+            field=models.ManyToManyField(blank=True, related_name='interactions', to='company.Contact'),
         ),
     ]
