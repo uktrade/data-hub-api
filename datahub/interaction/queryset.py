@@ -5,7 +5,6 @@ def get_interaction_queryset():
     """Gets the interaction query set used by v3 views."""
     return Interaction.objects.select_related(
         'company',
-        'contact',
         'dit_adviser',
         'dit_team',
         'communication_channel',
@@ -14,6 +13,7 @@ def get_interaction_queryset():
         'service_delivery_status',
         'event',
     ).prefetch_related(
+        'contacts',
         'policy_areas',
         'policy_issue_types',
     )
