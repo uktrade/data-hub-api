@@ -35,7 +35,7 @@ class TestInteractionAdmin(AdminTestMixin):
             'date_1': '00:00:00',
             'dit_adviser': self.user.pk,
             'company': company.pk,
-            'contacts': ','.join(str(contact.pk) for contact in contacts),
+            'contacts': [contact.pk for contact in contacts],
             'service': random_obj_for_model(Service).pk,
             'dit_team': random_obj_for_model(Team).pk,
             'was_policy_feedback_provided': False,
@@ -77,7 +77,7 @@ class TestInteractionAdmin(AdminTestMixin):
             'event': '',
 
             # Changed values
-            'contacts': ','.join(str(contact.pk) for contact in new_contacts),
+            'contacts': [contact.pk for contact in new_contacts],
         }
         response = self.client.post(url, data, follow=True)
 
@@ -111,7 +111,7 @@ class TestInteractionAdmin(AdminTestMixin):
             'event': '',
 
             # Changed values
-            'contacts': '',
+            'contacts': [],
         }
         response = self.client.post(url, data=data, follow=True)
 
