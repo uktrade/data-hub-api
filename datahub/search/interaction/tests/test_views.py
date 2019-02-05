@@ -956,7 +956,7 @@ class TestInteractionExportView(APITestMixin):
                     f'/{interaction.company.pk}',
                 'Company country': get_attr_or_none(
                     interaction,
-                    'company.registered_address_country.name',
+                    'company.address_country.name',
                 ),
                 'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
                 'Company sector': get_attr_or_none(interaction, 'company.sector.name'),

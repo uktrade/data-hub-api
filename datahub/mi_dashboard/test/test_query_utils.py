@@ -223,5 +223,5 @@ def test_get_country_url():
     result = query.first()
 
     url_prefix = settings.DATAHUB_FRONTEND_URL_PREFIXES['mi_fdi_dashboard_country']
-    url = f'{url_prefix}{investment_project.investor_company.registered_address_country_id}'
+    url = f'{url_prefix}{investment_project.investor_company.address_country_id}'
     assert result['country_url'] == url
