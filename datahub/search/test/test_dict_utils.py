@@ -172,6 +172,23 @@ def test_contact_or_adviser_dict_none_dit_team():
     }
 
 
+def test_contact_or_adviser_list_of_dicts():
+    """Test that contact_or_adviser_list_of_dicts returns a list of person dicts."""
+    data = [
+        {'id': '12', 'first_name': 'first A', 'last_name': 'last A', 'name': 'test A'},
+        {'id': '99', 'first_name': 'first B', 'last_name': 'last B', 'name': 'testing B'},
+    ]
+    objects = [mock.Mock(), mock.Mock()]
+    for obj, data_item in zip(objects, data):
+        obj.configure_mock(**data_item)
+
+    manager = mock.Mock(
+        all=mock.Mock(return_value=objects),
+    )
+
+    assert dict_utils.contact_or_adviser_list_of_dicts(manager) == data
+
+
 def test_ch_company_dict():
     """Tests ch_company_dict."""
     obj = mock.Mock()

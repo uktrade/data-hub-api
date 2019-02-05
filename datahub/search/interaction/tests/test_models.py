@@ -26,6 +26,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
     interaction = factory_cls()
 
     result = Interaction.db_object_to_dict(interaction)
+    result['contacts'].sort(key=itemgetter('id'))
     result['policy_areas'].sort(key=itemgetter('id'))
     result['policy_issue_types'].sort(key=itemgetter('id'))
 
@@ -52,6 +53,15 @@ def test_interaction_to_dict(setup_es, factory_cls):
             'name': interaction.contact.name,
             'last_name': interaction.contact.last_name,
         },
+        'contacts': [
+            {
+                'id': str(obj.pk),
+                'first_name': obj.first_name,
+                'name': obj.name,
+                'last_name': obj.last_name,
+            }
+            for obj in sorted(interaction.contacts.all(), key=attrgetter('id'))
+        ],
         'is_event': interaction.is_event,
         'event': None,
         'service': {
@@ -111,6 +121,7 @@ def test_service_delivery_to_dict(setup_es):
     interaction = ServiceDeliveryFactory()
 
     result = Interaction.db_object_to_dict(interaction)
+    result['contacts'].sort(key=itemgetter('id'))
 
     assert result == {
         'id': interaction.pk,
@@ -135,6 +146,15 @@ def test_service_delivery_to_dict(setup_es):
             'name': interaction.contact.name,
             'last_name': interaction.contact.last_name,
         },
+        'contacts': [
+            {
+                'id': str(obj.pk),
+                'first_name': obj.first_name,
+                'name': obj.name,
+                'last_name': obj.last_name,
+            }
+            for obj in sorted(interaction.contacts.all(), key=attrgetter('id'))
+        ],
         'is_event': interaction.is_event,
         'event': None,
         'service': {
