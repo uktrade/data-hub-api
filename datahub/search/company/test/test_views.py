@@ -51,6 +51,7 @@ def setup_data(setup_es):
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
         registered_address_country_id=country_us,
+        address_country_id=country_us,
     )
     setup_es.indices.refresh()
 
@@ -528,7 +529,7 @@ class TestCompanyExportView(APITestMixin):
                 'Name': company.name,
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}',
                 'Sector': get_attr_or_none(company, 'sector.name'),
-                'Country': get_attr_or_none(company, 'registered_address_country.name'),
+                'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Archived': company.archived,
                 'Date created': company.created_on,

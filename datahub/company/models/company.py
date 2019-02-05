@@ -264,11 +264,11 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     @property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
-        if not self.registered_address_country:
+        if not self.address_country:
             return None
 
         united_kingdom_id = uuid.UUID(constants.Country.united_kingdom.value.id)
-        return self.registered_address_country.id == united_kingdom_id
+        return self.address_country.id == united_kingdom_id
 
     @cached_property
     def companies_house_data(self):

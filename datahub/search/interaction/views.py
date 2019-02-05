@@ -105,7 +105,7 @@ class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIVie
         'link': 'Link',
         'company__name': 'Company',
         'company_link': 'Company link',
-        'company__registered_address_country__name': 'Company country',
+        'company__address_country__name': 'Company country',
         'company__uk_region__name': 'Company UK region',
         'company_sector_name': 'Company sector',
         'contact_names': 'Contacts',

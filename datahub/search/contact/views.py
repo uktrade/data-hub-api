@@ -84,11 +84,11 @@ class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
         company_sector_name=get_sector_name_subquery('company__sector'),
         company_link=get_front_end_url_expression('company', 'company__pk'),
         computed_country_name=Case(
-            When(address_same_as_company=True, then='company__registered_address_country__name'),
+            When(address_same_as_company=True, then='company__address_country__name'),
             default='address_country__name',
         ),
         computed_postcode=Case(
-            When(address_same_as_company=True, then='company__registered_address_postcode'),
+            When(address_same_as_company=True, then='company__address_postcode'),
             default='address_postcode',
         ),
         full_telephone_number=ConcatWS(
