@@ -1,12 +1,28 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Double, Keyword
+from elasticsearch_dsl import Boolean, Date, Double, Keyword, Object, Text
 
 from datahub.search import dict_utils, fields
+from datahub.search.fields import TrigramText
 from datahub.search.models import BaseESModel
 
 
 DOC_TYPE = 'interaction'
+
+
+def _contact_field():
+    return Object(
+        properties={
+            'id': Keyword(index=False),
+            'first_name': Text(index=False),
+            'last_name': Text(index=False),
+            'name': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+        },
+    )
 
 
 class Interaction(BaseESModel):
@@ -17,6 +33,7 @@ class Interaction(BaseESModel):
     company_sector = fields.sector_field()
     communication_channel = fields.id_name_field()
     contact = fields.contact_or_adviser_field('contact')
+    contacts = _contact_field()
     created_on = Date()
     date = Date()
     dit_adviser = fields.contact_or_adviser_field('dit_adviser')
@@ -44,6 +61,7 @@ class Interaction(BaseESModel):
         'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
         'contact': dict_utils.contact_or_adviser_dict,
+        'contacts': dict_utils.contact_or_adviser_list_of_dicts,
         'dit_adviser': dict_utils.contact_or_adviser_dict,
         'dit_team': dict_utils.id_name_dict,
         'event': dict_utils.id_name_dict,

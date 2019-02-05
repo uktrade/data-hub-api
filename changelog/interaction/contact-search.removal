@@ -1,0 +1,2 @@
+``GET /v3/search``, ``POST /v3/search/interaction``: The ``contact`` field in responses is deprecated and will be removed on or
+after 28 February 2019. Please use ``contacts`` instead.

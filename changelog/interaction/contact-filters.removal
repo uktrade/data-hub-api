@@ -1,0 +1,2 @@
+``POST /v3/search/interaction``: The ``contact`` and ``contact_name`` filters in request bodies are deprecated and will
+be removed on or after 28 February 2019.
