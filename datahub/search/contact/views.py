@@ -101,7 +101,7 @@ class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
             Max('interactions__date'),
         ),
         team_of_latest_interaction=get_top_related_expression_subquery(
-            DBInteraction.contact.field,
+            DBInteraction.contacts.field,
             F('dit_team__name'),
             ('-date',),
         ),
