@@ -1,6 +1,7 @@
 from django.db import models
 
 from datahub.core.models import BaseConstantModel, BaseModel, DisableableModel
+from datahub.metadata.models import Country
 
 
 class MetadataModel(BaseConstantModel):
@@ -89,3 +90,38 @@ class Book(models.Model):
     def __str__(self):
         """Human-friendly string representation."""
         return self.name
+
+
+class MultiAddressModel(models.Model):
+    """Model that has 2 addresses."""
+
+    primary_address_1 = models.CharField(max_length=255)
+    primary_address_2 = models.CharField(max_length=255, blank=True)
+    primary_address_town = models.CharField(max_length=255)
+    primary_address_county = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,  # deliberately  null=True
+    )
+    primary_address_country = models.ForeignKey(
+        Country,
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+    primary_address_postcode = models.CharField(max_length=255, blank=True)
+
+    secondary_address_1 = models.CharField(max_length=255, blank=True)
+    secondary_address_2 = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,  # deliberately  null=True
+    )
+    secondary_address_town = models.CharField(max_length=255, blank=True)
+    secondary_address_county = models.CharField(max_length=255, blank=True)
+    secondary_address_country = models.ForeignKey(
+        Country,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    secondary_address_postcode = models.CharField(max_length=255, blank=True)
