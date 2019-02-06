@@ -1,9 +1,29 @@
+from django.db.models import OuterRef, Subquery
+
+from datahub.core.model_helpers import get_m2m_model
 from datahub.interaction.models import Interaction
 
 
 def get_interaction_queryset():
     """Gets the interaction query set used by v3 views."""
-    return Interaction.objects.select_related(
+    contacts_m2m_model = get_m2m_model(Interaction, 'contacts')
+    first_contact_queryset = contacts_m2m_model.objects.filter(
+        interaction_id=OuterRef('pk'),
+        # We order by pk so that we always use the same contact, but note that when
+        # calling .set() on a many-to-many field, Django inserts the many-to-many objects
+        # in an arbitrary order
+    ).order_by(
+        'pk',
+    )[:1]
+
+    return Interaction.objects.annotate(
+        first_name_of_first_contact=Subquery(
+            first_contact_queryset.values('contact__first_name'),
+        ),
+        last_name_of_first_contact=Subquery(
+            first_contact_queryset.values('contact__last_name'),
+        ),
+    ).select_related(
         'company',
         'dit_adviser',
         'dit_team',
