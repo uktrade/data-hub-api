@@ -266,7 +266,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
-class CompanySerializer(PermittedFieldsModelSerializer):
+class CompanySerializerV3(PermittedFieldsModelSerializer):
     """
     Company read/write serializer V3.
 
