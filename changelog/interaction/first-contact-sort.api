@@ -1,0 +1,6 @@
+``GET /v3/interaction``: ``first_name_of_first_contact`` and ``last_name_of_first_contact`` were added as ``sortby``
+query parameter values for sorting event service deliveries by the first or last name of the contact. These sorting
+options aren't intended to be used for other types of interaction which may have multiple contacts.
+
+The ``contact__first_name`` and ``contact__last_name`` sorting options are deprecated and will be removed on or after
+28 February 2019.
