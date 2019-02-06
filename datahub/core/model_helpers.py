@@ -6,6 +6,16 @@ rather than model_utils.)
 """
 
 
+def get_m2m_model(model, field_name):
+    """
+    Gets the many-to-many through model for a many-to-many field.
+
+    This is rarely needed, but can be useful in rare cases when a hidden many-to-many
+    through model automatically created by Django needs to be accessed.
+    """
+    return model._meta.get_field(field_name).remote_field.through
+
+
 def get_related_fields(model):
     """
     Returns all the fields of `model` that hold the link between referencing objects

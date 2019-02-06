@@ -633,6 +633,45 @@ class TestListInteractions(APITestMixin):
         expected_ids = [str(person.pk) for person in people]
         assert actual_ids == expected_ids
 
+    @pytest.mark.parametrize(
+        'primary_field,secondary_field',
+        (
+            ('first_name', 'last_name'),
+            ('last_name', 'first_name'),
+        ),
+    )
+    def test_sort_by_first_and_last_name_of_first_contact(self, primary_field, secondary_field):
+        """Test sorting interactions by the first and last names of the first contact."""
+        contacts = [
+            ContactFactory(**{primary_field: 'Alfred', secondary_field: 'Jones'}),
+            ContactFactory(**{primary_field: 'Alfred', secondary_field: 'Terry'}),
+            ContactFactory(**{primary_field: 'Thomas', secondary_field: 'Richards'}),
+            ContactFactory(**{primary_field: 'Thomas', secondary_field: 'West'}),
+        ]
+        interactions = [
+            EventServiceDeliveryFactory(contacts=[contact])
+            for contact in sample(contacts, len(contacts))
+        ]
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(
+            url,
+            data={
+                'sortby': f'{primary_field}_of_first_contact,{secondary_field}_of_first_contact',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == len(interactions)
+
+        actual_ids = [
+            interaction['contacts'][0]['id'] for interaction in response_data['results']
+        ]
+        expected_ids = [str(person.pk) for person in contacts]
+        assert actual_ids == expected_ids
+
 
 class TestInteractionVersioning(APITestMixin):
     """

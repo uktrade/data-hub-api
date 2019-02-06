@@ -31,6 +31,7 @@ class InteractionViewSet(CoreViewSet):
     )
     filterset_fields = [
         'company_id',
+        # TODO: Remove once contact has been removed (following the deprecation period)
         'contact_id',
         'contacts__id',
         'event_id',
@@ -38,12 +39,16 @@ class InteractionViewSet(CoreViewSet):
     ]
     ordering_fields = (
         'company__name',
+        # TODO: Remove once contact has been removed (following the deprecation period)
         'contact__first_name',
+        # TODO: Remove once contact has been removed (following the deprecation period)
         'contact__last_name',
         'created_on',
         'date',
         'dit_adviser__first_name',
         'dit_adviser__last_name',
+        'first_name_of_first_contact',
+        'last_name_of_first_contact',
         'subject',
     )
     ordering = ('-date', '-created_on')
