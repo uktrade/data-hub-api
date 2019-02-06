@@ -6,7 +6,7 @@ from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
     CompaniesHouseCompanyViewSet,
     CompanyAuditViewSet,
-    CompanyViewSet,
+    CompanyViewSetV3,
     ContactAuditViewSet,
     ContactViewSet,
     OneListGroupCoreTeamViewSet,
@@ -46,12 +46,12 @@ contact_urls = [
 
 # COMPANY
 
-company_collection = CompanyViewSet.as_view({
+company_collection_v3 = CompanyViewSetV3.as_view({
     'get': 'list',
     'post': 'create',
 })
 
-company_item = CompanyViewSet.as_view({
+company_item_v3 = CompanyViewSetV3.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
 })
@@ -64,11 +64,11 @@ company_timeline = CompanyTimelineViewSet.as_view({
     'get': 'list',
 })
 
-company_archive = CompanyViewSet.as_view({
+company_archive_v3 = CompanyViewSetV3.as_view({
     'post': 'archive',
 })
 
-company_unarchive = CompanyViewSet.as_view({
+company_unarchive_v3 = CompanyViewSetV3.as_view({
     'post': 'unarchive',
 })
 
@@ -84,11 +84,11 @@ ch_company_item = CompaniesHouseCompanyViewSet.as_view({
     'get': 'retrieve',
 })
 
-company_urls = [
-    path('company', company_collection, name='collection'),
-    path('company/<uuid:pk>', company_item, name='item'),
-    path('company/<uuid:pk>/archive', company_archive, name='archive'),
-    path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
+company_urls_v3 = [
+    path('company', company_collection_v3, name='collection'),
+    path('company/<uuid:pk>', company_item_v3, name='item'),
+    path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
+    path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
     path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
     path(

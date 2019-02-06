@@ -16,7 +16,7 @@ from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializer,
-    CompanySerializer,
+    CompanySerializerV3,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
 )
@@ -28,11 +28,11 @@ from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
 
 
-class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSet):
     """Company view set V3."""
 
     required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompanySerializer
+    serializer_class = CompanySerializerV3
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id',)
