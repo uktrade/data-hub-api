@@ -5,6 +5,7 @@ from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
+from datahub.company.autocomplete import AutocompleteFilter
 from datahub.company.models import (
     Advisor,
     CompaniesHouseCompany,
@@ -179,8 +180,13 @@ class ContactAuditViewSet(AuditViewSet):
 class AdviserFilter(FilterSet):
     """Adviser filter."""
 
+    autocomplete = AutocompleteFilter(
+        search_fields=('first_name', 'last_name', 'dit_team__name'),
+    )
+
     class Meta:
         model = Advisor
+        # TODO: Remove unused options following the deprecation period.
         fields = {
             'first_name': ('exact', 'icontains'),
             'last_name': ('exact', 'icontains'),
@@ -204,5 +210,19 @@ class AdviserReadOnlyViewSetV1(
         OrderingFilter,
     )
     filterset_class = AdviserFilter
-    ordering_fields = ('first_name', 'last_name')
-    ordering = ('first_name', 'last_name')
+    ordering_fields = ('first_name', 'last_name', 'dit_team__name')
+    _default_ordering = ('first_name', 'last_name', 'dit_team__name')
+
+    def filter_queryset(self, queryset):
+        """
+        Applies the default ordering when the query set has not already been ordered.
+
+        (The autocomplete filter automatically applies an ordering, hence we only set the
+        default ordering when another one has not already been set.)
+        """
+        filtered_queryset = super().filter_queryset(queryset)
+
+        if not filtered_queryset.ordered:
+            return filtered_queryset.order_by(*self._default_ordering)
+
+        return filtered_queryset
