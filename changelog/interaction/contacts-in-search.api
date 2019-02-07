@@ -1,3 +1,0 @@
-``GET /v3/search``, ``POST /v3/search/interaction``: ``contacts`` was added as an array field in search results.
-This field is intended to replace the ``contact`` field. The ``contact`` field is deprecated and will be removed
-on or after 28 February 2019.
