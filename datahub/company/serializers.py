@@ -572,6 +572,8 @@ class CompanySerializerV3(BaseCompanySerializer):
         },
     }
 
+    registered_address_1 = serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_town = serializers.CharField(max_length=MAX_LENGTH)
     registered_address_country = NestedRelatedField(meta_models.Country)
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
