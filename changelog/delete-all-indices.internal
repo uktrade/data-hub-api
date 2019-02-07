@@ -1,2 +1,0 @@
-A management command to delete all Elasticsearch indices matching the configured index name prefix was added. This is intended for use on GOV.UK PaaS when required as GOV.UK PaaS Elasticsearch does not allow deletions
-using wildcards.

@@ -1,3 +1,54 @@
+Data Hub API 9.9.0 (2019-02-07)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``POST /v3/search/interaction``: The ``contact`` and ``contact_name`` filters in request bodies are deprecated and will
+  be removed on or after 28 February 2019.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: The ``contact`` field in responses is deprecated and will be removed on or
+  after 28 February 2019. Please use ``contacts`` instead.
+- **Interactions** ``POST /v3/search/interaction``: The ``contact.name`` value for the ``sortby`` query parameter is deprecated and will
+  be removed on or after 28 February 2019.
+- **Interactions** ``GET /v3/interaction``: The ``contact__first_name`` and ``contact__last_name`` values for the ``sortby`` query parameter
+  are deprecated and will be removed on or after 28 February 2019. Please use ``first_name_of_first_contact`` and
+  ``last_name_of_first_contact`` instead for event service deliveries only.
+
+Features
+--------
+
+- **Contacts** The contact search CSV export was updated to handle interactions with multiple contacts for the 'Date of latest interaction' and 'Team of latest interaction' fields.
+- **Contacts** Contacts can now be sorted by name in the admin site.
+- **Interactions** The admin site now uses an autocomplete widget for the contacts field when editing or adding an interaction.
+- **Interactions** The search CSV export was updated to handle interactions with multiple contacts. The previous Contact and Job title columns
+  have been merged into a single Contacts column. This column contains the names of all the contacts for each interaction with
+  the job title in brackets after each name and a comma between contacts.
+
+Internal changes
+----------------
+
+- **Companies** The system is now using the address and registered address for internal business logic instead of the trading and registered address.
+- A management command to delete all Elasticsearch indices matching the configured index name prefix was added. This is intended for use on GOV.UK PaaS when required as GOV.UK PaaS Elasticsearch does not allow deletions
+  using wildcards.
+- A management command to run MI Dashboard pipeline if changes to the relevant models have been made was added.
+- Updated various dependencies.
+
+API
+---
+
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: ``contacts`` was added as an array field in search results.
+  This field is intended to replace the ``contact`` field. The ``contact`` field is deprecated and will be removed
+  on or after 28 February 2019.
+- **Interactions** ``GET /v3/interaction``: ``first_name_of_first_contact`` and ``last_name_of_first_contact`` were added as ``sortby``
+  query parameter values for sorting event service deliveries by the first or last name of the contact. These sorting
+  options aren't intended to be used for other types of interaction which may have multiple contacts.
+
+  The ``contact__first_name`` and ``contact__last_name`` sorting options are deprecated and will be removed on or after
+  28 February 2019.
+
+
 Data Hub API 9.8.0 (2019-02-04)
 ===============================
 
