@@ -1,3 +1,0 @@
-``GET /v3/interaction``: The ``contact__first_name`` and ``contact__last_name`` values for the ``sortby`` query parameter
-are deprecated and will be removed on or after 28 February 2019. Please use ``first_name_of_first_contact`` and
-``last_name_of_first_contact`` instead for event service deliveries only.
