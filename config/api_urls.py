@@ -53,4 +53,6 @@ v3_urls = [
 
 # API V4 - new format for addresses
 
-v4_urls = []
+v4_urls = [
+    path('', include((company_urls.company_urls_v4, 'company'), namespace='company')),
+]

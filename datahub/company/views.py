@@ -17,6 +17,7 @@ from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializer,
     CompanySerializerV3,
+    CompanySerializerV4,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
 )
@@ -28,11 +29,10 @@ from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
 
 
-class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSet):
-    """Company view set V3."""
+class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Base Company view set."""
 
     required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompanySerializerV3
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id',)
@@ -69,6 +69,22 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
     )
+
+
+class CompanyViewSetV3(BaseCompanyViewSet):
+    """
+    Company view set V3.
+
+    TODO: delete once the migration to address and registered address is complete
+    """
+
+    serializer_class = CompanySerializerV3
+
+
+class CompanyViewSetV4(BaseCompanyViewSet):
+    """Company view set V4."""
+
+    serializer_class = CompanySerializerV4
 
 
 class OneListGroupCoreTeamViewSet(CoreViewSet):
