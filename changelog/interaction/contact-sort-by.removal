@@ -1,2 +1,0 @@
-``POST /v3/search/interaction``: The ``contact.name`` value for the ``sortby`` query parameter is deprecated and will
-be removed on or after 28 February 2019.
