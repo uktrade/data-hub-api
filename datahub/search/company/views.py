@@ -103,7 +103,7 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         'name': 'Name',
         'link': 'Link',
         'sector_name': 'Sector',
-        'registered_address_country__name': 'Country',
+        'address_country__name': 'Country',
         'uk_region__name': 'UK region',
         'archived': 'Archived',
         'created_on': 'Date created',

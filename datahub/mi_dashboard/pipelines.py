@@ -105,6 +105,7 @@ class ETLBase:
 class ETLInvestmentProjects(ETLBase):
     """Extract, Transform and Load Investment Projects."""
 
+    # Columns must exist both in the source query and the destination model.
     COLUMNS = {
         'dh_fdi_project_id',
         'sector_cluster',
@@ -187,11 +188,11 @@ class ETLInvestmentProjects(ETLBase):
             ),
             simplified_level_of_involvement=get_level_of_involvement_simplified_expression(),
             overseas_region=get_empty_string_if_null_expression(
-                'investor_company__registered_address_country__overseas_region__name',
+                'investor_company__address_country__overseas_region__name',
             ),
             country_url=get_country_url(),
             investor_company_country=get_empty_string_if_null_expression(
-                'investor_company__registered_address_country__name',
+                'investor_company__address_country__name',
             ),
             stage_name=F('stage__name'),
             total_investment_with_zero=Coalesce('total_investment', Value(0)),

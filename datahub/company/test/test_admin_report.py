@@ -148,7 +148,7 @@ def test_one_list_report_generation():
         'one_list_account_owner__telephone_number':
             company.one_list_account_owner.telephone_number,
         'one_list_account_owner__contact_email': company.one_list_account_owner.contact_email,
-        'registered_address_country__name': company.registered_address_country.name,
-        'registered_address_town': company.registered_address_town,
+        'address_country__name': company.address_country.name,
+        'address_town': company.address_town,
         'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
     } for company in companies]

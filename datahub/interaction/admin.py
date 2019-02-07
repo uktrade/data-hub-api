@@ -23,6 +23,7 @@ admin.site.register((PolicyArea, PolicyIssueType), OrderedMetadataAdmin)
 class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     """Interaction admin."""
 
+    autocomplete_fields = ('contacts',)
     search_fields = (
         '=pk',
         'subject',
@@ -44,7 +45,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'event',
         'dit_adviser',
         'investment_project',
-        'contacts',
     )
     readonly_fields = (
         'archived_documents_url_path',

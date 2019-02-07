@@ -3,7 +3,15 @@ from django.db import models
 
 
 class MIInvestmentProject(models.Model):
-    """MI Investment Project model."""
+    """
+    MI Investment Project model.
+
+    The pipeline is supposed to overwrite data in this table each time it runs.
+    If you add or change a column, the next step is to run the pipeline so the data is
+    updated (use management command run_pipeline).
+
+    Note: Make sure the table doesn't store any personally identifiable information data.
+    """
 
     dh_fdi_project_id = models.UUIDField(primary_key=True)
     sector_cluster = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)

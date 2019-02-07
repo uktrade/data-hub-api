@@ -1,3 +1,55 @@
+class _Address:
+    MAPPING = {
+        'line_1': '{prefix}_1',
+        'line_2': '{prefix}_2',
+        'town': '{prefix}_town',
+        'county': '{prefix}_county',
+        'postcode': '{prefix}_postcode',
+        'country': '{prefix}_country',
+    }
+
+    def __init__(self, field_prefix, company):
+        """
+        Initialises the object from the company using the values from the fields
+        with prefix `field_prefix`.
+        """
+        for attr_name, model_field_name_template in self.MAPPING.items():
+            model_field_name = model_field_name_template.format(prefix=field_prefix)
+            model_field_value = getattr(company, model_field_name)
+
+            setattr(self, attr_name, model_field_value)
+
+    def is_blank(self):
+        """
+        :returns: True if none of the field values are defined, False otherwise.
+        """
+        return not any(
+            getattr(self, attr)
+            for attr in self.MAPPING
+        )
+
+
+def compose_official_address(company):
+    """
+    :returns: the most official address for the given company as an object
+    with the following properties:
+        line_1
+        line_2
+        town
+        county
+        postcode
+        country
+
+    The values come from registered address if defined or from the address otherwise.
+    """
+    registered_address = _Address('registered_address', company)
+
+    if not registered_address.is_blank():
+        return registered_address
+
+    return _Address('address', company)
+
+
 def populate_billing_data(order):
     """
     Populate the order.billing_* fields from the company/contact if not set already.
@@ -17,14 +69,16 @@ def populate_billing_data(order):
         if getattr(order, field_name)
     }
 
+    company_address = compose_official_address(company)
+
     # get default and current order values of billing address
     default_billing_address = {
-        'billing_address_1': company.registered_address_1 or '',
-        'billing_address_2': company.registered_address_2 or '',
-        'billing_address_town': company.registered_address_town or '',
-        'billing_address_county': company.registered_address_county or '',
-        'billing_address_postcode': company.registered_address_postcode or '',
-        'billing_address_country': company.registered_address_country,
+        'billing_address_1': company_address.line_1 or '',
+        'billing_address_2': company_address.line_2 or '',
+        'billing_address_town': company_address.town or '',
+        'billing_address_county': company_address.county or '',
+        'billing_address_postcode': company_address.postcode or '',
+        'billing_address_country': company_address.country,
     }
     order_billing_address = {
         field_name: getattr(order, field_name)

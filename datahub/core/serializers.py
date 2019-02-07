@@ -2,9 +2,17 @@ from functools import partial
 
 from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ReadOnlyField, UUIDField
+
+from datahub.core.validate_utils import DataCombiner
+from datahub.metadata.models import Country
+
+
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class ConstantModelSerializer(serializers.Serializer):
@@ -197,3 +205,254 @@ class _Choices:
     def items(self):
         """Returns the choices."""
         return self._choices
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    """
+    ModelSerializer that can be used to simulate nested address objects.
+
+    E.g.
+
+    Model:
+        class MultiAddressModel(models.Model):
+            primary_address_1 = models.CharField(max_length=MAX_LENGTH)
+            primary_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+            primary_address_town = models.CharField(max_length=MAX_LENGTH)
+            primary_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+            primary_address_country = models.ForeignKey(
+                Country, on_delete=models.PROTECT, related_name='+',
+            )
+            primary_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
+
+            secondary_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
+            secondary_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+            secondary_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+            secondary_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+            secondary_address_country = models.ForeignKey(
+                Country, null=True, on_delete=models.SET_NULL, related_name='+',
+            )
+            secondary_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
+
+    Serializer:
+        class MultiAddressModelSerializer(serializers.ModelSerializer):
+            primary_address = AddressSerializer(
+                source_model=MultiAddressModel,
+                address_source_prefix='primary_address',
+            )
+            secondary_address = AddressSerializer(
+                source_model=MultiAddressModel,
+                address_source_prefix='secondary_address',
+                required=False,
+                allow_null=True,
+            )
+
+            class Meta:
+                model = MultiAddressModel
+                fields = ['primary_address', 'secondary_address']
+
+    Will produce the following API response:
+        {
+            'primary_address': {
+                'line_1': '2',
+                'line_2': '',
+                'town': 'London',
+                'county': '',
+                'postcode': '',
+                'country': {
+                    'id': '80756b9a-5d95-e211-a939-e4115bead28a',
+                    'name': 'United Kingdom',
+                },
+            },
+            'secondary_address': {
+                'line_1': '1',
+                'line_2': '',
+                'town': 'Muckamore',
+                'county': '',
+                'postcode': '',
+                'country': {
+                    'id': '736a9ab2-5d95-e211-a939-e4115bead28a',
+                    'name': 'Ireland',
+                },
+            },
+        },
+
+    Please note:
+    1. None values for CharFields will be converted to ''
+    2. If all address field values are blank the nested object in the response will return None
+
+        E.g. Fiven the following fields' values:
+            secondary_address_1=''
+            secondary_address_2=''
+            secondary_address_town=''
+            secondary_address_county=''
+            secondary_address_postcode=''
+            secondary_address_country_id=None
+
+        The equivalent API response body will be:
+            'secondary_address': None
+
+        The same applies for changing the data.
+    3. If AddressSerializer has required=False, the validation is triggered only if at least
+        one of the fields is passed in.
+    """
+
+    line_1 = serializers.CharField(
+        max_length=MAX_LENGTH,
+        allow_blank=True,
+        required=False,
+        default='',
+        source='{source_prefix}_1',
+    )
+    line_2 = serializers.CharField(
+        max_length=MAX_LENGTH,
+        allow_blank=True,
+        required=False,
+        default='',
+        source='{source_prefix}_2',
+    )
+    town = serializers.CharField(
+        max_length=MAX_LENGTH,
+        allow_blank=True,
+        required=False,
+        default='',
+        source='{source_prefix}_town',
+    )
+    county = serializers.CharField(
+        max_length=MAX_LENGTH,
+        allow_blank=True,
+        required=False,
+        default='',
+        source='{source_prefix}_county',
+    )
+    postcode = serializers.CharField(
+        max_length=MAX_LENGTH,
+        allow_blank=True,
+        required=False,
+        default='',
+        source='{source_prefix}_postcode',
+    )
+    country = NestedRelatedField(
+        Country,
+        allow_null=True,
+        required=False,
+        source='{source_prefix}_country',
+    )
+
+    REQUIRED_FIELDS = (
+        'line_1',
+        'town',
+        'country',
+    )
+
+    def __init__(self, source_model, *args, address_source_prefix='address', **kwargs):
+        """
+        Initialises the serializer.
+
+        It populates all necessary parts (e.g. Meta model, source, fields' source).
+        """
+        # Define a custom Meta so that the Meta model can be specified as an argument
+        class MultiAddressMeta(self.Meta):
+            model = source_model
+        self.Meta = MultiAddressMeta
+
+        kwargs.setdefault('source', '*')
+
+        super().__init__(*args, **kwargs)
+
+        # populate fields' source
+        for field_name, field in self.fields.items():
+            field.source = field.source.format(source_prefix=address_source_prefix)
+            field.source_attrs = field.source.split('.')
+
+    def run_validation(self, data=serializers.empty):
+        """
+        Converts None to dict with default values so that those values can be used to
+        reset the fields on the model.
+        """
+        if data or not self.allow_null:
+            normalised_data = data
+        else:
+            normalised_data = {
+                field_name: None if (field.default == serializers.empty) else field.default
+                for field_name, field in self.fields.items()
+            }
+        return super().run_validation(data=normalised_data)
+
+    def to_representation(self, value):
+        """
+        It returns None if none of the address values is set.
+        E.g.
+        {
+            'address': None
+        }
+        instead of
+        {
+            'address': {
+                'line_1': '',
+                'line_2': '',
+                'town': '',
+                'county': '',
+                'postcode': '',
+                'country': None
+            }
+        }
+        """
+        address_dict = super().to_representation(value)
+        if not any(address_dict.values()):
+            return None
+
+        # for each address field, replace None with default if possible
+        for field_name, value in address_dict.items():
+            field_default = self.fields[field_name].default
+
+            if value is None and field_default is not serializers.empty:
+                address_dict[field_name] = field_default
+
+        return address_dict
+
+    def should_validate(self, data_combiner):
+        """
+        Returns true if the data should be validated.
+        """
+        if self.required:
+            return True
+
+        return any(
+            data_combiner.get_value(field.source)
+            for field in self.fields.values()
+        )
+
+    def validate(self, attrs):
+        """
+        Validates the data if necessary.
+        This is needed because some addresses only need to be validated
+        if they are passed in.
+        """
+        validated_data = super().validate(attrs)
+
+        data_combiner = DataCombiner(self.parent.instance, validated_data)
+        if self.should_validate(data_combiner):
+            errors = {}
+            for field_name in self.REQUIRED_FIELDS:
+                field = self.fields[field_name]
+                value = data_combiner.get_value(field.source)
+                if not value:
+                    errors[field_name] = self.error_messages['required']
+
+            if errors:
+                raise ValidationError(errors)
+
+        return validated_data
+
+    class Meta:
+        """Meta options."""
+
+        model = None
+        fields = (
+            'line_1',
+            'line_2',
+            'town',
+            'county',
+            'postcode',
+            'country',
+        )

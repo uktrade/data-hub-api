@@ -232,7 +232,7 @@ class IProjectAbstract(models.Model):
     def investor_company_country(self):
         """The country of the investor company."""
         if self.investor_company:
-            return self.investor_company.registered_address_country
+            return self.investor_company.address_country
         return None
 
     @property

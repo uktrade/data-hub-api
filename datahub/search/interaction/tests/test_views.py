@@ -3,6 +3,7 @@ from collections import Counter
 from csv import DictReader
 from datetime import datetime
 from io import StringIO
+from operator import attrgetter, itemgetter
 from uuid import UUID
 
 import factory
@@ -224,7 +225,12 @@ class TestInteractionEntitySearchView(APITestMixin):
         response_data = response.json()
         interaction = interactions[0]
         assert response_data['count'] == 1
-        assert response_data['results'] == [{
+        results = response_data['results']
+
+        for result in results:
+            result['contacts'].sort(key=itemgetter('id'))
+
+        assert results == [{
             'id': str(interaction.pk),
             'kind': interaction.kind,
             'date': interaction.date.isoformat(),
@@ -247,6 +253,15 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'name': interaction.contact.name,
                 'last_name': interaction.contact.last_name,
             },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'first_name': contact.first_name,
+                    'name': contact.name,
+                    'last_name': contact.last_name,
+                }
+                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+            ],
             'is_event': None,
             'event': None,
             'service': {
@@ -887,10 +902,35 @@ class TestInteractionExportView(APITestMixin):
 
         Checks that all interaction kinds except for policy feedback are included in the export.
         """
-        CompanyInteractionFactory()
-        EventServiceDeliveryFactory()
-        InvestmentProjectInteractionFactory()
-        ServiceDeliveryFactory()
+        # Faker generates job titles containing commas which complicates comparisons,
+        # so all contact job titles are explicitly set
+        company = CompanyFactory()
+        CompanyInteractionFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Engineer'),
+                ContactFactory(company=company, job_title=None),
+                ContactFactory(company=company, job_title=''),
+            ],
+        )
+        EventServiceDeliveryFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Managing director'),
+            ],
+        )
+        InvestmentProjectInteractionFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Exports manager'),
+            ],
+        )
+        ServiceDeliveryFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Sales director'),
+            ],
+        )
 
         setup_es.indices.refresh()
 
@@ -931,12 +971,11 @@ class TestInteractionExportView(APITestMixin):
                     f'/{interaction.company.pk}',
                 'Company country': get_attr_or_none(
                     interaction,
-                    'company.registered_address_country.name',
+                    'company.address_country.name',
                 ),
                 'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
                 'Company sector': get_attr_or_none(interaction, 'company.sector.name'),
-                'Contact': get_attr_or_none(interaction, 'contact.name'),
-                'Contact job title': get_attr_or_none(interaction, 'contact.job_title'),
+                'Contacts': _format_interaction_contacts(interaction),
                 'Adviser': get_attr_or_none(interaction, 'dit_adviser.name'),
                 'Service provider': get_attr_or_none(interaction, 'dit_team.name'),
                 'Event': get_attr_or_none(interaction, 'event.name'),
@@ -949,4 +988,35 @@ class TestInteractionExportView(APITestMixin):
             for interaction in sorted_interactions
         ]
 
-        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
+        actual_row_data = [_format_actual_csv_row(row) for row in reader]
+        assert actual_row_data == format_csv_data(expected_row_data)
+
+
+def _format_interaction_contacts(interaction):
+    formatted_contact_names = sorted(
+        _format_contact_name_with_job_title(contact) for contact in interaction.contacts.all(),
+    )
+    return ', '.join(formatted_contact_names)
+
+
+def _format_contact_name_with_job_title(contact):
+    if contact.job_title:
+        return f'{contact.name} ({contact.job_title})'
+
+    return f'{contact.name}'
+
+
+def _format_actual_csv_row(row):
+    return {key: _format_actual_csv_value(key, value) for key, value in row.items()}
+
+
+def _format_actual_csv_value(key, value):
+    """
+    Sorts the value of 'Contacts' for a row alphabetically as they are unordered at present.
+
+    TODO Django 2.2 adds ordering support to StringAgg, which will remove the need for this as we
+      will be able to perform the sorting in the export query.
+    """
+    if key == 'Contacts':
+        return ', '.join(sorted(value.split(', ')))
+    return value

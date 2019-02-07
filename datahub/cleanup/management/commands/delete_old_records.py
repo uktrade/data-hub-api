@@ -6,6 +6,7 @@ from django.utils.timezone import utc
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, Contact
+from datahub.interaction.models import Interaction
 from datahub.investment.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
@@ -77,8 +78,8 @@ class Command(BaseCleanupCommand):
                 # Contacts are not deleted if they have any related interactions, investment
                 # projects, OMIS orders or OMIS quotes. We wait for those records to expire
                 # before we delete the related contacts.
+                Interaction._meta.get_field('contact').remote_field: (),
                 Contact._meta.get_field('interactions'): (),
-                Contact._meta.get_field('interactions_m2m'): (),
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),

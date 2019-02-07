@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist, FieldError
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, FDIValue, Sector, SectorCluster, UKRegion
@@ -21,6 +22,33 @@ from datahub.mi_dashboard.pipelines import (
 )
 
 pytestmark = pytest.mark.django_db
+
+
+def test_pipeline_can_query_investmentprojects():
+    """Test that pipeline can query investment projects."""
+    try:
+        etl = ETLInvestmentProjects(destination=MIInvestmentProject)
+        etl.get_source_query().first()
+    except (FieldDoesNotExist, FieldError) as exc:
+        pytest.fail(
+            'Missing or incorrect column type in InvestmentProject model breaks the '
+            'MI Dashboard pipeline. Please ensure that the change to InvestmentProject is '
+            'reflected in the MI Dashboard pipeline and relevant MI dashboards. Message: '
+            f'{str(exc)}.',
+        )
+
+
+def test_miinvestmentproject_columns_exist():
+    """Test that destination model has required columns."""
+    destination_fields = _get_db_model_fields(MIInvestmentProject)
+    available_destination_fields = destination_fields & ETLInvestmentProjects.COLUMNS
+    missing_destination_fields = ETLInvestmentProjects.COLUMNS - available_destination_fields
+
+    assert not missing_destination_fields, (
+        'Following required fields do not exist in the MIInvestmentProject model: '
+        f'{", ".join(missing_destination_fields)}. Ensure the changes are compatible with '
+        'MI Dashboards and update the pipeline specification (COLUMNS) accordingly.'
+    )
 
 
 def test_load_investment_projects():
@@ -65,7 +93,7 @@ def test_investment_projects_get_updated():
 
 
 def test_run_mi_investment_project_etl_pipeline():
-    """Tests that run_mi_investment_project_etl_pipeline copy data to FDIDashboard table."""
+    """Tests that run_mi_investment_project_etl_pipeline copy data to MIInvestmentProject table."""
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 4, 1))
     InvestmentProjectFactory.create_batch(5, actual_land_date=date(2018, 3, 31))
 
@@ -110,7 +138,7 @@ def test_project_fdi_value(fdi_value_id, expected):
 def test_investor_company_country(country_id, expected):
     """Tests that if investor country is not set investor_company_country is empty."""
     investor_company = CompanyFactory(
-        registered_address_country_id=country_id,
+        address_country_id=country_id,
     )
     InvestmentProjectFactory(
         investor_company=investor_company,
@@ -134,7 +162,7 @@ def test_investor_company_country(country_id, expected):
 def test_country_url(country_id):
     """Tests that if investor country is not set country url is empty."""
     investor_company = CompanyFactory(
-        registered_address_country_id=country_id,
+        address_country_id=country_id,
     )
     InvestmentProjectFactory(
         investor_company=investor_company,
@@ -398,3 +426,7 @@ def test_uk_region_name(actual_uk_region_id, possible_uk_region_id, expected):
 
     mi_investment_project = MIInvestmentProject.objects.values(*etl.COLUMNS).first()
     assert mi_investment_project['uk_region_name'] == expected
+
+
+def _get_db_model_fields(db_model):
+    return {field.name for field in db_model._meta.get_fields()}

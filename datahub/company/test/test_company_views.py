@@ -285,7 +285,7 @@ class TestGetCompany(APITestMixin):
             'trading_address_postcode': company.trading_address_postcode,
             'trading_address_town': company.trading_address_town,
             'uk_based': (
-                company.registered_address_country.id == uuid.UUID(Country.united_kingdom.value.id)
+                company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)
             ),
             'uk_region': {
                 'id': str(company.uk_region.id),
@@ -368,16 +368,15 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['companies_house_data'] is None
 
-    def test_get_company_without_registered_country(self):
+    def test_get_company_without_country(self):
         """
-        Tests the company item view for a company without a registered
-        company.
+        Tests the company item view for a company without a country.
 
         Checks that the endpoint returns 200 and the uk_based attribute is
         set to None.
         """
         company = CompanyFactory(
-            registered_address_country_id=None,
+            address_country_id=None,
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
