@@ -4,7 +4,6 @@ from collections import Counter
 from csv import DictReader
 from io import StringIO
 from itertools import chain
-from operator import attrgetter
 from uuid import UUID
 
 import factory
@@ -24,6 +23,7 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
+    join_attr_values,
     random_obj_for_queryset,
 )
 from datahub.investment.constants import Involvement, LikelihoodToLand
@@ -51,7 +51,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2011, 6, 13),
             actual_land_date=datetime.date(2010, 8, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_states.value.id,
+                address_country_id=constants.Country.united_states.value.id,
             ),
             status=InvestmentProject.STATUSES.ongoing,
             uk_region_locations=[
@@ -68,7 +68,7 @@ def setup_data(setup_es):
             actual_land_date=datetime.date(2047, 8, 13),
             country_investment_originates_from_id=constants.Country.ireland.value.id,
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.japan.value.id,
+                address_country_id=constants.Country.japan.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -86,7 +86,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2027, 9, 13),
             actual_land_date=datetime.date(2022, 11, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_kingdom.value.id,
+                address_country_id=constants.Country.united_kingdom.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -874,11 +874,6 @@ class TestSearchPermissions(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
 
-def _join_values(iterable, attr='name', separator=', '):
-    getter = attrgetter(attr)
-    return separator.join(sorted(getter(value) for value in iterable))
-
-
 class TestInvestmentProjectExportView(APITestMixin):
     """Tests the investment project export view."""
 
@@ -1003,9 +998,9 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project reference': project.project_code,
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
-                'Investor company town or city': project.investor_company.registered_address_town,
+                'Investor company town or city': project.investor_company.address_town,
                 'Country of origin':
-                    get_attr_or_none(project, 'investor_company.registered_address_country.name'),
+                    get_attr_or_none(project, 'investor_company.address_country.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
@@ -1023,10 +1018,10 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Global account manager': self._get_global_account_manager_name(project),
                 'Project assurance adviser':
                     get_attr_or_none(project, 'project_assurance_adviser.name'),
-                'Other team members': _join_values(project.team_members.all(), 'adviser.name'),
-                'Delivery partners': _join_values(project.delivery_partners.all()),
-                'Possible UK regions': _join_values(project.uk_region_locations.all()),
-                'Actual UK regions': _join_values(project.actual_uk_regions.all()),
+                'Other team members': join_attr_values(project.team_members.all(), 'adviser.name'),
+                'Delivery partners': join_attr_values(project.delivery_partners.all()),
+                'Possible UK regions': join_attr_values(project.uk_region_locations.all()),
+                'Actual UK regions': join_attr_values(project.actual_uk_regions.all()),
                 'Specific investment programme':
                     get_attr_or_none(project, 'specific_programme.name'),
                 'Referral source activity':

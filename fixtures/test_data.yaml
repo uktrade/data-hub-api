@@ -116,6 +116,10 @@
     future_interest_countries:
     - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 82 Ramsgate Rd
+    address_town: Willington
+    address_postcode: NE28 5JB
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     registered_address_1: 82 Ramsgate Rd
     registered_address_town: Willington
     registered_address_postcode: NE28 5JB
@@ -131,6 +135,10 @@
     name: Venus Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 66 Marcham Road
+    address_town: Bordley
+    address_postcode: BD23 8RZ
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     registered_address_1: 66 Marcham Road
     registered_address_town: Bordley
     registered_address_postcode: BD23 8RZ
@@ -156,6 +164,10 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 12 Alpha Street
+    address_town: Volcanus
+    address_postcode: NE28 5AQ
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     registered_address_1: 12 Alpha Street
     registered_address_town: Volcanus
     registered_address_postcode: NE28 5AQ
@@ -178,6 +190,10 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 12 First Street
+    address_town: New York
+    address_postcode: 765413
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
     registered_address_town: New York
     registered_address_postcode: 765413
@@ -199,6 +215,10 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 12 St George's Road
+    address_town: Paris
+    address_postcode: 75001
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
     registered_address_1: 12 St George's Road
     registered_address_town: Paris
     registered_address_postcode: 75001
@@ -215,6 +235,10 @@
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 12 St George's Road
+    address_town: Paris
+    address_postcode: 75001
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
     registered_address_1: 12 St George's Road
     registered_address_town: Paris
     registered_address_postcode: 75001
@@ -242,6 +266,10 @@
     number_of_employees: 95
     is_number_of_employees_estimated: True
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 1 Main Road
+    address_town: Rome
+    address_postcode: '001122'
+    address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
     registered_address_1: 1 Main Road
     registered_address_town: Rome
     registered_address_postcode: '001122'
@@ -257,6 +285,10 @@
     name: One List Subsidiary Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     sector: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    address_1: 100 Fordham Rd
+    address_town: Hainault
+    address_postcode: IG6 7SQ
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     registered_address_1: 100 Fordham Rd
     registered_address_town: Hainault
     registered_address_postcode: IG6 7SQ
@@ -276,6 +308,10 @@
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 16 Getabergsvagen
+    address_town: Geta
+    address_postcode: 22340
+    address_country: 0850bdb8-5d95-e211-a939-e4115bead28a  # Malta
     registered_address_1: 16 Getabergsvagen
     registered_address_town: Geta
     registered_address_postcode: 22340
@@ -312,6 +348,10 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 12 First Street
+    address_town: New York
+    address_postcode: 765413
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
     registered_address_town: New York
     registered_address_postcode: 765413

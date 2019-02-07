@@ -112,13 +112,19 @@ def test_get_choices_as_case_expression(genre):
 class TestGetFullNameExpression:
     """Tests for get_full_name_expression()."""
 
-    def test_full_name_annotation(self):
+    @pytest.mark.parametrize('include_country', (True, False))
+    @pytest.mark.parametrize('country', ('French', '', None))
+    def test_full_name_annotation(self, include_country, country):
         """Tests that a Person query set can be annotated with full names."""
-        person = PersonFactory()
+        person = PersonFactory(country=country)
+        bracketed_field_name = 'country' if include_country else None
         queryset = Person.objects.annotate(
-            name=get_full_name_expression(),
+            name=get_full_name_expression(bracketed_field_name=bracketed_field_name),
         )
         expected_name = f'{person.first_name} {person.last_name}'
+        if country and include_country:
+            expected_name += f' ({person.country})'
+
         assert queryset.first().name == expected_name
 
     def test_ignores_blank_first_name(self):
@@ -129,17 +135,25 @@ class TestGetFullNameExpression:
         )
         assert queryset.first().name == person.last_name
 
-    def test_full_name_related_annotation(self):
+    @pytest.mark.parametrize('include_country', (True, False))
+    @pytest.mark.parametrize('country', ('French', '', None))
+    def test_full_name_related_annotation(self, include_country, country):
         """
         Tests that a Book query set can be annotated with the full name of the proofreader
         of each book.
         """
-        book = BookFactory()
+        book = BookFactory(proofreader__country=country)
         proofreader = book.proofreader
+        bracketed_field_name = 'country' if include_country else None
         queryset = Book.objects.annotate(
-            proofreader_name=get_full_name_expression('proofreader'),
+            proofreader_name=get_full_name_expression(
+                person_field_name='proofreader',
+                bracketed_field_name=bracketed_field_name,
+            ),
         )
         expected_name = f'{proofreader.first_name} {proofreader.last_name}'
+        if country and include_country:
+            expected_name += f' ({proofreader.country})'
         assert queryset.first().proofreader_name == expected_name
 
     def test_none_for_none_relation(self):

@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 ('subject', models.TextField()),
                 ('notes', models.TextField(blank=True, max_length=4000)),
                 ('company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interactions', to='company.Company')),
-                ('contact', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interactions', to='company.Contact')),
+                ('contact', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='company.Contact')),
                 ('dit_adviser', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='interactions', to=settings.AUTH_USER_MODEL)),
                 ('dit_team', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Team')),
                 ('communication_channel', models.ForeignKey(blank=True, help_text='For interactions only.', null=True, on_delete=django.db.models.deletion.SET_NULL, to='interaction.CommunicationChannel')),

@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import factory
 
+from datahub.core import constants
 from datahub.core.test.factories import to_many_field
 from datahub.core.test.support.models import Book
 
@@ -36,6 +37,7 @@ class PersonFactory(factory.django.DjangoModelFactory):
 
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
+    country = factory.Faker('country')
 
     class Meta:
         model = 'support.Person'
@@ -56,3 +58,24 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'support.Book'
+
+
+class MultiAddressModelFactory(factory.django.DjangoModelFactory):
+    """MultiAddressModel factory."""
+
+    primary_address_1 = factory.Sequence(lambda n: f'Apt {n}.')
+    primary_address_2 = factory.Sequence(lambda n: f'{n} Foo st.')
+    primary_address_country_id = constants.Country.united_kingdom.value.id
+    primary_address_county = factory.Faker('text')
+    primary_address_postcode = factory.Faker('postcode')
+    primary_address_town = factory.Faker('city')
+
+    secondary_address_1 = factory.Sequence(lambda n: f'Apt {n}.')
+    secondary_address_2 = factory.Sequence(lambda n: f'{n} Foo st.')
+    secondary_address_country_id = constants.Country.united_kingdom.value.id
+    secondary_address_county = factory.Faker('text')
+    secondary_address_postcode = factory.Faker('postcode')
+    secondary_address_town = factory.Faker('city')
+
+    class Meta:
+        model = 'support.MultiAddressModel'

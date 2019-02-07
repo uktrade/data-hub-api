@@ -625,7 +625,7 @@ class TestOrderExportView(APITestMixin):
                 'UK region': order.uk_region.name,
                 'Company': order.company.name,
                 'Company country':
-                    order.company.registered_address_country.name,
+                    order.company.address_country.name,
                 'Company UK region': get_attr_or_none(order, 'company.uk_region.name'),
                 'Company link':
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'

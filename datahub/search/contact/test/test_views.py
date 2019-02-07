@@ -525,8 +525,11 @@ class TestContactExportView(APITestMixin):
         ArchivedContactFactory.create_batch(2)
         ContactWithOwnAddressFactory.create_batch(2)
         ContactFactory.create_batch(2)
-        contact_with_interactions = ContactFactory()
-        CompanyInteractionFactory.create_batch(10, contact=contact_with_interactions)
+        # This is to test date of and team of latest interaction a bit more thoroughly
+        CompanyInteractionFactory.create_batch(
+            10,
+            contacts=[ContactFactory(), ContactFactory(), ContactFactory()],
+        )
         CompanyInteractionFactory.create_batch(10)
 
         setup_es.indices.refresh()
@@ -549,7 +552,7 @@ class TestContactExportView(APITestMixin):
         sorted_contacts = Contact.objects.annotate(
             computed_address_country_name=Coalesce(
                 'address_country__name',
-                'company__registered_address_country__name',
+                'company__address_country__name',
             ),
         ).order_by(
             orm_ordering, 'pk',
@@ -571,11 +574,11 @@ class TestContactExportView(APITestMixin):
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
                 'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
                 'Country':
-                    contact.company.registered_address_country.name
+                    contact.company.address_country.name
                     if contact.address_same_as_company
                     else contact.address_country.name,
                 'Postcode':
-                    contact.company.registered_address_postcode
+                    contact.company.address_postcode
                     if contact.address_same_as_company
                     else contact.address_postcode,
                 'Phone number':

@@ -395,6 +395,33 @@ class TestAddServiceDelivery(APITestMixin):
                     'event': ['This field is required.'],
                 },
             ),
+
+            # multiple contacts not allowed for event service delivery
+            (
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'service_delivery_status': partial(
+                        random_obj_for_model, ServiceDeliveryStatus,
+                    ),
+                    'grant_amount_offered': '1111.11',
+                    'net_company_receipt': '8888.11',
+                    'was_policy_feedback_provided': False,
+                    'is_event': True,
+                    'event': EventFactory,
+
+                    # multiple contacts should not be allowed
+                    'contacts': [ContactFactory, ContactFactory],
+                },
+                {
+                    'contacts': ['Only one contact can be provided for event service deliveries.'],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -449,6 +476,22 @@ class TestUpdateServiceDelivery(APITestMixin):
         response_data = response.json()
         assert response_data['is_event'] is False
         assert response_data['event'] is None
+
+    def test_cannot_add_more_contacts_to_event_service_delivery(self):
+        """Test that an event service delivery cannot be updated to have multiple contacts."""
+        service_delivery = EventServiceDeliveryFactory()
+        new_contacts = ContactFactory.create_batch(2, company=service_delivery.company)
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk})
+        request_data = {
+            'contacts': [{'id': contact.pk} for contact in new_contacts],
+        }
+        response = self.api_client.patch(url, data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'contacts': ['Only one contact can be provided for event service deliveries.'],
+        }
 
     def test_fails_with_negative_grant_amount(self):
         """Test validation when an a negative grant amount offered is entered."""
