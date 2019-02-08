@@ -13,7 +13,6 @@ class SearchCompanySerializer(EntitySearchSerializer):
     """Serialiser used to validate company search POST bodies."""
 
     archived = serializers.BooleanField(required=False)
-    trading_name = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
     future_interest_country = SingleOrListField(child=StringUUIDField(), required=False)
