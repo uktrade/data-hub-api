@@ -25,7 +25,7 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
-from datahub.search.serializers import BasicSearchSerializer, EntitySearchSerializer
+from datahub.search.serializers import BasicSearchQuerySerializer, EntitySearchQuerySerializer
 from datahub.search.utils import SearchOrdering
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
@@ -46,7 +46,7 @@ class SearchBasicAPIView(APIView):
 
     def get(self, request, format=None):
         """Performs basic search."""
-        serializer = BasicSearchSerializer(data=request.query_params)
+        serializer = BasicSearchQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         validated_params = serializer.validated_data
         ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
@@ -102,7 +102,7 @@ class SearchAPIView(APIView):
     # e.g. 'name' to 'name.keyword'
     es_sort_by_remappings = {}
 
-    serializer_class = EntitySearchSerializer
+    serializer_class = EntitySearchQuerySerializer
     entity = None
 
     http_method_names = ('post',)

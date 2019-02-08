@@ -12,7 +12,7 @@ from datahub.investment.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.investment.models import InvestmentProject
-from datahub.search.investment.serializers import SearchInvestmentProjectSerializer
+from datahub.search.investment.serializers import SearchInvestmentProjectQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
@@ -21,7 +21,7 @@ class SearchInvestmentProjectAPIViewMixin:
 
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
-    serializer_class = SearchInvestmentProjectSerializer
+    serializer_class = SearchInvestmentProjectQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }

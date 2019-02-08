@@ -3,13 +3,13 @@ from rest_framework import serializers
 from datahub.core.serializers import RelaxedDateTimeField
 from datahub.investment.models import InvestmentProject
 from datahub.search.serializers import (
-    EntitySearchSerializer,
+    EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchInvestmentProjectSerializer(EntitySearchSerializer):
+class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate investment project search POST bodies."""
 
     adviser = SingleOrListField(child=StringUUIDField(), required=False)
