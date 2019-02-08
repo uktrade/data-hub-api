@@ -274,34 +274,27 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
-    autocomplete_serializer_class = None
-    results = None
     default_search_limit = 10
     document_fields = None
 
-    def get_queryset(self):
-        """Returns a list of elasticsearch documents"""
-        return self.get_search_results()
+    def list(self, request, *args, **kwargs):
+        """Executes the elasticsearch query"""
+        self.check_permission_filters()
+        results = execute_autocomplete_query(
+            self.search_app.es_model,
+            self.get_search_query_string(),
+            self.kwargs.get('limit', self.default_search_limit),
+            only_return_fields=self.document_fields,
+        )
 
-    def get_serializer_class(self):
-        """Returns the autocomplete serializer"""
-        return self.autocomplete_serializer_class
+        return Response(data={
+            'count': len(results),
+            'results': [result['_source'].to_dict() for result in results],
+        })
 
     def get_search_query_string(self):
         """Retrieves the query string from the get parameters"""
         return self.request.GET.get('term', '')
-
-    def get_search_results(self):
-        """Executes the elasticsearch query"""
-        if self.results is None:
-            self.check_permission_filters()
-            self.results = execute_autocomplete_query(
-                self.search_app.es_model,
-                self.get_search_query_string(),
-                self.kwargs.get('limit', self.default_search_limit),
-                only_return_fields=self.document_fields,
-            )
-        return self.results
 
     def check_permission_filters(self):
         """
