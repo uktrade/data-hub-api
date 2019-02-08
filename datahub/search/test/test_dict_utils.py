@@ -1,8 +1,19 @@
 from unittest import mock
 
+import pytest
 from pytest import raises
 
 from datahub.search import dict_utils
+
+
+def _construct_mock(**props):
+    """
+    Same as mock.Mock() but using configure_mock as
+    name collides with the kwarg in the Mock constructor.
+    """
+    obj = mock.Mock(spec_set=tuple(props.keys()))
+    obj.configure_mock(**props)
+    return obj
 
 
 def test_id_name_dict():
@@ -108,6 +119,113 @@ class TestCompanyDict:
         res = dict_utils.company_dict(None)
 
         assert res is None
+
+
+@pytest.mark.parametrize(
+    'obj,fields_prefix,expected_address_dict',
+    (
+        # returns None in case of empty address fields values
+        (
+            _construct_mock(
+                address_1='',
+                address_2='',
+                address_town='',
+                address_county='',
+                address_postcode='',
+                address_country=None,
+            ),
+            'address',
+            None,
+        ),
+
+        # returns None when obj is None
+        (
+            None,
+            'address',
+            None,
+        ),
+
+        # all fields converted into a dict
+        (
+            _construct_mock(
+                primary_address_1='1',
+                primary_address_2='Main Road',
+                primary_address_town='London',
+                primary_address_county='Greenwich',
+                primary_address_postcode='SE10 9NN',
+                primary_address_country=_construct_mock(
+                    id='80756b9a-5d95-e211-a939-e4115bead28a',
+                    name='United Kingdom',
+                ),
+            ),
+            'primary_address',
+            {
+                'line_1': '1',
+                'line_2': 'Main Road',
+                'town': 'London',
+                'county': 'Greenwich',
+                'postcode': 'SE10 9NN',
+                'country': {
+                    'id': '80756b9a-5d95-e211-a939-e4115bead28a',
+                    'name': 'United Kingdom',
+                },
+            },
+        ),
+
+
+        # None values converted to ''
+        (
+            _construct_mock(
+                primary_address_1=None,
+                primary_address_2=None,
+                primary_address_town=None,
+                primary_address_county=None,
+                primary_address_postcode=None,
+                primary_address_country=_construct_mock(
+                    id='80756b9a-5d95-e211-a939-e4115bead28a',
+                    name='United Kingdom',
+                ),
+            ),
+            'primary_address',
+            {
+                'line_1': '',
+                'line_2': '',
+                'town': '',
+                'county': '',
+                'postcode': '',
+                'country': {
+                    'id': '80756b9a-5d95-e211-a939-e4115bead28a',
+                    'name': 'United Kingdom',
+                },
+            },
+        ),
+    ),
+)
+def test_address_dict(obj, fields_prefix, expected_address_dict):
+    """Tests for address_dict."""
+    address = dict_utils.address_dict(obj, prefix=fields_prefix)
+
+    assert address == expected_address_dict
+
+
+def test_address_dict_raises_error_with_invalid_prefix():
+    """
+    Tests that if address_dict is called with a prefix that
+    cannot be found on the object, an AttributeError is raised.
+    """
+    obj = _construct_mock(
+        primary_address_1='1',
+        primary_address_2='Main Road',
+        primary_address_town='London',
+        primary_address_county='Greenwich',
+        primary_address_postcode='SE10 9NN',
+        primary_address_country=_construct_mock(
+            id='80756b9a-5d95-e211-a939-e4115bead28a',
+            name='United Kingdom',
+        ),
+    )
+    with pytest.raises(AttributeError):
+        dict_utils.address_dict(obj, prefix='secondary_address')
 
 
 def test_contact_or_adviser_dict():

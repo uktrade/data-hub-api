@@ -1,3 +1,14 @@
+def _attrgetter_with_default(attr, default):
+    """
+    It returns a function that can be called with an object to get the value
+    of attr or the default.
+    Useful to convert None values to ''.
+    """
+    def _getter(obj):
+        return getattr(obj, attr) or default
+    return _getter
+
+
 def id_name_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     if obj is None:
@@ -34,6 +45,35 @@ def id_uri_dict(obj):
         'id': str(obj.id),
         'uri': obj.uri,
     }
+
+
+def address_dict(obj, prefix='address'):
+    """
+    Creates a dictionary for the address fields with the given prefix
+    to be used as nested object.
+    """
+    if obj is None:
+        return None
+
+    mapping = {
+        'line_1': _attrgetter_with_default(f'{prefix}_1', ''),
+        'line_2': _attrgetter_with_default(f'{prefix}_2', ''),
+        'town': _attrgetter_with_default(f'{prefix}_town', ''),
+        'county': _attrgetter_with_default(f'{prefix}_county', ''),
+        'postcode': _attrgetter_with_default(f'{prefix}_postcode', ''),
+        'country': lambda obj: id_name_dict(
+            getattr(obj, f'{prefix}_country'),
+        ),
+    }
+
+    address = {
+        target_source_name: value_getter(obj)
+        for target_source_name, value_getter in mapping.items()
+    }
+
+    if any(address.values()):
+        return address
+    return None
 
 
 def company_dict(obj):
