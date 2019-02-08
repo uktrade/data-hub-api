@@ -13,7 +13,7 @@ from datahub.omis.order.query_utils import get_lead_order_assignee_name_subquery
 from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.models import Refund
 from datahub.search.omis.models import Order
-from datahub.search.omis.serializers import SearchOrderSerializer
+from datahub.search.omis.serializers import SearchOrderQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
@@ -22,7 +22,7 @@ class SearchOrderAPIViewMixin:
 
     required_scopes = (Scope.internal_front_end,)
     entity = Order
-    serializer_class = SearchOrderSerializer
+    serializer_class = SearchOrderQuerySerializer
 
     FILTER_FIELDS = [
         'primary_market',

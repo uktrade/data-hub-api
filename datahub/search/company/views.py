@@ -9,7 +9,7 @@ from datahub.oauth.scopes import Scope
 from datahub.search.company.models import Company
 from datahub.search.company.serializers import (
     AutocompleteSearchCompanySerializer,
-    SearchCompanySerializer,
+    SearchCompanyQuerySerializer,
 )
 from datahub.search.views import AutocompleteSearchListAPIView, SearchAPIView, SearchExportAPIView
 
@@ -19,7 +19,7 @@ class SearchCompanyAPIViewMixin:
 
     required_scopes = (Scope.internal_front_end,)
     entity = Company
-    serializer_class = SearchCompanySerializer
+    serializer_class = SearchCompanyQuerySerializer
     autocomplete_serializer_class = AutocompleteSearchCompanySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',

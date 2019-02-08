@@ -8,7 +8,7 @@ from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.interaction.models import Interaction
-from datahub.search.interaction.serializers import SearchInteractionSerializer
+from datahub.search.interaction.serializers import SearchInteractionQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
@@ -17,7 +17,7 @@ class SearchInteractionAPIViewMixin:
 
     required_scopes = (Scope.internal_front_end,)
     entity = Interaction
-    serializer_class = SearchInteractionSerializer
+    serializer_class = SearchInteractionQuerySerializer
 
     FILTER_FIELDS = (
         'kind',
