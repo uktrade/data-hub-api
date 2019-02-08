@@ -4,8 +4,8 @@ from datahub.search.event.serializers import SearchEventSerializer
 from datahub.search.views import SearchAPIView
 
 
-class SearchEventParams:
-    """Search event params."""
+class SearchEventAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Event
@@ -44,5 +44,5 @@ class SearchEventParams:
     }
 
 
-class SearchEventAPIView(SearchEventParams, SearchAPIView):
+class SearchEventAPIView(SearchEventAPIViewMixin, SearchAPIView):
     """Filtered event search view."""
