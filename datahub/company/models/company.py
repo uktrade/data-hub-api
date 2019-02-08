@@ -132,12 +132,12 @@ class Company(ArchivableModel, BaseModel):
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_export_to_countries',
+        related_name='companies_exporting_to',
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_future_interest_countries',
+        related_name='companies_with_future_interest',
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -158,7 +158,7 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-        related_name='company_address_country',
+        related_name='companies_with_country_address',
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -169,7 +169,7 @@ class Company(ArchivableModel, BaseModel):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='companies_with_country_registered_address',
         null=True,
         on_delete=models.SET_NULL,
     )
@@ -185,7 +185,7 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='company_trading_address_country',
+        related_name='companies_with_country_trading_address',
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -435,7 +435,7 @@ class CompaniesHouseCompany(models.Model):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='companieshousecompanies_with_country_registered_address',
         null=True,
         on_delete=models.SET_NULL,
     )
