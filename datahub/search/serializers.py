@@ -148,13 +148,3 @@ class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate entity search POST bodies."""
 
     original_query = serializers.CharField(default='', allow_blank=True)
-
-
-class AutocompleteSearchSerializer(serializers.Serializer):
-    """Base serializer for autocomplete search."""
-
-    id = serializers.UUIDField()
-
-    def to_representation(self, instance):
-        """Uses the _source property instead of the instance if one present."""
-        return super().to_representation(getattr(instance, '_source', instance))

@@ -1,9 +1,7 @@
 from rest_framework import serializers
 
 from datahub.search.serializers import (
-    AutocompleteSearchSerializer,
     EntitySearchQuerySerializer,
-    IdNameSerializer,
     SingleOrListField,
     StringUUIDField,
 )
@@ -49,23 +47,3 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         'uk_based',
         'uk_region.name',
     )
-
-
-class AutocompleteSearchCompanySerializer(AutocompleteSearchSerializer):
-    """Autocomplete search serializer for companies."""
-
-    name = serializers.CharField()
-    trading_name = serializers.CharField()
-    trading_names = serializers.ListField(child=serializers.CharField(), required=False)
-    trading_address_1 = serializers.CharField()
-    trading_address_2 = serializers.CharField()
-    trading_address_town = serializers.CharField()
-    trading_address_county = serializers.CharField()
-    trading_address_country = IdNameSerializer()
-    trading_address_postcode = serializers.CharField()
-    registered_address_1 = serializers.CharField()
-    registered_address_2 = serializers.CharField()
-    registered_address_town = serializers.CharField()
-    registered_address_county = serializers.CharField()
-    registered_address_country = IdNameSerializer()
-    registered_address_postcode = serializers.CharField()
