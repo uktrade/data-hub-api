@@ -11,16 +11,14 @@ def _construct_mock(**props):
     Same as mock.Mock() but using configure_mock as
     name collides with the kwarg in the Mock constructor.
     """
-    obj = mock.Mock(spec_set=tuple(props.keys()))
+    obj = mock.Mock(spec_set=tuple(props))
     obj.configure_mock(**props)
     return obj
 
 
 def test_id_name_dict():
     """Tests _id_name_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.name = 'test'
+    obj = _construct_mock(id=123, name='test')
 
     res = dict_utils.id_name_dict(obj)
 
@@ -36,9 +34,10 @@ def test_id_name_list_of_dicts():
         {'id': '12', 'name': 'test A'},
         {'id': '99', 'name': 'testing B'},
     ]
-    objects = [mock.Mock(), mock.Mock()]
-    for obj, data_item in zip(objects, data):
-        obj.configure_mock(**data_item)
+    objects = [
+        _construct_mock(**mock_data)
+        for mock_data in data
+    ]
 
     manager = mock.Mock(
         all=mock.Mock(return_value=objects),
@@ -49,9 +48,7 @@ def test_id_name_list_of_dicts():
 
 def test_id_type_dict():
     """Tests _id_type_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.type = 'test'
+    obj = _construct_mock(id=123, type='test')
 
     res = dict_utils.id_type_dict(obj)
 
@@ -62,10 +59,8 @@ def test_id_type_dict():
 
 
 def test_id_uri_dict():
-    """Tests _id_type_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.uri = 'test'
+    """Tests id_uri_dict."""
+    obj = _construct_mock(id=123, uri='test')
 
     res = dict_utils.id_uri_dict(obj)
 
@@ -75,50 +70,51 @@ def test_id_uri_dict():
     }
 
 
-class TestCompanyDict:
+@pytest.mark.parametrize(
+    'obj,expected_dict',
+    (
+        # complete object
+        (
+            _construct_mock(
+                id=123,
+                name='Name',
+                trading_names=['Trading 1', 'Trading 2'],
+            ),
+            {
+                'id': '123',
+                'name': 'Name',
+                'trading_name': 'Trading 1',
+                'trading_names': ['Trading 1', 'Trading 2'],
+            },
+        ),
+
+        # minimal object
+        (
+            _construct_mock(
+                id=123,
+                name='Name',
+                trading_names=[],
+            ),
+            {
+                'id': '123',
+                'name': 'Name',
+                'trading_name': '',
+                'trading_names': [],
+            },
+        ),
+
+        # None
+        (
+            None,
+            None,
+        ),
+    ),
+)
+def test_company_dict(obj, expected_dict):
     """Tests for the company_dict function."""
+    company = dict_utils.company_dict(obj)
 
-    def test_complete(self):
-        """Test with all fields filled in."""
-        obj = mock.Mock(
-            id=123,
-            name='Name',
-            trading_names=['Trading 1', 'Trading 2'],
-            spec_set=('id', 'name', 'trading_names'),
-        )
-
-        res = dict_utils.company_dict(obj)
-
-        assert res == {
-            'id': str(obj.id),
-            'name': obj.name,
-            'trading_name': obj.trading_names[0],
-            'trading_names': obj.trading_names,
-        }
-
-    def test_minimal(self):
-        """Test with only minimal fields filled in."""
-        obj = mock.Mock(
-            id=123,
-            name='Name',
-            trading_names=[],
-            spec_set=('id', 'name', 'trading_names'),
-        )
-
-        res = dict_utils.company_dict(obj)
-
-        assert res == {
-            'id': str(obj.id),
-            'name': obj.name,
-            'trading_name': '',
-            'trading_names': [],
-        }
-
-    def test_none(self):
-        """Test that if company is None, the resulting dict is None."""
-        res = dict_utils.company_dict(None)
-
-        assert res is None
+    assert company == expected_dict
 
 
 @pytest.mark.parametrize(
@@ -230,11 +226,12 @@ def test_address_dict_raises_error_with_invalid_prefix():
 
 def test_contact_or_adviser_dict():
     """Tests contact_or_adviser_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.first_name = 'First'
-    obj.last_name = 'Last'
-    obj.name = 'First Last'
+    obj = _construct_mock(
+        id=123,
+        first_name='First',
+        last_name='Last',
+        name='First Last',
+    )
 
     res = dict_utils.contact_or_adviser_dict(obj)
 
@@ -246,48 +243,57 @@ def test_contact_or_adviser_dict():
     }
 
 
-def test_contact_or_adviser_dict_include_dit_team():
+@pytest.mark.parametrize(
+    'obj,expected_dict',
+    (
+        # with dit_team != None
+        (
+            _construct_mock(
+                id=123,
+                first_name='First',
+                last_name='Last',
+                name='First Last',
+                dit_team=_construct_mock(
+                    id=321,
+                    name='team name',
+                ),
+            ),
+            {
+                'id': '123',
+                'first_name': 'First',
+                'last_name': 'Last',
+                'name': 'First Last',
+                'dit_team': {
+                    'id': '321',
+                    'name': 'team name',
+                },
+            },
+        ),
+
+        # with dit_team = None
+        (
+            _construct_mock(
+                id=123,
+                first_name='First',
+                last_name='Last',
+                name='First Last',
+                dit_team=None,
+            ),
+            {
+                'id': '123',
+                'first_name': 'First',
+                'last_name': 'Last',
+                'name': 'First Last',
+                'dit_team': {},
+            },
+        ),
+    ),
+)
+def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
     """Tests contact_or_adviser_dict including its team."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.first_name = 'First'
-    obj.last_name = 'Last'
-    obj.name = 'First Last'
-    obj.dit_team.id = 321
-    obj.dit_team.name = 'team name'
-
     res = dict_utils.contact_or_adviser_dict(obj, include_dit_team=True)
 
-    assert res == {
-        'id': str(obj.id),
-        'first_name': obj.first_name,
-        'last_name': obj.last_name,
-        'name': obj.name,
-        'dit_team': {
-            'id': '321',
-            'name': 'team name',
-        },
-    }
-
-
-def test_contact_or_adviser_dict_none_dit_team():
-    """Tests contact_or_adviser_dict including its team when dit_team is None."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.first_name = 'First'
-    obj.last_name = 'Last'
-    obj.name = 'First Last'
-    obj.dit_team = None
-
-    res = dict_utils.contact_or_adviser_dict(obj, include_dit_team=True)
-
-    assert res == {
-        'id': str(obj.id),
-        'first_name': obj.first_name,
-        'last_name': obj.last_name,
-        'name': obj.name,
-        'dit_team': {},
-    }
+    assert res == expected_dict
 
 
 def test_contact_or_adviser_list_of_dicts():
@@ -296,9 +302,10 @@ def test_contact_or_adviser_list_of_dicts():
         {'id': '12', 'first_name': 'first A', 'last_name': 'last A', 'name': 'test A'},
         {'id': '99', 'first_name': 'first B', 'last_name': 'last B', 'name': 'testing B'},
     ]
-    objects = [mock.Mock(), mock.Mock()]
-    for obj, data_item in zip(objects, data):
-        obj.configure_mock(**data_item)
+    objects = [
+        _construct_mock(**data_item)
+        for data_item in data
+    ]
 
     manager = mock.Mock(
         all=mock.Mock(return_value=objects),
@@ -309,9 +316,7 @@ def test_contact_or_adviser_list_of_dicts():
 
 def test_ch_company_dict():
     """Tests ch_company_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.company_number = '01234567'
+    obj = _construct_mock(id=123, company_number='01234567')
 
     res = dict_utils.ch_company_dict(obj)
 
@@ -321,18 +326,49 @@ def test_ch_company_dict():
     }
 
 
-def test_nested_id_name_dict():
-    """Tests nested id name dict."""
-    obj = mock.Mock()
-    obj.company.sector.id = 123
-    obj.company.sector.name = 'Cats'
+@pytest.mark.parametrize(
+    'obj,expected_dict',
+    (
+        # complete object
+        (
+            _construct_mock(
+                company=_construct_mock(
+                    sector=_construct_mock(
+                        id=123,
+                        name='Cats',
+                    ),
+                ),
+            ),
+            {
+                'id': '123',
+                'name': 'Cats',
+            },
+        ),
 
+        # None first level field
+        (
+            _construct_mock(
+                company=None,
+            ),
+            None,
+        ),
+
+        # None second level field
+        (
+            _construct_mock(
+                company=_construct_mock(
+                    sector=None,
+                ),
+            ),
+            None,
+        ),
+    ),
+)
+def test_nested_id_name_dict(obj, expected_dict):
+    """Tests nested id name dict."""
     res = dict_utils.computed_nested_id_name_dict('company.sector')(obj)
 
-    assert res == {
-        'id': str(obj.company.sector.id),
-        'name': obj.company.sector.name,
-    }
+    assert res == expected_dict
 
 
 def test_nested_id_name_dict_raises_exception_on_invalid_argument():
@@ -341,13 +377,3 @@ def test_nested_id_name_dict_raises_exception_on_invalid_argument():
 
     with raises(ValueError):
         dict_utils.computed_nested_id_name_dict('company')(obj)
-
-
-def test_nested_id_name_dict_returns_none_on_invalid_path():
-    """Tests nested id name dict raises exception on invalid path.
-    We assume that first part of path exists.
-    """
-    obj = mock.Mock(company=None)
-
-    res = dict_utils.computed_nested_id_name_dict('company.sector')(obj)
-    assert res is None
