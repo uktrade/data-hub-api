@@ -17,8 +17,8 @@ from datahub.search.omis.serializers import SearchOrderSerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchOrderParams:
-    """Search order params."""
+class SearchOrderAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Order
@@ -72,7 +72,7 @@ class SearchOrderParams:
     }
 
 
-class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
+class SearchOrderAPIView(SearchOrderAPIViewMixin, SearchAPIView):
     """Filtered order search view."""
 
     subtotal_cost_field = 'subtotal_cost'
@@ -95,7 +95,7 @@ class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
         return response
 
 
-class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
+class SearchOrderExportAPIView(SearchOrderAPIViewMixin, SearchExportAPIView):
     """Order search export view."""
 
     queryset = DBOrder.objects.annotate(

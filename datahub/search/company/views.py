@@ -14,8 +14,8 @@ from datahub.search.company.serializers import (
 from datahub.search.views import AutocompleteSearchListAPIView, SearchAPIView, SearchExportAPIView
 
 
-class SearchCompanyParams:
-    """Search company parameters."""
+class SearchCompanyAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Company
@@ -69,11 +69,11 @@ class SearchCompanyParams:
     }
 
 
-class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
+class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
 
-class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
+class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
     queryset = DBCompany.objects.annotate(
@@ -113,7 +113,10 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
     }
 
 
-class CompanyAutocompleteSearchListAPIView(SearchCompanyParams, AutocompleteSearchListAPIView):
+class CompanyAutocompleteSearchListAPIView(
+    SearchCompanyAPIViewMixin,
+    AutocompleteSearchListAPIView,
+):
     """Company autocomplete search view."""
 
     document_fields = [

@@ -17,8 +17,8 @@ from datahub.search.contact.serializers import SearchContactSerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchContactParams:
-    """Search contact params."""
+class SearchContactAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Contact
@@ -68,11 +68,11 @@ class SearchContactParams:
     }
 
 
-class SearchContactAPIView(SearchContactParams, SearchAPIView):
+class SearchContactAPIView(SearchContactAPIViewMixin, SearchAPIView):
     """Filtered contact search view."""
 
 
-class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
+class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
     db_sort_by_remappings = {

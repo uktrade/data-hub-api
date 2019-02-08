@@ -16,8 +16,8 @@ from datahub.search.investment.serializers import SearchInvestmentProjectSeriali
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchInvestmentProjectParams:
-    """Search investment project params."""
+class SearchInvestmentProjectAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
@@ -81,11 +81,11 @@ class SearchInvestmentProjectParams:
     }
 
 
-class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
+class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, SearchAPIView):
     """Filtered investment project search view."""
 
 
-class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
+class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchExportAPIView):
     """Investment project search export view."""
 
     # Note: Aggregations on related fields are only used via subqueries as they become very
