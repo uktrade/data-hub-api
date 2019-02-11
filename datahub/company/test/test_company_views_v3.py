@@ -264,7 +264,6 @@ class TestGetCompany(APITestMixin):
             'company_number': company.company_number,
             'vat_number': company.vat_number,
             'duns_number': company.duns_number,
-            'trading_name': company.trading_names[0],
             'trading_names': company.trading_names,
             'registered_address_1': company.registered_address_1,
             'registered_address_2': company.registered_address_2,
@@ -689,7 +688,6 @@ class TestUpdateCompany(APITestMixin):
 
         data = {
             'name': 'new name',
-            'trading_name': 'new trading name',
             'trading_names': ['new trading name'],
             'company_number': 'new company number',
             'vat_number': 'new vat number',
@@ -729,11 +727,6 @@ class TestUpdateCompany(APITestMixin):
     @pytest.mark.parametrize(
         'data,expected_error',
         (
-            # trading name too long
-            (
-                {'trading_name': 'a' * 600},
-                {'trading_name': ['Ensure this field has no more than 255 characters.']},
-            ),
             # trading names too long
             (
                 {'trading_names': ['a' * 600]},
@@ -922,140 +915,6 @@ class TestUpdateCompany(APITestMixin):
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
-
-
-class TestTradingNamesForCompany(APITestMixin):
-    """
-    Tests related to trading_names and trading_name.
-
-    TODO: They will be eventually deleted after the migration from trading_name to
-    trading_names is completed.
-    """
-
-    @pytest.mark.parametrize(
-        (
-            'old_trading_names',
-            'trading_name_api_data',
-            'expected_trading_names',
-        ),
-        (
-            # help in reading the params below:
-            # (
-            #     ['old value'],  # setup
-            #     'old value',  # API PATCH data
-            #     ['old value'],  # expectation
-            # ),
-            (
-                ['old value'],
-                'old value',
-                ['old value'],
-            ),
-            (
-                ['old value'],
-                'new value',
-                ['new value'],
-            ),
-            (
-                ['old value'],
-                '',
-                [],
-            ),
-            (
-                ['old value'],
-                None,
-                [],
-            ),
-            (
-                [],
-                'new value',
-                ['new value'],
-            ),
-            (
-                [],
-                '',
-                [],
-            ),
-            (
-                [],
-                None,
-                [],
-            ),
-            (
-                ['old value', 'another value'],
-                'new value',
-                ['new value'],
-            ),
-        ),
-    )
-    def test_values_updated_correctly(
-        self,
-        old_trading_names,
-        trading_name_api_data,
-        expected_trading_names,
-    ):
-        """
-        Test that given specific trading_names, updating a company using
-        the `trading_name` API data param, updates trading_names correctly.
-        """
-        company = CompanyFactory(
-            trading_names=old_trading_names,
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(
-            url,
-            data={
-                'trading_name': trading_name_api_data,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['trading_names'] == expected_trading_names
-
-        company.refresh_from_db()
-        assert company.trading_names == expected_trading_names
-
-    @pytest.mark.parametrize(
-        'trading_names,expected_trading_name,expected_trading_names',
-        (
-            (
-                ['value'],
-                'value',
-                ['value'],
-            ),
-            (
-                # only the first item is returned in trading_name
-                ['value', 'another value'],
-                'value',
-                ['value', 'another value'],
-            ),
-            (
-                [],
-                '',
-                [],
-            ),
-        ),
-    )
-    def test_trading_name_gets_value_from_trading_names(
-        self,
-        trading_names,
-        expected_trading_name,
-        expected_trading_names,
-    ):
-        """
-        Test that the values of trading_name and trading_names in the GET company
-        response API come from the trading_names field.
-        """
-        company = CompanyFactory(
-            trading_names=trading_names,
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['trading_name'] == expected_trading_name
-        assert response_data['trading_names'] == expected_trading_names
 
 
 class TestAddressesForCompany(APITestMixin):
@@ -1372,7 +1231,7 @@ class TestAddCompany(APITestMixin):
             (
                 {
                     'name': 'Acme',
-                    'trading_name': 'Trading name',
+                    'trading_names': ['Trading name'],
                     'business_type': {'id': BusinessTypeConstant.company.value.id},
                     'registered_address_country': {
                         'id': Country.united_kingdom.value.id,
@@ -1384,7 +1243,7 @@ class TestAddCompany(APITestMixin):
                 },
                 {
                     'name': 'Acme',
-                    'trading_name': 'Trading name',
+                    'trading_names': ['Trading name'],
                     'business_type': {
                         'id': BusinessTypeConstant.company.value.id,
                         'name': BusinessTypeConstant.company.value.name,
@@ -1741,7 +1600,7 @@ class TestCompanyVersioning(APITestMixin):
             reverse('api-v3:company:collection'),
             data={
                 'name': 'Acme',
-                'trading_name': 'Trading name',
+                'trading_names': ['Trading name'],
                 'business_type': {'id': BusinessTypeConstant.company.value.id},
                 'sector': {'id': random_obj_for_model(Sector).id},
                 'registered_address_country': {
@@ -1756,7 +1615,7 @@ class TestCompanyVersioning(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data['name'] == 'Acme'
-        assert response_data['trading_name'] == 'Trading name'
+        assert response_data['trading_names'] == ['Trading name']
 
         company = Company.objects.get(pk=response_data['id'])
 
@@ -1834,7 +1693,7 @@ class TestCompanyVersioning(APITestMixin):
 
         response = self.api_client.patch(
             reverse('api-v3:company:item', kwargs={'pk': company.pk}),
-            data={'trading_name': 'a' * 600},
+            data={'trading_names': ['a' * 600]},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

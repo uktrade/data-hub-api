@@ -84,37 +84,6 @@ NestedAdviserWithTeamGeographyField = partial(
 )
 
 
-class _ArrayAsSingleItemField(serializers.CharField):
-    """
-    Serialiser field that makes an ArrayField behave like a CharField.
-    Use for temporary backwards compatibility when migrating a CharField to be an ArrayField.
-
-    This isn't intended to be used in any other way as if the ArrayField contains multiple
-    items, only one of them will be returned, and all of them will be overwritten on updates.
-
-    TODO Remove this once trading_name has been removed from the API.
-    """
-
-    def run_validation(self, data=serializers.empty):
-        """
-        Converts a user-provided value to a list containing that value after it has been validated.
-
-        This logic is here instead of in to_internal_value so that we can keep the original
-        validators (for CharField instead of ArrayField).
-        Also, to_internal_value is not called in case of empty data which is problematic.
-        """
-        value = super().run_validation(data)
-        if not value:
-            return []
-        return [value]
-
-    def to_representation(self, value):
-        """Converts a list of values to the representation of the first item."""
-        if not value:
-            return ''
-        return super().to_representation(value[0])
-
-
 class AdviserSerializer(serializers.ModelSerializer):
     """Adviser serializer."""
 
@@ -298,13 +267,6 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
         ),
     }
 
-    trading_name = _ArrayAsSingleItemField(
-        source='trading_names',
-        required=False,
-        allow_null=True,
-        allow_blank=True,
-        max_length=MAX_LENGTH,
-    )
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True,
@@ -442,7 +404,6 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
             'id',
             'reference_code',
             'name',
-            'trading_name',
             'trading_names',
             'uk_based',
             'company_number',
@@ -495,7 +456,6 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
         )
         dnb_read_only_fields = (
             'name',
-            'trading_name',
             'trading_names',
             'company_number',
             'vat_number',
