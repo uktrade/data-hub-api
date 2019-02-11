@@ -1,3 +1,6 @@
+from collections import Counter
+
+import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -59,3 +62,25 @@ class TestAdviser(APITestMixin):
             'f sorted adviser',
             'z sorted adviser',
         ]
+
+    @pytest.mark.parametrize('filter_value', (False, True))
+    def test_can_filter_by_is_active(self, filter_value):
+        """Test filtering by is_active."""
+        AdviserFactory.create_batch(5, is_active=not filter_value)
+        matching_advisers = AdviserFactory.create_batch(4, is_active=filter_value)
+        if filter_value:
+            matching_advisers.append(self.user)
+
+        url = reverse('api-v1:advisor-list')
+        response = self.api_client.get(
+            url,
+            data={
+                'is_active': filter_value,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(matching_advisers)
+        actual_ids = Counter(str(adviser.pk) for adviser in matching_advisers)
+        expected_ids = Counter(result['id'] for result in response_data['results'])
+        assert actual_ids == expected_ids
