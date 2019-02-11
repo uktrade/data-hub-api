@@ -25,7 +25,11 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
-from datahub.search.serializers import BasicSearchQuerySerializer, EntitySearchQuerySerializer
+from datahub.search.serializers import (
+    AutocompleteSearchQuerySerializer,
+    BasicSearchQuerySerializer,
+    EntitySearchQuerySerializer,
+)
 from datahub.search.utils import SearchOrdering
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
@@ -274,16 +278,19 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
-    default_search_limit = 10
     document_fields = None
 
     def list(self, request, *args, **kwargs):
         """Executes the elasticsearch query"""
+        serializer = AutocompleteSearchQuerySerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        validated_params = serializer.validated_data
+
         self.check_permission_filters()
         results = execute_autocomplete_query(
             self.search_app.es_model,
-            self.get_search_query_string(),
-            self.kwargs.get('limit', self.default_search_limit),
+            validated_params['term'],
+            validated_params['limit'],
             only_return_fields=self.document_fields,
         )
 
@@ -291,10 +298,6 @@ class AutocompleteSearchListAPIView(ListAPIView):
             'count': len(results),
             'results': [result['_source'].to_dict() for result in results],
         })
-
-    def get_search_query_string(self):
-        """Retrieves the query string from the get parameters"""
-        return self.request.GET.get('term', '')
 
     def check_permission_filters(self):
         """

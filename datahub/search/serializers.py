@@ -148,3 +148,10 @@ class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate entity search POST bodies."""
 
     original_query = serializers.CharField(default='', allow_blank=True)
+
+
+class AutocompleteSearchQuerySerializer(serializers.Serializer):
+    """Serialiser used for the autocomplation search query parameters."""
+
+    term = serializers.CharField(required=True, allow_blank=True)
+    limit = serializers.IntegerField(default=10, min_value=1)
