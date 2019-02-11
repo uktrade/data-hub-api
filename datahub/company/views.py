@@ -1,7 +1,6 @@
 """Company and related resources view sets."""
 from django.db.models import Prefetch
-from django_filters import FilterSet
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response

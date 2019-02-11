@@ -1,4 +1,4 @@
-from django_filters import CharFilter, FilterSet
+from django_filters.rest_framework import CharFilter, FilterSet
 
 
 from datahub.metadata.models import Service

@@ -2,8 +2,7 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
-from django_filters import IsoDateTimeFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, IsoDateTimeFilter
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
