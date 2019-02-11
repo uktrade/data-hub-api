@@ -49,3 +49,13 @@ class ProjectManagerRequestStatus(Enum):
     assigned = Constant('Assigned', '9fc09623-f84f-450e-994b-3234c6d3248c')
     re_requested = Constant('Re-requested', '993f31d9-549d-4c0d-95f0-0f86e62e949d')
     self_assigned = Constant('Self assigned', 'd50b8f0c-20c1-484e-9018-b98e9631b08b')
+
+
+class InvestmentActivityType(Enum):
+    """Investment Activity type constants."""
+
+    change = Constant('Change', '931f96a9-bd15-49c0-b8ee-ab3ad7ff27b2')
+    risk = Constant('Risk', '9810a38f-95f6-4cb4-87f4-369eef23d2ca')
+    issue = Constant('Issue', '6aa82e79-bfab-4466-8d92-e108fd4c0b42')
+    spi_interaction = Constant('SPI Interaction', 'fa6ed4db-4e1d-4903-988b-3e8be45b37c2')
+    internal_interaction = Constant('Internal Interaction', 'c50d2f7a-57cd-435e-bf87-d04c1dab11e6')

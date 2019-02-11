@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
+from reversion.models import Revision
+
 
 from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
@@ -590,6 +592,32 @@ class InvestmentProjectStageLog(models.Model):
         return f'{self.investment_project} – {self.created_on} – {self.stage}'
 
 
+@reversion.register_base_model()
+class InvestmentActivity(BaseModel):
+    """An investment activity."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    revision = models.OneToOneField(Revision, on_delete=models.SET_NULL, null=True, blank=True)
+    text = models.TextField()
+    activity_type = models.ForeignKey(
+        'investment.InvestmentActivityType',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+    investment_project = models.ForeignKey(
+        InvestmentProject,
+        on_delete=models.CASCADE,
+        related_name='activities',
+    )
+
+    class Meta:
+        ordering = ('-created_on',)
+
+    def __str__(self):
+        """Human-readable representation"""
+        return self.text
+
+
 class InvestmentProjectCode(models.Model):
     """An investment project number used for project codes.
 
@@ -625,3 +653,7 @@ class LikelihoodToLand(BaseOrderedConstantModel):
 
 class ProjectManagerRequestStatus(BaseConstantModel):
     """Project manager request status."""
+
+
+class InvestmentActivityType(BaseConstantModel):
+    """Investment activity type."""
