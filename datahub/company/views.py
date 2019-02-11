@@ -161,11 +161,12 @@ class AdviserFilter(FilterSet):
 
     class Meta:
         model = Advisor
-        fields = dict(
-            first_name=['exact', 'icontains'],
-            last_name=['exact', 'icontains'],
-            email=['exact', 'icontains'],
-        )
+        fields = {
+            'first_name': ('exact', 'icontains'),
+            'last_name': ('exact', 'icontains'),
+            'email': ('exact', 'icontains'),
+            'is_active': ('exact',),
+        }
 
 
 class AdviserReadOnlyViewSetV1(
