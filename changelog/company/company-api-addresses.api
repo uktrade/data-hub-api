@@ -1,0 +1,5 @@
+``/v4/company``, ``/v4/company/<uuid:pk>``, ``/v4/company/<uuid:pk>/archive``, ``/v4/company/<uuid:pk>/unarchive``:
+
+- The ``trading_address_*`` fields were removed from v4
+- The ``registered_address_*`` fields were replaced by the nested object ``registered_address`` and made optional
+- The nested object ``address`` was added and is mandatory when creating a company. Its data was populated from trading_address fields or registered_address whichever was defined.

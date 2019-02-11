@@ -25,6 +25,7 @@ from datahub.company.validators import (
 from datahub.core.constants import Country
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
+    AddressSerializer,
     NestedRelatedField,
     PermittedFieldsModelSerializer,
     RelaxedURLField,
@@ -266,34 +267,14 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
-class CompanySerializer(PermittedFieldsModelSerializer):
+class BaseCompanySerializer(PermittedFieldsModelSerializer):
     """
-    Company read/write serializer V3.
+    Base Company read/write serializer
 
     Note that there is special validation for company number for UK establishments. This is
     because we don't get UK establishments in our Companies House data file at present, so users
     have to enter company numbers for UK establishments manually.
     """
-
-    # TODO: delete after the migration to address and registered address is completed
-    ADDRESS_FIELDS_MAPPING = {
-        'trading': {
-            'address_1': 'trading_address_1',
-            'address_2': 'trading_address_2',
-            'address_town': 'trading_address_town',
-            'address_county': 'trading_address_county',
-            'address_postcode': 'trading_address_postcode',
-            'address_country': 'trading_address_country',
-        },
-        'registered': {
-            'address_1': 'registered_address_1',
-            'address_2': 'registered_address_2',
-            'address_town': 'registered_address_town',
-            'address_county': 'registered_address_county',
-            'address_postcode': 'registered_address_postcode',
-            'address_country': 'registered_address_country',
-        },
-    }
 
     default_error_messages = {
         'invalid_uk_establishment_number_prefix': ugettext_lazy(
@@ -302,9 +283,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'invalid_uk_establishment_number_characters': ugettext_lazy(
             'This field can only contain the letters A to Z and numbers (no symbols, punctuation '
             'or spaces).',
-        ),
-        'uk_establishment_not_in_uk': ugettext_lazy(
-            'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
         'global_headquarters_hq_type_is_not_global_headquarters': ugettext_lazy(
             'Company to be linked as global headquarters must be a global headquarters.',
@@ -320,16 +298,12 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
     }
 
-    registered_address_country = NestedRelatedField(meta_models.Country)
     trading_name = _ArrayAsSingleItemField(
         source='trading_names',
         required=False,
         allow_null=True,
         allow_blank=True,
         max_length=MAX_LENGTH,
-    )
-    trading_address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True,
     )
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
@@ -402,46 +376,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     'headquarter_type': message,
                 })
 
-        self._populate_address_fields(combiner, data)
-
         return data
-
-    def _populate_address_fields(self, combiner, data):
-        """
-        Populates the address_* fields with the values from trading address or
-        registered address whichever is defined.
-
-        It's only triggered when any of the address fields are specified so that we don't
-        accidentally run this logic when changing any other field.
-        Doing this will allow us to implement a variant that updates the addresses
-        in a different way.
-
-        TODO: delete after the migration to address and registered address is completed
-        """
-        all_address_field_names = {
-            field
-            for mapping in self.ADDRESS_FIELDS_MAPPING.values()
-            for field in mapping.values()
-        }
-
-        # was any address field specified?
-        if not all_address_field_names & data.keys():
-            return
-
-        trading_fields_mapping = Company.TRADING_ADDRESS_VALIDATION_MAPPING
-
-        has_valid_trading_address = all(
-            combiner.get_value(field_name)
-            for field_name, rules in trading_fields_mapping.items()
-            if rules['required']
-        )
-
-        mapping_source = 'trading' if has_valid_trading_address else 'registered'
-
-        mapping = self.ADDRESS_FIELDS_MAPPING[mapping_source]
-        for target_field_name, source_field_name in mapping.items():
-            target_value = combiner.get_value(source_field_name)
-            data[target_field_name] = target_value
 
     def validate_headquarter_type(self, headquarter_type):
         """Raises an exception if company is a global hq and has subsidiaries."""
@@ -513,12 +448,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'company_number',
             'vat_number',
             'duns_number',
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_town',
-            'registered_address_county',
-            'registered_address_postcode',
-            'registered_address_country',
             'created_on',
             'modified_on',
             'archived',
@@ -532,12 +461,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'transferred_to',
             'transfer_reason',
             'website',
-            'trading_address_1',
-            'trading_address_2',
-            'trading_address_town',
-            'trading_address_county',
-            'trading_address_postcode',
-            'trading_address_country',
             'business_type',
             'one_list_group_tier',
             'companies_house_data',
@@ -570,50 +493,22 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'number_of_employees',
             'is_number_of_employees_estimated',
         )
-        dnb_read_only_fields = [
+        dnb_read_only_fields = (
             'name',
             'trading_name',
             'trading_names',
             'company_number',
             'vat_number',
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_town',
-            'registered_address_county',
-            'registered_address_postcode',
-            'registered_address_country',
             'website',
-            'trading_address_1',
-            'trading_address_2',
-            'trading_address_town',
-            'trading_address_county',
-            'trading_address_postcode',
-            'trading_address_country',
             'business_type',
             'employee_range',
             'turnover_range',
             'headquarter_type',
             'global_headquarters',
-        ]
-        validators = [
+        )
+        validators = (
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
             RulesBasedValidator(
-                ValidationRule(
-                    'required',
-                    OperatorRule('uk_region', bool),
-                    when=EqualsRule(
-                        'registered_address_country',
-                        Country.united_kingdom.value.id,
-                    ),
-                ),
-                ValidationRule(
-                    'uk_establishment_not_in_uk',
-                    EqualsRule('registered_address_country', Country.united_kingdom.value.id),
-                    when=EqualsRule(
-                        'business_type',
-                        BusinessTypeConstant.uk_establishment.value.id,
-                    ),
-                ),
                 ValidationRule(
                     'required',
                     OperatorRule('company_number', bool),
@@ -639,11 +534,239 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     ),
                 ),
             ),
-            AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
-        ]
+        )
         permissions = {
             f'company.{CompanyPermission.view_company_document}': 'archived_documents_url_path',
         }
+
+
+class CompanySerializerV3(BaseCompanySerializer):
+    """
+    Company read/write serializer V3
+
+    TODO: delete once the migration to address and registered address is complete
+    """
+
+    default_error_messages = {
+        'uk_establishment_not_in_uk': ugettext_lazy(
+            'A UK establishment (branch of non-UK company) must be in the UK.',
+        ),
+    }
+
+    ADDRESS_FIELDS_MAPPING = {
+        'trading': {
+            'address_1': 'trading_address_1',
+            'address_2': 'trading_address_2',
+            'address_town': 'trading_address_town',
+            'address_county': 'trading_address_county',
+            'address_postcode': 'trading_address_postcode',
+            'address_country': 'trading_address_country',
+        },
+        'registered': {
+            'address_1': 'registered_address_1',
+            'address_2': 'registered_address_2',
+            'address_town': 'registered_address_town',
+            'address_county': 'registered_address_county',
+            'address_postcode': 'registered_address_postcode',
+            'address_country': 'registered_address_country',
+        },
+    }
+
+    registered_address_1 = serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_town = serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_country = NestedRelatedField(meta_models.Country)
+    trading_address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True,
+    )
+
+    def validate(self, data):
+        """
+        Performs cross-field validation and adds extra fields to data.
+        """
+        data = super().validate(data)
+
+        combiner = DataCombiner(self.instance, data)
+        self._populate_address_fields(combiner, data)
+
+        return data
+
+    def _populate_address_fields(self, combiner, data):
+        """
+        Populates the address_* fields with the values from trading address or
+        registered address whichever is defined.
+
+        It's only triggered when any of the address fields are specified so that we don't
+        accidentally run this logic when changing any other field.
+        Doing this will allow us to implement a variant that updates the addresses
+        in a different way.
+        """
+        all_address_field_names = {
+            field
+            for mapping in self.ADDRESS_FIELDS_MAPPING.values()
+            for field in mapping.values()
+        }
+
+        # was any address field specified?
+        if not all_address_field_names & data.keys():
+            return
+
+        trading_fields_mapping = Company.TRADING_ADDRESS_VALIDATION_MAPPING
+
+        has_valid_trading_address = all(
+            combiner.get_value(field_name)
+            for field_name, rules in trading_fields_mapping.items()
+            if rules['required']
+        )
+
+        mapping_source = 'trading' if has_valid_trading_address else 'registered'
+
+        mapping = self.ADDRESS_FIELDS_MAPPING[mapping_source]
+        for target_field_name, source_field_name in mapping.items():
+            target_value = combiner.get_value(source_field_name)
+            data[target_field_name] = target_value
+
+    class Meta(BaseCompanySerializer.Meta):
+        fields = (
+            *BaseCompanySerializer.Meta.fields,
+
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_town',
+            'registered_address_county',
+            'registered_address_postcode',
+            'registered_address_country',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+            'trading_address_country',
+        )
+        dnb_read_only_fields = (
+            *BaseCompanySerializer.Meta.dnb_read_only_fields,
+
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_town',
+            'registered_address_county',
+            'registered_address_postcode',
+            'registered_address_country',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+            'trading_address_country',
+        )
+        validators = (
+            *BaseCompanySerializer.Meta.validators,
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('uk_region', bool),
+                    when=EqualsRule(
+                        'registered_address_country',
+                        Country.united_kingdom.value.id,
+                    ),
+                ),
+                ValidationRule(
+                    'uk_establishment_not_in_uk',
+                    EqualsRule('registered_address_country', Country.united_kingdom.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
+                ),
+            ),
+            AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
+        )
+
+
+class CompanySerializerV4(BaseCompanySerializer):
+    """Company read/write serializer V4."""
+
+    # TODO: delete once the migration to address and registered address is complete
+    ADDRESS_FIELDS_MAPPING = {
+        'address_1': 'trading_address_1',
+        'address_2': 'trading_address_2',
+        'address_town': 'trading_address_town',
+        'address_county': 'trading_address_county',
+        'address_postcode': 'trading_address_postcode',
+        'address_country': 'trading_address_country',
+    }
+
+    default_error_messages = {
+        'uk_establishment_not_in_uk': ugettext_lazy(
+            'A UK establishment (branch of non-UK company) must be in the UK.',
+        ),
+    }
+
+    address = AddressSerializer(source_model=Company, address_source_prefix='address')
+    registered_address = AddressSerializer(
+        source_model=Company,
+        address_source_prefix='registered_address',
+        required=False,
+        allow_null=True,
+    )
+
+    def validate(self, data):
+        """
+        Performs cross-field validation and adds extra fields to data.
+        """
+        data = super().validate(data)
+
+        combiner = DataCombiner(self.instance, data)
+        self._populate_address_fields(combiner, data)
+
+        return data
+
+    def _populate_address_fields(self, combiner, data):
+        """
+        Populates the trading_address_* fields with the values from address.
+        """
+        # was any address field specified?
+        if not self.ADDRESS_FIELDS_MAPPING.keys() & data.keys():
+            return
+
+        for source_field_name, target_field_name in self.ADDRESS_FIELDS_MAPPING.items():
+            target_value = combiner.get_value(source_field_name)
+            data[target_field_name] = target_value
+
+    class Meta(BaseCompanySerializer.Meta):
+        fields = (
+            *BaseCompanySerializer.Meta.fields,
+
+            'address',
+            'registered_address',
+        )
+        dnb_read_only_fields = (
+            *BaseCompanySerializer.Meta.dnb_read_only_fields,
+
+            'address',
+            'registered_address',
+        )
+        validators = (
+            *BaseCompanySerializer.Meta.validators,
+
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('uk_region', bool),
+                    when=EqualsRule(
+                        'address_country',
+                        Country.united_kingdom.value.id,
+                    ),
+                ),
+                ValidationRule(
+                    'uk_establishment_not_in_uk',
+                    EqualsRule('address_country', Country.united_kingdom.value.id),
+                    when=EqualsRule(
+                        'business_type',
+                        BusinessTypeConstant.uk_establishment.value.id,
+                    ),
+                ),
+            ),
+        )
 
 
 class OneListCoreTeamMemberSerializer(serializers.Serializer):

@@ -33,7 +33,7 @@ v3_urls = [
         ),
     ),
     path('', include((company_urls.contact_urls, 'contact'), namespace='contact')),
-    path('', include((company_urls.company_urls, 'company'), namespace='company')),
+    path('', include((company_urls.company_urls_v3, 'company'), namespace='company')),
     path('', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
     path('', include((event_urls, 'event'), namespace='event')),
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
@@ -48,4 +48,11 @@ v3_urls = [
             namespace='omis-public',
         ),
     ),
+]
+
+
+# API V4 - new format for addresses
+
+v4_urls = [
+    path('', include((company_urls.company_urls_v4, 'company'), namespace='company')),
 ]
