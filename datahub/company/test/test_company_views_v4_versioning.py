@@ -30,7 +30,7 @@ class TestCompanyVersioning(APITestMixin):
             reverse('api-v4:company:collection'),
             data={
                 'name': 'Acme',
-                'trading_name': 'Trading name',
+                'trading_names': ['Trading name'],
                 'business_type': {'id': BusinessTypeConstant.company.value.id},
                 'sector': {'id': random_obj_for_model(Sector).id},
                 'address': {
@@ -47,7 +47,7 @@ class TestCompanyVersioning(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data['name'] == 'Acme'
-        assert response_data['trading_name'] == 'Trading name'
+        assert response_data['trading_names'] == ['Trading name']
 
         company = Company.objects.get(pk=response_data['id'])
 
@@ -129,7 +129,7 @@ class TestCompanyVersioning(APITestMixin):
 
         response = self.api_client.patch(
             reverse('api-v4:company:item', kwargs={'pk': company.pk}),
-            data={'trading_name': 'a' * 600},
+            data={'trading_names': ['a' * 600]},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
