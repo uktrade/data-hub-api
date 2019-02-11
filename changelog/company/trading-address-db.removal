@@ -1,0 +1,8 @@
+The following database fields are deprecated and will be removed on or after the 21st of February, please use the ``address_*`` fields instead:
+
+- ``trading_address_1``
+- ``trading_address_2``
+- ``trading_address_town``
+- ``trading_address_county``
+- ``trading_address_postcode``
+- ``trading_address_country_id``

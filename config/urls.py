@@ -29,6 +29,7 @@ urlpatterns = [
     # V1 has actually no version in the URL
     path('', include((api_urls.v1_urls, 'api'), namespace='api-v1')),
     path('v3/', include((api_urls.v3_urls, 'api'), namespace='api-v3')),
+    path('v4/', include((api_urls.v4_urls, 'api'), namespace='api-v4')),
 ] + unversioned_urls
 
 if settings.DEBUG:
