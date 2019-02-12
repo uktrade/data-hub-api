@@ -1,0 +1,1 @@
+``GET /adviser/``: ``is_active`` was added as a query parameter. This is a boolean filter that filters advisers by whether they are active or not.
