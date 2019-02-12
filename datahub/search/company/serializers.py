@@ -1,19 +1,16 @@
 from rest_framework import serializers
 
 from datahub.search.serializers import (
-    AutocompleteSearchSerializer,
-    EntitySearchSerializer,
-    IdNameSerializer,
+    EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchCompanySerializer(EntitySearchSerializer):
+class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate company search POST bodies."""
 
     archived = serializers.BooleanField(required=False)
-    trading_name = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
     future_interest_country = SingleOrListField(child=StringUUIDField(), required=False)
@@ -50,23 +47,3 @@ class SearchCompanySerializer(EntitySearchSerializer):
         'uk_based',
         'uk_region.name',
     )
-
-
-class AutocompleteSearchCompanySerializer(AutocompleteSearchSerializer):
-    """Autocomplete search serializer for companies."""
-
-    name = serializers.CharField()
-    trading_name = serializers.CharField()
-    trading_names = serializers.ListField(child=serializers.CharField(), required=False)
-    trading_address_1 = serializers.CharField()
-    trading_address_2 = serializers.CharField()
-    trading_address_town = serializers.CharField()
-    trading_address_county = serializers.CharField()
-    trading_address_country = IdNameSerializer()
-    trading_address_postcode = serializers.CharField()
-    registered_address_1 = serializers.CharField()
-    registered_address_2 = serializers.CharField()
-    registered_address_town = serializers.CharField()
-    registered_address_county = serializers.CharField()
-    registered_address_country = IdNameSerializer()
-    registered_address_postcode = serializers.CharField()

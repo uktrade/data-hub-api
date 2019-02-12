@@ -25,7 +25,11 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
-from datahub.search.serializers import BasicSearchSerializer, EntitySearchSerializer
+from datahub.search.serializers import (
+    AutocompleteSearchQuerySerializer,
+    BasicSearchQuerySerializer,
+    EntitySearchQuerySerializer,
+)
 from datahub.search.utils import SearchOrdering
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
@@ -46,7 +50,7 @@ class SearchBasicAPIView(APIView):
 
     def get(self, request, format=None):
         """Performs basic search."""
-        serializer = BasicSearchSerializer(data=request.query_params)
+        serializer = BasicSearchQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         validated_params = serializer.validated_data
         ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
@@ -102,7 +106,7 @@ class SearchAPIView(APIView):
     # e.g. 'name' to 'name.keyword'
     es_sort_by_remappings = {}
 
-    serializer_class = EntitySearchSerializer
+    serializer_class = EntitySearchQuerySerializer
     entity = None
 
     http_method_names = ('post',)
@@ -274,34 +278,26 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
-    autocomplete_serializer_class = None
-    results = None
-    default_search_limit = 10
     document_fields = None
 
-    def get_queryset(self):
-        """Returns a list of elasticsearch documents"""
-        return self.get_search_results()
-
-    def get_serializer_class(self):
-        """Returns the autocomplete serializer"""
-        return self.autocomplete_serializer_class
-
-    def get_search_query_string(self):
-        """Retrieves the query string from the get parameters"""
-        return self.request.GET.get('term', '')
-
-    def get_search_results(self):
+    def list(self, request, *args, **kwargs):
         """Executes the elasticsearch query"""
-        if self.results is None:
-            self.check_permission_filters()
-            self.results = execute_autocomplete_query(
-                self.search_app.es_model,
-                self.get_search_query_string(),
-                self.kwargs.get('limit', self.default_search_limit),
-                only_return_fields=self.document_fields,
-            )
-        return self.results
+        serializer = AutocompleteSearchQuerySerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        validated_params = serializer.validated_data
+
+        self.check_permission_filters()
+        results = execute_autocomplete_query(
+            self.search_app.es_model,
+            validated_params['term'],
+            validated_params['limit'],
+            only_return_fields=self.document_fields,
+        )
+
+        return Response(data={
+            'count': len(results),
+            'results': [result['_source'].to_dict() for result in results],
+        })
 
     def check_permission_filters(self):
         """

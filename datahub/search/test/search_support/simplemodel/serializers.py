@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from datahub.search.serializers import EntitySearchSerializer
+from datahub.search.serializers import EntitySearchQuerySerializer
 
 
-class SearchSimpleModelSerializer(EntitySearchSerializer):
+class SearchSimpleModelSerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate simple model search POST bodies."""
 
     name = serializers.CharField(required=False)

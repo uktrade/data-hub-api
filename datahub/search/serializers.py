@@ -89,7 +89,7 @@ class _ESOrderingField(serializers.Field):
         return f'{value.field}:{value.direction}'
 
 
-class BaseSearchSerializer(serializers.Serializer):
+class BaseSearchQuerySerializer(serializers.Serializer):
     """Base serialiser for basic (global) and entity search."""
 
     SORT_BY_FIELDS = []
@@ -133,7 +133,7 @@ class _ESModelChoiceField(serializers.Field):
         return value._doc_type.name
 
 
-class BasicSearchSerializer(BaseSearchSerializer):
+class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate basic (global) search query parameters."""
 
     SORT_BY_FIELDS = (
@@ -144,17 +144,14 @@ class BasicSearchSerializer(BaseSearchSerializer):
     term = serializers.CharField(required=True, allow_blank=True)
 
 
-class EntitySearchSerializer(BaseSearchSerializer):
+class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate entity search POST bodies."""
 
     original_query = serializers.CharField(default='', allow_blank=True)
 
 
-class AutocompleteSearchSerializer(serializers.Serializer):
-    """Base serializer for autocomplete search."""
+class AutocompleteSearchQuerySerializer(serializers.Serializer):
+    """Serialiser used for the autocomplation search query parameters."""
 
-    id = serializers.UUIDField()
-
-    def to_representation(self, instance):
-        """Uses the _source property instead of the instance if one present."""
-        return super().to_representation(getattr(instance, '_source', instance))
+    term = serializers.CharField(required=True, allow_blank=True)
+    limit = serializers.IntegerField(default=10, min_value=1)
