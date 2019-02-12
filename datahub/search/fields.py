@@ -83,6 +83,33 @@ def id_name_partial_field(field):
     )
 
 
+def address_field():
+    """Address field as nested object."""
+    return Object(
+        properties={
+            'line_1': Text(index=False),
+            'line_2': Text(index=False),
+            'town': Text(index=False),
+            'county': Text(index=False),
+            'postcode': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+            'country': Object(
+                properties={
+                    'id': Keyword(index=False),
+                    'name': Text(
+                        fields={
+                            'trigram': TrigramText(),
+                        },
+                    ),
+                },
+            ),
+        },
+    )
+
+
 def company_field(field):
     """Company field."""
     return Object(
