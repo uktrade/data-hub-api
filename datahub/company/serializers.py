@@ -309,7 +309,6 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
         meta_models.BusinessType, required=False, allow_null=True,
     )
     one_list_group_tier = serializers.SerializerMethodField()
-    companies_house_data = NestedCompaniesHouseCompanySerializerV3(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
     employee_range = NestedRelatedField(
@@ -461,7 +460,6 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
             'website',
             'business_type',
             'one_list_group_tier',
-            'companies_house_data',
             'contacts',
             'employee_range',
             'number_of_employees',
@@ -569,6 +567,7 @@ class CompanySerializerV3(BaseCompanySerializer):
         },
     }
 
+    companies_house_data = NestedCompaniesHouseCompanySerializerV3(read_only=True)
     registered_address_1 = serializers.CharField(max_length=MAX_LENGTH)
     registered_address_town = serializers.CharField(max_length=MAX_LENGTH)
     registered_address_country = NestedRelatedField(meta_models.Country)
@@ -626,6 +625,7 @@ class CompanySerializerV3(BaseCompanySerializer):
         fields = (
             *BaseCompanySerializer.Meta.fields,
 
+            'companies_house_data',
             'registered_address_1',
             'registered_address_2',
             'registered_address_town',
