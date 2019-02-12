@@ -106,8 +106,8 @@ class AdviserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class NestedCompaniesHouseCompanySerializer(serializers.ModelSerializer):
-    """Nested Companies House company serializer."""
+class NestedCompaniesHouseCompanySerializerV3(serializers.ModelSerializer):
+    """Nested Companies House company serializer V3."""
 
     registered_address_country = NestedRelatedField('metadata.Country')
 
@@ -135,14 +135,14 @@ class NestedCompaniesHouseCompanySerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class CompaniesHouseCompanySerializer(NestedCompaniesHouseCompanySerializer):
-    """Full Companies House company serializer."""
+class CompaniesHouseCompanySerializerV3(NestedCompaniesHouseCompanySerializerV3):
+    """Full Companies House company serializer V3."""
 
     business_type = NestedRelatedField('metadata.BusinessType')
 
-    class Meta(NestedCompaniesHouseCompanySerializer.Meta):
+    class Meta(NestedCompaniesHouseCompanySerializerV3.Meta):
         fields = (
-            *NestedCompaniesHouseCompanySerializer.Meta.fields,
+            *NestedCompaniesHouseCompanySerializerV3.Meta.fields,
             'business_type',
         )
         read_only_fields = fields
@@ -272,7 +272,7 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
         meta_models.BusinessType, required=False, allow_null=True,
     )
     one_list_group_tier = serializers.SerializerMethodField()
-    companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
+    companies_house_data = NestedCompaniesHouseCompanySerializerV3(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
     employee_range = NestedRelatedField(
