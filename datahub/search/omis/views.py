@@ -13,16 +13,16 @@ from datahub.omis.order.query_utils import get_lead_order_assignee_name_subquery
 from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.models import Refund
 from datahub.search.omis.models import Order
-from datahub.search.omis.serializers import SearchOrderSerializer
+from datahub.search.omis.serializers import SearchOrderQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchOrderParams:
-    """Search order params."""
+class SearchOrderAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Order
-    serializer_class = SearchOrderSerializer
+    serializer_class = SearchOrderQuerySerializer
 
     FILTER_FIELDS = [
         'primary_market',
@@ -72,7 +72,7 @@ class SearchOrderParams:
     }
 
 
-class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
+class SearchOrderAPIView(SearchOrderAPIViewMixin, SearchAPIView):
     """Filtered order search view."""
 
     subtotal_cost_field = 'subtotal_cost'
@@ -95,7 +95,7 @@ class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
         return response
 
 
-class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
+class SearchOrderExportAPIView(SearchOrderAPIViewMixin, SearchExportAPIView):
     """Order search export view."""
 
     queryset = DBOrder.objects.annotate(
