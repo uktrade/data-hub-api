@@ -15,6 +15,7 @@ from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializerV3,
+    CompaniesHouseCompanySerializerV4,
     CompanySerializerV3,
     CompanySerializerV4,
     ContactSerializer,
@@ -119,12 +120,31 @@ class CompanyAuditViewSet(AuditViewSet):
 
 
 class CompaniesHouseCompanyViewSetV3(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
 ):
-    """Companies House company read-only GET only views V3."""
+    """
+    Companies House company read-only views V3.
+
+    TODO: delete once the migration to v4 is complete
+    """
 
     required_scopes = (Scope.internal_front_end,)
     serializer_class = CompaniesHouseCompanySerializerV3
+    queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
+    lookup_field = 'company_number'
+
+
+class CompaniesHouseCompanyViewSetV4(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
+):
+    """Companies House company read-only views V4."""
+
+    required_scopes = (Scope.internal_front_end,)
+    serializer_class = CompaniesHouseCompanySerializerV4
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
 
