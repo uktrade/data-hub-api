@@ -517,7 +517,6 @@ def test_limited_get_search_by_entity_query():
                                             'trading_names',
                                             'trading_names_trigram',
                                             'reference_code',
-                                            'uk_region.name_trigram',
                                             'registered_address_country.name_trigram',
                                             'registered_address_postcode_trigram',
                                             'trading_address_country.name_trigram',
