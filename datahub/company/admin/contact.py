@@ -18,7 +18,6 @@ from reversion.admin import VersionAdmin
 
 from datahub.company.models import Contact
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.core.query_utils import get_full_name_expression
 from datahub.search.signals import disable_search_signal_receivers
 
 
@@ -162,7 +161,10 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'archived_documents_url_path',
     )
     list_display = (
-        'get_name',
+        'name',
+        'company',
+    )
+    list_select_related = (
         'company',
     )
     exclude = (
@@ -171,22 +173,6 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
         'modified_by',
     )
-
-    def get_queryset(self, request):
-        """
-        Annotates the query set with full names.
-
-        Note: name_ is used to avoid a conflict with the Contact.name property.
-        """
-        queryset = super().get_queryset(request)
-        return queryset.annotate(name_=get_full_name_expression())
-
-    def get_name(self, obj):
-        """Returns the full name for a contact using the name annotation."""
-        return obj.name_
-
-    get_name.short_description = 'name'
-    get_name.admin_order_field = 'name_'
 
     def get_urls(self):
         """Gets the URLs for this model."""
