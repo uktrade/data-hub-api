@@ -2,7 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, custom_add_permission, custom_change_permission
-from datahub.core.query_utils import get_full_name_expression, get_string_agg_subquery
+from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -64,22 +64,21 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'contact',
     )
 
-    def get_queryset(self, request):
-        """Annotates the query set with contact names as a comma-separated string."""
-        queryset = super().get_queryset(request)
-        return queryset.annotate(
-            contact_names=get_string_agg_subquery(
-                Interaction,
-                get_full_name_expression('contacts'),
-            ),
+    def get_contact_names(self, obj):
+        """Returns contact names for the interaction as a formatted string."""
+        contact_queryset = obj.contacts.order_by('pk')
+
+        # Deliberate use of len() to force the query set to be evaluated (so that contact_count
+        # and first_contact are consistent)
+        contact_count = len(contact_queryset)
+        first_contact = contact_queryset[0] if contact_count else None
+
+        return join_truthy_strings(
+            first_contact.name if first_contact else '',
+            f'and {contact_count - 1} more' if contact_count > 1 else '',
         )
 
-    def get_contact_names(self, obj):
-        """Returns contact names for the interaction as a comma-separated string."""
-        return obj.contact_names
-
     get_contact_names.short_description = 'contacts'
-    get_contact_names.admin_order_field = 'contact_names'
 
     def save_model(self, request, obj, form, change):
         """
