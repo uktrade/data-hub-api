@@ -430,16 +430,15 @@ class CompaniesHouseCompany(models.Model):
     incorporation_date = models.DateField(null=True)
 
     registered_address_1 = models.CharField(max_length=MAX_LENGTH)
-    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_town = models.CharField(max_length=MAX_LENGTH)
-    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
         related_name='companieshousecompanies_with_country_registered_address',
-        null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
-    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     def __str__(self):
         """Admin displayed human readable name."""
