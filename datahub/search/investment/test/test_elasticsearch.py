@@ -793,9 +793,9 @@ def test_limited_get_search_by_entity_query():
         'estimated_land_date_before': date,
     }
     query = get_search_by_entity_query(
+        ESInvestmentProject,
         term='test',
         filter_data=filter_data,
-        entity=ESInvestmentProject,
     )
     query = limit_search_query(
         query,
