@@ -39,7 +39,7 @@ v3_urls = [
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
-    path('', include((search_urls, 'search'), namespace='search')),
+    path('', include((search_urls.urls_v3, 'search'), namespace='search')),
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     path(
         'omis/public/',
@@ -56,4 +56,5 @@ v3_urls = [
 v4_urls = [
     path('', include((company_urls.company_urls_v4, 'company'), namespace='company')),
     path('', include((company_urls.ch_company_urls_v4, 'ch-company'), namespace='ch-company')),
+    path('', include((search_urls.urls_v4, 'search'), namespace='search')),
 ]

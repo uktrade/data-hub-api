@@ -3,7 +3,7 @@ from datahub.search.apps import SearchApp
 from datahub.search.company.models import Company
 from datahub.search.company.views import (
     CompanyAutocompleteSearchListAPIView,
-    SearchCompanyAPIView,
+    SearchCompanyAPIViewV3,
     SearchCompanyExportAPIView,
 )
 
@@ -13,7 +13,7 @@ class CompanySearchApp(SearchApp):
 
     name = 'company'
     es_model = Company
-    view = SearchCompanyAPIView
+    view = SearchCompanyAPIViewV3
     export_view = SearchCompanyExportAPIView
     autocomplete_view = CompanyAutocompleteSearchListAPIView
     view_permissions = (f'company.{CompanyPermission.view_company}',)

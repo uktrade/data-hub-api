@@ -65,8 +65,13 @@ class SearchCompanyAPIViewMixin:
     }
 
 
-class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view."""
+class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
+    """Filtered company search view V3."""
+
+    fields_to_exclude = (
+        'address',
+        'registered_address',
+    )
 
 
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):

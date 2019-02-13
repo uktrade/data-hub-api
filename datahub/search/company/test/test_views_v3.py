@@ -1,3 +1,4 @@
+import uuid
 from cgi import parse_header
 from collections import Counter
 from csv import DictReader
@@ -13,8 +14,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import (
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+)
 from datahub.core import constants
+from datahub.core.constants import Country
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
     APITestMixin,
@@ -25,6 +30,7 @@ from datahub.core.test_utils import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.company.models import get_suggestions
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = pytest.mark.django_db
@@ -88,6 +94,107 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:company')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_company_response_body(self, setup_es):
+        """Tests the response body of a search query."""
+        ch_company = CompaniesHouseCompanyFactory(
+            company_number='123',
+        )
+        company = CompanyFactory(
+            company_number='123',
+            trading_names=['Xyz trading', 'Abc trading'],
+            global_headquarters=None,
+            one_list_tier=None,
+            one_list_account_owner=None,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 1,
+            'results': [
+                {
+                    'id': str(company.pk),
+                    'companies_house_data': {
+                        'id': str(ch_company.id),
+                        'company_number': ch_company.company_number,
+                    },
+                    'created_on': company.created_on.isoformat(),
+                    'modified_on': company.modified_on.isoformat(),
+                    'name': company.name,
+                    'reference_code': company.reference_code,
+                    'company_number': company.company_number,
+                    'vat_number': company.vat_number,
+                    'duns_number': company.duns_number,
+                    'trading_name': company.trading_names[0],
+                    'trading_names': company.trading_names,
+                    'registered_address_1': company.registered_address_1,
+                    'registered_address_2': company.registered_address_2,
+                    'registered_address_town': company.registered_address_town,
+                    'registered_address_county': company.registered_address_county,
+                    'registered_address_postcode': company.registered_address_postcode,
+                    'registered_address_country': {
+                        'id': str(Country.united_kingdom.value.id),
+                        'name': Country.united_kingdom.value.name,
+                    },
+                    'trading_address_1': company.trading_address_1,
+                    'trading_address_2': company.trading_address_2,
+                    'trading_address_country': {
+                        'id': str(company.trading_address_country.id),
+                        'name': company.trading_address_country.name,
+                    },
+                    'trading_address_county': company.trading_address_county,
+                    'trading_address_postcode': company.trading_address_postcode,
+                    'trading_address_town': company.trading_address_town,
+                    'uk_based': (
+                        company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)
+                    ),
+                    'uk_region': {
+                        'id': str(company.uk_region.id),
+                        'name': company.uk_region.name,
+                    },
+                    'business_type': {
+                        'id': str(company.business_type.id),
+                        'name': company.business_type.name,
+                    },
+                    'contacts': [],
+                    'description': company.description,
+                    'employee_range': {
+                        'id': str(company.employee_range.id),
+                        'name': company.employee_range.name,
+                    },
+                    'export_experience_category': {
+                        'id': str(company.export_experience_category.id),
+                        'name': company.export_experience_category.name,
+                    },
+                    'export_to_countries': [],
+                    'future_interest_countries': [],
+                    'headquarter_type': company.headquarter_type,
+                    'sector': {
+                        'id': str(company.sector.id),
+                        'name': company.sector.name,
+                        'ancestors': [
+                            {'id': str(ancestor.id)}
+                            for ancestor in company.sector.get_ancestors()
+                        ],
+                    },
+                    'turnover_range': {
+                        'id': str(company.turnover_range.id),
+                        'name': company.turnover_range.name,
+                    },
+                    'website': company.website,
+                    'global_headquarters': None,
+                    'archived': False,
+                    'archived_by': None,
+                    'archived_on': None,
+                    'archived_reason': None,
+                    'suggest': get_suggestions(company),
+                },
+            ],
+        }
 
     @pytest.mark.parametrize(
         'archived',
