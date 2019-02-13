@@ -135,7 +135,7 @@ class SearchAPIView(APIView):
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entity_query(
-            entity=self.entity,
+            self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,

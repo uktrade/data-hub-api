@@ -74,11 +74,11 @@ def get_basic_search_query(
 
 
 def get_search_by_entity_query(
+        entity,
         term=None,
         filter_data=None,
         composite_field_mapping=None,
         permission_filters=None,
-        entity=None,
         ordering=None,
         fields_to_include=None,
         fields_to_exclude=None,

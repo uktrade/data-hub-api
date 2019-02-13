@@ -513,11 +513,11 @@ def test_get_search_by_entity_query(
 ):
     """Tests for the get_search_by_entity_query function."""
     query = get_search_by_entity_query(
+        SimpleModelSearchApp.es_model,
         term=term,
         filter_data=filter_data,
         composite_field_mapping=composite_field_mapping,
         permission_filters=permission_filters,
-        entity=SimpleModelSearchApp.es_model,
         ordering=ordering,
         fields_to_include=fields_to_include,
         fields_to_exclude=fields_to_exclude,

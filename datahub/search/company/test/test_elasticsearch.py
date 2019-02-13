@@ -474,9 +474,9 @@ def test_limited_get_search_by_entity_query():
         'estimated_land_date_after': date,
     }
     query = get_search_by_entity_query(
+        ESCompany,
         term='test',
         filter_data=filter_data,
-        entity=ESCompany,
     )
     query = limit_search_query(
         query,
