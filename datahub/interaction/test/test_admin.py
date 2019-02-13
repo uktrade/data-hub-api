@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+import pytest
+from django.contrib.admin import site
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
 from rest_framework import status
@@ -7,6 +9,7 @@ from rest_framework import status
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.admin import get_change_url
 from datahub.core.test_utils import AdminTestMixin, random_obj_for_model
+from datahub.interaction.admin import InteractionAdmin
 from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Service, Team
@@ -120,3 +123,24 @@ class TestInteractionAdmin(AdminTestMixin):
         interaction.refresh_from_db()
         assert interaction.contact is None
         assert interaction.contacts.count() == 0
+
+    @pytest.mark.parametrize(
+        'num_contacts,expected_display_value',
+        (
+            (0, ''),
+            (1, '{first_contact_name}'),
+            (2, '{first_contact_name} and 1 more'),
+            (10, '{first_contact_name} and 9 more'),
+        ),
+    )
+    def test_get_contact_names(self, num_contacts, expected_display_value):
+        """Test that contact names are formatted as expected."""
+        interaction = CompanyInteractionFactory(
+            contacts=ContactFactory.create_batch(num_contacts),
+        )
+        interaction_admin = InteractionAdmin(Interaction, site)
+        first_contact = interaction.contacts.order_by('pk').first()
+        formatted_expected_display_value = expected_display_value.format(
+            first_contact_name=first_contact.name if first_contact else '',
+        )
+        assert interaction_admin.get_contact_names(interaction) == formatted_expected_display_value
