@@ -155,7 +155,6 @@ class Company(BaseESModel):
         'trading_names',  # to find 2-letter words
         'trading_names_trigram',
         'reference_code',
-        'uk_region.name_trigram',
 
         # TODO: replace with nested address and registered address
         # once the index data has been populated

@@ -51,26 +51,60 @@ def interactions(setup_es):
     """Sets up data for the tests."""
     data = []
     with freeze_time('2017-01-01 13:00:00'):
+        company_1 = CompanyFactory(name='ABC Trading Ltd')
+        company_2 = CompanyFactory(name='Little Puddle Ltd')
         data.extend([
             CompanyInteractionFactory(
                 subject='Exports meeting',
                 date=dateutil_parse('2017-10-30T00:00:00Z'),
+                company=company_1,
+                contacts=[
+                    ContactFactory(company=company_1, first_name='Lee', last_name='Danger'),
+                    ContactFactory(company=company_1, first_name='Francis', last_name='Brady'),
+                    ContactFactory(company=company_1, first_name='Zanger Za', last_name='Qa'),
+                ],
+                dit_adviser__first_name='Angela',
+                dit_adviser__last_name='Lawson',
             ),
             CompanyInteractionFactory(
                 subject='a coffee',
                 date=dateutil_parse('2017-04-05T00:00:00Z'),
+                company=company_2,
+                contacts=[
+                    ContactFactory(company=company_1, first_name='Try', last_name='Slanger'),
+                ],
+                dit_adviser__first_name='Zed',
+                dit_adviser__last_name='Zeddy',
             ),
             CompanyInteractionFactory(
                 subject='Email about exhibition',
                 date=dateutil_parse('2016-09-02T00:00:00Z'),
+                company=company_2,
+                contacts=[
+                    ContactFactory(company=company_1, first_name='Caroline', last_name='Green'),
+                ],
+                dit_adviser__first_name='Prime',
+                dit_adviser__last_name='Zeddy',
             ),
             CompanyInteractionFactory(
                 subject='talking about cats',
                 date=dateutil_parse('2018-02-01T00:00:00Z'),
+                company=company_2,
+                contacts=[
+                    ContactFactory(company=company_1, first_name='Full', last_name='Bridge'),
+                ],
+                dit_adviser__first_name='Low',
+                dit_adviser__last_name='Tremon',
             ),
             CompanyInteractionFactory(
                 subject='Event at HQ',
                 date=dateutil_parse('2018-01-01T00:00:00Z'),
+                company=company_2,
+                contacts=[
+                    ContactFactory(company=company_1, first_name='Diane', last_name='Pree'),
+                ],
+                dit_adviser__first_name='Trevor',
+                dit_adviser__last_name='Saleman',
             ),
         ])
 
@@ -211,7 +245,24 @@ class TestInteractionEntitySearchView(APITestMixin):
             'sortby': [error],
         }
 
-    @pytest.mark.parametrize('term', ('exports', 'meeting', 'exports meeting'))
+    @pytest.mark.parametrize(
+        'term',
+        (
+            'exports',
+            'meeting',
+            'exports meeting',
+            'danger',
+            'dan',
+            'dang',
+            'FRANCIS',
+            'angela',
+            'angel',
+            'ngel',
+            'ela',
+            'za',
+            'QA',
+        ),
+    )
     def test_search_original_query(self, interactions, term):
         """Tests searching across fields for a particular interaction."""
         url = reverse('api-v3:search:interaction')
