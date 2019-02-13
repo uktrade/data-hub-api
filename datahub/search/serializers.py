@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 from rest_framework.settings import api_settings
@@ -5,6 +7,9 @@ from rest_framework.settings import api_settings
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.query_builder import MAX_RESULTS
 from datahub.search.utils import SearchOrdering, SortDirection
+
+
+logger = logging.getLogger(__name__)
 
 
 class SingleOrListField(serializers.ListField):
@@ -142,6 +147,17 @@ class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
     )
     entity = _ESModelChoiceField(default='company')
     term = serializers.CharField(required=True, allow_blank=True)
+
+    def validate(self, data):
+        """
+        Logs the sortby search param to see if we can get rid of it from the global search.
+
+        TODO: Remove after figuring out what to do with sortby.
+        """
+        sortby = data.get('sortby')
+        if sortby:
+            logger.error(f'Sortby search field "{sortby.field}" used in the global search.')
+        return super().validate(data)
 
 
 class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
