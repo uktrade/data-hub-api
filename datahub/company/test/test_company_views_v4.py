@@ -10,11 +10,7 @@ from rest_framework.reverse import reverse
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, OneListTier
 from datahub.company.serializers import CompanySerializerV4
-from datahub.company.test.factories import (
-    AdviserFactory,
-    CompaniesHouseCompanyFactory,
-    CompanyFactory,
-)
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
 from datahub.core.test_utils import (
     APITestMixin,
@@ -200,11 +196,8 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert 'archived_documents_url_path' not in response.json()
 
-    def test_get_company_with_company_number(self):
-        """Tests the company item view for a company with a company number."""
-        ch_company = CompaniesHouseCompanyFactory(
-            company_number='123',
-        )
+    def test_get(self):
+        """Tests the company item view."""
         ghq = CompanyFactory(
             global_headquarters=None,
             one_list_tier=OneListTier.objects.first(),
@@ -231,28 +224,6 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'id': str(company.pk),
-            'companies_house_data': {
-                'id': ch_company.id,
-                'company_number': ch_company.company_number,
-                'company_category': ch_company.company_category,
-                'company_status': ch_company.company_status,
-                'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
-                'name': ch_company.name,
-                'registered_address_1': ch_company.registered_address_1,
-                'registered_address_2': ch_company.registered_address_2,
-                'registered_address_town': ch_company.registered_address_town,
-                'registered_address_county': ch_company.registered_address_county,
-                'registered_address_postcode': ch_company.registered_address_postcode,
-                'registered_address_country': {
-                    'id': str(ch_company.registered_address_country.id),
-                    'name': ch_company.registered_address_country.name,
-                },
-                'sic_code_1': ch_company.sic_code_1,
-                'sic_code_2': ch_company.sic_code_2,
-                'sic_code_3': ch_company.sic_code_3,
-                'sic_code_4': ch_company.sic_code_4,
-                'uri': ch_company.uri,
-            },
             'created_on': format_date_or_datetime(company.created_on),
             'modified_on': format_date_or_datetime(company.modified_on),
             'name': company.name,
@@ -356,16 +327,6 @@ class TestGetCompany(APITestMixin):
             'transferred_to': None,
             'transfer_reason': '',
         }
-
-    def test_get_company_without_company_number(self):
-        """Tests the company item view for a company without a company number."""
-        company = CompanyFactory()
-
-        url = reverse('api-v4:company:item', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['companies_house_data'] is None
 
     def test_get_company_without_country(self):
         """
