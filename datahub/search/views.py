@@ -108,6 +108,8 @@ class SearchAPIView(APIView):
 
     serializer_class = EntitySearchQuerySerializer
     entity = None
+    fields_to_include = None
+    fields_to_exclude = None
 
     http_method_names = ('post',)
 
@@ -139,6 +141,8 @@ class SearchAPIView(APIView):
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
             ordering=ordering,
+            fields_to_include=self.fields_to_include,
+            fields_to_exclude=self.fields_to_exclude,
         )
 
     def post(self, request, format=None):
@@ -291,7 +295,7 @@ class AutocompleteSearchListAPIView(ListAPIView):
             self.search_app.es_model,
             validated_params['term'],
             validated_params['limit'],
-            only_return_fields=self.document_fields,
+            fields_to_include=self.document_fields,
         )
 
         return Response(data={
