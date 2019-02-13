@@ -117,7 +117,6 @@ def company_field(field):
             'id': Keyword(),
             'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
             'name_trigram': TrigramText(),
-            'trading_name': Keyword(index=False),
             'trading_names': Text(
                 copy_to=f'{field}.trading_names_trigram',
             ),

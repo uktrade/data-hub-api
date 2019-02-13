@@ -328,10 +328,6 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                 },
-                'trading_name': {
-                    'index': False,
-                    'type': 'keyword',
-                },
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
                     'type': 'text',
@@ -642,7 +638,6 @@ def test_indexed_doc(setup_es):
         'trading_address_county',
         'trading_address_postcode',
         'trading_address_town',
-        'trading_name',
         'trading_names',
         'turnover_range',
         'uk_based',
@@ -651,37 +646,3 @@ def test_indexed_doc(setup_es):
         'duns_number',
         'website',
     }
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    'trading_names',
-    (
-        ['a', 'b'],
-        [],
-    ),
-)
-def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
-    """
-    Test that the value of trading_name is calculated from trading_names.
-
-    TODO: delete after trading_name is completely replaced by trading_names.
-    """
-    company = CompanyFactory(
-        trading_names=trading_names,
-    )
-
-    doc = ESCompany.es_document(company)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
-
-    setup_es.indices.refresh()
-
-    indexed_company = setup_es.get(
-        index=CompanySearchApp.es_model.get_write_index(),
-        doc_type=CompanySearchApp.name,
-        id=company.pk,
-    )
-
-    source = indexed_company['_source']
-    assert source['trading_names'] == trading_names
-    assert source['trading_name'] == ('' if not trading_names else trading_names[0])

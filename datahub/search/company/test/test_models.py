@@ -58,7 +58,6 @@ class TestCompanyElasticModel:
             'trading_address_postcode',
             'trading_address_town',
 
-            'trading_name',
             'trading_names',
             'turnover_range',
             'uk_based',
