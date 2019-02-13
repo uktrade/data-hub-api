@@ -94,17 +94,28 @@ job_defaults: &job_defaults
               bash ./codecov.sh -t ${COV_TOKEN}
 
 jobs:
-  default_build:
+  build:
     <<: *job_defaults
 
 workflows:
   version: 2
 
+  # Current standard environment
   Default build:
     jobs:
-      - default_build:
+      - build:
           publish_coverage: true
           python_image: python:3.6
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
+
+  # Environment that we are migrating to
+  Next environment (Elasticsearch 6.6):
+    jobs:
+      - build:
+          publish_coverage: false
+          python_image: python:3.6
+          postgres_image: postgres:10
+          mi_postgres_image: postgres:9.6
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0

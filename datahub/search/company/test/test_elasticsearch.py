@@ -604,8 +604,8 @@ def test_indexed_doc(setup_es):
         id=company.pk,
     )
 
-    source = indexed_company.pop('_source')
-    assert set(source.keys()) == {
+    assert indexed_company['_id'] == str(company.pk)
+    assert indexed_company['_source'].keys() == {
         'archived',
         'archived_by',
         'archived_on',
@@ -650,13 +650,6 @@ def test_indexed_doc(setup_es):
         'vat_number',
         'duns_number',
         'website',
-    }
-    assert indexed_company == {
-        '_id': str(company.pk),
-        '_index': CompanySearchApp.es_model.get_target_index_name(),
-        '_type': CompanySearchApp.name,
-        '_version': indexed_company['_version'],
-        'found': True,
     }
 
 
