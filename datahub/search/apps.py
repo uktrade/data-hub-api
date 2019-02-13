@@ -18,6 +18,12 @@ class SearchApp:
     view = None
     export_view = None
     autocomplete_view = None
+
+    # TODO: replace the base views with these once the migration to v4 is complete
+    view_v4 = None
+    export_view_v4 = None
+    autocomplete_view_v4 = None
+
     queryset = None
     exclude_from_global_search = False
     # A sequence of permissions. The user must have one of these permissions to perform searches.
