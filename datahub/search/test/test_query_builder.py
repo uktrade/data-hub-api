@@ -350,7 +350,7 @@ def test_build_autocomplete_search_query(keyword, size, only_fields, expected):
         # minimal
         (
             None,
-            {},
+            None,
             None,
             None,
             None,

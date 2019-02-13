@@ -86,6 +86,7 @@ def get_search_by_entity_query(
     """
     Performs filtered search for given terms in given entity.
     """
+    filter_data = filter_data or {}
     query = [Term(_type=entity._doc_type.name)]
     if term != '':
         query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
