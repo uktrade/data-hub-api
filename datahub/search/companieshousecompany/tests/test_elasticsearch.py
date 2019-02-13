@@ -122,32 +122,26 @@ def test_indexed_doc(setup_es):
         id=ch_company.pk,
     )
 
-    assert indexed_ch_company == {
-        '_index': ESCompaniesHouseCompany.get_target_index_name(),
-        '_type': CompaniesHouseCompanySearchApp.name,
-        '_id': str(ch_company.pk),
-        '_version': indexed_ch_company['_version'],
-        'found': True,
-        '_source': {
-            'id': str(ch_company.pk),
-            'name': ch_company.name,
-            'registered_address_1': ch_company.registered_address_1,
-            'registered_address_2': ch_company.registered_address_2,
-            'registered_address_town': ch_company.registered_address_town,
-            'registered_address_county': ch_company.registered_address_county,
-            'registered_address_postcode': ch_company.registered_address_postcode,
-            'registered_address_country': {
-                'id': str(ch_company.registered_address_country.pk),
-                'name': ch_company.registered_address_country.name,
-            },
-            'company_number': ch_company.company_number,
-            'company_category': ch_company.company_category,
-            'company_status': ch_company.company_status,
-            'sic_code_1': ch_company.sic_code_1,
-            'sic_code_2': ch_company.sic_code_2,
-            'sic_code_3': ch_company.sic_code_3,
-            'sic_code_4': ch_company.sic_code_4,
-            'uri': ch_company.uri,
-            'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
+    assert indexed_ch_company['_id'] == str(ch_company.pk)
+    assert indexed_ch_company['_source'] == {
+        'id': str(ch_company.pk),
+        'name': ch_company.name,
+        'registered_address_1': ch_company.registered_address_1,
+        'registered_address_2': ch_company.registered_address_2,
+        'registered_address_town': ch_company.registered_address_town,
+        'registered_address_county': ch_company.registered_address_county,
+        'registered_address_postcode': ch_company.registered_address_postcode,
+        'registered_address_country': {
+            'id': str(ch_company.registered_address_country.pk),
+            'name': ch_company.registered_address_country.name,
         },
+        'company_number': ch_company.company_number,
+        'company_category': ch_company.company_category,
+        'company_status': ch_company.company_status,
+        'sic_code_1': ch_company.sic_code_1,
+        'sic_code_2': ch_company.sic_code_2,
+        'sic_code_3': ch_company.sic_code_3,
+        'sic_code_4': ch_company.sic_code_4,
+        'uri': ch_company.uri,
+        'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
     }

@@ -480,132 +480,126 @@ def test_indexed_doc(Factory, setup_es):
         id=order.pk,
     )
 
-    assert indexed_order == {
-        '_index': OrderSearchApp.es_model.get_target_index_name(),
-        '_type': OrderSearchApp.name,
-        '_id': str(order.pk),
-        '_version': indexed_order['_version'],
-        'found': True,
-        '_source': {
-            'id': str(order.pk),
-            'created_by': {
-                'id': str(order.created_by.pk),
-                'first_name': order.created_by.first_name,
-                'last_name': order.created_by.last_name,
-                'name': order.created_by.name,
-                'dit_team': {
-                    'id': str(order.created_by.dit_team.id),
-                    'name': order.created_by.dit_team.name,
-                },
+    assert indexed_order['_id'] == str(order.pk)
+    assert indexed_order['_source'] == {
+        'id': str(order.pk),
+        'created_by': {
+            'id': str(order.created_by.pk),
+            'first_name': order.created_by.first_name,
+            'last_name': order.created_by.last_name,
+            'name': order.created_by.name,
+            'dit_team': {
+                'id': str(order.created_by.dit_team.id),
+                'name': order.created_by.dit_team.name,
             },
-            'company': {
-                'id': str(order.company.pk),
-                'name': order.company.name,
-                'trading_name': order.company.trading_names[0],
-                'trading_names': order.company.trading_names,
-            },
-            'contact': {
-                'id': str(order.contact.pk),
-                'first_name': order.contact.first_name,
-                'last_name': order.contact.last_name,
-                'name': order.contact.name,
-            },
-            'primary_market': {
-                'id': str(order.primary_market.pk),
-                'name': order.primary_market.name,
-            },
-            'sector': {
-                'id': str(order.sector.pk),
-                'name': order.sector.name,
-                'ancestors': [{
-                    'id': str(ancestor.pk),
-                } for ancestor in order.sector.get_ancestors()],
-            },
-            'uk_region': {
-                'id': str(order.uk_region.pk),
-                'name': order.uk_region.name,
-            },
-            'service_types': [
-                {
-                    'id': str(service_type.pk),
-                    'name': service_type.name,
-                }
-                for service_type in order.service_types.all()
-            ],
-            'created_on': order.created_on.isoformat(),
-            'modified_on': order.modified_on.isoformat(),
-            'reference': order.reference,
-            'status': order.status,
-            'description': order.description,
-            'contacts_not_to_approach': order.contacts_not_to_approach,
-            'further_info': order.further_info,
-            'existing_agents': order.existing_agents,
-            'delivery_date': order.delivery_date.isoformat(),
-            'contact_email': order.contact_email,
-            'contact_phone': order.contact_phone,
-            'subscribers': [
-                {
-                    'id': str(subscriber.adviser.pk),
-                    'name': subscriber.adviser.name,
-                    'first_name': subscriber.adviser.first_name,
-                    'last_name': subscriber.adviser.last_name,
-                }
-                for subscriber in order.subscribers.all()
-            ],
-            'assignees': [
-                {
-                    'id': str(assignee.adviser.pk),
-                    'name': assignee.adviser.name,
-                    'first_name': assignee.adviser.first_name,
-                    'last_name': assignee.adviser.last_name,
-                    'dit_team': {
-                        'id': str(assignee.adviser.dit_team.id),
-                        'name': assignee.adviser.dit_team.name,
-                    },
-                }
-                for assignee in order.assignees.all()
-            ],
-            'po_number': order.po_number,
-            'discount_value': order.discount_value,
-            'vat_status': order.vat_status,
-            'vat_number': order.vat_number,
-            'vat_verified': order.vat_verified,
-            'net_cost': order.net_cost,
-            'payment_due_date': None if not invoice else invoice.payment_due_date.isoformat(),
-            'subtotal_cost': order.subtotal_cost,
-            'vat_cost': order.vat_cost,
-            'total_cost': order.total_cost,
-            'billing_company_name': order.billing_company_name,
-            'billing_contact_name': order.billing_contact_name,
-            'billing_email': order.billing_email,
-            'billing_phone': order.billing_phone,
-            'billing_address_1': order.billing_address_1,
-            'billing_address_2': order.billing_address_2,
-            'billing_address_town': order.billing_address_town,
-            'billing_address_county': order.billing_address_county,
-            'billing_address_postcode': order.billing_address_postcode,
-            'billing_address_country': {
-                'id': str(order.billing_address_country.pk),
-                'name': order.billing_address_country.name,
-            },
-            'paid_on': order.paid_on.isoformat() if order.paid_on else None,
-            'completed_by': {
-                'id': str(order.completed_by.pk),
-                'first_name': order.completed_by.first_name,
-                'last_name': order.completed_by.last_name,
-                'name': order.completed_by.name,
-            } if order.completed_by else None,
-            'completed_on': order.completed_on.isoformat() if order.completed_on else None,
-            'cancelled_by': {
-                'id': str(order.cancelled_by.pk),
-                'first_name': order.cancelled_by.first_name,
-                'last_name': order.cancelled_by.last_name,
-                'name': order.cancelled_by.name,
-            } if order.cancelled_by else None,
-            'cancelled_on': order.cancelled_on.isoformat() if order.cancelled_on else None,
-            'cancellation_reason': {
-                'id': str(order.cancellation_reason.pk),
-                'name': order.cancellation_reason.name,
-            } if order.cancellation_reason else None,
         },
+        'company': {
+            'id': str(order.company.pk),
+            'name': order.company.name,
+            'trading_name': order.company.trading_names[0],
+            'trading_names': order.company.trading_names,
+        },
+        'contact': {
+            'id': str(order.contact.pk),
+            'first_name': order.contact.first_name,
+            'last_name': order.contact.last_name,
+            'name': order.contact.name,
+        },
+        'primary_market': {
+            'id': str(order.primary_market.pk),
+            'name': order.primary_market.name,
+        },
+        'sector': {
+            'id': str(order.sector.pk),
+            'name': order.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in order.sector.get_ancestors()],
+        },
+        'uk_region': {
+            'id': str(order.uk_region.pk),
+            'name': order.uk_region.name,
+        },
+        'service_types': [
+            {
+                'id': str(service_type.pk),
+                'name': service_type.name,
+            }
+            for service_type in order.service_types.all()
+        ],
+        'created_on': order.created_on.isoformat(),
+        'modified_on': order.modified_on.isoformat(),
+        'reference': order.reference,
+        'status': order.status,
+        'description': order.description,
+        'contacts_not_to_approach': order.contacts_not_to_approach,
+        'further_info': order.further_info,
+        'existing_agents': order.existing_agents,
+        'delivery_date': order.delivery_date.isoformat(),
+        'contact_email': order.contact_email,
+        'contact_phone': order.contact_phone,
+        'subscribers': [
+            {
+                'id': str(subscriber.adviser.pk),
+                'name': subscriber.adviser.name,
+                'first_name': subscriber.adviser.first_name,
+                'last_name': subscriber.adviser.last_name,
+            }
+            for subscriber in order.subscribers.all()
+        ],
+        'assignees': [
+            {
+                'id': str(assignee.adviser.pk),
+                'name': assignee.adviser.name,
+                'first_name': assignee.adviser.first_name,
+                'last_name': assignee.adviser.last_name,
+                'dit_team': {
+                    'id': str(assignee.adviser.dit_team.id),
+                    'name': assignee.adviser.dit_team.name,
+                },
+            }
+            for assignee in order.assignees.all()
+        ],
+        'po_number': order.po_number,
+        'discount_value': order.discount_value,
+        'vat_status': order.vat_status,
+        'vat_number': order.vat_number,
+        'vat_verified': order.vat_verified,
+        'net_cost': order.net_cost,
+        'payment_due_date': None if not invoice else invoice.payment_due_date.isoformat(),
+        'subtotal_cost': order.subtotal_cost,
+        'vat_cost': order.vat_cost,
+        'total_cost': order.total_cost,
+        'billing_company_name': order.billing_company_name,
+        'billing_contact_name': order.billing_contact_name,
+        'billing_email': order.billing_email,
+        'billing_phone': order.billing_phone,
+        'billing_address_1': order.billing_address_1,
+        'billing_address_2': order.billing_address_2,
+        'billing_address_town': order.billing_address_town,
+        'billing_address_county': order.billing_address_county,
+        'billing_address_postcode': order.billing_address_postcode,
+        'billing_address_country': {
+            'id': str(order.billing_address_country.pk),
+            'name': order.billing_address_country.name,
+        },
+        'paid_on': order.paid_on.isoformat() if order.paid_on else None,
+        'completed_by': {
+            'id': str(order.completed_by.pk),
+            'first_name': order.completed_by.first_name,
+            'last_name': order.completed_by.last_name,
+            'name': order.completed_by.name,
+        } if order.completed_by else None,
+        'completed_on': order.completed_on.isoformat() if order.completed_on else None,
+        'cancelled_by': {
+            'id': str(order.cancelled_by.pk),
+            'first_name': order.cancelled_by.first_name,
+            'last_name': order.cancelled_by.last_name,
+            'name': order.cancelled_by.name,
+        } if order.cancelled_by else None,
+        'cancelled_on': order.cancelled_on.isoformat() if order.cancelled_on else None,
+        'cancellation_reason': {
+            'id': str(order.cancellation_reason.pk),
+            'name': order.cancellation_reason.name,
+        } if order.cancellation_reason else None,
     }
