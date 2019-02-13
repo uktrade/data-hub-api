@@ -269,6 +269,8 @@ def test_get_basic_search_query():
                                 'company_number',
                                 'contact.name',
                                 'contact.name_trigram',
+                                'contacts.name',
+                                'contacts.name.trigram',
                                 'dit_adviser.name',
                                 'dit_adviser.name_trigram',
                                 'dit_team.name',
