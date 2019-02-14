@@ -12,16 +12,16 @@ from datahub.investment.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.investment.models import InvestmentProject
-from datahub.search.investment.serializers import SearchInvestmentProjectSerializer
+from datahub.search.investment.serializers import SearchInvestmentProjectQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchInvestmentProjectParams:
-    """Search investment project params."""
+class SearchInvestmentProjectAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
-    serializer_class = SearchInvestmentProjectSerializer
+    serializer_class = SearchInvestmentProjectQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }
@@ -81,11 +81,11 @@ class SearchInvestmentProjectParams:
     }
 
 
-class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
+class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, SearchAPIView):
     """Filtered investment project search view."""
 
 
-class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
+class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchExportAPIView):
     """Investment project search export view."""
 
     # Note: Aggregations on related fields are only used via subqueries as they become very

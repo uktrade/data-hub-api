@@ -12,8 +12,8 @@ from rest_framework.settings import api_settings
 from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import CompaniesHouseCompany, Company, OneListTier
-from datahub.company.serializers import CompanySerializer
+from datahub.company.models import Company, OneListTier
+from datahub.company.serializers import CompanySerializerV3
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
@@ -264,7 +264,6 @@ class TestGetCompany(APITestMixin):
             'company_number': company.company_number,
             'vat_number': company.vat_number,
             'duns_number': company.duns_number,
-            'trading_name': company.trading_names[0],
             'trading_names': company.trading_names,
             'registered_address_1': company.registered_address_1,
             'registered_address_2': company.registered_address_2,
@@ -657,7 +656,7 @@ class TestUpdateCompany(APITestMixin):
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
         Test that if company.duns_number is not blank, the client cannot update the
-        fields defined by CompanySerializer.Meta.dnb_read_only_fields.
+        fields defined by CompanySerializerV3.Meta.dnb_read_only_fields.
         """
         company = CompanyFactory(
             duns_number='012345678',
@@ -689,7 +688,6 @@ class TestUpdateCompany(APITestMixin):
 
         data = {
             'name': 'new name',
-            'trading_name': 'new trading name',
             'trading_names': ['new trading name'],
             'company_number': 'new company number',
             'vat_number': 'new vat number',
@@ -713,8 +711,8 @@ class TestUpdateCompany(APITestMixin):
             'global_headquarters': company.id,
         }
 
-        assert set(data.keys()) == set(CompanySerializer.Meta.dnb_read_only_fields), (
-            'It looks like you have changed CompanySerializer.Meta.dnb_read_only_fields, '
+        assert set(data.keys()) == set(CompanySerializerV3.Meta.dnb_read_only_fields), (
+            'It looks like you have changed CompanySerializerV3.Meta.dnb_read_only_fields, '
             'please update this test accordingly.'
         )
 
@@ -729,11 +727,6 @@ class TestUpdateCompany(APITestMixin):
     @pytest.mark.parametrize(
         'data,expected_error',
         (
-            # trading name too long
-            (
-                {'trading_name': 'a' * 600},
-                {'trading_name': ['Ensure this field has no more than 255 characters.']},
-            ),
             # trading names too long
             (
                 {'trading_names': ['a' * 600]},
@@ -922,140 +915,6 @@ class TestUpdateCompany(APITestMixin):
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
-
-
-class TestTradingNamesForCompany(APITestMixin):
-    """
-    Tests related to trading_names and trading_name.
-
-    TODO: They will be eventually deleted after the migration from trading_name to
-    trading_names is completed.
-    """
-
-    @pytest.mark.parametrize(
-        (
-            'old_trading_names',
-            'trading_name_api_data',
-            'expected_trading_names',
-        ),
-        (
-            # help in reading the params below:
-            # (
-            #     ['old value'],  # setup
-            #     'old value',  # API PATCH data
-            #     ['old value'],  # expectation
-            # ),
-            (
-                ['old value'],
-                'old value',
-                ['old value'],
-            ),
-            (
-                ['old value'],
-                'new value',
-                ['new value'],
-            ),
-            (
-                ['old value'],
-                '',
-                [],
-            ),
-            (
-                ['old value'],
-                None,
-                [],
-            ),
-            (
-                [],
-                'new value',
-                ['new value'],
-            ),
-            (
-                [],
-                '',
-                [],
-            ),
-            (
-                [],
-                None,
-                [],
-            ),
-            (
-                ['old value', 'another value'],
-                'new value',
-                ['new value'],
-            ),
-        ),
-    )
-    def test_values_updated_correctly(
-        self,
-        old_trading_names,
-        trading_name_api_data,
-        expected_trading_names,
-    ):
-        """
-        Test that given specific trading_names, updating a company using
-        the `trading_name` API data param, updates trading_names correctly.
-        """
-        company = CompanyFactory(
-            trading_names=old_trading_names,
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(
-            url,
-            data={
-                'trading_name': trading_name_api_data,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['trading_names'] == expected_trading_names
-
-        company.refresh_from_db()
-        assert company.trading_names == expected_trading_names
-
-    @pytest.mark.parametrize(
-        'trading_names,expected_trading_name,expected_trading_names',
-        (
-            (
-                ['value'],
-                'value',
-                ['value'],
-            ),
-            (
-                # only the first item is returned in trading_name
-                ['value', 'another value'],
-                'value',
-                ['value', 'another value'],
-            ),
-            (
-                [],
-                '',
-                [],
-            ),
-        ),
-    )
-    def test_trading_name_gets_value_from_trading_names(
-        self,
-        trading_names,
-        expected_trading_name,
-        expected_trading_names,
-    ):
-        """
-        Test that the values of trading_name and trading_names in the GET company
-        response API come from the trading_names field.
-        """
-        company = CompanyFactory(
-            trading_names=trading_names,
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['trading_name'] == expected_trading_name
-        assert response_data['trading_names'] == expected_trading_names
 
 
 class TestAddressesForCompany(APITestMixin):
@@ -1372,7 +1231,7 @@ class TestAddCompany(APITestMixin):
             (
                 {
                     'name': 'Acme',
-                    'trading_name': 'Trading name',
+                    'trading_names': ['Trading name'],
                     'business_type': {'id': BusinessTypeConstant.company.value.id},
                     'registered_address_country': {
                         'id': Country.united_kingdom.value.id,
@@ -1384,7 +1243,7 @@ class TestAddCompany(APITestMixin):
                 },
                 {
                     'name': 'Acme',
-                    'trading_name': 'Trading name',
+                    'trading_names': ['Trading name'],
                     'business_type': {
                         'id': BusinessTypeConstant.company.value.id,
                         'name': BusinessTypeConstant.company.value.name,
@@ -1741,7 +1600,7 @@ class TestCompanyVersioning(APITestMixin):
             reverse('api-v3:company:collection'),
             data={
                 'name': 'Acme',
-                'trading_name': 'Trading name',
+                'trading_names': ['Trading name'],
                 'business_type': {'id': BusinessTypeConstant.company.value.id},
                 'sector': {'id': random_obj_for_model(Sector).id},
                 'registered_address_country': {
@@ -1756,7 +1615,7 @@ class TestCompanyVersioning(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data['name'] == 'Acme'
-        assert response_data['trading_name'] == 'Trading name'
+        assert response_data['trading_names'] == ['Trading name']
 
         company = Company.objects.get(pk=response_data['id'])
 
@@ -1834,7 +1693,7 @@ class TestCompanyVersioning(APITestMixin):
 
         response = self.api_client.patch(
             reverse('api-v3:company:item', kwargs={'pk': company.pk}),
-            data={'trading_name': 'a' * 600},
+            data={'trading_names': ['a' * 600]},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1934,77 +1793,6 @@ class TestAuditLogView(APITestMixin):
         assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['description'] == ['Initial desc', 'New desc']
         assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
-
-
-class TestCHCompany(APITestMixin):
-    """CH company tests."""
-
-    def test_list_ch_companies(self):
-        """List the companies house companies."""
-        CompaniesHouseCompanyFactory()
-        CompaniesHouseCompanyFactory()
-
-        url = reverse('api-v3:ch-company:collection')
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == CompaniesHouseCompany.objects.all().count()
-
-    def test_get_ch_company(self):
-        """Test retrieving a single CH company."""
-        ch_company = CompaniesHouseCompanyFactory()
-        url = reverse(
-            'api-v3:ch-company:item', kwargs={'company_number': ch_company.company_number},
-        )
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data == {
-            'id': ch_company.id,
-            'business_type': {
-                'id': str(ch_company.business_type.id),
-                'name': ch_company.business_type.name,
-            },
-            'company_number': ch_company.company_number,
-            'company_category': ch_company.company_category,
-            'company_status': ch_company.company_status,
-            'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
-            'name': ch_company.name,
-            'registered_address_1': ch_company.registered_address_1,
-            'registered_address_2': ch_company.registered_address_2,
-            'registered_address_town': ch_company.registered_address_town,
-            'registered_address_county': ch_company.registered_address_county,
-            'registered_address_postcode': ch_company.registered_address_postcode,
-            'registered_address_country': {
-                'id': str(ch_company.registered_address_country.id),
-                'name': ch_company.registered_address_country.name,
-            },
-            'sic_code_1': ch_company.sic_code_1,
-            'sic_code_2': ch_company.sic_code_2,
-            'sic_code_3': ch_company.sic_code_3,
-            'sic_code_4': ch_company.sic_code_4,
-            'uri': ch_company.uri,
-        }
-
-    def test_get_ch_company_alphanumeric(self):
-        """Test retrieving a single CH company where the company number contains letters."""
-        CompaniesHouseCompanyFactory(company_number='SC00001234')
-        url = reverse(
-            'api-v3:ch-company:item', kwargs={'company_number': 'SC00001234'},
-        )
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['company_number'] == 'SC00001234'
-
-    def test_ch_company_cannot_be_written(self):
-        """Test CH company POST is not allowed."""
-        url = reverse('api-v3:ch-company:collection')
-        response = self.api_client.post(url)
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 class TestOneListGroupCoreTeam(APITestMixin):

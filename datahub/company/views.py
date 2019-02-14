@@ -1,7 +1,6 @@
 """Company and related resources view sets."""
 from django.db.models import Prefetch
-from django_filters import FilterSet
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -15,8 +14,10 @@ from datahub.company.models import (
 from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
-    CompaniesHouseCompanySerializer,
-    CompanySerializer,
+    CompaniesHouseCompanySerializerV3,
+    CompaniesHouseCompanySerializerV4,
+    CompanySerializerV3,
+    CompanySerializerV4,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
 )
@@ -28,11 +29,10 @@ from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
 
 
-class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """Company view set V3."""
+class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Base Company view set."""
 
     required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompanySerializer
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id',)
@@ -71,6 +71,22 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     )
 
 
+class CompanyViewSetV3(BaseCompanyViewSet):
+    """
+    Company view set V3.
+
+    TODO: delete once the migration to address and registered address is complete
+    """
+
+    serializer_class = CompanySerializerV3
+
+
+class CompanyViewSetV4(BaseCompanyViewSet):
+    """Company view set V4."""
+
+    serializer_class = CompanySerializerV4
+
+
 class OneListGroupCoreTeamViewSet(CoreViewSet):
     """
     Views for the One List Core Team of the group a company is part of.
@@ -103,13 +119,32 @@ class CompanyAuditViewSet(AuditViewSet):
     queryset = Company.objects.all()
 
 
-class CompaniesHouseCompanyViewSet(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+class CompaniesHouseCompanyViewSetV3(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
 ):
-    """Companies House company read-only GET only views."""
+    """
+    Companies House company read-only views V3.
+
+    TODO: delete once the migration to v4 is complete
+    """
 
     required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompaniesHouseCompanySerializer
+    serializer_class = CompaniesHouseCompanySerializerV3
+    queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
+    lookup_field = 'company_number'
+
+
+class CompaniesHouseCompanyViewSetV4(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
+):
+    """Companies House company read-only views V4."""
+
+    required_scopes = (Scope.internal_front_end,)
+    serializer_class = CompaniesHouseCompanySerializerV4
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
 
@@ -146,11 +181,12 @@ class AdviserFilter(FilterSet):
 
     class Meta:
         model = Advisor
-        fields = dict(
-            first_name=['exact', 'icontains'],
-            last_name=['exact', 'icontains'],
-            email=['exact', 'icontains'],
-        )
+        fields = {
+            'first_name': ('exact', 'icontains'),
+            'last_name': ('exact', 'icontains'),
+            'email': ('exact', 'icontains'),
+            'is_active': ('exact',),
+        }
 
 
 class AdviserReadOnlyViewSetV1(

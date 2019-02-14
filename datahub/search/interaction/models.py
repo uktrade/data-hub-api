@@ -84,8 +84,8 @@ class Interaction(BaseESModel):
         'id',
         'company.name',
         'company.name_trigram',
-        'contact.name',
-        'contact.name_trigram',
+        'contacts.name',  # to find 2-letter words
+        'contacts.name.trigram',
         'event.name',
         'event.name_trigram',
         'subject_english',

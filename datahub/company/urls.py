@@ -4,9 +4,11 @@ from django.urls import path
 
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
-    CompaniesHouseCompanyViewSet,
+    CompaniesHouseCompanyViewSetV3,
+    CompaniesHouseCompanyViewSetV4,
     CompanyAuditViewSet,
-    CompanyViewSet,
+    CompanyViewSetV3,
+    CompanyViewSetV4,
     ContactAuditViewSet,
     ContactViewSet,
     OneListGroupCoreTeamViewSet,
@@ -46,12 +48,24 @@ contact_urls = [
 
 # COMPANY
 
-company_collection = CompanyViewSet.as_view({
+# TODO: delete once the migration to address and registered address is complete
+company_collection_v3 = CompanyViewSetV3.as_view({
     'get': 'list',
     'post': 'create',
 })
 
-company_item = CompanyViewSet.as_view({
+# TODO: delete once the migration to address and registered address is complete
+company_item_v3 = CompanyViewSetV3.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update',
+})
+
+company_collection_v4 = CompanyViewSetV4.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+company_item_v4 = CompanyViewSetV4.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
 })
@@ -64,11 +78,21 @@ company_timeline = CompanyTimelineViewSet.as_view({
     'get': 'list',
 })
 
-company_archive = CompanyViewSet.as_view({
+# TODO: delete once the migration to address and registered address is complete
+company_archive_v3 = CompanyViewSetV3.as_view({
     'post': 'archive',
 })
 
-company_unarchive = CompanyViewSet.as_view({
+# TODO: delete once the migration to address and registered address is complete
+company_unarchive_v3 = CompanyViewSetV3.as_view({
+    'post': 'unarchive',
+})
+
+company_archive_v4 = CompanyViewSetV4.as_view({
+    'post': 'archive',
+})
+
+company_unarchive_v4 = CompanyViewSetV4.as_view({
     'post': 'unarchive',
 })
 
@@ -76,19 +100,29 @@ one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
-ch_company_list = CompaniesHouseCompanyViewSet.as_view({
+# TODO: delete once the migration to v4 is complete
+ch_company_collection_v3 = CompaniesHouseCompanyViewSetV3.as_view({
     'get': 'list',
 })
 
-ch_company_item = CompaniesHouseCompanyViewSet.as_view({
+# TODO: delete once the migration to v4 is complete
+ch_company_item_v3 = CompaniesHouseCompanyViewSetV3.as_view({
     'get': 'retrieve',
 })
 
-company_urls = [
-    path('company', company_collection, name='collection'),
-    path('company/<uuid:pk>', company_item, name='item'),
-    path('company/<uuid:pk>/archive', company_archive, name='archive'),
-    path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
+ch_company_collection_v4 = CompaniesHouseCompanyViewSetV4.as_view({
+    'get': 'list',
+})
+
+ch_company_item_v4 = CompaniesHouseCompanyViewSetV4.as_view({
+    'get': 'retrieve',
+})
+
+company_urls_v3 = [
+    path('company', company_collection_v3, name='collection'),
+    path('company/<uuid:pk>', company_item_v3, name='item'),
+    path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
+    path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
     path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
     path(
@@ -98,7 +132,26 @@ company_urls = [
     ),
 ]
 
-ch_company_urls = [
-    path('ch-company', ch_company_list, name='collection'),
-    path('ch-company/<company_number>', ch_company_item, name='item'),
+company_urls_v4 = [
+    path('company', company_collection_v4, name='collection'),
+    path('company/<uuid:pk>', company_item_v4, name='item'),
+    path('company/<uuid:pk>/archive', company_archive_v4, name='archive'),
+    path('company/<uuid:pk>/unarchive', company_unarchive_v4, name='unarchive'),
+    path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
+    path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
+    path(
+        'company/<uuid:pk>/one-list-group-core-team',
+        one_list_group_core_team,
+        name='one-list-group-core-team',
+    ),
+]
+
+ch_company_urls_v3 = [
+    path('ch-company', ch_company_collection_v3, name='collection'),
+    path('ch-company/<company_number>', ch_company_item_v3, name='item'),
+]
+
+ch_company_urls_v4 = [
+    path('ch-company', ch_company_collection_v4, name='collection'),
+    path('ch-company/<company_number>', ch_company_item_v4, name='item'),
 ]

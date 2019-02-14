@@ -712,14 +712,31 @@ class TestAutocompleteSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_searching_with_no_query_returns_no_results(self, setup_data):
+    @pytest.mark.parametrize(
+        'data,expected_error',
+        (
+            (
+                {},
+                {'term': ['This field is required.']},
+            ),
+            (
+                {'term': 'a', 'limit': 0},
+                {'limit': ['Ensure this value is greater than or equal to 1.']},
+            ),
+            (
+                {'term': 'a', 'limit': 'asdf'},
+                {'limit': ['A valid integer is required.']},
+            ),
+        ),
+    )
+    def test_validation_error(self, data, expected_error, setup_data):
         """Tests case where there is not query provided."""
         url = reverse('api-v3:search:company-autocomplete-search')
 
-        response = self.api_client.get(url, data={})
+        response = self.api_client.get(url, data=data)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 0
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_error
 
     @pytest.mark.parametrize(
         'query,expected_companies',
@@ -743,6 +760,33 @@ class TestAutocompleteSearch(APITestMixin):
         url = reverse('api-v3:search:company-autocomplete-search')
 
         response = self.api_client.get(url, data={'term': query})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(expected_companies)
+
+        if expected_companies:
+            companies = [result['name'] for result in response.data['results']]
+            assert companies == expected_companies
+
+    @pytest.mark.parametrize(
+        'limit,expected_companies',
+        (
+            (10, ['abc defg ltd', 'abc defg us ltd']),  # only 2 found
+            (2, ['abc defg ltd', 'abc defg us ltd']),
+            (1, ['abc defg ltd']),
+        ),
+    )
+    def test_searching_with_limit(self, setup_data, limit, expected_companies):
+        """Tests case where search limit is provided."""
+        url = reverse('api-v3:search:company-autocomplete-search')
+
+        response = self.api_client.get(
+            url,
+            data={
+                'term': 'abc',
+                'limit': limit,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == len(expected_companies)

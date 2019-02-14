@@ -5,8 +5,8 @@ from datahub.search.test.search_support.simplemodel.serializers import SearchSim
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchSimpleModelParams:
-    """Parameters for SimpleModel search views."""
+class SearchSimpleModelAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = ESSimpleModel
@@ -18,11 +18,11 @@ class SearchSimpleModelParams:
     FILTER_FIELDS = ('name',)
 
 
-class SearchSimpleModelAPIView(SearchSimpleModelParams, SearchAPIView):
+class SearchSimpleModelAPIView(SearchSimpleModelAPIViewMixin, SearchAPIView):
     """Filtered Simple Model search view."""
 
 
-class SearchSimpleModelExportAPIView(SearchSimpleModelParams, SearchExportAPIView):
+class SearchSimpleModelExportAPIView(SearchSimpleModelAPIViewMixin, SearchExportAPIView):
     """Filtered Simple Model search export view."""
 
     queryset = SimpleModel.objects.all()
