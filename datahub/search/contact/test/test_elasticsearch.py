@@ -103,10 +103,6 @@ def test_mapping(setup_es):
                             'analyzer': 'trigram_analyzer',
                             'type': 'text',
                         },
-                        'trading_name': {
-                            'index': False,
-                            'type': 'keyword',
-                        },
                         'trading_names': {
                             'copy_to': ['company.trading_names_trigram'],
                             'type': 'text',

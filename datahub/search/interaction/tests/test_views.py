@@ -288,7 +288,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             'company': {
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
-                'trading_name': interaction.company.trading_names[0],
                 'trading_names': interaction.company.trading_names,
             },
             'company_sector': {
