@@ -1,6 +1,0 @@
-The following columns in the ``company_companieshousecompany`` table were made NOT NULL:
-
-- ``registered_address_2``
-- ``registered_address_county``
-- ``registered_address_country_id``
-- ``registered_address_postcode``

@@ -1,3 +1,180 @@
+Data Hub API 9.10.0 (2019-02-14)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The following endpoints are deprecated and will be removed on or after the 21st of February, please use v4 instead:
+
+  - ``/v3/ch-company``
+  - ``/v3/ch-company/<uuid:pk>``
+- **Companies** The following endpoints are deprecated and will be removed on or after the 21st of February, please use v4 instead:
+
+  - ``/v3/company``
+  - ``/v3/company/<uuid:pk>``
+  - ``/v3/company/<uuid:pk>/archive``
+  - ``/v3/company/<uuid:pk>/audit``
+  - ``/v3/company/<uuid:pk>/one-list-group-core-team``
+  - ``/v3/company/<uuid:pk>/timeline``
+  - ``/v3/company/<uuid:pk>/unarchive``
+- **Companies** ``POST /v3/search/company``, ``POST /v3/search/company/export`` the following filters are deprecated and will be removed on or after the 21st of February:
+
+  - ``description``
+  - ``export_to_country``
+  - ``future_interest_country``
+  - ``global_headquarters``
+  - ``sector``
+  - ``trading_address_country``
+- **Companies** ``POST /v3/search/company``, ``POST /v3/search/company/export`` the following sortby values are deprecated and will be removed on or after the 21st of February:
+
+  - ``archived``
+  - ``archived_by``
+  - ``business_type.name``
+  - ``companies_house_data.company_number``
+  - ``company_number``
+  - ``created_on``
+  - ``employee_range.name``
+  - ``headquarter_type.name``
+  - ``id``
+  - ``registered_address_town``
+  - ``sector.name``
+  - ``trading_address_town``
+  - ``turnover_range.name``
+  - ``uk_based``
+  - ``uk_region.name``
+- **Companies** The following database fields are deprecated and will be removed on or after the 21st of February, please use the ``address_*`` fields instead:
+
+  - ``trading_address_1``
+  - ``trading_address_2``
+  - ``trading_address_town``
+  - ``trading_address_county``
+  - ``trading_address_postcode``
+  - ``trading_address_country_id``
+- **Companies** The field ``trading_name`` was removed from all ``/v3/company/*`` and ``/v4/company/*`` endpoints, please use the ``trading_names`` field instead.
+
+Features
+--------
+
+- **Companies** Companies now define fields for a mandatory address representing the main location for the business and fields for an optional registered address.
+  Trading address fields are still automatically updated but deprecated.
+  The data was migrated in the following way:
+
+  - address fields: populated from trading address or (as fallback) registered address in this specific order.
+  - registered fields: kept untouched for now but will be overridden by the values from Companies House where possible or (as fallback) set to blank values. A deprecation notice will be announced before this happens.
+- **Interactions** Global search was updated to handle multiple interaction contacts correctly when matching search terms with interactions.
+- **Investment** A note can now be submitted with any change to an Investment Project.
+
+Bug fixes
+---------
+
+- **Interactions** A performance problem with the interaction list in the admin site was resolved.
+
+Internal changes
+----------------
+
+- The permissions and content type for the previously deleted businesslead model/table were also deleted.
+- Django was updated from 2.1.5 to 2.1.7.
+
+API
+---
+
+- **Advisers** ``GET /adviser/``: ``is_active`` was added as a query parameter. This is a boolean filter that filters advisers by whether they are active or not.
+- **Companies** API V4 for companies house companies was introduced with nested object format for registered address.
+  The ``registered_address_*`` fields were replaced by the nested object ``registered_address`` for the following endpoints:
+
+  - ``/v4/ch-company``
+  - ``/v4/ch-company/<uuid:pk>``
+
+  The nested object has the following contract::
+
+      'line_1': '2',
+      'line_2': 'Main Road',
+      'town': 'London',
+      'county': 'Greenwich',
+      'postcode': 'SE10 9NN',
+      'country': {
+          'id': '80756b9a-5d95-e211-a939-e4115bead28a',
+          'name': 'United Kingdom',
+      }
+- **Companies** ``/v4/company``, ``/v4/company/<uuid:pk>``, ``/v4/company/<uuid:pk>/archive``, ``/v4/company/<uuid:pk>/unarchive``:
+
+  - The ``trading_address_*`` fields were removed from v4
+  - The ``registered_address_*`` fields were replaced by the nested object ``registered_address`` and made optional
+  - The nested object ``address`` was added and is mandatory when creating a company. Its data was populated from trading_address fields or registered_address whichever was defined.
+  - The nested ``companies_house_data`` object was removed from v4
+- **Companies** API V4 for companies was introduced with nested object format for addresses.
+  A new prefix ``v4`` was introduced along with the following endpoints:
+
+  - ``/v4/company``: see the related news fragment
+  - ``/v4/company/<uuid:pk>``: see the related news fragment
+  - ``/v4/company/<uuid:pk>/archive``:see the related news fragment
+  - ``/v4/company/<uuid:pk>/unarchive``: see the related news fragment
+  - ``/v4/company/<uuid:pk>/audit``: same response body as v3
+  - ``/v4/company/<uuid:pk>/one-list-group-core-team``: same response body as v3
+  - ``/v4/company/<uuid:pk>/timeline``: same response body as v3
+
+  The nested object has the following contract::
+
+      'line_1': '2',
+      'line_2': 'Main Road',
+      'town': 'London',
+      'county': 'Greenwich',
+      'postcode': 'SE10 9NN',
+      'country': {
+          'id': '80756b9a-5d95-e211-a939-e4115bead28a',
+          'name': 'United Kingdom',
+      }
+- **Companies** ``GET /v3/search/company/autocomplete``: the query param ``term`` is now required.
+- **Companies** The field ``trading_name`` was removed from all ``/v3/company/*`` and ``/v4/company/*`` endpoints, please use the ``trading_names`` field instead.
+- **Investment** ``POST /v3/investment`` endpoint now accepts ``note`` as an
+  optional property that can be set whilst creating an investment project.
+  The property expects a dictionary with a mandatory field of ``text`` and an optional field of ``activity_type``.
+  ``activity_type`` expects a ``investment_activity_type`` id.
+
+
+  ``PATCH /v3/investment/<uuid:pk>`` endpoint now accepts ``note``
+  as an optional property that can be set whilst updating an investment project.
+  The property expects a dictionary with a mandatory field of ``text`` and an optional field of ``activity_type``.
+  ``activity_type`` expects a ``investment_activity_type`` id.
+
+
+  ``GET /v3/investment/<uuid:pk>/audit`` endpoint now returns a property ``note``
+  within each audit change entry.
+
+
+  New endpoint ``GET /metadata/investment-activity-type/`` added that returns
+  all possible ``investment_activity_type`` options.
+
+Database schema
+---------------
+
+- **Companies** The following columns in the ``company_companieshousecompany`` table were made NOT NULL:
+
+  - ``registered_address_2``
+  - ``registered_address_county``
+  - ``registered_address_country_id``
+  - ``registered_address_postcode``
+- **Companies** The following database fields are deprecated and will be removed on or after the 21st of February, please use the ``address_*`` fields instead:
+
+  - ``trading_address_1``
+  - ``trading_address_2``
+  - ``trading_address_town``
+  - ``trading_address_county``
+  - ``trading_address_postcode``
+  - ``trading_address_country_id``
+- **Investment** The table ``investment_investmentactivitytype`` has been added.
+  The values of the column ``name`` will initial be ``change``, ``risk``, ``issue``, ``SPI Interaction``
+  and ``Internal Interaction``.
+
+  The table ``investment_investmentactivity`` has been added.
+  The columns are ``id``, ``investment_project_id``, ``revision_id``, ``activity_type_id``  and ``text``.
+  Where ``revision_id`` is a link to a copy of the investment projects data at the time of adding the row.
+  Where ``text`` can be used as a note to be associated with a change to a project or as a way to detail
+  an activity on the project.
+
+
 Data Hub API 9.9.0 (2019-02-07)
 ===============================
 

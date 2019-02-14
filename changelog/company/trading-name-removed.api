@@ -1,1 +1,0 @@
-The field ``trading_name`` was removed from all ``/v3/company/*`` and ``/v4/company/*`` endpoints, please use the ``trading_names`` field instead.
