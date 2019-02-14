@@ -6,20 +6,24 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.merge import DuplicateCompanyMerger, MergeNotAllowedError
-from datahub.company.models import Contact
+from datahub.company.merge import (
+    get_planned_changes,
+    merge_companies,
+    MergeNotAllowedError,
+    transform_merge_results_to_merge_entry_summaries,
+)
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
-from datahub.interaction.models import Interaction
-
 
 REVERSION_REVISION_COMMENT = 'Company marked as a duplicate and related records transferred.'
+MERGE_ENTRY_MSG_FRAGMENT = gettext_lazy(
+    '{0} {1}{2}',
+)
 MERGE_SUCCESS_MSG = gettext_lazy(
-    'Merge complete – {num_interactions_moved} {interaction_verbose_name}'
-    ' and {num_contacts_moved} {contact_verbose_name} moved from'
+    'Merge complete – {merge_entries} moved from'
     ' <a href="{source_company_url}" target="_blank">{source_company}</a> to'
     ' <a href="{target_company_url}" target="_blank">{target_company}</a>.',
 )
@@ -48,9 +52,8 @@ def confirm_merge(model_admin, request):
         raise SuspiciousOperation()
 
     is_post = request.method == 'POST'
-    merger = DuplicateCompanyMerger(source_company, target_company)
 
-    if is_post and _perform_merge(request, merger, model_admin):
+    if is_post and _perform_merge(request, source_company, target_company, model_admin):
         changelist_route_name = admin_urlname(model_admin.model._meta, 'changelist')
         changelist_url = reverse(changelist_route_name)
         return HttpResponseRedirect(changelist_url)
@@ -58,13 +61,17 @@ def confirm_merge(model_admin, request):
     template_name = 'admin/company/company/merge/step_3_confirm_selection.html'
     title = gettext_lazy('Confirm merge')
 
-    move_entries, should_archive_source = merger.get_planned_changes()
+    planned_merge_results, should_archive_source = get_planned_changes(source_company)
+    merge_entries = transform_merge_results_to_merge_entry_summaries(
+        planned_merge_results,
+        skip_zeroes=True,
+    )
 
     context = {
         **model_admin.admin_site.each_context(request),
         'source_company': source_company,
         'target_company': target_company,
-        'move_entries': move_entries,
+        'merge_entries': merge_entries,
         'should_archive_source': should_archive_source,
         'media': model_admin.media,
         'opts': model_admin.model._meta,
@@ -73,37 +80,45 @@ def confirm_merge(model_admin, request):
     return TemplateResponse(request, template_name, context)
 
 
-def _perform_merge(request, merger, model_admin):
+def _perform_merge(request, source_company, target_company, model_admin):
     try:
-        merge_result = merger.perform_merge(request.user)
+        merge_results = merge_companies(source_company, target_company, request.user)
     except MergeNotAllowedError:
         failure_msg = MERGE_FAILURE_MSG.format(
-            source_company=merger.source_company,
-            target_company=merger.target_company,
+            source_company=source_company,
+            target_company=target_company,
         )
         model_admin.message_user(request, failure_msg, django_messages.ERROR)
         return False
 
     reversion.set_comment(REVERSION_REVISION_COMMENT)
-    success_msg = _build_success_msg(merger, merge_result)
+    success_msg = _build_success_msg(source_company, target_company, merge_results)
     model_admin.message_user(request, success_msg, django_messages.SUCCESS)
     return True
 
 
-def _build_success_msg(merger, merge_result):
-    interaction_verbose_name = verbose_name_for_count(
-        merge_result.num_interactions_moved,
-        Interaction._meta,
+def _build_success_msg(source_company, target_company, merge_results):
+    merge_entries = transform_merge_results_to_merge_entry_summaries(
+        merge_results,
+        skip_zeroes=True,
     )
-    contact_verbose_name = verbose_name_for_count(merge_result.num_contacts_moved, Contact._meta)
-    return format_html(
+
+    messages = (
+        (
+            merge_entry.count,
+            verbose_name_for_count(merge_entry.count, merge_entry.model_meta),
+            merge_entry.description,
+        ) for merge_entry in merge_entries
+    )
+
+    html_merge_entries = format_html_join(', ', MERGE_ENTRY_MSG_FRAGMENT, messages)
+
+    html = format_html(
         MERGE_SUCCESS_MSG,
-        num_interactions_moved=merge_result.num_interactions_moved,
-        num_contacts_moved=merge_result.num_contacts_moved,
-        interaction_verbose_name=interaction_verbose_name,
-        contact_verbose_name=contact_verbose_name,
-        source_company_url=merger.source_company.get_absolute_url(),
-        source_company=merger.source_company,
-        target_company_url=merger.target_company.get_absolute_url(),
-        target_company=merger.target_company,
+        merge_entries=html_merge_entries,
+        source_company_url=source_company.get_absolute_url(),
+        source_company=source_company,
+        target_company_url=target_company.get_absolute_url(),
+        target_company=target_company,
     )
+    return html
