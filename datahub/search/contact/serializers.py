@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
 from datahub.search.serializers import (
-    EntitySearchSerializer,
+    EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class SearchContactSerializer(EntitySearchSerializer):
+class SearchContactQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate contact search POST bodies."""
 
     archived = serializers.BooleanField(required=False)

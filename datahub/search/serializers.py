@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 from rest_framework.settings import api_settings
@@ -5,6 +7,9 @@ from rest_framework.settings import api_settings
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.query_builder import MAX_RESULTS
 from datahub.search.utils import SearchOrdering, SortDirection
+
+
+logger = logging.getLogger(__name__)
 
 
 class SingleOrListField(serializers.ListField):
@@ -89,7 +94,7 @@ class _ESOrderingField(serializers.Field):
         return f'{value.field}:{value.direction}'
 
 
-class BaseSearchSerializer(serializers.Serializer):
+class BaseSearchQuerySerializer(serializers.Serializer):
     """Base serialiser for basic (global) and entity search."""
 
     SORT_BY_FIELDS = []
@@ -133,7 +138,7 @@ class _ESModelChoiceField(serializers.Field):
         return value._doc_type.name
 
 
-class BasicSearchSerializer(BaseSearchSerializer):
+class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate basic (global) search query parameters."""
 
     SORT_BY_FIELDS = (
@@ -143,18 +148,26 @@ class BasicSearchSerializer(BaseSearchSerializer):
     entity = _ESModelChoiceField(default='company')
     term = serializers.CharField(required=True, allow_blank=True)
 
+    def validate(self, data):
+        """
+        Logs the sortby search param to see if we can get rid of it from the global search.
 
-class EntitySearchSerializer(BaseSearchSerializer):
+        TODO: Remove after figuring out what to do with sortby.
+        """
+        sortby = data.get('sortby')
+        if sortby:
+            logger.error(f'Sortby search field "{sortby.field}" used in the global search.')
+        return super().validate(data)
+
+
+class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate entity search POST bodies."""
 
     original_query = serializers.CharField(default='', allow_blank=True)
 
 
-class AutocompleteSearchSerializer(serializers.Serializer):
-    """Base serializer for autocomplete search."""
+class AutocompleteSearchQuerySerializer(serializers.Serializer):
+    """Serialiser used for the autocomplation search query parameters."""
 
-    id = serializers.UUIDField()
-
-    def to_representation(self, instance):
-        """Uses the _source property instead of the instance if one present."""
-        return super().to_representation(getattr(instance, '_source', instance))
+    term = serializers.CharField(required=True, allow_blank=True)
+    limit = serializers.IntegerField(default=10, min_value=1)

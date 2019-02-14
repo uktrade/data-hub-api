@@ -2,8 +2,7 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
-from django_filters import IsoDateTimeFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, IsoDateTimeFilter
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
@@ -21,7 +20,11 @@ from datahub.investment.permissions import (
     IsAssociatedToInvestmentProjectPermission,
     IsAssociatedToInvestmentProjectTeamMemberPermission,
 )
-from datahub.investment.serializers import IProjectSerializer, IProjectTeamMemberSerializer
+from datahub.investment.serializers import (
+    InvestmentActivitySerializer,
+    IProjectSerializer,
+    IProjectTeamMemberSerializer,
+)
 from datahub.oauth.scopes import Scope
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
@@ -41,6 +44,22 @@ class IProjectAuditViewSet(AuditViewSet):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment project audit log'
+
+    @classmethod
+    def _get_additional_change_information(cls, v_new):
+        """
+        Gets any investment activity associated with a change for the a change log entry.
+        If a note is not present then returns a None for a note to follow
+        the same behaviour as DRF.
+        """
+        if hasattr(v_new.revision, 'investmentactivity'):
+            return {'note': cls.get_activity_data(v_new.revision.investmentactivity)}
+        return {'note': None}
+
+    @classmethod
+    def get_activity_data(cls, activity):
+        """Returns the serialized data of an investment activity instance."""
+        return InvestmentActivitySerializer(activity).data
 
 
 class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):

@@ -181,6 +181,72 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                 },
+                'address': {
+                    'type': 'object',
+                    'properties': {
+                        'line_1': {'index': False, 'type': 'text'},
+                        'line_2': {'index': False, 'type': 'text'},
+                        'town': {'index': False, 'type': 'text'},
+                        'county': {'index': False, 'type': 'text'},
+                        'postcode': {
+                            'type': 'text',
+                            'fields': {
+                                'trigram': {
+                                    'type': 'text',
+                                    'analyzer': 'trigram_analyzer',
+                                },
+                            },
+                        },
+                        'country': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'index': False, 'type': 'keyword'},
+                                'name': {
+                                    'type': 'text',
+                                    'fields': {
+                                        'trigram': {
+                                            'type': 'text',
+                                            'analyzer': 'trigram_analyzer',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                'registered_address': {
+                    'type': 'object',
+                    'properties': {
+                        'line_1': {'index': False, 'type': 'text'},
+                        'line_2': {'index': False, 'type': 'text'},
+                        'town': {'index': False, 'type': 'text'},
+                        'county': {'index': False, 'type': 'text'},
+                        'postcode': {
+                            'type': 'text',
+                            'fields': {
+                                'trigram': {
+                                    'type': 'text',
+                                    'analyzer': 'trigram_analyzer',
+                                },
+                            },
+                        },
+                        'country': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'index': False, 'type': 'keyword'},
+                                'name': {
+                                    'type': 'text',
+                                    'fields': {
+                                        'trigram': {
+                                            'type': 'text',
+                                            'analyzer': 'trigram_analyzer',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
                 'registered_address_1': {'type': 'text'},
                 'registered_address_2': {'type': 'text'},
                 'registered_address_country': {
@@ -332,6 +398,8 @@ def test_get_basic_search_query():
                                 'company_number',
                                 'contact.name',
                                 'contact.name_trigram',
+                                'contacts.name',
+                                'contacts.name.trigram',
                                 'dit_adviser.name',
                                 'dit_adviser.name_trigram',
                                 'dit_team.name',
@@ -453,7 +521,6 @@ def test_limited_get_search_by_entity_query():
                                             'registered_address_postcode_trigram',
                                             'trading_address_country.name_trigram',
                                             'trading_address_postcode_trigram',
-                                            'uk_region.name_trigram',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',
@@ -559,6 +626,8 @@ def test_indexed_doc(setup_es):
         'name',
         'global_headquarters',
         'reference_code',
+        'address',
+        'registered_address',
         'registered_address_1',
         'registered_address_2',
         'registered_address_country',

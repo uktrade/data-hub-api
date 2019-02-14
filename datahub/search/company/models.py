@@ -1,4 +1,5 @@
 import itertools
+from functools import partial
 
 from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
 
@@ -74,6 +75,11 @@ class Company(BaseESModel):
         },
     )
     reference_code = fields.NormalizedKeyword()
+    sector = fields.sector_field()
+    address = fields.address_field()
+    registered_address = fields.address_field()
+
+    # TODO: delete once the migration to address and registered address is complete
     registered_address_1 = Text()
     registered_address_2 = Text()
     registered_address_town = fields.NormalizedKeyword()
@@ -87,7 +93,6 @@ class Company(BaseESModel):
         ],
     )
     registered_address_postcode_trigram = fields.TrigramText()
-    sector = fields.sector_field()
     trading_address_1 = Text()
     trading_address_2 = Text()
     trading_address_town = fields.NormalizedKeyword()
@@ -99,6 +104,7 @@ class Company(BaseESModel):
     trading_address_country = fields.id_name_partial_field(
         'trading_address_country',
     )
+
     trading_name = Keyword(index=False)
     trading_names = Text(
         copy_to=['trading_names_trigram'],
@@ -115,6 +121,8 @@ class Company(BaseESModel):
     COMPUTED_MAPPINGS = {
         'trading_name': lambda obj: dict_utils.company_dict(obj)['trading_name'],
         'suggest': get_suggestions,
+        'address': partial(dict_utils.address_dict, prefix='address'),
+        'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
     }
 
     MAPPINGS = {
@@ -128,9 +136,12 @@ class Company(BaseESModel):
         'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
-        'registered_address_country': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
+
+        # TODO: delete once the migration to address and registered address is complete
+        'registered_address_country': dict_utils.id_name_dict,
         'trading_address_country': dict_utils.id_name_dict,
+
         'turnover_range': dict_utils.id_name_dict,
         'uk_based': bool,
         'uk_region': dict_utils.id_name_dict,
@@ -144,11 +155,13 @@ class Company(BaseESModel):
         'trading_names',  # to find 2-letter words
         'trading_names_trigram',
         'reference_code',
+
+        # TODO: replace with nested address and registered address
+        # once the index data has been populated
         'registered_address_country.name_trigram',
         'registered_address_postcode_trigram',
         'trading_address_country.name_trigram',
         'trading_address_postcode_trigram',
-        'uk_region.name_trigram',
     )
 
     class Meta:

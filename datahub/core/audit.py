@@ -57,8 +57,14 @@ class AuditViewSet(GenericViewSet):
                 'changes': diff_versions(
                     model_meta_data, v_old.field_dict, v_new.field_dict,
                 ),
+                **cls._get_additional_change_information(v_new),
             })
         return changelog
+
+    @classmethod
+    def _get_additional_change_information(cls, v_new):
+        """Gets additional information about a change for the a change log entry."""
+        return {}
 
 
 class _VersionQuerySetProxy:

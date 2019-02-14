@@ -82,6 +82,20 @@ def test_validate_model_no_mapping_and_computed_intersection(search_app):
     assert not intersection
 
 
+def test_validate_model_search_fields(search_app):
+    """Test that all field paths in SEARCH_FIELDS exist on the ES model."""
+    es_model = search_app.es_model
+    mapping = es_model._doc_type.mapping
+    invalid_fields = {
+        field for field in es_model.SEARCH_FIELDS
+        if not mapping.resolve_field(field)
+    }
+
+    assert not invalid_fields, (
+        f'Invalid search fields {invalid_fields} detected on {es_model.__name__} search model'
+    )
+
+
 def _get_db_model_fields(db_model):
     return {field.name for field in db_model._meta.get_fields()}
 

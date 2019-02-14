@@ -5,6 +5,7 @@ import uuid
 from collections import Counter
 from datetime import date, datetime
 from operator import attrgetter
+from unittest import mock
 
 import pytest
 import reversion
@@ -28,10 +29,12 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment import views
 from datahub.investment.constants import (
     FEATURE_FLAG_STREAMLINED_FLOW,
+    InvestmentActivityType,
     LikelihoodToLand,
     ProjectManagerRequestStatus,
 )
 from datahub.investment.models import (
+    InvestmentActivity,
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
@@ -1942,6 +1945,142 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['name'] == 'new name'
 
 
+class TestInvestmentProjectActivities(APITestMixin):
+    """Tests for adding notes to an investment project."""
+
+    def test_create_project_with_a_note(self):
+        """Test that a project can be created with a note."""
+        adviser = AdviserFactory()
+        post_data = {
+            'name': 'project name',
+            'description': 'project description',
+            'estimated_land_date': '2020-12-12',
+            'investment_type': {
+                'id': constants.InvestmentType.fdi.value.id,
+            },
+            'business_activities': [{
+                'id': constants.InvestmentBusinessActivity.retail.value.id,
+            }],
+            'other_business_activity': 'New innovation centre',
+            'client_contacts': [{'id': str(ContactFactory().id)}],
+            'client_relationship_manager': {'id': str(adviser.id)},
+            'fdi_type': {
+                'id': constants.FDIType.creation_of_new_site_or_activity.value.id,
+            },
+            'investor_company': {'id': str(CompanyFactory().id)},
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id,
+            },
+            'referral_source_adviser': {'id': str(adviser.id)},
+            'sector': {
+                'id': str(constants.Sector.aerospace_assembly_aircraft.value.id),
+            },
+            'note': {'text': 'An investment note'},
+        }
+
+        response = self.api_client.post(
+            reverse('api-v3:investment:investment-collection'),
+            data=post_data,
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['name'] == 'project name'
+
+        assert 'note' not in response_data
+        investment_project = InvestmentProject.objects.get(pk=response_data['id'])
+        assert investment_project.activities.count() == 1
+        activity = investment_project.activities.first()
+        assert activity.text == 'An investment note'
+        assert str(activity.activity_type_id) == InvestmentActivityType.change.value.id
+
+    def test_patch_project_with_a_risk(self):
+        """Test successfully adding a note to a project"""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        risk_activity_type_id = InvestmentActivityType.risk.value.id
+
+        request_data = {
+            'note': {
+                'text': 'Project risk.',
+                'activity_type': risk_activity_type_id,
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert 'note' not in response_data
+        investment_project = InvestmentProject.objects.get(pk=response_data['id'])
+        assert investment_project.activities.count() == 1
+        activity = investment_project.activities.first()
+        assert activity.text == 'Project risk.'
+        assert str(activity.activity_type.id) == risk_activity_type_id
+
+    def test_patch_project_with_a_note_fails_when_project_does_not_save(self):
+        """
+        Test that if there's a problem when saving a problem, the note is not saved
+        either so that we keep db integrity.
+        """
+        project = InvestmentProjectFactory()
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        change_activity_type_id = InvestmentActivityType.change.value.id
+
+        request_data = {
+            'note': {
+                'text': 'Updated description',
+                'activity_type': change_activity_type_id,
+            },
+        }
+
+        with mock.patch.object(InvestmentProject, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                self.api_client.patch(url, data=request_data)
+
+        project.refresh_from_db()
+        assert project.activities.count() == 0
+
+    @pytest.mark.parametrize(
+        'note_request,expected_field_error,expected_error_message',
+        (
+            (None, None, 'This field may not be null.'),
+            ('hello', 'non_field_errors', 'Invalid data. Expected a dictionary'),
+            (
+                {'text': 'hello', 'activity_type': uuid.uuid4()},
+                'activity_type',
+                'object does not exist',
+            ),
+            (
+                {'activity_type': InvestmentActivityType.risk.value.id},
+                'text',
+                'This field is required.',
+            ),
+        ),
+    )
+    def test_patch_project_with_a_note_failures_returns_400(
+        self, note_request, expected_field_error, expected_error_message,
+    ):
+        """Tests failure conditions for adding a note to a project."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'note': note_request,
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert 'note' in response_data
+        if expected_field_error:
+            actual_error_message = response_data['note'][expected_field_error][0]
+        else:
+            actual_error_message = response_data['note']
+
+        assert expected_error_message in str(actual_error_message)
+
+
 class TestInvestmentProjectVersioning(APITestMixin):
     """
     Tests for versions created when interacting with the investment project endpoints.
@@ -3274,9 +3413,17 @@ class TestAuditLogView(APITestMixin):
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
         ),
     )
-    def test_audit_log_non_restricted_user(self, permissions):
+    @pytest.mark.parametrize(
+        'expected_note_text',
+        (
+            'Hello',
+            None,
+        ),
+    )
+    def test_audit_log_with_notes_for_a_non_restricted_user(self, permissions, expected_note_text):
         """Test retrieval of audit log for a non-restricted user."""
         team = TeamFactory()
+        change_activity_type = InvestmentActivityType.change.value.id
         user, api_client = _create_user_and_api_client(self, team, permissions)
 
         initial_datetime = now()
@@ -3297,6 +3444,14 @@ class TestAuditLogView(APITestMixin):
             reversion.set_comment('Changed')
             reversion.set_date_created(changed_datetime)
             reversion.set_user(user)
+            if expected_note_text:
+                reversion.add_meta(
+                    InvestmentActivity,
+                    created_by=user,
+                    investment_project=iproject,
+                    text=expected_note_text,
+                    activity_type_id=change_activity_type,
+                )
 
         versions = Version.objects.get_for_object(iproject)
         version_id = versions[0].id
@@ -3320,6 +3475,10 @@ class TestAuditLogView(APITestMixin):
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
         assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
+        if expected_note_text:
+            assert entry['note']['text'] == expected_note_text
+        else:
+            assert entry['note'] is None
 
     def test_audit_log_restricted_user_associated_project(self):
         """Test retrieval of audit log for a restricted user and an associated project."""

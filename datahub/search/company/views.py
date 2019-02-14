@@ -7,20 +7,16 @@ from datahub.core.query_utils import get_front_end_url_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.company.models import Company
-from datahub.search.company.serializers import (
-    AutocompleteSearchCompanySerializer,
-    SearchCompanySerializer,
-)
+from datahub.search.company.serializers import SearchCompanyQuerySerializer
 from datahub.search.views import AutocompleteSearchListAPIView, SearchAPIView, SearchExportAPIView
 
 
-class SearchCompanyParams:
-    """Search company parameters."""
+class SearchCompanyAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Company
-    serializer_class = SearchCompanySerializer
-    autocomplete_serializer_class = AutocompleteSearchCompanySerializer
+    serializer_class = SearchCompanyQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }
@@ -69,11 +65,11 @@ class SearchCompanyParams:
     }
 
 
-class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
+class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
 
-class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
+class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
     queryset = DBCompany.objects.annotate(
@@ -113,7 +109,10 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
     }
 
 
-class CompanyAutocompleteSearchListAPIView(SearchCompanyParams, AutocompleteSearchListAPIView):
+class CompanyAutocompleteSearchListAPIView(
+    SearchCompanyAPIViewMixin,
+    AutocompleteSearchListAPIView,
+):
     """Company autocomplete search view."""
 
     document_fields = [

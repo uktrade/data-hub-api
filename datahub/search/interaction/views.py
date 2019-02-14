@@ -8,16 +8,16 @@ from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.interaction.models import Interaction
-from datahub.search.interaction.serializers import SearchInteractionSerializer
+from datahub.search.interaction.serializers import SearchInteractionQuerySerializer
 from datahub.search.views import SearchAPIView, SearchExportAPIView
 
 
-class SearchInteractionParams:
-    """Search interaction params."""
+class SearchInteractionAPIViewMixin:
+    """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
     entity = Interaction
-    serializer_class = SearchInteractionSerializer
+    serializer_class = SearchInteractionQuerySerializer
 
     FILTER_FIELDS = (
         'kind',
@@ -76,11 +76,11 @@ class SearchInteractionParams:
     }
 
 
-class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
+class SearchInteractionAPIView(SearchInteractionAPIViewMixin, SearchAPIView):
     """Filtered interaction search view."""
 
 
-class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
+class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExportAPIView):
     """Filtered interaction search export view."""
 
     queryset = DBInteraction.objects.annotate(

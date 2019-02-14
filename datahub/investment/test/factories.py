@@ -19,6 +19,7 @@ from datahub.core.constants import (
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.constants import (
+    InvestmentActivityType,
     InvestorType,
     Involvement,
     LikelihoodToLand,
@@ -161,3 +162,15 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentProjectTeamMember'
+
+
+class InvestmentActivityFactory(factory.django.DjangoModelFactory):
+    """Investment activity factory."""
+
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
+
+    text = factory.Faker('name')
+    activity_type_id = InvestmentActivityType.change.value.id
+
+    class Meta:
+        model = 'investment.InvestmentActivity'

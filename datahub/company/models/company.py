@@ -50,33 +50,9 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-class CompanyAbstract(models.Model):
-    """Share as much as possible in the company representation."""
-
-    name = models.CharField(max_length=MAX_LENGTH)
-    registered_address_1 = models.CharField(max_length=MAX_LENGTH)
-    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    registered_address_town = models.CharField(max_length=MAX_LENGTH)
-    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    registered_address_country = models.ForeignKey(
-        metadata_models.Country,
-        related_name="%(class)ss",  # noqa: Q000
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return self.name
-
-
 @reversion.register_base_model()
-class Company(ArchivableModel, BaseModel, CompanyAbstract):
-    """Representation of the company as per CDMS."""
+class Company(ArchivableModel, BaseModel):
+    """Representation of the company."""
 
     TRADING_ADDRESS_VALIDATION_MAPPING = {
         'trading_address_1': {'required': True},
@@ -91,6 +67,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    name = models.CharField(max_length=MAX_LENGTH)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -155,12 +132,12 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_export_to_countries',
+        related_name='companies_exporting_to',
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_future_interest_countries',
+        related_name='companies_with_future_interest',
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -171,7 +148,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     # address is the main location for the business, it could be the trading address
     # or the registered address or a completely different address
-    # TODO make address CharFields NOT NULL
+    # TODO: make address CharFields NOT NULL
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -181,12 +158,24 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-        related_name='company_address_country',
+        related_name='companies_with_country_address',
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    # will eventually become obsolete when the migration to solely address and registered
-    # address is completed
+    # TODO: make registered_address CharFields NOT NULL
+    registered_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_country = models.ForeignKey(
+        metadata_models.Country,
+        related_name='companies_with_country_registered_address',
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+
+    # TODO: delete once the migration to address and registered address is complete
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -196,7 +185,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='company_trading_address_country',
+        related_name='companies_with_country_trading_address',
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -248,6 +237,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return self.name
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
@@ -422,9 +415,10 @@ class OneListCoreTeamMember(models.Model):
         )
 
 
-class CompaniesHouseCompany(CompanyAbstract):
+class CompaniesHouseCompany(models.Model):
     """Representation of Companies House company."""
 
+    name = models.CharField(max_length=MAX_LENGTH)
     company_number = models.CharField(max_length=MAX_LENGTH, unique=True)
     company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -434,6 +428,17 @@ class CompaniesHouseCompany(CompanyAbstract):
     sic_code_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
     uri = models.CharField(max_length=MAX_LENGTH, blank=True)
     incorporation_date = models.DateField(null=True)
+
+    registered_address_1 = models.CharField(max_length=MAX_LENGTH)
+    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_town = models.CharField(max_length=MAX_LENGTH)
+    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_country = models.ForeignKey(
+        metadata_models.Country,
+        related_name='companieshousecompanies_with_country_registered_address',
+        on_delete=models.PROTECT,
+    )
+    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     def __str__(self):
         """Admin displayed human readable name."""

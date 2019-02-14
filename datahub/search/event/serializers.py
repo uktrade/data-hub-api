@@ -2,20 +2,26 @@ from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
 from datahub.search.serializers import (
-    EntitySearchSerializer,
+    EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
 
 
-class NestedDisabledOnOrFilterSerializer(serializers.Serializer):
-    """Serialiser used to validate disabled_on filter."""
+class NestedDisabledOnQuerySerializer(serializers.Serializer):
+    """
+    Serialiser used to validate disabled_on filter.
+
+    Validated data uses "or" operator. For example if you want to
+    find events that were disabled after certain date, but also those that
+    have not been disabled.
+    """
 
     exists = serializers.BooleanField(required=False)
     after = RelaxedDateTimeField(required=False)
 
 
-class SearchEventSerializer(EntitySearchSerializer):
+class SearchEventQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate Event search POST bodies.
 
     Nested disabled_on filters use "or" operator. For example if you want to
@@ -24,7 +30,7 @@ class SearchEventSerializer(EntitySearchSerializer):
     """
 
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
-    disabled_on = NestedDisabledOnOrFilterSerializer(required=False)
+    disabled_on = NestedDisabledOnQuerySerializer(required=False)
     disabled_on_exists = serializers.BooleanField(required=False)
     event_type = SingleOrListField(child=StringUUIDField(), required=False)
     lead_team = SingleOrListField(child=StringUUIDField(), required=False)
