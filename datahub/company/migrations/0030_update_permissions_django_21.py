@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('company', '0029_remove-parent-from-django'),
-        ('core', '0003_rename_read_permissions'),
     ]
 
     operations = [
