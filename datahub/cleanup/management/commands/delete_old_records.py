@@ -64,6 +64,7 @@ class Command(BaseCleanupCommand):
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
                 Company._meta.get_field('dnbmatchingresult'),
+                Company._meta.get_field('investor_profiles'),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
@@ -83,6 +84,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
+                Contact._meta.get_field('investor_profiles'): (),
             },
         ),
         'interaction.Interaction': ModelCleanupConfig(

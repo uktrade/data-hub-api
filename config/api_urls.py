@@ -46,7 +46,7 @@ v3_urls = [
         include(
             (investor_profile_urls, 'large-investor-profile'),
             namespace='large-investor-profile',
-        )
+        ),
     ),
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     path(

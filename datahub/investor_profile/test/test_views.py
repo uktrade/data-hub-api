@@ -1,0 +1,383 @@
+from datetime import datetime
+
+from django.utils.timezone import utc
+from freezegun import freeze_time
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
+
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.core.constants import (
+    Country as CountryConstant,
+    UKRegion as UKRegionConstant,
+)
+from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.investor_profile.constants import (
+    AssetClassInterest as AssetClassInterestConstant,
+    BackgroundChecksConducted as BackgroundChecksConductedConstant,
+    ConstructionRisk as ConstructionRiskConstant,
+    DealTicketSize as DealTicketSizeConstant,
+    DesiredDealRole as DesiredDealRoleConstant,
+    EquityPercentage as EquityPercentageConstant,
+    InvestorType as InvestorTypeConstant,
+    LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
+    ProfileType as ProfileTypeConstant,
+    RelationshipHealth as RelationshipHealthConstant,
+    Restriction as RestrictionConstant,
+    ReturnRate as ReturnRateConstant,
+    TimeHorizon as TimeHorizonConstant,
+)
+from datahub.investor_profile.test.factories import InvestorProfileFactory
+
+
+class TestCreateLargeCapitalProfileView(APITestMixin):
+    """Test creating a large capital profile"""
+
+    def test_large_capital_unauthorized_user_(self):
+        """Should return 401"""
+        url = reverse('api-v3:large-investor-profile:collection')
+        api_client = APIClient()
+        user = create_test_user()
+        response = api_client.get(url, user=user)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_create_large_capital_profile_fail(self):
+        """Test creating a large capital profile without an investor company."""
+        url = reverse('api-v3:large-investor-profile:collection')
+        request_data = {}
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'investor_company': ['This field is required.'],
+        }
+
+    def test_create_large_capital_profile_with_minimum_required_values(self):
+        """Test creating a large capital profile with minimum required fields."""
+        url = reverse('api-v3:large-investor-profile:collection')
+        investor_company = CompanyFactory()
+
+        request_data = {
+            'investor_company': {'id': investor_company.pk},
+        }
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+            response = self.api_client.post(url, data=request_data)
+
+        expected_incomplete_details_fields = [
+            'investor_type',
+            'investable_capital',
+            'investor_description',
+            'dit_relationship_manager',
+            'client_contacts',
+            'relationship_health',
+            'background_checks_conducted',
+        ]
+
+        expected_incomplete_requirements_fields = [
+            'deal_ticket_sizes',
+            'investment_types',
+            'minimum_return_rate',
+            'time_horizons',
+            'construction_risks',
+            'minimum_equity_percentage',
+            'desired_deal_roles',
+            'restrictions',
+            'asset_classes_of_interest',
+        ]
+
+        expected_incomplete_location_fields = [
+            'uk_region_locations',
+            'notes_on_locations',
+            'other_countries_considering',
+        ]
+
+        response_data = response.json()
+        assert 'id' in response_data
+        assert response_data['incomplete_details_fields'] == expected_incomplete_details_fields
+        assert (
+            response_data['incomplete_requirements_fields']
+            == expected_incomplete_requirements_fields
+        )
+        assert response_data['incomplete_location_fields'] == expected_incomplete_location_fields
+        assert response_data['investor_company']['id'] == str(investor_company.id)
+        assert response_data['profile_type']['id'] == str(ProfileTypeConstant.large.value.id)
+        assert response_data['created_on'] == '2017-04-28T17:35:00Z'
+        assert response_data['modified_on'] == '2017-04-28T17:35:00Z'
+
+    def test_create_large_capital_profile_fails_if_profile_already_exists(self):
+        """Test creating a large investor profile with minimum required fields."""
+        url = reverse('api-v3:large-investor-profile:collection')
+        investor_company = CompanyFactory()
+        InvestorProfileFactory(
+            investor_company=investor_company,
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+
+        request_data = {
+            'investor_company': {'id': investor_company.pk},
+        }
+
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        response_data = response.json()
+        assert response_data == {
+            'investor_company':
+                ['Investor company already has large capital investor profile'],
+        }
+
+
+class TestUpdateLargeCapitalProfileView(APITestMixin):
+    """Test updating a large capital profile"""
+
+    def test_patch_large_capital_profile(self):
+        """Test updating a large capital profile"""
+        new_description = 'Description 2'
+        investor_company = CompanyFactory()
+        investor_profile = InvestorProfileFactory(
+            investor_company=investor_company,
+            profile_type_id=ProfileTypeConstant.large.value.id,
+            investor_description='Description 1',
+        )
+        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+
+        request_data = {
+            'investor_description': new_description,
+        }
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK, response_data
+        assert response_data['investor_description'] == new_description
+
+        investor_profile.refresh_from_db()
+        assert investor_profile.investor_description == new_description
+        assert 'investor_description' not in response_data['incomplete_details_fields']
+
+    def test_patch_large_capital_profile_all_details_fields(self):
+        """Test updating the details fields for a large capital profile"""
+        adviser = AdviserFactory()
+        investor_company = CompanyFactory()
+        contacts = [ContactFactory(), ContactFactory()]
+        investor_profile = InvestorProfileFactory(
+            investor_company=investor_company,
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+
+        request_data = {
+            'investor_description': 'Description',
+            'investor_type': {'id': InvestorTypeConstant.state_pension_fund.value.id},
+            'investable_capital': 1000,
+            'dit_relationship_manager': {'id': str(adviser.id)},
+            'relationship_health': {'id': RelationshipHealthConstant.good.value.id},
+            'background_checks_conducted': {'id': BackgroundChecksConductedConstant.yes.value.id},
+            'client_contacts': [
+                {
+                    'id': str(contacts[0].id),
+                },
+                {
+                    'id': str(contacts[1].id),
+                },
+            ],
+        }
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK, response_data
+        assert response_data['incomplete_details_fields'] == []
+        assert response_data['investor_description'] == 'Description'
+        assert response_data['investable_capital'] == str(1000)
+        assert (
+            response_data['investor_type']['id']
+            == str(InvestorTypeConstant.state_pension_fund.value.id)
+        )
+        assert (
+            response_data['dit_relationship_manager']['id']
+            == str(adviser.id)
+        )
+        assert (
+            response_data['relationship_health']['id']
+            == str(RelationshipHealthConstant.good.value.id)
+        )
+        assert (
+            response_data['background_checks_conducted']['id']
+            == str(BackgroundChecksConductedConstant.yes.value.id)
+        )
+        expected_client_contacts = [
+            str(contacts[0].pk),
+            str(contacts[1].pk),
+        ]
+        self._assert_many_field_ids(
+            response_data, 'client_contacts', expected_client_contacts,
+        )
+
+    def test_patch_large_capital_profile_all_requirements_fields(self):
+        """Test updating the requirements fields for a large capital profile"""
+        direct_investment_equity_id = (
+            LargeCapitalInvestmentTypesConstant.direct_investment_in_project_equity.value.id
+        )
+
+        investor_profile = InvestorProfileFactory(
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        request_data = {
+            'deal_ticket_sizes': [
+                {'id': DealTicketSizeConstant.up_to_forty_nine_million.value.id},
+            ],
+            'investment_types': [
+                {'id': direct_investment_equity_id},
+            ],
+            'minimum_return_rate': {'id': ReturnRateConstant.up_to_five_percent.value.id},
+            'time_horizons': [
+                {'id': TimeHorizonConstant.up_to_five_years.value.id},
+                {'id': TimeHorizonConstant.five_to_nine_years.value.id},
+            ],
+            'construction_risks': [
+                {'id': ConstructionRiskConstant.greenfield.value.id},
+                {'id': ConstructionRiskConstant.brownfield.value.id},
+            ],
+            'minimum_equity_percentage': {'id': EquityPercentageConstant.zero_percent.value.id},
+            'desired_deal_roles': [
+                {'id': DesiredDealRoleConstant.lead_manager.value.id},
+                {'id': DesiredDealRoleConstant.co_leader_manager.value.id},
+            ],
+            'restrictions': [
+                {'id': RestrictionConstant.liquidity.value.id},
+                {'id': RestrictionConstant.inflation_adjustment.value.id},
+
+            ],
+            'asset_classes_of_interest': [
+                {'id': AssetClassInterestConstant.biofuel.value.id},
+                {'id': AssetClassInterestConstant.biomass.value.id},
+            ],
+        }
+
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK, response_data
+        assert response_data['incomplete_requirements_fields'] == []
+        assert (
+            response_data['deal_ticket_sizes'][0]['id']
+            == str(DealTicketSizeConstant.up_to_forty_nine_million.value.id)
+        )
+        assert response_data['investment_types'][0]['id'] == str(direct_investment_equity_id)
+        assert (
+            response_data['minimum_return_rate']['id']
+            == str(ReturnRateConstant.up_to_five_percent.value.id)
+        )
+        assert (
+            response_data['minimum_equity_percentage']['id']
+            == str(EquityPercentageConstant.zero_percent.value.id)
+        )
+
+        expected_time_horizons = [
+            TimeHorizonConstant.up_to_five_years.value.id,
+            TimeHorizonConstant.five_to_nine_years.value.id,
+        ]
+        self._assert_many_field_ids(response_data, 'time_horizons', expected_time_horizons)
+
+        expected_construction_risks = [
+            ConstructionRiskConstant.greenfield.value.id,
+            ConstructionRiskConstant.brownfield.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'construction_risks', expected_construction_risks,
+        )
+
+        expected_desired_deal_roles = [
+            DesiredDealRoleConstant.lead_manager.value.id,
+            DesiredDealRoleConstant.co_leader_manager.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'desired_deal_roles', expected_desired_deal_roles,
+        )
+
+        expected_restrictions = [
+            RestrictionConstant.liquidity.value.id,
+            RestrictionConstant.inflation_adjustment.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'restrictions', expected_restrictions,
+        )
+
+        expected_asset_classes_of_interest = [
+            AssetClassInterestConstant.biofuel.value.id,
+            AssetClassInterestConstant.biomass.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'asset_classes_of_interest', expected_asset_classes_of_interest,
+        )
+
+    def test_patch_large_capital_profile_all_location_fields(self):
+        """Test updating the location fields for a large capital profile"""
+        investor_profile = InvestorProfileFactory(
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        request_data = {
+            'uk_region_locations': [
+                {'id': UKRegionConstant.north_east.value.id},
+                {'id': UKRegionConstant.north_west.value.id},
+            ],
+            'other_countries_considering': [
+                {'id': CountryConstant.ireland.value.id},
+                {'id': CountryConstant.argentina.value.id},
+            ],
+            'notes_on_locations': 'Notes',
+        }
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK, response_data
+        assert response_data['incomplete_location_fields'] == []
+        assert response_data['notes_on_locations'] == 'Notes'
+
+        expected_uk_region_locations = [
+            UKRegionConstant.north_east.value.id,
+            UKRegionConstant.north_west.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'uk_region_locations', expected_uk_region_locations,
+        )
+
+        expected_other_countries_considering = [
+            CountryConstant.ireland.value.id,
+            CountryConstant.argentina.value.id,
+        ]
+        self._assert_many_field_ids(
+            response_data, 'other_countries_considering', expected_other_countries_considering,
+        )
+
+    def test_patch_large_capital_profile_with_additional_fields(self):
+        """
+        Test updating fields that are deemed additional
+        ie. not necessary for a profile to be complete.
+        """
+        adviser_1 = AdviserFactory()
+        adviser_2 = AdviserFactory()
+        investor_profile = InvestorProfileFactory(
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        request_data = {
+            'dit_advisers': [
+                {'id': str(adviser_1.pk)},
+                {'id': str(adviser_2.pk)},
+            ],
+        }
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK, response_data
+
+        expected_dit_advisers = [
+            str(adviser_1.pk),
+            str(adviser_2.pk),
+        ]
+        self._assert_many_field_ids(
+            response_data, 'dit_advisers', expected_dit_advisers,
+        )
+
+    def _assert_many_field_ids(self, response_data, field_name, expected_ids):
+        assert len(response_data[field_name]) == len(expected_ids)
+        assert (
+            set([field['id'] for field in response_data[field_name]]) == set(expected_ids)
+        ), field_name

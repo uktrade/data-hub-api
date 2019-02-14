@@ -18,7 +18,3 @@ class LargeCapitalInvestorProfileViewSet(CoreViewSet):
     def get_queryset(self):
         """Returns only large capital investor profile queryset"""
         return InvestorProfile.objects.filter(profile_type_id=self.profile_type_id)
-
-    def perform_create(self, serializer):
-        """Sets the large capital profile type"""
-        serializer.save(profile_type_id=self.profile_type_id)

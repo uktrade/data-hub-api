@@ -2,15 +2,19 @@ from django.urls import path
 
 from datahub.investor_profile.views import LargeCapitalInvestorProfileViewSet
 
-collection = LargeCapitalInvestorProfileViewSet.as_view({
+GET_AND_POST = {
     'get': 'list',
     'post': 'create',
-})
+}
 
-item = LargeCapitalInvestorProfileViewSet.as_view({
+GET_AND_PATCH_ITEM = {
     'get': 'retrieve',
     'patch': 'partial_update',
-})
+}
+
+collection = LargeCapitalInvestorProfileViewSet.as_view(actions=GET_AND_POST)
+
+item = LargeCapitalInvestorProfileViewSet.as_view(actions=GET_AND_PATCH_ITEM)
 
 urlpatterns = [
     path('large-investor-profile', collection, name='collection'),

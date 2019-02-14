@@ -10,7 +10,8 @@ import uuid
 
 
 metadata_files = [
-    'asset_interest_class.yaml',
+    'asset_class_interest_sector.yaml',
+    'asset_class_interest.yaml',
     'background_checks_conducted.yaml',
     'construction_risk.yaml',
     'deal_ticket_size.yaml',
@@ -45,13 +46,26 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='AssetClassInterestSector',
+            fields=[
+                ('disabled_on', models.DateTimeField(blank=True, null=True)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('name', models.TextField(blank=True)),
+                ('order', models.FloatField(default=0.0)),
+            ],
+            options={
+                'ordering': ('order',),
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='AssetClassInterest',
             fields=[
                 ('disabled_on', models.DateTimeField(blank=True, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.TextField(blank=True)),
-                ('asset_interest_sector', models.CharField(max_length=255)),
                 ('order', models.FloatField(default=0.0)),
+                ('asset_class_interest_sector', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='asset_class_interests', to='investor_profile.AssetClassInterestSector'),)
             ],
             options={
                 'ordering': ('order',),
@@ -298,9 +312,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='investorprofile',
-            name='dit_advisors',
+            name='dit_advisers',
             field=models.ManyToManyField(blank=True,
-                                         related_name='_investorprofile_dit_advisors_+',
+                                         related_name='_investorprofile_dit_advisers_+',
                                          to=settings.AUTH_USER_MODEL),
         ),
         migrations.RunPython(load_metadata, migrations.RunPython.noop),

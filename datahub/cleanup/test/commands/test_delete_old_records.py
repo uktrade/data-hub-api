@@ -40,6 +40,7 @@ from datahub.interaction.test.factories import (
 from datahub.investment.evidence.test.factories import EvidenceDocumentFactory
 from datahub.investment.proposition.test.factories import PropositionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investor_profile.test.factories import InvestorProfileFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.payment.test.factories import (
     ApprovedRefundFactory,
@@ -242,6 +243,17 @@ MAPPING = {
             {
                 'factory': OrderFactory,
                 'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': InvestorProfileFactory,
+                'field': 'client_contacts',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {

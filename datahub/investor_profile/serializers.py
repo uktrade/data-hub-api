@@ -6,6 +6,7 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investor_profile.models import (
     AssetClassInterest,
+    AssetClassInterestSector,
     BackgroundChecksConducted,
     ConstructionRisk,
     DealTicketSize,
@@ -49,7 +50,7 @@ LARGE_CAPITAL_DETAILS_FIELDS = [
 ]
 
 ADDITIONAL_LARGE_CAPITAL_DETAILS_FIELDS = [
-    'dit_advisors',
+    'dit_advisers',
 ]
 
 LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
@@ -123,7 +124,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    dit_advisors = NestedRelatedField(
+    dit_advisers = NestedRelatedField(
         Advisor,
         many=True,
         required=False,
@@ -226,6 +227,11 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def create(self, validated_data):
+        """Overrides the create method to add the large profile type id into the data."""
+        validated_data['profile_type_id'] = ProfileTypeConstant.large.value.id
+        return super().create(validated_data)
+
     class Meta:
         model = InvestorProfile
         fields = ALL_LARGE_CAPITAL_FIELDS
@@ -234,4 +240,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
 class AssetClassInterestSerializer(ConstantModelSerializer):
     """Asset class interest serializer"""
 
-    asset_interest_sector = serializers.ReadOnlyField()
+    asset_class_interest_sector = NestedRelatedField(
+        AssetClassInterestSector,
+        read_only=True,
+    )

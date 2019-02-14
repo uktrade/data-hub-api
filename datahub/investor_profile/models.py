@@ -69,7 +69,7 @@ class InvestorProfile(BaseModel):
         null=True,
     )
 
-    dit_advisors = models.ManyToManyField(
+    dit_advisers = models.ManyToManyField(
         'company.Advisor',
         related_name='+',
         blank=True,
@@ -171,6 +171,10 @@ class InvestorProfile(BaseModel):
     class Meta:
         unique_together = ('investor_company', 'profile_type')
 
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.investor_company}, {self.profile_type} capital profile'
+
 
 class ProfileType(BaseOrderedConstantModel):
     """Investor profile type metadata"""
@@ -220,11 +224,15 @@ class BackgroundChecksConducted(BaseOrderedConstantModel):
     """Background checks conducted metadata"""
 
 
+class AssetClassInterestSector(BaseOrderedConstantModel):
+    """Asset class interest sector metadata"""
+
+
 class AssetClassInterest(BaseOrderedConstantModel):
     """Asset class interest metadata"""
 
-    asset_interest_sector = models.CharField(
-        max_length=MAX_LENGTH,
-        null=False,
-        blank=False,
+    asset_class_interest_sector = models.ForeignKey(
+        AssetClassInterestSector,
+        related_name='asset_class_interests',
+        on_delete=models.CASCADE,
     )

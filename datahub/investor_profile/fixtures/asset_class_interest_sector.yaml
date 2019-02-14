@@ -1,0 +1,6 @@
+- model: investor_profile.assetclassinterestsector
+  pk: f3eb86b0-d53c-488d-8d64-47ab3294a6bf
+  fields: {disabled_on: null, name: Energy and infrastructure, order: 100}
+- model: investor_profile.assetclassinterestsector
+  pk: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47
+  fields: {disabled_on: null, name: Real estate, order: 200}

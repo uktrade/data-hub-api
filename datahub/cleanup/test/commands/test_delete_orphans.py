@@ -25,6 +25,7 @@ from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investor_profile.test.factories import InvestorProfileFactory
 from datahub.omis.order.test.factories import (
     OrderFactory,
 )
@@ -51,6 +52,7 @@ MAPPINGS = {
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
+            (InvestorProfileFactory, 'client_contacts'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
@@ -67,6 +69,7 @@ MAPPINGS = {
             (CompanyFactory, 'transferred_to'),
             (CompanyFactory, 'global_headquarters'),
             (OneListCoreTeamMemberFactory, 'company'),
+            (InvestorProfileFactory, 'investor_company'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
