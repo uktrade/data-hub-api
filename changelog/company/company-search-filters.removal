@@ -1,8 +1,0 @@
-``POST /v3/search/company``, ``POST /v3/search/company/export`` the following filters are deprecated and will be removed on or after the 21st of February:
-
-- ``description``
-- ``export_to_country``
-- ``future_interest_country``
-- ``global_headquarters``
-- ``sector``
-- ``trading_address_country``
