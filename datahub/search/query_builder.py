@@ -74,19 +74,19 @@ def get_basic_search_query(
 
 
 def get_search_by_entity_query(
+        entity,
         term=None,
         filter_data=None,
         composite_field_mapping=None,
         permission_filters=None,
-        entity=None,
         ordering=None,
+        fields_to_include=None,
+        fields_to_exclude=None,
 ):
     """
     Performs filtered search for given terms in given entity.
-
-    :param permission_filters: dict of field names and values. These represent rules that records
-                               must match one of to be included in the results.
     """
+    filter_data = filter_data or {}
     query = [Term(_type=entity._doc_type.name)]
     if term != '':
         query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -107,16 +107,22 @@ def get_search_by_entity_query(
         s = s.filter(permission_query)
 
     s = s.filter(Bool(must=must_filter))
+    s = _apply_sorting_to_query(s, ordering)
+    return _apply_source_filtering_to_query(
+        s,
+        fields_to_include=fields_to_include,
+        fields_to_exclude=fields_to_exclude,
+    )
 
-    return _apply_sorting_to_query(s, ordering)
 
-
-def build_autocomplete_query(es_model, keyword_search, limit, only_return_fields):
+def build_autocomplete_query(es_model, keyword_search, limit, fields_to_include):
     """Builds the query for autocomplete search and applies source filtering."""
     index = es_model.get_read_alias()
     autocomplete_search = es_model.search(index=index)
-    if only_return_fields:
-        autocomplete_search = autocomplete_search.extra(_source={'include': only_return_fields})
+    autocomplete_search = _apply_source_filtering_to_query(
+        autocomplete_search,
+        fields_to_include=fields_to_include,
+    )
     return autocomplete_search.suggest(
         'autocomplete',
         keyword_search,
@@ -355,3 +361,7 @@ def _apply_sorting_to_query(query, ordering):
         {ordering.field: sort_params},
         'id',
     )
+
+
+def _apply_source_filtering_to_query(query, fields_to_include=None, fields_to_exclude=None):
+    return query.source(includes=fields_to_include, excludes=fields_to_exclude)
