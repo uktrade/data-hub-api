@@ -13,7 +13,6 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
-from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
@@ -74,10 +73,6 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
             ),
             (
                 CompanyFactory,
-                lambda: InvestmentProjectFactory().investor_company,
-            ),
-            (
-                CompanyFactory,
                 lambda: OrderFactory().company,
             ),
             (
@@ -91,7 +86,6 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         ),
         ids=[
             'archived-company',
-            'company-with-investment-project',
             'company-with-order',
             'subsidiary',
             'global-headquarters',
@@ -105,8 +99,8 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
     ):
         """
         Tests that the radio button to select a company is disabled if it is archived,
-        or the other company has an investment project, OMIS order or other related object
-        (other than an interaction or contact).
+        or the other company has an OMIS order or other related object
+        (other than an interaction, contact or investment project).
         """
         company_1 = (company_2_factory if swap else company_1_factory)()
         company_2 = (company_1_factory if swap else company_2_factory)()
@@ -186,12 +180,6 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
             ),
             (
                 CompanyFactory,
-                lambda: InvestmentProjectFactory().investor_company,
-                'The other company has related records which can’t be moved to the selected '
-                'company.',
-            ),
-            (
-                CompanyFactory,
                 lambda: OrderFactory().company,
                 'The other company has related records which can’t be moved to the selected '
                 'company.',
@@ -240,7 +228,6 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
                 'selected_company': selected_company,
             },
         )
-
         assert response.status_code == status.HTTP_200_OK
         form = response.context['form']
         assert form.errors == {

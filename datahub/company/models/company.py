@@ -280,6 +280,7 @@ class Company(ArchivableModel, BaseModel):
 
         This is used, for example, for marking a company as a duplicate record.
         """
+        self.modified_by = user
         self.transfer_reason = reason
         self.transferred_by = user
         self.transferred_on = now()
