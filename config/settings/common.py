@@ -87,7 +87,7 @@ LOCAL_APPS = [
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.investment.report',
     'datahub.user_event_log',
-
+    'datahub.investor_profile',
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
 ]

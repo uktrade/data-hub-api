@@ -10,6 +10,7 @@ from datahub.event import urls as event_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
+from datahub.investor_profile import urls as investor_profile_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
 
@@ -40,6 +41,13 @@ v3_urls = [
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
     path('', include((search_urls.urls_v3, 'search'), namespace='search')),
+    path(
+        '',
+        include(
+            (investor_profile_urls, 'large-investor-profile'),
+            namespace='large-investor-profile',
+        )
+    ),
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     path(
         'omis/public/',
