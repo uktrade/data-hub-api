@@ -1,0 +1,7 @@
+This adds a new ``autocomplete`` query parameter to ``GET /adviser/`` intended to replace the previous name-related query parameters.
+
+The new parameter matches prefixes of words in the ``first_name``, ``last_name`` and ``dit_team.name`` fields. Each token must match the prefix of at least one word in (at least) one of those fields.
+
+Results are automatically ordered with advisers with a match on ``first_name`` appearing first, `last_name`` second and ``dit_team.name`` last.
+
+As a result, the ``first_name``, ``first_name__icontains``, ``last_name``, ``last_name__icontains``, ``email`` and ``email__icontains`` query parameters are deprecated and will be removed on or after 4 March 2019.
