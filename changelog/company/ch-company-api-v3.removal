@@ -1,4 +1,0 @@
-The following endpoints are deprecated and will be removed on or after the 21st of February, please use v4 instead:
-
-- ``/v3/ch-company``
-- ``/v3/ch-company/<uuid:pk>``
