@@ -23,9 +23,9 @@ def test_investment_project_auto_sync_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={'name': test_name},
-        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -40,9 +40,9 @@ def test_investment_project_auto_updates_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={'name': new_test_name},
-        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -59,9 +59,9 @@ def test_investment_project_team_member_added_sync_to_es(setup_es, team_member):
     setup_es.indices.refresh()
 
     results = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={},
-        entity=InvestmentProject,
     ).execute()
 
     assert len(results) == 1
@@ -79,9 +79,9 @@ def test_investment_project_team_member_updated_sync_to_es(setup_es, team_member
     setup_es.indices.refresh()
 
     results = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={},
-        entity=InvestmentProject,
     ).execute()
 
     assert len(results) == 1
@@ -97,9 +97,9 @@ def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member
     setup_es.indices.refresh()
 
     results = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={},
-        entity=InvestmentProject,
     ).execute()
 
     assert len(results) == 1
@@ -131,9 +131,9 @@ def test_investment_project_syncs_when_adviser_changes(setup_es, field):
     setup_es.indices.refresh()
 
     result = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={'id': project.pk},
-        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -154,9 +154,9 @@ def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, tea
     setup_es.indices.refresh()
 
     result = get_search_by_entity_query(
+        InvestmentProject,
         term='',
         filter_data={'id': team_member.investment_project.pk},
-        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
