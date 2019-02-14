@@ -295,7 +295,7 @@ class AutocompleteSearchListAPIView(ListAPIView):
             self.search_app.es_model,
             validated_params['term'],
             validated_params['limit'],
-            fields_to_include=self.document_fields,
+            self.document_fields,
         )
 
         return Response(data={
