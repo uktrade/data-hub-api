@@ -9,7 +9,7 @@ from datahub.search.query_builder import build_autocomplete_query
 logger = getLogger(__name__)
 
 
-def execute_autocomplete_query(es_model, keyword_search, limit, fields_to_include=None):
+def execute_autocomplete_query(es_model, keyword_search, limit, fields_to_include):
     """Executes the query for autocomplete search returning all suggested documents."""
     autocomplete_search = build_autocomplete_query(
         es_model,
