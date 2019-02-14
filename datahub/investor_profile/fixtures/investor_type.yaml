@@ -1,0 +1,15 @@
+- model: investor_profile.investortype
+  pk: feb117ea-6a3d-4e89-a548-33cf4afc03af
+  fields: {disabled_on: null, name: Sovereign Wealth Fund, order: 100}
+- model: investor_profile.investortype
+  pk: ac294431-94ba-4318-9b27-75f0ada99c0d
+  fields: {disabled_on: null, name: State Pension Fund, order: 200}
+- model: investor_profile.investortype
+  pk: efd87186-ae34-44c4-8dd2-a8796dec7089
+  fields: {disabled_on: null, name: Regulated Insurance / Investment Fund, order: 300}
+- model: investor_profile.investortype
+  pk: fa96518f-81e6-468a-ba63-7f25037c57b1
+  fields: {disabled_on: null, name: Corporation, order: 400}
+- model: investor_profile.investortype
+  pk: 26b09c4e-a13c-47e5-926c-6f8079035477
+  fields: {disabled_on: null, name: Other, order: 500}

@@ -33,7 +33,6 @@ registry.register(
     model=models.InvestmentDeliveryPartner,
 )
 
-
 registry.register(
     metadata_id='likelihood-to-land',
     model=models.LikelihoodToLand,
