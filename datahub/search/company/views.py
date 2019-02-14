@@ -118,7 +118,6 @@ class CompanyAutocompleteSearchListAPIView(
     document_fields = [
         'id',
         'name',
-        'trading_name',
         'trading_names',
         'trading_address_1',
         'trading_address_2',
