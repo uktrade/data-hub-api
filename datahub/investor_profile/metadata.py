@@ -1,10 +1,12 @@
 from datahub.investor_profile import models
+from datahub.investor_profile.serializers import AssetClassInterestSerializer
 from datahub.metadata.registry import registry
 
 
 registry.register(
     metadata_id='asset-class-interest',
     model=models.AssetClassInterest,
+    serializer=AssetClassInterestSerializer,
 )
 
 registry.register(

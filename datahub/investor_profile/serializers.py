@@ -1,12 +1,26 @@
 from rest_framework import serializers
 
-from datahub.company.models import Company
-from datahub.core.serializers import NestedRelatedField
+import datahub.metadata.models as meta_models
+from datahub.company.models import Advisor, Company, Contact
+from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investor_profile.models import (
+    AssetClassInterest,
+    BackgroundChecksConducted,
+    ConstructionRisk,
+    DealTicketSize,
+    DesiredDealRole,
+    EquityPercentage,
     InvestorProfile,
+    InvestorType,
+    LargeCapitalInvestmentType,
     ProfileType,
+    RelationshipHealth,
+    Restriction,
+    ReturnRate,
+    TimeHorizon,
 )
+from datahub.investor_profile.validate import get_incomplete_fields
 
 
 BASE_FIELDS = [
@@ -16,6 +30,55 @@ BASE_FIELDS = [
     'investor_company',
     'profile_type',
 ]
+
+INCOMPLETE_LIST_FIELDS = [
+    'incomplete_details_fields',
+    'incomplete_requirements_fields',
+    'incomplete_location_fields',
+]
+
+
+LARGE_CAPITAL_DETAILS_FIELDS = [
+    'investor_type',
+    'investable_capital',
+    'investor_description',
+    'dit_relationship_manager',
+    'client_contacts',
+    'relationship_health',
+    'background_checks_conducted',
+]
+
+ADDITIONAL_LARGE_CAPITAL_DETAILS_FIELDS = [
+    'dit_advisors',
+]
+
+LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
+    'deal_ticket_sizes',
+    'investment_types',
+    'minimum_return_rate',
+    'time_horizons',
+    'construction_risks',
+    'minimum_equity_percentage',
+    'desired_deal_roles',
+    'restrictions',
+    'asset_classes_of_interest',
+]
+
+
+LARGE_CAPITAL_LOCATION_FIELDS = [
+    'uk_region_locations',
+    'notes_on_locations',
+    'other_countries_considering',
+]
+
+ALL_LARGE_CAPITAL_FIELDS = (
+    BASE_FIELDS
+    + INCOMPLETE_LIST_FIELDS
+    + LARGE_CAPITAL_DETAILS_FIELDS
+    + ADDITIONAL_LARGE_CAPITAL_DETAILS_FIELDS
+    + LARGE_CAPITAL_REQUIREMENTS_FIELDS
+    + LARGE_CAPITAL_LOCATION_FIELDS
+)
 
 
 class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
@@ -39,6 +102,120 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    investor_type = NestedRelatedField(
+        InvestorType,
+        required=False,
+    )
+
+    background_checks_conducted = NestedRelatedField(
+        BackgroundChecksConducted,
+        required=False,
+    )
+
+    client_contacts = NestedRelatedField(
+        Contact,
+        many=True,
+        required=False,
+    )
+
+    dit_relationship_manager = NestedRelatedField(
+        Advisor,
+        required=False,
+    )
+
+    dit_advisors = NestedRelatedField(
+        Advisor,
+        many=True,
+        required=False,
+    )
+
+    relationship_health = NestedRelatedField(
+        RelationshipHealth,
+        required=False,
+    )
+
+    deal_ticket_sizes = NestedRelatedField(
+        DealTicketSize,
+        many=True,
+        required=False,
+    )
+
+    investment_types = NestedRelatedField(
+        LargeCapitalInvestmentType,
+        many=True,
+        required=False,
+    )
+
+    minimum_return_rate = NestedRelatedField(
+        ReturnRate,
+        required=False,
+    )
+
+    time_horizons = NestedRelatedField(
+        TimeHorizon,
+        many=True,
+        required=False,
+    )
+
+    restrictions = NestedRelatedField(
+        Restriction,
+        many=True,
+        required=False,
+    )
+
+    construction_risks = NestedRelatedField(
+        ConstructionRisk,
+        many=True,
+        required=False,
+    )
+
+    minimum_equity_percentage = NestedRelatedField(
+        EquityPercentage,
+        required=False,
+    )
+
+    desired_deal_roles = NestedRelatedField(
+        DesiredDealRole,
+        many=True,
+        required=False,
+    )
+
+    uk_region_locations = NestedRelatedField(
+        meta_models.UKRegion,
+        many=True,
+        required=False,
+    )
+
+    other_countries_considering = NestedRelatedField(
+        meta_models.Country,
+        many=True,
+        required=False,
+    )
+
+    asset_classes_of_interest = NestedRelatedField(
+        AssetClassInterest,
+        many=True,
+        required=False,
+    )
+
+    incomplete_details_fields = serializers.SerializerMethodField()
+
+    incomplete_requirements_fields = serializers.SerializerMethodField()
+
+    incomplete_location_fields = serializers.SerializerMethodField()
+
+    def get_incomplete_details_fields(self, instance):
+        """Returns a list of all the detail fields that are incomplete"""
+        return get_incomplete_fields(instance, LARGE_CAPITAL_DETAILS_FIELDS)
+
+    def get_incomplete_requirements_fields(self, instance):
+        """Returns a list of all the requirement fields that are incomplete"""
+        return get_incomplete_fields(instance, LARGE_CAPITAL_REQUIREMENTS_FIELDS)
+
+    def get_incomplete_location_fields(self, instance):
+        """Returns a list of all the location fields that are incomplete"""
+        return get_incomplete_fields(instance, LARGE_CAPITAL_LOCATION_FIELDS)
+
     def validate_investor_company(self, value):
         """Validates the company does not already have a large capital investment profile"""
         if value.investor_profiles.filter(
@@ -51,4 +228,10 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestorProfile
-        fields = BASE_FIELDS
+        fields = ALL_LARGE_CAPITAL_FIELDS
+
+
+class AssetClassInterestSerializer(ConstantModelSerializer):
+    """Asset class interest serializer"""
+
+    asset_interest_sector = serializers.ReadOnlyField()
