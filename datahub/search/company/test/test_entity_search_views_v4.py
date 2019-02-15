@@ -1,5 +1,5 @@
+import uuid
 from cgi import parse_header
-from collections import Counter
 from csv import DictReader
 from io import StringIO
 from unittest import mock
@@ -25,6 +25,7 @@ from datahub.core.test_utils import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.company.models import get_suggestions
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = pytest.mark.django_db
@@ -35,6 +36,7 @@ def setup_data(setup_es):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
+    country_anguilla = constants.Country.anguilla.value.id
     uk_region = constants.UKRegion.south_east.value.id
     CompanyFactory(
         name='abc defg ltd',
@@ -42,6 +44,8 @@ def setup_data(setup_es):
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_uk,
+        registered_address_country_id=country_uk,
+        address_country_id=country_uk,
         uk_region_id=uk_region,
     )
     CompanyFactory(
@@ -52,6 +56,16 @@ def setup_data(setup_es):
         trading_address_country_id=country_us,
         registered_address_country_id=country_us,
         address_country_id=country_us,
+    )
+    CompanyFactory(
+        name='archived',
+        trading_names=[],
+        trading_address_1='Main Lane',
+        trading_address_town='Somewhere',
+        trading_address_country_id=country_anguilla,
+        registered_address_country_id=country_anguilla,
+        address_country_id=country_anguilla,
+        archived=True,
     )
     setup_es.indices.refresh()
 
@@ -85,74 +99,190 @@ class TestSearch(APITestMixin):
         """Should return 403"""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize(
-        'archived',
-        (
-            True,
-            False,
-        ),
-    )
-    def test_archived_filter(self, setup_es, archived):
-        """Tests filtering by archived."""
-        matching_companies = CompanyFactory.create_batch(5, archived=archived)
-        CompanyFactory.create_batch(2, archived=not archived)
-
+    def test_response_body(self, setup_es):
+        """Tests the response body of a search query."""
+        company = CompanyFactory(
+            company_number='123',
+            trading_names=['Xyz trading', 'Abc trading'],
+            global_headquarters=None,
+            one_list_tier=None,
+            one_list_account_owner=None,
+        )
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 1,
+            'results': [
+                {
+                    'id': str(company.pk),
+                    'created_on': company.created_on.isoformat(),
+                    'modified_on': company.modified_on.isoformat(),
+                    'name': company.name,
+                    'reference_code': company.reference_code,
+                    'company_number': company.company_number,
+                    'vat_number': company.vat_number,
+                    'duns_number': company.duns_number,
+                    'trading_names': company.trading_names,
+                    'address': {
+                        'line_1': company.address_1,
+                        'line_2': company.address_2 or '',
+                        'town': company.address_town,
+                        'county': company.address_county or '',
+                        'postcode': company.address_postcode or '',
+                        'country': {
+                            'id': str(company.trading_address_country.id),
+                            'name': company.trading_address_country.name,
+                        },
+                    },
+                    'registered_address': {
+                        'line_1': company.registered_address_1,
+                        'line_2': company.registered_address_2 or '',
+                        'town': company.registered_address_town,
+                        'county': company.registered_address_county or '',
+                        'postcode': company.registered_address_postcode or '',
+                        'country': {
+                            'id': str(company.registered_address_country.id),
+                            'name': company.registered_address_country.name,
+                        },
+                    },
+                    'uk_based': (
+                        company.address_country.id == uuid.UUID(
+                            constants.Country.united_kingdom.value.id,
+                        )
+                    ),
+                    'uk_region': {
+                        'id': str(company.uk_region.id),
+                        'name': company.uk_region.name,
+                    },
+                    'business_type': {
+                        'id': str(company.business_type.id),
+                        'name': company.business_type.name,
+                    },
+                    'contacts': [],
+                    'description': company.description,
+                    'employee_range': {
+                        'id': str(company.employee_range.id),
+                        'name': company.employee_range.name,
+                    },
+                    'export_experience_category': {
+                        'id': str(company.export_experience_category.id),
+                        'name': company.export_experience_category.name,
+                    },
+                    'export_to_countries': [],
+                    'future_interest_countries': [],
+                    'headquarter_type': company.headquarter_type,
+                    'sector': {
+                        'id': str(company.sector.id),
+                        'name': company.sector.name,
+                        'ancestors': [
+                            {'id': str(ancestor.id)}
+                            for ancestor in company.sector.get_ancestors()
+                        ],
+                    },
+                    'turnover_range': {
+                        'id': str(company.turnover_range.id),
+                        'name': company.turnover_range.name,
+                    },
+                    'website': company.website,
+                    'global_headquarters': None,
+                    'archived': False,
+                    'archived_by': None,
+                    'archived_on': None,
+                    'archived_reason': None,
+                    'suggest': get_suggestions(company),
+                },
+            ],
+        }
+
+    @pytest.mark.parametrize(
+        'filters,expected_companies',
+        (
+            # no filter
+            (
+                {},
+                ['abc defg ltd', 'abc defg us ltd', 'archived'],
+            ),
+
+            # archived True
+            (
+                {
+                    'archived': True,
+                },
+                ['archived'],
+            ),
+
+            # archived False
+            (
+                {
+                    'archived': False,
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # trading_address_country
+            (
+                {
+                    'trading_address_country': constants.Country.united_states.value.id,
+                },
+                ['abc defg us ltd'],
+            ),
+
+            # multiple trading_address_country filters
+            (
+                {
+                    'trading_address_country': [
+                        constants.Country.united_states.value.id,
+                        constants.Country.united_kingdom.value.id,
+                    ],
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # uk_region
+            (
+                {
+                    'uk_region': constants.UKRegion.south_east.value.id,
+                },
+                ['abc defg ltd'],
+            ),
+
+            # uk_region
+            (
+                {
+                    'uk_based': True,
+                },
+                ['abc defg ltd'],
+            ),
+        ),
+    )
+    def test_filters(self, setup_data, filters, expected_companies):
+        """Tests different filters."""
+        url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
             url,
             data={
-                'archived': archived,
+                **filters,
+                'sortby': 'name',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 5
+        assert response_data['count'] == len(expected_companies)
 
-        expected_ids = Counter(str(company.pk) for company in matching_companies)
-        actual_ids = Counter(result['id'] for result in response_data['results'])
-        assert expected_ids == actual_ids
-
-    def test_trading_address_country_filter(self, setup_data):
-        """Tests trading address country filter."""
-        url = reverse('api-v3:search:company')
-        united_states_id = constants.Country.united_states.value.id
-
-        response = self.api_client.post(
-            url,
-            data={
-                'trading_address_country': united_states_id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
-
-    def test_uk_region_filter(self, setup_data):
-        """Tests uk region filter."""
-        url = reverse('api-v3:search:company')
-        uk_region = constants.UKRegion.south_east.value.id
-
-        response = self.api_client.post(
-            url,
-            data={
-                'uk_region': uk_region,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['uk_region']['id'] == uk_region
+        assert [
+            result['name']
+            for result in response_data['results']
+        ] == expected_companies
 
     @pytest.mark.parametrize(
         'query,results',
@@ -192,7 +322,7 @@ class TestSearch(APITestMixin):
     )
     def test_headquarter_type_filter(self, setup_headquarters_data, query, results):
         """Test headquarter type filter."""
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
         response = self.api_client.post(
             url,
             query,
@@ -217,7 +347,7 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
         response = self.api_client.post(
             url,
             {
@@ -254,7 +384,7 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
         body = {
             'sector_descends': hierarchical_sectors[sector_level].pk,
         }
@@ -285,7 +415,7 @@ class TestSearch(APITestMixin):
         )
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
             url,
@@ -342,7 +472,7 @@ class TestSearch(APITestMixin):
         )
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
             url,
@@ -361,29 +491,6 @@ class TestSearch(APITestMixin):
         else:
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
-
-    def test_multiple_trading_address_country_filter(self, setup_data):
-        """Tests multiple trading address countries filter."""
-        term = 'abc defg'
-
-        url = reverse('api-v3:search:company')
-        united_states_id = constants.Country.united_states.value.id
-        united_kingdom_id = constants.Country.united_kingdom.value.id
-
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'trading_address_country': [united_states_id, united_kingdom_id],
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert len(response.data['results']) == 2
-        country_ids = {result['trading_address_country']['id']
-                       for result in response.data['results']}
-        assert country_ids == {united_kingdom_id, united_states_id}
 
     def test_company_search_paging(self, setup_es):
         """
@@ -407,7 +514,7 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
+        url = reverse('api-v4:search:company')
         for page in range((len(ids) + page_size - 1) // page_size):
             response = self.api_client.post(
                 url,
@@ -426,30 +533,6 @@ class TestSearch(APITestMixin):
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
 
-    def test_search_company_no_filters(self, setup_data):
-        """Tests case where there is no filters provided."""
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data['results']) > 0
-
-    def test_search_foreign_company_json(self, setup_data):
-        """Tests detailed company search."""
-        url = reverse('api-v3:search:company')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'uk_based': False,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['uk_based'] is False
-
 
 class TestCompanyExportView(APITestMixin):
     """Tests the company export view."""
@@ -467,7 +550,7 @@ class TestCompanyExportView(APITestMixin):
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
-        url = reverse('api-v3:search:company-export')
+        url = reverse('api-v4:search:company-export')
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -508,7 +591,7 @@ class TestCompanyExportView(APITestMixin):
         if request_sortby:
             data['sortby'] = request_sortby
 
-        url = reverse('api-v3:search:company-export')
+        url = reverse('api-v4:search:company-export')
 
         with freeze_time('2018-01-01 11:12:13'):
             response = self.api_client.post(url, data=data)
@@ -552,153 +635,6 @@ class TestCompanyExportView(APITestMixin):
         assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
 
 
-class TestBasicSearch(APITestMixin):
-    """Tests basic search view."""
-
-    def test_all_companies(self, setup_data):
-        """Tests basic aggregate all companies query."""
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': '',
-                'entity': 'company',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] > 0
-
-    def test_companies(self, setup_data):
-        """Tests basic aggregate companies query."""
-        term = 'abc defg'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': term,
-                'entity': 'company',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert response.data['results'][0]['name'].startswith(term)
-        assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
-
-    @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
-            # name
-            ('whiskers', 'whiskers and tabby'),
-            ('whi', 'whiskers and tabby'),
-            ('his', 'whiskers and tabby'),
-            ('ers', 'whiskers and tabby'),
-            ('1a', '1a'),
-
-            # trading names
-            ('maine coon egyptian mau', 'whiskers and tabby'),
-            ('maine', 'whiskers and tabby'),
-            ('mau', 'whiskers and tabby'),
-            ('ine oon', 'whiskers and tabby'),
-            ('ine mau', 'whiskers and tabby'),
-            ('3a', '1a'),
-
-            # non-matches
-            ('whi lorem', None),
-            ('wh', None),
-            ('whe', None),
-            ('tiger', None),
-            ('panda', None),
-            ('moine', None),
-        ),
-    )
-    def test_search_in_name(self, setup_es, name_term, matched_company_name):
-        """Tests basic aggregate companies query."""
-        CompanyFactory(
-            name='whiskers and tabby',
-            trading_names=['Maine Coon', 'Egyptian Mau'],
-        )
-        CompanyFactory(
-            name='1a',
-            trading_names=['3a', '4a'],
-        )
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': name_term,
-                'entity': 'company',
-            },
-        )
-
-        match = Company.objects.filter(name=matched_company_name).first()
-        if match:
-            assert response.data['count'] == 1
-            assert len(response.data['results']) == 1
-            assert response.data['results'][0]['id'] == str(match.id)
-            assert [{'count': 1, 'entity': 'company'}] == response.data['aggregations']
-        else:
-            assert response.data['count'] == 0
-            assert len(response.data['results']) == 0
-
-    @pytest.mark.parametrize(
-        'field,value,term,match',
-        (
-            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
-            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
-            ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
-            ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
-        ),
-    )
-    def test_search_in_field(self, setup_es, field, value, term, match):
-        """Tests basic aggregate companies query."""
-        CompanyFactory()
-        CompanyFactory(**{field: value})
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': term,
-                'entity': 'company',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        if match:
-            assert response.data['count'] == 1
-            assert response.data['results'][0][field] == value
-        else:
-            assert response.data['count'] == 0
-
-    def test_no_results(self, setup_data):
-        """Tests case where there should be no results."""
-        term = 'there-should-be-no-match'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': term,
-                'entity': 'company',
-            },
-        )
-
-        assert response.data['count'] == 0
-
-    def test_companies_no_term(self, setup_data):
-        """Tests case where there is not term provided."""
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
 class TestAutocompleteSearch(APITestMixin):
     """Tests for autocomplete search views."""
 
@@ -706,11 +642,56 @@ class TestAutocompleteSearch(APITestMixin):
         """Should return 403"""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v4:search:company-autocomplete')
 
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_response_body(self, setup_es):
+        """Tests the response body of autocomplete search query."""
+        company = CompanyFactory(
+            name='abc',
+            trading_names=['Xyz trading', 'Abc trading'],
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v4:search:company-autocomplete')
+        response = self.api_client.get(url, data={'term': 'abc'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 1,
+            'results': [
+                {
+                    'id': str(company.id),
+                    'name': company.name,
+                    'address': {
+                        'line_1': company.address_1,
+                        'line_2': company.address_2 or '',
+                        'town': company.address_town,
+                        'county': company.address_county or '',
+                        'postcode': company.address_postcode or '',
+                        'country': {
+                            'id': str(company.trading_address_country.id),
+                            'name': company.trading_address_country.name,
+                        },
+                    },
+                    'registered_address': {
+                        'line_1': company.registered_address_1,
+                        'line_2': company.registered_address_2 or '',
+                        'town': company.registered_address_town,
+                        'county': company.registered_address_county or '',
+                        'postcode': company.registered_address_postcode or '',
+                        'country': {
+                            'id': str(company.registered_address_country.id),
+                            'name': company.registered_address_country.name,
+                        },
+                    },
+                    'trading_names': ['Xyz trading', 'Abc trading'],
+                },
+            ],
+        }
 
     @pytest.mark.parametrize(
         'data,expected_error',
@@ -731,7 +712,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_validation_error(self, data, expected_error, setup_data):
         """Tests case where there is not query provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v4:search:company-autocomplete')
 
         response = self.api_client.get(url, data=data)
 
@@ -757,7 +738,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_searching_with_a_query(self, setup_data, query, expected_companies):
         """Tests case where search queries are provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v4:search:company-autocomplete')
 
         response = self.api_client.get(url, data={'term': query})
 
@@ -778,7 +759,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_searching_with_limit(self, setup_data, limit, expected_companies):
         """Tests case where search limit is provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v4:search:company-autocomplete')
 
         response = self.api_client.get(
             url,
@@ -797,7 +778,7 @@ class TestAutocompleteSearch(APITestMixin):
 
     @mock.patch(
         'datahub.search.company.views.'
-        'CompanyAutocompleteSearchListAPIView._get_permission_filters',
+        'CompanyAutocompleteSearchListAPIViewV4._get_permission_filters',
     )
     def test_raise_datahub_error_when_search_app_has_permission_search_filters(
         self, mock_get_app_permission_filters,
@@ -807,7 +788,7 @@ class TestAutocompleteSearch(APITestMixin):
         permitted and a datahub exception error is raised.
         """
         mock_get_app_permission_filters.return_value = True
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v4:search:company-autocomplete')
         with pytest.raises(DataHubException) as expected_error:
             self.api_client.get(url, data={'term': 'query'})
         assert (

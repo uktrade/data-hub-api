@@ -687,7 +687,7 @@ def test_mapping(setup_es):
 def test_get_basic_search_query():
     """Tests basic search query."""
     query = get_basic_search_query(
-        'test', entities=(ESInvestmentProject,), offset=5, limit=5,
+        ESInvestmentProject, 'test', offset=5, limit=5,
     )
 
     assert query.to_dict() == {
