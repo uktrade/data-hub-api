@@ -15,7 +15,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    'Factory',  # noqa: N803
+    'order_factory',
     (
         OrderCancelledFactory,
         OrderCompleteFactory,
@@ -24,9 +24,9 @@ pytestmark = pytest.mark.django_db
         OrderWithAcceptedQuoteFactory,
     ),
 )
-def test_order_to_dict(Factory):
+def test_order_to_dict(order_factory):
     """Test converting an order to dict."""
-    order = Factory()
+    order = order_factory()
 
     invoice = order.invoice
     OrderSubscriberFactory.create_batch(2, order=order)

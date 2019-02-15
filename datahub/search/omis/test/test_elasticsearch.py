@@ -451,7 +451,7 @@ def test_mapping(setup_es):
 
 
 @pytest.mark.parametrize(
-    'Factory',  # noqa: N803
+    'order_factory',
     (
         OrderFactory,
         OrderWithAcceptedQuoteFactory,
@@ -460,9 +460,9 @@ def test_mapping(setup_es):
         OrderPaidFactory,
     ),
 )
-def test_indexed_doc(Factory, setup_es):
+def test_indexed_doc(order_factory, setup_es):
     """Test the ES data of an indexed order."""
-    order = Factory()
+    order = order_factory()
     invoice = order.invoice
 
     doc = ESOrder.es_document(order)

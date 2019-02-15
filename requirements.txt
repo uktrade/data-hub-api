@@ -77,7 +77,7 @@ notifications-python-client==5.3.0
 oauthlib==2.1.0
 packaging==19.0           # via pytest-sugar
 parso==0.3.4              # via jedi
-pep8-naming==0.7.0
+pep8-naming==0.8.2
 pexpect==4.6.0            # via ipython
 pickleshare==0.7.5        # via ipython
 pip-tools==3.3.2
