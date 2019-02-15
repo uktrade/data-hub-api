@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.metadata import urls
-from datahub.metadata.models import Sector, Service
+from datahub.metadata.models import AdministrativeArea, Sector, Service
 from datahub.metadata.registry import registry
 from datahub.metadata.test.factories import ServiceFactory
 
@@ -96,6 +96,26 @@ def test_ordered_metadata_order_view(ordered_mapping, api_client):
     assert response.status_code == status.HTTP_200_OK
     response_names = [value['name'] for value in response.json()]
     assert response_names == list(model.objects.order_by('order').values_list('name', flat=True))
+
+
+def test_administrative_area_view(api_client):
+    """Test that the administrative area view includes the country field."""
+    administrative_area = AdministrativeArea.objects.order_by('name').first()
+
+    url = reverse(viewname='administrative-area')
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    results = response.json()
+    assert results[0] == {
+        'id': str(administrative_area.pk),
+        'name': administrative_area.name,
+        'country': {
+            'id': str(administrative_area.country.pk),
+            'name': administrative_area.country.name,
+        },
+        'disabled_on': format_date_or_datetime(administrative_area.disabled_on),
+    }
 
 
 def test_team_view(api_client):
