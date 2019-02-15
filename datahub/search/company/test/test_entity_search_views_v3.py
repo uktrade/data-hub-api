@@ -665,7 +665,7 @@ class TestAutocompleteSearch(APITestMixin):
         """Should return 403"""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
 
         response = api_client.get(url)
 
@@ -679,7 +679,7 @@ class TestAutocompleteSearch(APITestMixin):
         )
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
         response = self.api_client.get(url, data={'term': 'abc'})
 
         assert response.status_code == status.HTTP_200_OK
@@ -731,7 +731,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_validation_error(self, data, expected_error, setup_data):
         """Tests case where there is not query provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
 
         response = self.api_client.get(url, data=data)
 
@@ -757,7 +757,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_searching_with_a_query(self, setup_data, query, expected_companies):
         """Tests case where search queries are provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
 
         response = self.api_client.get(url, data={'term': query})
 
@@ -778,7 +778,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_searching_with_limit(self, setup_data, limit, expected_companies):
         """Tests case where search limit is provided."""
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
 
         response = self.api_client.get(
             url,
@@ -807,7 +807,7 @@ class TestAutocompleteSearch(APITestMixin):
         permitted and a datahub exception error is raised.
         """
         mock_get_app_permission_filters.return_value = True
-        url = reverse('api-v3:search:company-autocomplete-search')
+        url = reverse('api-v3:search:company-autocomplete')
         with pytest.raises(DataHubException) as expected_error:
             self.api_client.get(url, data={'term': 'query'})
         assert (
