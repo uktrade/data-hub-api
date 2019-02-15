@@ -214,7 +214,7 @@ def test_build_term_query(term, expected):
 def test_offset_near_max_results(offset, limit, expected_size):
     """Tests limit clipping when near max_results."""
     query = get_basic_search_query(
-        'test', entities=(mock.Mock(),), offset=offset, limit=limit,
+        mock.Mock(), 'test', offset=offset, limit=limit,
     )
 
     query_dict = query.to_dict()

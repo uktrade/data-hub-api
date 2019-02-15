@@ -56,8 +56,8 @@ class SearchBasicAPIView(APIView):
         ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
 
         query = get_basic_search_query(
+            entity=validated_params['entity'],
             term=validated_params['term'],
-            entities=(validated_params['entity'],),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
             ordering=ordering,
             offset=validated_params['offset'],
