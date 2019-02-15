@@ -94,9 +94,19 @@ admin.site.register(
 )
 
 
+@admin.register(models.AdministrativeArea)
+class AdministrativeAreaAdmin(ViewOnlyAdmin):
+    """View-only admin for administrative areas (of countries)."""
+
+    fields = ('pk', 'name', 'country', 'disabled_on')
+    list_display = ('name', 'country', 'disabled_on')
+    search_fields = ('name', 'pk', 'country__name')
+    list_filter = (DisabledOnFilter, 'country')
+
+
 @admin.register(models.Country)
 class CountryAdmin(ViewOnlyAdmin):
-    """Admin for countries."""
+    """View-only admin for countries."""
 
     fields = ('pk', 'name', 'overseas_region', 'disabled_on', 'iso_alpha2_code')
     list_display = ('name', 'overseas_region', 'disabled_on', 'iso_alpha2_code')
