@@ -1,18 +1,7 @@
-from unittest import mock
-
 import pytest
 
+from datahub.core.test_utils import construct_mock
 from datahub.search.contact import dict_utils
-
-
-def _construct_mock(**props):
-    """
-    Same as mock.Mock() but using configure_mock as
-    name collides with the kwarg in the Mock constructor.
-    """
-    obj = mock.Mock(spec_set=tuple(props))
-    obj.configure_mock(**props)
-    return obj
 
 
 @pytest.mark.parametrize(
@@ -20,7 +9,7 @@ def _construct_mock(**props):
     (
         # address_same_as_company = False and char field
         (
-            _construct_mock(
+            construct_mock(
                 address_same_as_company=False,
                 address_1='2',
             ),
@@ -30,9 +19,9 @@ def _construct_mock(**props):
 
         # address_same_as_company = False and nested field
         (
-            _construct_mock(
+            construct_mock(
                 address_same_as_company=False,
-                address_country=_construct_mock(
+                address_country=construct_mock(
                     id='80756b9a-5d95-e211-a939-e4115bead28a',
                     name='United Kingdom',
                 ),
@@ -46,10 +35,10 @@ def _construct_mock(**props):
 
         # address_same_as_company = True and char field
         (
-            _construct_mock(
+            construct_mock(
                 address_same_as_company=True,
                 address_1='2',
-                company=_construct_mock(
+                company=construct_mock(
                     address_1='3',
                 ),
             ),
@@ -59,14 +48,14 @@ def _construct_mock(**props):
 
         # address_same_as_company = True and nested field
         (
-            _construct_mock(
+            construct_mock(
                 address_same_as_company=True,
-                address_country=_construct_mock(
+                address_country=construct_mock(
                     id='80756b9a-5d95-e211-a939-e4115bead28a',
                     name='United Kingdom',
                 ),
-                company=_construct_mock(
-                    address_country=_construct_mock(
+                company=construct_mock(
+                    address_country=construct_mock(
                         id='81756b9a-5d95-e211-a939-e4115bead28a',
                         name='United States',
                     ),
