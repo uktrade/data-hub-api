@@ -41,30 +41,27 @@ def setup_data(setup_es):
     CompanyFactory(
         name='abc defg ltd',
         trading_names=['helm', 'nop'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_uk,
-        registered_address_country_id=country_uk,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
         address_country_id=country_uk,
+        registered_address_country_id=country_uk,
         uk_region_id=uk_region,
     )
     CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_us,
-        registered_address_country_id=country_us,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
         address_country_id=country_us,
+        registered_address_country_id=country_us,
     )
     CompanyFactory(
         name='archived',
         trading_names=[],
-        trading_address_1='Main Lane',
-        trading_address_town='Somewhere',
-        trading_address_country_id=country_anguilla,
-        registered_address_country_id=country_anguilla,
+        address_1='Main Lane',
+        address_town='Somewhere',
         address_country_id=country_anguilla,
+        registered_address_country_id=country_anguilla,
         archived=True,
     )
     setup_es.indices.refresh()
@@ -410,7 +407,7 @@ class TestSearch(APITestMixin):
     def test_composite_country_filter(self, setup_es, country, match):
         """Tests composite country filter."""
         company = CompanyFactory(
-            trading_address_country_id=constants.Country.cayman_islands.value.id,
+            address_country_id=constants.Country.cayman_islands.value.id,
             registered_address_country_id=constants.Country.montserrat.value.id,
         )
         setup_es.indices.refresh()
@@ -673,8 +670,8 @@ class TestAutocompleteSearch(APITestMixin):
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
                         'country': {
-                            'id': str(company.trading_address_country.id),
-                            'name': company.trading_address_country.name,
+                            'id': str(company.address_country.id),
+                            'name': company.address_country.name,
                         },
                     },
                     'registered_address': {
