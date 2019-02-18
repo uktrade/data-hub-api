@@ -328,10 +328,6 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                 },
-                'trading_name': {
-                    'index': False,
-                    'type': 'keyword',
-                },
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
                     'type': 'text',
@@ -373,7 +369,7 @@ def test_mapping(setup_es):
 
 def test_get_basic_search_query():
     """Tests basic search query."""
-    query = get_basic_search_query('test', entities=(ESCompany,), offset=5, limit=5)
+    query = get_basic_search_query(ESCompany, 'test', offset=5, limit=5)
 
     assert query.to_dict() == {
         'query': {
@@ -478,9 +474,9 @@ def test_limited_get_search_by_entity_query():
         'estimated_land_date_after': date,
     }
     query = get_search_by_entity_query(
+        ESCompany,
         term='test',
         filter_data=filter_data,
-        entity=ESCompany,
     )
     query = limit_search_query(
         query,
@@ -604,8 +600,8 @@ def test_indexed_doc(setup_es):
         id=company.pk,
     )
 
-    source = indexed_company.pop('_source')
-    assert set(source.keys()) == {
+    assert indexed_company['_id'] == str(company.pk)
+    assert indexed_company['_source'].keys() == {
         'archived',
         'archived_by',
         'archived_on',
@@ -642,7 +638,6 @@ def test_indexed_doc(setup_es):
         'trading_address_county',
         'trading_address_postcode',
         'trading_address_town',
-        'trading_name',
         'trading_names',
         'turnover_range',
         'uk_based',
@@ -651,44 +646,3 @@ def test_indexed_doc(setup_es):
         'duns_number',
         'website',
     }
-    assert indexed_company == {
-        '_id': str(company.pk),
-        '_index': CompanySearchApp.es_model.get_target_index_name(),
-        '_type': CompanySearchApp.name,
-        '_version': indexed_company['_version'],
-        'found': True,
-    }
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    'trading_names',
-    (
-        ['a', 'b'],
-        [],
-    ),
-)
-def test_trading_name_value_comes_from_trading_names(setup_es, trading_names):
-    """
-    Test that the value of trading_name is calculated from trading_names.
-
-    TODO: delete after trading_name is completely replaced by trading_names.
-    """
-    company = CompanyFactory(
-        trading_names=trading_names,
-    )
-
-    doc = ESCompany.es_document(company)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
-
-    setup_es.indices.refresh()
-
-    indexed_company = setup_es.get(
-        index=CompanySearchApp.es_model.get_write_index(),
-        doc_type=CompanySearchApp.name,
-        id=company.pk,
-    )
-
-    source = indexed_company['_source']
-    assert source['trading_names'] == trading_names
-    assert source['trading_name'] == ('' if not trading_names else trading_names[0])

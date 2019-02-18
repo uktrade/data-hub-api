@@ -103,10 +103,6 @@ def test_mapping(setup_es):
                             'analyzer': 'trigram_analyzer',
                             'type': 'text',
                         },
-                        'trading_name': {
-                            'index': False,
-                            'type': 'keyword',
-                        },
                         'trading_names': {
                             'copy_to': ['company.trading_names_trigram'],
                             'type': 'text',
@@ -244,7 +240,7 @@ def test_mapping(setup_es):
 
 def test_get_basic_search_query():
     """Tests basic search query."""
-    query = get_basic_search_query('test', entities=(ESContact,), offset=5, limit=5)
+    query = get_basic_search_query(ESContact, 'test', offset=5, limit=5)
 
     assert query.to_dict() == {
         'query': {
@@ -349,9 +345,9 @@ def test_get_limited_search_by_entity_query():
         'estimated_land_date_before': date,
     }
     query = get_search_by_entity_query(
+        ESContact,
         term='test',
         filter_data=filter_data,
-        entity=ESContact,
     )
     query = limit_search_query(
         query,

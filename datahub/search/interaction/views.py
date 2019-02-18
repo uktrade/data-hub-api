@@ -96,6 +96,16 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         dit_adviser_name=get_full_name_expression('dit_adviser'),
         link=get_front_end_url_expression('interaction', 'pk'),
         kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
+        policy_issue_type_names=get_string_agg_subquery(
+            DBInteraction,
+            'policy_issue_types__name',
+        ),
+        policy_area_names=get_string_agg_subquery(
+            DBInteraction,
+            'policy_areas__name',
+            # Some policy areas contain commas, so we use a semicolon to delimit multiple values
+            delimiter='; ',
+        ),
     )
     field_titles = {
         'date': 'Date',
@@ -114,4 +124,7 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         'event__name': 'Event',
         'service_delivery_status__name': 'Service delivery status',
         'net_company_receipt': 'Net company receipt',
+        'policy_issue_type_names': 'Policy issue types',
+        'policy_area_names': 'Policy areas',
+        'policy_feedback_notes': 'Policy feedback notes',
     }

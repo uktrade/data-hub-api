@@ -15,7 +15,7 @@ def test_company_auto_sync_to_es(setup_es):
     )
     setup_es.indices.refresh()
 
-    result = get_basic_search_query(test_name, entities=(Company,)).execute()
+    result = get_basic_search_query(Company, test_name).execute()
 
     assert result.hits.total == 1
 
@@ -31,7 +31,7 @@ def test_company_auto_updates_to_es(setup_es):
     company.save()
     setup_es.indices.refresh()
 
-    result = get_basic_search_query(new_test_name, entities=(Company,)).execute()
+    result = get_basic_search_query(Company, new_test_name).execute()
 
     assert result.hits.total == 1
     assert result.hits[0].id == str(company.id)

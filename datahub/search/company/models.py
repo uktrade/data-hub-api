@@ -105,7 +105,6 @@ class Company(BaseESModel):
         'trading_address_country',
     )
 
-    trading_name = Keyword(index=False)
     trading_names = Text(
         copy_to=['trading_names_trigram'],
     )
@@ -119,7 +118,6 @@ class Company(BaseESModel):
     suggest = Completion()
 
     COMPUTED_MAPPINGS = {
-        'trading_name': lambda obj: dict_utils.company_dict(obj)['trading_name'],
         'suggest': get_suggestions,
         'address': partial(dict_utils.address_dict, prefix='address'),
         'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),

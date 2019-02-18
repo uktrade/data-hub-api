@@ -65,8 +65,34 @@ class SearchCompanyAPIViewMixin:
     }
 
 
-class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view."""
+class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
+    """Filtered company search view V3."""
+
+    fields_to_exclude = (
+        'address',
+        'registered_address',
+    )
+
+
+class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
+    """Filtered company search view V4."""
+
+    # TODO: delete once the migration to v4 is complete
+    fields_to_exclude = (
+        'companies_house_data',
+        'trading_address_1',
+        'trading_address_2',
+        'trading_address_town',
+        'trading_address_county',
+        'trading_address_country',
+        'trading_address_postcode',
+        'registered_address_1',
+        'registered_address_2',
+        'registered_address_town',
+        'registered_address_county',
+        'registered_address_country',
+        'registered_address_postcode',
+    )
 
 
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
@@ -109,16 +135,15 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
     }
 
 
-class CompanyAutocompleteSearchListAPIView(
+class CompanyAutocompleteSearchListAPIViewV3(
     SearchCompanyAPIViewMixin,
     AutocompleteSearchListAPIView,
 ):
-    """Company autocomplete search view."""
+    """Company autocomplete search view V3."""
 
     document_fields = [
         'id',
         'name',
-        'trading_name',
         'trading_names',
         'trading_address_1',
         'trading_address_2',
@@ -132,4 +157,19 @@ class CompanyAutocompleteSearchListAPIView(
         'registered_address_county',
         'registered_address_country',
         'registered_address_postcode',
+    ]
+
+
+class CompanyAutocompleteSearchListAPIViewV4(
+    SearchCompanyAPIViewMixin,
+    AutocompleteSearchListAPIView,
+):
+    """Company autocomplete search view V4."""
+
+    document_fields = [
+        'id',
+        'name',
+        'trading_names',
+        'address',
+        'registered_address',
     ]

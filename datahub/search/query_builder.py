@@ -25,18 +25,16 @@ class MatchNone(Query):
 
 
 def get_basic_search_query(
+        entity,
         term,
-        entities=None,
         permission_filters_by_entity=None,
         ordering=None,
         offset=0,
         limit=100,
 ):
-    """Performs basic search looking for name and then SEARCH_FIELDS in entity.
-
-    Also returns number of results in other entities.
-
-    TODO: entities should be a positional argument and a single ES model instead of a sequence
+    """
+    Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
+    It also returns number of results in other entities.
 
     :param permission_filters_by_entity: List of pairs of entities and corresponding permission
                                          filters. Only entities in this list are included in the
@@ -60,10 +58,10 @@ def get_basic_search_query(
     if permission_query:
         search = search.filter(permission_query)
 
-    entity_type_subqueries = [Term(_type=entity._doc_type.name) for entity in entities]
-
     search = search.post_filter(
-        Bool(should=entity_type_subqueries),
+        Bool(
+            should=Term(_type=entity._doc_type.name),
+        ),
     )
     search = _apply_sorting_to_query(search, ordering)
     search.aggs.bucket(
@@ -74,19 +72,19 @@ def get_basic_search_query(
 
 
 def get_search_by_entity_query(
+        entity,
         term=None,
         filter_data=None,
         composite_field_mapping=None,
         permission_filters=None,
-        entity=None,
         ordering=None,
+        fields_to_include=None,
+        fields_to_exclude=None,
 ):
     """
-    Performs filtered search for given terms in given entity.
-
-    :param permission_filters: dict of field names and values. These represent rules that records
-                               must match one of to be included in the results.
+    Performs filtered search for the given term in the given entity.
     """
+    filter_data = filter_data or {}
     query = [Term(_type=entity._doc_type.name)]
     if term != '':
         query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -107,16 +105,22 @@ def get_search_by_entity_query(
         s = s.filter(permission_query)
 
     s = s.filter(Bool(must=must_filter))
+    s = _apply_sorting_to_query(s, ordering)
+    return _apply_source_filtering_to_query(
+        s,
+        fields_to_include=fields_to_include,
+        fields_to_exclude=fields_to_exclude,
+    )
 
-    return _apply_sorting_to_query(s, ordering)
 
-
-def build_autocomplete_query(es_model, keyword_search, limit, only_return_fields):
+def build_autocomplete_query(es_model, keyword_search, limit, fields_to_include):
     """Builds the query for autocomplete search and applies source filtering."""
     index = es_model.get_read_alias()
     autocomplete_search = es_model.search(index=index)
-    if only_return_fields:
-        autocomplete_search = autocomplete_search.extra(_source={'include': only_return_fields})
+    autocomplete_search = _apply_source_filtering_to_query(
+        autocomplete_search,
+        fields_to_include=fields_to_include,
+    )
     return autocomplete_search.suggest(
         'autocomplete',
         keyword_search,
@@ -355,3 +359,7 @@ def _apply_sorting_to_query(query, ordering):
         {ordering.field: sort_params},
         'id',
     )
+
+
+def _apply_source_filtering_to_query(query, fields_to_include=None, fields_to_exclude=None):
+    return query.source(includes=fields_to_include, excludes=fields_to_exclude)
