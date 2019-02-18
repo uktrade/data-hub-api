@@ -109,19 +109,12 @@ class BaseESModel(Document):
         return len(read_indices) != 1
 
     @classmethod
-    def set_up_index_and_aliases(cls, force_update_mapping=False):
-        """
-        Creates the index and aliases for this model if they don't already exist.
-
-        If force_update_mapping is True and the write alias already exists, an attempt
-        is made to update to update the existing mapping in place.
-        """
+    def set_up_index_and_aliases(cls):
+        """Creates the index and aliases for this model if they don't already exist."""
         if not alias_exists(cls.get_write_alias()):
             index_name = cls.get_target_index_name()
             alias_names = (cls.get_write_alias(), cls.get_read_alias())
             create_index(index_name, cls._doc_type.mapping, alias_names=alias_names)
-        elif force_update_mapping:
-            cls.init(cls.get_write_alias())
 
         # Should not normally happen
         if not alias_exists(cls.get_read_alias()):
