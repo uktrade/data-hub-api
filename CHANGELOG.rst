@@ -1,3 +1,61 @@
+Data Hub API 10.0.0 (2019-02-18)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Advisers** ``GET /adviser/``: The ``first_name``, ``first_name__icontains``, ``last_name``, ``last_name__icontains``, ``email`` and ``email__icontains`` query parameters are deprecated and will be removed on or after 4 March 2019.
+- **Companies** The following endpoints are deprecated and will be removed on or after the 28th of February, please use v4 instead:
+
+  - ``/v3/search/company``
+  - ``/v3/search/company/autocomplete``
+  - ``/v3/search/company/export``
+- **Companies** The field ``trading_name`` was removed from the endpoints below, please use the ``trading_names`` field instead:
+
+  - ``/v3/search/company``
+  - ``/v3/search/company/autocomplete``
+  - ``/v3/search/contact``: from the nested company object
+  - ``/v3/search/interaction``: from the nested company object
+  - ``/v3/search/order``: from the nested company object
+
+Features
+--------
+
+- **Interactions** Policy issue types, policy areas and policy feedback notes were added to interaction search result CSV exports.
+
+API
+---
+
+- **Advisers** This adds a new ``autocomplete`` query parameter to ``GET /adviser/`` intended to replace the previous name-related query parameters.
+
+  The new parameter matches prefixes of words in the ``first_name``, ``last_name`` and ``dit_team.name`` fields. Each token must match the prefix of at least one word in (at least) one of those fields.
+
+  Results are automatically ordered with advisers with a match on ``first_name`` appearing first, ``last_name`` second and ``dit_team.name`` last.
+
+  As a result, the ``first_name``, ``first_name__icontains``, ``last_name``, ``last_name__icontains``, ``email`` and ``email__icontains`` query parameters are deprecated and will be removed on or after 4 March 2019.
+- **Companies** API V4 for company search was introduced with nested object format for addresses.
+  The following endpoints were added:
+
+  - ``/v4/search/company``: see below
+  - ``/v4/search/company/autocomplete``: see below
+  - ``/v4/search/company/export``: same response body as v3
+
+  ``/v4/search/company``, ``/v4/search/company/autocomplete``:
+
+  - The ``trading_address_*`` fields were removed from v4
+  - The ``registered_address_*`` fields were replaced by the nested object ``registered_address``
+  - The nested object ``address`` was added. Its data was populated from trading_address fields or registered_address whichever was defined.
+- **Companies** The field ``trading_name`` was removed from the endpoints below, please use the ``trading_names`` field instead:
+
+  - ``/v3/search/company``
+  - ``/v3/search/company/autocomplete``
+  - ``/v3/search/contact``: from the nested company object
+  - ``/v3/search/interaction``: from the nested company object
+  - ``/v3/search/order``: from the nested company object
+
+
 Data Hub API 9.10.0 (2019-02-14)
 ================================
 
