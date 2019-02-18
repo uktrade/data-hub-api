@@ -339,10 +339,10 @@ def test_get_limited_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
     filter_data = {
-        'address_town': ['Woodside'],
-        'trading_address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
-        'estimated_land_date_after': date,
-        'estimated_land_date_before': date,
+        'name': 'Woodside',
+        'address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
+        'archived_before': date,
+        'archived_after': date,
     }
     query = get_search_by_entity_query(
         ESContact,
@@ -398,25 +398,19 @@ def test_get_limited_search_by_entity_query():
                         'bool': {
                             'must': [
                                 {
-                                    'bool': {
-                                        'should': [
-                                            {
-                                                'match': {
-                                                    'address_town': {
-                                                        'query': 'Woodside',
-                                                        'operator': 'and',
-                                                    },
-                                                },
-                                            },
-                                        ],
-                                        'minimum_should_match': 1,
+                                    'match': {
+                                        'name': {
+                                            'query': 'Woodside',
+                                            'operator': 'and',
+                                        },
                                     },
-                                }, {
+                                },
+                                {
                                     'bool': {
                                         'should': [
                                             {
                                                 'match': {
-                                                    'trading_address_country.id': {
+                                                    'address_country.id': {
                                                         'query':
                                                             '80756b9a-5d95-e211-a939-e4115bead28a',
                                                         'operator': 'and',
@@ -428,7 +422,7 @@ def test_get_limited_search_by_entity_query():
                                     },
                                 }, {
                                     'range': {
-                                        'estimated_land_date': {
+                                        'archived': {
                                             'gte': '2017-06-13T09:44:31.062870',
                                             'lte': '2017-06-13T09:44:31.062870',
                                         },
