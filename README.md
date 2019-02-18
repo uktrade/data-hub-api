@@ -133,19 +133,21 @@ Dependencies:
 
     ```shell
     ./manage.py migrate
-    ./manage.py init_es
+    ./manage.py migrate_es
 
     ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
     ```
 
-12. Optionally, you can load some test data and update Elasticsearch:
+12. Optionally, you can load some test data:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
-
-    ./manage.py sync_es --foreground
     ```
+    
+    Note that this will queue Celery tasks to index the created records in Elasticsearch, 
+    and hence the loaded records won‘t be returned by search endpoints until Celery is
+    started and the queued tasks have run.
 
 13. Create a superuser:
 
@@ -358,19 +360,27 @@ These commands are generally only intended to be used on a blank database.
 
 ### Elasticsearch
 
-Create the Elasticsearch index (if it doesn't exist) and update the mapping:
+#### Update indexes and mapping types
+
+To create missing Elasticsearch indexes and migrate modified mapping types:
 
 ```shell
-./manage.py init_es
+./manage.py migrate_es
 ```
 
-Resync all Elasticsearch records (using Celery):
+This will also resync data (using Celery) for any newly-created indexes.
+
+See [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail about how the command works.
+
+#### Resync all Elasticsearch records
+
+To resync all records using Celery:
 
 ```shell
 ./manage.py sync_es
 ```
 
-Resync all Elasticsearch records synchronously (without Celery running):
+To resync all records synchronously (without Celery running):
 
 ```shell
 ./manage.py sync_es --foreground
@@ -387,14 +397,6 @@ For more details including all the available choices:
 ```shell
 ./manage.py sync_es --help
 ```
-
-Migrate modified mappings:
-
-```shell
-./manage.py migrate_es
-```
-
-Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail.
 
 ## Dependencies
 

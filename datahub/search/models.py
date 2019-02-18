@@ -115,14 +115,16 @@ class BaseESModel(Document):
             index_name = cls.get_target_index_name()
             alias_names = (cls.get_write_alias(), cls.get_read_alias())
             create_index(index_name, cls._doc_type.mapping, alias_names=alias_names)
+            return True
 
         # Should not normally happen
         if not alias_exists(cls.get_read_alias()):
             logger.warning(
-                f'Missing read alias {cls.get_read_alias()} detected, recreating '
-                f'the alias...',
+                f'Missing read alias {cls.get_read_alias()} detected, recreating the alias...',
             )
             associate_index_with_alias(cls.get_read_alias(), cls.get_write_index())
+
+        return False
 
     @classmethod
     def es_document(cls, db_object, index=None, include_index=True, include_source=True):

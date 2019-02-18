@@ -17,7 +17,8 @@ names follow the following pattern: `<prefix>-<model name>-<mapping hash>`.
 
 (The prefix is defined by the `ES_INDEX_PREFIX` setting.)
 
-The `./manage.py init_es` command creates indexes and aliases as described above.
+When run for the first time, the `./manage.py migrate_es` command creates indexes
+and aliases in this pattern.
 
 The mapping hash is calculated by hashing the mapping as defined in the code base
 (rather than the mapping as returned by the Elasticsearch server). This is because
@@ -29,7 +30,7 @@ mapping it returns.
 A migration is triggered by running `./manage.py migrate_es`. (This 
 is automatically run during deployment.)
 
-This command:
+When an index already exists, this command:
 
 1. Creates new indexes (in the `<prefix>-<model name>-<mapping hash>` format) using 
 the new mapping hashes (where the mapping hash has changed).

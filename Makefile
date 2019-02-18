@@ -12,9 +12,6 @@ docker-cleanup:
 migrate:
 	docker-compose run api python manage.py migrate
 
-init-es:
-	docker-compose run api python manage.py init_es
-
 makemigrations:
 	docker-compose run api python manage.py makemigrations
 
