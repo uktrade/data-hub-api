@@ -138,8 +138,8 @@ class TestSearch(APITestMixin):
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
                         'country': {
-                            'id': str(company.trading_address_country.id),
-                            'name': company.trading_address_country.name,
+                            'id': str(company.address_country.id),
+                            'name': company.address_country.name,
                         },
                     },
                     'registered_address': {
