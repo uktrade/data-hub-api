@@ -42,7 +42,6 @@ class CompanySearchApp(SearchApp):
         'turnover_range',
         'uk_region',
     ).prefetch_related(
-        'contacts',
         'export_to_countries',
         'future_interest_countries',
     )
