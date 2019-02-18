@@ -83,7 +83,6 @@ def test_id_uri_dict():
             {
                 'id': '123',
                 'name': 'Name',
-                'trading_name': 'Trading 1',
                 'trading_names': ['Trading 1', 'Trading 2'],
             },
         ),
@@ -98,7 +97,6 @@ def test_id_uri_dict():
             {
                 'id': '123',
                 'name': 'Name',
-                'trading_name': '',
                 'trading_names': [],
             },
         ),

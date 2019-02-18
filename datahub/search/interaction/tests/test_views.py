@@ -22,6 +22,7 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
+    join_attr_values,
     random_obj_for_queryset,
 )
 from datahub.interaction.models import (
@@ -288,7 +289,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             'company': {
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
-                'trading_name': interaction.company.trading_names[0],
                 'trading_names': interaction.company.trading_names,
             },
             'company_sector': {
@@ -982,6 +982,14 @@ class TestInteractionExportView(APITestMixin):
                 ContactFactory(company=company, job_title='Sales director'),
             ],
         )
+        CompanyInteractionFactoryWithPolicyFeedback(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Business development manager'),
+            ],
+            policy_areas=PolicyArea.objects.order_by('?')[:2],
+            policy_issue_types=PolicyIssueType.objects.order_by('?')[:2],
+        )
 
         setup_es.indices.refresh()
 
@@ -1026,7 +1034,7 @@ class TestInteractionExportView(APITestMixin):
                 ),
                 'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
                 'Company sector': get_attr_or_none(interaction, 'company.sector.name'),
-                'Contacts': _format_interaction_contacts(interaction),
+                'Contacts': _format_expected_contacts(interaction),
                 'Adviser': get_attr_or_none(interaction, 'dit_adviser.name'),
                 'Service provider': get_attr_or_none(interaction, 'dit_team.name'),
                 'Event': get_attr_or_none(interaction, 'event.name'),
@@ -1035,6 +1043,9 @@ class TestInteractionExportView(APITestMixin):
                     'service_delivery_status.name',
                 ),
                 'Net company receipt': interaction.net_company_receipt,
+                'Policy issue types': join_attr_values(interaction.policy_issue_types.all()),
+                'Policy areas': join_attr_values(interaction.policy_areas.all(), separator='; '),
+                'Policy feedback notes': interaction.policy_feedback_notes,
             }
             for interaction in sorted_interactions
         ]
@@ -1043,14 +1054,14 @@ class TestInteractionExportView(APITestMixin):
         assert actual_row_data == format_csv_data(expected_row_data)
 
 
-def _format_interaction_contacts(interaction):
+def _format_expected_contacts(interaction):
     formatted_contact_names = sorted(
-        _format_contact_name_with_job_title(contact) for contact in interaction.contacts.all(),
+        _format_expected_contact_name(contact) for contact in interaction.contacts.all(),
     )
     return ', '.join(formatted_contact_names)
 
 
-def _format_contact_name_with_job_title(contact):
+def _format_expected_contact_name(contact):
     if contact.job_title:
         return f'{contact.name} ({contact.job_title})'
 
@@ -1063,11 +1074,21 @@ def _format_actual_csv_row(row):
 
 def _format_actual_csv_value(key, value):
     """
-    Sorts the value of 'Contacts' for a row alphabetically as they are unordered at present.
+    Sorts the value of multi-value fields for a row alphabetically as they are unordered at
+    present.
 
     TODO Django 2.2 adds ordering support to StringAgg, which will remove the need for this as we
       will be able to perform the sorting in the export query.
     """
-    if key == 'Contacts':
-        return ', '.join(sorted(value.split(', ')))
+    multi_value_fields_and_separators = {
+        'Contacts': ', ',
+        'Policy areas': '; ',
+        'Policy issue types': ', ',
+    }
+
+    if key in multi_value_fields_and_separators:
+        separator = multi_value_fields_and_separators[key]
+        sorted_split_values = sorted(value.split(separator))
+        return separator.join(sorted_split_values)
+
     return value

@@ -56,8 +56,8 @@ class SearchBasicAPIView(APIView):
         ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
 
         query = get_basic_search_query(
+            entity=validated_params['entity'],
             term=validated_params['term'],
-            entities=(validated_params['entity'],),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
             ordering=ordering,
             offset=validated_params['offset'],
@@ -108,6 +108,8 @@ class SearchAPIView(APIView):
 
     serializer_class = EntitySearchQuerySerializer
     entity = None
+    fields_to_include = None
+    fields_to_exclude = None
 
     http_method_names = ('post',)
 
@@ -133,12 +135,14 @@ class SearchAPIView(APIView):
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entity_query(
-            entity=self.entity,
+            self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
             ordering=ordering,
+            fields_to_include=self.fields_to_include,
+            fields_to_exclude=self.fields_to_exclude,
         )
 
     def post(self, request, format=None):
@@ -291,7 +295,7 @@ class AutocompleteSearchListAPIView(ListAPIView):
             self.search_app.es_model,
             validated_params['term'],
             validated_params['limit'],
-            only_return_fields=self.document_fields,
+            self.document_fields,
         )
 
         return Response(data={

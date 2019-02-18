@@ -42,8 +42,8 @@ def _get_objects(request, limit, search_app, adviser_field):
         return []
 
     query = get_search_by_entity_query(
+        search_app.es_model,
         term='',
-        entity=search_app.es_model,
         filter_data={
             adviser_field: request.user.id,
             'created_on_exists': True,
