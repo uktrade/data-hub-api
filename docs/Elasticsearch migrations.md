@@ -88,13 +88,3 @@ fail as they will assume it’s a non-existent field).
 5. Release this, and run `./manage.py migrate_es`.
 6. Remove references to the old field from the attributes mentioned in previous steps 
 (and return composite filters to normal filters if applicable).
-
-## Force-updating an existing mapping
-
-If you’ve only added a field to a mapping, a full migration is technically not 
-required and the existing mapping can be updated in place. (There is no automated
-detection of this in the `migrate_es` command, as it’s not easy to automatically 
-detect for various reasons.)
-
-To do this, run `./manage.py init_es --model=<model name> --force-update-mapping`
-followed by `./manage.py sync_es --model=<model name>`.

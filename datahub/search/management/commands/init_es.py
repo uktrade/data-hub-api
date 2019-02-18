@@ -21,11 +21,6 @@ class Command(BaseCommand):
             choices=[search_app.name for search_app in get_search_apps()],
             help='Search apps to initialise. If empty, all are initialised.',
         )
-        parser.add_argument(
-            '--force-update-mapping',
-            action='store_true',
-            help='Attempts to update the mapping if the index and alias already exist.',
-        )
 
     def handle(self, *args, **options):
         """Executes the command."""
@@ -33,6 +28,6 @@ class Command(BaseCommand):
             logger.info('Creating Elasticsearch indices and initialising mappings...')
 
             for app in get_search_apps_by_name(options['model']):
-                app.init_es(force_update_mapping=options['force_update_mapping'])
+                app.init_es()
 
             logger.info('Elasticsearch indices and mappings initialised')

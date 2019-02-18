@@ -25,14 +25,9 @@ class SearchApp:
     export_permission = None
 
     @classmethod
-    def init_es(cls, force_update_mapping=False):
-        """
-        Creates the index and aliases for this app if they don't already exist.
-
-        If force_update_mapping is True and the write alias already exists, an attempt
-        is made to update the existing mapping in place.
-        """
-        cls.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
+    def init_es(cls):
+        """Creates the index and aliases for this app if they don't already exist."""
+        cls.es_model.set_up_index_and_aliases()
 
     @classmethod
     def load_views(cls):
