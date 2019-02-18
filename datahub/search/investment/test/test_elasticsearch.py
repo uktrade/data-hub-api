@@ -706,6 +706,8 @@ def test_get_basic_search_query():
                         'multi_match': {
                             'query': 'test',
                             'fields': [
+                                'address.country.name.trigram',
+                                'address.postcode.trigram',
                                 'address_country.name_trigram',
                                 'address_postcode_trigram',
                                 'company.name',
@@ -732,8 +734,8 @@ def test_get_basic_search_query():
                                 'project_code_trigram',
                                 'reference_code',
                                 'reference_trigram',
-                                'registered_address_country.name_trigram',
-                                'registered_address_postcode_trigram',
+                                'registered_address.country.name.trigram',
+                                'registered_address.postcode.trigram',
                                 'related_programmes.name',
                                 'related_programmes.name_trigram',
                                 'subject_english',
@@ -741,8 +743,6 @@ def test_get_basic_search_query():
                                 'teams.name',
                                 'teams.name_trigram',
                                 'total_cost_string',
-                                'trading_address_country.name_trigram',
-                                'trading_address_postcode_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',
