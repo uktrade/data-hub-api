@@ -1,7 +1,0 @@
-The field ``trading_name`` was removed from the endpoints below, please use the ``trading_names`` field instead:
-
-- ``/v3/search/company``
-- ``/v3/search/company/autocomplete``
-- ``/v3/search/contact``: from the nested company object
-- ``/v3/search/interaction``: from the nested company object
-- ``/v3/search/order``: from the nested company object
