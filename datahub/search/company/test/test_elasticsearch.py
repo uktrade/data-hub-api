@@ -200,7 +200,7 @@ def test_mapping(setup_es):
                         'country': {
                             'type': 'object',
                             'properties': {
-                                'id': {'index': False, 'type': 'keyword'},
+                                'id': {'type': 'keyword'},
                                 'name': {
                                     'type': 'text',
                                     'fields': {
@@ -233,7 +233,7 @@ def test_mapping(setup_es):
                         'country': {
                             'type': 'object',
                             'properties': {
-                                'id': {'index': False, 'type': 'keyword'},
+                                'id': {'type': 'keyword'},
                                 'name': {
                                     'type': 'text',
                                     'fields': {
