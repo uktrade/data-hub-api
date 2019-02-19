@@ -1,3 +1,24 @@
+Data Hub API 10.1.0 (2019-02-19)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The ``contacts`` field in company search results is deprecated and will be removed on or after 28 February 2019 from the following endpoints:
+
+  - ``/v3/search``
+  - ``/v3/search/company``
+  - ``/v4/search/company``
+
+Internal changes
+----------------
+
+- **Companies** ``company.address_country_id`` and ``company.registered_address_country_id`` are now indexed in ElasticSearch so that they can be used when filtering down results.
+- Various dependencies were updated.
+
+
 Data Hub API 10.0.0 (2019-02-18)
 ================================
 
