@@ -1,8 +1,10 @@
 from random import shuffle
 
+import pytest
 from django.urls import reverse
 
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.search.fields import address_field
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
@@ -49,3 +51,79 @@ class TestNormalizedField(APITestMixin):
             'Barbara',
             'barbara 2',
         ]
+
+
+@pytest.mark.parametrize(
+    'index_country,expected_mapping',
+    (
+        (
+            True,
+            {
+                'type': 'object',
+                'properties': {
+                    'line_1': {'index': False, 'type': 'text'},
+                    'line_2': {'index': False, 'type': 'text'},
+                    'town': {'index': False, 'type': 'text'},
+                    'county': {'index': False, 'type': 'text'},
+                    'postcode': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'country': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        ),
+
+        (
+            False,
+            {
+                'type': 'object',
+                'properties': {
+                    'line_1': {'index': False, 'type': 'text'},
+                    'line_2': {'index': False, 'type': 'text'},
+                    'town': {'index': False, 'type': 'text'},
+                    'county': {'index': False, 'type': 'text'},
+                    'postcode': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'country': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'index': False, 'type': 'keyword'},
+                            'name': {'index': False, 'type': 'text'},
+                        },
+                    },
+                },
+            },
+        ),
+    ),
+)
+def test_address_field(index_country, expected_mapping):
+    """Test for address_field."""
+    field_mapping = address_field(index_country=index_country)
+    assert field_mapping.to_dict() == expected_mapping

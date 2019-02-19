@@ -1,3 +1,5 @@
+from functools import partial
+
 from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
@@ -21,6 +23,9 @@ class CompaniesHouseCompany(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    registered_address = fields.address_field(index_country=False)
+
+    # TODO: delete once the migration to nested registered address is complete
     registered_address_1 = Text()
     registered_address_2 = Text()
     registered_address_town = fields.NormalizedKeyword()
@@ -28,22 +33,31 @@ class CompaniesHouseCompany(BaseESModel):
     registered_address_postcode = Text(copy_to='registered_address_postcode_trigram')
     registered_address_postcode_trigram = fields.TrigramText()
     registered_address_country = fields.id_name_field()
+
     sic_code_1 = Text()
     sic_code_2 = Text()
     sic_code_3 = Text()
     sic_code_4 = Text()
     uri = Text()
 
+    COMPUTED_MAPPINGS = {
+        'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
+    }
+
     MAPPINGS = {
         'id': str,
+
+        # TODO: delete once the migration to nested registered address is complete
         'registered_address_country': dict_utils.id_name_dict,
     }
 
     SEARCH_FIELDS = (
-        # to match names like A & B
-        'name',
+        'name',  # to find 2-letter words
         'name.trigram',
         'company_number',
+
+        # TODO: replace with nested registered address
+        # once the index data has been populated
         'registered_address_postcode_trigram',
     )
 
