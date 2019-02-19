@@ -290,7 +290,7 @@ def test_empty_object_returned_with_authentication(api_client):
     )
     with pytest.raises(mohawk.exc.MacMismatch):
         sender.accept_response(
-            response_header=response['Server-Authorization'] + 'incorrect',
+            response_header='Hawk mac="incorrect", hash="incorrect"',
             content=response.content,
             content_type=response['Content-Type'],
         )

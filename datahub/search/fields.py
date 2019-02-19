@@ -98,7 +98,7 @@ def address_field():
             ),
             'country': Object(
                 properties={
-                    'id': Keyword(index=False),
+                    'id': Keyword(),
                     'name': Text(
                         fields={
                             'trigram': TrigramText(),
