@@ -134,12 +134,12 @@ class TestCreatePreviewOrder(APITestMixin):
 
     @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
-        'OrderFactoryClass',  # noqa: N803
+        'order_factory',
         (OrderFactory, OrderWithCancelledQuoteFactory),
     )
-    def test_create_success(self, OrderFactoryClass):
+    def test_create_success(self, order_factory):
         """Test a successful call to create a quote."""
-        order = OrderFactoryClass(
+        order = order_factory(
             delivery_date=dateutil_parse('2017-06-18').date(),
         )
         orig_quote = order.quote
@@ -190,15 +190,15 @@ class TestCreatePreviewOrder(APITestMixin):
 
     @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
-        'OrderFactoryClass',  # noqa: N803
+        'order_factory',
         (OrderFactory, OrderWithCancelledQuoteFactory),
     )
-    def test_preview_success(self, OrderFactoryClass):
+    def test_preview_success(self, order_factory):
         """
         Test a successful call to preview a quote.
         Changes are not saved in the db.
         """
-        order = OrderFactoryClass(
+        order = order_factory(
             delivery_date=dateutil_parse('2017-06-18').date(),
         )
         orig_quote = order.quote
