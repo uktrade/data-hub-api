@@ -1,0 +1,1 @@
+The search logic is now using company address and registered address instead of trading address behind the scenes.
