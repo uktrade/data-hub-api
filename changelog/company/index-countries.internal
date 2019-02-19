@@ -1,0 +1,1 @@
+``company.address_country_id`` and ``company.registered_address_country_id`` are now indexed in ElasticSearch so that they can be used when filtering down results.
