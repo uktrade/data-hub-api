@@ -17,6 +17,12 @@ TeamWithGeographyField = partial(
 )
 
 
+class AdministrativeAreaSerializer(ConstantModelSerializer):
+    """Administrative area serializer."""
+
+    country = NestedRelatedField(Country, read_only=True)
+
+
 class ServiceSerializer(ConstantModelSerializer):
     """Service serializer."""
 
