@@ -60,7 +60,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'data,results',
+        'post_data,expected_results',
         (
             (  # no filter => return all records
                 {},
@@ -89,13 +89,59 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
             ),
         ),
     )
-    def test_search(self, setup_data, data, results):
+    def test_search(self, setup_data, post_data, expected_results):
         """Test search results."""
         url = reverse('api-v3:search:companieshousecompany')
 
-        response = self.api_client.post(url, data)
+        response = self.api_client.post(url, post_data)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.json()['results']) == len(results)
-        assert {
-            item['company_number'] for item in response.json()['results']
-        } == results
+        response_data = response.json()
+        actual_results = {
+            item['company_number']
+            for item in response_data['results']
+        }
+        assert len(response_data['results']) == len(expected_results)
+        assert actual_results == expected_results
+
+    def test_response_body(self, setup_es):
+        """Tests the response body of a search query."""
+        company = CompaniesHouseCompanyFactory(
+            name='Pallas',
+            company_number='111',
+            incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
+            company_status='jumping',
+        )
+        sync_object(CompaniesHouseCompanySearchApp, company.pk)
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:companieshousecompany')
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 1,
+            'results': [
+                {
+                    'id': str(company.pk),
+                    'name': company.name,
+                    'company_category': company.company_category,
+                    'incorporation_date': company.incorporation_date.date().isoformat(),
+                    'company_number': company.company_number,
+                    'company_status': company.company_status,
+                    'registered_address_1': company.registered_address_1,
+                    'registered_address_2': company.registered_address_2,
+                    'registered_address_town': company.registered_address_town,
+                    'registered_address_county': company.registered_address_county,
+                    'registered_address_postcode': company.registered_address_postcode,
+                    'registered_address_country': {
+                        'id': str(company.registered_address_country.id),
+                        'name': company.registered_address_country.name,
+                    },
+                    'sic_code_1': company.sic_code_1,
+                    'sic_code_2': company.sic_code_2,
+                    'sic_code_3': company.sic_code_3,
+                    'sic_code_4': company.sic_code_4,
+                    'uri': company.uri,
+                },
+            ],
+        }
