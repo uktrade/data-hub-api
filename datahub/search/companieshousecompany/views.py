@@ -18,3 +18,16 @@ class SearchCompaniesHouseCompanyAPIViewV3(BaseSearchCompaniesHouseCompanyAPIVie
     fields_to_exclude = (
         'registered_address',
     )
+
+
+class SearchCompaniesHouseCompanyAPIViewV4(BaseSearchCompaniesHouseCompanyAPIView):
+    """Filtered company search view V4."""
+
+    fields_to_exclude = (
+        'registered_address_1',
+        'registered_address_2',
+        'registered_address_town',
+        'registered_address_county',
+        'registered_address_country',
+        'registered_address_postcode',
+    )
