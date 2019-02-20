@@ -84,6 +84,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
             ],
@@ -95,9 +96,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -109,11 +112,13 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -125,9 +130,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -139,9 +146,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
                 [
@@ -155,11 +164,13 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -171,11 +182,13 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
                 [
@@ -191,11 +204,13 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -207,6 +222,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
@@ -214,6 +230,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -225,6 +242,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
@@ -232,6 +250,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
                 [
@@ -243,12 +262,14 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234560',
+                    'name': 'Consolidated',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -258,18 +279,22 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234560',
+                    'name': 'Consolidated',
                 },
                 {
                     'company_number': '01234561',
+                    'name': 'ACME',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -279,20 +304,24 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234560',
+                    'name': 'Consolidated',
                 },
                 {
                     'company_number': '01234561',
+                    'name': 'ACME',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -302,15 +331,18 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234560',
+                    'name': 'Consolidated',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -320,17 +352,20 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234560',
+                    'name': 'Consolidated',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'ACME',
                     },
                 ],
             ],
@@ -340,15 +375,18 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234561',
+                    'name': 'ACME',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -358,17 +396,20 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
             [
                 {
                     'company_number': '01234561',
+                    'name': 'ACME',
                 },
             ],
             [
                 [
                     {
                         'dit:companiesHouseNumber': '01234560',
+                        'name': 'Consolidated',
                     },
                 ],
                 [
                     {
                         'dit:companiesHouseNumber': '01234561',
+                        'name': 'Updated name that should be ignored',
                     },
                 ],
             ],
@@ -379,8 +420,10 @@ def test_imports_companies_without_duplicates(existing_company_attributes,
                                               as_paginated_company_attributes, requests_mock):
     """Tests that all non-existing companies are created, with no duplicates are created"""
     # Create all existing companies
-    for company_attributes in existing_company_attributes:
+    existing_companies = [
         CompanyFactory(**company_attributes)
+        for company_attributes in existing_company_attributes
+    ]
 
     first_page_url = os.environ['ACTIVITY_STREAM_OUTGOING_URL']
 
@@ -422,6 +465,37 @@ def test_imports_companies_without_duplicates(existing_company_attributes,
         company_number__in=company_numbers_that_should_exist,
     ).values_list('company_number', flat=True))
     assert company_numbers_that_should_exist == company_numbers_that_do_exist
+
+    # Assert that the new companies have all the required values
+    as_companies_without_dupes = sorted({
+        company_attributes['dit:companiesHouseNumber']: company_attributes
+        for company_attributes in reversed(_flatten(as_paginated_company_attributes))
+    }.values(), key=lambda company_attributes: company_attributes['dit:companiesHouseNumber'])
+    company_numbers_to_be_created = sorted(as_company_numbers - existing_company_numbers)
+    companies_to_be_created_without_dupes = [
+        company for company in as_companies_without_dupes if
+        company['dit:companiesHouseNumber'] in company_numbers_to_be_created
+    ]
+    mapping = {
+        'company_number': 'dit:companiesHouseNumber',
+        'name': 'name',
+    }
+    expected_values = [{
+        key: company_attributes[mapping[key]]
+        for key, value in mapping.items()
+    }
+        for company_attributes in companies_to_be_created_without_dupes
+    ]
+    actual_values = list(Company.objects.filter(
+        company_number__in=company_numbers_to_be_created,
+    ).order_by('company_number').values(*mapping.keys()))
+    assert expected_values == actual_values
+
+    # Assert that all the existing companies have not been updated
+    possibly_updated_companies = list(Company.objects.filter(
+        id__in=[company.id for company in existing_companies],
+    ).order_by('company_number'))
+    assert existing_companies == possibly_updated_companies
 
 
 def _activity_stream_page(company_attributes_list, next_page_dict):

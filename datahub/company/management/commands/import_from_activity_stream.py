@@ -75,9 +75,20 @@ class Command(BaseCommand):
                 company_numbers_to_create = \
                     company_numbers_that_should_exist - company_numbers_that_do_exist
                 logger.info('Creating companies: %s', company_numbers_to_create)
+                companies_to_create_by_number = {
+                    company['dit:companiesHouseNumber']: company
+                    # Reversed to ensure it's the _first_ company used in the case of duplicates,
+                    # since in a dict comprehension the later keys overwrite the earlier ones
+                    for item in reversed(response_page['orderedItems'])
+                    for company in [item['object']['attributedTo']]
+                }
                 Company.objects.bulk_create([
-                    Company(company_number=company_number)
+                    Company(
+                        company_number=company['dit:companiesHouseNumber'],
+                        name=company['name'],
+                    )
                     for company_number in company_numbers_to_create
+                    for company in [companies_to_create_by_number[company_number]]
                 ])
                 logger.info('Companies created')
 
