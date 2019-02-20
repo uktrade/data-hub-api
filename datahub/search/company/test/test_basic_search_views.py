@@ -19,19 +19,18 @@ def setup_data(setup_es):
     CompanyFactory(
         name='abc defg ltd',
         trading_names=['helm', 'nop'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_uk,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
+        address_country_id=country_uk,
         uk_region_id=uk_region,
     )
     CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_us,
-        registered_address_country_id=country_us,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
         address_country_id=country_us,
+        registered_address_country_id=country_us,
     )
     setup_es.indices.refresh()
 
@@ -130,33 +129,38 @@ class TestBasicSearch(APITestMixin):
             assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'field,value,term,match',
+        'model_field,model_value,search_term,match_found',
         (
-            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
-            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
+            ('address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
+            ('address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
         ),
     )
-    def test_search_in_field(self, setup_es, field, value, term, match):
+    def test_search_in_field(self, setup_es, model_field, model_value, search_term, match_found):
         """Tests basic aggregate companies query."""
         CompanyFactory()
-        CompanyFactory(**{field: value})
+        CompanyFactory(
+            **{
+                'name': 'test_company',
+                model_field: model_value,
+            },
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
             url,
             data={
-                'term': term,
+                'term': search_term,
                 'entity': 'company',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        if match:
+        if match_found:
             assert response.data['count'] == 1
-            assert response.data['results'][0][field] == value
+            assert response.data['results'][0]['name'] == 'test_company'
         else:
             assert response.data['count'] == 0
 
