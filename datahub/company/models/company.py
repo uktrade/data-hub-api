@@ -274,14 +274,6 @@ class Company(ArchivableModel, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    def has_valid_trading_address(self):
-        """Tells if Company has all required trading address fields defined."""
-        field_mapping = self.TRADING_ADDRESS_VALIDATION_MAPPING
-
-        return all(
-            getattr(self, field) for field, rules in field_mapping.items() if rules['required']
-        )
-
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.

@@ -3,22 +3,13 @@ from unittest import mock
 import pytest
 from pytest import raises
 
+from datahub.core.test_utils import construct_mock
 from datahub.search import dict_utils
-
-
-def _construct_mock(**props):
-    """
-    Same as mock.Mock() but using configure_mock as
-    name collides with the kwarg in the Mock constructor.
-    """
-    obj = mock.Mock(spec_set=tuple(props))
-    obj.configure_mock(**props)
-    return obj
 
 
 def test_id_name_dict():
     """Tests _id_name_dict."""
-    obj = _construct_mock(id=123, name='test')
+    obj = construct_mock(id=123, name='test')
 
     res = dict_utils.id_name_dict(obj)
 
@@ -35,7 +26,7 @@ def test_id_name_list_of_dicts():
         {'id': '99', 'name': 'testing B'},
     ]
     objects = [
-        _construct_mock(**mock_data)
+        construct_mock(**mock_data)
         for mock_data in data
     ]
 
@@ -48,7 +39,7 @@ def test_id_name_list_of_dicts():
 
 def test_id_type_dict():
     """Tests _id_type_dict."""
-    obj = _construct_mock(id=123, type='test')
+    obj = construct_mock(id=123, type='test')
 
     res = dict_utils.id_type_dict(obj)
 
@@ -60,7 +51,7 @@ def test_id_type_dict():
 
 def test_id_uri_dict():
     """Tests id_uri_dict."""
-    obj = _construct_mock(id=123, uri='test')
+    obj = construct_mock(id=123, uri='test')
 
     res = dict_utils.id_uri_dict(obj)
 
@@ -75,7 +66,7 @@ def test_id_uri_dict():
     (
         # complete object
         (
-            _construct_mock(
+            construct_mock(
                 id=123,
                 name='Name',
                 trading_names=['Trading 1', 'Trading 2'],
@@ -89,7 +80,7 @@ def test_id_uri_dict():
 
         # minimal object
         (
-            _construct_mock(
+            construct_mock(
                 id=123,
                 name='Name',
                 trading_names=[],
@@ -120,7 +111,7 @@ def test_company_dict(obj, expected_dict):
     (
         # returns None in case of empty address fields values
         (
-            _construct_mock(
+            construct_mock(
                 address_1='',
                 address_2='',
                 address_town='',
@@ -141,13 +132,13 @@ def test_company_dict(obj, expected_dict):
 
         # all fields converted into a dict
         (
-            _construct_mock(
+            construct_mock(
                 primary_address_1='1',
                 primary_address_2='Main Road',
                 primary_address_town='London',
                 primary_address_county='Greenwich',
                 primary_address_postcode='SE10 9NN',
-                primary_address_country=_construct_mock(
+                primary_address_country=construct_mock(
                     id='80756b9a-5d95-e211-a939-e4115bead28a',
                     name='United Kingdom',
                 ),
@@ -169,13 +160,13 @@ def test_company_dict(obj, expected_dict):
 
         # None values converted to ''
         (
-            _construct_mock(
+            construct_mock(
                 primary_address_1=None,
                 primary_address_2=None,
                 primary_address_town=None,
                 primary_address_county=None,
                 primary_address_postcode=None,
-                primary_address_country=_construct_mock(
+                primary_address_country=construct_mock(
                     id='80756b9a-5d95-e211-a939-e4115bead28a',
                     name='United Kingdom',
                 ),
@@ -207,13 +198,13 @@ def test_address_dict_raises_error_with_invalid_prefix():
     Tests that if address_dict is called with a prefix that
     cannot be found on the object, an AttributeError is raised.
     """
-    obj = _construct_mock(
+    obj = construct_mock(
         primary_address_1='1',
         primary_address_2='Main Road',
         primary_address_town='London',
         primary_address_county='Greenwich',
         primary_address_postcode='SE10 9NN',
-        primary_address_country=_construct_mock(
+        primary_address_country=construct_mock(
             id='80756b9a-5d95-e211-a939-e4115bead28a',
             name='United Kingdom',
         ),
@@ -224,7 +215,7 @@ def test_address_dict_raises_error_with_invalid_prefix():
 
 def test_contact_or_adviser_dict():
     """Tests contact_or_adviser_dict."""
-    obj = _construct_mock(
+    obj = construct_mock(
         id=123,
         first_name='First',
         last_name='Last',
@@ -246,12 +237,12 @@ def test_contact_or_adviser_dict():
     (
         # with dit_team != None
         (
-            _construct_mock(
+            construct_mock(
                 id=123,
                 first_name='First',
                 last_name='Last',
                 name='First Last',
-                dit_team=_construct_mock(
+                dit_team=construct_mock(
                     id=321,
                     name='team name',
                 ),
@@ -270,7 +261,7 @@ def test_contact_or_adviser_dict():
 
         # with dit_team = None
         (
-            _construct_mock(
+            construct_mock(
                 id=123,
                 first_name='First',
                 last_name='Last',
@@ -301,7 +292,7 @@ def test_contact_or_adviser_list_of_dicts():
         {'id': '99', 'first_name': 'first B', 'last_name': 'last B', 'name': 'testing B'},
     ]
     objects = [
-        _construct_mock(**data_item)
+        construct_mock(**data_item)
         for data_item in data
     ]
 
@@ -314,7 +305,7 @@ def test_contact_or_adviser_list_of_dicts():
 
 def test_ch_company_dict():
     """Tests ch_company_dict."""
-    obj = _construct_mock(id=123, company_number='01234567')
+    obj = construct_mock(id=123, company_number='01234567')
 
     res = dict_utils.ch_company_dict(obj)
 
@@ -329,9 +320,9 @@ def test_ch_company_dict():
     (
         # complete object
         (
-            _construct_mock(
-                company=_construct_mock(
-                    sector=_construct_mock(
+            construct_mock(
+                company=construct_mock(
+                    sector=construct_mock(
                         id=123,
                         name='Cats',
                     ),
@@ -345,7 +336,7 @@ def test_ch_company_dict():
 
         # None first level field
         (
-            _construct_mock(
+            construct_mock(
                 company=None,
             ),
             None,
@@ -353,8 +344,8 @@ def test_ch_company_dict():
 
         # None second level field
         (
-            _construct_mock(
-                company=_construct_mock(
+            construct_mock(
+                company=construct_mock(
                     sector=None,
                 ),
             ),

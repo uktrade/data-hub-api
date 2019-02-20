@@ -73,16 +73,16 @@ def setup_data():
     CompanyFactory(
         name='abc defg ltd',
         trading_names=['abc defg trading ltd'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_uk,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
+        address_country_id=country_uk,
     )
     CompanyFactory(
         name='abc defg us ltd',
         trading_names=['abc defg us trading ltd'],
-        trading_address_1='1 Fake Lane',
-        trading_address_town='Downtown',
-        trading_address_country_id=country_us,
+        address_1='1 Fake Lane',
+        address_town='Downtown',
+        address_country_id=country_us,
         registered_address_country_id=country_us,
     )
 
