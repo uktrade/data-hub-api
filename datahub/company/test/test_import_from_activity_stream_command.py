@@ -3,7 +3,6 @@ from unittest.mock import (
     patch,
 )
 
-import factory
 import pytest
 from django.core.management import (
     call_command,
@@ -66,7 +65,7 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'existing_company_numbers,as_paginated_company_attributes',
+    'existing_company_attributes,as_paginated_company_attributes',
     (
         (
             # Single empty page
@@ -241,7 +240,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # No new companies, one existing
-            ['01234560'],
+            [
+                {
+                    'company_number': '01234560',
+                },
+            ],
             [
                 [
                     {
@@ -252,7 +255,14 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # No new companies, two existing, single page
-            ['01234560', '01234561'],
+            [
+                {
+                    'company_number': '01234560',
+                },
+                {
+                    'company_number': '01234561',
+                },
+            ],
             [
                 [
                     {
@@ -266,7 +276,14 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # No new companies, two existing, two pages
-            ['01234560', '01234561'],
+            [
+                {
+                    'company_number': '01234560',
+                },
+                {
+                    'company_number': '01234561',
+                },
+            ],
             [
                 [
                     {
@@ -282,7 +299,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # One new company, one existing which is first on single page
-            ['01234560'],
+            [
+                {
+                    'company_number': '01234560',
+                },
+            ],
             [
                 [
                     {
@@ -296,7 +317,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # One new company, one existing which is second of two pages
-            ['01234560'],
+            [
+                {
+                    'company_number': '01234560',
+                },
+            ],
             [
                 [
                     {
@@ -312,7 +337,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # One new company, one existing which is second on single page
-            ['01234561'],
+            [
+                {
+                    'company_number': '01234561',
+                },
+            ],
             [
                 [
                     {
@@ -326,7 +355,11 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
         (
             # One new company, one existing which is second on two pages
-            ['01234561'],
+            [
+                {
+                    'company_number': '01234561',
+                },
+            ],
             [
                 [
                     {
@@ -342,14 +375,12 @@ def test_import_raises_exception_on_http_error_code(requests_mock):
         ),
     ),
 )
-def test_imports_companies_without_duplicates(existing_company_numbers,
+def test_imports_companies_without_duplicates(existing_company_attributes,
                                               as_paginated_company_attributes, requests_mock):
     """Tests that all non-existing companies are created, with no duplicates are created"""
     # Create all existing companies
-    CompanyFactory.create_batch(
-        len(existing_company_numbers),
-        company_number=factory.Iterator(existing_company_numbers),
-    )
+    for company_attributes in existing_company_attributes:
+        CompanyFactory(**company_attributes)
 
     first_page_url = os.environ['ACTIVITY_STREAM_OUTGOING_URL']
 
@@ -378,11 +409,15 @@ def test_imports_companies_without_duplicates(existing_company_numbers,
     assert '"dit:directory:CompanyVerification"' in initial_request_body
 
     # Assert that new companies are created, and without duplicates
+    existing_company_numbers = set(
+        company_attributes['company_number']
+        for company_attributes in existing_company_attributes
+    )
     as_company_numbers = set(
         company_attributes['dit:companiesHouseNumber']
         for company_attributes in _flatten(as_paginated_company_attributes)
     )
-    company_numbers_that_should_exist = sorted(as_company_numbers | set(existing_company_numbers))
+    company_numbers_that_should_exist = sorted(as_company_numbers | existing_company_numbers)
     company_numbers_that_do_exist = sorted(Company.objects.filter(
         company_number__in=company_numbers_that_should_exist,
     ).values_list('company_number', flat=True))
