@@ -5,6 +5,8 @@ from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
 from datahub.investment.models import InvestmentProject
+from datahub.omis.order.models import Order
+
 
 ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('dnbmatchingresult').remote_field,
@@ -13,6 +15,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.investor_company.field,
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
+    Order.company.field,
 }
 
 
@@ -51,6 +54,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(Interaction, ('company',)),
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
+    MergeConfiguration(Order, ('company',)),
 ]
 
 
