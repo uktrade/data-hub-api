@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.metadata import urls
-from datahub.metadata.models import AdministrativeArea, Sector, Service
+from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
 from datahub.metadata.registry import registry
 from datahub.metadata.test.factories import ServiceFactory
 
@@ -115,6 +115,33 @@ def test_administrative_area_view(api_client):
             'name': administrative_area.country.name,
         },
         'disabled_on': format_date_or_datetime(administrative_area.disabled_on),
+    }
+
+
+def test_country_view(api_client):
+    """Test that the country view includes the country field."""
+    country = Country.objects.filter(
+        overseas_region__isnull=False,
+    ).order_by(
+        'name',
+    ).first()
+
+    url = reverse(viewname='country')
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    first_result_with_overseas_region = next(
+        result for result in response.json()
+        if result['overseas_region'] is not None
+    )
+    assert first_result_with_overseas_region == {
+        'id': str(country.pk),
+        'name': country.name,
+        'overseas_region': {
+            'id': str(country.overseas_region.pk),
+            'name': country.overseas_region.name,
+        },
+        'disabled_on': format_date_or_datetime(country.disabled_on),
     }
 
 
