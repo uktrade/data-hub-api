@@ -105,7 +105,7 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.6
+          python_image: python:3.7
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
@@ -115,7 +115,7 @@ workflows:
     jobs:
       - build:
           publish_coverage: false
-          python_image: python:3.6
+          python_image: python:3.7
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
