@@ -87,6 +87,31 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                 },
+                'registered_address': {
+                    'type': 'object',
+                    'properties': {
+                        'line_1': {'index': False, 'type': 'text'},
+                        'line_2': {'index': False, 'type': 'text'},
+                        'town': {'index': False, 'type': 'text'},
+                        'county': {'index': False, 'type': 'text'},
+                        'postcode': {
+                            'type': 'text',
+                            'fields': {
+                                'trigram': {
+                                    'type': 'text',
+                                    'analyzer': 'trigram_analyzer',
+                                },
+                            },
+                        },
+                        'country': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'index': False, 'type': 'keyword'},
+                                'name': {'index': False, 'type': 'text'},
+                            },
+                        },
+                    },
+                },
                 'sic_code_1': {
                     'type': 'text',
                 },
@@ -126,6 +151,17 @@ def test_indexed_doc(setup_es):
     assert indexed_ch_company['_source'] == {
         'id': str(ch_company.pk),
         'name': ch_company.name,
+        'registered_address': {
+            'line_1': ch_company.registered_address_1,
+            'line_2': ch_company.registered_address_2,
+            'town': ch_company.registered_address_town,
+            'county': ch_company.registered_address_county,
+            'postcode': ch_company.registered_address_postcode,
+            'country': {
+                'id': str(ch_company.registered_address_country.pk),
+                'name': ch_company.registered_address_country.name,
+            },
+        },
         'registered_address_1': ch_company.registered_address_1,
         'registered_address_2': ch_company.registered_address_2,
         'registered_address_town': ch_company.registered_address_town,
