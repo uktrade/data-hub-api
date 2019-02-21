@@ -1,0 +1,8 @@
+``POST /v3/search/company``, ``POST /v3/search/company/export`` the following filters were deleted:
+
+- ``description``
+- ``export_to_country``
+- ``future_interest_country``
+- ``global_headquarters``
+- ``sector``
+- ``trading_address_country``
