@@ -46,141 +46,127 @@ def _auth_sender(
     (
         (
             # If no X-Forwarded-For header
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If second-to-last X-Forwarded-For header isn't whitelisted
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-                HTTP_X_FORWARDED_FOR='9.9.9.9, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+                'HTTP_X_FORWARDED_FOR': '9.9.9.9, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the only IP address in X-Forwarded-For is whitelisted
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the only IP address in X-Forwarded-For isn't whitelisted
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-                HTTP_X_FORWARDED_FOR='123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+                'HTTP_X_FORWARDED_FOR': '123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If third-to-last IP in X-Forwarded-For header is whitelisted
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 124.124.124, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 124.124.124, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If last of 3 IPs in X-Forwarded-For header is whitelisted
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header,
-                HTTP_X_FORWARDED_FOR='124.124.124, 123.123.123.123, 1.2.3.4',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender().request_header,
+                'HTTP_X_FORWARDED_FOR': '124.124.124, 123.123.123.123, 1.2.3.4',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header isn't passed
-            dict(
-                content_type='',
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Authentication credentials were not provided.'},
         ),
         (
             # If the Authorization header generated from an incorrect ID
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    key_id='incorrect',
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(key_id='incorrect').request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from an incorrect secret
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    secret_key='incorrect',
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(secret_key='incorrect').request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from an incorrect domain
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    url=_url_incorrect_domain,
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(url=_url_incorrect_domain).request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from an incorrect path
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    url=_url_incorrect_path,
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(url=_url_incorrect_path).request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from an incorrect method
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    method='POST',
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(method='POST').request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from an incorrect
             # content-type
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    content_type='incorrect',
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(content_type='incorrect').request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
         (
             # If the Authorization header generated from incorrect content
-            dict(
-                content_type='',
-                HTTP_AUTHORIZATION=_auth_sender(
-                    content='incorrect',
-                ).request_header,
-                HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            ),
+            {
+                'content_type': '',
+                'HTTP_AUTHORIZATION': _auth_sender(content='incorrect').request_header,
+                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
+            },
             {'detail': 'Incorrect authentication credentials.'},
         ),
     ),
