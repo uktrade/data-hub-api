@@ -1,3 +1,42 @@
+Data Hub API 10.2.0 (2019-02-21)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The endpoint ``/v3/search/companieshousecompany`` is deprecated and will be removed on or after the 28th of February, please use v4 instead.
+
+Features
+--------
+
+- **Companies** Company merge tool now supports merging companies having investment projects.
+- Administrative areas of countries were added to the admin site. These cannot be edited and will initially be used by the Market Access service (but are not used within Data Hub CRM at present).
+
+Internal changes
+----------------
+
+- **Companies** The search logic is now using company address and registered address instead of trading address behind the scenes.
+
+API
+---
+
+- **Companies** API V4 of companieshouse company search was introduced with nested object format for addresses.
+  The endpoint ``/v4/search/companieshousecompany`` was added with the ``registered_address_*`` fields
+  replaced by the nested object ``registered_address``.
+- ``GET /metadata/administrative-area/`` was added to retrieve a list of administrative areas of countries.
+- ``/metadata/country/``: ``overseas_region`` was added to each country in responses. For non-UK countries, this is an object
+  containing the the ID and name of the DIT overseas region the country belongs to.
+
+Database schema
+---------------
+
+- The ``metadata_administrative_area`` table was added with columns ``("disabled_on" timestamp with time zone NULL, "id" uuid NOT NULL PRIMARY KEY, "name" text NOT NULL, "country_id" uuid NOT NULL)``.
+
+  This contains a list of administrative areas of countries.
+
+
 Data Hub API 10.1.0 (2019-02-19)
 ================================
 
