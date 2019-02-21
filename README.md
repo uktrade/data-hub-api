@@ -213,7 +213,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | Variable name | Required | Description |
 | ------------- | ------------- | ------------- |
 | `ACTIVITY_STREAM_ACCESS_KEY_ID` | Yes | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication. |
-| `ACTIVITY_STREAM_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the activity stream endpoint. |
 | `ACTIVITY_STREAM_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
@@ -247,6 +246,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
+| `HAWK_RECEIVER_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |

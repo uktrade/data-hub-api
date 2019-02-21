@@ -231,6 +231,29 @@ def test_if_authentication_reused_401_returned(api_client):
 
 
 @pytest.mark.django_db
+def test_403_returned(api_client):
+    """
+    Test that a 403 is returned if the request is Hawk authenticated but the client doesn't have
+    the required scope.
+    """
+    sender = _auth_sender(
+        key_id='scopeless-id',
+        secret_key='scopeless-key',
+    )
+    response = api_client.get(
+        _url(),
+        content_type='',
+        HTTP_AUTHORIZATION=sender.request_header,
+        HTTP_X_FORWARDED_FOR='3.3.3.3, 1.2.3.4, 123.123.123.123',
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json() == {
+        'detail': 'You do not have permission to perform this action.',
+    }
+
+
+@pytest.mark.django_db
 def test_empty_object_returned_with_authentication_3_ips(api_client):
     """If the Authorization and X-Forwarded-For headers are correct,
     with an extra IP address prepended to the X-Forwarded-For then
