@@ -1,3 +1,0 @@
-API V4 of companieshouse company search was introduced with nested object format for addresses.
-The endpoint ``/v4/search/companieshousecompany`` was added with the ``registered_address_*`` fields
-replaced by the nested object ``registered_address``.
