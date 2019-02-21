@@ -32,14 +32,15 @@
 </p>
 <p>{% trans 'This will make the following changes:' %}</p>
 <ul>
-  {% for move_entry in move_entries %}
+  {% for merge_entry in merge_entries %}
   <li>
-    {% verbose_name_for_count move_entry.count move_entry.model_meta as verbose_name %}
-    {% blocktrans with count=move_entry.count %}
-    {{ count }} {{ verbose_name }} will be moved from {{ source_company_link }} to {{ target_company_link }}.
+    {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
+    {% blocktrans with count=merge_entry.count description=merge_entry.description %}
+      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_company_link }} to {{ target_company_link }}.
     {% endblocktrans %}
   </li>
   {% endfor %}
+
   <li>
     {% if should_archive_source %}
       {% blocktrans %}{{ source_company_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
