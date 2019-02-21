@@ -37,7 +37,7 @@ class RelationshipHealth(Enum):
 class BackgroundChecksConducted(Enum):
     """Background checks conducted constants."""
 
-    yes = Constant(
+    cleared = Constant(
         'Cleared',
         '02d6fc9b-fbb9-4621-b247-d86f2487898e',
     )

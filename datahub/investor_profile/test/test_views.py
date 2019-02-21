@@ -170,7 +170,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             'investable_capital': 1000,
             'dit_relationship_manager': {'id': str(adviser.id)},
             'relationship_health': {'id': RelationshipHealthConstant.good.value.id},
-            'background_checks_conducted': {'id': BackgroundChecksConductedConstant.yes.value.id},
+            'background_checks_conducted': {
+                'id': BackgroundChecksConductedConstant.cleared.value.id,
+            },
             'client_contacts': [
                 {
                     'id': str(contacts[0].id),
@@ -200,7 +202,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         )
         assert (
             response_data['background_checks_conducted']['id']
-            == str(BackgroundChecksConductedConstant.yes.value.id)
+            == str(BackgroundChecksConductedConstant.cleared.value.id)
         )
         expected_client_contacts = [
             str(contacts[0].pk),
