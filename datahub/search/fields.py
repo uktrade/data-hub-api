@@ -83,8 +83,27 @@ def id_name_partial_field(field):
     )
 
 
-def address_field():
+def address_field(index_country=True):
     """Address field as nested object."""
+    if index_country:
+        country_field = Object(
+            properties={
+                'id': Keyword(),
+                'name': Text(
+                    fields={
+                        'trigram': TrigramText(),
+                    },
+                ),
+            },
+        )
+    else:
+        country_field = Object(
+            properties={
+                'id': Keyword(index=False),
+                'name': Text(index=False),
+            },
+        )
+
     return Object(
         properties={
             'line_1': Text(index=False),
@@ -96,16 +115,7 @@ def address_field():
                     'trigram': TrigramText(),
                 },
             ),
-            'country': Object(
-                properties={
-                    'id': Keyword(),
-                    'name': Text(
-                        fields={
-                            'trigram': TrigramText(),
-                        },
-                    ),
-                },
-            ),
+            'country': country_field,
         },
     )
 
