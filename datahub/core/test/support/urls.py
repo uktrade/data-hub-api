@@ -1,6 +1,10 @@
 from django.urls import path
 
-from datahub.core.test.support.views import MultiAddressModelViewset, MyDisableableModelViewset
+from datahub.core.test.support.views import (
+    HawkView,
+    MultiAddressModelViewset,
+    MyDisableableModelViewset,
+)
 
 urlpatterns = [
     path(
@@ -25,5 +29,10 @@ urlpatterns = [
             'patch': 'partial_update',
         }),
         name='test-addresses-item',
+    ),
+    path(
+        'test-hawk/',
+        HawkView.as_view(),
+        name='test-hawk',
     ),
 ]

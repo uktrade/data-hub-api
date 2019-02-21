@@ -61,6 +61,10 @@ HAWK_RECEIVER_CREDENTIALS = {
         'key': 'some-secret',
         'scope': HawkScope.activity_stream,
     },
+    'test-id': {
+        'key': 'test-key',
+        'scope': next(iter(HawkScope.__members__.values())),
+    },
     'scopeless-id': {
         'key': 'scopeless-key',
         'scope': object(),
