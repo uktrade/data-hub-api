@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from itertools import chain
+from itertools import chain, cycle, islice
 
 import pytest
 from django.contrib import messages as django_messages
@@ -13,6 +13,7 @@ from rest_framework import status
 from reversion.models import Version
 
 from datahub.company.admin.merge.step_3 import REVERSION_REVISION_COMMENT
+from datahub.company.merge import FIELD_TO_DESCRIPTION_MAPPING, INVESTMENT_PROJECT_COMPANY_FIELDS
 from datahub.company.models import Company
 from datahub.company.test.factories import (
     ArchivedCompanyFactory,
@@ -23,6 +24,7 @@ from datahub.company.test.factories import (
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
@@ -96,17 +98,35 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
     @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
-    def test_merge_succeeds(self, source_num_interactions, source_num_contacts):
+    @pytest.mark.parametrize('source_num_investment_projects', (0, 1, 3))
+    def test_merge_succeeds(
+        self,
+        source_num_interactions,
+        source_num_contacts,
+        source_num_investment_projects,
+    ):
         """
         Test that the merge succeeds and the source company is marked as a duplicate when the
-        source company has various amounts of contacts and interactions.
+        source company has various amounts of contacts, interactions and investment projects.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
         with freeze_time(creation_time):
-            source_company = _company_factory(source_num_interactions, source_num_contacts)
+            source_company = _company_factory(
+                source_num_interactions,
+                source_num_contacts,
+                source_num_investment_projects,
+            )
         target_company = CompanyFactory()
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
+
+        source_investment_projects_by_field = {
+            investment_project_field: list(
+                InvestmentProject.objects.filter(**{
+                    investment_project_field: source_company,
+                }),
+            ) for investment_project_field in INVESTMENT_PROJECT_COMPANY_FIELDS
+        }
 
         # Each interaction has a contact, so actual number of contacts is
         # source_num_interactions + source_num_contacts
@@ -125,9 +145,32 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         messages = list(response.context['messages'])
         assert len(messages) == 1
         assert messages[0].level == django_messages.SUCCESS
+
+        merge_entries = []
+        if len(source_interactions) > 0:
+            interaction_noun = 'interaction' if len(source_interactions) == 1 else 'interactions'
+            merge_entries.append(
+                f'{len(source_interactions)} {interaction_noun}',
+            )
+        if len(source_contacts) > 0:
+            interaction_noun = 'contact' if len(source_contacts) == 1 else 'contacts'
+            merge_entries.append(
+                f'{len(source_contacts)} {interaction_noun}',
+            )
+        for field, investment_projects in source_investment_projects_by_field.items():
+            num_investment_projects = len(investment_projects)
+            if num_investment_projects > 0:
+                project_noun = 'project' if num_investment_projects == 1 else 'projects'
+                description = FIELD_TO_DESCRIPTION_MAPPING.get(field)
+                merge_entries.append(
+                    f'{num_investment_projects} investment {project_noun}{description}',
+                )
+
+        merge_entries = ', '.join(merge_entries)
+
         match = re.match(
-            r'^Merge complete – (?P<num_interactions>\d) (?P<interaction_noun>interactions?)'
-            r' and (?P<num_contacts>\d) (?P<contact_noun>contacts?) moved from'
+            r'^Merge complete – (?P<merge_entries>.*)'
+            r' moved from'
             r' <a href="(?P<source_company_url>.*)" target="_blank">(?P<source_company>.*)</a>'
             r' to'
             r' <a href="(?P<target_company_url>.*)" target="_blank">(?P<target_company>.*)</a>'
@@ -136,23 +179,26 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         )
         assert match
         assert match.groupdict() == {
-            'num_interactions': str(len(source_interactions)),
-            'num_contacts': str(len(source_contacts)),
-            'interaction_noun': 'interaction' if len(source_interactions) == 1 else 'interactions',
-            'contact_noun': 'contact' if len(source_contacts) == 1 else 'contacts',
+            'merge_entries': merge_entries,
             'source_company_url': escape(source_company.get_absolute_url()),
             'source_company': escape(str(source_company)),
             'target_company_url': escape(target_company.get_absolute_url()),
             'target_company': escape(str(target_company)),
         }
 
-        for obj in chain(source_interactions, source_contacts):
+        for obj in chain(source_interactions, source_contacts, chain.from_iterable(
+            investment_projects
+            for investment_projects in source_investment_projects_by_field.values()
+        )):
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_interactions)
         assert all(obj.modified_on == creation_time for obj in source_interactions)
         assert all(obj.company == target_company for obj in source_contacts)
         assert all(obj.modified_on == creation_time for obj in source_contacts)
+        for field, investment_projects in source_investment_projects_by_field.items():
+            assert all(getattr(obj, field) == target_company for obj in investment_projects)
+            assert all(obj.modified_on == creation_time for obj in investment_projects)
 
         source_company.refresh_from_db()
 
@@ -210,10 +256,6 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 ArchivedCompanyFactory,
             ),
             (
-                lambda: InvestmentProjectFactory().investor_company,
-                CompanyFactory,
-            ),
-            (
                 lambda: OrderFactory().company,
                 CompanyFactory,
             ),
@@ -263,11 +305,18 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert not source_company.transferred_to
 
 
-def _company_factory(num_interactions, num_contacts):
-    """Factory for a company that has companies and interactions."""
+def _company_factory(num_interactions, num_contacts, num_investment_projects):
+    """Factory for a company that has companies, interactions and investment projects."""
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
+
+    fields_iter = cycle(INVESTMENT_PROJECT_COMPANY_FIELDS)
+    fields = islice(fields_iter, 0, num_investment_projects)
+    InvestmentProjectFactory.create_batch(
+        num_investment_projects,
+        **{field: company for field in fields},
+    )
     return company
 
 

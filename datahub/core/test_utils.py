@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from operator import attrgetter
 from secrets import token_hex
+from unittest import mock
 
 import factory
 import pytest
@@ -346,3 +347,13 @@ def _format_csv_value(value):
     if isinstance(value, datetime):
         return value.strftime('%Y-%m-%d %H:%M:%S')
     return str(value)
+
+
+def construct_mock(**props):
+    """
+    Same as mock.Mock() but using configure_mock as
+    name collides with the kwarg in the Mock constructor.
+    """
+    obj = mock.Mock(spec_set=tuple(props))
+    obj.configure_mock(**props)
+    return obj

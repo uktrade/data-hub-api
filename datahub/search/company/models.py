@@ -154,12 +154,10 @@ class Company(BaseESModel):
         'trading_names_trigram',
         'reference_code',
 
-        # TODO: replace with nested address and registered address
-        # once the index data has been populated
-        'registered_address_country.name_trigram',
-        'registered_address_postcode_trigram',
-        'trading_address_country.name_trigram',
-        'trading_address_postcode_trigram',
+        'address.country.name.trigram',
+        'address.postcode.trigram',
+        'registered_address.country.name.trigram',
+        'registered_address.postcode.trigram',
     )
 
     class Meta:

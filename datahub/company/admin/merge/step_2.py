@@ -7,7 +7,12 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.merge import DuplicateCompanyMerger
+from datahub.company.merge import (
+    get_planned_changes,
+    is_company_a_valid_merge_source,
+    is_company_a_valid_merge_target,
+    transform_merge_results_to_merge_entry_summaries,
+)
 from datahub.core.utils import reverse_with_query_string
 
 
@@ -53,12 +58,10 @@ class SelectPrimaryCompanyForm(forms.Form):
         target_company = self._company_1 if company_index == '1' else self._company_2
         source_company = self._company_1 if company_index != '1' else self._company_2
 
-        merger = DuplicateCompanyMerger(source_company, target_company)
-
-        if not merger.is_target_valid():
+        if not is_company_a_valid_merge_target(target_company):
             raise ValidationError(self.INVALID_TARGET_COMPANY_MSG)
 
-        if not merger.is_source_valid():
+        if not is_company_a_valid_merge_source(source_company):
             raise ValidationError(self.INVALID_SOURCE_COMPANY_MSG)
 
         cleaned_data['target_company'] = target_company
@@ -121,10 +124,16 @@ def select_primary_company(model_admin, request):
 
 
 def _build_option_context(source_company, target_company):
-    merger = DuplicateCompanyMerger(source_company, target_company)
+    merge_results, _ = get_planned_changes(target_company)
+    merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
+
+    is_source_valid = is_company_a_valid_merge_source(source_company)
+    is_target_valid = is_company_a_valid_merge_target(target_company)
+
     return {
         'target': target_company,
-        'is_source_valid': merger.is_source_valid(),
-        'is_target_valid': merger.is_target_valid(),
-        'is_valid': merger.is_valid(),
+        'merge_entries': merge_entries,
+        'is_source_valid': is_source_valid,
+        'is_target_valid': is_target_valid,
+        'is_valid': is_source_valid and is_target_valid,
     }

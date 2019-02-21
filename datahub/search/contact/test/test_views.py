@@ -40,7 +40,13 @@ pytestmark = pytest.mark.django_db
 def setup_data():
     """Sets up data for the tests."""
     contacts = [
-        ContactFactory(first_name='abc', last_name='defg'),
+        ContactFactory(
+            first_name='abc',
+            last_name='defg',
+            company=CompanyFactory(
+                address_country_id=Country.united_kingdom.value.id,
+            ),
+        ),
         ContactFactory(first_name='first', last_name='last'),
     ]
     yield contacts
@@ -82,44 +88,42 @@ class TestSearch(APITestMixin):
 
     def test_filter_contact(self, setup_es):
         """Tests matching contact using multiple filters."""
-        contact = ContactFactory(address_same_as_company=True)
-        company = contact.company
-        company.name = 'SlothsCats'
-        company.trading_address_country_id = Country.united_kingdom.value.id
-        company.uk_region_id = UKRegion.east_of_england.value.id
-        company.sector_id = Sector.renewable_energy_wind.value.id
-        company.save()
-
+        contact = ContactFactory(
+            address_same_as_company=True,
+            company=CompanyFactory(
+                name='SlothsCats',
+                address_country_id=Country.united_kingdom.value.id,
+                uk_region_id=UKRegion.east_of_england.value.id,
+                sector_id=Sector.renewable_energy_wind.value.id,
+            ),
+        )
         setup_es.indices.refresh()
-
-        term = ''
 
         url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(
             url,
             data={
-                'original_query': term,
-                'company_name': company.name,
-                'company_sector': company.sector_id,
-                'company_uk_region': company.uk_region_id,
-                'address_country': company.trading_address_country_id,
+                'company_name': contact.company.name,
+                'company_sector': contact.company.sector_id,
+                'company_uk_region': contact.company.uk_region_id,
+                'address_country': contact.company.address_country_id,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        contact = response.data['results'][0]
-        assert contact['address_country']['id'] == company.trading_address_country_id
-        assert contact['company']['name'] == company.name
-        assert contact['company_uk_region']['id'] == company.uk_region_id
-        assert contact['company_sector']['id'] == company.sector_id
+        result = response.data['results'][0]
+        assert result['address_country']['id'] == contact.company.address_country_id
+        assert result['company']['name'] == contact.company.name
+        assert result['company_uk_region']['id'] == contact.company.uk_region_id
+        assert result['company_sector']['id'] == contact.company.sector_id
 
     def test_filter_without_uk_region(self, setup_es):
         """Tests matching contact without uk_region using multiple filters."""
         company = CompanyFactory(
             registered_address_country_id=Country.united_states.value.id,
-            trading_address_country_id=Country.united_states.value.id,
+            address_country_id=Country.united_states.value.id,
             uk_region_id=None,
             sector_id=Sector.renewable_energy_wind.value.id,
         )
@@ -130,24 +134,21 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        term = ''
-
         url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(
             url,
             data={
-                'original_query': term,
                 'company_name': company.name,
                 'company_sector': company.sector_id,
-                'address_country': company.trading_address_country_id,
+                'address_country': company.address_country_id,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         contact = response.data['results'][0]
-        assert contact['address_country']['id'] == company.trading_address_country_id
+        assert contact['address_country']['id'] == company.address_country_id
         assert contact['company']['name'] == company.name
         assert contact['company_uk_region'] is None
         assert contact['company_sector']['id'] == company.sector_id
@@ -249,7 +250,6 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'original_query': '',
                 'company_name': name_term,
             },
         )
@@ -383,9 +383,8 @@ class TestSearch(APITestMixin):
 
     def test_company_name_trigram_filter(self, setup_es):
         """Tests edge case of partially matching company name."""
-        company = CompanyFactory(name='United States')
         ContactFactory(
-            company=company,
+            company=CompanyFactory(name='United States'),
         )
         setup_es.indices.refresh()
 
@@ -672,8 +671,8 @@ class TestBasicSearch(APITestMixin):
         sector_name = Sector.renewable_energy_wind.value.name
         assert sector_name == response.data['results'][0]['company_sector']['name']
 
-    def test_search_contact_has_company_trading_address_updated(self, setup_es):
-        """Tests if contact has a correct address after company trading address update."""
+    def test_search_contact_has_company_address_updated(self, setup_es):
+        """Tests if contact has a correct address after company address update."""
         contact = ContactFactory(
             address_same_as_company=True,
         )
@@ -687,9 +686,9 @@ class TestBasicSearch(APITestMixin):
         }
 
         company = contact.company
-        for k, v in address.items():
-            setattr(company, f'trading_{k}', v)
-        company.trading_address_country.id = Country.united_kingdom.value.id
+        for field_name, field_value in address.items():
+            setattr(company, field_name, field_value)
+        company.address_country.id = Country.united_kingdom.value.id
         company.save()
 
         setup_es.indices.refresh()
@@ -707,53 +706,10 @@ class TestBasicSearch(APITestMixin):
 
         result = response.data['results'][0]
 
-        for k, v in address.items():
-            assert v == result[k]
+        for field_name, field_value in address.items():
+            assert field_value == result[field_name]
 
-        country = contact.company.trading_address_country.name
-        assert country == result['address_country']['name']
-
-    def test_search_contact_has_company_registered_address_updated(self, setup_es):
-        """Tests if contact has a correct address after company registered address update."""
-        contact = ContactFactory(
-            address_same_as_company=True,
-        )
-
-        address = {
-            'address_1': '2 Own Street',
-            'address_2': '',
-            'address_county': 'Hello',
-            'address_town': 'Cats Town',
-            'address_postcode': 'ABC DEF',
-        }
-
-        company = contact.company
-        for k, v in address.items():
-            setattr(company, f'registered_{k}', v)
-            setattr(company, f'trading_{k}', None)
-        company.registered_address_country.id = Country.united_kingdom.value.id
-        company.trading_address_country = None
-        company.save()
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:contact')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': contact.id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-
-        result = response.data['results'][0]
-
-        for k, v in address.items():
-            assert v == result[k]
-
-        country = contact.company.registered_address_country.name
+        country = contact.company.address_country.name
         assert country == result['address_country']['name']
 
     def test_search_contact_has_own_address(self, setup_es):

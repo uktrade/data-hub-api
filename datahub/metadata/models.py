@@ -104,6 +104,20 @@ class Country(BaseConstantModel):
         verbose_name_plural = 'countries'
 
 
+class AdministrativeArea(BaseConstantModel):
+    """
+    States, provinces etc. within a country.
+
+    This is used by Market Access (but is not currently used in Data Hub CRM).
+    """
+
+    country = models.ForeignKey(
+        Country,
+        related_name='administrative_areas',
+        on_delete=models.CASCADE,
+    )
+
+
 class Title(BaseConstantModel):
     """Contact title."""
 
