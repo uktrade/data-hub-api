@@ -54,9 +54,18 @@ CELERY_TASK_ALWAYS_EAGER = True
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
 
-ACTIVITY_STREAM_IP_WHITELIST = '1.2.3.4'
-ACTIVITY_STREAM_ACCESS_KEY_ID = 'some-id'
-ACTIVITY_STREAM_SECRET_ACCESS_KEY = 'some-secret'
+HAWK_RECEIVER_IP_WHITELIST = ['1.2.3.4']
+
+HAWK_RECEIVER_CREDENTIALS = {
+    'some-id': {
+        'key': 'some-secret',
+        'scope': HawkScope.activity_stream,
+    },
+    'scopeless-id': {
+        'key': 'scopeless-key',
+        'scope': object(),
+    },
+}
 
 DOCUMENT_BUCKETS = {
     'default': {
