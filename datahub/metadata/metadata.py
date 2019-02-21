@@ -2,14 +2,31 @@ from datahub.metadata import models
 from datahub.metadata.filters import ServiceFilterSet
 from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
+    AdministrativeAreaSerializer,
+    CountrySerializer,
     InvestmentProjectStageSerializer,
     SectorSerializer,
     ServiceSerializer,
     TeamSerializer,
 )
 
+registry.register(
+    metadata_id='administrative-area',
+    model=models.AdministrativeArea,
+    queryset=models.AdministrativeArea.objects.select_related(
+        'country',
+    ),
+    serializer=AdministrativeAreaSerializer,
+)
 registry.register(metadata_id='business-type', model=models.BusinessType)
-registry.register(metadata_id='country', model=models.Country)
+registry.register(
+    metadata_id='country',
+    model=models.Country,
+    queryset=models.Country.objects.select_related(
+        'overseas_region',
+    ),
+    serializer=CountrySerializer,
+)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='overseas-region', model=models.OverseasRegion)
 registry.register(

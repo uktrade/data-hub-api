@@ -1,147 +1,184 @@
 from collections import namedtuple
 
-from django.db import transaction
-
 from datahub.company.models import Company, Contact
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
+from datahub.investment.models import InvestmentProject
 
 ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('dnbmatchingresult').remote_field,
     Contact.company.field,
     Interaction.company.field,
+    InvestmentProject.investor_company.field,
+    InvestmentProject.intermediate_company.field,
+    InvestmentProject.uk_company.field,
 }
 
 
-MoveEntry = namedtuple(
-    'MoveEntry',
+INVESTMENT_PROJECT_COMPANY_FIELDS = (
+    'investor_company',
+    'intermediate_company',
+    'uk_company',
+)
+
+FIELD_TO_DESCRIPTION_MAPPING = {
+    'investor_company': ' as investor company ',
+    'intermediate_company': ' as intermediate company ',
+    'uk_company': ' as UK company ',
+}
+
+MergeEntrySummary = namedtuple(
+    'MergeEntrySummary',
     [
         'count',
+        'description',
         'model_meta',
     ],
 )
 
 
-MergeResult = namedtuple(
-    'MergeResult',
+MergeConfiguration = namedtuple(
+    'MergeConfiguration',
     [
-        'num_interactions_moved',
-        'num_contacts_moved',
+        'model',
+        'fields',
     ],
 )
+
+
+MERGE_CONFIGURATION = [
+    MergeConfiguration(Interaction, ('company',)),
+    MergeConfiguration(Contact, ('company',)),
+    MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
+]
 
 
 class MergeNotAllowedError(DataHubException):
     """Merging the specified source company into the specified target company is not allowed."""
 
 
-class DuplicateCompanyMerger:
-    """Utility class for merging duplicate companies."""
+def is_company_a_valid_merge_source(company: Company):
+    """Checks if company can be moved."""
+    # First, check that there are no references to the company from other objects
+    # (other than via the fields specified in ALLOWED_RELATIONS_FOR_MERGING).
+    relations = get_related_fields(Company)
 
-    def __init__(self, source_company: Company, target_company: Company):
-        """Initialises the instance with the source and target companies."""
-        self.source_company = source_company
-        self.target_company = target_company
+    has_related_objects = any(
+        getattr(company, relation.name).count()
+        for relation in relations
+        if relation.remote_field not in ALLOWED_RELATIONS_FOR_MERGING
+    )
 
-    def get_planned_changes(self):
-        """Gets information about the changes that would be made if the merge proceeds."""
-        move_entries = []
+    if has_related_objects:
+        return False
 
-        contact_count = self.source_company.contacts.count()
-        self._append_move_entry(move_entries, contact_count, Contact)
+    # Then, check that the source company itself doesn't have any references to other
+    # companies.
+    self_referential_fields = get_self_referential_relations(Company)
+    return not any(
+        getattr(company, field.name) for field in self_referential_fields
+    )
 
-        interaction_count = self.source_company.interactions.count()
-        self._append_move_entry(move_entries, interaction_count, Interaction)
 
-        should_archive_source = not self.source_company.archived
+def is_company_a_valid_merge_target(company: Company):
+    """
+    Returns whether the specified company is a valid merge target.
 
-        return move_entries, should_archive_source
+    This checks that the target company isn't archived.
+    """
+    return not company.archived
 
-    def is_source_valid(self):
-        """
-        Returns whether the specified source company is a valid merge source.
 
-        This checks whether there are any references to the source company (other than
-        references through the relations specified in ALLOWED_RELATIONS_FOR_MERGING).
-        It also checks if the source company has any references to other companies.
-        Merging is not permitted if either of those types of reference exists.
-        """
-        if not hasattr(self, '_cached_is_source_valid'):
-            self._cached_is_source_valid = self._is_source_valid()
+def transform_merge_results_to_merge_entry_summaries(results, skip_zeroes=False):
+    """Transforms merge results into move entries to aid the presentation template."""
+    merge_entries = []
 
-        return self._cached_is_source_valid
+    for model, fields in results.items():
+        for field, num_objects_updated in fields.items():
+            if num_objects_updated == 0 and skip_zeroes:
+                continue
 
-    def is_target_valid(self):
-        """
-        Returns whether the specified target company is a valid merge target.
+            merge_entry = MergeEntrySummary(
+                num_objects_updated,
+                FIELD_TO_DESCRIPTION_MAPPING.get(field, ''),
+                model._meta,
+            )
+            merge_entries.append(merge_entry)
 
-        This checks that the target company isn't archived.
-        """
-        return not self.target_company.archived
+    return merge_entries
 
-    def is_valid(self):
-        """Returns whether the merge is allowed."""
-        return self.is_source_valid() and self.is_target_valid()
 
-    @transaction.atomic
-    def perform_merge(self, user):
-        """
-        Merges the source company into the target company.
+def merge_companies(source_company: Company, target_company: Company, user):
+    """
+    Merges the source company into the target company.
 
-        is_valid() should be called first to check if the merge is allowed. DataHubException
-        will be raised if the merge is not allowed, and perform_merge() was called anyway.
-        """
-        if not self.is_valid():
-            raise MergeNotAllowedError()
+    MergeNotAllowedError will be raised if the merge is not allowed.
+    """
+    if not (
+        is_company_a_valid_merge_source(source_company)
+        and is_company_a_valid_merge_target(target_company)
+    ):
+        raise MergeNotAllowedError()
 
-        num_interactions_moved = 0
-        num_contacts_moved = 0
+    results = _process_all_objects(
+        _update_objects,
+        source=source_company,
+        target=target_company,
+    )
 
-        for interaction in self.source_company.interactions.iterator():
-            interaction.company = self.target_company
-            interaction.save(update_fields=('company',))
-            num_interactions_moved += 1
+    source_company.mark_as_transferred(
+        target_company,
+        Company.TRANSFER_REASONS.duplicate,
+        user,
+    )
 
-        for contact in self.source_company.contacts.iterator():
-            contact.company = self.target_company
-            contact.save(update_fields=('company',))
-            num_contacts_moved += 1
+    return results
 
-        self.source_company.modified_by = user
-        self.source_company.mark_as_transferred(
-            self.target_company,
-            Company.TRANSFER_REASONS.duplicate,
-            user,
-        )
 
-        return MergeResult(num_interactions_moved, num_contacts_moved)
+def get_planned_changes(company: Company):
+    """Gets information about the changes that would be made if merge proceeds."""
+    results = _process_all_objects(
+        _count_objects,
+        source=company,
+    )
 
-    @staticmethod
-    def _append_move_entry(to_move, count, model):
-        if count == 0:
-            return
+    should_archive = not company.archived
 
-        move_item = MoveEntry(count, model._meta)
-        to_move.append(move_item)
+    return results, should_archive
 
-    def _is_source_valid(self):
-        # First, check that there are no references to the source company from other objects
-        # (other than via the fields specified in ALLOWED_RELATIONS_FOR_MERGING).
-        relations = get_related_fields(Company)
 
-        has_related_objects = any(
-            getattr(self.source_company, relation.name).count()
-            for relation in relations
-            if relation.remote_field not in ALLOWED_RELATIONS_FOR_MERGING
-        )
+def _process_all_objects(process_objects_fn, **kwargs):
+    """Process all objects defined in the configuration using provided function."""
+    return {
+        configuration.model: process_objects_fn(configuration, **kwargs)
+        for configuration in MERGE_CONFIGURATION
+    }
 
-        if has_related_objects:
-            return False
 
-        # Then, check that the source company itself doesn't have any references to other
-        # companies.
-        self_referential_fields = get_self_referential_relations(Company)
-        return not any(
-            getattr(self.source_company, field.name) for field in self_referential_fields
-        )
+def _update_objects(configuration: MergeConfiguration, source, target):
+    """Update fields of objects from given model with the target value."""
+    objects_updated = {field: 0 for field in configuration.fields}
+
+    for field, filtered_objects in _get_objects_from_configuration(configuration, source):
+        for obj in filtered_objects.iterator():
+            setattr(obj, field, target)
+            obj.save(update_fields=(field,))
+            objects_updated[field] += 1
+    return objects_updated
+
+
+def _count_objects(configuration: MergeConfiguration, source):
+    """Count objects for each field from given model with the target value."""
+    objects_updated = {field: 0 for field in configuration.fields}
+
+    for field, filtered_objects in _get_objects_from_configuration(configuration, source):
+        objects_updated[field] = filtered_objects.count()
+
+    return objects_updated
+
+
+def _get_objects_from_configuration(configuration: MergeConfiguration, source: Company):
+    """Gets objects for each configured field."""
+    for field in configuration.fields:
+        yield field, configuration.model.objects.filter(**{field: source})

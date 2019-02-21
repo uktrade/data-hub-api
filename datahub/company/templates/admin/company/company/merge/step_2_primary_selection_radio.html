@@ -19,14 +19,14 @@
     <br>
     {% blocktrans with created_on=option.target.created_on %}Created on {{ created_on }}{% endblocktrans %}
     <br>
-    {% with option.target.contacts.count as contact_count %}
-    {{ contact_count }} contact{{ contact_count|pluralize }}
-    {% endwith %}
-    <br>
-    {% with option.target.interactions.count as interaction_count %}
-    {{ interaction_count }} interaction{{ interaction_count|pluralize }}
-    {% endwith %}
-    <br>
+    {% for merge_entry in option.merge_entries %}
+      {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
+      {% blocktrans with count=merge_entry.count description=merge_entry.description %}
+        {{ count }} {{ verbose_name }}{{ description }}
+      {% endblocktrans %}
+      <br>
+    {% endfor %}
+
     {% blocktrans with obj_change_url=option.target|admin_change_url site_url=option.target.get_absolute_url %}
     <a href="{{ obj_change_url }}" target="_blank">View company on admin site</a> or <a href="{{ site_url }}" target="_blank">view on Data Hub</a>
     {% endblocktrans %}

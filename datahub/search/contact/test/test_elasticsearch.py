@@ -258,6 +258,8 @@ def test_get_basic_search_query():
                         'multi_match': {
                             'query': 'test',
                             'fields': [
+                                'address.country.name.trigram',
+                                'address.postcode.trigram',
                                 'address_country.name_trigram',
                                 'address_postcode_trigram',
                                 'company.name',
@@ -284,8 +286,8 @@ def test_get_basic_search_query():
                                 'project_code_trigram',
                                 'reference_code',
                                 'reference_trigram',
-                                'registered_address_country.name_trigram',
-                                'registered_address_postcode_trigram',
+                                'registered_address.country.name.trigram',
+                                'registered_address.postcode.trigram',
                                 'related_programmes.name',
                                 'related_programmes.name_trigram',
                                 'subject_english',
@@ -293,8 +295,6 @@ def test_get_basic_search_query():
                                 'teams.name',
                                 'teams.name_trigram',
                                 'total_cost_string',
-                                'trading_address_country.name_trigram',
-                                'trading_address_postcode_trigram',
                                 'trading_names',
                                 'trading_names_trigram',
                                 'uk_company.name',
@@ -339,10 +339,10 @@ def test_get_limited_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
     filter_data = {
-        'address_town': ['Woodside'],
-        'trading_address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
-        'estimated_land_date_after': date,
-        'estimated_land_date_before': date,
+        'name': 'Woodside',
+        'address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
+        'archived_before': date,
+        'archived_after': date,
     }
     query = get_search_by_entity_query(
         ESContact,
@@ -398,25 +398,19 @@ def test_get_limited_search_by_entity_query():
                         'bool': {
                             'must': [
                                 {
-                                    'bool': {
-                                        'should': [
-                                            {
-                                                'match': {
-                                                    'address_town': {
-                                                        'query': 'Woodside',
-                                                        'operator': 'and',
-                                                    },
-                                                },
-                                            },
-                                        ],
-                                        'minimum_should_match': 1,
+                                    'match': {
+                                        'name': {
+                                            'query': 'Woodside',
+                                            'operator': 'and',
+                                        },
                                     },
-                                }, {
+                                },
+                                {
                                     'bool': {
                                         'should': [
                                             {
                                                 'match': {
-                                                    'trading_address_country.id': {
+                                                    'address_country.id': {
                                                         'query':
                                                             '80756b9a-5d95-e211-a939-e4115bead28a',
                                                         'operator': 'and',
@@ -428,7 +422,7 @@ def test_get_limited_search_by_entity_query():
                                     },
                                 }, {
                                     'range': {
-                                        'estimated_land_date': {
+                                        'archived': {
                                             'gte': '2017-06-13T09:44:31.062870',
                                             'lte': '2017-06-13T09:44:31.062870',
                                         },

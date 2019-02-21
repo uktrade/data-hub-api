@@ -43,7 +43,7 @@ class SearchCompanyAPIViewMixin:
         'global_headquarters': 'global_headquarters.id',
         'headquarter_type': 'headquarter_type.id',
         'sector': 'sector.id',
-        'trading_address_country': 'trading_address_country.id',
+        'trading_address_country': 'address.country.id',
         'uk_region': 'uk_region.id',
     }
 
@@ -55,8 +55,8 @@ class SearchCompanyAPIViewMixin:
             'trading_names_trigram',
         ],
         'country': [
-            'trading_address_country.id',
-            'registered_address_country.id',
+            'address.country.id',
+            'registered_address.country.id',
         ],
         'sector_descends': [
             'sector.id',
