@@ -1,16 +1,16 @@
 from datetime import datetime
 from itertools import chain
-from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge import (
-    DuplicateCompanyMerger,
+    get_planned_changes,
+    INVESTMENT_PROJECT_COMPANY_FIELDS,
+    merge_companies,
     MergeNotAllowedError,
-    MergeResult,
-    MoveEntry,
 )
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
@@ -21,6 +21,8 @@ from datahub.company.test.factories import (
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.models import InvestmentProject
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 
 def company_with_interactions_and_contacts_factory():
@@ -39,27 +41,82 @@ def company_with_contacts_factory():
     return company
 
 
+def company_with_investment_projects_factory():
+    """Factory for a company with investment projects."""
+    company = CompanyFactory()
+    for field in INVESTMENT_PROJECT_COMPANY_FIELDS:
+        InvestmentProjectFactory(**{field: company})
+    return company
+
+
 @pytest.mark.django_db
 class TestDuplicateCompanyMerger:
     """Tests DuplicateCompanyMerger."""
 
     @pytest.mark.parametrize(
-        'source_company_factory,expected_move_entries,expected_should_archive',
+        'source_company_factory,expected_result,expected_should_archive',
         (
-            (CompanyFactory, [], True),
             (
-                company_with_interactions_and_contacts_factory,
-                [MoveEntry(4, Contact._meta), MoveEntry(4, Interaction._meta)],
+                CompanyFactory,
+                {
+                    Contact: {'company': 0},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                },
                 True,
             ),
-            (company_with_contacts_factory, [MoveEntry(3, Contact._meta)], True),
-            (ArchivedCompanyFactory, [], False),
+            (
+                company_with_interactions_and_contacts_factory,
+                {
+                    Contact: {'company': 4},
+                    Interaction: {'company': 4},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                },
+                True,
+            ),
+            (
+                company_with_contacts_factory,
+                {
+                    Contact: {'company': 3},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                },
+                True,
+            ),
+            (
+                company_with_investment_projects_factory,
+                {
+                    Contact: {'company': 0},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                },
+                True,
+            ),
+            (
+                ArchivedCompanyFactory,
+                {
+                    Contact: {'company': 0},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                },
+                False,
+            ),
         ),
     )
     def test_get_planned_changes(
         self,
         source_company_factory,
-        expected_move_entries,
+        expected_result,
         expected_should_archive,
     ):
         """
@@ -67,41 +124,50 @@ class TestDuplicateCompanyMerger:
         cases.
         """
         source_company = source_company_factory()
-        target_company = CompanyFactory()
-        duplicate_merger = DuplicateCompanyMerger(source_company, target_company)
+        merge_results = get_planned_changes(source_company)
 
-        expected_planned_changes = (expected_move_entries, expected_should_archive)
-        assert duplicate_merger.get_planned_changes() == expected_planned_changes
+        expected_planned_merge_results = (expected_result, expected_should_archive)
+        assert merge_results == expected_planned_merge_results
 
     @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
-    def test_merge_succeeds(self, source_num_interactions, source_num_contacts):
+    def test_merge_interactions_contacts_succeeds(
+            self,
+            source_num_interactions,
+            source_num_contacts,
+    ):
         """
         Tests that perform_merge() moves contacts and interactions to the target company,
         and marks the source company as archived and transferred.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
         with freeze_time(creation_time):
-            source_company = _company_factory(source_num_interactions, source_num_contacts)
+            source_company = _company_factory(
+                source_num_interactions,
+                source_num_contacts,
+            )
         target_company = CompanyFactory()
         user = AdviserFactory()
 
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
+
         # Each interaction has a contact, so actual number of contacts is
         # source_num_interactions + source_num_contacts
         assert len(source_contacts) == source_num_interactions + source_num_contacts
 
-        merger = DuplicateCompanyMerger(source_company, target_company)
         merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
 
         with freeze_time(merge_time):
-            result = merger.perform_merge(user)
+            result = merge_companies(source_company, target_company, user)
 
-        assert result == MergeResult(
-            num_interactions_moved=len(source_interactions),
-            num_contacts_moved=len(source_contacts),
-        )
+        assert result == {
+            Contact: {'company': len(source_contacts)},
+            Interaction: {'company': len(source_interactions)},
+            InvestmentProject: {
+                field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+            },
+        }
 
         for obj in chain(source_interactions, source_contacts):
             obj.refresh_from_db()
@@ -127,19 +193,110 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_on == merge_time
         assert source_company.transferred_to == target_company
 
-    def test_merge_fails_when_not_allowed(self, monkeypatch):
+    @pytest.mark.parametrize(
+        'fields',
+        (
+            (),
+            ('investor_company',),
+            ('intermediate_company',),
+            ('uk_company',),
+            ('investor_company', 'intermediate_company'),
+            ('investor_company', 'uk_company'),
+            ('intermediate_company', 'uk_company'),
+            ('investor_company', 'intermediate_company', 'uk_company'),
+        ),
+    )
+    def test_merge_investment_projects_succeeds(self, fields):
         """
-        Test that perform_merge() raises DuplicateCompanyMerger when the merge is not
+        Tests that perform_merge() moves investment projects to the target company and marks the
+        source company as archived and transferred.
+        """
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        with freeze_time(creation_time):
+            source_company = CompanyFactory()
+            investment_project = InvestmentProjectFactory(
+                **{field: source_company for field in fields},
+            )
+
+        target_company = CompanyFactory()
+        user = AdviserFactory()
+
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            result = merge_companies(source_company, target_company, user)
+
+        other_fields = set(INVESTMENT_PROJECT_COMPANY_FIELDS) - set(fields)
+
+        assert result == {
+            # each interaction has a contact, that's why 4 contacts should be moved
+            Contact: {'company': 0},
+            Interaction: {'company': 0},
+            InvestmentProject: {
+                **{
+                    field: 1
+                    for field in fields
+                },
+                **{
+                    field: 0
+                    for field in other_fields
+                },
+            },
+        }
+
+        investment_project.refresh_from_db()
+
+        assert all(getattr(investment_project, field) == target_company for field in fields)
+        assert all(getattr(investment_project, field) != target_company for field in other_fields)
+        assert all(getattr(investment_project, field) != source_company for field in other_fields)
+
+        assert investment_project.modified_on == creation_time
+
+        source_company.refresh_from_db()
+
+        assert source_company.archived
+        assert source_company.archived_by == user
+        assert source_company.archived_on == merge_time
+        assert source_company.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_company} for the following reason: Duplicate record.'
+        )
+        assert source_company.modified_by == user
+        assert source_company.modified_on == merge_time
+        assert source_company.transfer_reason == Company.TRANSFER_REASONS.duplicate
+        assert source_company.transferred_by == user
+        assert source_company.transferred_on == merge_time
+        assert source_company.transferred_to == target_company
+
+    @pytest.mark.parametrize(
+        'valid_source,valid_target',
+        (
+            (False, True),
+            (True, False),
+            (False, False),
+        ),
+    )
+    @patch('datahub.company.merge.is_company_a_valid_merge_target')
+    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    def test_merge_fails_when_not_allowed(
+        self,
+        is_company_a_valid_merge_source_mock,
+        is_company_a_valid_merge_target_mock,
+        valid_source,
+        valid_target,
+    ):
+        """
+        Test that perform_merge() raises MergeNotAllowedError when the merge is not
         allowed.
         """
-        monkeypatch.setattr(DuplicateCompanyMerger, 'is_valid', Mock(return_value=False))
+        is_company_a_valid_merge_source_mock.return_value = valid_source
+        is_company_a_valid_merge_target_mock.return_value = valid_target
 
         source_company = CompanyFactory()
         target_company = CompanyFactory()
         user = AdviserFactory()
-        merger = DuplicateCompanyMerger(source_company, target_company)
         with pytest.raises(MergeNotAllowedError):
-            merger.perform_merge(user)
+            merge_companies(source_company, target_company, user)
 
 
 def _company_factory(num_interactions, num_contacts):
