@@ -20,24 +20,28 @@ def setup_data(setup_es):
             name='Pallas',
             company_number='111',
             incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
+            registered_address_postcode='SW1A 1AA',
             company_status='jumping',
         ),
         CompaniesHouseCompanyFactory(
             name='Jaguarundi',
             company_number='222',
             incorporation_date=dateutil_parse('2015-09-12T00:00:00Z'),
+            registered_address_postcode='E1 6JE',
             company_status='sleeping',
         ),
         CompaniesHouseCompanyFactory(
             name='Cheetah',
             company_number='333',
             incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
+            registered_address_postcode='SW1A 0PW',
             company_status='purring',
         ),
         CompaniesHouseCompanyFactory(
             name='Pallas Second',
             company_number='444',
             incorporation_date=dateutil_parse('2019-09-12T00:00:00Z'),
+            registered_address_postcode='WC1B 3DG',
             company_status='crying',
         ),
     )
@@ -86,6 +90,12 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
                     'original_query': 'jaguar',
                 },
                 {'222'},
+            ),
+            (  # original query partial postcode
+                {
+                    'original_query': 'SW1',
+                },
+                {'111', '333'},
             ),
         ),
     )
