@@ -152,11 +152,14 @@ class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
         """
         Logs the sortby search param to see if we can get rid of it from the global search.
 
-        TODO: Remove after figuring out what to do with sortby.
+        TODO: Remove following deprecation period.
         """
         sortby = data.get('sortby')
         if sortby:
-            logger.error(f'Sortby search field "{sortby.field}" used in the global search.')
+            logger.error(
+                'The following deprecated global search sortby field was '
+                f'used: {sortby.field}.',
+            )
         return super().validate(data)
 
 
