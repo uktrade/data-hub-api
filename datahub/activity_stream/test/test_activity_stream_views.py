@@ -74,8 +74,8 @@ def test_403_returned(api_client):
     the required scope.
     """
     sender = _auth_sender(
-        key_id='scopeless-id',
-        secret_key='scopeless-key',
+        key_id='test-id-without-scope',
+        secret_key='test-key-without-scope',
     )
     response = api_client.get(
         _url(),

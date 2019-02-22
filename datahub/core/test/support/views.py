@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from config.settings.types import HawkScope
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
-    HawkScopePermission,
     HawkResponseMiddleware,
+    HawkScopePermission,
 )
 from datahub.core.test.support.models import MultiAddressModel, MyDisableableModel, PermissionModel
 from datahub.core.test.support.serializers import (
@@ -44,7 +44,19 @@ class MultiAddressModelViewset(CoreViewSet):
     queryset = MultiAddressModel.objects.all()
 
 
-class HawkView(APIView):
+class HawkViewWithoutScope(APIView):
+    """View using Hawk authentication."""
+
+    authentication_classes = (HawkAuthentication,)
+    permission_classes = ()
+
+    @decorator_from_middleware(HawkResponseMiddleware)
+    def get(self, request):
+        """Simple test view with fixed response."""
+        return Response({'content': 'hawk-test-view-without-scope'})
+
+
+class HawkViewWithScope(APIView):
     """View using Hawk authentication."""
 
     authentication_classes = (HawkAuthentication,)
@@ -53,5 +65,5 @@ class HawkView(APIView):
 
     @decorator_from_middleware(HawkResponseMiddleware)
     def get(self, request):
-        """Simple test view with fixed response"""
-        return Response({'content': 'hawk-test-view'})
+        """Simple test view with fixed response."""
+        return Response({'content': 'hawk-test-view-with-scope'})
