@@ -1,7 +1,8 @@
 from django.urls import path
 
 from datahub.core.test.support.views import (
-    HawkView,
+    HawkViewWithoutScope,
+    HawkViewWithScope,
     MultiAddressModelViewset,
     MyDisableableModelViewset,
 )
@@ -31,8 +32,13 @@ urlpatterns = [
         name='test-addresses-item',
     ),
     path(
-        'test-hawk/',
-        HawkView.as_view(),
-        name='test-hawk',
+        'test-hawk-without-scope/',
+        HawkViewWithoutScope.as_view(),
+        name='test-hawk-without-scope',
+    ),
+    path(
+        'test-hawk-with-scope/',
+        HawkViewWithScope.as_view(),
+        name='test-hawk-with-scope',
     ),
 ]

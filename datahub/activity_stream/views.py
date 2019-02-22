@@ -5,8 +5,8 @@ from rest_framework.viewsets import ViewSet
 from config.settings.types import HawkScope
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
-    HawkScopePermission,
     HawkResponseMiddleware,
+    HawkScopePermission,
 )
 
 
