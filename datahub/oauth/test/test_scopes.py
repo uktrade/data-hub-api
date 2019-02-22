@@ -3,7 +3,6 @@ from unittest import mock
 from urllib.parse import urlencode
 
 import pytest
-from django.test.utils import override_settings
 from django.utils.timezone import utc
 from factory import Faker
 from oauth2_provider.models import Application
@@ -93,14 +92,8 @@ class TestOAuthScopeBackend:
         }
 
 
-@pytest.fixture
-def test_urls():  # noqa: D403
-    """pytest fixture to override the ROOT_URLCONF with test views."""
-    with override_settings(ROOT_URLCONF='datahub.core.test.support.urls'):
-        yield
-
-
 @mock.patch.dict(SCOPES_DESCS, TEST_SCOPES_DESC)
+@pytest.mark.urls('datahub.core.test.support.urls')
 class TestOAuthViewScope(APITestMixin):
     """Tests app-specific OAuth scopes in views."""
 
@@ -111,7 +104,7 @@ class TestOAuthViewScope(APITestMixin):
             Application.GRANT_CLIENT_CREDENTIALS,
         ),
     )
-    def test_scope_allowed(self, test_urls, grant_type):
+    def test_scope_allowed(self, grant_type):
         """Tests a test view with the required scope."""
         client = self.create_api_client(TestScope.test_scope_1, grant_type=grant_type)
         url = reverse('test-disableable-collection')
@@ -125,7 +118,7 @@ class TestOAuthViewScope(APITestMixin):
             Application.GRANT_CLIENT_CREDENTIALS,
         ),
     )
-    def test_scope_not_allowed(self, test_urls, grant_type):
+    def test_scope_not_allowed(self, grant_type):
         """Tests a test view without the required scope."""
         client = self.create_api_client(TestScope.test_scope_2, grant_type=grant_type)
         url = reverse('test-disableable-collection')
@@ -139,7 +132,7 @@ class TestOAuthViewScope(APITestMixin):
             Application.GRANT_CLIENT_CREDENTIALS,
         ),
     )
-    def test_expired_token(self, test_urls, grant_type):
+    def test_expired_token(self, grant_type):
         """Tests a test view with an expired token and the required scope."""
         application = self.get_application(grant_type=grant_type)
         access_token = AccessTokenFactory(
@@ -153,7 +146,7 @@ class TestOAuthViewScope(APITestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_unauthenticated(self, test_urls):
+    def test_unauthenticated(self):
         """Tests a test view unauthenticated."""
         client = APIClient()
         url = reverse('test-disableable-collection')
