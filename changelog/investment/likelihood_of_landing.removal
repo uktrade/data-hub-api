@@ -1,0 +1,1 @@
+The field ``InvestmentProject.likelihood_of_landing`` was removed from django.
