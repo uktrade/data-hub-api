@@ -1,4 +1,5 @@
 """Search views."""
+import logging
 from collections import namedtuple
 from itertools import islice
 
@@ -37,6 +38,9 @@ from datahub.user_event_log.utils import record_user_event
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
 
+logger = logging.getLogger(__name__)
+
+
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
@@ -54,6 +58,13 @@ class SearchBasicAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_params = serializer.validated_data
         ordering = _map_es_ordering(validated_params['sortby'], self.es_sort_by_remappings)
+
+        # TODO Remove following deprecation period.
+        if ordering:
+            logger.error(
+                'The following deprecated global search ordering was '
+                f'used: {ordering.field}.',
+            )
 
         query = get_basic_search_query(
             entity=validated_params['entity'],
