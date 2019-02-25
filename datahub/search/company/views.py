@@ -23,27 +23,16 @@ class SearchCompanyAPIViewMixin:
 
     FILTER_FIELDS = (
         'archived',
-        'description',
-        'export_to_country',
-        'future_interest_country',
-        'global_headquarters',
         'headquarter_type',
         'name',
-        'sector',
         'sector_descends',
         'country',
-        'trading_address_country',
         'uk_based',
         'uk_region',
     )
 
     REMAP_FIELDS = {
-        'export_to_country': 'export_to_countries.id',
-        'future_interest_country': 'future_interest_countries.id',
-        'global_headquarters': 'global_headquarters.id',
         'headquarter_type': 'headquarter_type.id',
-        'sector': 'sector.id',
-        'trading_address_country': 'address.country.id',
         'uk_region': 'uk_region.id',
     }
 
