@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
@@ -7,6 +9,8 @@ from datahub.search.serializers import (
     StringUUIDField,
 )
 from datahub.search.utils import SearchOrdering, SortDirection
+
+logger = getLogger(__name__)
 
 
 class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
@@ -42,3 +46,34 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
         'id',
         'subject',
     )
+    deprecated_filters = {
+        'contact',
+        'contact_name',
+    }
+    deprecated_sortby_fields = {
+        'contact.name',
+        'dit_adviser.name',
+        'dit_team.name',
+        'id',
+    }
+
+    def validate(self, data):
+        """
+        Logs all deprecated params to make sure we don't break things when we get rid of them.
+
+        TODO Remove following deprecation period.
+        """
+        deprecated_filters_in_data = data.keys() & self.deprecated_filters
+        if deprecated_filters_in_data:
+            logger.error(
+                'The following deprecated interaction search filters were '
+                f'used: {deprecated_filters_in_data}.',
+            )
+
+        sortby = data.get('sortby')
+        if sortby and sortby.field in self.deprecated_sortby_fields:
+            logger.error(
+                'The following deprecated interaction search sortby field was '
+                f'used: {sortby.field}.',
+            )
+        return super().validate(data)
