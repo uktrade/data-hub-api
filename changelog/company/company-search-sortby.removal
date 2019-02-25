@@ -1,0 +1,17 @@
+``POST /v3/search/company``, ``POST /v3/search/company/export`` the following sortby values were deleted:
+
+- ``archived``
+- ``archived_by``
+- ``business_type.name``
+- ``companies_house_data.company_number``
+- ``company_number``
+- ``created_on``
+- ``employee_range.name``
+- ``headquarter_type.name``
+- ``id``
+- ``registered_address_town``
+- ``sector.name``
+- ``trading_address_town``
+- ``turnover_range.name``
+- ``uk_based``
+- ``uk_region.name``
