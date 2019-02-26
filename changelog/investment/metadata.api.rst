@@ -20,8 +20,6 @@ The values also include a field ``asset-class-interest-sector`` which returns th
 
 ``GET /metadata/profile-type/`` returns all possible ``investor_profile_profiletype`` values.
 
-``GET /metadata/relationship-health/`` returns all possible ``investor_profile_relationshiphealth`` values.
-
 ``GET /metadata/restriction/`` returns all possible ``investor_profile_restriction`` values.
 
 ``GET /metadata/return-rate/`` returns all possible ``investor_profile_returnrate`` values.

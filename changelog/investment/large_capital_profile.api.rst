@@ -84,6 +84,7 @@ A large capital profile consists of the following fields:
 
     ``incomplete_location_fields`` a list of the location fields that are yet to have a value set.
 
+
 The detail fields:
     ``investor_type``
     ``investable_capital``,
@@ -91,6 +92,7 @@ The detail fields:
     ``dit_relationship_manager``,
     ``client_contacts``,
     ``background_checks_conducted``
+
 
 The requirement fields:
     ``deal_ticket_sizes``,
@@ -102,6 +104,7 @@ The requirement fields:
     ``desired_deal_roles``,
     ``restrictions``,
     ``asset_classes_of_interest``
+
 
 The location fields:
     ``uk_region_locations``,

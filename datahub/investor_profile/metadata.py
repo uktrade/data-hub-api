@@ -45,11 +45,6 @@ registry.register(
 )
 
 registry.register(
-    metadata_id='profile-type',
-    model=models.ProfileType,
-)
-
-registry.register(
     metadata_id='restriction',
     model=models.Restriction,
 )

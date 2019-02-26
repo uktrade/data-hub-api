@@ -13,5 +13,4 @@ The database table``investor_profile_investorprofile`` has been added with the f
     ``investor_type_id (uuid)``,
     ``minimum_equity_percentage_id (uuid)``,
     ``minimum_return_rate_id (uuid)``,
-    ``relationship_health_id (uuid)``,
     ``background_checks_conducted_id (uuid)``.
