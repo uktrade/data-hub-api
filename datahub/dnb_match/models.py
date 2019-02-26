@@ -13,6 +13,7 @@ class DnBMatchingResult(models.Model):
     """
 
     created_on = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
     company = models.OneToOneField('company.Company', on_delete=models.CASCADE)
     data = JSONField(encoder=DjangoJSONEncoder)
 
