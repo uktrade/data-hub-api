@@ -6,7 +6,7 @@ from datahub.investor_profile.constants import ProfileType as ProfileTypeConstan
 
 
 class InvestorProfileFactory(factory.django.DjangoModelFactory):
-    """Investment project team member factory."""
+    """Investor profile factory."""
 
     investor_company = factory.SubFactory(CompanyFactory)
     profile_type_id = ProfileTypeConstant.large.value.id

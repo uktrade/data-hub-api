@@ -33,7 +33,7 @@ from datahub.investor_profile.test.factories import InvestorProfileFactory
 class TestCreateLargeCapitalProfileView(APITestMixin):
     """Test creating a large capital profile"""
 
-    def test_large_capital_unauthorized_user_(self):
+    def test_large_capital_unauthorized_user(self):
         """Should return 401"""
         url = reverse('api-v3:large-investor-profile:collection')
         api_client = APIClient()
@@ -100,7 +100,6 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         )
         assert response_data['incomplete_location_fields'] == expected_incomplete_location_fields
         assert response_data['investor_company']['id'] == str(investor_company.id)
-        assert response_data['profile_type']['id'] == str(ProfileTypeConstant.large.value.id)
         assert response_data['created_on'] == '2017-04-28T17:35:00Z'
         assert response_data['modified_on'] == '2017-04-28T17:35:00Z'
 
@@ -187,7 +186,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK, response_data
         assert response_data['incomplete_details_fields'] == []
         assert response_data['investor_description'] == 'Description'
-        assert response_data['investable_capital'] == str(1000)
+        assert response_data['investable_capital'] == 1000
         assert (
             response_data['investor_type']['id']
             == str(InvestorTypeConstant.state_pension_fund.value.id)

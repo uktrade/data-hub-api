@@ -2,7 +2,7 @@ from django.urls import path
 
 from datahub.investor_profile.views import LargeCapitalInvestorProfileViewSet
 
-GET_AND_POST = {
+GET_AND_POST_COLLECTION = {
     'get': 'list',
     'post': 'create',
 }
@@ -12,7 +12,7 @@ GET_AND_PATCH_ITEM = {
     'patch': 'partial_update',
 }
 
-collection = LargeCapitalInvestorProfileViewSet.as_view(actions=GET_AND_POST)
+collection = LargeCapitalInvestorProfileViewSet.as_view(actions=GET_AND_POST_COLLECTION)
 
 item = LargeCapitalInvestorProfileViewSet.as_view(actions=GET_AND_PATCH_ITEM)
 
