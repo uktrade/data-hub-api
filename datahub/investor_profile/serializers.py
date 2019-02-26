@@ -15,8 +15,6 @@ from datahub.investor_profile.models import (
     InvestorProfile,
     InvestorType,
     LargeCapitalInvestmentType,
-    ProfileType,
-    RelationshipHealth,
     Restriction,
     ReturnRate,
     TimeHorizon,
@@ -29,7 +27,6 @@ BASE_FIELDS = [
     'created_on',
     'modified_on',
     'investor_company',
-    'profile_type',
 ]
 
 INCOMPLETE_LIST_FIELDS = [
@@ -90,11 +87,6 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         allow_null=False,
     )
 
-    profile_type = NestedRelatedField(
-        ProfileType,
-        read_only=True,
-    )
-
     created_on = serializers.DateTimeField(
         read_only=True,
     )
@@ -127,11 +119,6 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     dit_advisers = NestedRelatedField(
         Advisor,
         many=True,
-        required=False,
-    )
-
-    relationship_health = NestedRelatedField(
-        RelationshipHealth,
         required=False,
     )
 
