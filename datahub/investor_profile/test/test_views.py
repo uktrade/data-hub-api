@@ -12,7 +12,8 @@ from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.investor_profile.constants import (
+from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
+from datahub.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
     BackgroundChecksConducted as BackgroundChecksConductedConstant,
     ConstructionRisk as ConstructionRiskConstant,
@@ -21,7 +22,6 @@ from datahub.investor_profile.constants import (
     EquityPercentage as EquityPercentageConstant,
     InvestorType as InvestorTypeConstant,
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
-    ProfileType as ProfileTypeConstant,
     RelationshipHealth as RelationshipHealthConstant,
     Restriction as RestrictionConstant,
     ReturnRate as ReturnRateConstant,
