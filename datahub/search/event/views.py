@@ -1,14 +1,14 @@
 from datahub.oauth.scopes import Scope
-from datahub.search.event.models import Event
+from datahub.search.event import EventSearchApp
 from datahub.search.event.serializers import SearchEventQuerySerializer
-from datahub.search.views import SearchAPIView
+from datahub.search.views import register_v3_view, SearchAPIView
 
 
 class SearchEventAPIViewMixin:
     """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = Event
+    search_app = EventSearchApp
     serializer_class = SearchEventQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
@@ -44,5 +44,6 @@ class SearchEventAPIViewMixin:
     }
 
 
+@register_v3_view()
 class SearchEventAPIView(SearchEventAPIViewMixin, SearchAPIView):
     """Filtered event search view."""

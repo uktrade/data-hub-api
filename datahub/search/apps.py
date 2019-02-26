@@ -4,7 +4,7 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.conf import settings
 
-from datahub.search.elasticsearch import index_exists
+from datahub.search.elasticsearch import configure_connection, index_exists
 
 EXCLUDE_ALL = object()
 
@@ -15,14 +15,6 @@ class SearchApp:
     name = None
     es_model = None
     bulk_batch_size = 2000
-    view = None
-    export_view = None
-    autocomplete_view = None
-
-    # TODO: replace the base views with these once the migration to v4 is complete
-    view_v4 = None
-    export_view_v4 = None
-    autocomplete_view_v4 = None
 
     queryset = None
     exclude_from_global_search = False
@@ -43,11 +35,14 @@ class SearchApp:
         cls.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
     @classmethod
+    def load_views(cls):
+        """Loads the views submodule for the app to ensure views are registered."""
+        cls._load_submodule('views')
+
+    @classmethod
     def get_signal_receivers(cls):
         """Returns the signal receivers for this search app."""
-        package, _, _ = cls.__module__.rpartition('.')
-        module = f'{package}.signals'
-        return import_module(module).receivers
+        return cls._load_submodule('signals').receivers
 
     @classmethod
     def connect_signals(cls):
@@ -74,6 +69,12 @@ class SearchApp:
         Can also return EXCLUDE_ALL when no results should be returned.
         """
         return None
+
+    @classmethod
+    def _load_submodule(cls, name):
+        package, _, _ = cls.__module__.rpartition('.')
+        module = f'{package}.{name}'
+        return import_module(module)
 
 
 def get_search_apps():
@@ -150,9 +151,19 @@ class SearchConfig(AppConfig):
     verbose_name = 'Search'
 
     def ready(self):
-        """Configures Elasticsearch default connection."""
-        from datahub.search.elasticsearch import configure_connection
+        """
+        Configures the default Elasticsearch connection, connects signal receivers and
+        registers views.
+        """
+        # The automatic connection configuration is disabled during tests because the connection
+        # is set up using different environment variables in the _es_client pytest fixture
+        if settings.SEARCH_CONFIGURE_CONNECTION_ON_READY:
+            configure_connection()
 
-        configure_connection()
         for app in get_search_apps():
-            app.connect_signals()
+            # For tests we disable automatic connection of signal receivers on app ready.
+            # They are instead only enabled for tests that use the setup_es pytest fixture
+            if settings.SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY:
+                app.connect_signals()
+
+            app.load_views()
