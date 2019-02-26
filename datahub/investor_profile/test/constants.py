@@ -12,15 +12,6 @@ class InvestorType(Enum):
     )
 
 
-class RelationshipHealth(Enum):
-    """Relationship health constants."""
-
-    good = Constant(
-        'Good',
-        'a3ef5e49-90c7-4d73-a696-f6ba42cb37da',
-    )
-
-
 class BackgroundChecksConducted(Enum):
     """Background checks conducted constants."""
 

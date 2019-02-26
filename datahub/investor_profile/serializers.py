@@ -42,7 +42,6 @@ LARGE_CAPITAL_DETAILS_FIELDS = [
     'investor_description',
     'dit_relationship_manager',
     'client_contacts',
-    'relationship_health',
     'background_checks_conducted',
 ]
 

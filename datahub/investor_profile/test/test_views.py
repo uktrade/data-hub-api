@@ -22,7 +22,6 @@ from datahub.investor_profile.test.constants import (
     EquityPercentage as EquityPercentageConstant,
     InvestorType as InvestorTypeConstant,
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
-    RelationshipHealth as RelationshipHealthConstant,
     Restriction as RestrictionConstant,
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
@@ -69,7 +68,6 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
             'investor_description',
             'dit_relationship_manager',
             'client_contacts',
-            'relationship_health',
             'background_checks_conducted',
         ]
 
@@ -168,7 +166,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             'investor_type': {'id': InvestorTypeConstant.state_pension_fund.value.id},
             'investable_capital': 1000,
             'dit_relationship_manager': {'id': str(adviser.id)},
-            'relationship_health': {'id': RelationshipHealthConstant.good.value.id},
             'background_checks_conducted': {
                 'id': BackgroundChecksConductedConstant.cleared.value.id,
             },
@@ -194,10 +191,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert (
             response_data['dit_relationship_manager']['id']
             == str(adviser.id)
-        )
-        assert (
-            response_data['relationship_health']['id']
-            == str(RelationshipHealthConstant.good.value.id)
         )
         assert (
             response_data['background_checks_conducted']['id']
