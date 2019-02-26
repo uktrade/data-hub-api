@@ -1,9 +1,0 @@
-- model: investor_profile.relationshiphealth
-  pk: a3ef5e49-90c7-4d73-a696-f6ba42cb37da
-  fields: {disabled_on: null, name: Good, order: 100}
-- model: investor_profile.relationshiphealth
-  pk: 04caccf7-4f46-4e41-b524-bfeaf96b34ce
-  fields: {disabled_on: null, name: Fair, order: 200}
-- model: investor_profile.relationshiphealth
-  pk: f1f0aebf-50f8-471c-a86b-8bf454b60e1b
-  fields: {disabled_on: null, name: Poor, order: 300}

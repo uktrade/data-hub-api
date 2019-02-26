@@ -35,16 +35,14 @@ class InvestorProfile(BaseModel):
     )
 
     investor_type = models.ForeignKey(
-        'InvestorType',
+        'investor_profile.InvestorType',
         related_name='+',
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
 
-    investable_capital = models.DecimalField(
-        max_digits=19,
-        decimal_places=0,
+    investable_capital = models.IntegerField(
         blank=True,
         null=True,
         help_text='Investable capital amount in USD',
@@ -52,7 +50,6 @@ class InvestorProfile(BaseModel):
 
     investor_description = models.TextField(
         blank=True,
-        null=True,
     )
 
     client_contacts = models.ManyToManyField(
@@ -75,16 +72,8 @@ class InvestorProfile(BaseModel):
         blank=True,
     )
 
-    relationship_health = models.ForeignKey(
-        'RelationshipHealth',
-        related_name='+',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-
     background_checks_conducted = models.ForeignKey(
-        'BackgroundChecksConducted',
+        'investor_profile.BackgroundChecksConducted',
         related_name='+',
         on_delete=models.SET_NULL,
         blank=True,
@@ -92,25 +81,25 @@ class InvestorProfile(BaseModel):
     )
 
     deal_ticket_sizes = models.ManyToManyField(
-        'DealTicketSize',
+        'investor_profile.DealTicketSize',
         related_name='+',
         blank=True,
     )
 
     asset_classes_of_interest = models.ManyToManyField(
-        'AssetClassInterest',
+        'investor_profile.AssetClassInterest',
         related_name='+',
         blank=True,
     )
 
     investment_types = models.ManyToManyField(
-        'LargeCapitalInvestmentType',
+        'investor_profile.LargeCapitalInvestmentType',
         related_name='+',
         blank=True,
     )
 
     minimum_return_rate = models.ForeignKey(
-        'ReturnRate',
+        'investor_profile.ReturnRate',
         related_name='+',
         on_delete=models.SET_NULL,
         blank=True,
@@ -118,25 +107,25 @@ class InvestorProfile(BaseModel):
     )
 
     time_horizons = models.ManyToManyField(
-        'TimeHorizon',
+        'investor_profile.TimeHorizon',
         related_name='+',
         blank=True,
     )
 
     restrictions = models.ManyToManyField(
-        'Restriction',
+        'investor_profile.Restriction',
         related_name='+',
         blank=True,
     )
 
     construction_risks = models.ManyToManyField(
-        'ConstructionRisk',
+        'investor_profile.ConstructionRisk',
         related_name='+',
         blank=True,
     )
 
     minimum_equity_percentage = models.ForeignKey(
-        'EquityPercentage',
+        'investor_profile.EquityPercentage',
         related_name='+',
         on_delete=models.SET_NULL,
         blank=True,
@@ -144,7 +133,7 @@ class InvestorProfile(BaseModel):
     )
 
     desired_deal_roles = models.ManyToManyField(
-        'DesiredDealRole',
+        'investor_profile.DesiredDealRole',
         related_name='+',
         blank=True,
     )
@@ -182,10 +171,6 @@ class ProfileType(BaseOrderedConstantModel):
 
 class InvestorType(BaseOrderedConstantModel):
     """Investor type metadata"""
-
-
-class RelationshipHealth(BaseOrderedConstantModel):
-    """Relationship health metadata"""
 
 
 class DealTicketSize(BaseOrderedConstantModel):

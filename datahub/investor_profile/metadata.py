@@ -50,11 +50,6 @@ registry.register(
 )
 
 registry.register(
-    metadata_id='relationship-health',
-    model=models.RelationshipHealth,
-)
-
-registry.register(
     metadata_id='restriction',
     model=models.Restriction,
 )
