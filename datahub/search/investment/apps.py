@@ -11,10 +11,6 @@ from datahub.investment.permissions import (
 )
 from datahub.search.apps import EXCLUDE_ALL, SearchApp
 from datahub.search.investment.models import InvestmentProject
-from datahub.search.investment.views import (
-    SearchInvestmentExportAPIView,
-    SearchInvestmentProjectAPIView,
-)
 
 
 class InvestmentSearchApp(SearchApp):
@@ -27,8 +23,6 @@ class InvestmentSearchApp(SearchApp):
     # (In some environments, the maximum ES request size is 10 MB. This is dependent on the AWS
     # EC2 instance type.)
     bulk_batch_size = 1000
-    view = SearchInvestmentProjectAPIView
-    export_view = SearchInvestmentExportAPIView
     view_permissions = (
         f'investment.{InvestmentProjectPermission.view_all}',
         f'investment.{InvestmentProjectPermission.view_associated}',
