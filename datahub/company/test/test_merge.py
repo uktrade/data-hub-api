@@ -23,6 +23,8 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.omis.order.models import Order
+from datahub.omis.order.test.factories import OrderFactory
 
 
 def company_with_interactions_and_contacts_factory():
@@ -38,6 +40,13 @@ def company_with_contacts_factory():
     """Factory for a company with contacts."""
     company = CompanyFactory()
     ContactFactory.create_batch(3, company=company)
+    return company
+
+
+def company_with_orders_factory():
+    """Factory for a company with orders."""
+    company = CompanyFactory()
+    OrderFactory.create_batch(3, company=company)
     return company
 
 
@@ -64,6 +73,7 @@ class TestDuplicateCompanyMerger:
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
+                    Order: {'company': 0},
                 },
                 True,
             ),
@@ -75,6 +85,7 @@ class TestDuplicateCompanyMerger:
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
+                    Order: {'company': 0},
                 },
                 True,
             ),
@@ -86,6 +97,7 @@ class TestDuplicateCompanyMerger:
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
+                    Order: {'company': 0},
                 },
                 True,
             ),
@@ -97,6 +109,19 @@ class TestDuplicateCompanyMerger:
                     InvestmentProject: {
                         field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
+                    Order: {'company': 0},
+                },
+                True,
+            ),
+            (
+                company_with_orders_factory,
+                {
+                    Contact: {'company': 3},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                    Order: {'company': 3},
                 },
                 True,
             ),
@@ -108,6 +133,7 @@ class TestDuplicateCompanyMerger:
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
+                    Order: {'company': 0},
                 },
                 False,
             ),
@@ -131,10 +157,12 @@ class TestDuplicateCompanyMerger:
 
     @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
+    @pytest.mark.parametrize('source_num_orders', (0, 1, 3))
     def test_merge_interactions_contacts_succeeds(
             self,
             source_num_interactions,
             source_num_contacts,
+            source_num_orders,
     ):
         """
         Tests that perform_merge() moves contacts and interactions to the target company,
@@ -145,16 +173,20 @@ class TestDuplicateCompanyMerger:
             source_company = _company_factory(
                 source_num_interactions,
                 source_num_contacts,
+                source_num_orders,
             )
         target_company = CompanyFactory()
         user = AdviserFactory()
 
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
+        source_orders = list(source_company.orders.all())
 
-        # Each interaction has a contact, so actual number of contacts is
-        # source_num_interactions + source_num_contacts
-        assert len(source_contacts) == source_num_interactions + source_num_contacts
+        # Each interaction and order has a contact, so actual number of contacts is
+        # source_num_interactions + source_num_contacts + source_num_orders
+        assert len(source_contacts) == (
+            source_num_interactions + source_num_contacts + source_num_orders
+        )
 
         merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
 
@@ -167,15 +199,18 @@ class TestDuplicateCompanyMerger:
             InvestmentProject: {
                 field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
             },
+            Order: {'company': len(source_orders)},
         }
 
-        for obj in chain(source_interactions, source_contacts):
+        for obj in chain(source_interactions, source_contacts, source_orders):
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_interactions)
         assert all(obj.modified_on == creation_time for obj in source_interactions)
         assert all(obj.company == target_company for obj in source_contacts)
         assert all(obj.modified_on == creation_time for obj in source_contacts)
+        assert all(obj.company == target_company for obj in source_orders)
+        assert all(obj.modified_on == creation_time for obj in source_orders)
 
         source_company.refresh_from_db()
 
@@ -242,6 +277,7 @@ class TestDuplicateCompanyMerger:
                     for field in other_fields
                 },
             },
+            Order: {'company': 0},
         }
 
         investment_project.refresh_from_db()
@@ -299,9 +335,10 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
 
-def _company_factory(num_interactions, num_contacts):
-    """Factory for a company that has companies and interactions."""
+def _company_factory(num_interactions, num_contacts, num_orders):
+    """Factory for a company that has companies, interactions and OMIS orders."""
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    OrderFactory.create_batch(num_orders, company=company)
     return company

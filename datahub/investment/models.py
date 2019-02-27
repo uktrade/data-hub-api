@@ -118,7 +118,6 @@ class IProjectAbstract(models.Model):
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     quotable_as_public_case_study = models.BooleanField(null=True)
     actual_land_date = models.DateField(blank=True, null=True)
-    likelihood_of_landing = models.IntegerField(blank=True, null=True)
     likelihood_to_land = models.ForeignKey(
         'investment.LikelihoodToLand', related_name='+',
         null=True, blank=True, on_delete=models.SET_NULL,

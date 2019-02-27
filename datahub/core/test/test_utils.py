@@ -2,7 +2,6 @@ from enum import Enum
 from uuid import UUID
 
 import pytest
-from django.test import override_settings
 
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
@@ -94,7 +93,7 @@ def test_load_constants_to_database():
         ({'ab': ['1', '2']}, '/test-disableable/?ab=1&ab=2'),
     ),
 )
-@override_settings(ROOT_URLCONF='datahub.core.test.support.urls')
+@pytest.mark.urls('datahub.core.test.support.urls')
 def test_reverse_with_query_string(query_args, expected_url):
     """Test reverse_with_query_string() for various query arguments."""
     assert reverse_with_query_string('test-disableable-collection', query_args) == expected_url

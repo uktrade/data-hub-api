@@ -55,10 +55,7 @@ class CompaniesHouseCompany(BaseESModel):
         'name',  # to find 2-letter words
         'name.trigram',
         'company_number',
-
-        # TODO: replace with nested registered address
-        # once the index data has been populated
-        'registered_address_postcode_trigram',
+        'registered_address.postcode.trigram',
     )
 
     class Meta:

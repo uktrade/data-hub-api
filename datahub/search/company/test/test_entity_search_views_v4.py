@@ -224,25 +224,6 @@ class TestSearch(APITestMixin):
                 ['abc defg ltd', 'abc defg us ltd'],
             ),
 
-            # trading_address_country
-            (
-                {
-                    'trading_address_country': constants.Country.united_states.value.id,
-                },
-                ['abc defg us ltd'],
-            ),
-
-            # multiple trading_address_country filters
-            (
-                {
-                    'trading_address_country': [
-                        constants.Country.united_states.value.id,
-                        constants.Country.united_kingdom.value.id,
-                    ],
-                },
-                ['abc defg ltd', 'abc defg us ltd'],
-            ),
-
             # uk_region
             (
                 {
@@ -333,31 +314,6 @@ class TestSearch(APITestMixin):
 
         search_results = {company['name'] for company in response.data['results']}
         assert search_results == results
-
-    def test_global_headquarters(self, setup_es):
-        """Test global headquarters filter."""
-        ghq1 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
-        ghq2 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
-        companies = CompanyFactory.create_batch(5, global_headquarters=ghq1)
-        CompanyFactory.create_batch(5, global_headquarters=ghq2)
-        CompanyFactory.create_batch(10)
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v4:search:company')
-        response = self.api_client.post(
-            url,
-            {
-                'global_headquarters': ghq1.id,
-            },
-        )
-        assert response.status_code == status.HTTP_200_OK
-
-        assert response.data['count'] == 5
-        assert len(response.data['results']) == 5
-
-        search_results = {UUID(company['id']) for company in response.data['results']}
-        assert search_results == {company.id for company in companies}
 
     @pytest.mark.parametrize(
         'sector_level',
