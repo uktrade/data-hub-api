@@ -1,3 +1,54 @@
+Data Hub API 10.3.0 (2019-02-27)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** ``POST /v3/search/company``, ``POST /v3/search/company/export`` the following filters were deleted:
+
+  - ``description``
+  - ``export_to_country``
+  - ``future_interest_country``
+  - ``global_headquarters``
+  - ``sector``
+  - ``trading_address_country``
+- **Companies** ``POST /v3/search/company``, ``POST /v3/search/company/export`` the following sortby values were deleted:
+
+  - ``archived``
+  - ``archived_by``
+  - ``business_type.name``
+  - ``companies_house_data.company_number``
+  - ``company_number``
+  - ``created_on``
+  - ``employee_range.name``
+  - ``headquarter_type.name``
+  - ``id``
+  - ``registered_address_town``
+  - ``sector.name``
+  - ``trading_address_town``
+  - ``turnover_range.name``
+  - ``uk_based``
+  - ``uk_region.name``
+- **Interactions** ``POST /v3/search/interaction``: The ``dit_adviser.name``, ``dit_team.name`` and ``id``
+  values for the ``sortby`` query parameter are deprecated and will be removed on or
+  after 28 February 2019.
+- **Investment** The field ``InvestmentProject.likelihood_of_landing`` was removed from django.
+- ``GET /v3/search``: all the values for the ``sortby`` query parameter are deprecated and will be removed on or after 28 February 2019.
+
+Features
+--------
+
+- **Companies** Company merge tool now supports merging companies having OMIS orders.
+
+Internal changes
+----------------
+
+- **Companies** The companieshouse company search endpoints now use the nested registered address object when searching by term.
+- The django app ``leads`` was deleted.
+
+
 Data Hub API 10.2.0 (2019-02-21)
 ================================
 
