@@ -1,1 +1,0 @@
-The companieshouse company search endpoints now use the nested registered address object when searching by term.
