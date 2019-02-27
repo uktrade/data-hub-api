@@ -16,7 +16,9 @@ from urllib.parse import urlencode
 
 import environ
 from celery.schedules import crontab
+from django.core.exceptions import ImproperlyConfigured
 
+from config.settings.types import HawkScope
 from datahub.core.constants import InvestmentProjectStage
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -68,7 +70,6 @@ LOCAL_APPS = [
     'datahub.investment',
     'datahub.investment.evidence',
     'datahub.investment.proposition',
-    'datahub.leads',
     'datahub.metadata',
     'datahub.oauth',
     'datahub.admin_report',
@@ -458,13 +459,33 @@ GOVUK_PAY_TIMEOUT = 15  # in seconds
 GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
 GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 
-# Activity Stream
-ACTIVITY_STREAM_IP_WHITELIST = env('ACTIVITY_STREAM_IP_WHITELIST', default='')
-# Defaults are not used so we don't accidentally expose the endpoint
-# with default credentials
-ACTIVITY_STREAM_ACCESS_KEY_ID = env('ACTIVITY_STREAM_ACCESS_KEY_ID')
-ACTIVITY_STREAM_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_SECRET_ACCESS_KEY')
-ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS = 60
+# Hawk
+HAWK_RECEIVER_IP_WHITELIST = env.list('HAWK_RECEIVER_IP_WHITELIST', default=[])
+HAWK_RECEIVER_NONCE_EXPIRY_SECONDS = 60
+
+# List of (ID, key, scope) tuples
+_hawk_receiver_credentials = [
+    (
+        env('ACTIVITY_STREAM_ACCESS_KEY_ID'),
+        env('ACTIVITY_STREAM_SECRET_ACCESS_KEY'),
+        HawkScope.activity_stream,
+    ),
+]
+
+HAWK_RECEIVER_CREDENTIALS = {
+    id_: {
+        'key': key,
+        'scope': scope,
+    }
+    for id_, key, scope in _hawk_receiver_credentials
+}
+
+# Check that there are the correct number of items in HAWK_RECEIVER_CREDENTIALS to make sure
+# no duplicate Hawk IDs were configured
+if len(_hawk_receiver_credentials) != len(HAWK_RECEIVER_CREDENTIALS):
+    raise ImproperlyConfigured(
+        'Duplicate Hawk access key IDs detected. All access key IDs should be unique.',
+    )
 
 DOCUMENT_BUCKETS = {
     'default': {

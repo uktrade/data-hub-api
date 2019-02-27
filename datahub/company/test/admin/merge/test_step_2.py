@@ -13,7 +13,6 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
-from datahub.omis.order.test.factories import OrderFactory
 
 
 class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
@@ -73,10 +72,6 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
             ),
             (
                 CompanyFactory,
-                lambda: OrderFactory().company,
-            ),
-            (
-                CompanyFactory,
                 SubsidiaryFactory,
             ),
             (
@@ -86,7 +81,6 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         ),
         ids=[
             'archived-company',
-            'company-with-order',
             'subsidiary',
             'global-headquarters',
         ],
@@ -177,12 +171,6 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
                 ArchivedCompanyFactory,
                 CompanyFactory,
                 'The company selected is archived.',
-            ),
-            (
-                CompanyFactory,
-                lambda: OrderFactory().company,
-                'The other company has related records which can’t be moved to the selected '
-                'company.',
             ),
             (
                 CompanyFactory,

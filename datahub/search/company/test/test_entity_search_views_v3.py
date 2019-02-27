@@ -225,23 +225,6 @@ class TestSearch(APITestMixin):
         actual_ids = Counter(result['id'] for result in response_data['results'])
         assert expected_ids == actual_ids
 
-    def test_trading_address_country_filter(self, setup_data):
-        """Tests trading address country filter."""
-        url = reverse('api-v3:search:company')
-        united_states_id = constants.Country.united_states.value.id
-
-        response = self.api_client.post(
-            url,
-            data={
-                'trading_address_country': united_states_id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
-
     def test_uk_region_filter(self, setup_data):
         """Tests uk region filter."""
         url = reverse('api-v3:search:company')
@@ -311,31 +294,6 @@ class TestSearch(APITestMixin):
 
         search_results = {company['name'] for company in response.data['results']}
         assert search_results == results
-
-    def test_global_headquarters(self, setup_es):
-        """Test global headquarters filter."""
-        ghq1 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
-        ghq2 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
-        companies = CompanyFactory.create_batch(5, global_headquarters=ghq1)
-        CompanyFactory.create_batch(5, global_headquarters=ghq2)
-        CompanyFactory.create_batch(10)
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(
-            url,
-            {
-                'global_headquarters': ghq1.id,
-            },
-        )
-        assert response.status_code == status.HTTP_200_OK
-
-        assert response.data['count'] == 5
-        assert len(response.data['results']) == 5
-
-        search_results = {UUID(company['id']) for company in response.data['results']}
-        assert search_results == {company.id for company in companies}
 
     @pytest.mark.parametrize(
         'sector_level',

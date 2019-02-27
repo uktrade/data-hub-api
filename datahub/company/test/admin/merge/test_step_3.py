@@ -99,15 +99,18 @@ class TestConfirmMergeViewPost(AdminTestMixin):
     @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
     @pytest.mark.parametrize('source_num_investment_projects', (0, 1, 3))
+    @pytest.mark.parametrize('source_num_orders', (0, 3))
     def test_merge_succeeds(
         self,
         source_num_interactions,
         source_num_contacts,
         source_num_investment_projects,
+        source_num_orders,
     ):
         """
         Test that the merge succeeds and the source company is marked as a duplicate when the
-        source company has various amounts of contacts, interactions and investment projects.
+        source company has various amounts of contacts, interactions, investment projects and
+        orders.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
         with freeze_time(creation_time):
@@ -115,10 +118,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 source_num_interactions,
                 source_num_contacts,
                 source_num_investment_projects,
+                source_num_orders,
             )
         target_company = CompanyFactory()
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
+        source_orders = list(source_company.orders.all())
 
         source_investment_projects_by_field = {
             investment_project_field: list(
@@ -128,9 +133,11 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ) for investment_project_field in INVESTMENT_PROJECT_COMPANY_FIELDS
         }
 
-        # Each interaction has a contact, so actual number of contacts is
-        # source_num_interactions + source_num_contacts
-        assert len(source_contacts) == source_num_interactions + source_num_contacts
+        # Each interaction and order has a contact, so actual number of contacts is
+        # source_num_interactions + source_num_contacts + source_num_orders
+        assert len(source_contacts) == (
+            source_num_interactions + source_num_contacts + source_num_orders
+        )
 
         confirm_merge_url = _make_confirm_merge_url(source_company, target_company)
 
@@ -165,6 +172,11 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 merge_entries.append(
                     f'{num_investment_projects} investment {project_noun}{description}',
                 )
+        if len(source_orders) > 0:
+            order_noun = 'order' if len(source_contacts) == 1 else 'orders'
+            merge_entries.append(
+                f'{len(source_orders)} {order_noun}',
+            )
 
         merge_entries = ', '.join(merge_entries)
 
@@ -186,7 +198,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             'target_company': escape(str(target_company)),
         }
 
-        for obj in chain(source_interactions, source_contacts, chain.from_iterable(
+        for obj in chain(source_interactions, source_contacts, source_orders, chain.from_iterable(
             investment_projects
             for investment_projects in source_investment_projects_by_field.values()
         )):
@@ -196,6 +208,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert all(obj.modified_on == creation_time for obj in source_interactions)
         assert all(obj.company == target_company for obj in source_contacts)
         assert all(obj.modified_on == creation_time for obj in source_contacts)
+        assert all(obj.company == target_company for obj in source_orders)
+        assert all(obj.modified_on == creation_time for obj in source_orders)
         for field, investment_projects in source_investment_projects_by_field.items():
             assert all(getattr(obj, field) == target_company for obj in investment_projects)
             assert all(obj.modified_on == creation_time for obj in investment_projects)
@@ -256,10 +270,6 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 ArchivedCompanyFactory,
             ),
             (
-                lambda: OrderFactory().company,
-                CompanyFactory,
-            ),
-            (
                 SubsidiaryFactory,
                 CompanyFactory,
             ),
@@ -305,11 +315,14 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert not source_company.transferred_to
 
 
-def _company_factory(num_interactions, num_contacts, num_investment_projects):
-    """Factory for a company that has companies, interactions and investment projects."""
+def _company_factory(num_interactions, num_contacts, num_investment_projects, num_orders):
+    """
+    Factory for a company that has companies, interactions, investment projects and OMIS orders.
+    """
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    OrderFactory.create_batch(num_orders, company=company)
 
     fields_iter = cycle(INVESTMENT_PROJECT_COMPANY_FIELDS)
     fields = islice(fields_iter, 0, num_investment_projects)
