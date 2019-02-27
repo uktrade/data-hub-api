@@ -4,7 +4,7 @@ The following metadata endpoints have been added
 The values also include a field ``asset-class-interest-sector`` which returns the ``id`` and
 ``name`` of the the associated ``asset_class_interest_sector``.
 
-``GET /metadata/background-checks-conducted/`` returns all possible ``investor_profile_backgroundchecksconducted`` values.
+``GET /metadata/required-checks-conducted/`` returns all possible ``investor_profile_requiredchecksconducted`` values.
 
 ``GET /metadata/construction-risk/`` returns all possible ``investor_profile_constructionrisk`` values.
 
@@ -17,8 +17,6 @@ The values also include a field ``asset-class-interest-sector`` which returns th
 ``GET /metadata/large-capital-investor-type/`` returns all possible ``investor_profile_investortype`` values.
 
 ``GET /metadata/large-capital-investment-type/`` returns all possible ``investor_profile_largecapitalinvestmenttype`` values.
-
-``GET /metadata/profile-type/`` returns all possible ``investor_profile_profiletype`` values.
 
 ``GET /metadata/restriction/`` returns all possible ``investor_profile_restriction`` values.
 

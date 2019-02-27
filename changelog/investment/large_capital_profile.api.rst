@@ -19,19 +19,13 @@ A large capital profile consists of the following fields:
     ``investable_capital`` the capital that could be invested in USD (int),
 
 
+    ``global_assets_under_management`` Global assets under management amount in USD (int),
+
+
     ``investor_description`` a text description of the investor,
 
 
-    ``dit_relationship_manager`` the adviser who is acting as the dit relationship manager (uuid and name),
-
-
-    ``client_contacts`` a list of client contacts (uuid and name),
-
-
-    ``background_checks_conducted`` a background checks conducted status (uuid and name),
-
-
-    ``dit_advisers`` a list of dit advisers (uuid and name),
+    ``required_checks_conducted`` a required background checks conducted status (uuid and name),
 
 
     ``deal_ticket_sizes`` a list of deal ticket sizes (uuid and name),

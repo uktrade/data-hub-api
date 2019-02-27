@@ -7,7 +7,6 @@ The following metadata database tables have been added:
     ``investor_profile_equitypercentage``
     ``investor_profile_investortype``
     ``investor_profile_largecapitalinvestmenttype``
-    ``investor_profile_profiletype``
     ``investor_profile_restriction``
     ``investor_profile_returnrate``
     ``investor_profile_timehorizon``

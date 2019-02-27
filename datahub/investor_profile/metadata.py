@@ -10,8 +10,8 @@ registry.register(
 )
 
 registry.register(
-    metadata_id='background-checks-conducted',
-    model=models.BackgroundChecksConducted,
+    metadata_id='required-checks-conducted',
+    model=models.RequiredChecksConducted,
 )
 
 registry.register(

@@ -1,13 +1,12 @@
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
-from datahub.company.models import Advisor, Company, Contact
+from datahub.company.models import Company
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investor_profile.models import (
     AssetClassInterest,
     AssetClassInterestSector,
-    BackgroundChecksConducted,
     ConstructionRisk,
     DealTicketSize,
     DesiredDealRole,
@@ -15,6 +14,7 @@ from datahub.investor_profile.models import (
     InvestorProfile,
     InvestorType,
     LargeCapitalInvestmentType,
+    RequiredChecksConducted,
     Restriction,
     ReturnRate,
     TimeHorizon,
@@ -39,15 +39,11 @@ INCOMPLETE_LIST_FIELDS = [
 LARGE_CAPITAL_DETAILS_FIELDS = [
     'investor_type',
     'investable_capital',
+    'global_assets_under_management',
     'investor_description',
-    'dit_relationship_manager',
-    'client_contacts',
-    'background_checks_conducted',
+    'required_checks_conducted',
 ]
 
-ADDITIONAL_LARGE_CAPITAL_DETAILS_FIELDS = [
-    'dit_advisers',
-]
 
 LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
     'deal_ticket_sizes',
@@ -72,7 +68,6 @@ ALL_LARGE_CAPITAL_FIELDS = (
     BASE_FIELDS
     + INCOMPLETE_LIST_FIELDS
     + LARGE_CAPITAL_DETAILS_FIELDS
-    + ADDITIONAL_LARGE_CAPITAL_DETAILS_FIELDS
     + LARGE_CAPITAL_REQUIREMENTS_FIELDS
     + LARGE_CAPITAL_LOCATION_FIELDS
 )
@@ -99,25 +94,8 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    background_checks_conducted = NestedRelatedField(
-        BackgroundChecksConducted,
-        required=False,
-    )
-
-    client_contacts = NestedRelatedField(
-        Contact,
-        many=True,
-        required=False,
-    )
-
-    dit_relationship_manager = NestedRelatedField(
-        Advisor,
-        required=False,
-    )
-
-    dit_advisers = NestedRelatedField(
-        Advisor,
-        many=True,
+    required_checks_conducted = NestedRelatedField(
+        RequiredChecksConducted,
         required=False,
     )
 

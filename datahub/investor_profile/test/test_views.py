@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import (
     Country as CountryConstant,
     UKRegion as UKRegionConstant,
@@ -15,13 +15,13 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
-    BackgroundChecksConducted as BackgroundChecksConductedConstant,
     ConstructionRisk as ConstructionRiskConstant,
     DealTicketSize as DealTicketSizeConstant,
     DesiredDealRole as DesiredDealRoleConstant,
     EquityPercentage as EquityPercentageConstant,
     InvestorType as InvestorTypeConstant,
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
+    RequiredChecksConducted as RequiredChecksConductedConstant,
     Restriction as RestrictionConstant,
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
@@ -65,10 +65,9 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         expected_incomplete_details_fields = [
             'investor_type',
             'investable_capital',
+            'global_assets_under_management',
             'investor_description',
-            'dit_relationship_manager',
-            'client_contacts',
-            'background_checks_conducted',
+            'required_checks_conducted',
         ]
 
         expected_incomplete_requirements_fields = [
@@ -82,7 +81,6 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
             'restrictions',
             'asset_classes_of_interest',
         ]
-
         expected_incomplete_location_fields = [
             'uk_region_locations',
             'notes_on_locations',
@@ -152,9 +150,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def test_patch_large_capital_profile_all_details_fields(self):
         """Test updating the details fields for a large capital profile"""
-        adviser = AdviserFactory()
         investor_company = CompanyFactory()
-        contacts = [ContactFactory(), ContactFactory()]
         investor_profile = InvestorProfileFactory(
             investor_company=investor_company,
             profile_type_id=ProfileTypeConstant.large.value.id,
@@ -165,18 +161,10 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             'investor_description': 'Description',
             'investor_type': {'id': InvestorTypeConstant.state_pension_fund.value.id},
             'investable_capital': 1000,
-            'dit_relationship_manager': {'id': str(adviser.id)},
-            'background_checks_conducted': {
-                'id': BackgroundChecksConductedConstant.cleared.value.id,
+            'global_assets_under_management': 3000,
+            'required_checks_conducted': {
+                'id': RequiredChecksConductedConstant.cleared.value.id,
             },
-            'client_contacts': [
-                {
-                    'id': str(contacts[0].id),
-                },
-                {
-                    'id': str(contacts[1].id),
-                },
-            ],
         }
         response = self.api_client.patch(url, data=request_data)
         response_data = response.json()
@@ -184,24 +172,14 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert response_data['incomplete_details_fields'] == []
         assert response_data['investor_description'] == 'Description'
         assert response_data['investable_capital'] == 1000
+        assert response_data['global_assets_under_management'] == 3000
         assert (
             response_data['investor_type']['id']
             == str(InvestorTypeConstant.state_pension_fund.value.id)
         )
         assert (
-            response_data['dit_relationship_manager']['id']
-            == str(adviser.id)
-        )
-        assert (
-            response_data['background_checks_conducted']['id']
-            == str(BackgroundChecksConductedConstant.cleared.value.id)
-        )
-        expected_client_contacts = [
-            str(contacts[0].pk),
-            str(contacts[1].pk),
-        ]
-        self._assert_many_field_ids(
-            response_data, 'client_contacts', expected_client_contacts,
+            response_data['required_checks_conducted']['id']
+            == str(RequiredChecksConductedConstant.cleared.value.id)
         )
 
     def test_patch_large_capital_profile_all_requirements_fields(self):
@@ -339,35 +317,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         ]
         self._assert_many_field_ids(
             response_data, 'other_countries_considering', expected_other_countries_considering,
-        )
-
-    def test_patch_large_capital_profile_with_additional_fields(self):
-        """
-        Test updating fields that are deemed additional
-        ie. not necessary for a profile to be complete.
-        """
-        adviser_1 = AdviserFactory()
-        adviser_2 = AdviserFactory()
-        investor_profile = InvestorProfileFactory(
-            profile_type_id=ProfileTypeConstant.large.value.id,
-        )
-        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
-        request_data = {
-            'dit_advisers': [
-                {'id': str(adviser_1.pk)},
-                {'id': str(adviser_2.pk)},
-            ],
-        }
-        response = self.api_client.patch(url, data=request_data)
-        response_data = response.json()
-        assert response.status_code == status.HTTP_200_OK, response_data
-
-        expected_dit_advisers = [
-            str(adviser_1.pk),
-            str(adviser_2.pk),
-        ]
-        self._assert_many_field_ids(
-            response_data, 'dit_advisers', expected_dit_advisers,
         )
 
     def _assert_many_field_ids(self, response_data, field_name, expected_ids):

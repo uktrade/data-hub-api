@@ -48,32 +48,18 @@ class InvestorProfile(BaseModel):
         help_text='Investable capital amount in USD',
     )
 
+    global_assets_under_management = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text='Global assets under management amount in USD',
+    )
+
     investor_description = models.TextField(
         blank=True,
     )
 
-    client_contacts = models.ManyToManyField(
-        'company.Contact',
-        related_name='investor_profiles',
-        blank=True,
-    )
-
-    dit_relationship_manager = models.ForeignKey(
-        'company.Advisor',
-        related_name='investor_profiles',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-
-    dit_advisers = models.ManyToManyField(
-        'company.Advisor',
-        related_name='+',
-        blank=True,
-    )
-
-    background_checks_conducted = models.ForeignKey(
-        'investor_profile.BackgroundChecksConducted',
+    required_checks_conducted = models.ForeignKey(
+        'investor_profile.RequiredChecksConducted',
         related_name='+',
         on_delete=models.SET_NULL,
         blank=True,
@@ -205,8 +191,8 @@ class DesiredDealRole(BaseOrderedConstantModel):
     """Desired deal role metadata"""
 
 
-class BackgroundChecksConducted(BaseOrderedConstantModel):
-    """Background checks conducted metadata"""
+class RequiredChecksConducted(BaseOrderedConstantModel):
+    """Required checks conducted metadata"""
 
 
 class AssetClassInterestSector(BaseOrderedConstantModel):

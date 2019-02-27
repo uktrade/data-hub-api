@@ -12,7 +12,7 @@ import uuid
 metadata_files = [
     'asset_class_interest_sector.yaml',
     'asset_class_interest.yaml',
-    'background_checks_conducted.yaml',
+    'required_checks_conducted.yaml',
     'construction_risk.yaml',
     'deal_ticket_size.yaml',
     'desired_deal_role.yaml',
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='BackgroundChecksConducted',
+            name='requiredChecksConducted',
             fields=[
                 ('disabled_on', models.DateTimeField(blank=True, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
@@ -143,17 +143,15 @@ class Migration(migrations.Migration):
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('investable_capital', models.IntegerField(blank=True, help_text='Investable capital amount in USD', null=True)),
+                ('global_assets_under_management', models.IntegerField(blank=True, help_text='Global assets under management amount in USD', null=True)),
                 ('investor_description', models.TextField(blank=True)),
                 ('notes_on_locations', models.TextField(blank=True, null=True)),
                 ('asset_classes_of_interest', models.ManyToManyField(blank=True, related_name='_investorprofile_asset_classes_of_interest_+', to='investor_profile.AssetClassInterest')),
-                ('background_checks_conducted', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='investor_profile.BackgroundChecksConducted')),
-                ('client_contacts', models.ManyToManyField(blank=True, related_name='investor_profiles', to='company.Contact')),
+                ('required_checks_conducted', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='investor_profile.requiredChecksConducted')),
                 ('construction_risks', models.ManyToManyField(blank=True, related_name='_investorprofile_construction_risks_+', to='investor_profile.ConstructionRisk')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('deal_ticket_sizes', models.ManyToManyField(blank=True, related_name='_investorprofile_deal_ticket_sizes_+', to='investor_profile.DealTicketSize')),
                 ('desired_deal_roles', models.ManyToManyField(blank=True, related_name='_investorprofile_desired_deal_roles_+', to='investor_profile.DesiredDealRole')),
-                ('dit_advisers', models.ManyToManyField(blank=True, related_name='_investorprofile_dit_advisers_+', to=settings.AUTH_USER_MODEL)),
-                ('dit_relationship_manager', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investor_profiles', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

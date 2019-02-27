@@ -12,8 +12,8 @@ class InvestorType(Enum):
     )
 
 
-class BackgroundChecksConducted(Enum):
-    """Background checks conducted constants."""
+class RequiredChecksConducted(Enum):
+    """Required checks conducted constants."""
 
     cleared = Constant(
         'Cleared',
