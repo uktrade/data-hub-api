@@ -59,6 +59,12 @@ def advisers():
             'dit_team__name': 'New York',
         },
         {
+            # with accent
+            'first_name': 'Éla',
+            'last_name': 'Pien',
+            'dit_team__name': 'Iceland',
+        },
+        {
             # with middle name
             'first_name': 'Amy Sarah',
             'last_name': 'Dacre',
@@ -173,6 +179,7 @@ class TestAdviser(APITestMixin):
                 [
                     ('Amy Sarah', 'Dacre', 'New York'),
                     ('Anna', 'George', 'London'),
+                    ('Éla', 'Pien', 'Iceland'),
                     ('Elisabeth', 'Gravy', 'Johannesburg'),
                     ('Jennifer', 'Cakeman', 'New York'),
                     ('Jessica', 'Samson-James', 'New York'),
@@ -190,7 +197,12 @@ class TestAdviser(APITestMixin):
             ),
             (
                 # nothing odd should happen with special characters
-                r"/\.*+?|'()[]{}",  # noqa: P103
+                r"%_`~:'()[]{}?*+-|^$\\.&~# \t\n\r\v\f",  # noqa: P103
+                [],
+            ),
+            (
+                # non-ASCII characters should not fail
+                r'ẽõḉẹã',
                 [],
             ),
             (
@@ -227,6 +239,18 @@ class TestAdviser(APITestMixin):
             (
                 'conner new york london',
                 [],
+            ),
+            (
+                'É',
+                [
+                    ('Éla', 'Pien', 'Iceland'),
+                ],
+            ),
+            (
+                'Éla',
+                [
+                    ('Éla', 'Pien', 'Iceland'),
+                ],
             ),
             (
                 'Gr',
