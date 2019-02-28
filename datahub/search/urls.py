@@ -2,23 +2,25 @@
 
 from django.urls import path
 
-from datahub.search.views import SearchBasicAPIView, v3_view_registry, v4_view_registry
+from datahub.core.utils import join_truthy_strings
+from datahub.search.views import SearchBasicAPIView, v3_view_registry, v4_view_registry, ViewType
 
 
-def _construct_path(search_app, view, suffix=None):
-    url = f'search/{search_app.name}'
-    if suffix:
-        url = f'{url}/{suffix}'
+def _construct_path(search_app, view_type, view_cls, suffix=None):
+    prefix = 'public' if view_type == ViewType.public else None
 
-    url_name = search_app.name
-    if suffix:
-        url_name = f'{url_name}-{suffix}'
+    url_parts = [
+        prefix,
+        'search',
+        search_app.name,
+        suffix,
+    ]
 
-    return path(
-        url,
-        view.as_view(search_app=search_app),
-        name=url_name,
-    )
+    url = join_truthy_strings(*url_parts, sep='/')
+    url_name = join_truthy_strings(prefix, search_app.name, suffix, sep='-')
+    view = view_cls.as_view(search_app=search_app)
+
+    return path(url, view, name=url_name)
 
 
 # API V3
@@ -26,8 +28,8 @@ def _construct_path(search_app, view, suffix=None):
 urls_v3 = [
     path('search', SearchBasicAPIView.as_view(), name='basic'),
     *[
-        _construct_path(search_app, view_cls, suffix=name)
-        for (search_app, name), view_cls in v3_view_registry.items()
+        _construct_path(search_app, view_type, view_cls, suffix=name)
+        for (search_app, view_type, name), view_cls in v3_view_registry.items()
     ],
 ]
 
@@ -36,6 +38,6 @@ urls_v3 = [
 
 # TODO add global search when all search apps are v4 ready
 urls_v4 = [
-    _construct_path(search_app, view_cls, suffix=name)
-    for (search_app, name), view_cls in v4_view_registry.items()
+    _construct_path(search_app, view_type, view_cls, suffix=name)
+    for (search_app, view_type, name), view_cls in v4_view_registry.items()
 ]
