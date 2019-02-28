@@ -82,9 +82,8 @@ A large capital profile consists of the following fields:
 The detail fields:
     ``investor_type``
     ``investable_capital``,
+    ``global_assets_under_management``,
     ``investor_description``,
-    ``dit_relationship_manager``,
-    ``client_contacts``,
     ``background_checks_conducted``
 
 
