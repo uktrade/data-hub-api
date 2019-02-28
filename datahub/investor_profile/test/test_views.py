@@ -4,7 +4,6 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import (
@@ -32,10 +31,9 @@ from datahub.investor_profile.test.factories import InvestorProfileFactory
 class TestCreateLargeCapitalProfileView(APITestMixin):
     """Test creating a large capital profile."""
 
-    def test_large_capital_unauthorized_user(self):
+    def test_large_capital_unauthorized_user(self, api_client):
         """Should return 401"""
         url = reverse('api-v3:large-investor-profile:collection')
-        api_client = APIClient()
         user = create_test_user()
         response = api_client.get(url, user=user)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
