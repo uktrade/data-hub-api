@@ -58,7 +58,6 @@ class Company(BaseESModel):
     business_type = fields.id_name_field()
     companies_house_data = fields.ch_company_field()
     company_number = fields.NormalizedKeyword()
-    contacts = fields.contact_or_adviser_field('contacts')
     created_on = Date()
     description = fields.EnglishText()
     employee_range = fields.id_name_field()
@@ -127,7 +126,6 @@ class Company(BaseESModel):
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
         'companies_house_data': dict_utils.ch_company_dict,
-        'contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],

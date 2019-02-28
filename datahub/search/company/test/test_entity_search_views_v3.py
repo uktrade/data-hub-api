@@ -158,7 +158,6 @@ class TestSearch(APITestMixin):
                         'id': str(company.business_type.id),
                         'name': company.business_type.name,
                     },
-                    'contacts': [],
                     'description': company.description,
                     'employee_range': {
                         'id': str(company.employee_range.id),
