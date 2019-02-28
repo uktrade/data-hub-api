@@ -52,7 +52,6 @@ MAPPINGS = {
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
-            (InvestorProfileFactory, 'client_contacts'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),

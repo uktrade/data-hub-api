@@ -19,6 +19,7 @@ from datahub.cleanup.management.commands.delete_old_records import (
     INTERACTION_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
+    INVESTOR_PROFILE_EXPIRY_PERIOD,
     ORDER_EXPIRY_PERIOD,
     ORDER_MODIFIED_ON_CUT_OFF,
 )
@@ -59,6 +60,7 @@ CONTACT_DELETE_BEFORE_DATETIME = FROZEN_TIME - CONTACT_EXPIRY_PERIOD
 INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
+INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
 
 
 MAPPING = {
@@ -187,12 +189,12 @@ MAPPING = {
             },
             {
                 'factory': InvestorProfileFactory,
-                'field': 'company',
+                'field': 'investor_company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on':
+                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
                     },
                 ],
             },
