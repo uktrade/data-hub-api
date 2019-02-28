@@ -185,6 +185,17 @@ MAPPING = {
                     },
                 ],
             },
+            {
+                'factory': InvestorProfileFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
         ],
     },
     'company.Contact': {
@@ -243,17 +254,6 @@ MAPPING = {
             {
                 'factory': OrderFactory,
                 'field': 'contact',
-                'expired_objects_kwargs': [],
-                'unexpired_objects_kwargs': [
-                    {
-                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                    },
-                ],
-            },
-            {
-                'factory': InvestorProfileFactory,
-                'field': 'client_contacts',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
