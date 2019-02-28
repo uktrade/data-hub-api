@@ -30,7 +30,7 @@ from datahub.investor_profile.test.factories import InvestorProfileFactory
 
 
 class TestCreateLargeCapitalProfileView(APITestMixin):
-    """Test creating a large capital profile"""
+    """Test creating a large capital profile."""
 
     def test_large_capital_unauthorized_user(self):
         """Should return 401"""
@@ -123,10 +123,10 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
 
 
 class TestUpdateLargeCapitalProfileView(APITestMixin):
-    """Test updating a large capital profile"""
+    """Test updating a large capital profile."""
 
     def test_patch_large_capital_profile(self):
-        """Test updating a large capital profile"""
+        """Test updating a large capital profile."""
         new_description = 'Description 2'
         investor_company = CompanyFactory()
         investor_profile = InvestorProfileFactory(
@@ -183,7 +183,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         )
 
     def test_patch_large_capital_profile_all_requirements_fields(self):
-        """Test updating the requirements fields for a large capital profile"""
+        """Test updating the requirements fields for a large capital profile."""
         direct_investment_equity_id = (
             LargeCapitalInvestmentTypesConstant.direct_investment_in_project_equity.value.id
         )
@@ -281,7 +281,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         )
 
     def test_patch_large_capital_profile_all_location_fields(self):
-        """Test updating the location fields for a large capital profile"""
+        """Test updating the location fields for a large capital profile."""
         investor_profile = InvestorProfileFactory(
             profile_type_id=ProfileTypeConstant.large.value.id,
         )

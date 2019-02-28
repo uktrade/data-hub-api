@@ -15,7 +15,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class InvestorProfile(BaseModel):
-    """Investor profile model"""
+    """Investor profile model."""
 
     id = models.UUIDField(
         primary_key=True,
@@ -152,55 +152,55 @@ class InvestorProfile(BaseModel):
 
 
 class ProfileType(BaseOrderedConstantModel):
-    """Investor profile type metadata"""
+    """Investor profile type metadata."""
 
 
 class InvestorType(BaseOrderedConstantModel):
-    """Investor type metadata"""
+    """Investor type metadata."""
 
 
 class DealTicketSize(BaseOrderedConstantModel):
-    """Deal ticket size metadata"""
+    """Deal ticket size metadata."""
 
 
 class LargeCapitalInvestmentType(BaseOrderedConstantModel):
-    """Large capital investment type metadata"""
+    """Large capital investment type metadata."""
 
 
 class ReturnRate(BaseOrderedConstantModel):
-    """Return rate metadata"""
+    """Return rate metadata."""
 
 
 class TimeHorizon(BaseOrderedConstantModel):
-    """Investor time horizons metadata"""
+    """Investor time horizons metadata."""
 
 
 class Restriction(BaseOrderedConstantModel):
-    """Investor restrictions metadata"""
+    """Investor restrictions metadata."""
 
 
 class ConstructionRisk(BaseOrderedConstantModel):
-    """Investment construction risk metadata"""
+    """Investment construction risk metadata."""
 
 
 class EquityPercentage(BaseOrderedConstantModel):
-    """Equity percentage metadata"""
+    """Equity percentage metadata."""
 
 
 class DesiredDealRole(BaseOrderedConstantModel):
-    """Desired deal role metadata"""
+    """Desired deal role metadata."""
 
 
 class RequiredChecksConducted(BaseOrderedConstantModel):
-    """Required checks conducted metadata"""
+    """Required checks conducted metadata."""
 
 
 class AssetClassInterestSector(BaseOrderedConstantModel):
-    """Asset class interest sector metadata"""
+    """Asset class interest sector metadata."""
 
 
 class AssetClassInterest(BaseOrderedConstantModel):
-    """Asset class interest metadata"""
+    """Asset class interest metadata."""
 
     asset_class_interest_sector = models.ForeignKey(
         AssetClassInterestSector,

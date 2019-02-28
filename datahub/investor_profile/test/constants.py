@@ -22,7 +22,7 @@ class RequiredChecksConducted(Enum):
 
 
 class DealTicketSize(Enum):
-    """Deal ticket size constants"""
+    """Deal ticket size constants."""
 
     up_to_forty_nine_million = Constant(
         'Up to £49 million',

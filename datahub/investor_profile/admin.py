@@ -5,7 +5,7 @@ from datahub.investor_profile import models
 
 @admin.register(models.InvestorProfile)
 class InvestorProfileAdmin(admin.ModelAdmin):
-    """Investment project stage admin."""
+    """Investor profile admin."""
 
     list_display = ('investor_company', 'profile_type')
     search_fields = ('investor_company', 'pk')

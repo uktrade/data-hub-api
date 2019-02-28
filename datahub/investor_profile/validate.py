@@ -4,7 +4,7 @@ from datahub.investor_profile.models import InvestorProfile
 
 
 def get_incomplete_fields(instance, fields):
-    """Returns a list of fields that are incomplete"""
+    """Returns a list of fields that are incomplete."""
     combiner = DataCombiner(instance, {}, model=InvestorProfile)
     incomplete_fields = []
     for field in fields:

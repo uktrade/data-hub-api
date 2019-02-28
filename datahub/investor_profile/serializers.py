@@ -74,7 +74,7 @@ ALL_LARGE_CAPITAL_FIELDS = (
 
 
 class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
-    """Large capital investor profile serializer"""
+    """Large capital investor profile serializer."""
 
     investor_company = NestedRelatedField(
         Company,
@@ -170,21 +170,21 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     incomplete_location_fields = serializers.SerializerMethodField()
 
     def get_incomplete_details_fields(self, instance):
-        """Returns a list of all the detail fields that are incomplete"""
+        """Returns a list of all the detail fields that are incomplete."""
         return get_incomplete_fields(instance, LARGE_CAPITAL_DETAILS_FIELDS)
 
     def get_incomplete_requirements_fields(self, instance):
-        """Returns a list of all the requirement fields that are incomplete"""
+        """Returns a list of all the requirement fields that are incomplete."""
         return get_incomplete_fields(instance, LARGE_CAPITAL_REQUIREMENTS_FIELDS)
 
     def get_incomplete_location_fields(self, instance):
-        """Returns a list of all the location fields that are incomplete"""
+        """Returns a list of all the location fields that are incomplete."""
         return get_incomplete_fields(instance, LARGE_CAPITAL_LOCATION_FIELDS)
 
     def validate_investor_company(self, value):
-        """Validates the company does not already have a large capital investment profile"""
+        """Validates the company does not already have a large capital investment profile."""
         if value.investor_profiles.filter(
-                profile_type_id=ProfileTypeConstant.large.value.id,
+            profile_type_id=ProfileTypeConstant.large.value.id,
         ).exists():
             raise serializers.ValidationError(
                 'Investor company already has large capital investor profile',
@@ -202,7 +202,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
 
 
 class AssetClassInterestSerializer(ConstantModelSerializer):
-    """Asset class interest serializer"""
+    """Asset class interest serializer."""
 
     asset_class_interest_sector = NestedRelatedField(
         AssetClassInterestSector,

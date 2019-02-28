@@ -8,7 +8,7 @@ from datahub.oauth.scopes import Scope
 
 
 class LargeCapitalInvestorProfileViewSet(CoreViewSet):
-    """Large capital investor profile view set"""
+    """Large capital investor profile view set."""
 
     required_scopes = (Scope.internal_front_end,)
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
@@ -16,5 +16,5 @@ class LargeCapitalInvestorProfileViewSet(CoreViewSet):
     profile_type_id = ProfileTypeConstant.large.value.id
 
     def get_queryset(self):
-        """Returns only large capital investor profile queryset"""
+        """Returns only large capital investor profile queryset."""
         return InvestorProfile.objects.filter(profile_type_id=self.profile_type_id)
