@@ -61,7 +61,7 @@ LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
 LARGE_CAPITAL_LOCATION_FIELDS = [
     'uk_region_locations',
     'notes_on_locations',
-    'other_countries_considered',
+    'other_countries_being_considered',
 ]
 
 ALL_LARGE_CAPITAL_FIELDS = (
@@ -151,7 +151,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    other_countries_considered = NestedRelatedField(
+    other_countries_being_considered = NestedRelatedField(
         meta_models.Country,
         many=True,
         required=False,

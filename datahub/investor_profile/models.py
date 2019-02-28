@@ -131,7 +131,7 @@ class InvestorProfile(BaseModel):
         verbose_name='possible UK regions',
     )
 
-    other_countries_considered = models.ManyToManyField(
+    other_countries_being_considered = models.ManyToManyField(
         'metadata.Country',
         related_name='+',
         blank=True,
