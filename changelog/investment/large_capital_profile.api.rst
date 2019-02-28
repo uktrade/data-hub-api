@@ -61,7 +61,7 @@ A large capital profile consists of the following fields:
     ``notes_on_locations`` a text field,
 
 
-    ``other_countries_considering`` a list of countries (uuid and name),
+    ``other_countries_considered`` a list of countries (uuid and name),
 
 
     ``created_on`` the time and date the profile was created,
@@ -102,4 +102,4 @@ The requirement fields:
 The location fields:
     ``uk_region_locations``,
     ``notes_on_locations``,
-    ``other_countries_considering``
+    ``other_countries_considered``

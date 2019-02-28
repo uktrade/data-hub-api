@@ -84,7 +84,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         expected_incomplete_location_fields = [
             'uk_region_locations',
             'notes_on_locations',
-            'other_countries_considering',
+            'other_countries_considered',
         ]
 
         response_data = response.json()
@@ -291,7 +291,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
                 {'id': UKRegionConstant.north_east.value.id},
                 {'id': UKRegionConstant.north_west.value.id},
             ],
-            'other_countries_considering': [
+            'other_countries_considered': [
                 {'id': CountryConstant.ireland.value.id},
                 {'id': CountryConstant.argentina.value.id},
             ],
@@ -311,12 +311,12 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             response_data, 'uk_region_locations', expected_uk_region_locations,
         )
 
-        expected_other_countries_considering = [
+        expected_other_countries_considered = [
             CountryConstant.ireland.value.id,
             CountryConstant.argentina.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'other_countries_considering', expected_other_countries_considering,
+            response_data, 'other_countries_considered', expected_other_countries_considered,
         )
 
     def _assert_many_field_ids(self, response_data, field_name, expected_ids):

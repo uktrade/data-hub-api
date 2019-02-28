@@ -264,8 +264,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='investorprofile',
-            name='other_countries_considering',
-            field=models.ManyToManyField(blank=True, help_text='The other countries being considered for investment', related_name='_investorprofile_other_countries_considering_+', to='metadata.Country'),
+            name='other_countries_considered',
+            field=models.ManyToManyField(blank=True, help_text='The other countries being considered for investment', related_name='_investorprofile_other_countries_considered_+', to='metadata.Country'),
         ),
         migrations.AddField(
             model_name='investorprofile',
