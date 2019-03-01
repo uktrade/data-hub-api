@@ -11,4 +11,4 @@ from enum import auto, Enum
 class HawkScope(Enum):
     """Scopes used for Hawk views."""
     activity_stream = auto()
-    company_search = auto()
+    public_company = auto()

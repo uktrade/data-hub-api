@@ -70,6 +70,10 @@ HAWK_RECEIVER_CREDENTIALS = {
         'key': 'test-key-without-scope',
         'scope': object(),
     },
+    'public-company-id': {
+        'key': 'public-company-key',
+        'scope': HawkScope.public_company,
+    },
 }
 
 DOCUMENT_BUCKETS = {
