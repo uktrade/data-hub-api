@@ -11,16 +11,16 @@ from datahub.investment.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from datahub.search.investment.models import InvestmentProject
+from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.serializers import SearchInvestmentProjectQuerySerializer
-from datahub.search.views import SearchAPIView, SearchExportAPIView
+from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
 
 
 class SearchInvestmentProjectAPIViewMixin:
     """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = InvestmentProject
+    search_app = InvestmentSearchApp
     serializer_class = SearchInvestmentProjectQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
@@ -81,10 +81,12 @@ class SearchInvestmentProjectAPIViewMixin:
     }
 
 
+@register_v3_view()
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, SearchAPIView):
     """Filtered investment project search view."""
 
 
+@register_v3_view(sub_path='export')
 class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchExportAPIView):
     """Investment project search export view."""
 

@@ -5,12 +5,13 @@ env = environ.Env()
 
 from config.settings.common import *
 
-# We need to prevent Django from initialising datahub.search for tests.
-# Removing SearchConfig stops django from calling .ready() which initialises
-# the search signals
-INSTALLED_APPS.remove('datahub.search.apps.SearchConfig')
+# The automatic connection configuration is disabled during tests because the connection is set up
+# using different environment variables in the _es_client pytest fixture
+SEARCH_CONFIGURE_CONNECTION_ON_READY = False
+# We need to prevent Django from connecting signal receivers when the search app is initialised
+# to stop them from firing during non-search tests
+SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY = False
 INSTALLED_APPS += [
-    'datahub.search',
     'datahub.core.test.support',
     'datahub.documents.test.my_entity_document',
     'datahub.search.test.search_support',

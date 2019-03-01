@@ -1,17 +1,18 @@
 from datahub.oauth.scopes import Scope
-from datahub.search.companieshousecompany.models import CompaniesHouseCompany
+from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
 from datahub.search.serializers import EntitySearchQuerySerializer
-from datahub.search.views import SearchAPIView
+from datahub.search.views import register_v3_view, register_v4_view, SearchAPIView
 
 
 class BaseSearchCompaniesHouseCompanyAPIView(SearchAPIView):
     """Base filtered company search view V3."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = CompaniesHouseCompany
+    search_app = CompaniesHouseCompanySearchApp
     serializer_class = EntitySearchQuerySerializer
 
 
+@register_v3_view()
 class SearchCompaniesHouseCompanyAPIViewV3(BaseSearchCompaniesHouseCompanyAPIView):
     """Filtered company search view V3."""
 
@@ -20,6 +21,7 @@ class SearchCompaniesHouseCompanyAPIViewV3(BaseSearchCompaniesHouseCompanyAPIVie
     )
 
 
+@register_v4_view()
 class SearchCompaniesHouseCompanyAPIViewV4(BaseSearchCompaniesHouseCompanyAPIView):
     """Filtered company search view V4."""
 
