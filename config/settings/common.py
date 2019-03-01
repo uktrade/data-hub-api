@@ -465,29 +465,38 @@ GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 HAWK_RECEIVER_IP_WHITELIST = env.list('HAWK_RECEIVER_IP_WHITELIST', default=[])
 HAWK_RECEIVER_NONCE_EXPIRY_SECONDS = 60
 
-# List of (ID, key, scope) tuples
-_hawk_receiver_credentials = [
-    (
-        env('ACTIVITY_STREAM_ACCESS_KEY_ID'),
-        env('ACTIVITY_STREAM_SECRET_ACCESS_KEY'),
-        HawkScope.activity_stream,
-    ),
-]
 
-HAWK_RECEIVER_CREDENTIALS = {
-    id_: {
-        'key': key,
+HAWK_RECEIVER_CREDENTIALS = {}
+
+
+def _add_hawk_credentials(id_env_name, key_env_name, scope):
+    id_ = env(id_env_name, default=None)
+
+    if not id_:
+        return
+
+    if id_ in HAWK_RECEIVER_CREDENTIALS:
+        raise ImproperlyConfigured(
+            'Duplicate Hawk access key IDs detected. All access key IDs should be unique.',
+        )
+
+    HAWK_RECEIVER_CREDENTIALS[id_] = {
+        'key': env(key_env_name),
         'scope': scope,
     }
-    for id_, key, scope in _hawk_receiver_credentials
-}
 
-# Check that there are the correct number of items in HAWK_RECEIVER_CREDENTIALS to make sure
-# no duplicate Hawk IDs were configured
-if len(_hawk_receiver_credentials) != len(HAWK_RECEIVER_CREDENTIALS):
-    raise ImproperlyConfigured(
-        'Duplicate Hawk access key IDs detected. All access key IDs should be unique.',
-    )
+
+_add_hawk_credentials(
+    'ACTIVITY_STREAM_ACCESS_KEY_ID',
+    'ACTIVITY_STREAM_SECRET_ACCESS_KEY',
+    HawkScope.activity_stream,
+)
+
+_add_hawk_credentials(
+    'MARKET_ACCESS_ACCESS_KEY_ID',
+    'MARKET_ACCESS_SECRET_ACCESS_KEY',
+    HawkScope.public_company,
+)
 
 DOCUMENT_BUCKETS = {
     'default': {
