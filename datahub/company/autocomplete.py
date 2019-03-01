@@ -1,4 +1,3 @@
-import re
 from functools import reduce
 from operator import or_
 
@@ -66,7 +65,7 @@ def _apply_autocomplete_filter_to_queryset(queryset, autocomplete_fields, search
     the gin_trgm_ops operator class from the pg_trgm PostgreSQL extension. However, this will
     typically only work if all search fields are on the same table.
     """
-    escaped_tokens = [re.escape(token) for token in search_string.split()]
+    escaped_tokens = [_escape_regex_string(token) for token in search_string.split()]
 
     # Skip the remainder of the logic if an empty string or only spaces were entered
     if not escaped_tokens:
@@ -185,3 +184,19 @@ def _make_ordering_case_expression(sort_values_and_fields, escaped_tokens, outpu
         for sort_value, field in sort_values_and_fields
     )
     return Case(*case_whens, output_field=output_field)
+
+
+def _escape_regex_string(string):
+    """
+    Escapes strings for use in regular expressions.
+
+    This is needed as Python 3.6 escapes all non-ASCII characters, which is incompatible with
+    PostgreSQL.
+
+    Python 3.7 only escapes special characters.
+
+    TODO: Use re.escape instead once we have updated to Python 3.7.
+    """
+    characters_to_escape = '()[]{}?*+-|^$\\.&~# \t\n\r\v\f'  # noqa: P103
+    character_mapping = {ord(char): f'\\{char}' for char in characters_to_escape}
+    return string.translate(character_mapping)
