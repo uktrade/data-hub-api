@@ -94,7 +94,7 @@ class Interaction(BaseModel):
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -116,7 +116,7 @@ class Interaction(BaseModel):
     )
     event = models.ForeignKey(
         'event.Event',
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -128,7 +128,7 @@ class Interaction(BaseModel):
     subject = models.TextField()
     dit_adviser = models.ForeignKey(
         'company.Advisor',
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -144,7 +144,7 @@ class Interaction(BaseModel):
     )
     investment_project = models.ForeignKey(
         'investment.InvestmentProject',
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         null=True,
         blank=True,
         on_delete=models.CASCADE,

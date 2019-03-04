@@ -129,18 +129,18 @@ class Order(BaseModel):
 
     company = models.ForeignKey(
         Company,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     contact = models.ForeignKey(
         Contact,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
 
     primary_market = models.ForeignKey(
         Country,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         null=True,
         on_delete=models.SET_NULL,
     )
@@ -152,14 +152,14 @@ class Order(BaseModel):
     )
     uk_region = models.ForeignKey(
         UKRegion,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         null=True, blank=True,
         on_delete=models.SET_NULL,
     )
 
     service_types = models.ManyToManyField(
         ServiceType,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         blank=True,
     )
     description = models.TextField(
@@ -197,7 +197,7 @@ class Order(BaseModel):
 
     hourly_rate = models.ForeignKey(
         HourlyRate,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
         default=DEFAULT_HOURLY_RATE,
     )
