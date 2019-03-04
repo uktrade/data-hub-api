@@ -6,6 +6,7 @@ from datahub.company.views import (
     CompanyViewSetV3,
     CompanyViewSetV4,
     OneListGroupCoreTeamViewSet,
+    PublicCompanyViewSet,
 )
 
 # TODO: delete once the migration to address and registered address is complete
@@ -60,6 +61,9 @@ one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
+public_company_item_v4 = PublicCompanyViewSet.as_view({
+    'get': 'retrieve',
+})
 
 urls_v3 = [
     path('company', company_collection_v3, name='collection'),
@@ -87,4 +91,5 @@ urls_v4 = [
         one_list_group_core_team,
         name='one-list-group-core-team',
     ),
+    path('public/company/<uuid:pk>', public_company_item_v4, name='public-item'),
 ]
