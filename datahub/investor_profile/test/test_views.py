@@ -33,14 +33,14 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
 
     def test_large_capital_unauthorized_user(self, api_client):
         """Should return 401"""
-        url = reverse('api-v3:large-investor-profile:collection')
+        url = reverse('api-v4:large-investor-profile:collection')
         user = create_test_user()
         response = api_client.get(url, user=user)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_create_large_capital_profile_fail(self):
         """Test creating a large capital profile without an investor company."""
-        url = reverse('api-v3:large-investor-profile:collection')
+        url = reverse('api-v4:large-investor-profile:collection')
         request_data = {}
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -51,7 +51,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
 
     def test_create_large_capital_profile_with_minimum_required_values(self):
         """Test creating a large capital profile with minimum required fields."""
-        url = reverse('api-v3:large-investor-profile:collection')
+        url = reverse('api-v4:large-investor-profile:collection')
         investor_company = CompanyFactory()
 
         request_data = {
@@ -99,7 +99,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
 
     def test_create_large_capital_profile_fails_if_profile_already_exists(self):
         """Test creating a large investor profile with minimum required fields."""
-        url = reverse('api-v3:large-investor-profile:collection')
+        url = reverse('api-v4:large-investor-profile:collection')
         investor_company = CompanyFactory()
         InvestorProfileFactory(
             investor_company=investor_company,
@@ -132,7 +132,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             profile_type_id=ProfileTypeConstant.large.value.id,
             investor_description='Description 1',
         )
-        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
 
         request_data = {
             'investor_description': new_description,
@@ -153,7 +153,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             investor_company=investor_company,
             profile_type_id=ProfileTypeConstant.large.value.id,
         )
-        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
 
         request_data = {
             'investor_description': 'Description',
@@ -189,7 +189,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         investor_profile = InvestorProfileFactory(
             profile_type_id=ProfileTypeConstant.large.value.id,
         )
-        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'deal_ticket_sizes': [
                 {'id': DealTicketSizeConstant.up_to_forty_nine_million.value.id},
@@ -283,7 +283,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         investor_profile = InvestorProfileFactory(
             profile_type_id=ProfileTypeConstant.large.value.id,
         )
-        url = reverse('api-v3:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'uk_region_locations': [
                 {'id': UKRegionConstant.north_east.value.id},

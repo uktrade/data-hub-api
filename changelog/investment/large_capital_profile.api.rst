@@ -1,10 +1,10 @@
-``GET /v3/large-investor-profile`` returns a list of all the large capital profiles.
+``GET /v4/large-investor-profile`` returns a list of all the large capital profiles.
 
-``POST /v3/large-investor-profile`` creates a large capital profile for a given ``investor_company``.
+``POST /v4/large-investor-profile`` creates a large capital profile for a given ``investor_company``.
 
-``GET /v3/large-investor-profile/<uuid:pk>`` returns the large capital profile for the given id.
+``GET /v4/large-investor-profile/<uuid:pk>`` returns the large capital profile for the given id.
 
-``PATCH /v3/large-investor-profile/<uuid:pk>`` updates the large capital profile for the given id.
+``PATCH /v4/large-investor-profile/<uuid:pk>`` updates the large capital profile for the given id.
 
 A large capital profile consists of the following fields:
     ``id`` the uuid of the of the investor profile (readonly),
