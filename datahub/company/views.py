@@ -4,7 +4,9 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
+from config.settings.types import HawkScope
 from datahub.company.autocomplete import AutocompleteFilter
 from datahub.company.models import (
     Advisor,
@@ -21,9 +23,15 @@ from datahub.company.serializers import (
     CompanySerializerV4,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
+    PublicCompanySerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
+from datahub.core.hawk_receiver import (
+    HawkAuthentication,
+    HawkResponseSigningMixin,
+    HawkScopePermission,
+)
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.queryset import get_slim_investment_project_queryset
@@ -86,6 +94,38 @@ class CompanyViewSetV4(BaseCompanyViewSet):
     """Company view set V4."""
 
     serializer_class = CompanySerializerV4
+
+
+class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    """Read-only company view set using Hawk-authentication (with no user context)."""
+
+    serializer_class = PublicCompanySerializer
+    authentication_classes = (HawkAuthentication,)
+    permission_classes = (HawkScopePermission,)
+    required_hawk_scope = HawkScope.public_company
+
+    queryset = Company.objects.select_related(
+        'address_country',
+        'archived_by',
+        'business_type',
+        'employee_range',
+        'export_experience_category',
+        'global_headquarters',
+        'global_headquarters__one_list_tier',
+        'headquarter_type',
+        'one_list_tier',
+        'registered_address_country',
+        'trading_address_country',
+        'transferred_to',
+        'turnover_range',
+        'uk_region',
+    ).prefetch_related(
+        'export_to_countries',
+        'future_interest_countries',
+        'sector',
+        'sector__parent',
+        'sector__parent__parent',
+    )
 
 
 class OneListGroupCoreTeamViewSet(CoreViewSet):
