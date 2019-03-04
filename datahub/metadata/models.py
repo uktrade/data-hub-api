@@ -33,7 +33,7 @@ class Sector(MPTTModel, DisableableModel):
     sector_cluster = models.ForeignKey(
         SectorCluster,
         null=True, blank=True,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     parent = TreeForeignKey(
@@ -145,19 +145,19 @@ class Team(BaseConstantModel):
     role = models.ForeignKey(
         TeamRole,
         null=True, blank=True,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     uk_region = models.ForeignKey(
         UKRegion,
         null=True, blank=True,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     country = models.ForeignKey(
         Country,
         null=True, blank=True,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     tags = MultipleChoiceField(
