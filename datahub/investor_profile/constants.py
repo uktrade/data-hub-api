@@ -3,6 +3,9 @@ from enum import Enum
 from datahub.core.constants import Constant
 
 
+FEATURE_FLAG_LARGE_CAPITAL_PROFILE = 'large-capital-profile-feature'
+
+
 class ProfileType(Enum):
     """Specific profile type constants."""
 

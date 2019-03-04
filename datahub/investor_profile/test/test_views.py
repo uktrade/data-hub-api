@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -11,7 +12,11 @@ from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.investor_profile.constants import ProfileType as ProfileTypeConstant
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.investor_profile.constants import (
+    FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
+    ProfileType as ProfileTypeConstant,
+)
 from datahub.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
     ConstructionRisk as ConstructionRiskConstant,
@@ -28,6 +33,27 @@ from datahub.investor_profile.test.constants import (
 from datahub.investor_profile.test.factories import InvestorProfileFactory
 
 
+@pytest.fixture
+def set_large_capital_feature_flag_as_active():
+    """Creates the streamlined flow feature flag."""
+    yield FeatureFlagFactory(
+        code=FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
+        is_active=True,
+        description='description of feature',
+    )
+
+
+@pytest.fixture
+def set_large_capital_feature_flag_as_inactive():
+    """Creates the streamlined flow feature flag."""
+    yield FeatureFlagFactory(
+        code=FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
+        is_active=False,
+        description='description of feature',
+    )
+
+
+@pytest.mark.usefixtures('set_large_capital_feature_flag_as_active')
 class TestCreateLargeCapitalProfileView(APITestMixin):
     """Test creating a large capital profile."""
 
@@ -120,6 +146,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         }
 
 
+@pytest.mark.usefixtures('set_large_capital_feature_flag_as_active')
 class TestUpdateLargeCapitalProfileView(APITestMixin):
     """Test updating a large capital profile."""
 
@@ -324,3 +351,31 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert (
             set([field['id'] for field in response_data[field_name]]) == set(expected_ids)
         ), field_name
+
+
+@pytest.mark.usefixtures('set_large_capital_feature_flag_as_inactive')
+class TestLargeCapitalProfileViewWithFeatureFlagInactive(APITestMixin):
+    """Test large capital profile views when feature flag is inactive."""
+
+    def test_create_profile_with_inactive_feature_flag_returns_404(self):
+        """Test creating a large capital profile with feature flag set to inactive returns 404."""
+        url = reverse('api-v4:large-investor-profile:collection')
+        request_data = {}
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+    def test_patch_profile_with_inactive_feature_flag_returns_404(self):
+        """Test updating a large capital profile."""
+        new_description = 'Description 2'
+        investor_company = CompanyFactory()
+        investor_profile = InvestorProfileFactory(
+            investor_company=investor_company,
+            profile_type_id=ProfileTypeConstant.large.value.id,
+            investor_description='Description 1',
+        )
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        request_data = {
+            'investor_description': new_description,
+        }
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
