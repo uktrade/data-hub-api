@@ -36,7 +36,6 @@ redis==3.1.0
 # ES
 elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
-aws-requests-auth==0.4.2
 
 # Celery
 celery==4.2.1
