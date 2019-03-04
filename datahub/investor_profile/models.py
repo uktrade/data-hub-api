@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from datahub.core import reversion
@@ -41,17 +42,18 @@ class InvestorProfile(BaseModel):
         blank=True,
         null=True,
     )
-
-    investable_capital = models.IntegerField(
-        blank=True,
+    investable_capital = models.BigIntegerField(
         null=True,
+        blank=True,
         help_text='Investable capital amount in USD',
+        validators=[MinValueValidator(0)],
     )
 
-    global_assets_under_management = models.IntegerField(
+    global_assets_under_management = models.BigIntegerField(
         blank=True,
         null=True,
         help_text='Global assets under management amount in USD',
+        validators=[MinValueValidator(0)],
     )
 
     investor_description = models.TextField(
@@ -140,7 +142,6 @@ class InvestorProfile(BaseModel):
 
     notes_on_locations = models.TextField(
         blank=True,
-        null=True,
     )
 
     class Meta:
