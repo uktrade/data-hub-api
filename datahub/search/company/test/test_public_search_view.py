@@ -1,18 +1,16 @@
-import json
 import uuid
 from collections import Counter
 from uuid import UUID, uuid4
 
 import factory
-import mohawk
 import pytest
-from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
+from datahub.core.test_utils import HawkAPITestClient
 
 
 @pytest.fixture
@@ -51,54 +49,15 @@ def setup_data(setup_es):
     setup_es.indices.refresh()
 
 
-class HawkAPITestClient:
-    """Simple test client for making requests signed using Hawk."""
-
-    def __init__(self, api_client):
-        """Initialise the client using an APIClient instance."""
-        self.api_client = api_client
-        self.credentials = None
-
-    def set_credentials(self, id_, key, algorithm='sha256'):
-        """Set the credentials for requests."""
-        self.credentials = {
-            'id': id_,
-            'key': key,
-            'algorithm': algorithm,
-        }
-
-    def post(self, path, data):
-        """Make a POST request with a JSON body."""
-        content_type = 'application/json'
-        serialised_data = json.dumps(data, cls=DjangoJSONEncoder)
-
-        sender = mohawk.Sender(
-            self.credentials,
-            f'http://testserver{path}',
-            'post',
-            content=serialised_data,
-            content_type=content_type,
-        )
-
-        return self.api_client.post(
-            path,
-            data=serialised_data,
-            HTTP_AUTHORIZATION=sender.request_header,
-            HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-            content_type=content_type,
-        )
-
-
 @pytest.fixture
-def hawk_api_client(api_client):
+def hawk_api_client():
     """Hawk API client fixture."""
-    yield HawkAPITestClient(api_client)
+    yield HawkAPITestClient()
 
 
 @pytest.fixture
-def public_company_api_client(api_client):
+def public_company_api_client(hawk_api_client):
     """Hawk API client fixture configured to use credentials with the public_company scope."""
-    hawk_api_client = HawkAPITestClient(api_client)
     hawk_api_client.set_credentials(
         'public-company-id',
         'public-company-key',
