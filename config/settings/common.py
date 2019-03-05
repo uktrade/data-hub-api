@@ -413,11 +413,11 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'event': f'{DATAHUB_FRONTEND_BASE_URL}/events',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
-    'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
+    'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 
     'mi_fdi_dashboard_country': (
-        f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
+        f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
     )
 }
 
