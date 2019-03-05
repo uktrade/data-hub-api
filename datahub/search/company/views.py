@@ -1,13 +1,12 @@
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
-from django.utils.decorators import decorator_from_middleware
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
-    HawkResponseMiddleware,
+    HawkResponseSigningMixin,
     HawkScopePermission,
 )
 from datahub.core.query_utils import get_front_end_url_expression
@@ -103,7 +102,7 @@ class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
 
 
 @register_v4_view(is_public=True)
-class PublicSearchCompanyAPIView(SearchAPIView):
+class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
     """
     Company search view using Hawk authentication.
 
@@ -161,15 +160,6 @@ class PublicSearchCompanyAPIView(SearchAPIView):
             'trading_names_trigram',
         ],
     }
-
-    @decorator_from_middleware(HawkResponseMiddleware)
-    def post(self, request, format=None):
-        """
-        Perform search.
-
-        Overridden to add Hawk response signing.
-        """
-        return super().post(request, format=format)
 
 
 @register_v3_view(sub_path='export')
