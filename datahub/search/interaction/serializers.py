@@ -19,8 +19,6 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     kind = SingleOrListField(child=serializers.CharField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)
-    contact = SingleOrListField(child=StringUUIDField(), required=False)
-    contact_name = serializers.CharField(required=False)
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
     created_on_exists = serializers.BooleanField(required=False)
@@ -46,10 +44,6 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
         'id',
         'subject',
     )
-    deprecated_filters = {
-        'contact',
-        'contact_name',
-    }
     deprecated_sortby_fields = {
         'contact.name',
         'dit_adviser.name',
@@ -63,13 +57,6 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
 
         TODO Remove following deprecation period.
         """
-        deprecated_filters_in_data = data.keys() & self.deprecated_filters
-        if deprecated_filters_in_data:
-            logger.error(
-                'The following deprecated interaction search filters were '
-                f'used: {deprecated_filters_in_data}.',
-            )
-
         sortby = data.get('sortby')
         if sortby and sortby.field in self.deprecated_sortby_fields:
             logger.error(
