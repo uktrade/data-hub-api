@@ -66,7 +66,7 @@ INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_
 MAPPING = {
     'company.Company': {
         'factory': CompanyFactory,
-        'implicitly_deletable_models': set(),
+        'implicitly_deletable_models': {'investor_profile.InvestorProfile'},
         'expired_objects_kwargs': [
             {
                 'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
@@ -190,7 +190,12 @@ MAPPING = {
             {
                 'factory': InvestorProfileFactory,
                 'field': 'investor_company',
-                'expired_objects_kwargs': [],
+                'expired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
                 'unexpired_objects_kwargs': [
                     {
                         'modified_on':
