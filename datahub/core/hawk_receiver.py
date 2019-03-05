@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 from django.conf import settings
 from django.core.cache import cache
@@ -88,24 +89,26 @@ class HawkAuthentication(BaseAuthentication):
         return None, hawk_receiver
 
 
-class HawkResponseMiddleware:
-    """Adds the Server-Authorization header to the response, so the originator
-    of the request can authenticate the response
+class HawkResponseSigningMixin:
+    """
+    DRF view mixin to add the Server-Authorization header to responses, so the originator
+    of the request can authenticate the response.
+
+    Must be first in the base class list so that the APIView method is overridden.
     """
 
-    def process_response(self, view, response):
+    def finalize_response(self, request, response, *args, **kwargs):
         """
-        Sign Hawk responses.
+        Add callback to sign Hawk responses.
 
-        If the request was authenticated using Hawk, this adds the Server-Authorization header
-        to the response, so the originator of the request can authenticate the response.
+        If the request was authenticated using Hawk, this adds a post-render callback to the
+        response which sets the Server-Authorization header, so that the originator of the
+        request can authenticate the response.
         """
-        if isinstance(view.request.successful_authenticator, HawkAuthentication):
-            response['Server-Authorization'] = view.request.auth.respond(
-                content=response.content,
-                content_type=response['Content-Type'],
-            )
-        return response
+        finalized_response = super().finalize_response(request, response, *args, **kwargs)
+        callback = partial(_sign_rendered_response, request)
+        finalized_response.add_post_render_callback(callback)
+        return finalized_response
 
 
 class HawkScopePermission(BasePermission):
@@ -172,3 +175,12 @@ def _authorise(request):
         content_type=request.content_type,
         seen_nonce=_seen_nonce,
     )
+
+
+def _sign_rendered_response(request, response):
+    if isinstance(request.successful_authenticator, HawkAuthentication):
+        response['Server-Authorization'] = request.auth.respond(
+            content=response.content,
+            content_type=response['Content-Type'],
+        )
+    return response

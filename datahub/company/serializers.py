@@ -766,6 +766,56 @@ class CompanySerializerV4(BaseCompanySerializer):
         )
 
 
+class PublicCompanySerializer(CompanySerializerV4):
+    """
+    Read-only serialiser for the Hawk-authenticated company view.
+
+    This is a slightly stripped down read-only version of the v4 company serialiser. Some fields
+    containing personal data are deliberately omitted.
+    """
+
+    class Meta(CompanySerializerV4.Meta):
+        fields = (
+            'address',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'business_type',
+            'company_number',
+            'created_on',
+            'description',
+            'duns_number',
+            'employee_range',
+            'export_experience_category',
+            'export_to_countries',
+            'future_interest_countries',
+            'global_headquarters',
+            'headquarter_type',
+            'id',
+            'is_number_of_employees_estimated',
+            'is_turnover_estimated',
+            'modified_on',
+            'name',
+            'number_of_employees',
+            'one_list_group_tier',
+            'reference_code',
+            'registered_address',
+            'sector',
+            'trading_names',
+            'transfer_reason',
+            'transferred_on',
+            'transferred_to',
+            'turnover',
+            'turnover_range',
+            'uk_based',
+            'uk_region',
+            'vat_number',
+            'website',
+        )
+        permissions = {}
+        read_only_fields = fields
+
+
 class OneListCoreTeamMemberSerializer(serializers.Serializer):
     """One List Core Team Member Serializer."""
 

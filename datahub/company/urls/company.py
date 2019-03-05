@@ -1,52 +1,13 @@
-"""Company views URL config."""
-
 from django.urls import path
 
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
-    CompaniesHouseCompanyViewSetV3,
-    CompaniesHouseCompanyViewSetV4,
     CompanyAuditViewSet,
     CompanyViewSetV3,
     CompanyViewSetV4,
-    ContactAuditViewSet,
-    ContactViewSet,
     OneListGroupCoreTeamViewSet,
+    PublicCompanyViewSet,
 )
-
-# CONTACT
-
-contact_collection = ContactViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
-
-contact_item = ContactViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
-
-contact_archive = ContactViewSet.as_view({
-    'post': 'archive',
-})
-
-contact_unarchive = ContactViewSet.as_view({
-    'post': 'unarchive',
-})
-
-contact_audit = ContactAuditViewSet.as_view({
-    'get': 'list',
-})
-
-contact_urls = [
-    path('contact', contact_collection, name='list'),
-    path('contact/<uuid:pk>', contact_item, name='detail'),
-    path('contact/<uuid:pk>/archive', contact_archive, name='archive'),
-    path('contact/<uuid:pk>/unarchive', contact_unarchive, name='unarchive'),
-    path('contact/<uuid:pk>/audit', contact_audit, name='audit-item'),
-]
-
-# COMPANY
 
 # TODO: delete once the migration to address and registered address is complete
 company_collection_v3 = CompanyViewSetV3.as_view({
@@ -100,25 +61,11 @@ one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
-# TODO: delete once the migration to v4 is complete
-ch_company_collection_v3 = CompaniesHouseCompanyViewSetV3.as_view({
-    'get': 'list',
-})
-
-# TODO: delete once the migration to v4 is complete
-ch_company_item_v3 = CompaniesHouseCompanyViewSetV3.as_view({
+public_company_item_v4 = PublicCompanyViewSet.as_view({
     'get': 'retrieve',
 })
 
-ch_company_collection_v4 = CompaniesHouseCompanyViewSetV4.as_view({
-    'get': 'list',
-})
-
-ch_company_item_v4 = CompaniesHouseCompanyViewSetV4.as_view({
-    'get': 'retrieve',
-})
-
-company_urls_v3 = [
+urls_v3 = [
     path('company', company_collection_v3, name='collection'),
     path('company/<uuid:pk>', company_item_v3, name='item'),
     path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
@@ -132,7 +79,7 @@ company_urls_v3 = [
     ),
 ]
 
-company_urls_v4 = [
+urls_v4 = [
     path('company', company_collection_v4, name='collection'),
     path('company/<uuid:pk>', company_item_v4, name='item'),
     path('company/<uuid:pk>/archive', company_archive_v4, name='archive'),
@@ -144,14 +91,5 @@ company_urls_v4 = [
         one_list_group_core_team,
         name='one-list-group-core-team',
     ),
-]
-
-ch_company_urls_v3 = [
-    path('ch-company', ch_company_collection_v3, name='collection'),
-    path('ch-company/<company_number>', ch_company_item_v3, name='item'),
-]
-
-ch_company_urls_v4 = [
-    path('ch-company', ch_company_collection_v4, name='collection'),
-    path('ch-company/<company_number>', ch_company_item_v4, name='item'),
+    path('public/company/<uuid:pk>', public_company_item_v4, name='public-item'),
 ]
