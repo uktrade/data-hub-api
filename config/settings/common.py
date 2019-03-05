@@ -287,15 +287,8 @@ VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 # Leeloo stuff
 if 'elasticsearch' in VCAP_SERVICES:
     ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
-    ES_USE_AWS_AUTH = False
 else:
     ES_URL = env('ES5_URL')
-    ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
-
-if ES_USE_AWS_AUTH:
-    AWS_ELASTICSEARCH_REGION = env('AWS_ELASTICSEARCH_REGION')
-    AWS_ELASTICSEARCH_KEY = env('AWS_ELASTICSEARCH_KEY')
-    AWS_ELASTICSEARCH_SECRET = env('AWS_ELASTICSEARCH_SECRET')
 
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
