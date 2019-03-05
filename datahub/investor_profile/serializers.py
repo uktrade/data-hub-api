@@ -182,9 +182,20 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
         return get_incomplete_fields(instance, LARGE_CAPITAL_LOCATION_FIELDS)
 
     def validate_investor_company(self, value):
-        """Validates the company does not already have a large capital investment profile."""
+        """
+        Validates that the company has not changed and that the company does not already
+        have a large capital investment profile.
+        """
+        if self.instance and self.instance.investor_company_id != value.id:
+            raise serializers.ValidationError(
+                'Investor company can not be updated',
+            )
+
+        profile_id = getattr(self.instance, 'id', None)
         if value.investor_profiles.filter(
             profile_type_id=ProfileTypeConstant.large.value.id,
+        ).exclude(
+            id=profile_id,
         ).exists():
             raise serializers.ValidationError(
                 'Investor company already has large capital investor profile',

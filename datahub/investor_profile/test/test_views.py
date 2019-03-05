@@ -33,24 +33,24 @@ from datahub.investor_profile.test.constants import (
 from datahub.investor_profile.test.factories import InvestorProfileFactory
 
 
+def _set_large_capital_feature_flag(is_active):
+    return FeatureFlagFactory(
+        code=FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
+        is_active=is_active,
+        description='description of feature',
+    )
+
+
 @pytest.fixture
 def set_large_capital_feature_flag_as_active():
     """Creates the streamlined flow feature flag."""
-    yield FeatureFlagFactory(
-        code=FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
-        is_active=True,
-        description='description of feature',
-    )
+    yield _set_large_capital_feature_flag(True)
 
 
 @pytest.fixture
 def set_large_capital_feature_flag_as_inactive():
     """Creates the streamlined flow feature flag."""
-    yield FeatureFlagFactory(
-        code=FEATURE_FLAG_LARGE_CAPITAL_PROFILE,
-        is_active=False,
-        description='description of feature',
-    )
+    yield _set_large_capital_feature_flag(False)
 
 
 @pytest.mark.usefixtures('set_large_capital_feature_flag_as_active')
@@ -162,6 +162,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
 
         request_data = {
+            'investor_company': {'id': investor_company.pk},
             'investor_description': new_description,
         }
         response = self.api_client.patch(url, data=request_data)
@@ -172,6 +173,31 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         investor_profile.refresh_from_db()
         assert investor_profile.investor_description == new_description
         assert 'investor_description' not in response_data['incomplete_details_fields']
+
+    def test_patch_large_capital_profile_with_a_different_company_returns_validation_error(self):
+        """
+        Test updating a large capital profile with a different investor company
+        does return a validation error
+        """
+        investor_company = CompanyFactory()
+        new_investor_company = CompanyFactory()
+        investor_profile = InvestorProfileFactory(
+            investor_company=investor_company,
+            profile_type_id=ProfileTypeConstant.large.value.id,
+        )
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        request_data = {
+            'investor_company': {'id': new_investor_company.pk},
+        }
+
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        response_data = response.json()
+        assert response_data == {
+            'investor_company':
+                ['Investor company can not be updated'],
+        }
 
     def test_patch_large_capital_profile_all_details_fields(self):
         """Test updating the details fields for a large capital profile"""
