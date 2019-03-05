@@ -37,8 +37,7 @@ def test_index_exists(mock_es_client, expected):
 @mock.patch('datahub.search.elasticsearch.settings')
 @mock.patch('datahub.search.elasticsearch.connections')
 def test_configure_connection(connections, settings):
-    """Tests if Heroku connection is configured."""
-    settings.HEROKU = True
+    """Test configuration of the connection."""
     settings.ES_URL = 'https://login:password@test:1234'
     connections.configure.return_value = {}
 
