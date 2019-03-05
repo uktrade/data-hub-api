@@ -432,25 +432,6 @@ class TestListInteractions(APITestMixin):
         assert response.data['count'] == 2
         assert {i['id'] for i in response.data['results']} == {str(i.id) for i in interactions}
 
-    def test_filter_by_contact_legacy(self):
-        """
-        Test filtering interactions by contact (using the legacy contact_id field).
-
-        TODO Remove once contact_id filter removed.
-        """
-        contact1 = ContactFactory()
-        contact2 = ContactFactory()
-
-        CompanyInteractionFactory.create_batch(3, contact=contact1)
-        interactions = CompanyInteractionFactory.create_batch(2, contact=contact2)
-
-        url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, data={'contact_id': contact2.id})
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert {i['id'] for i in response.data['results']} == {str(i.id) for i in interactions}
-
     def test_filter_by_contact(self):
         """Test filtering interactions by contact (using contacts__id)."""
         contact1 = ContactFactory()

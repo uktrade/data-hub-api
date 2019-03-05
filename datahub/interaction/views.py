@@ -31,8 +31,6 @@ class InteractionViewSet(CoreViewSet):
     )
     filterset_fields = [
         'company_id',
-        # TODO: Remove once contact has been removed (following the deprecation period)
-        'contact_id',
         'contacts__id',
         'event_id',
         'investment_project_id',
