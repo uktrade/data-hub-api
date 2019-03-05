@@ -116,13 +116,6 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'contact': {
-                'id': str(contact.pk),
-                'name': contact.name,
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'job_title': contact.job_title,
-            },
             'contacts': [{
                 'id': str(contact.pk),
                 'name': contact.name,
@@ -166,6 +159,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'kind': Interaction.KINDS.service_delivery,
                 },
                 {
+                    'contacts': ['This field is required.'],
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
@@ -173,24 +167,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
-                },
-            ),
-
-            # contacts required if other fields have been specified
-            (
-                {
-                    'kind': Interaction.KINDS.service_delivery,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
-                    'was_policy_feedback_provided': False,
-                    'is_event': False,
-                },
-                {
-                    'contacts': ['This field is required.'],
                 },
             ),
 
