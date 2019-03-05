@@ -23,8 +23,6 @@ class SearchInteractionAPIViewMixin:
         'kind',
         'company',
         'company_name',
-        'contact',
-        'contact_name',
         'created_on_exists',
         'dit_adviser',
         'dit_adviser_name',
@@ -42,7 +40,6 @@ class SearchInteractionAPIViewMixin:
 
     REMAP_FIELDS = {
         'company': 'company.id',
-        'contact': 'contact.id',
         'dit_adviser': 'dit_adviser.id',
         'dit_team': 'dit_team.id',
         'communication_channel': 'communication_channel.id',
@@ -53,10 +50,6 @@ class SearchInteractionAPIViewMixin:
     }
 
     COMPOSITE_FILTERS = {
-        'contact_name': [
-            'contact.name',
-            'contact.name_trigram',
-        ],
         'company_name': [
             'company.name',
             'company.name_trigram',
