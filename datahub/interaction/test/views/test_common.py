@@ -517,8 +517,6 @@ class TestListInteractions(APITestMixin):
         'field',
         (
             'company.name',
-            'contact.first_name',
-            'contact.last_name',
             'created_on',
             'dit_adviser.first_name',
             'dit_adviser.last_name',
@@ -531,8 +529,6 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2015, 1, 1),
                 'company__name': 'Black Group',
-                'contact__first_name': 'Holly',
-                'contact__last_name': 'Taylor',
                 'dit_adviser__first_name': 'Elaine',
                 'dit_adviser__last_name': 'Johnston',
                 'subject': 'lorem',
@@ -540,8 +536,6 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2005, 4, 1),
                 'company__name': 'Hicks Ltd',
-                'contact__first_name': 'Conor',
-                'contact__last_name': 'Webb',
                 'dit_adviser__first_name': 'Connor',
                 'dit_adviser__last_name': 'Webb',
                 'subject': 'ipsum',
@@ -549,8 +543,6 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2019, 1, 1),
                 'company__name': 'Sheppard LLC',
-                'contact__first_name': 'Suzanne',
-                'contact__last_name': 'Palmer',
                 'dit_adviser__first_name': 'Hayley',
                 'dit_adviser__last_name': 'Hunt',
                 'subject': 'dolor',
@@ -591,25 +583,18 @@ class TestListInteractions(APITestMixin):
         ]
         assert expected == actual
 
-    @pytest.mark.parametrize(
-        'field,factory_class',
-        (
-            ('contact', ContactFactory),
-            ('dit_adviser', AdviserFactory),
-        ),
-    )
-    def test_sort_by_first_and_last_name(self, field, factory_class):
+    def test_sort_by_adviser_first_and_last_name(self):
         """Test sorting interactions by first_name with a secondary last_name sort."""
         people = [
-            factory_class(first_name='Alfred', last_name='Jones'),
-            factory_class(first_name='Alfred', last_name='Terry'),
-            factory_class(first_name='Thomas', last_name='Richards'),
-            factory_class(first_name='Thomas', last_name='West'),
+            AdviserFactory(first_name='Alfred', last_name='Jones'),
+            AdviserFactory(first_name='Alfred', last_name='Terry'),
+            AdviserFactory(first_name='Thomas', last_name='Richards'),
+            AdviserFactory(first_name='Thomas', last_name='West'),
         ]
         interactions = EventServiceDeliveryFactory.create_batch(
             len(people),
             **{
-                field: factory.Iterator(sample(people, k=len(people))),
+                'dit_adviser': factory.Iterator(sample(people, k=len(people))),
             },
         )
 
@@ -617,7 +602,7 @@ class TestListInteractions(APITestMixin):
         response = self.api_client.get(
             url,
             data={
-                'sortby': f'{field}__first_name,{field}__last_name',
+                'sortby': f'dit_adviser__first_name,dit_adviser__last_name',
             },
         )
 
@@ -627,7 +612,7 @@ class TestListInteractions(APITestMixin):
         assert response_data['count'] == len(interactions)
 
         actual_ids = [
-            interaction[field]['id']
+            interaction['dit_adviser']['id']
             for interaction in response_data['results']
         ]
         expected_ids = [str(person.pk) for person in people]
