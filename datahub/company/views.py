@@ -34,7 +34,7 @@ from datahub.core.hawk_receiver import (
 )
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
-from datahub.investment.queryset import get_slim_investment_project_queryset
+from datahub.investment.project.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
 
 
