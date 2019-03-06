@@ -19,6 +19,7 @@ from datahub.cleanup.management.commands.delete_old_records import (
     INTERACTION_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
+    INVESTOR_PROFILE_EXPIRY_PERIOD,
     ORDER_EXPIRY_PERIOD,
     ORDER_MODIFIED_ON_CUT_OFF,
 )
@@ -37,6 +38,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,
 )
+from datahub.investment.investor_profile.test.factories import InvestorProfileFactory
 from datahub.investment.project.evidence.test.factories import EvidenceDocumentFactory
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -58,12 +60,13 @@ CONTACT_DELETE_BEFORE_DATETIME = FROZEN_TIME - CONTACT_EXPIRY_PERIOD
 INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
+INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
 
 
 MAPPING = {
     'company.Company': {
         'factory': CompanyFactory,
-        'implicitly_deletable_models': set(),
+        'implicitly_deletable_models': {'investor_profile.InvestorProfile'},
         'expired_objects_kwargs': [
             {
                 'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
@@ -181,6 +184,22 @@ MAPPING = {
                     {
                         'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                         'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': InvestorProfileFactory,
+                'field': 'investor_company',
+                'expired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+                'unexpired_objects_kwargs': [
+                    {
+                        'modified_on':
+                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
                     },
                 ],
             },
