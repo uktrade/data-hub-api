@@ -1,0 +1,18 @@
+- model: investor_profile.restriction
+  pk: 5b4f5dc5-c836-4572-afd2-013776ed00c5
+  fields: {disabled_on: null, name: Liquidity / exchange listing, order: 100}
+- model: investor_profile.restriction
+  pk: daa293d4-e18e-44af-b139-bd1b4c4a9067
+  fields: {disabled_on: null, name: Inflation adjustment, order: 200}
+- model: investor_profile.restriction
+  pk: 24d90807-91de-4814-92f6-0a5ee43406d1
+  fields: {disabled_on: null, name: Require FX hedge, order: 300}
+- model: investor_profile.restriction
+  pk: 7dad0891-9174-437d-bb30-b610ac1ecd0a
+  fields: {disabled_on: null, name: Require board seat, order: 400}
+- model: investor_profile.restriction
+  pk: bfa167ab-f98a-4c73-b34d-c34ba7bdf93b
+  fields: {disabled_on: null, name: Require linked technology / knowledge transfer, order: 500}
+- model: investor_profile.restriction
+  pk: dbc0cdf0-5365-4cbf-8d55-7516b6ebc383
+  fields: {disabled_on: null, name: Will participate in competitive bids / auctions, order: 600}

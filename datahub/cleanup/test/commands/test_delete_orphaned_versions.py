@@ -12,6 +12,7 @@ from datahub.cleanup.management.commands import delete_orphaned_versions
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.investor_profile.test.factories import InvestorProfileFactory
 from datahub.investment.project.test.factories import (
     InvestmentActivityFactory, InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
@@ -26,6 +27,7 @@ MAPPINGS = {
     'investment.InvestmentProject': InvestmentProjectFactory,
     'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory,
     'investment.InvestmentActivity': InvestmentActivityFactory,
+    'investor_profile.InvestorProfile': InvestorProfileFactory,
 }
 
 

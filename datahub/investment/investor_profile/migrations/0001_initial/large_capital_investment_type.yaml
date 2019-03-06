@@ -1,0 +1,24 @@
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 4170d99a-02fc-46ee-8fd4-3fe786717708
+  fields: {disabled_on: null, name: Direct Investment in Project Equity, order: 100.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 06834da2-c9ac-4faf-b555-39762ce373ae
+  fields: {disabled_on: null, name: Direct Investment in Project Debt, order: 200.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 942726e3-1b3f-4218-b06e-7cf983754de0
+  fields: {disabled_on: null, name: Direct Investment in Corporate Equity, order: 300.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: f972c0d9-f480-4727-af39-dff10cf935a9
+  fields: {disabled_on: null, name: Direct Investment in Corporate Debt, order: 400.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 703140ec-6990-4f36-8b22-52ebde63932c
+  fields: {disabled_on: null, name: 'Mezzanine Debt (incl. preferred shares, convertibles)', order: 500.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 8feb6087-d61c-43bd-9bf1-3d9e1129432b
+  fields: {disabled_on: null, name: Venture capital funds, order: 600.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: 24826b7c-e3df-4a76-80d4-4fe2661b838e
+  fields: {disabled_on: null, name: Energy / Infrastructure / Real Estate Funds (UKEIREFs), order: 700.0}
+- model: investor_profile.largecapitalinvestmenttype
+  pk: ef615dde-49d8-41dd-9ddd-a00c78004135
+  fields: {disabled_on: null, name: Private Equity / Venture Capital, order: 800.0}
