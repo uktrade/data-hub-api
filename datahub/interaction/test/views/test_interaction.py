@@ -25,7 +25,7 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
 )
 from datahub.interaction.test.views.utils import resolve_data
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 
 
