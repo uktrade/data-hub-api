@@ -18,14 +18,14 @@ from datahub.core.constants import (
 )
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
-from datahub.investment.constants import (
+from datahub.investment.project.constants import (
     InvestmentActivityType,
     InvestorType,
     Involvement,
     LikelihoodToLand,
     SpecificProgramme,
 )
-from datahub.investment.models import InvestmentDeliveryPartner, InvestmentProject
+from datahub.investment.project.models import InvestmentDeliveryPartner, InvestmentProject
 from datahub.metadata.models import UKRegion
 
 

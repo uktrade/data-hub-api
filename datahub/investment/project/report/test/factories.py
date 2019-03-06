@@ -4,7 +4,7 @@ import factory
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.report.models import SPIReport
+from datahub.investment.project.report.models import SPIReport
 
 
 class SPIReportFactory(factory.django.DjangoModelFactory):

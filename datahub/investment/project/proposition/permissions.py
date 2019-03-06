@@ -1,10 +1,10 @@
 from datahub.core.permissions import IsAssociatedToObjectPermission, ViewBasedModelPermissions
 from datahub.core.utils import StrEnum
-from datahub.investment.permissions import (
+from datahub.investment.project.permissions import (
     InvestmentProjectAssociationCheckerBase,
     IsAssociatedToInvestmentProjectPermissionMixin,
 )
-from datahub.investment.proposition.models import Proposition, PropositionDocument
+from datahub.investment.project.proposition.models import Proposition, PropositionDocument
 
 
 class _PermissionTemplate(StrEnum):

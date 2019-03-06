@@ -26,21 +26,21 @@ from datahub.core.test_utils import (
     random_obj_for_model,
 )
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.investment import views
-from datahub.investment.constants import (
+from datahub.investment.project import views
+from datahub.investment.project.constants import (
     FEATURE_FLAG_STREAMLINED_FLOW,
     InvestmentActivityType,
     LikelihoodToLand,
     ProjectManagerRequestStatus,
 )
-from datahub.investment.models import (
+from datahub.investment.project.models import (
     InvestmentActivity,
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
 )
-from datahub.investment.test.factories import (
+from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
     AssignPMInvestmentProjectFactory,
     InvestmentProjectFactory,

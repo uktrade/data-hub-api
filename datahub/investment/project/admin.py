@@ -10,7 +10,7 @@ from datahub.core.admin import (
     custom_change_permission,
     custom_delete_permission,
 )
-from datahub.investment.models import (
+from datahub.investment.project.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,

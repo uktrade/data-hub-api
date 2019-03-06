@@ -1,4 +1,4 @@
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.models import InvestmentProject
 
 
 def get_slim_investment_project_queryset():

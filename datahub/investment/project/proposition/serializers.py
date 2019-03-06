@@ -3,9 +3,9 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.serializers import NestedAdviserField
 from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.investment.proposition.constants import FEATURE_FLAG_PROPOSITION_DOCUMENT
-from datahub.investment.proposition.models import Proposition, PropositionDocument
-from datahub.investment.serializers import NestedInvestmentProjectField
+from datahub.investment.project.proposition.constants import FEATURE_FLAG_PROPOSITION_DOCUMENT
+from datahub.investment.project.proposition.models import Proposition, PropositionDocument
+from datahub.investment.project.serializers import NestedInvestmentProjectField
 
 
 class CreatePropositionSerializer(serializers.ModelSerializer):

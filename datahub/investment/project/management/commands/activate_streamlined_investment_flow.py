@@ -3,8 +3,8 @@ from django.core.management.base import BaseCommand
 
 from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.models import FeatureFlag
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
+from datahub.investment.project.models import InvestmentProject
 
 
 FEATURE_DESCRIPTION = (

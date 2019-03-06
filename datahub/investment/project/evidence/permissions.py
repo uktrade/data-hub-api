@@ -1,7 +1,7 @@
 from datahub.core.permissions import IsAssociatedToObjectPermission, ViewBasedModelPermissions
 from datahub.core.utils import StrEnum
-from datahub.investment.evidence.models import EvidenceDocument
-from datahub.investment.permissions import (
+from datahub.investment.project.evidence.models import EvidenceDocument
+from datahub.investment.project.permissions import (
     InvestmentProjectAssociationCheckerBase,
     IsAssociatedToInvestmentProjectPermissionMixin,
 )

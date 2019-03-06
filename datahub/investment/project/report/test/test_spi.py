@@ -6,11 +6,11 @@ from datahub.company.test.factories import AdviserFactory, TeamFactory
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.constants import Service
 from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
-from datahub.investment.constants import InvestorType
-from datahub.investment.proposition.models import PropositionDocument
-from datahub.investment.proposition.test.factories import PropositionFactory
-from datahub.investment.report.spi import SPIReport
-from datahub.investment.test.factories import (
+from datahub.investment.project.constants import InvestorType
+from datahub.investment.project.proposition.models import PropositionDocument
+from datahub.investment.project.proposition.test.factories import PropositionFactory
+from datahub.investment.project.report.spi import SPIReport
+from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     VerifyWinInvestmentProjectFactory,
 )

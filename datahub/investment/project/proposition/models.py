@@ -12,7 +12,7 @@ from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
 from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.investment.proposition.constants import (
+from datahub.investment.project.proposition.constants import (
     FEATURE_FLAG_PROPOSITION_DOCUMENT,
     PropositionStatus,
 )

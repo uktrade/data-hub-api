@@ -2,8 +2,8 @@ import uuid
 
 import factory
 
-from datahub.investment.evidence.models import EvidenceDocument, EvidenceTag
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.evidence.models import EvidenceDocument, EvidenceTag
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class EvidenceTagFactory(factory.django.DjangoModelFactory):

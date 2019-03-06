@@ -2,7 +2,10 @@
 
 from django.urls import path
 
-from datahub.investment.proposition.views import PropositionDocumentViewSet, PropositionViewSet
+from datahub.investment.project.proposition.views import (
+    PropositionDocumentViewSet,
+    PropositionViewSet,
+)
 
 proposition_collection = PropositionViewSet.as_view({
     'get': 'list',

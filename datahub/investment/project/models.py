@@ -21,7 +21,7 @@ from datahub.core.models import (
     BaseOrderedConstantModel,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
-from datahub.investment import constants
+from datahub.investment.project import constants
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

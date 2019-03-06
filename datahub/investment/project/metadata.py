@@ -1,4 +1,4 @@
-from datahub.investment import models
+from datahub.investment.project import models
 from datahub.metadata.fixtures import Fixture
 from datahub.metadata.registry import registry
 

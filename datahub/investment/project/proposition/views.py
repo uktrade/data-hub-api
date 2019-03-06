@@ -9,15 +9,15 @@ from rest_framework.response import Response
 from datahub.core.exceptions import APIBadRequestException
 from datahub.core.viewsets import CoreViewSet
 from datahub.documents.views import BaseEntityDocumentModelViewSet
-from datahub.investment.models import InvestmentProject
-from datahub.investment.proposition.models import Proposition, PropositionDocument
-from datahub.investment.proposition.permissions import (
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.proposition.models import Proposition, PropositionDocument
+from datahub.investment.project.proposition.permissions import (
     IsAssociatedToInvestmentProjectPropositionDocumentPermission,
     IsAssociatedToInvestmentProjectPropositionPermission,
     PropositionDocumentModelPermissions,
     PropositionModelPermissions,
 )
-from datahub.investment.proposition.serializers import (
+from datahub.investment.project.proposition.serializers import (
     AbandonPropositionSerializer,
     CompletePropositionSerializer,
     CreatePropositionSerializer,

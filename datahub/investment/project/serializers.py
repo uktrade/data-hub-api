@@ -14,11 +14,11 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
-from datahub.investment.constants import (
+from datahub.investment.project.constants import (
     InvestmentActivityType as InvestmentActivityTypeValue,
     ProjectManagerRequestStatus as ProjectManagerRequestStatusValue,
 )
-from datahub.investment.models import (
+from datahub.investment.project.models import (
     InvestmentActivity,
     InvestmentActivityType,
     InvestmentDeliveryPartner,
@@ -32,7 +32,7 @@ from datahub.investment.models import (
     ProjectManagerRequestStatus,
     SpecificProgramme,
 )
-from datahub.investment.validate import REQUIRED_MESSAGE, validate
+from datahub.investment.project.validate import REQUIRED_MESSAGE, validate
 
 CORE_FIELDS = (
     'id',

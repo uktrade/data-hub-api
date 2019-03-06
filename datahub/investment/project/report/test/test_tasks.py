@@ -1,6 +1,6 @@
 from freezegun import freeze_time
 
-from datahub.investment.report.tasks import _get_report_key
+from datahub.investment.project.report.tasks import _get_report_key
 
 
 @freeze_time('2018-03-01 01:02:03')

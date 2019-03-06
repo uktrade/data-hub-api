@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from datahub.investment.evidence.views import EvidenceDocumentViewSet
+from datahub.investment.project.evidence.views import EvidenceDocumentViewSet
 
 evidence_document_collection = EvidenceDocumentViewSet.as_view({
     'get': 'list',

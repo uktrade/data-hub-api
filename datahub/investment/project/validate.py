@@ -12,8 +12,8 @@ from datahub.core.constants import (
 )
 from datahub.core.validate_utils import DataCombiner
 from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
+from datahub.investment.project.models import InvestmentProject
 
 
 REQUIRED_MESSAGE = 'This field is required.'

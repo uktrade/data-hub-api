@@ -8,7 +8,7 @@ from datahub.core.permissions import (
     ViewBasedModelPermissions,
 )
 from datahub.core.utils import StrEnum
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.models import InvestmentProject
 
 
 class _PermissionTemplate(StrEnum):

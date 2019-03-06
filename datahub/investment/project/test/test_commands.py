@@ -6,9 +6,9 @@ from reversion.models import Version
 from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.models import FeatureFlag
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
-from datahub.investment.management.commands import activate_streamlined_investment_flow
-from datahub.investment.test.factories import (
+from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
+from datahub.investment.project.management.commands import activate_streamlined_investment_flow
+from datahub.investment.project.test.factories import (
     AssignPMInvestmentProjectFactory,
     VerifyWinInvestmentProjectFactory,
 )
@@ -67,10 +67,10 @@ class TestActivateStreamlinedInvestmentFlowCommand:
         assert Version.objects.get_for_object(assign_pm_project).count() == 1
         assert Version.objects.get_for_object(verify_win_project).count() == 0
 
-    @mock.patch('datahub.investment.management.commands.'
+    @mock.patch('datahub.investment.project.management.commands.'
                 'activate_streamlined_investment_flow.Command.'
                 'move_assign_pm_investment_projects_back_to_prospect')
-    @mock.patch('datahub.investment.management.commands.'
+    @mock.patch('datahub.investment.project.management.commands.'
                 'activate_streamlined_investment_flow.Command.'
                 'activate_streamlined_investment_flow_feature')
     def test_command_handle_calls_all_methods(self, mock_activate, mock_move_projects):

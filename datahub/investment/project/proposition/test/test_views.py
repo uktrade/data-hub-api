@@ -13,18 +13,18 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.documents.models import Document, UPLOAD_STATUSES
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.investment.proposition.constants import (
+from datahub.investment.project.proposition.constants import (
     FEATURE_FLAG_PROPOSITION_DOCUMENT,
     PropositionStatus,
 )
-from datahub.investment.proposition.models import (
+from datahub.investment.project.proposition.models import (
     Proposition,
     PropositionDocument,
     PropositionDocumentPermission,
     PropositionPermission,
 )
-from datahub.investment.proposition.test.factories import PropositionFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.proposition.test.factories import PropositionFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
 

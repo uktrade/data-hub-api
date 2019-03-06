@@ -2,7 +2,7 @@
 from django.contrib.admin import site
 from django.urls import path
 
-from datahub.investment.report.views import download_spi_report
+from datahub.investment.project.report.views import download_spi_report
 
 app_name = 'investment-report'
 

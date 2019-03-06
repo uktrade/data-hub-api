@@ -4,16 +4,16 @@ from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.investment.constants import FEATURE_FLAG_STREAMLINED_FLOW
-from datahub.investment.models import InvestmentDeliveryPartner
-from datahub.investment.serializers import (
+from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
+from datahub.investment.project.models import InvestmentDeliveryPartner
+from datahub.investment.project.serializers import (
     CORE_FIELDS,
     REQUIREMENTS_FIELDS,
     TEAM_FIELDS,
     VALUE_FIELDS,
 )
-from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.investment.validate import (
+from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment.project.validate import (
     _get_desired_stage_order,
     InvestmentProjectStageValidationConfig,
     validate,

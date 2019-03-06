@@ -11,10 +11,10 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import TeamFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.documents.models import Document, UPLOAD_STATUSES
-from datahub.investment.evidence.models import EvidenceDocument, EvidenceDocumentPermission
-from datahub.investment.evidence.test.factories import EvidenceTagFactory
-from datahub.investment.evidence.test.utils import create_evidence_document
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.evidence.models import EvidenceDocument, EvidenceDocumentPermission
+from datahub.investment.project.evidence.test.factories import EvidenceTagFactory
+from datahub.investment.project.evidence.test.utils import create_evidence_document
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
 
 pytestmark = pytest.mark.django_db

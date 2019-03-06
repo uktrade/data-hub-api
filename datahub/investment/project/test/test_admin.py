@@ -10,9 +10,9 @@ from freezegun import freeze_time
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import AdminTestMixin
-from datahub.investment.admin import InvestmentProjectAdmin
-from datahub.investment.models import InvestmentProject
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.admin import InvestmentProjectAdmin
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class TestInvestmentProjectAdmin(AdminTestMixin):

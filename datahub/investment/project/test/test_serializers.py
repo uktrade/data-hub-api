@@ -3,12 +3,12 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
-from datahub.investment.serializers import (
+from datahub.investment.project.serializers import (
     IProjectSerializer,
     IProjectTeamMemberListSerializer,
     IProjectTeamMemberSerializer,
 )
-from datahub.investment.test.factories import (
+from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
 )

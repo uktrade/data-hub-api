@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from datahub.investment.models import InvestmentProject, InvestmentProjectCode
+from datahub.investment.project.models import InvestmentProject, InvestmentProjectCode
 
 
 @receiver(post_save, sender=InvestmentProject, dispatch_uid='project_code_project_post_save')

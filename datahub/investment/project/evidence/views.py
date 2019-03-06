@@ -3,13 +3,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from datahub.documents.views import BaseEntityDocumentModelViewSet
-from datahub.investment.evidence.models import EvidenceDocument
-from datahub.investment.evidence.permissions import (
+from datahub.investment.project.evidence.models import EvidenceDocument
+from datahub.investment.project.evidence.permissions import (
     EvidenceDocumentModelPermissions,
     IsAssociatedToInvestmentProjectEvidenceDocumentPermission,
 )
-from datahub.investment.evidence.serializers import EvidenceDocumentSerializer
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.evidence.serializers import EvidenceDocumentSerializer
+from datahub.investment.project.models import InvestmentProject
 from datahub.oauth.scopes import Scope
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event

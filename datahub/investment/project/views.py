@@ -12,15 +12,15 @@ from rest_framework.response import Response
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
-from datahub.investment.models import InvestmentProject, InvestmentProjectTeamMember
-from datahub.investment.permissions import (
+from datahub.investment.project.models import InvestmentProject, InvestmentProjectTeamMember
+from datahub.investment.project.permissions import (
     InvestmentProjectModelPermissions,
     InvestmentProjectTeamMemberModelPermissions,
     IsAssociatedToInvestmentProjectFilter,
     IsAssociatedToInvestmentProjectPermission,
     IsAssociatedToInvestmentProjectTeamMemberPermission,
 )
-from datahub.investment.serializers import (
+from datahub.investment.project.serializers import (
     InvestmentActivitySerializer,
     IProjectSerializer,
     IProjectTeamMemberSerializer,

@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from datahub.investment.report.models import SPIReportPermission
-from datahub.investment.report.test.factories import SPIReportFactory
+from datahub.investment.project.report.models import SPIReportPermission
+from datahub.investment.project.report.test.factories import SPIReportFactory
 
 
 class TestGetSPIReport(AdminTestMixin):

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from rest_framework.reverse import reverse
 
-from datahub.investment.report.models import SPIReport
+from datahub.investment.project.report.models import SPIReport
 
 
 @admin.register(SPIReport)

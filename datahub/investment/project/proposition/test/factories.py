@@ -4,9 +4,9 @@ import factory
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.proposition.constants import PropositionStatus
-from datahub.investment.proposition.models import Proposition
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.proposition.constants import PropositionStatus
+from datahub.investment.project.proposition.models import Proposition
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class PropositionFactory(factory.django.DjangoModelFactory):

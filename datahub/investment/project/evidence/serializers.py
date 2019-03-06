@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField
-from datahub.investment.evidence.models import EvidenceDocument, EvidenceTag
-from datahub.investment.serializers import NestedInvestmentProjectField, NestedRelatedField
+from datahub.investment.project.evidence.models import EvidenceDocument, EvidenceTag
+from datahub.investment.project.serializers import NestedInvestmentProjectField, NestedRelatedField
 
 
 class EvidenceDocumentSerializer(serializers.ModelSerializer):

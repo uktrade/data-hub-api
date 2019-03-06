@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.http import HttpResponseRedirect
 
-from datahub.investment.report.models import SPIReport, SPIReportPermission
+from datahub.investment.project.report.models import SPIReport, SPIReportPermission
 
 
 def download_spi_report(request, pk=None):
