@@ -9,8 +9,8 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
-from datahub.investment.models import InvestmentProject
-from datahub.investment.query_utils import get_project_code_expression
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.mi_dashboard.constants import (
     NO_FDI_VALUE_ASSIGNED,

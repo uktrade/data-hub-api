@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.utils.timezone import utc
 from reversion.models import Version
 
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 pytestmark = pytest.mark.django_db
 

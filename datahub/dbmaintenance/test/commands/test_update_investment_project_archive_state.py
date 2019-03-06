@@ -5,8 +5,8 @@ from django.core.management import call_command
 from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.models import InvestmentProject
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 pytestmark = pytest.mark.django_db
 

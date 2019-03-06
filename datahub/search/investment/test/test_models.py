@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 
 pytestmark = pytest.mark.django_db
