@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.models import InvestmentProject
 from datahub.search.serializers import (
     EntitySearchQuerySerializer,
     SingleOrListField,
