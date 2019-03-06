@@ -1,0 +1,2 @@
+The subdirectory `project` has been added to the investment django application
+and all investment project related code moved to it and all import paths updated.
