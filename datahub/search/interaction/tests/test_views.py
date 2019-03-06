@@ -1056,7 +1056,7 @@ class TestInteractionExportView(APITestMixin):
 
 def _format_expected_contacts(interaction):
     formatted_contact_names = sorted(
-        [_format_expected_contact_name(contact) for contact in interaction.contacts.all()]
+        [_format_expected_contact_name(contact) for contact in interaction.contacts.all()],
     )
     return ', '.join(formatted_contact_names)
 
