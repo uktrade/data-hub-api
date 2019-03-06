@@ -1,0 +1,9 @@
+- model: investor_profile.desireddealrole
+  pk: efadc6bb-2a73-4627-8ce3-9dc2c34c3f31
+  fields: {disabled_on: null, name: Lead manager / deal structure, order: 100}
+- model: investor_profile.desireddealrole
+  pk: 29d930e6-de2f-403d-87dc-764bc418d33a
+  fields: {disabled_on: null, name: Co-lead manager, order: 200}
+- model: investor_profile.desireddealrole
+  pk: 48cace6e-ec14-467b-b1b5-19b318ab5c51
+  fields: {disabled_on: null, name: Co-investor / syndicate member, order: 300}
