@@ -26,7 +26,7 @@ from datahub.interaction.test.factories import (
     EventServiceDeliveryFactory,
 )
 from datahub.interaction.test.views.utils import resolve_data
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import Service as ServiceModel
 from datahub.metadata.test.factories import TeamFactory
 

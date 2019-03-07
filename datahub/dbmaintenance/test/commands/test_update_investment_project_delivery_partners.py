@@ -4,8 +4,8 @@ import pytest
 from django.core.management import call_command
 from reversion.models import Version
 
-from datahub.investment.models import InvestmentDeliveryPartner
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.models import InvestmentDeliveryPartner
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 pytestmark = pytest.mark.django_db
 

@@ -14,8 +14,8 @@ from django.db.models import (
 from django.db.models.functions import Cast, Coalesce, Concat, ExtractYear
 
 from datahub.core.query_utils import NullIf
-from datahub.investment.constants import Involvement
-from datahub.investment.models import IProjectAbstract
+from datahub.investment.project.constants import Involvement
+from datahub.investment.project.models import IProjectAbstract
 from datahub.metadata.models import Sector
 from datahub.mi_dashboard.constants import NO_SECTOR_ASSIGNED, NO_SECTOR_CLUSTER_ASSIGNED
 

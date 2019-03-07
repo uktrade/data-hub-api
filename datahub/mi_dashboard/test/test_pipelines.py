@@ -7,7 +7,7 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, FDIValue, Sector, SectorCluster, UKRegion
 from datahub.dbmaintenance.utils import parse_uuid
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import SectorFactory
 from datahub.mi_dashboard.constants import (
     NO_FDI_VALUE_ASSIGNED,
