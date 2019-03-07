@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         ('omis-invoice', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('omis-quote', '0001_initial'),
-        ('company', '0001_squashed_0010_auto_20170807_1124'),
+        ('company', '0001_squashed_0056_number_of_employees'),
     ]
 
     operations = [
