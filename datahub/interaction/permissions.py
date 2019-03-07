@@ -6,7 +6,7 @@ from datahub.core.permissions import (
 )
 from datahub.core.utils import StrEnum
 from datahub.interaction.models import Interaction
-from datahub.investment.permissions import (
+from datahub.investment.project.permissions import (
     InvestmentProjectAssociationCheckerBase,
     IsAssociatedToInvestmentProjectFilter,
 )

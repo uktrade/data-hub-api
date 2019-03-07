@@ -285,7 +285,7 @@ class TestHawkAuthentication:
 
 @pytest.mark.django_db
 @pytest.mark.urls('datahub.core.test.support.urls')
-class TestHawkResponseMiddleware:
+class TestHawkResponseSigningMixin:
     """Tests Hawk response signing when using HawkResponseMiddleware."""
 
     def test_empty_object_returned_with_authentication(self, api_client):

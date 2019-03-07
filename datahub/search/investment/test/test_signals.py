@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.test.factories import (
+from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
 )

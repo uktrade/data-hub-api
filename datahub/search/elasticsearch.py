@@ -1,10 +1,7 @@
 from contextlib import contextmanager
 from logging import getLogger
-from urllib.parse import urlparse
 
-from aws_requests_auth.aws_auth import AWSRequestsAuth
 from django.conf import settings
-from elasticsearch import RequestsHttpConnection
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index
 from elasticsearch_dsl.connections import connections
@@ -75,38 +72,11 @@ ANALYZERS = (
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
-    if settings.ES_USE_AWS_AUTH:
-        es_protocol = {
-            'http': 80,
-            'https': 443,
-        }
-        es_host = urlparse(settings.ES_URL)
-        es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
-        use_ssl = es_host.scheme == 'https'
-        auth = AWSRequestsAuth(
-            aws_access_key=settings.AWS_ELASTICSEARCH_KEY,
-            aws_secret_access_key=settings.AWS_ELASTICSEARCH_SECRET,
-            aws_host=es_host.netloc,
-            aws_region=settings.AWS_ELASTICSEARCH_REGION,
-            aws_service='es',
-        )
-        connections_default = {
-            'hosts': [es_host.netloc],
-            'port': es_port,
-            'use_ssl': use_ssl,
-            'verify_certs': settings.ES_VERIFY_CERTS,
-            'http_auth': auth,
-            'connection_class': RequestsHttpConnection,
-        }
-    else:
-        connections_default = {
-            'hosts': [settings.ES_URL],
-            'verify_certs': settings.ES_VERIFY_CERTS,
-        }
-
-    connections.configure(
-        default=connections_default,
-    )
+    connections_default = {
+        'hosts': [settings.ES_URL],
+        'verify_certs': settings.ES_VERIFY_CERTS,
+    }
+    connections.configure(default=connections_default)
 
 
 def get_client():

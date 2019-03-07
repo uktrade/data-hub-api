@@ -124,7 +124,7 @@ class Payment(BaseModel):
     order = models.ForeignKey(
         'order.Order',
         on_delete=models.CASCADE,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
     )
     reference = models.CharField(
         max_length=100,
@@ -189,7 +189,7 @@ class Refund(BaseModel):
     order = models.ForeignKey(
         'order.Order',
         on_delete=models.CASCADE,
-        related_name="%(class)ss",  # noqa: Q000
+        related_name='%(class)ss',
     )
     reference = models.CharField(max_length=100)
     status = models.CharField(max_length=100, choices=RefundStatus)

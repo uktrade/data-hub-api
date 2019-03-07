@@ -2,73 +2,42 @@
 
 from django.urls import path
 
-from datahub.search.apps import get_search_apps
-from datahub.search.views import SearchBasicAPIView
+from datahub.core.utils import join_truthy_strings
+from datahub.search.views import SearchBasicAPIView, v3_view_registry, v4_view_registry, ViewType
 
 
-def _construct_path(search_app, view, suffix=None):
-    if not view:
-        return []
+def _construct_path(search_app, view_type, view_cls, suffix=None):
+    prefix = 'public' if view_type == ViewType.public else None
 
-    url = f'search/{search_app.name}'
-    if suffix:
-        url = f'{url}/{suffix}'
-
-    url_name = search_app.name
-    if suffix:
-        url_name = f'{url_name}-{suffix}'
-
-    return [
-        path(
-            url,
-            view.as_view(search_app=search_app),
-            name=url_name,
-        ),
+    url_parts = [
+        prefix,
+        'search',
+        search_app.name,
+        suffix,
     ]
+
+    url = join_truthy_strings(*url_parts, sep='/')
+    url_name = join_truthy_strings(prefix, search_app.name, suffix, sep='-')
+    view = view_cls.as_view(search_app=search_app)
+
+    return path(url, view, name=url_name)
 
 
 # API V3
 
 urls_v3 = [
     path('search', SearchBasicAPIView.as_view(), name='basic'),
+    *[
+        _construct_path(search_app, view_type, view_cls, suffix=name)
+        for (search_app, view_type, name), view_cls in v3_view_registry.items()
+    ],
 ]
-
-for search_app in get_search_apps():
-    urls_v3.extend(
-        [
-            *_construct_path(search_app, search_app.view),
-            *_construct_path(
-                search_app,
-                search_app.export_view,
-                'export',
-            ),
-            *_construct_path(
-                search_app,
-                search_app.autocomplete_view,
-                'autocomplete',
-            ),
-        ],
-    )
 
 
 # API V4 - new format for addresses
 
 # TODO add global search when all search apps are v4 ready
-urls_v4 = []
-
-for search_app in get_search_apps():
-    urls_v4.extend(
-        [
-            *_construct_path(search_app, search_app.view_v4),
-            *_construct_path(
-                search_app,
-                search_app.export_view_v4,
-                'export',
-            ),
-            *_construct_path(
-                search_app,
-                search_app.autocomplete_view_v4,
-                'autocomplete',
-            ),
-        ],
-    )
+urls_v4 = [
+    _construct_path(search_app, view_type, view_cls, suffix=name)
+    for (search_app, view_type, name), view_cls in v4_view_registry.items()
+]

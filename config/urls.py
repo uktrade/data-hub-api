@@ -11,7 +11,7 @@ from datahub.user.views import who_am_i
 unversioned_urls = [
     path('admin/', admin.site.urls),
     path('', include('datahub.admin_report.urls')),
-    path('', include('datahub.investment.report.urls')),
+    path('', include('datahub.investment.project.report.urls')),
     path('ping.xml', ping, name='ping'),
     path('metadata/', include('datahub.metadata.urls')),
     path('token/', TokenView.as_view(), name='token'),

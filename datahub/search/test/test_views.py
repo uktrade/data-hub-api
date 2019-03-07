@@ -18,7 +18,7 @@ from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
@@ -90,43 +90,40 @@ def setup_data():
 class TestValidateViewAttributes:
     """Validates the field names specified in various class attributes on views."""
 
-    def test_validate_filter_fields_are_in_serializer(self, search_app):
+    def test_validate_filter_fields_are_in_serializer(self, search_view):
         """Validates that all filter fields exist in the serializer class."""
-        view = search_app.view
-        valid_fields = view.serializer_class._declared_fields.keys()
+        valid_fields = search_view.serializer_class._declared_fields.keys()
 
-        invalid_fields = frozenset(view.FILTER_FIELDS) - valid_fields
+        invalid_fields = frozenset(search_view.FILTER_FIELDS) - valid_fields
         assert not invalid_fields
 
-    def test_validate_remap_fields_exist(self, search_app):
+    def test_validate_remap_fields_exist(self, search_view):
         """Validate that the values of REMAP_FIELDS are valid field paths."""
-        view = search_app.view
-        mapping = search_app.es_model._doc_type.mapping
+        mapping = search_view.search_app.es_model._doc_type.mapping
 
         invalid_fields = {
-            field for field in view.REMAP_FIELDS.values()
+            field for field in search_view.REMAP_FIELDS.values()
             if not mapping.resolve_field(field)
         }
 
         assert not invalid_fields
 
-    def test_validate_remap_fields_are_used_in_filters(self, search_app):
+    def test_validate_remap_fields_are_used_in_filters(self, search_view):
         """Validate that the values of REMAP_FIELDS are used in a filter."""
-        view = search_app.view
+        assert not {
+            field for field in search_view.REMAP_FIELDS if field not in search_view.FILTER_FIELDS
+        }
 
-        assert not {field for field in view.REMAP_FIELDS if field not in view.FILTER_FIELDS}
-
-    def test_validate_composite_filter_fields(self, search_app):
+    def test_validate_composite_filter_fields(self, search_view):
         """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
-        view = search_app.view
-        mapping = search_app.es_model._doc_type.mapping
+        mapping = search_view.search_app.es_model._doc_type.mapping
 
         invalid_fields = {
             field
-            for field_list in view.COMPOSITE_FILTERS.values()
+            for field_list in search_view.COMPOSITE_FILTERS.values()
             for field in field_list
             if not mapping.resolve_field(field)
-            and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
+            and field not in search_view.search_app.es_model.PREVIOUS_MAPPING_FIELDS
         }
 
         assert not invalid_fields
@@ -135,28 +132,30 @@ class TestValidateViewAttributes:
 class TestValidateViewSortByAttributes:
     """Validates the various sort by attributes for each view (and the related serialiser)."""
 
-    def test_sort_by_fields(self, search_app):
+    def test_sort_by_fields(self, search_view):
         """Validate that all sort by values are valid field paths."""
-        view = search_app.view
-        serializer_class = view.serializer_class
-        mapping = search_app.es_model._doc_type.mapping
+        serializer_class = search_view.serializer_class
+        mapping = search_view.search_app.es_model._doc_type.mapping
 
         invalid_fields = {
             field
             for field in set(serializer_class.SORT_BY_FIELDS)
-            if not mapping.resolve_field(view.es_sort_by_remappings.get(field, field))
+            if not mapping.resolve_field(search_view.es_sort_by_remappings.get(field, field))
         }
 
         assert not invalid_fields
 
-    def test_sort_by_remapping_keys_are_sort_by_fields(self, search_app):
+    def test_sort_by_remapping_keys_are_sort_by_fields(self, search_view):
         """
         Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
         """
-        serializer_class = search_app.view.serializer_class
+        if not hasattr(search_view, 'es_sort_by_remappings'):
+            return
+
+        serializer_class = search_view.serializer_class
 
         invalid_fields = (
-            search_app.view.es_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+            search_view.es_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
         )
 
         assert not invalid_fields
@@ -165,15 +164,15 @@ class TestValidateViewSortByAttributes:
 class TestValidateExportViewAttributes:
     """Validates the field names specified in class attributes on export views."""
 
-    def test_validate_db_sort_by_remappings_keys(self, search_app):
+    def test_validate_db_sort_by_remappings_keys(self, search_view):
         """Validate that the keys of db_sort_by_remappings are valid sort by fields."""
-        view = search_app.export_view
-
-        if not view:
+        if not hasattr(search_view, 'db_sort_by_remappings'):
             return
 
-        serializer_class = view.serializer_class
-        invalid_fields = view.db_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+        serializer_class = search_view.serializer_class
+        invalid_fields = (
+            search_view.db_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+        )
         assert not invalid_fields
 
 

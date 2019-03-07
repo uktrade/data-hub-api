@@ -25,7 +25,6 @@ class TestCompanyElasticModel:
             'business_type',
             'companies_house_data',
             'company_number',
-            'contacts',
             'created_on',
             'description',
             'employee_range',
