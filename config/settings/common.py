@@ -71,6 +71,7 @@ LOCAL_APPS = [
     'datahub.investment.project.evidence',
     'datahub.investment.project.proposition',
     'datahub.investment.project.report',
+    'datahub.investment.investor_profile',
     'datahub.metadata',
     'datahub.oauth',
     'datahub.admin_report',
