@@ -21,8 +21,8 @@ from datahub.company.test.factories import (
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.models import InvestmentProject
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 

@@ -1,7 +1,7 @@
 import pytest
 from django.core import management
 
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.mi_dashboard.management.commands import run_pipeline
 from datahub.mi_dashboard.models import MIInvestmentProject
 from datahub.mi_dashboard.pipelines import ETLInvestmentProjects

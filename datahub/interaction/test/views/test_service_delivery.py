@@ -21,7 +21,7 @@ from datahub.interaction.test.factories import (
     ServiceDeliveryFactory,
 )
 from datahub.interaction.test.views.utils import resolve_data
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class TestAddServiceDelivery(APITestMixin):

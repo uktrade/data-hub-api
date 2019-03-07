@@ -5,7 +5,7 @@ from django.db.transaction import atomic
 
 from datahub.core.exceptions import SimulationRollback
 from datahub.dbmaintenance.management.base import CSVBaseCommand
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.models import InvestmentProject
 from datahub.search.deletion import update_es_after_deletions
 
 logger = getLogger(__name__)

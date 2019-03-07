@@ -24,7 +24,7 @@ from datahub.interaction.models import (
 )
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
 from datahub.interaction.validators import ContactsBelongToCompanyValidator
-from datahub.investment.serializers import NestedInvestmentProjectField
+from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 
 

@@ -1,6 +1,6 @@
 from datahub.core.test.factories import to_many_field
 from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class ShallowInvestmentProjectFactory(InvestmentProjectFactory):

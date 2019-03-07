@@ -3,7 +3,7 @@ from django.db.models.query_utils import Q
 from django.db.models.signals import post_delete, post_save
 
 from datahub.company.models import Advisor
-from datahub.investment.models import (
+from datahub.investment.project.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember,
 )
