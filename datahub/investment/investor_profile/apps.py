@@ -6,3 +6,4 @@ class InvestorProfileConfig(AppConfig):
 
     name = 'datahub.investment.investor_profile'
     label = 'investor_profile'
+    verbose_name = 'Investor Profile'

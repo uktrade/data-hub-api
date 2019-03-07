@@ -40,15 +40,34 @@ def test_register_with_overriding_values():
     assert mapping.serializer == MySerializer
 
 
-def test_register_id_already_used():
+@pytest.mark.parametrize(
+    'metadata_id,path_prefix,expected_mapping',
+    (
+        ('sector', None, 'sector'),
+        ('sector', 'investments', 'investments/sector'),
+    ),
+)
+def test_register_id_already_used(metadata_id, path_prefix, expected_mapping):
     """
     Tests that if I try to register the same metadata twice, the second call fails.
     """
     reg = MetadataRegistry()
 
-    reg.register('sector', model=Sector)
+    reg.register(metadata_id, model=Sector, path_prefix=path_prefix)
 
     with pytest.raises(ImproperlyConfigured):
-        reg.register('sector', model=UKRegion)
+        reg.register(metadata_id, model=UKRegion, path_prefix=path_prefix)
 
-    assert set(reg.mappings) == {'sector'}
+    assert set(reg.mappings) == {expected_mapping}
+
+
+def test_register_with_path_prefix():
+    """
+    Tests registering with a prefix to url path
+
+    """
+    reg = MetadataRegistry()
+
+    reg.register('sector', model=Sector, path_prefix='investment')
+    mapping = reg.mappings['investment/sector']
+    assert mapping.model is Sector
