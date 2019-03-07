@@ -1,3 +1,47 @@
+Data Hub API 10.4.0 (2019-03-07)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The ``contacts`` field in company search results was removed from the following endpoints:
+
+  - ``/v3/search``
+  - ``/v3/search/company``
+  - ``/v4/search/company``
+
+  If you require a list of contacts for a company, please use ``/v3/contacts?company_id=<company ID>``
+
+Features
+--------
+
+- Chinese administrative areas were added.
+
+Bug fixes
+---------
+
+- **Advisers** The adviser autocomplete feature no longer returns an error when certain non-ASCII characters such as é are entered.
+
+Internal changes
+----------------
+
+- **Companies** Previously squashed migrations were removed.
+- **Investment** The subdirectory ``project`` has been added to the investment django application
+  and all investment project related code moved to it and all import paths updated.
+- Various dependencies were updated.
+
+API
+---
+
+- **Companies** ``GET /v4/public/company/<id>`` was added as a Hawk-authenticated endpoint for retrieving a single company. This is similar to
+  ``GET /v4/company/<id>`` but has a slightly reduced set of fields.
+- **Companies** ``POST /v4/public/search/company`` was added as a Hawk-authenticated company search endpoint. This is similar to
+  ``POST /v4/search/company`` but has a reduced set of filters (``name``, ``archived`` and ``original_query``) and
+  slightly reduced set of response fields.
+
+
 Data Hub API 10.3.0 (2019-02-27)
 ================================
 
