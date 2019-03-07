@@ -1,4 +1,3 @@
-from django.utils.decorators import decorator_from_middleware
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,7 +5,7 @@ from rest_framework.views import APIView
 from config.settings.types import HawkScope
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
-    HawkResponseMiddleware,
+    HawkResponseSigningMixin,
     HawkScopePermission,
 )
 from datahub.core.test.support.models import MultiAddressModel, MyDisableableModel, PermissionModel
@@ -44,26 +43,24 @@ class MultiAddressModelViewset(CoreViewSet):
     queryset = MultiAddressModel.objects.all()
 
 
-class HawkViewWithoutScope(APIView):
+class HawkViewWithoutScope(HawkResponseSigningMixin, APIView):
     """View using Hawk authentication."""
 
     authentication_classes = (HawkAuthentication,)
     permission_classes = ()
 
-    @decorator_from_middleware(HawkResponseMiddleware)
     def get(self, request):
         """Simple test view with fixed response."""
         return Response({'content': 'hawk-test-view-without-scope'})
 
 
-class HawkViewWithScope(APIView):
+class HawkViewWithScope(HawkResponseSigningMixin, APIView):
     """View using Hawk authentication."""
 
     authentication_classes = (HawkAuthentication,)
     permission_classes = (HawkScopePermission,)
     required_hawk_scope = next(iter(HawkScope.__members__.values()))
 
-    @decorator_from_middleware(HawkResponseMiddleware)
     def get(self, request):
         """Simple test view with fixed response."""
         return Response({'content': 'hawk-test-view-with-scope'})

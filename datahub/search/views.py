@@ -1,6 +1,7 @@
 """Search views."""
 import logging
 from collections import namedtuple
+from enum import auto, Enum
 from itertools import islice
 
 from django.conf import settings
@@ -37,8 +38,10 @@ from datahub.user_event_log.utils import record_user_event
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
-
 logger = logging.getLogger(__name__)
+
+v3_view_registry = {}
+v4_view_registry = {}
 
 
 class SearchBasicAPIView(APIView):
@@ -118,7 +121,6 @@ class SearchAPIView(APIView):
     es_sort_by_remappings = {}
 
     serializer_class = EntitySearchQuerySerializer
-    entity = None
     fields_to_include = None
     fields_to_exclude = None
 
@@ -146,7 +148,7 @@ class SearchAPIView(APIView):
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entity_query(
-            self.entity,
+            self.search_app.es_model,
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,
@@ -327,6 +329,104 @@ class AutocompleteSearchListAPIView(ListAPIView):
 
     def _get_permission_filters(self):
         return self.search_app.get_permission_filters(self.request)
+
+
+class ViewType(Enum):
+    """Types of views."""
+
+    # The standard type (no special prefix)
+    default = auto()
+    # Use a public prefix (e.g. /v4/public/search/company)
+    public = auto()
+
+
+def register_v3_view(sub_path=None):
+    """
+    Decorator that registers a v3 search view.
+
+    :param sub_path: optional sub-path to add to the URL
+
+    TODO: This should be removed when the migration to v4 is complete.
+
+    Examples:
+       For the main entity search view at `/v3/search/<app name>`:
+
+       @register_v4_view()
+       class SearchView(...):
+          ...
+
+       For a CSV export view at `/v3/search/<app name>/export`:
+
+       @register_v4_view(name='export')
+       class SearchView(...):
+          ...
+
+    """
+    def inner(view_cls):
+        _register_view(v3_view_registry, view_cls.search_app, view_cls, 'v3', sub_path=sub_path)
+        return view_cls
+
+    return inner
+
+
+def register_v4_view(sub_path=None, is_public=False):
+    """
+    Decorator that registers a v4 search view.
+
+    :param sub_path: optional sub-path to add to the URL
+    :param is_public: if True, the URL path will have a /v4/public prefix instead of just /v4
+
+    Examples:
+       For the main entity search view at `/v4/search/<app sub_path>`:
+
+           @register_v4_view()
+           class SearchView(...):
+              ...
+
+       For a CSV export view at `/v4/search/<app sub_path>/export`:
+
+           @register_v4_view(sub_path='export')
+           class SearchView(...):
+              ...
+
+       For a view at `/v4/public/search/<app sub_path>`:
+
+           @register_v4_view(is_public=True)
+           class SearchView(...):
+              ...
+
+    """
+    def inner(view_cls):
+        _register_view(
+            v4_view_registry,
+            view_cls.search_app,
+            view_cls,
+            'v4',
+            sub_path=sub_path,
+            is_public=is_public,
+        )
+        return view_cls
+
+    return inner
+
+
+def _register_view(
+    view_mapping,
+    search_app,
+    view_cls,
+    version_for_error,
+    sub_path=None,
+    is_public=False,
+):
+    view_type = ViewType.public if is_public else ViewType.default
+
+    if (search_app, view_type, sub_path) in view_mapping:
+        raise ValueError(
+            f'There is already a {version_for_error} view with sub_path {sub_path} for search app '
+            f'{search_app.__name__}',
+        )
+
+    view_mapping[(search_app, view_type, sub_path)] = view_cls
 
 
 def _map_es_ordering(ordering, mapping):

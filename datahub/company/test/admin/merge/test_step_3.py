@@ -24,8 +24,8 @@ from datahub.company.test.factories import (
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
 from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.models import InvestmentProject
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 

@@ -2,20 +2,35 @@ from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
+from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
+from datahub.core.hawk_receiver import (
+    HawkAuthentication,
+    HawkResponseSigningMixin,
+    HawkScopePermission,
+)
 from datahub.core.query_utils import get_front_end_url_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from datahub.search.company.models import Company
-from datahub.search.company.serializers import SearchCompanyQuerySerializer
-from datahub.search.views import AutocompleteSearchListAPIView, SearchAPIView, SearchExportAPIView
+from datahub.search.company import CompanySearchApp
+from datahub.search.company.serializers import (
+    PublicSearchCompanyQuerySerializer,
+    SearchCompanyQuerySerializer,
+)
+from datahub.search.views import (
+    AutocompleteSearchListAPIView,
+    register_v3_view,
+    register_v4_view,
+    SearchAPIView,
+    SearchExportAPIView,
+)
 
 
 class SearchCompanyAPIViewMixin:
     """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = Company
+    search_app = CompanySearchApp
     serializer_class = SearchCompanyQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
@@ -54,6 +69,7 @@ class SearchCompanyAPIViewMixin:
     }
 
 
+@register_v3_view()
 class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view V3."""
 
@@ -63,6 +79,7 @@ class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
     )
 
 
+@register_v4_view()
 class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view V4."""
 
@@ -84,6 +101,69 @@ class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
     )
 
 
+@register_v4_view(is_public=True)
+class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
+    """
+    Company search view using Hawk authentication.
+
+    This is a slightly stripped down version of the company search view, intended for use by the
+    Market Access service using Hawk authentication and without a user context in requests.
+
+    Some fields containing personal data are deliberately omitted.
+    """
+
+    search_app = CompanySearchApp
+    serializer_class = PublicSearchCompanyQuerySerializer
+    authentication_classes = (HawkAuthentication,)
+    permission_classes = (HawkScopePermission,)
+    required_hawk_scope = HawkScope.public_company
+    fields_to_include = (
+        'id',
+        'address',
+        'archived',
+        'archived_on',
+        'archived_reason',
+        'business_type',
+        'company_number',
+        'created_on',
+        'description',
+        'duns_number',
+        'employee_range',
+        'export_experience_category',
+        'export_to_countries',
+        'future_interest_countries',
+        'global_headquarters',
+        'headquarter_type',
+        'modified_on',
+        'name',
+        'reference_code',
+        'registered_address',
+        'sector',
+        'trading_names',
+        'turnover_range',
+        'uk_based',
+        'uk_region',
+        'vat_number',
+        'website',
+    )
+
+    FILTER_FIELDS = (
+        'archived',
+        'name',
+    )
+
+    COMPOSITE_FILTERS = {
+        'name': [
+            'name',  # to find 2-letter words
+            'name.trigram',
+            'trading_names',  # to find 2-letter words
+            'trading_names_trigram',
+        ],
+    }
+
+
+@register_v3_view(sub_path='export')
+@register_v4_view(sub_path='export')
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
@@ -124,6 +204,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
     }
 
 
+@register_v3_view(sub_path='autocomplete')
 class CompanyAutocompleteSearchListAPIViewV3(
     SearchCompanyAPIViewMixin,
     AutocompleteSearchListAPIView,
@@ -149,6 +230,7 @@ class CompanyAutocompleteSearchListAPIViewV3(
     ]
 
 
+@register_v4_view(sub_path='autocomplete')
 class CompanyAutocompleteSearchListAPIViewV4(
     SearchCompanyAPIViewMixin,
     AutocompleteSearchListAPIView,

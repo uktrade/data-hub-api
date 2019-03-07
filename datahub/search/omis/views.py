@@ -12,16 +12,16 @@ from datahub.omis.order.models import Order as DBOrder
 from datahub.omis.order.query_utils import get_lead_order_assignee_name_subquery
 from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.models import Refund
-from datahub.search.omis.models import Order
+from datahub.search.omis import OrderSearchApp
 from datahub.search.omis.serializers import SearchOrderQuerySerializer
-from datahub.search.views import SearchAPIView, SearchExportAPIView
+from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
 
 
 class SearchOrderAPIViewMixin:
     """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = Order
+    search_app = OrderSearchApp
     serializer_class = SearchOrderQuerySerializer
 
     FILTER_FIELDS = [
@@ -72,6 +72,7 @@ class SearchOrderAPIViewMixin:
     }
 
 
+@register_v3_view()
 class SearchOrderAPIView(SearchOrderAPIViewMixin, SearchAPIView):
     """Filtered order search view."""
 
@@ -95,6 +96,7 @@ class SearchOrderAPIView(SearchOrderAPIViewMixin, SearchAPIView):
         return response
 
 
+@register_v3_view(sub_path='export')
 class SearchOrderExportAPIView(SearchOrderAPIViewMixin, SearchExportAPIView):
     """Order search export view."""
 

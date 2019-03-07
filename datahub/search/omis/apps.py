@@ -8,7 +8,6 @@ from datahub.omis.order.models import (
 )
 from datahub.search.apps import SearchApp
 from datahub.search.omis.models import Order
-from datahub.search.omis.views import SearchOrderAPIView, SearchOrderExportAPIView
 
 
 class OrderSearchApp(SearchApp):
@@ -16,8 +15,6 @@ class OrderSearchApp(SearchApp):
 
     name = 'order'
     es_model = Order
-    view = SearchOrderAPIView
-    export_view = SearchOrderExportAPIView
     view_permissions = (f'order.{OrderPermission.view}',)
     export_permission = f'order.{OrderPermission.export}'
     queryset = DBOrder.objects.select_related(

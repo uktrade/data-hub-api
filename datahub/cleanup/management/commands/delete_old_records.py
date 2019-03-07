@@ -7,7 +7,7 @@ from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelC
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, Contact
 from datahub.interaction.models import Interaction
-from datahub.investment.models import InvestmentProject
+from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
 

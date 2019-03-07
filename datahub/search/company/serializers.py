@@ -26,3 +26,10 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         'modified_on',
         'name',
     )
+
+
+class PublicSearchCompanyQuerySerializer(EntitySearchQuerySerializer):
+    """Serialiser used to validate public company search POST bodies."""
+
+    archived = serializers.BooleanField(required=False)
+    name = serializers.CharField(required=False)

@@ -73,29 +73,6 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                 },
-                'contacts': {
-                    'properties': {
-                        'first_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'id': {'type': 'keyword'},
-                        'last_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'copy_to': ['contacts.name_trigram'],
-                            'type': 'keyword',
-                        },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
-                        },
-                    },
-                    'type': 'object',
-                },
                 'created_on': {'type': 'date'},
                 'description': {
                     'analyzer': 'english_analyzer',
@@ -603,7 +580,6 @@ def test_indexed_doc(setup_es):
         'business_type',
         'companies_house_data',
         'company_number',
-        'contacts',
         'created_on',
         'description',
         'employee_range',

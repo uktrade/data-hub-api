@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from decimal import Decimal
 from operator import attrgetter
@@ -5,19 +6,78 @@ from secrets import token_hex
 from unittest import mock
 
 import factory
+import mohawk
 import pytest
 from django.contrib.auth import get_user_model, REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import Client
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
+from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
 from datahub.oauth.scopes import Scope
+
+
+class HawkAPITestClient:
+    """Simple test client for making requests signed using Hawk."""
+
+    unset = object()
+
+    def __init__(self):
+        """Initialise the client and create an APIClient instance."""
+        self.api_client = APIClient()
+        self.credentials = None
+
+    def set_credentials(self, id_, key, algorithm='sha256'):
+        """Set the credentials for requests."""
+        self.credentials = {
+            'id': id_,
+            'key': key,
+            'algorithm': algorithm,
+        }
+
+    def get(self, path, params=None):
+        """Make a GET request (optionally with query params)."""
+        return self.request('get', path, params=params)
+
+    def post(self, path, json_):
+        """Make a POST request with a JSON body."""
+        return self.request('post', path, json_=json_)
+
+    def request(self, method, path, params=None, json_=unset, content_type=''):
+        """Make a request with a specified HTTP method."""
+        params = urlencode(params) if params else ''
+        url = join_truthy_strings(f'http://testserver{path}', params, sep='?')
+
+        if json_ is not self.unset:
+            content_type = 'application/json'
+            body = json.dumps(json_, cls=DjangoJSONEncoder).encode('utf-8')
+        else:
+            body = b''
+
+        sender = mohawk.Sender(
+            self.credentials,
+            url,
+            method,
+            content=body,
+            content_type=content_type,
+        )
+
+        return self.api_client.generic(
+            method,
+            url,
+            HTTP_AUTHORIZATION=sender.request_header,
+            HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
+            data=body,
+            content_type=content_type,
+        )
 
 
 def get_default_test_user():

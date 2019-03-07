@@ -12,16 +12,16 @@ from datahub.core.query_utils import (
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
-from datahub.search.contact.models import Contact
+from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.serializers import SearchContactQuerySerializer
-from datahub.search.views import SearchAPIView, SearchExportAPIView
+from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
 
 
 class SearchContactAPIViewMixin:
     """Defines common settings."""
 
     required_scopes = (Scope.internal_front_end,)
-    entity = Contact
+    search_app = ContactSearchApp
     serializer_class = SearchContactQuerySerializer
     es_sort_by_remappings = {
         'first_name': 'first_name.keyword',
@@ -68,10 +68,12 @@ class SearchContactAPIViewMixin:
     }
 
 
+@register_v3_view()
 class SearchContactAPIView(SearchContactAPIViewMixin, SearchAPIView):
     """Filtered contact search view."""
 
 
+@register_v3_view(sub_path='export')
 class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 

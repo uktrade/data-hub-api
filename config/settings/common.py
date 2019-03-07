@@ -67,9 +67,10 @@ LOCAL_APPS = [
     'datahub.event',
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
-    'datahub.investment',
-    'datahub.investment.evidence',
-    'datahub.investment.proposition',
+    'datahub.investment.project',
+    'datahub.investment.project.evidence',
+    'datahub.investment.project.proposition',
+    'datahub.investment.project.report',
     'datahub.metadata',
     'datahub.oauth',
     'datahub.admin_report',
@@ -86,7 +87,6 @@ LOCAL_APPS = [
     'datahub.omis.invoice',
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
-    'datahub.investment.report',
     'datahub.user_event_log',
 
     # TODO: delete after the whole data cleansing piece of work is complete
@@ -287,15 +287,8 @@ VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 # Leeloo stuff
 if 'elasticsearch' in VCAP_SERVICES:
     ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
-    ES_USE_AWS_AUTH = False
 else:
     ES_URL = env('ES5_URL')
-    ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
-
-if ES_USE_AWS_AUTH:
-    AWS_ELASTICSEARCH_REGION = env('AWS_ELASTICSEARCH_REGION')
-    AWS_ELASTICSEARCH_KEY = env('AWS_ELASTICSEARCH_KEY')
-    AWS_ELASTICSEARCH_SECRET = env('AWS_ELASTICSEARCH_SECRET')
 
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
@@ -308,8 +301,9 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
 )
 SEARCH_EXPORT_MAX_RESULTS = 5000
 SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
+SEARCH_CONFIGURE_CONNECTION_ON_READY = True
+SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY = True
 CHAR_FIELD_MAX_LENGTH = 255
-HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 
 AV_V2_SERVICE_URL = env('AV_V2_SERVICE_URL', default=None)
@@ -418,11 +412,11 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'event': f'{DATAHUB_FRONTEND_BASE_URL}/events',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
-    'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
+    'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 
     'mi_fdi_dashboard_country': (
-        f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
+        f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
     )
 }
 
@@ -463,29 +457,38 @@ GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 HAWK_RECEIVER_IP_WHITELIST = env.list('HAWK_RECEIVER_IP_WHITELIST', default=[])
 HAWK_RECEIVER_NONCE_EXPIRY_SECONDS = 60
 
-# List of (ID, key, scope) tuples
-_hawk_receiver_credentials = [
-    (
-        env('ACTIVITY_STREAM_ACCESS_KEY_ID'),
-        env('ACTIVITY_STREAM_SECRET_ACCESS_KEY'),
-        HawkScope.activity_stream,
-    ),
-]
 
-HAWK_RECEIVER_CREDENTIALS = {
-    id_: {
-        'key': key,
+HAWK_RECEIVER_CREDENTIALS = {}
+
+
+def _add_hawk_credentials(id_env_name, key_env_name, scope):
+    id_ = env(id_env_name, default=None)
+
+    if not id_:
+        return
+
+    if id_ in HAWK_RECEIVER_CREDENTIALS:
+        raise ImproperlyConfigured(
+            'Duplicate Hawk access key IDs detected. All access key IDs should be unique.',
+        )
+
+    HAWK_RECEIVER_CREDENTIALS[id_] = {
+        'key': env(key_env_name),
         'scope': scope,
     }
-    for id_, key, scope in _hawk_receiver_credentials
-}
 
-# Check that there are the correct number of items in HAWK_RECEIVER_CREDENTIALS to make sure
-# no duplicate Hawk IDs were configured
-if len(_hawk_receiver_credentials) != len(HAWK_RECEIVER_CREDENTIALS):
-    raise ImproperlyConfigured(
-        'Duplicate Hawk access key IDs detected. All access key IDs should be unique.',
-    )
+
+_add_hawk_credentials(
+    'ACTIVITY_STREAM_ACCESS_KEY_ID',
+    'ACTIVITY_STREAM_SECRET_ACCESS_KEY',
+    HawkScope.activity_stream,
+)
+
+_add_hawk_credentials(
+    'MARKET_ACCESS_ACCESS_KEY_ID',
+    'MARKET_ACCESS_SECRET_ACCESS_KEY',
+    HawkScope.public_company,
+)
 
 DOCUMENT_BUCKETS = {
     'default': {
