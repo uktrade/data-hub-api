@@ -176,15 +176,16 @@ class TestValidateExportViewAttributes:
         assert not invalid_fields
 
 
-class TestSearch(APITestMixin):
-    """Tests search views."""
+class TestBasicSearch(APITestMixin):
+    """
+    Tests for SearchBasicAPIView.
 
-    def test_basic_search_paging(self, setup_es):
-        """
-        Tests the pagination.
+    TODO: make these tests generic using `search_support` instead of relying on specific
+    search apps.
+    """
 
-        The sortby is not passed in so records are ordered by id.
-        """
+    def test_pagination(self, setup_es):
+        """Tests the pagination."""
         total_records = 9
         page_size = 2
 
@@ -220,10 +221,8 @@ class TestSearch(APITestMixin):
             assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
     @pytest.mark.parametrize('entity', ('sloth', 'companieshousecompany'))
-    def test_invalid_entity(self, setup_es, entity):
+    def test_400_with_invalid_entity(self, setup_es, entity):
         """Tests case where provided entity is invalid."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
             url,
@@ -238,7 +237,7 @@ class TestSearch(APITestMixin):
             'entity': [f'"{entity}" is not a valid choice.'],
         }
 
-    def test_search_results_quality(self, setup_es, setup_data):
+    def test_quality(self, setup_es, setup_data):
         """Tests quality of results."""
         CompanyFactory(name='The Risk Advisory Group', trading_names=[])
         CompanyFactory(name='The Advisory Group', trading_names=[])
@@ -261,14 +260,14 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
 
-        # results are in order of relevance if sortby is not applied
+        # results are in order of relevance
         assert [
             'The Advisory',
             'The Advisory Group',
             'The Risk Advisory Group',
         ] == [company['name'] for company in response.data['results']]
 
-    def test_search_partial_match(self, setup_es, setup_data):
+    def test_partial_match(self, setup_es, setup_data):
         """Tests partial matching."""
         CompanyFactory(name='Veryuniquename1', trading_names=[])
         CompanyFactory(name='Veryuniquename2', trading_names=[])
@@ -299,7 +298,7 @@ class TestSearch(APITestMixin):
             'Veryuniquename4',
         } == {company['name'] for company in response.data['results']}
 
-    def test_search_hyphen_match(self, setup_es, setup_data):
+    def test_hyphen_match(self, setup_es, setup_data):
         """Tests hyphen query."""
         CompanyFactory(name='t-shirt', trading_names=[])
         CompanyFactory(name='tshirt', trading_names=[])
@@ -328,7 +327,7 @@ class TestSearch(APITestMixin):
             'tshirt',
         ] == [company['name'] for company in response.data['results']]
 
-    def test_search_id_match(self, setup_es, setup_data):
+    def test_search_by_id(self, setup_es, setup_data):
         """Tests exact id matching."""
         CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
         CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
@@ -352,187 +351,21 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['results'][0]['id']
 
-    def test_search_sort_desc(self, setup_es, setup_data):
-        """Tests sorting in descending order."""
-        CompanyFactory(name='Water 1')
-        CompanyFactory(name='water 2')
-        CompanyFactory(name='water 3')
-        CompanyFactory(name='Water 4')
-
-        setup_es.indices.refresh()
-
-        term = 'Water'
-
+    def test_400_with_invalid_sortby(self, setup_es, setup_data):
+        """Tests attempt to sort by non existent field."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
             url,
             data={
-                'term': term,
-                'sortby': 'name:desc',
+                'term': 'Test',
                 'entity': 'company',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
-        assert [
-            'Water 4',
-            'water 3',
-            'water 2',
-            'Water 1',
-        ] == [company['name'] for company in response.data['results']]
-
-    def test_search_sort_asc(self, setup_es, setup_data):
-        """Tests sorting in ascending order."""
-        CompanyFactory(name='Fire 4')
-        CompanyFactory(name='fire 3')
-        CompanyFactory(name='fire 2')
-        CompanyFactory(name='Fire 1')
-
-        setup_es.indices.refresh()
-
-        term = 'Fire'
-
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'sortby': 'name:asc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
-        assert [
-            'Fire 1',
-            'fire 2',
-            'fire 3',
-            'Fire 4',
-        ] == [company['name'] for company in response.data['results']]
-
-    def test_search_sort_nested_desc(self, setup_es, setup_data):
-        """Tests sorting by nested field."""
-        InvestmentProjectFactory(
-            name='Potato 1',
-            stage_id=constants.InvestmentProjectStage.active.value.id,
-        )
-        InvestmentProjectFactory(
-            name='Potato 2',
-            stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        )
-        InvestmentProjectFactory(
-            name='potato 3',
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-        InvestmentProjectFactory(
-            name='Potato 4',
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-
-        setup_es.indices.refresh()
-
-        term = 'Potato'
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'sortby': 'stage.name:desc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
-        assert [
-            'Won',
-            'Won',
-            'Prospect',
-            'Active',
-        ] == [
-            investment_project['stage']['name'] for investment_project in response.data['results']
-        ]
-
-    def test_search_sort_invalid(self, setup_es, setup_data):
-        """Tests attempt to sort by non existent field."""
-        CompanyFactory(name='Fire 4')
-        CompanyFactory(name='fire 3')
-        CompanyFactory(name='fire 2')
-        CompanyFactory(name='Fire 1')
-
-        setup_es.indices.refresh()
-
-        term = 'Fire'
-
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
                 'sortby': 'some_field_that_doesnt_exist:asc',
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_search_sort_asc_with_null_values(self, setup_es, setup_data):
-        """Tests placement of null values in sorted results when order is ascending."""
-        InvestmentProjectFactory(name='Earth 1', total_investment=1000)
-        InvestmentProjectFactory(name='Earth 2')
-
-        setup_es.indices.refresh()
-
-        term = 'Earth'
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'sortby': 'total_investment:asc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert [
-            ('Earth 2', None),
-            ('Earth 1', 1000),
-        ] == [
-            (investment['name'], investment['total_investment'])
-            for investment in response.data['results']
-        ]
-
-    def test_search_sort_desc_with_null_values(self, setup_es, setup_data):
-        """Tests placement of null values in sorted results when order is descending."""
-        InvestmentProjectFactory(name='Ether 1', total_investment=1000)
-        InvestmentProjectFactory(name='Ether 2')
-
-        setup_es.indices.refresh()
-
-        term = 'Ether'
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'sortby': 'total_investment:desc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert [
-            ('Ether 1', 1000),
-            ('Ether 2', None),
-        ] == [
-            (investment['name'], investment['total_investment'])
-            for investment in response.data['results']
-        ]
-
-    def test_basic_search_aggregations(self, setup_es, setup_data):
+    def test_aggregations(self, setup_es, setup_data):
         """Tests basic aggregate query."""
         company = CompanyFactory(name='very_unique_company')
         ContactFactory(company=company)
@@ -605,7 +438,7 @@ class TestSearch(APITestMixin):
             'order',
         ),
     )
-    def test_basic_search_permissions(self, setup_es, permission, permission_entity, entity):
+    def test_permissions(self, setup_es, permission, permission_entity, entity):
         """Tests model permissions enforcement in basic search."""
         user = create_test_user(permission_codenames=[permission], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -663,6 +496,71 @@ class TestSearch(APITestMixin):
         assert response_data['count'] == 0
 
         assert len(response_data['aggregations']) == 0
+
+
+class TestFilteredSearch(APITestMixin):
+    """
+    Tests related to `SearchAPIView`.
+
+    TODO: make these tests generic using `search_support` instead of relying on specific
+    search apps.
+    """
+
+    def test_search_sort_asc_with_null_values(self, setup_es, setup_data):
+        """Tests placement of null values in sorted results when order is ascending."""
+        InvestmentProjectFactory(name='Earth 1', total_investment=1000)
+        InvestmentProjectFactory(name='Earth 2')
+
+        setup_es.indices.refresh()
+
+        term = 'Earth'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': term,
+                'sortby': 'total_investment:asc',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [
+            ('Earth 2', None),
+            ('Earth 1', 1000),
+        ] == [
+            (investment['name'], investment['total_investment'])
+            for investment in response.data['results']
+        ]
+
+    def test_search_sort_desc_with_null_values(self, setup_es, setup_data):
+        """Tests placement of null values in sorted results when order is descending."""
+        InvestmentProjectFactory(name='Ether 1', total_investment=1000)
+        InvestmentProjectFactory(name='Ether 2')
+
+        setup_es.indices.refresh()
+
+        term = 'Ether'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': term,
+                'sortby': 'total_investment:desc',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [
+            ('Ether 1', 1000),
+            ('Ether 2', None),
+        ] == [
+            (investment['name'], investment['total_investment'])
+            for investment in response.data['results']
+        ]
 
 
 class TestSearchExportAPIView(APITestMixin):

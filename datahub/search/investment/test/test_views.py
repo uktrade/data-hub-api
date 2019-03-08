@@ -759,6 +759,49 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
+    def test_search_sort_nested_desc(self, setup_es, setup_data):
+        """Tests sorting by nested field."""
+        InvestmentProjectFactory(
+            name='Potato 1',
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 2',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            name='potato 3',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 4',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+
+        setup_es.indices.refresh()
+
+        term = 'Potato'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': term,
+                'sortby': 'stage.name:desc',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert [
+            'Won',
+            'Won',
+            'Prospect',
+            'Active',
+        ] == [
+            investment_project['stage']['name'] for investment_project in response.data['results']
+        ]
+
 
 class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
