@@ -129,13 +129,12 @@ class Interaction(BaseModel):
     dit_adviser = models.ForeignKey(
         'company.Advisor',
         related_name='%(class)ss',
-        blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
     notes = models.TextField(max_length=10000, blank=True)
     dit_team = models.ForeignKey(
-        'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL,
+        'metadata.Team', null=True, on_delete=models.PROTECT,
     )
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,
