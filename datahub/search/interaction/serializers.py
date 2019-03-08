@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
@@ -10,8 +8,6 @@ from datahub.search.serializers import (
 )
 from datahub.search.utils import SearchOrdering, SortDirection
 
-logger = getLogger(__name__)
-
 
 class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate interaction search POST bodies."""
@@ -19,8 +15,6 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     kind = SingleOrListField(child=serializers.CharField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)
-    contact = SingleOrListField(child=StringUUIDField(), required=False)
-    contact_name = serializers.CharField(required=False)
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
     created_on_exists = serializers.BooleanField(required=False)
@@ -39,41 +33,6 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
 
     SORT_BY_FIELDS = (
         'company.name',
-        'contact.name',
         'date',
-        'dit_adviser.name',
-        'dit_team.name',
-        'id',
         'subject',
     )
-    deprecated_filters = {
-        'contact',
-        'contact_name',
-    }
-    deprecated_sortby_fields = {
-        'contact.name',
-        'dit_adviser.name',
-        'dit_team.name',
-        'id',
-    }
-
-    def validate(self, data):
-        """
-        Logs all deprecated params to make sure we don't break things when we get rid of them.
-
-        TODO Remove following deprecation period.
-        """
-        deprecated_filters_in_data = data.keys() & self.deprecated_filters
-        if deprecated_filters_in_data:
-            logger.error(
-                'The following deprecated interaction search filters were '
-                f'used: {deprecated_filters_in_data}.',
-            )
-
-        sortby = data.get('sortby')
-        if sortby and sortby.field in self.deprecated_sortby_fields:
-            logger.error(
-                'The following deprecated interaction search sortby field was '
-                f'used: {sortby.field}.',
-            )
-        return super().validate(data)

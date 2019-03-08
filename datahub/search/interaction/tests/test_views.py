@@ -461,57 +461,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    def test_filter_by_contact_id(self, setup_es):
-        """Tests filtering interaction by contact id."""
-        contacts = ContactFactory.create_batch(10)
-        CompanyInteractionFactory.create_batch(
-            len(contacts),
-            contact=factory.Iterator(contacts),
-        )
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:interaction')
-        request_data = {
-            'contact': contacts[5].id,
-        }
-        response = self.api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] == 1
-
-        results = response_data['results']
-        assert results[0]['contact']['id'] == str(contacts[5].id)
-
-    def test_filter_by_contact_name(self, setup_es):
-        """Tests filtering interaction by contact name."""
-        contacts = ContactFactory.create_batch(10)
-        CompanyInteractionFactory.create_batch(
-            len(contacts),
-            contact=factory.Iterator(contacts),
-        )
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:interaction')
-        request_data = {
-            'contact_name': contacts[5].name,
-        }
-        response = self.api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] > 0
-
-        results = response_data['results']
-        # multiple records can match our filter, let's make sure at least one is exact match
-        assert any(result['contact']['id'] == str(contacts[5].id) for result in results)
-        assert any(result['contact']['name'] == contacts[5].name for result in results)
-
     @pytest.mark.parametrize(
         'created_on_exists',
         (True, False),
