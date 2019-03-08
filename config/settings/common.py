@@ -374,7 +374,7 @@ if REDIS_BASE_URL:
 
     if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
         CELERY_BEAT_SCHEDULE['spi_report'] = {
-            'task': 'datahub.investment.report.tasks.generate_spi_report',
+            'task': 'datahub.investment.project.report.tasks.generate_spi_report',
             'schedule': crontab(minute=0, hour=8),
         }
 
