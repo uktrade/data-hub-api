@@ -28,7 +28,6 @@ def get_basic_search_query(
         entity,
         term,
         permission_filters_by_entity=None,
-        ordering=None,
         offset=0,
         limit=100,
 ):
@@ -63,7 +62,7 @@ def get_basic_search_query(
             should=Term(_type=entity._doc_type.name),
         ),
     )
-    search = _apply_sorting_to_query(search, ordering)
+    search = search.sort('_score', 'id')
     search.aggs.bucket(
         'count_by_type', 'terms', field='_type',
     )
