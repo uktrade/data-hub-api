@@ -65,6 +65,18 @@
     - - delete_associated_evidencedocument
       - evidence
       - evidencedocument
+    - - add_investorprofile
+      - investor_profile
+      - investorprofile
+    - - change_investorprofile
+      - investor_profile
+      - investorprofile
+    - - delete_investorprofile
+      - investor_profile
+      - investorprofile
+    - - view_investorprofile
+      - investor_profile
+      - investorprofile
   model: auth.group
 - fields:
     name: DA
@@ -183,6 +195,18 @@
     - - delete_associated_evidencedocument
       - evidence
       - evidencedocument
+    - - add_investorprofile
+      - investor_profile
+      - investorprofile
+    - - change_investorprofile
+      - investor_profile
+      - investorprofile
+    - - delete_investorprofile
+      - investor_profile
+      - investorprofile
+    - - view_investorprofile
+      - investor_profile
+      - investorprofile
   model: auth.group
 - fields:
     name: DIT_staff
@@ -352,6 +376,18 @@
     - - view_ordersubscriber
       - order
       - ordersubscriber
+    - - add_investorprofile
+      - investor_profile
+      - investorprofile
+    - - change_investorprofile
+      - investor_profile
+      - investorprofile
+    - - delete_investorprofile
+      - investor_profile
+      - investorprofile
+    - - view_investorprofile
+      - investor_profile
+      - investorprofile
   model: auth.group
 
 

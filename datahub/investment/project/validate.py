@@ -14,7 +14,7 @@ from datahub.core.validate_utils import DataCombiner
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
 from datahub.investment.project.models import InvestmentProject
-
+from datahub.investment.validate import field_incomplete
 
 REQUIRED_MESSAGE = 'This field is required.'
 
@@ -142,14 +142,14 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
         if _should_skip_rule(field, fields, desired_stage_order, req_stage.order):
             continue
 
-        if _field_incomplete(combiner, field):
+        if field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
     for field, rule in validation_config.get_conditional_rules_after_stage().items():
         if _should_skip_rule(field, fields, desired_stage_order, rule.stage.order):
             continue
 
-        if _check_rule(combiner, rule) and _field_incomplete(combiner, field):
+        if _check_rule(combiner, rule) and field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
     return errors
@@ -160,13 +160,6 @@ def _should_skip_rule(field, validate_fields, desired_stage_order, req_stage_ord
     skip_field = validate_fields is not None and field not in validate_fields
 
     return skip_field or desired_stage_order < req_stage_order
-
-
-def _field_incomplete(combiner, field):
-    """Checks whether a field has been filled in."""
-    if combiner.is_field_to_many(field):
-        return not combiner.get_value_to_many(field)
-    return combiner.get_value(field) in (None, '')
 
 
 def _check_rule(combiner, rule):
