@@ -11,6 +11,7 @@ from datahub.company.urls import contact as contact_urls
 from datahub.event import urls as event_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
+from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.project import urls as investment_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
@@ -59,4 +60,11 @@ v4_urls = [
     path('', include((ch_company_urls.urls_v4, 'ch-company'), namespace='ch-company')),
     path('', include((company_urls.urls_v4, 'company'), namespace='company')),
     path('', include((search_urls.urls_v4, 'search'), namespace='search')),
+    path(
+        '',
+        include(
+            (investor_profile_urls, 'large-investor-profile'),
+            namespace='large-investor-profile',
+        ),
+    ),
 ]
