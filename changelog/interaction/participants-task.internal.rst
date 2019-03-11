@@ -1,0 +1,1 @@
+A Celery task was added to create ``InteractionDITParticipant`` objects from the ``dit_adviser`` and ``dit_team`` values for interactions that do not already have a ``InteractionDITParticipant`` object. The task must be run manually.
