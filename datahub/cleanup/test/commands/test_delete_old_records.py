@@ -284,7 +284,10 @@ MAPPING = {
     },
     'interaction.Interaction': {
         'factory': CompanyInteractionFactory,
-        'implicitly_deletable_models': {'interaction.Interaction_contacts'},
+        'implicitly_deletable_models': {
+            'interaction.Interaction_contacts',
+            'interaction.InteractionDITParticipant',
+        },
         'expired_objects_kwargs': [
             {
                 'date': INTERACTION_DELETE_BEFORE_DATETIME - relativedelta(days=1),
