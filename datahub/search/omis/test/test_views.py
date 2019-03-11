@@ -654,7 +654,7 @@ class TestGlobalSearch(APITestMixin):
     """Test global search for orders."""
 
     @pytest.mark.parametrize(
-        'term,results',
+        'term,expected_results',
         (
             (  # no filter => return all records
                 '',
@@ -694,7 +694,7 @@ class TestGlobalSearch(APITestMixin):
             ),
         ),
     )
-    def test_search(self, setup_data, term, results):
+    def test_search(self, setup_data, term, expected_results):
         """Test search results."""
         url = reverse('api-v3:search:basic')
 
@@ -702,13 +702,14 @@ class TestGlobalSearch(APITestMixin):
             url,
             data={
                 'term': term,
-                'sortby': 'created_on:asc',
                 'entity': 'order',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.json()['results']) == len(results)
-        assert [
-            item['reference'] for item in response.json()['results']
-        ] == results
+        assert len(response.json()['results']) == len(expected_results)
+        actual_results = sorted(
+            item['reference']
+            for item in response.json()['results']
+        )
+        assert actual_results == expected_results

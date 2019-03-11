@@ -20,6 +20,7 @@ INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF = datetime(2013, 11, 23, tzinfo=utc)  # 2
 INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
 ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=utc)  # 2014-07-11 + 1 day
 ORDER_EXPIRY_PERIOD = relativedelta(years=7)
+INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -60,6 +61,9 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('orders'): (),
                 Company._meta.get_field('subsidiaries'): (),
                 Company._meta.get_field('transferred_from'): (),
+                Company._meta.get_field('investor_profiles'): (
+                    DatetimeLessThanCleanupFilter('modified_on', INVESTOR_PROFILE_EXPIRY_PERIOD),
+                ),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(

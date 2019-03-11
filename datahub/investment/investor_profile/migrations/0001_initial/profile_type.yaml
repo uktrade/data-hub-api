@@ -1,0 +1,6 @@
+- model: investor_profile.profiletype
+  pk: 32451551-28d9-4aff-bc25-45e4cfb15265
+  fields: {disabled_on: null, name: Large, order: 100}
+- model: investor_profile.profiletype
+  pk: 38a38617-84d9-41d0-bf01-d8f027cd109b
+  fields: {disabled_on: null, name: Growth, order: 200}

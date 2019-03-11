@@ -524,3 +524,99 @@ def test_get_search_by_entity_query(
     )
     assert query.to_dict() == expected_query
     assert query._index == [SimpleModelSearchApp.es_model.get_read_alias()]
+
+
+@mock.patch('datahub.search.query_builder.get_global_search_apps_as_mapping')
+def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
+    """Test for get_basic_search_query."""
+    search_app = SimpleModelSearchApp
+    mocked_get_global_search_apps_as_mapping.return_value = {
+        search_app.name: search_app,
+    }
+
+    query = get_basic_search_query(
+        search_app.es_model,
+        'test',
+        permission_filters_by_entity={
+            search_app.name: [('name', 'perm')],
+        },
+        offset=2,
+        limit=3,
+    )
+
+    assert query.to_dict() == {
+        'query': {
+            'bool': {
+                'should': [
+                    {
+                        'match': {
+                            'name.keyword': {
+                                'query': 'test',
+                                'boost': 2,
+                            },
+                        },
+                    },
+                    {
+                        'multi_match': {
+                            'query': 'test',
+                            'fields': ['name', 'name.trigram'],
+                            'type': 'cross_fields',
+                            'operator': 'and',
+                        },
+                    },
+                ],
+                'filter': [
+                    {
+                        'bool': {
+                            'should': [
+                                {
+                                    'bool': {
+                                        'should': [
+                                            {
+                                                'term': {
+                                                    'name': 'perm',
+                                                },
+                                            },
+                                        ],
+                                        'must': [
+                                            {
+                                                'term': {
+                                                    '_type': search_app.name,
+                                                },
+                                            },
+                                        ],
+                                        'minimum_should_match': 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+                'minimum_should_match': 1,
+            },
+        },
+        'post_filter': {
+            'bool': {
+                'should': [
+                    {
+                        'term': {
+                            '_type': search_app.name,
+                        },
+                    },
+                ],
+            },
+        },
+        'aggs': {
+            'count_by_type': {
+                'terms': {
+                    'field': '_type',
+                },
+            },
+        },
+        'sort': [
+            '_score',
+            'id',
+        ],
+        'from': 2,
+        'size': 3,
+    }
