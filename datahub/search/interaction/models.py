@@ -32,7 +32,6 @@ class Interaction(BaseESModel):
     company = fields.company_field('company')
     company_sector = fields.sector_field()
     communication_channel = fields.id_name_field()
-    contact = fields.contact_or_adviser_field('contact')
     contacts = _contact_field()
     created_on = Date()
     date = Date()
@@ -60,7 +59,6 @@ class Interaction(BaseESModel):
     MAPPINGS = {
         'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
-        'contact': dict_utils.contact_or_adviser_dict,
         'contacts': dict_utils.contact_or_adviser_list_of_dicts,
         'dit_adviser': dict_utils.contact_or_adviser_dict,
         'dit_team': dict_utils.id_name_dict,
