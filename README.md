@@ -35,22 +35,23 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose run leeloo ./manage.py createinitialrevisions
     ```
 
-    **NOTE:** If you are using a linux system, these commands may hang on 
-    waiting for the elasticsearch container to come up (`data-hub-leeloo_es_1`).
-    If the logs for that container mention something like 
-    `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
-    you will need to run the following on your running host machine:
+    * **NOTE:** 
+      If you are using a linux system, these commands may hang on 
+      waiting for the elasticsearch container to come up (`data-hub-leeloo_es_1`).
+      If the logs for that container mention something like 
+      `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
+      you will need to run the following on your running host machine:
 
-    ```shell
-    sudo sysctl -w vm.max_map_count=262144
-    ```
+      ```shell
+      sudo sysctl -w vm.max_map_count=262144
+      ```
 
-    and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so 
-    that this setting persists after restart):
+      and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so 
+      that this setting persists after restart):
 
-    ```shell
-    vm.max_map_count=262144
-    ```
+      ```shell
+      vm.max_map_count=262144
+      ```
 
 4. Optionally, you can load some test data and update elasticsearch:
 
