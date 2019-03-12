@@ -46,9 +46,9 @@ class TestAddInteraction(APITestMixin):
             'company': {
                 'id': company.pk,
             },
-            'contact': {
+            'contacts': [{
                 'id': contact.pk,
-            },
+            }],
             'date': '2017-04-18',
             'dit_adviser': {
                 'id': adviser.pk,
@@ -69,48 +69,6 @@ class TestAddInteraction(APITestMixin):
         assert response.json() == {
             'kind': [f'"{kind}" is not a valid choice.'],
         }
-
-    def test_contact_copied_to_contacts(self):
-        """
-        Test that the value provided in the contact field is copied to contacts when an
-        interaction is created.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        company = CompanyFactory()
-        contact = ContactFactory(company=company)
-        communication_channel = random_obj_for_model(CommunicationChannel)
-
-        url = reverse('api-v3:interaction:collection')
-        request_data = {
-            'kind': Interaction.KINDS.interaction,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': {
-                'id': self.user.pk,
-            },
-            'company': {
-                'id': company.pk,
-            },
-            'contact': {
-                'id': contact.pk,
-            },
-            'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
-            },
-            'dit_team': {
-                'id': self.user.dit_team.pk,
-            },
-            'was_policy_feedback_provided': False,
-        }
-
-        api_client = self.create_api_client()
-        response = api_client.post(url, request_data)
-        assert response.status_code == status.HTTP_201_CREATED
-        interaction = Interaction.objects.get(pk=response.json()['id'])
-        assert interaction.contact == contact
-        assert list(interaction.contacts.all()) == [contact]
 
     def test_contacts_copied_to_contact(self):
         """
@@ -153,50 +111,6 @@ class TestAddInteraction(APITestMixin):
         interaction = Interaction.objects.get(pk=response.json()['id'])
         assert interaction.contact == contacts[0]
         assert set(interaction.contacts.all()) == set(contacts)
-
-    def test_providing_contact_and_contacts_returns_an_error(self):
-        """
-        Test that if both contact and contacts are provided, an error is returned.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        company = CompanyFactory()
-        contact = ContactFactory()
-        communication_channel = random_obj_for_model(CommunicationChannel)
-
-        url = reverse('api-v3:interaction:collection')
-        request_data = {
-            'kind': Interaction.KINDS.interaction,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': {
-                'id': self.user.pk,
-            },
-            'company': {
-                'id': company.pk,
-            },
-            'contact': {
-                'id': contact.pk,
-            },
-            'contacts': [{
-                'id': contact.pk,
-            }],
-            'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
-            },
-            'dit_team': {
-                'id': self.user.dit_team.pk,
-            },
-            'was_policy_feedback_provided': False,
-        }
-
-        api_client = self.create_api_client()
-        response = api_client.post(url, request_data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'non_field_errors': ['Only one of contact and contacts should be provided.'],
-        }
 
     def test_error_returned_if_contacts_dont_belong_to_company(self):
         """
@@ -289,29 +203,6 @@ class TestUpdateInteraction(APITestMixin):
             'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.',
         ]
 
-    def test_contact_copied_to_contacts(self):
-        """
-        Test that the value provided in the contact field is copied to contacts when an
-        interaction is updated.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        interaction = CompanyInteractionFactory(contacts=[])
-        new_contact = ContactFactory(company=interaction.company)
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        data = {
-            'contact': {
-                'id': new_contact.pk,
-            },
-        }
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_200_OK
-        interaction.refresh_from_db()
-        assert interaction.contact == new_contact
-        assert list(interaction.contacts.all()) == [new_contact]
-
     def test_contacts_copied_to_contact(self):
         """
         Test that the value provided in the contact field is copied to contacts when an
@@ -334,31 +225,6 @@ class TestUpdateInteraction(APITestMixin):
         interaction.refresh_from_db()
         assert interaction.contact == new_contacts[0]
         assert set(interaction.contacts.all()) == set(new_contacts)
-
-    def test_providing_contact_and_contacts_returns_an_error(self):
-        """
-        Test that if both contact and contacts are provided, an error is returned.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        interaction = CompanyInteractionFactory(contacts=[])
-        new_contact = ContactFactory(company=interaction.company)
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        data = {
-            'contact': {
-                'id': new_contact.pk,
-            },
-            'contacts': [{
-                'id': new_contact.pk,
-            }],
-        }
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'non_field_errors': ['Only one of contact and contacts should be provided.'],
-        }
 
     @pytest.mark.parametrize(
         'request_data',

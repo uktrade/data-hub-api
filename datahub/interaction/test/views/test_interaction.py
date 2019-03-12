@@ -155,13 +155,6 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'contact': {
-                'id': str(contact.pk),
-                'name': contact.name,
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'job_title': contact.job_title,
-            },
             'contacts': [{
                 'id': str(contact.pk),
                 'name': contact.name,
@@ -205,6 +198,7 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                 },
                 {
+                    'contacts': ['This field is required.'],
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
@@ -212,24 +206,6 @@ class TestAddInteraction(APITestMixin):
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
-                },
-            ),
-
-            # contacts required if other fields have been specified
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
-                    'was_policy_feedback_provided': False,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                },
-                {
-                    'contacts': ['This field is required.'],
                 },
             ),
 
@@ -549,13 +525,6 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
-            'contact': {
-                'id': str(interaction.contact.pk),
-                'name': interaction.contact.name,
-                'first_name': interaction.contact.first_name,
-                'last_name': interaction.contact.last_name,
-                'job_title': interaction.contact.job_title,
-            },
             'contacts': [{
                 'id': str(interaction.contact.pk),
                 'name': interaction.contact.name,
@@ -637,13 +606,6 @@ class TestGetInteraction(APITestMixin):
             'company': {
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
-            },
-            'contact': {
-                'id': str(interaction.contact.pk),
-                'name': interaction.contact.name,
-                'first_name': interaction.contact.first_name,
-                'last_name': interaction.contact.last_name,
-                'job_title': interaction.contact.job_title,
             },
             'contacts': [{
                 'id': str(interaction.contact.pk),

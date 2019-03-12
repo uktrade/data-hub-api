@@ -2,7 +2,6 @@ from operator import not_
 
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
-from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
@@ -28,32 +27,6 @@ from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 
 
-class _ManyRelatedAsSingleItemField(NestedRelatedField):
-    """
-    Serialiser field that makes a to-many field behave like a to-one field.
-
-    Use for temporary backwards compatibility when migrating a to-one field to be a to-many field
-    (so that a to-one field can be emulated using a to-many field).
-
-    This isn't intended to be used in any other way as if the to-many field contains multiple
-    items, only one of them will be returned, and all of them will overwritten on updates.
-
-    TODO Remove this once contact has been removed from interactions.
-    """
-
-    def run_validation(self, data=serializers.empty):
-        """Validate a user-provided value and return the internal value (converted to a list)."""
-        validated_value = super().run_validation(data)
-        return [validated_value] if validated_value else []
-
-    def to_representation(self, value):
-        """Converts a query set to a dict representation of the first item in the query set."""
-        if not value.exists():
-            return None
-
-        return super().to_representation(value.first())
-
-
 class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
@@ -76,38 +49,22 @@ class InteractionSerializer(serializers.ModelSerializer):
         'invalid_when_no_policy_feedback': ugettext_lazy(
             'This field is only valid when policy feedback has been provided.',
         ),
-        'one_contact_field': ugettext_lazy(
-            'Only one of contact and contacts should be provided.',
-        ),
         'too_many_contacts_for_event_service_delivery': ugettext_lazy(
             'Only one contact can be provided for event service deliveries.',
         ),
     }
 
     company = NestedRelatedField(Company)
-    # TODO Remove contact following deprecation period
-    contact = _ManyRelatedAsSingleItemField(
-        Contact,
-        extra_fields=(
-            'name',
-            'first_name',
-            'last_name',
-            'job_title',
-        ),
-        source='contacts',
-        required=False,
-    )
-    # TODO Make required once contact has been removed
     contacts = NestedRelatedField(
         Contact,
         many=True,
+        allow_empty=False,
         extra_fields=(
             'name',
             'first_name',
             'last_name',
             'job_title',
         ),
-        required=False,
     )
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
@@ -130,24 +87,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
-
-    def to_internal_value(self, data):
-        """
-        Checks that contact and contacts haven't both been provided.
-
-        Note: On serialisers, to_internal_value() is called before validate().
-
-        TODO Remove once contact removed from the API.
-        """
-        if 'contact' in data and 'contacts' in data:
-            error = {
-                api_settings.NON_FIELD_ERRORS_KEY: [
-                    self.error_messages['one_contact_field'],
-                ],
-            }
-            raise serializers.ValidationError(error, code='one_contact_field')
-
-        return super().to_internal_value(data)
 
     def validate(self, data):
         """
@@ -182,8 +121,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'company',
-            # TODO Remove contact following deprecation period
-            'contact',
             'contacts',
             'created_on',
             'created_by',
@@ -216,14 +153,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             HasAssociatedInvestmentProjectValidator(),
             ContactsBelongToCompanyValidator(),
             RulesBasedValidator(
-                # Because contacts could come from either contact or contacts, this has to be at
-                # the object level
-                # TODO Remove once contact has been removed and required=False removed from
-                #  contacts
-                ValidationRule(
-                    'required',
-                    OperatorRule('contacts', bool),
-                ),
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),
