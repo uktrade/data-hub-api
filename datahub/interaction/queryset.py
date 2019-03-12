@@ -1,7 +1,7 @@
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Prefetch, Subquery
 
 from datahub.core.model_helpers import get_m2m_model
-from datahub.interaction.models import Interaction
+from datahub.interaction.models import Interaction, InteractionDITParticipant
 
 
 def get_interaction_queryset():
@@ -36,4 +36,8 @@ def get_interaction_queryset():
         'contacts',
         'policy_areas',
         'policy_issue_types',
+        Prefetch(
+            'dit_participants',
+            queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
+        ),
     )
