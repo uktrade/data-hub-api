@@ -44,6 +44,21 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         """
         return [self.contact] if self.contact else []
 
+    @to_many_field
+    def dit_participants(self):
+        """
+        Instances of InteractionDITParticipant.
+
+        Defaults to one InteractionDITParticipant based on dit_adviser and dit_team.
+        """
+        return [
+            InteractionDITParticipantFactory(
+                interaction=self,
+                adviser=self.dit_adviser,
+                team=self.dit_team,
+            ),
+        ]
+
     class Meta:
         model = 'interaction.Interaction'
 
@@ -122,3 +137,18 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     event = factory.SubFactory(EventFactory)
+
+
+class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
+    """Factory for a DIT participant in an interaction."""
+
+    interaction = factory.SubFactory(
+        CompanyInteractionFactory,
+        dit_adviser=factory.SelfAttribute('..adviser'),
+        dit_team=factory.SelfAttribute('..team'),
+    )
+    adviser = factory.SubFactory(AdviserFactory)
+    team = factory.SelfAttribute('adviser.dit_team')
+
+    class Meta:
+        model = 'interaction.InteractionDITParticipant'
