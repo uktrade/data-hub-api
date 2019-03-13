@@ -2,6 +2,7 @@ from datetime import date, datetime
 from functools import reduce
 from operator import attrgetter
 from random import sample
+from uuid import UUID
 
 import factory
 import pytest
@@ -151,6 +152,54 @@ class TestAddInteraction(APITestMixin):
             'non_field_errors': ['The interaction contacts must belong to the specified company.'],
         }
 
+    def test_adviser_and_team_copied_to_participants(self):
+        """
+        Test that a DIT participant is created using the values provided in the dit_adviser and
+        dit_team fields.
+
+        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
+         dit_team fields.
+        """
+        contact = ContactFactory()
+        communication_channel = random_obj_for_model(CommunicationChannel)
+        dit_adviser = AdviserFactory()
+        dit_team = TeamFactory()
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.KINDS.interaction,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': {
+                'id': dit_adviser.pk,
+            },
+            'company': {
+                'id': contact.company.pk,
+            },
+            'contacts': [{
+                'id': contact.pk,
+            }],
+            'service': {
+                'id': random_obj_for_model(ServiceModel).pk,
+            },
+            'dit_team': {
+                'id': dit_team.pk,
+            },
+            'was_policy_feedback_provided': False,
+        }
+
+        api_client = self.create_api_client()
+        response = api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_201_CREATED
+
+        interaction = Interaction.objects.get(pk=response.json()['id'])
+        assert interaction.dit_participants.count() == 1
+
+        dit_participant = interaction.dit_participants.first()
+        assert dit_participant.adviser == dit_adviser
+        assert dit_participant.team == dit_team
+
 
 class TestGetInteraction(APITestMixin):
     """Base tests for the get interaction view."""
@@ -278,6 +327,81 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['notes'] == data['notes']
+
+    def test_creates_participant_when_updating_adviser_or_team(self):
+        """
+        Test that the values provided in the dit_adviser and dit_team fields are copied to
+         a DIT participant when an interaction without an existing DIT participant is updated.
+
+        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
+         dit_team fields.
+        """
+        interaction = CompanyInteractionFactory(dit_participants=[])
+        new_dit_adviser = AdviserFactory()
+        new_dit_team = TeamFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        data = {
+            'dit_adviser': {
+                'id': new_dit_adviser.pk,
+            },
+            'dit_team': {
+                'id': new_dit_team.pk,
+            },
+        }
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        interaction.refresh_from_db()
+        assert interaction.dit_participants.count() == 1
+
+        dit_participant = interaction.dit_participants.first()
+        assert dit_participant.adviser == new_dit_adviser
+        assert dit_participant.team == new_dit_team
+
+    @pytest.mark.parametrize(
+        'request_data',
+        (
+            {
+                'dit_adviser': AdviserFactory,
+            },
+            {
+                'dit_team': TeamFactory,
+            },
+            {
+                'dit_adviser': AdviserFactory,
+                'dit_team': TeamFactory,
+            },
+        ),
+    )
+    def test_updates_participant_when_updating_adviser_or_team(self, request_data):
+        """
+        Test that an existing DIT participant is updated with the values provided in the
+        dit_adviser and dit_team fields.
+
+        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
+         dit_team fields.
+        """
+        interaction = CompanyInteractionFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        resolved_data = resolve_data(request_data)
+        response = self.api_client.patch(url, data=resolved_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        interaction.refresh_from_db()
+        assert interaction.dit_participants.count() == 1
+
+        dit_participant = interaction.dit_participants.first()
+
+        if 'dit_adviser' in resolved_data:
+            assert interaction.dit_adviser.pk == UUID(resolved_data['dit_adviser']['id'])
+
+        if 'dit_team' in resolved_data:
+            assert interaction.dit_team.pk == UUID(resolved_data['dit_team']['id'])
+
+        assert dit_participant.adviser == interaction.dit_adviser
+        assert dit_participant.team == interaction.dit_team
 
 
 class TestListInteractions(APITestMixin):

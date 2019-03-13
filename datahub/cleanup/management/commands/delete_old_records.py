@@ -93,6 +93,10 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),
             ),
+            # We want to delete the relations below along with any expired interactions
+            excluded_relations=(
+                Interaction._meta.get_field('dit_participants'),
+            ),
         ),
         # There are no investment projects in the live system with a modified-on date
         # before 2013-11-22, because of a bulk event in the legacy system (this was

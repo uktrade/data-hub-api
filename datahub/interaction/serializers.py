@@ -1,5 +1,6 @@
 from operator import not_
 
+from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
@@ -17,6 +18,7 @@ from datahub.event.models import Event
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
+    InteractionDITParticipant,
     PolicyArea,
     PolicyIssueType,
     ServiceDeliveryStatus,
@@ -106,6 +108,51 @@ class InteractionSerializer(serializers.ModelSerializer):
             data['contact'] = contacts[0] if contacts else None
 
         return data
+
+    @atomic
+    def create(self, validated_data):
+        """
+        Create an interaction.
+
+        Overridden so that dit_adviser and dit_team can be copied to dit_participants.
+
+        TODO: Remove once dit_adviser and dit_team have been fully replaced by dit_participants.
+        """
+        interaction = super().create(validated_data)
+
+        # These fields are required, so we can assume they are present
+        dit_adviser = validated_data['dit_adviser']
+        dit_team = validated_data['dit_team']
+
+        dit_participant = InteractionDITParticipant(
+            interaction=interaction,
+            adviser=dit_adviser,
+            team=dit_team,
+        )
+        dit_participant.save()
+
+        return interaction
+
+    @atomic
+    def update(self, instance, validated_data):
+        """
+        Create an interaction.
+
+        Overridden so that dit_adviser and dit_team can be copied to dit_participants.
+
+        TODO: Remove once dit_adviser and dit_team have been fully replaced by dit_participants.
+        """
+        interaction = super().update(instance, validated_data)
+
+        InteractionDITParticipant.objects.update_or_create(
+            interaction=interaction,
+            defaults={
+                'adviser': interaction.dit_adviser,
+                'team': interaction.dit_team,
+            },
+        )
+
+        return interaction
 
     class Meta:
         model = Interaction
