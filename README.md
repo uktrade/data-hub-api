@@ -37,10 +37,11 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
     * **NOTE:** 
       If you are using a linux system, these commands may hang on 
-      waiting for the elasticsearch container to come up (`data-hub-leeloo_es_1`).
+      waiting for the elasticsearch container to come up (`data-hub-leeloo_es_1`) - 
+      it might be perpetually restarting.
       If the logs for that container mention something like 
       `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
-      you will need to run the following on your running host machine:
+      you will need to run the following on your host machine:
 
       ```shell
       sudo sysctl -w vm.max_map_count=262144
