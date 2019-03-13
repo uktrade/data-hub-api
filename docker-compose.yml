@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/app
     entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
-    env_file: docker-compose.env
+    env_file: .env
     depends_on:
       - postgres
       - mi-postgres
@@ -24,7 +24,7 @@ services:
     volumes:
       - .:/app
     entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 60s
-    env_file: docker-compose.env
+    env_file: .env
     command: celery worker -A config -l info -Q celery -B
 
   postgres:

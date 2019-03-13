@@ -20,13 +20,19 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     cd data-hub-leeloo
     ```
 
-2.  Build and run the necessary containers for the required environment:
+2.  Create a `.env` file from `sample.env`
+
+    ```shell
+    cp sample.env .env
+    ```
+
+3.  Build and run the necessary containers for the required environment:
 
     ```shell
     docker-compose build
     ```
 
-3.  Populate the database and initialise Elasticsearch:
+4.  Populate the database and initialise Elasticsearch:
 
     ```shell
     docker-compose run leeloo ./manage.py migrate
@@ -56,21 +62,20 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
       For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
 
-4. Optionally, you can load some test data and update elasticsearch:
+5. Optionally, you can load some test data and update elasticsearch:
 
     ```shell
     docker-compose run leeloo ./manage.py loaddata /app/fixtures/test_data.yaml
-
     docker-compose run leeloo ./manage.py sync_es
     ```
 
-5.  Create a superuser:
+6.  Create a superuser:
 
     ```shell
     docker-compose run leeloo ./manage.py createsuperuser
     ```
 
-6.  Run the services:
+7.  Run the services:
 
     ```shell
     docker-compose up
