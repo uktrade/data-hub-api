@@ -1,5 +1,7 @@
+import uuid
 from datetime import datetime
 
+import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -26,6 +28,30 @@ from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import InvestorProfileFactory
+
+
+INVALID_CHOICE_ERROR_MESSAGE = (
+    'Select a valid choice. That choice is not one of the available choices.'
+)
+
+
+@pytest.fixture
+def get_large_capital_profile_for_search():
+    """Sets up search list test by adding many profiles and returning a large capital profile."""
+    InvestorProfileFactory.create_batch(
+        5,
+        profile_type_id=ProfileTypeConstant.large.value.id,
+    )
+    investor_company = CompanyFactory()
+    large_capital_profile = InvestorProfileFactory(
+        investor_company=investor_company,
+        profile_type_id=ProfileTypeConstant.large.value.id,
+    )
+    InvestorProfileFactory(
+        investor_company=investor_company,
+        profile_type_id=ProfileTypeConstant.growth.value.id,
+    )
+    yield large_capital_profile
 
 
 class TestCreateLargeCapitalProfileView(APITestMixin):
@@ -118,6 +144,70 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
             'investor_company':
                 ['Investor company already has large capital investor profile'],
         }
+
+
+class TestLargeCapitalProfileListView(APITestMixin):
+    """Test large capital list view profile."""
+
+    def test_large_capital_profile_list_view_returns_no_results_for_valid_company(self):
+        """Test creating a large capital profile without an investor company."""
+        investor_company = CompanyFactory()
+        url = reverse('api-v4:large-investor-profile:collection')
+        response = self.api_client.get(
+            url,
+            data={'investor_company_id': investor_company.pk},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    @pytest.mark.parametrize(
+        'search_parameter,expected_response',
+        (
+            (
+                uuid.uuid4(),
+                {'investor_company_id': [INVALID_CHOICE_ERROR_MESSAGE]},
+            ),
+            (
+                'hello',
+                {'investor_company_id': ["'hello' is not a valid UUID."]},
+            ),
+            (
+                1,
+                {'investor_company_id': ["'1' is not a valid UUID."]},
+            ),
+        ),
+    )
+    def test_large_capital_profile_list_view_invalid_search(
+        self, search_parameter, expected_response,
+    ):
+        """Test creating a large capital profile without an investor company."""
+        url = reverse('api-v4:large-investor-profile:collection')
+        response = self.api_client.get(
+            url,
+            data={'investor_company_id': search_parameter},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == expected_response
+
+    def test_large_capital_profile_list_view_search_by_investor_company(
+        self, get_large_capital_profile_for_search,
+    ):
+        """Test searching large capital profile by investor company pk."""
+        large_capital_profile = get_large_capital_profile_for_search
+        url = reverse('api-v4:large-investor-profile:collection')
+        response = self.api_client.get(
+            url,
+            data={'investor_company_id': large_capital_profile.investor_company.pk},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['investor_company']['id'] == str(
+            large_capital_profile.investor_company.pk,
+        )
+        assert response_data['results'][0]['id'] == str(large_capital_profile.pk)
 
 
 class TestUpdateLargeCapitalProfileView(APITestMixin):

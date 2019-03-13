@@ -1,4 +1,5 @@
 ``GET /v4/large-investor-profile`` returns a list of all the large capital profiles.
+The results can be filtered using a parameter of ``investor_company_id`` given a company id.
 
 ``POST /v4/large-investor-profile`` creates a large capital profile for a given ``investor_company``.
 
