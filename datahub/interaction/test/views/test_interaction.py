@@ -6,6 +6,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Service, Team
@@ -216,9 +217,7 @@ class TestAddInteraction(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
-                    'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
-                    'dit_team': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
@@ -344,18 +343,58 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     # fields where None is not allowed
+                    'dit_adviser': None,
+                    'dit_team': None,
                     'was_policy_feedback_provided': None,
                     'policy_feedback_notes': None,
                 },
                 {
+                    'dit_adviser': ['This field may not be null.'],
+                    'dit_team': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
+                },
+            ),
+
+            # dit_participants cannot be None
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+
+                    'dit_participants': None,
+                },
+                {
+                    'dit_participants': ['This field may not be null.'],
+                },
+            ),
+
+            # dit_participants cannot be empty list
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+
+                    'dit_participants': [],
+                },
+                {
+                    'dit_participants': {
+                        api_settings.NON_FIELD_ERRORS_KEY: ['This list may not be empty.'],
+                    },
                 },
             ),
         ),
