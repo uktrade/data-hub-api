@@ -54,6 +54,8 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
       vm.max_map_count=262144
       ```
 
+      For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
+
 4. Optionally, you can load some test data and update elasticsearch:
 
     ```shell
