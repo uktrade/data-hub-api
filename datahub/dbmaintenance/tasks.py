@@ -106,17 +106,20 @@ def copy_foreign_key_to_m2m_field(
             batch_size=batch_size,
         )
 
-        # If there are definitely no more rows needing processing, return
-        if num_processed < batch_size:
-            return
+    # If there are definitely no more rows needing processing, return
+    if num_processed < batch_size:
+        return
 
-        # Schedule another task to update another batch of rows.
-        # This must be outside of the atomic block, otherwise it will probably run before the
-        # current changes have been committed.
-        copy_foreign_key_to_m2m_field.apply_async(
-            args=(model_label, source_fk_field_name, target_m2m_field_name),
-            kwargs={'batch_size': batch_size},
-        )
+    # Schedule another task to update another batch of rows.
+    #
+    # This must be outside of the atomic block, otherwise it will probably run before the
+    # current changes have been committed.
+    #
+    # (Similarly, the lock should also be released before the next task is scheduled.)
+    copy_foreign_key_to_m2m_field.apply_async(
+        args=(model_label, source_fk_field_name, target_m2m_field_name),
+        kwargs={'batch_size': batch_size},
+    )
 
 
 @shared_task(acks_late=True)
