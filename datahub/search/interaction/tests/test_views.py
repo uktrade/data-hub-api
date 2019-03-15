@@ -298,12 +298,6 @@ class TestInteractionEntitySearchView(APITestMixin):
                     'id': str(ancestor.pk),
                 } for ancestor in interaction.company.sector.get_ancestors()],
             },
-            'contact': {
-                'id': str(interaction.contact.pk),
-                'first_name': interaction.contact.first_name,
-                'name': interaction.contact.name,
-                'last_name': interaction.contact.last_name,
-            },
             'contacts': [
                 {
                     'id': str(contact.pk),

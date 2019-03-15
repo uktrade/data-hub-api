@@ -24,6 +24,7 @@ class MetadataRegistry:
             model=<model>,
             queryset=<queryset>,
             serializer=<serializer>
+            path_prefix=<string>
         )
 
     Where:
@@ -31,6 +32,7 @@ class MetadataRegistry:
         - model: metadata model
         - queryset (optional): if you want to override the default one
         - serializer (optional): if you want to override the default one
+        - path_prefix (optional): if you want to prefix the url path
 
     The data registered is currently used by metadata.views to generate views automatically.
     """
@@ -47,8 +49,12 @@ class MetadataRegistry:
         serializer=ConstantModelSerializer,
         filterset_fields=None,
         filterset_class=None,
+        path_prefix=None,
     ):
         """Registers a new metadata."""
+        if path_prefix:
+            metadata_id = f'{path_prefix}/{metadata_id}'
+
         if metadata_id in self.metadata:
             raise ImproperlyConfigured(f'Metadata {metadata_id} already registered.')
 

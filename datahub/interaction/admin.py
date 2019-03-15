@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.transaction import atomic
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, custom_add_permission, custom_change_permission
@@ -6,6 +7,7 @@ from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
+    InteractionDITParticipant,
     InteractionPermission,
     PolicyArea,
     PolicyIssueType,
@@ -80,14 +82,26 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
 
     get_contact_names.short_description = 'contacts'
 
+    @atomic
     def save_model(self, request, obj, form, change):
         """
-        Saves the object, populating contacts from contact.
-
-        TODO: Remove once the migration from contact to contacts is complete.
+        Saves the object, while also:
+            - copying contacts to contact
+            - copying dit_adviser and dit_team to dit_participants
         """
+        # TODO: Remove once the migration from contact to contacts is complete.
         if 'contacts' in form.cleaned_data:
             contacts = form.cleaned_data['contacts']
             obj.contact = contacts[0] if contacts else None
 
         super().save_model(request, obj, form, change)
+
+        # TODO: Remove once the migration from dit_adviser and dit_team to dit_participants is
+        #  complete.
+        InteractionDITParticipant.objects.update_or_create(
+            interaction=obj,
+            defaults={
+                'adviser': obj.dit_adviser,
+                'team': obj.dit_team,
+            },
+        )

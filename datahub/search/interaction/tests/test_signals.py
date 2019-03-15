@@ -85,9 +85,10 @@ def test_updating_contact_name_updates_interaction(setup_es):
     interaction = CompanyInteractionFactory()
     new_first_name = 'Jamie'
     new_last_name = 'Bloggs'
-    interaction.contact.first_name = new_first_name
-    interaction.contact.last_name = new_last_name
-    interaction.contact.save()
+    contact = interaction.contacts.first()
+    contact.first_name = new_first_name
+    contact.last_name = new_last_name
+    contact.save()
     setup_es.indices.refresh()
 
     result = setup_es.get(
@@ -95,7 +96,7 @@ def test_updating_contact_name_updates_interaction(setup_es):
         doc_type=InteractionSearchApp.name,
         id=interaction.pk,
     )
-    assert result['_source']['contact'] == {
+    assert result['_source']['contacts'][0] == {
         'id': str(interaction.contact.id),
         'first_name': new_first_name,
         'last_name': new_last_name,

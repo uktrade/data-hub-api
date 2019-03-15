@@ -31,7 +31,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
-    dit_team_id = constants.Team.healthcare_uk.value.id
+    dit_team = factory.SelfAttribute('dit_adviser.dit_team')
     archived_documents_url_path = factory.Faker('uri_path')
     was_policy_feedback_provided = False
 
@@ -43,6 +43,21 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         Defaults to the contact from the contact field.
         """
         return [self.contact] if self.contact else []
+
+    @to_many_field
+    def dit_participants(self):
+        """
+        Instances of InteractionDITParticipant.
+
+        Defaults to one InteractionDITParticipant based on dit_adviser and dit_team.
+        """
+        return [
+            InteractionDITParticipantFactory(
+                interaction=self,
+                adviser=self.dit_adviser,
+                team=self.dit_team,
+            ),
+        ]
 
     class Meta:
         model = 'interaction.Interaction'
@@ -122,3 +137,18 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     event = factory.SubFactory(EventFactory)
+
+
+class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
+    """Factory for a DIT participant in an interaction."""
+
+    interaction = factory.SubFactory(
+        CompanyInteractionFactory,
+        dit_adviser=factory.SelfAttribute('..adviser'),
+        dit_team=factory.SelfAttribute('..team'),
+    )
+    adviser = factory.SubFactory(AdviserFactory)
+    team = factory.SelfAttribute('adviser.dit_team')
+
+    class Meta:
+        model = 'interaction.InteractionDITParticipant'
