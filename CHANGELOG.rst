@@ -1,3 +1,205 @@
+Data Hub API 11.0.0 (2019-03-15)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET,POST /v3/interaction``, ``GET,PATCH /v3/interaction/<id>``: The deprecated ``contact`` field was removed. Please use ``contacts`` instead.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: The deprecated ``contact`` field in interaction search results was removed. Please use ``contacts`` instead.
+
+Features
+--------
+
+- **Investment** A new endpoint has been added for creating and maintaining Large capital investor profiles on datahub.
+
+Internal changes
+----------------
+
+- **Interactions** A Celery task was added to create ``InteractionDITParticipant`` objects from the ``dit_adviser`` and ``dit_team`` values for interactions that do not already have a ``InteractionDITParticipant`` object. The task must be run manually.
+
+API
+---
+
+- **Investment** ``GET /v4/large-investor-profile`` returns a list of all the large capital profiles.
+  The results can be filtered using a parameter of ``investor_company_id`` given a company id.
+
+  ``POST /v4/large-investor-profile`` creates a large capital profile for a given ``investor_company``.
+
+  ``GET /v4/large-investor-profile/<uuid:pk>`` returns the large capital profile for the given id.
+
+  ``PATCH /v4/large-investor-profile/<uuid:pk>`` updates the large capital profile for the given id.
+
+  A large capital profile consists of the following fields:
+      ``id`` the uuid of the of the investor profile (readonly),
+
+
+      ``investor_company`` a company (uuid and name),
+
+
+      ``investor_type`` the capital investment investor type (uuid and name),
+
+
+      ``investable_capital`` the capital that could be invested in USD (int),
+
+
+      ``global_assets_under_management`` Global assets under management amount in USD (int),
+
+
+      ``investor_description`` a text description of the investor,
+
+
+      ``required_checks_conducted`` a required background checks conducted status (uuid and name),
+
+
+      ``deal_ticket_sizes`` a list of deal ticket sizes (uuid and name),
+
+
+      ``investment_types`` a list of large capital investment types (uuid and name),
+
+
+      ``minimum_return_rate`` a return rate (uuid and name),
+
+
+      ``time_horizons`` a list of time horizons (uuid and name),
+
+
+      ``construction_risks`` a list of construction risks (uuid and name),
+
+
+      ``minimum_equity_percentage`` an equity percentage (uuid and name),
+
+
+      ``desired_deal_roles`` a list of desired deal roles (uuid and name),
+
+
+      ``restrictions`` a list of restrictions (uuid and name),
+
+
+      ``asset_classes_of_interest`` a list of asset class interests (uuid and name),
+
+
+      ``uk_region_locations`` a list of uk regions (uuid and name),
+
+
+      ``notes_on_locations`` a text field,
+
+
+      ``other_countries_being_considered`` a list of countries (uuid and name),
+
+
+      ``created_on`` the time and date the profile was created,
+
+
+      ``modified_on`` the time and date the profile was last modified,
+
+
+      ``incomplete_details_fields`` a list of the detail fields that are yet to have a value set.
+
+
+      ``incomplete_requirements_fields`` a list of the requirements fields that are yet to have a value set.
+
+
+      ``incomplete_location_fields`` a list of the location fields that are yet to have a value set.
+
+
+  The detail fields:
+      ``investor_type``
+
+
+      ``investable_capital``,
+
+
+      ``global_assets_under_management``,
+
+
+      ``investor_description``,
+
+
+      ``background_checks_conducted``
+
+
+  The requirement fields:
+      ``deal_ticket_sizes``,
+
+
+      ``investment_types``,
+
+
+      ``minimum_return_rate``,
+
+
+      ``time_horizons``,
+
+
+      ``construction_risks``,
+
+
+      ``minimum_equity_percentage``,
+
+
+      ``desired_deal_roles``,
+
+
+      ``restrictions``,
+
+
+      ``asset_classes_of_interest``
+
+
+  The location fields:
+      ``uk_region_locations``,
+
+
+      ``notes_on_locations``,
+
+
+      ``other_countries_being_considered``
+- **Investment** The following metadata endpoints have been added
+
+  ``GET /metadata/capital-investment/asset-class-interest/`` returns all possible ``asset_class_interest`` values.
+  The values also include a field ``asset-class-interest-sector`` which returns the ``id`` and
+  ``name`` of the the associated ``asset_class_interest_sector``.
+
+  ``GET /metadata/capital-investment/required-checks-conducted/`` returns all possible ``investor_profile_requiredchecksconducted`` values.
+
+  ``GET /metadata/capital-investment/construction-risk/`` returns all possible ``investor_profile_constructionrisk`` values.
+
+  ``GET /metadata/capital-investment/deal-ticket-size/`` returns all possible ``investor_profile_dealticketsize`` values.
+
+  ``GET /metadata/capital-investment/desired-deal-role/`` returns all possible ``investor_profile_desireddealrole`` values.
+
+  ``GET /metadata/capital-investment/equity-percentage/`` returns all possible ``investor_profile_equitypercentage`` values.
+
+  ``GET /metadata/capital-investment/investor-type/`` returns all possible ``investor_profile_investortype`` values.
+
+  ``GET /metadata/capital-investment/large-capital-investment-type/`` returns all possible ``investor_profile_largecapitalinvestmenttype`` values.
+
+  ``GET /metadata/capital-investment/restriction/`` returns all possible ``investor_profile_restriction`` values.
+
+  ``GET /metadata/capital-investment/return-rate/`` returns all possible ``investor_profile_returnrate`` values.
+
+  ``GET /metadata/capital-investment/time-horizon/`` returns all possible ``investor_profile_time_horizon`` values.
+
+Database schema
+---------------
+
+- **Interactions** The table ``interaction_interactionditparticipant`` table was added with the following columns:
+
+  - ``"id" bigserial NOT NULL PRIMARY KEY``
+
+  - ``"adviser_id" uuid NULL``
+
+  - ``"interaction_id" uuid NOT NULL``
+
+  - ``"team_id" uuid NULL``
+
+  This is a many-to-many relationship table linking interactions with advisers.
+
+  The table had not been fully populated with data yet; continue to use ``interaction_interaction.dit_adviser_id`` and ``interaction_interaction.dit_team_id`` for the time being.
+
+
 Data Hub API 10.5.0 (2019-03-11)
 ================================
 
