@@ -538,8 +538,8 @@ class TestGetInteraction(APITestMixin):
                 'name': Service.trade_enquiry.value.name,
             },
             'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
@@ -620,8 +620,8 @@ class TestGetInteraction(APITestMixin):
                 'name': Service.trade_enquiry.value.name,
             },
             'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
