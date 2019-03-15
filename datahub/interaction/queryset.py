@@ -25,10 +25,12 @@ def get_interaction_queryset():
         ),
     ).select_related(
         'company',
+        'created_by',
         'dit_adviser',
         'dit_team',
         'communication_channel',
         'investment_project',
+        'modified_by',
         'service',
         'service_delivery_status',
         'event',
