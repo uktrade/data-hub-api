@@ -72,6 +72,10 @@ class ConstructionRisk(Enum):
         'Brownfield (some construction risk)',
         '884deaf6-cb0c-4036-b78c-efd92cb10098',
     )
+    operational = Constant(
+        'Operational (no construction risk)',
+        '9f554b26-70f2-4cac-89ae-758c2ef71c70',
+    )
 
 
 class DesiredDealRole(Enum):

@@ -111,6 +111,7 @@ def company_field():
             'name': Text(
                 fields={
                     'trigram': TrigramText(),
+                    'keyword': NormalizedKeyword(),
                 },
             ),
             'trading_names': Text(
