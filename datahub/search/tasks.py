@@ -69,6 +69,7 @@ def sync_related_objects_task(
     related_model_label,
     related_obj_pk,
     related_obj_field_name,
+    related_obj_filter,
 ):
     """
     Syncs objects related to another object via a specified field.
@@ -89,6 +90,8 @@ def sync_related_objects_task(
     related_model = apps.get_model(related_model_label)
     related_obj = related_model.objects.get(pk=related_obj_pk)
     manager = getattr(related_obj, related_obj_field_name)
+    if related_obj_filter:
+        manager = manager.filter(**related_obj_filter)
     queryset = manager.values_list('pk', flat=True)
     search_app = get_search_app_by_model(manager.model)
 

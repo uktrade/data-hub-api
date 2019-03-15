@@ -5,7 +5,7 @@ from datahub.investment.investor_profile.constants import ProfileType as Profile
 
 
 class LargeInvestorProfileFactory(factory.django.DjangoModelFactory):
-    """Investor profile factory."""
+    """Large Capital Investor profile factory."""
 
     investor_company = factory.SubFactory(CompanyFactory)
     profile_type_id = ProfileTypeConstant.large.value.id
@@ -15,4 +15,6 @@ class LargeInvestorProfileFactory(factory.django.DjangoModelFactory):
 
 
 class GrowthInvestorProfileFactory(LargeInvestorProfileFactory):
+    """Growth Capital Investor profile factory."""
+
     profile_type_id = ProfileTypeConstant.growth.value.id

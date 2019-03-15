@@ -44,7 +44,7 @@ def sync_object_async(search_app, pk):
     )
 
 
-def sync_related_objects_async(related_obj, related_obj_field_name):
+def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_filter=None):
     """
     Syncs objects related to another object via a specified field.
 
@@ -61,6 +61,7 @@ def sync_related_objects_async(related_obj, related_obj_field_name):
             related_obj._meta.label,
             str(related_obj.pk),
             related_obj_field_name,
+            related_obj_filter,
         ),
     )
     logger.info(

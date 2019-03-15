@@ -78,6 +78,7 @@ def test_sync_related_objects_task_syncs(monkeypatch):
             SimpleModel._meta.label,
             str(simpleton.pk),
             'relatedmodel_set',
+            None,
         ),
     )
 
