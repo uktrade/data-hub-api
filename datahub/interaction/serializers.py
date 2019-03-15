@@ -29,6 +29,21 @@ from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 
 
+class InteractionDITParticipantSerializer(serializers.ModelSerializer):
+    """
+    Interaction DIT participant serialiser.
+
+    Used within InteractionSerializer.
+    """
+
+    adviser = NestedAdviserField()
+    team = NestedRelatedField(Team)
+
+    class Meta:
+        model = InteractionDITParticipant
+        fields = ('adviser', 'team')
+
+
 class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
@@ -68,8 +83,9 @@ class InteractionSerializer(serializers.ModelSerializer):
             'job_title',
         ),
     )
-    dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
+    dit_adviser = NestedAdviserField()
+    dit_participants = InteractionDITParticipantSerializer(many=True, read_only=True)
     dit_team = NestedRelatedField(Team)
     communication_channel = NestedRelatedField(
         CommunicationChannel, required=False, allow_null=True,
@@ -178,6 +194,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'modified_on',
             'date',
             'dit_adviser',
+            'dit_participants',
             'dit_team',
             'communication_channel',
             'grant_amount_offered',
