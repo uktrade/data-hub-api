@@ -150,6 +150,24 @@ class TestAddInteraction(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(adviser.pk),
+                        'first_name': adviser.first_name,
+                        'last_name': adviser.last_name,
+                        'name': adviser.name,
+                    },
+                    'team': {
+                        'id': str(Team.healthcare_uk.value.id),
+                        'name': Team.healthcare_uk.value.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
@@ -166,10 +184,6 @@ class TestAddInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
             },
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
@@ -520,6 +534,24 @@ class TestGetInteraction(APITestMixin):
                 'last_name': interaction.dit_adviser.last_name,
                 'name': interaction.dit_adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(interaction.dit_adviser.pk),
+                        'first_name': interaction.dit_adviser.first_name,
+                        'last_name': interaction.dit_adviser.last_name,
+                        'name': interaction.dit_adviser.name,
+                    },
+                    'team': {
+                        'id': str(interaction.dit_team.pk),
+                        'name': interaction.dit_team.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
+            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
@@ -536,10 +568,6 @@ class TestGetInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
@@ -602,6 +630,24 @@ class TestGetInteraction(APITestMixin):
                 'last_name': interaction.dit_adviser.last_name,
                 'name': interaction.dit_adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(interaction.dit_adviser.pk),
+                        'first_name': interaction.dit_adviser.first_name,
+                        'last_name': interaction.dit_adviser.last_name,
+                        'name': interaction.dit_adviser.name,
+                    },
+                    'team': {
+                        'id': str(interaction.dit_team.pk),
+                        'name': interaction.dit_team.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
+            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
@@ -618,10 +664,6 @@ class TestGetInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),

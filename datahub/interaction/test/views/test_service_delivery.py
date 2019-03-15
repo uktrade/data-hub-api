@@ -111,6 +111,24 @@ class TestAddServiceDelivery(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(adviser.pk),
+                        'first_name': adviser.first_name,
+                        'last_name': adviser.last_name,
+                        'name': adviser.name,
+                    },
+                    'team': {
+                        'id': str(Team.healthcare_uk.value.id),
+                        'name': Team.healthcare_uk.value.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
@@ -127,10 +145,6 @@ class TestAddServiceDelivery(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
             },
             'investment_project': None,
             'archived_documents_url_path': '',

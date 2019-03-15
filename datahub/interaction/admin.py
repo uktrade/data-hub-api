@@ -7,7 +7,6 @@ from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
-    InteractionDITParticipant,
     InteractionPermission,
     PolicyArea,
     PolicyIssueType,
@@ -52,6 +51,8 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'archived_documents_url_path',
         'created',
         'modified',
+        'dit_adviser',
+        'dit_team',
     )
     list_select_related = (
         'company',
@@ -95,13 +96,3 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
             obj.contact = contacts[0] if contacts else None
 
         super().save_model(request, obj, form, change)
-
-        # TODO: Remove once the migration from dit_adviser and dit_team to dit_participants is
-        #  complete.
-        InteractionDITParticipant.objects.update_or_create(
-            interaction=obj,
-            defaults={
-                'adviser': obj.dit_adviser,
-                'team': obj.dit_team,
-            },
-        )
