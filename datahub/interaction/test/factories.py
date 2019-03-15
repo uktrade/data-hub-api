@@ -31,7 +31,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
-    dit_team_id = constants.Team.healthcare_uk.value.id
+    dit_team = factory.SelfAttribute('dit_adviser.dit_team')
     archived_documents_url_path = factory.Faker('uri_path')
     was_policy_feedback_provided = False
 
