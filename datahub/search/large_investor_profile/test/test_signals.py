@@ -36,22 +36,35 @@ def test_updated_large_investor_profile_synced(setup_es):
     setup_es.indices.refresh()
 
 
-def test_deleted_large_investor_profile_deleted_from_es(setup_es):
+@pytest.mark.parametrize(
+    'investor_profile_factory,expected_in_index,expected_to_call_delete',
+    (
+        (LargeInvestorProfileFactory, True, True),
+        (GrowthInvestorProfileFactory, False, False),
+    ),
+)
+def test_delete_from_es(
+    investor_profile_factory, expected_in_index, expected_to_call_delete, setup_es
+):
     """
     Test that when an large investor profile is deleted from db it is also
-    deleted from ES.
+    calls delete document to delete from ES.
     """
-    large_investor_profile = LargeInvestorProfileFactory()
+    investor_profile = investor_profile_factory()
     setup_es.indices.refresh()
 
-    assert _get_es_document(setup_es, large_investor_profile.pk)
+    if expected_in_index:
+        assert _get_es_document(setup_es, investor_profile.pk)
+    else:
+        with pytest.raises(NotFoundError):
+            assert _get_es_document(setup_es, investor_profile.pk) is None
 
-    large_investor_profile_id = large_investor_profile.pk
-    large_investor_profile.delete()
-    setup_es.indices.refresh()
-
-    with pytest.raises(NotFoundError):
-        assert _get_es_document(setup_es, large_investor_profile_id) is None
+    with mock.patch(
+        'datahub.search.large_investor_profile.signals.delete_document'
+    ) as mock_delete_document:
+        investor_profile.delete()
+        setup_es.indices.refresh()
+        assert mock_delete_document.called == expected_in_index
 
 
 def test_edit_company_syncs_large_investor_profile_in_es(setup_es):
