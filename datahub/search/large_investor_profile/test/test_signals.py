@@ -44,7 +44,7 @@ def test_updated_large_investor_profile_synced(setup_es):
     ),
 )
 def test_delete_from_es(
-    investor_profile_factory, expected_in_index, expected_to_call_delete, setup_es
+    investor_profile_factory, expected_in_index, expected_to_call_delete, setup_es,
 ):
     """
     Test that when an large investor profile is deleted from db it is also
@@ -60,7 +60,7 @@ def test_delete_from_es(
             assert _get_es_document(setup_es, investor_profile.pk) is None
 
     with mock.patch(
-        'datahub.search.large_investor_profile.signals.delete_document'
+        'datahub.search.large_investor_profile.signals.delete_document',
     ) as mock_delete_document:
         investor_profile.delete()
         setup_es.indices.refresh()
