@@ -1,9 +1,10 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Double, Keyword, Object, Text
+from elasticsearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText
+from datahub.search.inner_docs import IDNameTrigram, Person
 from datahub.search.models import BaseESModel
 
 
@@ -25,6 +26,21 @@ def _contact_field():
     )
 
 
+def _dit_participant_list(dit_participant_manager):
+    return [
+        {
+            'adviser': dict_utils.contact_or_adviser_dict(dit_participant.adviser),
+            'team': dict_utils.id_name_dict(dit_participant.team),
+        }
+        for dit_participant in dit_participant_manager.all()
+    ]
+
+
+class _DITParticipant(InnerDoc):
+    adviser = Object(Person)
+    team = Object(IDNameTrigram)
+
+
 class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
@@ -35,7 +51,10 @@ class Interaction(BaseESModel):
     contacts = _contact_field()
     created_on = Date()
     date = Date()
+    # TODO: dit_adviser is deprecated. Remove after deprecation period.
     dit_adviser = fields.contact_or_adviser_field('dit_adviser')
+    dit_participants = Object(_DITParticipant)
+    # TODO: dit_team is deprecated. Remove after deprecation period.
     dit_team = fields.id_name_partial_field('dit_team')
     event = fields.id_name_partial_field('event')
     investment_project = fields.id_name_field()
@@ -61,6 +80,7 @@ class Interaction(BaseESModel):
         'communication_channel': dict_utils.id_name_dict,
         'contacts': dict_utils.contact_or_adviser_list_of_dicts,
         'dit_adviser': dict_utils.contact_or_adviser_dict,
+        'dit_participants': _dit_participant_list,
         'dit_team': dict_utils.id_name_dict,
         'event': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
