@@ -4,6 +4,7 @@ from csv import DictReader
 from datetime import datetime
 from io import StringIO
 from operator import attrgetter, itemgetter
+from random import choice
 from uuid import UUID
 
 import factory
@@ -36,6 +37,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
     EventServiceDeliveryFactory,
+    InteractionDITParticipantFactory,
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
@@ -579,6 +581,33 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         results = response_data['results']
         assert {result['dit_team']['id'] for result in results} == {str(dit_team_id)}
+
+    @pytest.mark.parametrize('dit_participant_field', ('adviser', 'team'))
+    def test_filter_by_dit_participant(self, setup_es, dit_participant_field):
+        """Test filtering interaction by DIT participant adviser and team IDs."""
+        interactions = CompanyInteractionFactory.create_batch(10, dit_participants=[])
+        for interaction in interactions:
+            InteractionDITParticipantFactory.create_batch(2, interaction=interaction)
+
+        setup_es.indices.refresh()
+
+        interaction = choice(interactions)
+        dit_participant = interaction.dit_participants.order_by('?').first()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            f'dit_participants__{dit_participant_field}':
+                getattr(dit_participant, dit_participant_field).id,
+        }
+        response = self.api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == str(interaction.pk)
 
     def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
