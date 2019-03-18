@@ -18,4 +18,18 @@ class LargeInvestorProfileSearchApp(SearchApp):
         profile_type_id=ProfileType.large.value.id,
     ).select_related(
         'investor_company',
+        'investor_type',
+        'required_checks_conducted',
+        'minimum_return_rate',
+        'minimum_equity_percentage',
+    ).prefetch_related(
+        'deal_ticket_sizes',
+        'asset_classes_of_interest',
+        'investment_types',
+        'time_horizons',
+        'restrictions',
+        'construction_risks',
+        'desired_deal_roles',
+        'uk_region_locations',
+        'other_countries_being_considered',
     )
