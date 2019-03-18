@@ -7,7 +7,10 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.interaction.models import InteractionPermission
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 
 
 class TestDashboard(APITestMixin):
@@ -21,7 +24,10 @@ class TestDashboard(APITestMixin):
 
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
-                interactions.append(CompanyInteractionFactory(dit_adviser=self.user))
+                interaction = CompanyInteractionFactory(dit_participants=[])
+                InteractionDITParticipantFactory(interaction=interaction)
+                InteractionDITParticipantFactory(interaction=interaction, adviser=self.user)
+                interactions.append(interaction)
                 contacts.append(ContactFactory(created_by=self.user))
 
         setup_es.indices.refresh()

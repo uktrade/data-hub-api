@@ -26,7 +26,12 @@ class IntelligentHomepageView(APIView):
         serializer.is_valid(raise_exception=True)
         limit = serializer.validated_data['limit']
 
-        interactions = _get_objects(request, limit, InteractionSearchApp, 'dit_adviser.id')
+        interactions = _get_objects(
+            request,
+            limit,
+            InteractionSearchApp,
+            'dit_participants.adviser.id',
+        )
         contacts = _get_objects(request, limit, ContactSearchApp, 'created_by.id')
 
         response = {
