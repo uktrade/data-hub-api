@@ -13,7 +13,6 @@ from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.investment.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
     ConstructionRisk as ConstructionRiskConstant,
@@ -27,7 +26,10 @@ from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
 )
-from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import (
+    GrowthInvestorProfileFactory,
+    LargeInvestorProfileFactory,
+)
 
 
 INVALID_CHOICE_ERROR_MESSAGE = (
@@ -38,18 +40,13 @@ INVALID_CHOICE_ERROR_MESSAGE = (
 @pytest.fixture
 def get_large_capital_profile_for_search():
     """Sets up search list test by adding many profiles and returning a large capital profile."""
-    LargeInvestorProfileFactory.create_batch(
-        5,
-        profile_type_id=ProfileTypeConstant.large.value.id,
-    )
+    LargeInvestorProfileFactory.create_batch(5)
     investor_company = CompanyFactory()
     large_capital_profile = LargeInvestorProfileFactory(
         investor_company=investor_company,
-        profile_type_id=ProfileTypeConstant.large.value.id,
     )
-    LargeInvestorProfileFactory(
+    GrowthInvestorProfileFactory(
         investor_company=investor_company,
-        profile_type_id=ProfileTypeConstant.growth.value.id,
     )
     yield large_capital_profile
 
@@ -129,7 +126,6 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         investor_company = CompanyFactory()
         LargeInvestorProfileFactory(
             investor_company=investor_company,
-            profile_type_id=ProfileTypeConstant.large.value.id,
         )
 
         request_data = {
@@ -219,7 +215,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         investor_company = CompanyFactory()
         investor_profile = LargeInvestorProfileFactory(
             investor_company=investor_company,
-            profile_type_id=ProfileTypeConstant.large.value.id,
             investor_description='Description 1',
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -246,7 +241,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         new_investor_company = CompanyFactory()
         investor_profile = LargeInvestorProfileFactory(
             investor_company=investor_company,
-            profile_type_id=ProfileTypeConstant.large.value.id,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
@@ -267,7 +261,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         investor_company = CompanyFactory()
         investor_profile = LargeInvestorProfileFactory(
             investor_company=investor_company,
-            profile_type_id=ProfileTypeConstant.large.value.id,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
 
@@ -302,9 +295,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             LargeCapitalInvestmentTypesConstant.direct_investment_in_project_equity.value.id
         )
 
-        investor_profile = LargeInvestorProfileFactory(
-            profile_type_id=ProfileTypeConstant.large.value.id,
-        )
+        investor_profile = LargeInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'deal_ticket_sizes': [
@@ -396,9 +387,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def test_patch_large_capital_profile_all_location_fields(self):
         """Test updating the location fields for a large capital profile."""
-        investor_profile = LargeInvestorProfileFactory(
-            profile_type_id=ProfileTypeConstant.large.value.id,
-        )
+        investor_profile = LargeInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'uk_region_locations': [

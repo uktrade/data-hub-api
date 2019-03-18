@@ -2,7 +2,6 @@ import pytest
 from django.db.utils import IntegrityError
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.investment.investor_profile.constants import ProfileType as ProfileTypeConstant
 from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
 
 
@@ -19,12 +18,10 @@ class TestInvestorProfileModel:
         investor_company = CompanyFactory()
         LargeInvestorProfileFactory(
             investor_company=investor_company,
-            profile_type_id=ProfileTypeConstant.large.value.id,
         )
         with pytest.raises(IntegrityError):
             LargeInvestorProfileFactory(
                 investor_company=investor_company,
-                profile_type_id=ProfileTypeConstant.large.value.id,
             )
 
     @pytest.mark.parametrize(
