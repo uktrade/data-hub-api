@@ -23,26 +23,26 @@ class LargeInvestorProfile(BaseESModel):
 
     investor_company = fields.company_field('investor_company')
     country_of_origin = fields.id_name_partial_field('country_of_origin')
-    asset_classes_of_interest = fields.id_name_field()
+    asset_classes_of_interest = fields.id_unindexed_name_field()
     created_by = fields.contact_or_adviser_field(
         'created_by', include_dit_team=True,
     )
 
-    investor_type = fields.id_name_field()
+    investor_type = fields.id_unindexed_name_field()
     global_assets_under_management = Long()
     investable_capital = Long()
-    required_checks_conducted = fields.id_name_field()
+    required_checks_conducted = fields.id_unindexed_name_field()
 
-    deal_ticket_sizes = fields.id_name_field()
-    investment_types = fields.id_name_field()
-    minimum_return_rate = fields.id_name_field()
-    time_horizons = fields.id_name_field()
-    restrictions = fields.id_name_field()
-    construction_risks = fields.id_name_field()
-    minimum_equity_percentage = fields.id_name_field()
-    desired_deal_roles = fields.id_name_field()
+    deal_ticket_sizes = fields.id_unindexed_name_field()
+    investment_types = fields.id_unindexed_name_field()
+    minimum_return_rate = fields.id_unindexed_name_field()
+    time_horizons = fields.id_unindexed_name_field()
+    restrictions = fields.id_unindexed_name_field()
+    construction_risks = fields.id_unindexed_name_field()
+    minimum_equity_percentage = fields.id_unindexed_name_field()
+    desired_deal_roles = fields.id_unindexed_name_field()
 
-    uk_region_locations = fields.id_name_field()
+    uk_region_locations = fields.id_unindexed_name_field()
     other_countries_being_considered = fields.id_name_partial_field(
         'other_countries_being_considered',
     )
