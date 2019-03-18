@@ -21,8 +21,8 @@ class LargeInvestorProfile(BaseESModel):
 
     id = Keyword()
 
-    investor_company = fields.company_field('investor_company')
-    country_of_origin = fields.id_name_partial_field('country_of_origin')
+    investor_company = fields.company_field()
+    country_of_origin = fields.country_field()
     asset_classes_of_interest = fields.id_unindexed_name_field()
     created_by = fields.contact_or_adviser_field(
         'created_by', include_dit_team=True,
@@ -43,9 +43,7 @@ class LargeInvestorProfile(BaseESModel):
     desired_deal_roles = fields.id_unindexed_name_field()
 
     uk_region_locations = fields.id_unindexed_name_field()
-    other_countries_being_considered = fields.id_name_partial_field(
-        'other_countries_being_considered',
-    )
+    other_countries_being_considered = fields.country_field()
 
     created_on = Date()
     modified_on = Date()

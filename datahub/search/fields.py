@@ -83,21 +83,43 @@ def id_name_partial_field(field):
     )
 
 
+def company_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+            'trading_names': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+        },
+    )
+
+
+def country_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+        },
+    )
+
+
 def address_field(index_country=True):
     """Address field as nested object."""
     if index_country:
-        country_field = Object(
-            properties={
-                'id': Keyword(),
-                'name': Text(
-                    fields={
-                        'trigram': TrigramText(),
-                    },
-                ),
-            },
-        )
+        nested_country_field = country_field()
     else:
-        country_field = Object(
+        nested_country_field = Object(
             properties={
                 'id': Keyword(index=False),
                 'name': Text(index=False),
@@ -115,12 +137,12 @@ def address_field(index_country=True):
                     'trigram': TrigramText(),
                 },
             ),
-            'country': country_field,
+            'country': nested_country_field,
         },
     )
 
 
-def company_field(field):
+def company_field_with_copy_to_name_trigram(field):
     """Company field."""
     return Object(
         properties={
