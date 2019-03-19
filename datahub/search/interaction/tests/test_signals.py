@@ -3,6 +3,7 @@ from elasticsearch.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
     InvestmentProjectInteractionFactory,
 )
 from datahub.search.interaction.apps import InteractionSearchApp
@@ -62,6 +63,32 @@ def test_deleted_interaction_deleted_from_es(setup_es):
             doc_type=InteractionSearchApp.name,
             id=interaction_id,
         ) is None
+
+
+def test_interaction_synced_when_dit_participant_added(setup_es):
+    """Test that interactions are synced to ES if their DIT participants change."""
+    interaction = CompanyInteractionFactory(dit_participants=[])
+    setup_es.indices.refresh()
+
+    doc = setup_es.get(
+        index=InteractionSearchApp.es_model.get_read_alias(),
+        doc_type=InteractionSearchApp.name,
+        id=interaction.pk,
+    )
+    assert doc['_source']['dit_participants'] == []
+
+    dit_participant = InteractionDITParticipantFactory(interaction=interaction)
+    setup_es.indices.refresh()
+
+    updated_doc = setup_es.get(
+        index=InteractionSearchApp.es_model.get_read_alias(),
+        doc_type=InteractionSearchApp.name,
+        id=interaction.pk,
+    )
+    actual_dit_participants = updated_doc['_source']['dit_participants']
+    assert len(actual_dit_participants) == 1
+    assert actual_dit_participants[0]['adviser']['id'] == str(dit_participant.adviser.pk)
+    assert actual_dit_participants[0]['team']['id'] == str(dit_participant.team.pk)
 
 
 def test_updating_company_name_updates_interaction(setup_es):
