@@ -2,7 +2,10 @@ from django.db import transaction
 from django.db.models.signals import post_delete, post_save
 
 from datahub.company.models import Company as DBCompany, Contact as DBContact
-from datahub.interaction.models import Interaction as DBInteraction
+from datahub.interaction.models import (
+    Interaction as DBInteraction,
+    InteractionDITParticipant as DBInteractionDITParticipant,
+)
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.search.deletion import delete_document
 from datahub.search.interaction import InteractionSearchApp
@@ -15,6 +18,13 @@ def sync_interaction_to_es(instance):
     """Sync interaction to the Elasticsearch."""
     transaction.on_commit(
         lambda: sync_object_async(InteractionSearchApp, instance.pk),
+    )
+
+
+def sync_participant_to_es(dit_participant):
+    """Sync a DIT participant's interaction to Elasticsearch."""
+    transaction.on_commit(
+        lambda: sync_object_async(InteractionSearchApp, dit_participant.interaction_id),
     )
 
 
@@ -34,6 +44,7 @@ def sync_related_interactions_to_es(instance):
 
 receivers = (
     SignalReceiver(post_save, DBInteraction, sync_interaction_to_es),
+    SignalReceiver(post_save, DBInteractionDITParticipant, sync_participant_to_es),
     SignalReceiver(post_save, DBCompany, sync_related_interactions_to_es),
     SignalReceiver(post_save, DBContact, sync_related_interactions_to_es),
     SignalReceiver(post_save, DBInvestmentProject, sync_related_interactions_to_es),

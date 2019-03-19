@@ -1,4 +1,10 @@
-from datahub.interaction.models import Interaction as DBInteraction, InteractionPermission
+from django.db.models import Prefetch
+
+from datahub.interaction.models import (
+    Interaction as DBInteraction,
+    InteractionDITParticipant,
+    InteractionPermission,
+)
 from datahub.search.apps import SearchApp
 from datahub.search.interaction.models import Interaction
 
@@ -29,4 +35,8 @@ class InteractionSearchApp(SearchApp):
         'contacts',
         'policy_areas',
         'policy_issue_types',
+        Prefetch(
+            'dit_participants',
+            queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
+        ),
     )
