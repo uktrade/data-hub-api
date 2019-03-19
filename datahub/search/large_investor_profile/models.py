@@ -83,12 +83,6 @@ class LargeInvestorProfile(BaseESModel):
         **_LOCATION_FIELD_MAPPINGS,
     }
 
-    SEARCH_FIELDS = (
-        'id',
-        'investor_company.name',
-        'investor_company.name.trigram',
-    )
-
     class Meta:
         """Default document meta data."""
 
