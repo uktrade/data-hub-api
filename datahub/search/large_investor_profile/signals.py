@@ -15,7 +15,7 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 def investor_profile_sync_es(instance):
     """Sync investor profile to Elasticsearch."""
-    if instance.profile_type_id == ProfileType.large.value.id:
+    if str(instance.profile_type_id) == str(ProfileType.large.value.id):
         transaction.on_commit(
             lambda: sync_object_async(LargeInvestorProfileSearchApp, instance.pk),
         )
