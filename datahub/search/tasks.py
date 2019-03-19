@@ -69,7 +69,7 @@ def sync_related_objects_task(
     related_model_label,
     related_obj_pk,
     related_obj_field_name,
-    related_obj_filter,
+    related_obj_filter=None,
 ):
     """
     Syncs objects related to another object via a specified field.
