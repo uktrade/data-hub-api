@@ -86,7 +86,7 @@ class LargeInvestorProfile(BaseESModel):
     SEARCH_FIELDS = (
         'id',
         'investor_company.name',
-        'investor_company.name_trigram',
+        'investor_company.name.trigram',
     )
 
     class Meta:
