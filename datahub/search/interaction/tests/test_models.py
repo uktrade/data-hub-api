@@ -27,6 +27,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
 
     result = Interaction.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
+    result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
     result['policy_areas'].sort(key=itemgetter('id'))
     result['policy_issue_types'].sort(key=itemgetter('id'))
 
@@ -68,6 +69,21 @@ def test_interaction_to_dict(setup_es, factory_cls):
             'name': interaction.dit_adviser.name,
             'last_name': interaction.dit_adviser.last_name,
         },
+        'dit_participants': [
+            {
+                'adviser': {
+                    'id': str(dit_participant.adviser.pk),
+                    'first_name': dit_participant.adviser.first_name,
+                    'name': dit_participant.adviser.name,
+                    'last_name': dit_participant.adviser.last_name,
+                },
+                'team': {
+                    'id': str(dit_participant.team.pk),
+                    'name': dit_participant.team.name,
+                },
+            }
+            for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+        ],
         'notes': interaction.notes,
         'dit_team': {
             'id': str(interaction.dit_team.pk),
@@ -115,6 +131,7 @@ def test_service_delivery_to_dict(setup_es):
 
     result = Interaction.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
+    result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
 
     assert result == {
         'id': interaction.pk,
@@ -154,6 +171,21 @@ def test_service_delivery_to_dict(setup_es):
             'name': interaction.dit_adviser.name,
             'last_name': interaction.dit_adviser.last_name,
         },
+        'dit_participants': [
+            {
+                'adviser': {
+                    'id': str(dit_participant.adviser.pk),
+                    'first_name': dit_participant.adviser.first_name,
+                    'name': dit_participant.adviser.name,
+                    'last_name': dit_participant.adviser.last_name,
+                },
+                'team': {
+                    'id': str(dit_participant.team.pk),
+                    'name': dit_participant.team.name,
+                },
+            }
+            for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+        ],
         'notes': interaction.notes,
         'dit_team': {
             'id': str(interaction.dit_team.pk),
