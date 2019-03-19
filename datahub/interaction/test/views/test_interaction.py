@@ -6,6 +6,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Service, Team
@@ -150,6 +151,24 @@ class TestAddInteraction(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(adviser.pk),
+                        'first_name': adviser.first_name,
+                        'last_name': adviser.last_name,
+                        'name': adviser.name,
+                    },
+                    'team': {
+                        'id': str(Team.healthcare_uk.value.id),
+                        'name': Team.healthcare_uk.value.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
@@ -166,10 +185,6 @@ class TestAddInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
             },
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
@@ -202,9 +217,7 @@ class TestAddInteraction(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
-                    'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
-                    'dit_team': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
@@ -330,18 +343,58 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     # fields where None is not allowed
+                    'dit_adviser': None,
+                    'dit_team': None,
                     'was_policy_feedback_provided': None,
                     'policy_feedback_notes': None,
                 },
                 {
+                    'dit_adviser': ['This field may not be null.'],
+                    'dit_team': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
+                },
+            ),
+
+            # dit_participants cannot be None
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+
+                    'dit_participants': None,
+                },
+                {
+                    'dit_participants': ['This field may not be null.'],
+                },
+            ),
+
+            # dit_participants cannot be empty list
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+
+                    'dit_participants': [],
+                },
+                {
+                    'dit_participants': {
+                        api_settings.NON_FIELD_ERRORS_KEY: ['This list may not be empty.'],
+                    },
                 },
             ),
         ),
@@ -520,6 +573,24 @@ class TestGetInteraction(APITestMixin):
                 'last_name': interaction.dit_adviser.last_name,
                 'name': interaction.dit_adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(interaction.dit_adviser.pk),
+                        'first_name': interaction.dit_adviser.first_name,
+                        'last_name': interaction.dit_adviser.last_name,
+                        'name': interaction.dit_adviser.name,
+                    },
+                    'team': {
+                        'id': str(interaction.dit_team.pk),
+                        'name': interaction.dit_team.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
+            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
@@ -536,10 +607,6 @@ class TestGetInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
@@ -602,6 +669,24 @@ class TestGetInteraction(APITestMixin):
                 'last_name': interaction.dit_adviser.last_name,
                 'name': interaction.dit_adviser.name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(interaction.dit_adviser.pk),
+                        'first_name': interaction.dit_adviser.first_name,
+                        'last_name': interaction.dit_adviser.last_name,
+                        'name': interaction.dit_adviser.name,
+                    },
+                    'team': {
+                        'id': str(interaction.dit_team.pk),
+                        'name': interaction.dit_team.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
+            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
@@ -618,10 +703,6 @@ class TestGetInteraction(APITestMixin):
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
-            },
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
             },
             'investment_project': {
                 'id': str(interaction.investment_project.pk),

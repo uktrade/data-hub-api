@@ -281,6 +281,9 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         for result in results:
             result['contacts'].sort(key=itemgetter('id'))
+            result['dit_participants'].sort(
+                key=lambda dit_participant: dit_participant['adviser']['id'],
+            )
 
         assert results == [{
             'id': str(interaction.pk),
@@ -320,6 +323,21 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'name': interaction.dit_adviser.name,
                 'last_name': interaction.dit_adviser.last_name,
             },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'name': dit_participant.adviser.name,
+                        'last_name': dit_participant.adviser.last_name,
+                    },
+                    'team': {
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
+                    },
+                }
+                for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+            ],
             'notes': interaction.notes,
             'dit_team': {
                 'id': str(interaction.dit_team.pk),

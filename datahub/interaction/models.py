@@ -116,9 +116,7 @@ class InteractionDITParticipant(models.Model):
 
     class Meta:
         default_permissions = ()
-        # TODO: Add adviser to the unique constraint when multiple advisers is exposed via the
-        #  API or admin
-        unique_together = (('interaction',),)
+        unique_together = (('interaction', 'adviser'),)
 
 
 @reversion.register_base_model()
