@@ -84,6 +84,7 @@ def id_name_partial_field(field):
 
 
 def company_field():
+    """Company field with id, name, trading_names and trigrams."""
     return Object(
         properties={
             'id': Keyword(),
@@ -102,6 +103,7 @@ def company_field():
 
 
 def country_field():
+    """Country field with id, name and trigram."""
     return Object(
         properties={
             'id': Keyword(),
@@ -143,7 +145,7 @@ def address_field(index_country=True):
 
 
 def company_field_with_copy_to_name_trigram(field):
-    """Company field."""
+    """Company field with copy to, deprecated in favour of company_field"""
     return Object(
         properties={
             'id': Keyword(),
