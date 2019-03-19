@@ -68,6 +68,16 @@ class InvestorProfile(BaseModel):
         null=True,
     )
 
+    required_checks_conducted_by = models.ForeignKey(
+        'company.Advisor',
+        related_name='+',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+
+    required_checks_conducted_on = models.DateField(null=True, blank=True)
+
     deal_ticket_sizes = models.ManyToManyField(
         'investor_profile.DealTicketSize',
         related_name='+',
