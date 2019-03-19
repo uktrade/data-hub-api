@@ -1,3 +1,112 @@
+Data Hub API 11.1.0 (2019-03-19)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET /v3/interaction``: The ``dit_adviser__first_name`` and ``dit_adviser__last_name`` values for the
+  ``sortby`` query parameter are deprecated and will be removed on or after 28 March 2019.
+- **Interactions** ``GET /v3/interaction, GET /v3/interaction/<id>, POST /v3/interaction, PATCH /v3/interaction/<id>``: The
+  ``dit_adviser`` and ``dit_team`` fields are deprecated and will be removed on or after 28 March 2019. Please
+  use ``dit_participants`` instead.
+- **Interactions** The DIT adviser and DIT team fields were temporarily made read-only in the admin site until the transition to allowing multiple advisers in an interaction is complete.
+- **Interactions** ``interaction_interaction``: The ``dit_adviser_id`` and ``dit_team_id`` columns are deprecated and will be
+  removed on or after 22 April 2019. Please use the ``interaction_interactionditparticipant`` table instead.
+
+API
+---
+
+- **Interactions** ``GET /v3/interaction, GET /v3/interaction/<id>, POST /v3/interaction, PATCH /v3/interaction/<id>``:
+
+  ``dit_participants`` was added to responses. This is an array in the following format::
+
+      [
+          {
+             "adviser": {
+                 "id": ...,
+                 "first_name": ...,
+                 "last_name": ...,
+                 "name": ...
+             },
+             "team": {
+                 "id": ...,
+                 "name": ...
+             }
+          },
+          {
+             "adviser": {
+                 "id": ...,
+                 "first_name": ...,
+                 "last_name": ...,
+                 "name": ...
+             },
+             "team": {
+                 "id": ...,
+                 "name": ...
+             }
+          },
+          ...
+      ]
+
+  This field is intended to replace the ``dit_adviser`` and ``dit_team`` fields.
+- **Interactions** ``POST /v3/interaction, PATCH /v3/interaction/<id>``:
+
+  ``dit_participants`` is now a valid field in request bodies. This should be an array in the following format::
+
+      [
+          {
+             "adviser": {
+                 "id": ...
+             }
+          },
+          {
+             "adviser": {
+                 "id": ...
+             }
+          },
+          ...
+      ]
+
+  Note that the team for each participant will be set automatically. (If a team is provided it will be ignored.)
+
+  ``dit_participants`` is intended to replace the ``dit_adviser`` and ``dit_team`` fields.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``:
+
+  ``dit_participants`` was added to interaction search results in responses. This is an array in the following format::
+
+      [
+          {
+             "adviser": {
+                 "id": ...,
+                 "first_name": ...,
+                 "last_name": ...,
+                 "name": ...
+             },
+             "team": {
+                 "id": ...,
+                 "name": ...
+             }
+          },
+          {
+             "adviser": {
+                 "id": ...,
+                 "first_name": ...,
+                 "last_name": ...,
+                 "name": ...
+             },
+             "team": {
+                 "id": ...,
+                 "name": ...
+             }
+          },
+          ...
+      ]
+
+  This field is intended to replace the ``dit_adviser`` and ``dit_team`` fields.
+
+
 Data Hub API 11.0.0 (2019-03-15)
 ================================
 
