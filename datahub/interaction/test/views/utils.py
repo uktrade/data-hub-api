@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from datahub.core.test_utils import create_test_user
 from datahub.interaction.models import InteractionPermission
@@ -6,20 +6,22 @@ from datahub.interaction.models import InteractionPermission
 
 def resolve_data(data):
     """
-    Given a data dict with keys and values,
-    if a value is a callable, it resolves it
-    if a value is an object with a 'pk' attribute, it uses that instead.
+    Given a value:
 
-    It returns a new dict with resolved values.
+    - if it's a callable, it resolves it
+    - if it's an object with a 'pk' attribute, it uses that instead
+    - if it's a sequence it resolves each of the sequence's values
+    - if it's a dict it resolves each value of the dict
+
+    The resolved value is returned.
     """
-    return {key: _resolve_value(value) for key, value in data.items()}
+    if isinstance(data, Sequence) and not isinstance(data, str):
+        return [resolve_data(item) for item in data]
 
+    if isinstance(data, Mapping):
+        return {key: resolve_data(value) for key, value in data.items()}
 
-def _resolve_value(value):
-    if isinstance(value, Sequence) and not isinstance(value, str):
-        return [_resolve_single_value(item) for item in value]
-
-    return _resolve_single_value(value)
+    return _resolve_single_value(data)
 
 
 def _resolve_single_value(value):
