@@ -44,7 +44,7 @@ def sync_object_async(search_app, pk):
     )
 
 
-def sync_related_objects_async(related_obj, related_obj_field_name):
+def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_filter=None):
     """
     Syncs objects related to another object via a specified field.
 
@@ -56,13 +56,17 @@ def sync_related_objects_async(related_obj, related_obj_field_name):
     This function is normally used by signal receivers to copy new or updated related objects to
     Elasticsearch.
     """
+    kwargs = {'related_obj_filter': related_obj_filter} if related_obj_filter else {}
+
     result = sync_related_objects_task.apply_async(
         args=(
             related_obj._meta.label,
             str(related_obj.pk),
             related_obj_field_name,
         ),
+        kwargs=kwargs,
     )
+
     logger.info(
         f'Task {result.id} scheduled to synchronise {related_obj_field_name} for object'
         f' {related_obj.pk}',
