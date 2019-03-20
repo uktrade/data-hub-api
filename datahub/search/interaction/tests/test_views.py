@@ -1044,6 +1044,124 @@ class TestInteractionExportView(APITestMixin):
         assert actual_row_data == format_csv_data(expected_row_data)
 
 
+class TestInteractionBasicSearch(APITestMixin):
+    """Tests searching for interactions via basic (global) search."""
+
+    @pytest.mark.parametrize(
+        'term',
+        (
+            'exports',
+            'meeting',
+            'exports meeting',
+            'danger',
+            'dan',
+            'dang',
+            'FRANCIS',
+            'angela',
+            'angel',
+            'ngel',
+            'ela',
+            'za',
+            'QA',
+        ),
+    )
+    def test_search(self, interactions, term):
+        """Tests searching for various search terms."""
+        url = reverse('api-v3:search:basic')
+
+        request_data = {
+            'term': term,
+            'entity': 'interaction',
+        }
+        response = self.api_client.get(url, request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        interaction = interactions[0]
+        assert response_data['count'] == 1
+        results = response_data['results']
+
+        for result in results:
+            result['contacts'].sort(key=itemgetter('id'))
+            result['dit_participants'].sort(
+                key=lambda dit_participant: dit_participant['adviser']['id'],
+            )
+
+        assert results == [{
+            'id': str(interaction.pk),
+            'kind': interaction.kind,
+            'date': interaction.date.isoformat(),
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+                'trading_names': interaction.company.trading_names,
+            },
+            'company_sector': {
+                'id': str(interaction.company.sector.pk),
+                'name': interaction.company.sector.name,
+                'ancestors': [{
+                    'id': str(ancestor.pk),
+                } for ancestor in interaction.company.sector.get_ancestors()],
+            },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'first_name': contact.first_name,
+                    'name': contact.name,
+                    'last_name': contact.last_name,
+                }
+                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+            ],
+            'is_event': None,
+            'event': None,
+            'service': {
+                'id': str(interaction.service.pk),
+                'name': interaction.service.name,
+            },
+            'subject': interaction.subject,
+            'dit_adviser': {
+                'id': str(interaction.dit_adviser.pk),
+                'first_name': interaction.dit_adviser.first_name,
+                'name': interaction.dit_adviser.name,
+                'last_name': interaction.dit_adviser.last_name,
+            },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'name': dit_participant.adviser.name,
+                        'last_name': dit_participant.adviser.last_name,
+                    },
+                    'team': {
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
+                    },
+                }
+                for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+            ],
+            'notes': interaction.notes,
+            'dit_team': {
+                'id': str(interaction.dit_team.pk),
+                'name': interaction.dit_team.name,
+            },
+            'communication_channel': {
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name,
+            },
+            'investment_project': None,
+            'investment_project_sector': None,
+            'policy_areas': [],
+            'policy_issue_types': [],
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'net_company_receipt': None,
+            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+            'created_on': interaction.created_on.isoformat(),
+            'modified_on': interaction.modified_on.isoformat(),
+        }]
+
+
 def _format_expected_contacts(interaction):
     formatted_contact_names = sorted(
         [_format_expected_contact_name(contact) for contact in interaction.contacts.all()],
