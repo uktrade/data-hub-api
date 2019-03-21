@@ -43,6 +43,10 @@ class TestInteractionAdminContacts(AdminTestMixin):
             'service': random_obj_for_model(Service).pk,
             'dit_team': random_obj_for_model(Team).pk,
             'was_policy_feedback_provided': False,
+            'dit_participants-TOTAL_FORMS': 0,
+            'dit_participants-INITIAL_FORMS': 0,
+            'dit_participants-MAX_NUM_FORMS': 0,
+            'dit_participants-MIN_NUM_FORMS': 0,
         }
         response = self.client.post(url, data, follow=True)
 
@@ -79,6 +83,12 @@ class TestInteractionAdminContacts(AdminTestMixin):
             'policy_areas': [],
             'policy_issue_types': [],
             'event': '',
+            'dit_participants-TOTAL_FORMS': 0,
+            'dit_participants-INITIAL_FORMS': 0,
+            'dit_participants-MAX_NUM_FORMS': 0,
+            'dit_participants-MIN_NUM_FORMS': 0,
+            'dit_participants-0-id': interaction.dit_participants.first().pk,
+            'dit_participants-0-interaction': interaction.pk,
 
             # Changed values
             'contacts': [contact.pk for contact in new_contacts],
@@ -113,6 +123,12 @@ class TestInteractionAdminContacts(AdminTestMixin):
             'policy_areas': [],
             'policy_issue_types': [],
             'event': '',
+            'dit_participants-TOTAL_FORMS': 0,
+            'dit_participants-INITIAL_FORMS': 0,
+            'dit_participants-MAX_NUM_FORMS': 0,
+            'dit_participants-MIN_NUM_FORMS': 0,
+            'dit_participants-0-id': interaction.dit_participants.first().pk,
+            'dit_participants-0-interaction': interaction.pk,
 
             # Changed values
             'contacts': [],
