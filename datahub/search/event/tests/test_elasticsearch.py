@@ -25,6 +25,16 @@ def test_mapping(setup_es):
                                 'address_country.name_trigram',
                             ],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -137,6 +147,16 @@ def test_mapping(setup_es):
                                 'related_programmes.name_trigram',
                             ],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -165,6 +185,16 @@ def test_mapping(setup_es):
                                 'teams.name_trigram',
                             ],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -182,6 +212,16 @@ def test_mapping(setup_es):
                                 'uk_region.name_trigram',
                             ],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
