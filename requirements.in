@@ -38,7 +38,7 @@ elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
 
 # Celery
-celery==4.2.1
+celery==4.2.2
 billiard==3.5.0.4  # pinned due to https://github.com/celery/billiard/issues/260
 
 # Testing and dev
