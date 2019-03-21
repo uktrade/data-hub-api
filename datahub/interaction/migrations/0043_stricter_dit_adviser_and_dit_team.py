@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interaction',
             name='dit_adviser',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='interactions', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(help_text='This field is deprecated and has been replaced by DIT participants.', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='interactions', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='interaction',
             name='dit_team',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='metadata.Team'),
+            field=models.ForeignKey(help_text='This field is deprecated and has been replaced by DIT participants.', null=True, on_delete=django.db.models.deletion.PROTECT, to='metadata.Team'),
         ),
     ]

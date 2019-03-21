@@ -7,6 +7,7 @@ from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
+    InteractionDITParticipant,
     InteractionPermission,
     PolicyArea,
     PolicyIssueType,
@@ -18,6 +19,46 @@ admin.site.register(CommunicationChannel, DisableableMetadataAdmin)
 admin.site.register((PolicyArea, PolicyIssueType), OrderedMetadataAdmin)
 
 
+class InteractionDITParticipantInline(admin.TabularInline):
+    """
+    Inline admin for InteractionDITParticipant.
+
+    Currently view-only while the legacy Interaction.dit_adviser and Interaction.dit_team fields
+    still exist (to avoid the need to keep them in sync when edits are made via the admin site).
+    """
+
+    model = InteractionDITParticipant
+    fields = ('adviser', 'team')
+    verbose_name = 'DIT participant'
+    # Note: verbose_name_plural does not get automatically updated here if verbose_name is set,
+    # so we have to set it manually
+    verbose_name_plural = 'DIT participants'
+
+    def has_add_permission(self, request, obj=None):
+        """
+        Gets whether the user can add new objects for this model.
+
+        Always returns False.
+        """
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """
+        Gets whether the user can change objects for this model.
+
+        Always returns False.
+        """
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Gets whether the user can delete objects for this model.
+
+        Always returns False.
+        """
+        return False
+
+
 @admin.register(Interaction)
 @custom_add_permission(InteractionPermission.add_all)
 @custom_change_permission(InteractionPermission.change_all)
@@ -25,6 +66,9 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     """Interaction admin."""
 
     autocomplete_fields = ('contacts',)
+    inlines = (
+        InteractionDITParticipantInline,
+    )
     search_fields = (
         '=pk',
         'subject',
@@ -44,7 +88,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     raw_id_fields = (
         'company',
         'event',
-        'dit_adviser',
         'investment_project',
     )
     readonly_fields = (
