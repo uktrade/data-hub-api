@@ -20,6 +20,8 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     created_on_exists = serializers.BooleanField(required=False)
     dit_adviser = SingleOrListField(child=StringUUIDField(), required=False)
     dit_adviser_name = serializers.CharField(required=False)
+    dit_participants__adviser = SingleOrListField(child=StringUUIDField(), required=False)
+    dit_participants__team = SingleOrListField(child=StringUUIDField(), required=False)
     dit_team = SingleOrListField(child=StringUUIDField(), required=False)
     communication_channel = SingleOrListField(child=StringUUIDField(), required=False)
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
