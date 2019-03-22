@@ -4,22 +4,22 @@
 #
 #    pip-compile --upgrade --output-file requirements.txt requirements.in
 #
-amqp==2.4.1               # via kombu
+amqp==2.4.2               # via kombu
 apipkg==1.5               # via execnet
 atomicwrites==1.3.0       # via pytest
-attrs==18.2.0             # via pytest
+attrs==19.1.0             # via pytest
 backcall==0.1.0           # via ipython
 billiard==3.5.0.4
-boto3==1.9.105
-botocore==1.12.105        # via boto3, s3transfer
-celery==4.2.1
-certifi==2018.11.29       # via requests
+boto3==1.9.119
+botocore==1.12.119        # via boto3, s3transfer
+celery[redis]==4.2.1
+certifi==2019.3.9         # via requests
 chardet==3.0.4
 click==7.0                # via pip-tools, towncrier
-coverage==4.5.2           # via pytest-cov
+coverage==4.5.3           # via pytest-cov
 cssselect==1.0.3
-decorator==4.3.2          # via ipython, traitlets
-django-admin-ip-restrictor==0.2.1
+decorator==4.4.0          # via ipython, traitlets
+django-admin-ip-restrictor==1.0.0
 django-debug-toolbar==1.11
 django-environ==0.4.5
 django-extensions==2.1.6
@@ -34,19 +34,19 @@ django-redis==4.10.0
 django-reversion==3.0.3
 django==2.1.7
 djangorestframework==3.9.2
-docopt==0.6.2             # via docopt, notifications-python-client
-docutils==0.14            # via botocore, docutils
+docopt==0.6.2             # via notifications-python-client
+docutils==0.14            # via botocore
 elasticsearch-dsl==6.3.1
 elasticsearch==6.3.1
 entrypoints==0.3          # via flake8
 execnet==1.5.0            # via pytest-xdist
 factory-boy==2.11.1
-faker==1.0.2              # via factory-boy
+faker==1.0.4              # via factory-boy
 flake8-blind-except==0.1.1
 flake8-commas==2.0.0
 flake8-debugger==3.1.0
 flake8-docstrings==1.3.0
-flake8-import-order==0.18
+flake8-import-order==0.18.1
 flake8-polyfill==1.0.2    # via flake8-docstrings, pep8-naming
 flake8-print==3.1.0
 flake8-quotes==1.0.0
@@ -59,16 +59,16 @@ greenlet==0.4.15          # via gevent
 gunicorn==19.9.0
 idna==2.8                 # via requests
 incremental==17.5.0       # via towncrier
-ipdb==0.11
-ipython-genutils==0.2.0   # via ipython-genutils, traitlets
+ipdb==0.12
+ipython-genutils==0.2.0   # via traitlets
 ipython==7.3.0
 jedi==0.13.3              # via ipython
 jinja2==2.10              # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.3.0              # via celery
+kombu==4.3.0
 lxml==4.3.2
 markupsafe==1.1.1         # via jinja2
-mccabe==0.6.1             # via flake8, mccabe
+mccabe==0.6.1             # via flake8
 mohawk==1.0.0
 monotonic==1.5            # via notifications-python-client
 more-itertools==6.0.0     # via pytest
@@ -79,7 +79,7 @@ parso==0.3.4              # via jedi
 pep8-naming==0.8.2
 pexpect==4.6.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pip-tools==3.4.0
+pip-tools==3.5.0
 piprot==0.9.10
 pluggy==0.9.0             # via pytest
 prompt-toolkit==2.0.9     # via ipython
@@ -88,7 +88,7 @@ psycopg2==2.7.7
 ptyprocess==0.6.0         # via pexpect
 py==1.8.0                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
-pydocstyle==2.1.1
+pydocstyle==3.0.0
 pyflakes==2.1.1           # via flake8
 pygments==2.3.1           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
@@ -97,11 +97,11 @@ pytest-cov==2.6.1
 pytest-django==3.4.8
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-sugar==0.9.2
-pytest-xdist==1.26.1
-pytest==4.3.0
+pytest-xdist==1.27.0
+pytest==4.3.1
 python-dateutil==2.8.0
 pytz==2018.9              # via celery, django
-pyyaml==3.13
+pyyaml==5.1
 raven==6.10.0
 redis==3.1.0
 requests-futures==0.9.9   # via piprot
@@ -110,15 +110,15 @@ requests==2.21.0
 requests_toolbelt==0.9.1
 s3transfer==0.2.0         # via boto3
 six==1.12.0               # via django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, mohawk, packaging, pip-tools, piprot, prompt-toolkit, pydocstyle, pytest, pytest-xdist, python-dateutil, requests-mock, traitlets
-snowballstemmer==1.2.1    # via pydocstyle, snowballstemmer
-sqlparse==0.2.4           # via django-debug-toolbar, sqlparse
-termcolor==1.1.0          # via pytest-sugar, termcolor
+snowballstemmer==1.2.1    # via pydocstyle
+sqlparse==0.3.0           # via django-debug-toolbar
+termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.2       # via faker
 toml==0.10.0              # via towncrier
 towncrier==19.2.0
-traitlets==4.3.2          # via ipython, traitlets
+traitlets==4.3.2          # via ipython
 urllib3==1.24.1           # via botocore, elasticsearch, requests
 vine==1.2.0               # via amqp
-wcwidth==0.1.7            # via prompt-toolkit, wcwidth
-werkzeug==0.14.1
+wcwidth==0.1.7            # via prompt-toolkit
+werkzeug==0.15.0
 whitenoise==4.1.2

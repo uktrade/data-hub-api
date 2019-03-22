@@ -151,6 +151,12 @@ class InvestorProfile(BaseModel):
         """Human-readable representation"""
         return f'{self.investor_company}, {self.profile_type} capital profile'
 
+    @property
+    def country_of_origin(self):
+        """Returns the country of which the investment would originate from."""
+        if self.investor_company:
+            return self.investor_company.address_country
+
 
 class ProfileType(BaseOrderedConstantModel):
     """Investor profile type metadata."""

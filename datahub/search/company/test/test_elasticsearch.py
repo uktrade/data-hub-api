@@ -233,6 +233,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['registered_address_country.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -284,6 +294,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['trading_address_country.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -375,10 +395,10 @@ def test_get_basic_search_query():
                                 'contact.name_trigram',
                                 'contacts.name',
                                 'contacts.name.trigram',
-                                'dit_adviser.name',
-                                'dit_adviser.name_trigram',
-                                'dit_team.name',
-                                'dit_team.name_trigram',
+                                'dit_participants.adviser.name',
+                                'dit_participants.adviser.name.trigram',
+                                'dit_participants.team.name',
+                                'dit_participants.team.name.trigram',
                                 'email',
                                 'email_alternative',
                                 'event.name',
