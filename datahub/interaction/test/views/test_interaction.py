@@ -1,6 +1,7 @@
 from datetime import date
 from functools import partial
 from itertools import chain
+from operator import itemgetter
 
 import pytest
 from freezegun import freeze_time
@@ -576,6 +577,7 @@ class TestGetInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        response_data['contacts'].sort(key=itemgetter('id'))
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
@@ -634,13 +636,16 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
-            'contacts': [{
-                'id': str(interaction.contact.pk),
-                'name': interaction.contact.name,
-                'first_name': interaction.contact.first_name,
-                'last_name': interaction.contact.last_name,
-                'job_title': interaction.contact.job_title,
-            }],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                }
+                for contact in interaction.contacts.order_by('pk')
+            ],
             'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
@@ -690,6 +695,7 @@ class TestGetInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        response_data['contacts'].sort(key=itemgetter('id'))
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
@@ -738,13 +744,16 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
-            'contacts': [{
-                'id': str(interaction.contact.pk),
-                'name': interaction.contact.name,
-                'first_name': interaction.contact.first_name,
-                'last_name': interaction.contact.last_name,
-                'job_title': interaction.contact.job_title,
-            }],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                }
+                for contact in interaction.contacts.order_by('pk')
+            ],
             'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),

@@ -1,7 +1,6 @@
 import json
 
 from django.contrib import admin
-from django.db.transaction import atomic
 from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
@@ -121,7 +120,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
-        'contact',
         'source',
     )
 
@@ -148,20 +146,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         return format_html('<pre>{0}</pre>', json.dumps(obj.source, indent=2))
 
     pretty_source.short_description = 'source'
-
-    @atomic
-    def save_model(self, request, obj, form, change):
-        """
-        Saves the object, while also:
-            - copying contacts to contact
-            - copying dit_adviser and dit_team to dit_participants
-        """
-        # TODO: Remove once the migration from contact to contacts is complete.
-        if 'contacts' in form.cleaned_data:
-            contacts = form.cleaned_data['contacts']
-            obj.contact = contacts[0] if contacts else None
-
-        super().save_model(request, obj, form, change)
 
     def changelist_view(self, request, extra_context=None):
         """

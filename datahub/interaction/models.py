@@ -169,18 +169,8 @@ class Interaction(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.CASCADE,
     )
-    # TODO: contact is being replaced with contacts, and contact will be removed once the
-    # migration to a to-many field is complete
-    contact = models.ForeignKey(
-        'company.Contact',
-        related_name='+',
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-    )
     contacts = models.ManyToManyField(
         'company.Contact',
-        # TODO: change related_name to interactions once this field has fully replaced contact
         related_name='%(class)ss',
         blank=True,
     )
