@@ -22,10 +22,6 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
-    contact = factory.SubFactory(
-        ContactFactory,
-        company=factory.SelfAttribute('..company'),
-    )
     subject = factory.Faker('sentence', nb_words=8)
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
@@ -42,7 +38,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 
         Defaults to the contact from the contact field.
         """
-        return [self.contact] if self.contact else []
+        return [ContactFactory(company=self.company)] if self.company else []
 
     @to_many_field
     def dit_participants(self):

@@ -24,7 +24,6 @@ from datahub.cleanup.management.commands.delete_old_records import (
     ORDER_MODIFIED_ON_CUT_OFF,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
-from datahub.cleanup.test.commands.factories import CompanyInteractionFactoryWithoutContacts
 from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
@@ -226,18 +225,7 @@ MAPPING = {
         ],
         'relations': [
             {
-                'factory': CompanyInteractionFactoryWithoutContacts,
-                'field': 'contact',
-                'expired_objects_kwargs': [],
-                'unexpired_objects_kwargs': [
-                    {
-                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                    },
-                ],
-            },
-            {
-                'factory': CompanyInteractionFactoryWithoutContacts,
+                'factory': CompanyInteractionFactory,
                 'field': 'contacts',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
