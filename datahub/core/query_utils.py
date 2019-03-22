@@ -180,16 +180,6 @@ def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
     )
 
 
-def get_front_end_url_expression(model_name, pk_expression):
-    """
-    Gets an SQL expression that returns a front-end URL for an object.
-
-    :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
-    :param pk_expression:   expression that resolves to the pk for the model
-    """
-    return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
-
-
 def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
     """
     Gets an SQL expression that concatenates a number of expressions and optionally another
@@ -236,3 +226,13 @@ def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
         parts.append(bracketed_expression)
 
     return ConcatWS(Value(' '), *parts, output_field=CharField())
+
+
+def get_front_end_url_expression(model_name, pk_expression):
+    """
+    Gets an SQL expression that returns a front-end URL for an object.
+
+    :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
+    :param pk_expression:   expression that resolves to the pk for the model
+    """
+    return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
