@@ -1,3 +1,43 @@
+Data Hub API 11.2.0 (2019-03-22)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``POST /v3/search/interaction``: The ``dit_adviser`` filter is deprecated and will be removed on or after 4 April 2019. Please use the ``dit_participants__adviser`` filter instead.
+- **Interactions** ``POST /v3/search/interaction``: The ``dit_adviser_name`` filter is deprecated and will be removed on or after 4 April 2019. There is no replacement for this filter.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: The ``dit_adviser`` and ``dit_team`` interaction fields are deprecated and will be removed on or after 28 March 2019. Please use ``dit_participants`` instead.
+- **Interactions** ``POST /v3/search/interaction``: The ``dit_team`` filter is deprecated and will be removed on or after 4 April 2019. Please use the ``dit_participants__team`` filter instead.
+- **Investment** The column ``investmentproject.likelhood_of_landing`` was removed from the database.
+
+Features
+--------
+
+- **Interactions** A DIT participants section was added to the interaction form in the admin site. This displays all advisers and teams that are associated with an interaction. This section will remain read-only until the old DIT adviser and DIT team fields are removed from the database.
+- **Interactions** Global search is now aware of multiple interaction advisers and teams. This means that it searches the names of all advisers and teams added to an interaction instead of only one of them.
+- The 'My latest interactions' list on the home page is now aware of multiple interaction advisers. This means that if multiple advisers are added to an
+  interaction, the interaction will show up on all of those advisers' home pages.
+
+Internal changes
+----------------
+
+- **Investment** Large Capital investor profile search index added.
+- Various dependencies were updated.
+
+API
+---
+
+- **Interactions** ``POST /v3/search/interaction``: ``dit_participants__adviser`` was added as a filter. This is intended to replace the existing ``dit_adviser`` filter.
+- **Interactions** ``POST /v3/search/interaction``: ``dit_participants__team`` was added as a filter. This is intended to replace the existing ``dit_team`` filter.
+
+Database schema
+---------------
+
+- **Investment** The column ``investmentproject.likelhood_of_landing`` was removed from the database.
+
+
 Data Hub API 11.1.0 (2019-03-19)
 ================================
 

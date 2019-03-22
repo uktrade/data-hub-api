@@ -1,1 +1,0 @@
-``GET /v3/search``, ``POST /v3/search/interaction``: The ``dit_adviser`` and ``dit_team`` interaction fields are deprecated and will be removed on or after 28 March 2019. Please use ``dit_participants`` instead.

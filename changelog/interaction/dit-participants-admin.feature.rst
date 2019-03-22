@@ -1,1 +1,0 @@
-A DIT participants section was added to the interaction form in the admin site. This displays all advisers and teams that are associated with an interaction. This section will remain read-only until the old DIT adviser and DIT team fields are removed from the database.
