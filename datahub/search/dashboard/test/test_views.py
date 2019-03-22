@@ -7,7 +7,10 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.interaction.models import InteractionPermission
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 
 
 class TestDashboard(APITestMixin):
@@ -21,7 +24,10 @@ class TestDashboard(APITestMixin):
 
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
-                interactions.append(CompanyInteractionFactory(dit_adviser=self.user))
+                interaction = CompanyInteractionFactory(dit_participants=[])
+                InteractionDITParticipantFactory(interaction=interaction)
+                InteractionDITParticipantFactory(interaction=interaction, adviser=self.user)
+                interactions.append(interaction)
                 contacts.append(ContactFactory(created_by=self.user))
 
         setup_es.indices.refresh()
@@ -32,21 +38,25 @@ class TestDashboard(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        resp_contacts = response_data['contacts']
+        actual_contacts = response_data['contacts']
 
-        resp_contact_ids = [contact['id'] for contact in resp_contacts]
-        assert resp_contact_ids == [str(contact.id) for contact in contacts[:-6:-1]]
+        actual_contact_ids = [contact['id'] for contact in actual_contacts]
+        # Latest 5 contacts, most recent first
+        expected_contact_ids = [str(contact.id) for contact in contacts[:-6:-1]]
+        assert actual_contact_ids == expected_contact_ids
 
-        resp_interactions = response_data['interactions']
-        resp_interaction_ids = [interaction['id'] for interaction in resp_interactions]
+        actual_interactions = response_data['interactions']
+        actual_interaction_ids = [interaction['id'] for interaction in actual_interactions]
 
-        assert resp_interaction_ids == [
+        # Latest 5 interactions, most recent first
+        expected_interaction_ids = [
             str(interaction.id) for interaction in interactions[:-6:-1]
         ]
+        assert actual_interaction_ids == expected_interaction_ids
 
-        resp_interaction = response.data['interactions'][0]
-        assert isinstance(resp_interaction['company'], dict)
-        assert resp_interaction['company']['name'] == interactions[-1].company.name
+        actual_first_interaction = response.data['interactions'][0]
+        assert isinstance(actual_first_interaction['company'], dict)
+        assert actual_first_interaction['company']['name'] == interactions[-1].company.name
 
     def test_intelligent_homepage_limit(self, setup_es):
         """Test the limit param."""

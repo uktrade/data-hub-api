@@ -38,7 +38,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,
 )
-from datahub.investment.investor_profile.test.factories import InvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
 from datahub.investment.project.evidence.test.factories import EvidenceDocumentFactory
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -188,7 +188,7 @@ MAPPING = {
                 ],
             },
             {
-                'factory': InvestorProfileFactory,
+                'factory': LargeInvestorProfileFactory,
                 'field': 'investor_company',
                 'expired_objects_kwargs': [
                     {

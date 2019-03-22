@@ -73,12 +73,65 @@ def id_unindexed_name_field():
 
 
 def id_name_partial_field(field):
-    """Object field with id and name sub-fields, and with partial matching on name."""
+    """
+    Object field with id and name sub-fields, and with partial matching on name.
+
+    The `name` field is being migrated away from using `copy_to` to being a multi-field.
+    `name_trigram` and `name.trigram` are both defined while the switch takes place.
+
+    Additionally, the `name` field should have had a data type of text, but it was mistakenly made
+    a keyword field. Hence, a `keyword` sub-field has also been added so type of `name` can be
+    changed to text once sorting operations have been migrated to using the `keyword` sub-field.
+
+    TODO:
+        - remove name_trigram once related logic has been updated to use name.trigram
+        - change name use Text instead of NormalizedKeyword once sorting options have been
+        updated to use name.keyword
+    """
     return Object(
         properties={
             'id': Keyword(),
-            'name': NormalizedKeyword(copy_to=f'{field}.name_trigram'),
+            'name': NormalizedKeyword(
+                copy_to=f'{field}.name_trigram',
+                fields={
+                    'keyword': NormalizedKeyword(),
+                    'trigram': TrigramText(),
+                },
+            ),
             'name_trigram': TrigramText(),
+        },
+    )
+
+
+def company_field():
+    """Company field with id, name, trading_names and trigrams."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+            'trading_names': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
+        },
+    )
+
+
+def country_field():
+    """Country field with id, name and trigram."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Text(
+                fields={
+                    'trigram': TrigramText(),
+                },
+            ),
         },
     )
 
@@ -86,18 +139,9 @@ def id_name_partial_field(field):
 def address_field(index_country=True):
     """Address field as nested object."""
     if index_country:
-        country_field = Object(
-            properties={
-                'id': Keyword(),
-                'name': Text(
-                    fields={
-                        'trigram': TrigramText(),
-                    },
-                ),
-            },
-        )
+        nested_country_field = country_field()
     else:
-        country_field = Object(
+        nested_country_field = Object(
             properties={
                 'id': Keyword(index=False),
                 'name': Text(index=False),
@@ -115,13 +159,13 @@ def address_field(index_country=True):
                     'trigram': TrigramText(),
                 },
             ),
-            'country': country_field,
+            'country': nested_country_field,
         },
     )
 
 
-def company_field(field):
-    """Company field."""
+def company_field_with_copy_to_name_trigram(field):
+    """Company field with copy to, deprecated in favour of company_field"""
     return Object(
         properties={
             'id': Keyword(),

@@ -172,12 +172,16 @@ class Interaction(BaseModel):
         related_name='%(class)ss',
         null=True,
         on_delete=models.PROTECT,
+        help_text='This field is deprecated and has been replaced by DIT participants.',
     )
     notes = models.TextField(max_length=10000, blank=True)
     # TODO: dit_team is being replaced with InteractionDITParticipant, and dit_team will be
     #  removed once the migration is complete
     dit_team = models.ForeignKey(
-        'metadata.Team', null=True, on_delete=models.PROTECT,
+        'metadata.Team',
+        null=True,
+        on_delete=models.PROTECT,
+        help_text='This field is deprecated and has been replaced by DIT participants.',
     )
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,

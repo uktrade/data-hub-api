@@ -45,7 +45,7 @@ class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    company = fields.company_field('company')
+    company = fields.company_field_with_copy_to_name_trigram('company')
     company_sector = fields.sector_field()
     communication_channel = fields.id_name_field()
     contacts = _contact_field()
@@ -107,10 +107,10 @@ class Interaction(BaseESModel):
         'event.name',
         'event.name_trigram',
         'subject_english',
-        'dit_adviser.name',
-        'dit_adviser.name_trigram',
-        'dit_team.name',
-        'dit_team.name_trigram',
+        'dit_participants.adviser.name',
+        'dit_participants.adviser.name.trigram',
+        'dit_participants.team.name',
+        'dit_participants.team.name.trigram',
     )
 
     class Meta:
