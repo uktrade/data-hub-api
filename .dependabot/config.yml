@@ -3,7 +3,9 @@ update_configs:
   - package_manager: "python"
     directory: "/"
     update_schedule: "weekly"
-    automerged_updates:
-      - match:
-          dependency_name: "boto3"
-          update_type: "semver:patch"
+    default_reviewers:
+    - "currycoder"
+    - "elcct"
+    - "marcofucci"
+    - "marcuspp"
+    - "reupen"
