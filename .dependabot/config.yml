@@ -3,3 +3,9 @@ update_configs:
   - package_manager: "python"
     directory: "/"
     update_schedule: "weekly"
+    default_reviewers:
+    - "currycoder"
+    - "elcct"
+    - "marcofucci"
+    - "marcuspp"
+    - "reupen"
