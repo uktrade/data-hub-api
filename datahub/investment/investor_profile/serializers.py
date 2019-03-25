@@ -1,9 +1,22 @@
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-from datahub.investment.investor_profile.constants import ProfileType as ProfileTypeConstant
+from datahub.core.validate_utils import is_not_blank
+from datahub.core.validators import (
+    AnyIsNotBlankRule,
+    InRule,
+    OperatorRule,
+    RulesBasedValidator,
+    ValidationRule,
+)
+from datahub.investment.investor_profile.constants import (
+    ProfileType as ProfileTypeConstant,
+    REQUIRED_CHECKS_THAT_DO_NOT_NEED_ADDITIONAL_INFORMATION,
+    REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION,
+)
 from datahub.investment.investor_profile.models import (
     AssetClassInterest,
     AssetClassInterestSector,
@@ -44,6 +57,11 @@ LARGE_CAPITAL_DETAILS_FIELDS = [
     'required_checks_conducted',
 ]
 
+LARGE_CAPITAL_ADDITIONAL_DETAILS_FIELDS = [
+    'required_checks_conducted_on',
+    'required_checks_conducted_by',
+]
+
 
 LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
     'deal_ticket_sizes',
@@ -68,6 +86,7 @@ ALL_LARGE_CAPITAL_FIELDS = (
     BASE_FIELDS
     + INCOMPLETE_LIST_FIELDS
     + LARGE_CAPITAL_DETAILS_FIELDS
+    + LARGE_CAPITAL_ADDITIONAL_DETAILS_FIELDS
     + LARGE_CAPITAL_REQUIREMENTS_FIELDS
     + LARGE_CAPITAL_LOCATION_FIELDS
 )
@@ -75,6 +94,18 @@ ALL_LARGE_CAPITAL_FIELDS = (
 
 class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     """Large capital investor profile serializer."""
+
+    default_error_messages = {
+        'invalid_required_checks_conducted_on': gettext_lazy(
+            'Enter the date of the most recent checks',
+        ),
+        'invalid_required_checks_conducted_by': gettext_lazy(
+            'Enter the person responsible for the most recent checks',
+        ),
+        'required_checks_conducted_value': gettext_lazy(
+            'Enter a value for required checks conducted',
+        ),
+    }
 
     investor_company = NestedRelatedField(
         Company,
@@ -96,6 +127,15 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
 
     required_checks_conducted = NestedRelatedField(
         RequiredChecksConducted,
+        required=False,
+    )
+
+    required_checks_conducted_by = NestedRelatedField(
+        'company.Advisor',
+        required=False,
+    )
+
+    required_checks_conducted_on = serializers.DateField(
         required=False,
     )
 
@@ -201,6 +241,25 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def update(self, instance, validated_data):
+        """Overriding update to check required checks conducted data."""
+        validated_data = self._update_required_checks_conducted(validated_data)
+        return super().update(instance, validated_data)
+
+    def _update_required_checks_conducted(self, validated_data):
+        """
+        Checks if required checks conducted is being set to a setting that does not require
+        the conditional data. If it is then the conditional fields are blanked.
+        """
+        if 'required_checks_conducted' in validated_data:
+            if (
+                    str(validated_data['required_checks_conducted'].id)
+                    in REQUIRED_CHECKS_THAT_DO_NOT_NEED_ADDITIONAL_INFORMATION
+            ):
+                validated_data['required_checks_conducted_on'] = None
+                validated_data['required_checks_conducted_by'] = None
+        return validated_data
+
     def create(self, validated_data):
         """Overrides the create method to add the large profile type id into the data."""
         validated_data['profile_type_id'] = ProfileTypeConstant.large.value.id
@@ -209,6 +268,34 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestorProfile
         fields = ALL_LARGE_CAPITAL_FIELDS
+        validators = [
+            RulesBasedValidator(
+                ValidationRule(
+                    'invalid_required_checks_conducted_on',
+                    OperatorRule('required_checks_conducted_on', bool),
+                    when=InRule(
+                        'required_checks_conducted',
+                        REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION,
+                    ),
+                ),
+                ValidationRule(
+                    'invalid_required_checks_conducted_by',
+                    OperatorRule('required_checks_conducted_by', bool),
+                    when=InRule(
+                        'required_checks_conducted',
+                        REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION,
+                    ),
+                ),
+                ValidationRule(
+                    'required_checks_conducted_value',
+                    OperatorRule('required_checks_conducted', is_not_blank),
+                    when=AnyIsNotBlankRule(
+                        'required_checks_conducted_by',
+                        'required_checks_conducted_on',
+                    ),
+                ),
+            ),
+        ]
 
 
 class AssetClassInterestSerializer(ConstantModelSerializer):

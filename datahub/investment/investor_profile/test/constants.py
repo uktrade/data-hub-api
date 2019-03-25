@@ -12,15 +12,6 @@ class InvestorType(Enum):
     )
 
 
-class RequiredChecksConducted(Enum):
-    """Required checks conducted constants."""
-
-    cleared = Constant(
-        'Cleared',
-        '02d6fc9b-fbb9-4621-b247-d86f2487898e',
-    )
-
-
 class DealTicketSize(Enum):
     """Deal ticket size constants."""
 
