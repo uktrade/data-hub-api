@@ -65,7 +65,7 @@ ipython==7.3.0
 jedi==0.13.3              # via ipython
 jinja2==2.10              # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.3.0
+kombu==4.4.0
 lxml==4.3.2
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
