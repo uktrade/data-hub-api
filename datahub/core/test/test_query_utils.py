@@ -8,6 +8,7 @@ from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
+    get_bracketed_concat_expression,
     get_choices_as_case_expression,
     get_front_end_url_expression,
     get_full_name_expression,
@@ -163,6 +164,84 @@ class TestGetFullNameExpression:
             proofreader_name=get_full_name_expression('proofreader'),
         )
         assert queryset.first().proofreader_name is None
+
+
+class TestBracketedConcatExpression:
+    """Tests for get_bracketed_concat_expression()."""
+
+    @pytest.mark.parametrize(
+        'first_name,last_name,country,fields,bracketed_field,expected_value',
+        (
+            (
+                'John',
+                'Rogers',
+                'France',
+                ('first_name', 'last_name'),
+                'country',
+                'John Rogers (France)',
+            ),
+            (
+                'John',
+                'Sill',
+                'France',
+                ('last_name', 'first_name'),
+                'country',
+                'Sill John (France)',
+            ),
+            (
+                'Alice',
+                'Gentle',
+                None,
+                ('first_name', 'last_name'),
+                'country',
+                'Alice Gentle',
+            ),
+            (
+                'Jennifer',
+                '',
+                'France',
+                ('first_name', 'last_name'),
+                None,
+                'Jennifer',
+            ),
+            (
+                'Carl',
+                'Rogers',
+                'UK',
+                (),
+                'country',
+                '(UK)',
+            ),
+            (
+                '',
+                '',
+                '',
+                ('first_name', 'last_name'),
+                'country',
+                '',
+            ),
+        ),
+    )
+    def test_annotation(
+        self,
+        first_name,
+        last_name,
+        country,
+        fields,
+        bracketed_field,
+        expected_value,
+    ):
+        """
+        Tests that a Person query set can be annotated using get_bracketed_concat_expression().
+        """
+        PersonFactory(first_name=first_name, last_name=last_name, country=country)
+        queryset = Person.objects.annotate(
+            name=get_bracketed_concat_expression(
+                *fields,
+                expression_to_bracket=bracketed_field,
+            ),
+        )
+        assert queryset.first().name == expected_value
 
 
 def test_get_front_end_url_expression(monkeypatch):
