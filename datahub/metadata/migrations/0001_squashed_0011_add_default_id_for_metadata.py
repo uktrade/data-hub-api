@@ -13,6 +13,12 @@ def load_initial_countries(apps, schema_editor):
         PurePath(__file__).parent / '0001_initial_countries.yaml',
     )
 
+def load_initial_employee_ranges(apps, schema_editor):
+    load_yaml_data_in_migration(
+        apps,
+        PurePath(__file__).parent / '0001_initial_employee_ranges.yaml',
+    )
+
 
 class Migration(migrations.Migration):
 
@@ -312,4 +318,5 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunPython(load_initial_countries, migrations.RunPython.noop),
+        migrations.RunPython(load_initial_employee_ranges, migrations.RunPython.noop),
     ]

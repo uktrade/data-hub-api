@@ -17,7 +17,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
 )
 
 MODELS_TO_REGISTER_WITH_ORDER = (
-    models.EmployeeRange,
     models.FDIValue,
     models.TurnoverRange,
     models.SalaryRange,
@@ -25,6 +24,7 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
+    models.EmployeeRange,
     models.InvestmentType,
     models.OverseasRegion,
     models.SectorCluster,

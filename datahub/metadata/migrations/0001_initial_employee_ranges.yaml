@@ -1,0 +1,30 @@
+- model: metadata.employeerange
+  pk: 3dafd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: 1 to 9
+    order: 100.0
+    disabled_on: null
+- model: metadata.employeerange
+  pk: 3eafd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: 10 to 49
+    order: 200.0
+    disabled_on: null
+- model: metadata.employeerange
+  pk: 3fafd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: 50 to 249
+    order: 300.0
+    disabled_on: null
+- model: metadata.employeerange
+  pk: 40afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: 250 to 499
+    order: 400.0
+    disabled_on: null
+- model: metadata.employeerange
+  pk: 41afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: 500+
+    order: 500.0
+    disabled_on: null
