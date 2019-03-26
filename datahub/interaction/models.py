@@ -128,8 +128,16 @@ class Interaction(BaseModel):
         ('service_delivery', 'Service delivery'),
     )
 
+    STATES = Choices(
+        ('incomplete', 'Incomplete'),
+        ('complete', 'Complete'),
+        ('cancelled', 'Cancelled'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
+    state = models.CharField(max_length=MAX_LENGTH, choices=STATES, default=STATES.complete)
+    location = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -188,14 +196,6 @@ class Interaction(BaseModel):
         on_delete=models.SET_NULL,
         help_text='For interactions only.',
     )
-    investment_project = models.ForeignKey(
-        'investment.InvestmentProject',
-        related_name='%(class)ss',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        help_text='For interactions only.',
-    )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this '
@@ -206,6 +206,15 @@ class Interaction(BaseModel):
         verbose_name='status',
         help_text='For service deliveries only.',
     )
+    # Investments
+    investment_project = models.ForeignKey(
+        'investment.InvestmentProject',
+        related_name='%(class)ss',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text='For interactions only.',
+    )
     grant_amount_offered = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
@@ -214,6 +223,7 @@ class Interaction(BaseModel):
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
     )
+    # Policy feedback
     was_policy_feedback_provided = models.BooleanField()
     policy_areas = models.ManyToManyField(
         'PolicyArea',

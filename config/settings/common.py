@@ -58,6 +58,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'django_filters',
     'mptt',
+    'django_mailbox',
 ]
 
 LOCAL_APPS = [
@@ -89,6 +90,7 @@ LOCAL_APPS = [
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.user_event_log',
+    'datahub.email_ingestion',
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
@@ -383,6 +385,11 @@ if REDIS_BASE_URL:
         CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
             'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
             'schedule': crontab(minute=0, hour=1),
+        }
+    if env.bool('ENABLE_EMAIL_INGESTION', False):
+        CELERY_BEAT_SCHEDULE['email_ingestion'] = {
+            'task': 'datahub.email_ingestion.tasks.ingest_emails',
+            'schedule': 10.0,
         }
 
     CELERY_WORKER_LOG_FORMAT = (
