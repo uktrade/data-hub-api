@@ -21,7 +21,7 @@ class EventSerializer(serializers.ModelSerializer):
     end_date = serializers.DateField()
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
-    organiser = NestedAdviserField(required=False, allow_null=True)
+    organiser = NestedAdviserField()
     lead_team = NestedRelatedField('metadata.Team')
     teams = NestedRelatedField('metadata.Team', many=True, allow_empty=False)
     address_country = NestedRelatedField('metadata.Country')

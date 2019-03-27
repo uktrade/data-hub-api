@@ -131,6 +131,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_minimal_success(self):
         """Tests successfully creating an event with only the required fields."""
+        organiser = AdviserFactory()
         team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
 
@@ -143,6 +144,7 @@ class TestCreateEventView(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
             'end_date': '2010-09-12',
+            'organiser': organiser.pk,
             'lead_team': team.pk,
             'teams': [team.pk],
         }
@@ -172,7 +174,12 @@ class TestCreateEventView(APITestMixin):
             },
             'disabled_on': None,
             'uk_region': None,
-            'organiser': None,
+            'organiser': {
+                'id': str(organiser.pk),
+                'first_name': organiser.first_name,
+                'last_name': organiser.last_name,
+                'name': organiser.name,
+            },
             'lead_team': {
                 'id': str(team.pk),
                 'name': team.name,
@@ -191,6 +198,8 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_maximal_success(self):
         """Tests successfully creating an event with all fields completed."""
+        organiser = AdviserFactory()
+
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
@@ -206,7 +215,7 @@ class TestCreateEventView(APITestMixin):
             'address_postcode': 'SW9 9AA',
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
-            'organiser': str(self.user.pk),
+            'organiser': str(organiser.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
             'related_programmes': [Programme.great_branded.value.id],
@@ -246,10 +255,10 @@ class TestCreateEventView(APITestMixin):
                 'name': UKRegion.east_of_england.value.name,
             },
             'organiser': {
-                'id': str(self.user.pk),
-                'first_name': self.user.first_name,
-                'last_name': self.user.last_name,
-                'name': self.user.name,
+                'id': str(organiser.pk),
+                'first_name': organiser.first_name,
+                'last_name': organiser.last_name,
+                'name': organiser.name,
             },
             'lead_team': {
                 'id': Team.crm.value.id,
@@ -288,6 +297,7 @@ class TestCreateEventView(APITestMixin):
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
             'lead_team': Team.crm.value.id,
+            'organiser': AdviserFactory().pk,
             'teams': [Team.healthcare_uk.value.id],
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
@@ -313,6 +323,7 @@ class TestCreateEventView(APITestMixin):
             'address_country': Country.united_kingdom.value.id,
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
+            'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
         }
@@ -338,6 +349,7 @@ class TestCreateEventView(APITestMixin):
             'uk_region': UKRegion.east_of_england.value.id,
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
+            'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
         }
@@ -362,6 +374,7 @@ class TestCreateEventView(APITestMixin):
             'uk_region': UKRegion.east_of_england.value.id,
             'service': Service.trade_enquiry.value.id,
             'end_date': '2020-01-01',
+            'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
         }
@@ -387,6 +400,7 @@ class TestCreateEventView(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'start_date': '2020-01-02',
             'end_date': '2020-01-01',
+            'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
         }
@@ -414,6 +428,7 @@ class TestCreateEventView(APITestMixin):
             'event_type': ['This field is required.'],
             'lead_team': ['This field is required.'],
             'name': ['This field is required.'],
+            'organiser': ['This field is required.'],
             'service': ['This field is required.'],
             'start_date': ['This field is required.'],
             'teams': ['This field is required.'],
@@ -430,6 +445,7 @@ class TestCreateEventView(APITestMixin):
             'event_type': None,
             'lead_team': None,
             'name': '',
+            'organiser': None,
             'service': None,
             'start_date': None,
             'teams': [],
@@ -446,6 +462,7 @@ class TestCreateEventView(APITestMixin):
             'event_type': ['This field may not be null.'],
             'lead_team': ['This field may not be null.'],
             'name': ['This field may not be blank.'],
+            'organiser': ['This field may not be null.'],
             'service': ['This field may not be null.'],
             'start_date': ['This field may not be null.'],
             'teams': ['This list may not be empty.'],
@@ -625,6 +642,7 @@ class TestEventVersioning(APITestMixin):
                 'service': Service.trade_enquiry.value.id,
                 'start_date': '2010-09-12',
                 'end_date': '2010-09-12',
+                'organiser': AdviserFactory().pk,
                 'lead_team': team.pk,
                 'teams': [team.pk],
             },
