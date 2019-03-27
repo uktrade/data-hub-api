@@ -88,7 +88,7 @@ def get_search_by_entity_query(
     if term != '':
         query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
 
-    filters, ranges = _split_date_range_fields(filter_data)
+    filters, ranges = _split_range_fields(filter_data)
 
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
@@ -133,25 +133,31 @@ def limit_search_query(query, offset=0, limit=100):
     return query[offset:offset + limit]
 
 
-def _split_date_range_fields(fields):
+def _split_range_fields(fields):
     """Finds and formats range fields."""
     filters = {}
     ranges = defaultdict(dict)
 
     for k, v in fields.items():
-        if k.endswith('_before') or k.endswith('_after'):
+        range_type = _get_range_type(k)
+        if range_type:
             range_key = k[:k.rindex('_')]
-
-            if k.endswith('_before'):
-                ranges[range_key]['lte'] = fields[k]
-            if k.endswith('_after'):
-                ranges[range_key]['gte'] = fields[k]
-
+            ranges[range_key][range_type] = fields[k]
             continue
 
         filters.update({k: v})
 
     return filters, ranges
+
+
+def _get_range_type(field_key):
+    """Checks field name for a range key word and returns range type."""
+    end_of_field_name = field_key.split('_')[-1]
+    if end_of_field_name in ['before', 'end']:
+        return 'lte'
+    if end_of_field_name in ['after', 'start']:
+        return 'gte'
+    return None
 
 
 def _clip_limit(offset, limit):
@@ -304,7 +310,7 @@ def _build_nested_queries(field, nested_filters):
         for nested_field, nested_value in nested_filters.items()
     }
 
-    filters, ranges = _split_date_range_fields(normalised_nested_filters)
+    filters, ranges = _split_range_fields(normalised_nested_filters)
     return [
         *_build_field_queries(filters),
         *_build_range_queries(ranges),

@@ -8,7 +8,7 @@ from datahub.search.query_builder import (
     _build_entity_permission_query,
     _build_field_query,
     _build_term_query,
-    _split_date_range_fields,
+    _split_range_fields,
     build_autocomplete_query,
     get_basic_search_query,
     get_search_by_entity_query,
@@ -231,7 +231,7 @@ def test_date_range_fields():
         'adviser.id': 1234,
     }
 
-    filters, ranges = _split_date_range_fields(fields)
+    filters, ranges = _split_range_fields(fields)
 
     assert filters == {
         'adviser.id': 1234,
