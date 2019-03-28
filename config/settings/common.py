@@ -58,7 +58,6 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'django_filters',
     'mptt',
-    'django_mailbox',
 ]
 
 LOCAL_APPS = [
@@ -519,3 +518,15 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     }
 }
+
+MAILBOXES = {
+    "meetings": {
+        "email": env("MAILBOX_MEETINGS_EMAIL", default=''),
+        "password": env("MAILBOX_MEETINGS_PASSWORD", default=''),
+        "imap_domain": env("MAILBOX_MEETINGS_IMAP_DOMAIN", default=''),
+    },
+}
+
+EMAIL_PROCESSOR_CLASSES = [
+    "datahub.interaction.email_processors.CalendarInteractionEmailProcessor",
+]
