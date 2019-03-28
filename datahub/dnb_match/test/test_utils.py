@@ -6,10 +6,12 @@ import pytest
 from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.dnb_match.utils import (
     _extract_address,
+    _extract_companies_house_number,
     _extract_country,
     _extract_employees,
     _extract_turnover,
     EmployeesIndicator,
+    NATIONAL_ID_SYSTEM_CODE_UK,
     TurnoverIndicator,
 )
 from datahub.metadata.models import Country
@@ -458,3 +460,88 @@ class TestExtractAddress:
 
         actual_output = _extract_address(wb_record)
         assert actual_output == expected_output
+
+
+class TestExtractCompaniesHouseNumber:
+    """Tests for the _extract_companies_house_number function."""
+
+    @pytest.mark.parametrize(
+        'wb_record,expected_output',
+        (
+            # System Code == UK CH
+            (
+                {
+                    'National Identification Number': '12345678',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                },
+                '12345678',
+            ),
+
+            # System Code == UK CH and CHN == ''
+            (
+                {
+                    'National Identification Number': '',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                },
+                '',
+            ),
+
+            # System Code == UK CH and len(CHN) != 8
+            (
+                {
+                    'National Identification Number': '1',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                },
+                '00000001',
+            ),
+
+            # System Code == UK CH and len(CHN) > 8 (shouldn't happen but still testing the case)
+            (
+                {
+                    'National Identification Number': '123456789',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                },
+                '123456789',
+            ),
+
+            # System Code != UK CH
+            (
+                {
+                    'National Identification Number': '123456789',
+                    'National Identification System Code': '0',
+                },
+                '',
+            ),
+
+            # System Code == ''
+            (
+                {
+                    'National Identification Number': '123456789',
+                    'National Identification System Code': '',
+                },
+                '',
+            ),
+        ),
+    )
+    def test_success(self, wb_record, expected_output):
+        """
+        Test successful cases related to _extract_companies_house_number().
+        """
+        actual_output = _extract_companies_house_number(wb_record)
+        assert actual_output == expected_output
+
+    @pytest.mark.parametrize(
+        'wb_record',
+        (
+            {
+                'National Identification Number': '123456789',
+                'National Identification System Code': 'a',
+            },
+        ),
+    )
+    def test_bad_data(self, wb_record):
+        """
+        Test cases related to bad input data when calling _extract_companies_house_number().
+        """
+        with pytest.raises(ValueError):
+            _extract_companies_house_number(wb_record)

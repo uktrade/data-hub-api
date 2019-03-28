@@ -6,6 +6,8 @@ from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.metadata.models import Country
 
 
+NATIONAL_ID_SYSTEM_CODE_UK = 12
+
 
 class EmployeesIndicator(Enum):
     """
@@ -124,3 +126,20 @@ def _extract_address(wb_record):
         'address_country': country,
         'address_postcode': wb_record['Postal Code for Street Address'],
     }
+
+
+def _extract_companies_house_number(wb_record):
+    """
+    :returns: the companies house number for the given D&B Worldbase
+        record or an empty string
+    """
+    system_code = wb_record['National Identification System Code']
+    if not system_code or int(system_code) != NATIONAL_ID_SYSTEM_CODE_UK:
+        return ''
+
+    companies_house_number = wb_record['National Identification Number']
+    if companies_house_number:
+        # companies house numbers are length 8
+        return companies_house_number.zfill(8)
+
+    return ''
