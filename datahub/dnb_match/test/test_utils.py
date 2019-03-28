@@ -5,6 +5,7 @@ import pytest
 
 from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.dnb_match.utils import (
+    _extract_address,
     _extract_country,
     _extract_employees,
     _extract_turnover,
@@ -393,3 +394,67 @@ class TestExtractCountry:
         with pytest.raises(Country.DoesNotExist) as excinfo:
             _extract_country('897')
         assert str(excinfo.value) == 'Country matching query does not exist.'
+
+
+@pytest.mark.django_db
+class TestExtractAddress:
+    """Tests for the _extract_address function."""
+
+    @pytest.mark.parametrize(
+        'wb_record,expected_output',
+        (
+            # all values populated
+            (
+                {
+                    'Street Address': '1',
+                    'Street Address 2': 'Main Street',
+                    'City Name': 'London',
+                    'State/Province Name': 'Camden',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': 'SW1A 1AA',
+                },
+                {
+                    'address_1': '1',
+                    'address_2': 'Main Street',
+                    'address_town': 'London',
+                    'address_county': 'Camden',
+                    # the body of the test replaces the ISO code in 'address_country'
+                    # with an instance of metadata.Country before any comparison
+                    'address_country': 'GB',
+                    'address_postcode': 'SW1A 1AA',
+                },
+            ),
+
+            # all values blank apart from country
+            (
+                {
+                    'Street Address': '',
+                    'Street Address 2': '',
+                    'City Name': '',
+                    'State/Province Name': '',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': '',
+                },
+                {
+                    'address_1': '',
+                    'address_2': '',
+                    'address_town': '',
+                    'address_county': '',
+                    # the body of the test replaces the ISO code in 'address_country'
+                    # with an instance of metadata.Country before any comparison
+                    'address_country': 'GB',
+                    'address_postcode': '',
+                },
+            ),
+        ),
+    )
+    def test_success(self, wb_record, expected_output):
+        """
+        Test successful cases related to _extract_address().
+        """
+        expected_output['address_country'] = Country.objects.get(
+            iso_alpha2_code=expected_output['address_country'],
+        )
+
+        actual_output = _extract_address(wb_record)
+        assert actual_output == expected_output

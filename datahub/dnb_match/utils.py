@@ -106,3 +106,21 @@ def _extract_country(wb_country_code):
     return Country.objects.get(
         iso_alpha2_code=dnb_country_data['iso_alpha2_code'],
     )
+
+
+def _extract_address(wb_record):
+    """
+    :returns: dict with address for the given D&B Worldbase record
+    :raises: AssertionError in case of unexpected non-implemented scenarios
+    :raises: Country.DoesNotExist if the DnB Country could not be
+        found in Data Hub
+    """
+    country = _extract_country(wb_record['Country Code'])
+    return {
+        'address_1': wb_record['Street Address'],
+        'address_2': wb_record['Street Address 2'],
+        'address_town': wb_record['City Name'],
+        'address_county': wb_record['State/Province Name'],
+        'address_country': country,
+        'address_postcode': wb_record['Postal Code for Street Address'],
+    }
