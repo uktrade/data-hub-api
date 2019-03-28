@@ -1,5 +1,10 @@
 from decimal import Decimal
 from enum import Enum
+from functools import lru_cache
+
+from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
+from datahub.metadata.models import Country
+
 
 
 class EmployeesIndicator(Enum):
@@ -78,3 +83,26 @@ def _extract_turnover(wb_record):
     is_turnover_estimated = turnover_indicator != turnover_indicator.ACTUAL
 
     return turnover, is_turnover_estimated
+
+
+@lru_cache()
+def _extract_country(wb_country_code):
+    """
+    :returns: instance of Country for given DnB country code
+    :raises: AssertionError in case of unexpected non-implemented scenarios
+    :raises: Country.DoesNotExist if the DnB Country could not be
+        found in the Data Hub
+    """
+    assert wb_country_code in DNB_COUNTRY_CODE_MAPPING, (
+        f'Country code {wb_country_code} not recognised, please check DNB_COUNTRY_CODE_MAPPING.'
+    )
+
+    dnb_country_data = DNB_COUNTRY_CODE_MAPPING[wb_country_code]
+    assert dnb_country_data['iso_alpha2_code'], (
+        f'Country {dnb_country_data["name"]} not currently mapped, '
+        'please check DNB_COUNTRY_CODE_MAPPING.'
+    )
+
+    return Country.objects.get(
+        iso_alpha2_code=dnb_country_data['iso_alpha2_code'],
+    )

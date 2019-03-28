@@ -1,13 +1,17 @@
 from decimal import InvalidOperation
+from unittest import mock
 
 import pytest
 
+from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.dnb_match.utils import (
+    _extract_country,
     _extract_employees,
     _extract_turnover,
     EmployeesIndicator,
     TurnoverIndicator,
 )
+from datahub.metadata.models import Country
 
 
 class TestExtractEmployees:
@@ -330,3 +334,62 @@ class TestExtractTurnover:
         """
         with pytest.raises(exception):
             _extract_turnover(wb_record)
+
+
+@pytest.mark.django_db
+class TestExtractCountry:
+    """Tests for the _extract_country function."""
+
+    @pytest.mark.parametrize(
+        'wb_country_code,expected_iso_alpha2_code',
+        (
+            ('790', 'GB'),  # United Kingdom
+            ('797', 'GB'),  # Scotland
+            ('033', 'AR'),  # Argentina
+        ),
+    )
+    def test_success(self, wb_country_code, expected_iso_alpha2_code):
+        """
+        Test successful cases related to _extract_country().
+        """
+        actual_country = _extract_country(wb_country_code)
+        assert actual_country.iso_alpha2_code == expected_iso_alpha2_code
+
+    def test_fails_with_non_existent_code(self):
+        """
+        Test that AssertionError is raised if the given country code
+        is not in `constants.DNB_COUNTRY_CODE_MAPPING`.
+        """
+        with pytest.raises(AssertionError) as excinfo:
+            _extract_country('111111')
+        assert str(excinfo.value) == (
+            'Country code 111111 not recognised, please check DNB_COUNTRY_CODE_MAPPING.'
+        )
+
+    def test_fails_with_country_not_mapped(self):
+        """
+        Test that AssertionError is raised if iso_alpha2_code is None.
+        """
+        country_code = '898'
+        country_mapping = DNB_COUNTRY_CODE_MAPPING[country_code]
+
+        assert not country_mapping['iso_alpha2_code']
+
+        with pytest.raises(AssertionError) as excinfo:
+            _extract_country(country_code)
+        assert str(excinfo.value) == (
+            f'Country {country_mapping["name"]} not currently mapped, '
+            'please check DNB_COUNTRY_CODE_MAPPING.'
+        )
+
+    @mock.patch.dict(
+        'datahub.dnb_match.constants.DNB_COUNTRY_CODE_MAPPING',
+        {'897': {'iso_alpha2_code': 'AAA', 'name': 'NOT IN DH'}},
+    )
+    def test_fails_with_country_not_in_datahub(self):
+        """
+        Test that Country.DoesNotExist is raised if the country is not in Data Hub.
+        """
+        with pytest.raises(Country.DoesNotExist) as excinfo:
+            _extract_country('897')
+        assert str(excinfo.value) == 'Country matching query does not exist.'
