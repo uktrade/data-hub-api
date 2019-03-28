@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='service',
             name='contexts',
-            field=datahub.core.fields.MultipleChoiceField(blank=True, choices=(('event', 'Event'), ('interaction', 'Interaction'), ('investment_project_interaction', 'Investment project interaction'), ('service_delivery', 'Service delivery')), max_length=255),
+            field=datahub.core.fields.MultipleChoiceField(blank=True, choices=(('event', 'Event'), ('export_interaction', 'Export interaction'), ('export_service_delivery', 'Export service delivery'), ('investment_interaction', 'Investment interaction'), ('investment_project_interaction', 'Investment project interaction'), ('other_interaction', 'Other interaction'), ('other_service_delivery', 'Other service delivery'), ('interaction', 'Interaction (deprecated)'), ('service_delivery', 'Service delivery (deprecated)')), max_length=255),
         ),
     ]
