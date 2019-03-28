@@ -26,7 +26,6 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -947,20 +946,13 @@ class TestInteractionExportView(APITestMixin):
         # Faker generates job titles containing commas which complicates comparisons,
         # so all contact job titles are explicitly set
         company = CompanyFactory()
-        interaction = CompanyInteractionFactory(
+        CompanyInteractionFactory(
             company=company,
             contacts=[
                 ContactFactory(company=company, job_title='Engineer'),
                 ContactFactory(company=company, job_title=None),
                 ContactFactory(company=company, job_title=''),
             ],
-        )
-        InteractionDITParticipantFactory.create_batch(2, interaction=interaction)
-        InteractionDITParticipantFactory(interaction=interaction, team=None)
-        InteractionDITParticipantFactory(
-            interaction=interaction,
-            adviser=None,
-            team=factory.SubFactory(TeamFactory),
         )
         EventServiceDeliveryFactory(
             company=company,
@@ -1033,7 +1025,8 @@ class TestInteractionExportView(APITestMixin):
                 'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
                 'Company sector': get_attr_or_none(interaction, 'company.sector.name'),
                 'Contacts': _format_expected_contacts(interaction),
-                'Advisers': _format_expected_advisers(interaction),
+                'Adviser': get_attr_or_none(interaction, 'dit_adviser.name'),
+                'Service provider': get_attr_or_none(interaction, 'dit_team.name'),
                 'Event': get_attr_or_none(interaction, 'event.name'),
                 'Service delivery status': get_attr_or_none(
                     interaction,
@@ -1183,20 +1176,6 @@ def _format_expected_contact_name(contact):
     return f'{contact.name}'
 
 
-def _format_expected_advisers(interaction):
-    formatted_contact_names = sorted(
-        _format_expected_adviser_name(dit_participant)
-        for dit_participant in interaction.dit_participants.all(),
-    )
-    return ', '.join(formatted_contact_names)
-
-
-def _format_expected_adviser_name(dit_participant):
-    adviser_name = dit_participant.adviser.name if dit_participant.adviser else ''
-    team_name = f'({dit_participant.team.name})' if dit_participant.team else ''
-    return join_truthy_strings(adviser_name, team_name)
-
-
 def _format_actual_csv_row(row):
     return {key: _format_actual_csv_value(key, value) for key, value in row.items()}
 
@@ -1210,7 +1189,6 @@ def _format_actual_csv_value(key, value):
       will be able to perform the sorting in the export query.
     """
     multi_value_fields_and_separators = {
-        'Advisers': ', ',
         'Contacts': ', ',
         'Policy areas': '; ',
         'Policy issue types': ', ',
