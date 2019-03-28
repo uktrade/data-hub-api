@@ -12,15 +12,6 @@ class InvestorType(Enum):
     )
 
 
-class RequiredChecksConducted(Enum):
-    """Required checks conducted constants."""
-
-    cleared = Constant(
-        'Cleared',
-        '02d6fc9b-fbb9-4621-b247-d86f2487898e',
-    )
-
-
 class DealTicketSize(Enum):
     """Deal ticket size constants."""
 
@@ -80,6 +71,10 @@ class ConstructionRisk(Enum):
     brownfield = Constant(
         'Brownfield (some construction risk)',
         '884deaf6-cb0c-4036-b78c-efd92cb10098',
+    )
+    operational = Constant(
+        'Operational (no construction risk)',
+        '9f554b26-70f2-4cac-89ae-758c2ef71c70',
     )
 
 
