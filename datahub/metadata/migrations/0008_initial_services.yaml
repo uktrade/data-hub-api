@@ -34,7 +34,9 @@
     contexts:
     - interaction
     - event
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 21f2c8c2-f9f7-e511-888e-e4115bead28a
   fields:
@@ -68,6 +70,8 @@
     disabled_on:
     name: OBN Chargeable Services
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 44345a68-49fd-e311-8a2b-e4115bead28a
@@ -118,6 +122,8 @@
     disabled_on:
     name: Events - Webinars
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 496f0ce8-dcc9-e211-a646-e4115bead28a
@@ -328,7 +334,9 @@
     contexts:
     - interaction
     - event
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 9484b82b-3499-e211-a939-e4115bead28a
   fields:
@@ -337,13 +345,20 @@
     contexts:
     - interaction
     - event
+    - export_interaction
+    - export_service_delivery
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: 9584b82b-3499-e211-a939-e4115bead28a
   fields:
     disabled_on:
     name: Events - UK Based
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 9684b82b-3499-e211-a939-e4115bead28a
@@ -376,6 +391,8 @@
     disabled_on:
     name: Inbound Referral
     contexts:
+    - export_interaction
+    - other_interaction
     - service_delivery
 - model: metadata.service
   pk: 9a84b82b-3499-e211-a939-e4115bead28a
@@ -383,6 +400,8 @@
     disabled_on:
     name: UK Region Local
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 9b84b82b-3499-e211-a939-e4115bead28a
@@ -423,7 +442,9 @@
     disabled_on:
     name: Onward Referral
     contexts:
+    - export_interaction
     - service_delivery
+    - other_interaction
 - model: metadata.service
   pk: c5f9b82b-3499-e211-a939-e4115bead28a
   fields:
@@ -481,6 +502,8 @@
     disabled_on:
     name: Events - Overseas
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: cdf9b82b-3499-e211-a939-e4115bead28a
@@ -517,7 +540,9 @@
     contexts:
     - interaction
     - event
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: d420b92b-3499-e211-a939-e4115bead28a
   fields:
@@ -533,6 +558,7 @@
     disabled_on:
     name: Export Opportunities
     contexts:
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: d620b92b-3499-e211-a939-e4115bead28a
@@ -602,7 +628,9 @@
     contexts:
     - interaction
     - event
+    - export_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: f46eb92b-3499-e211-a939-e4115bead28a
   fields:
@@ -616,6 +644,8 @@
     disabled_on:
     name: Significant Assistance (PIMS)
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: f66eb92b-3499-e211-a939-e4115bead28a
@@ -687,13 +717,17 @@
     contexts:
     - interaction
     - event
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 0696b92b-3499-e211-a939-e4115bead28a
   fields:
     disabled_on:
     name: Events - Outward Missions
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 0796b92b-3499-e211-a939-e4115bead28a
@@ -703,7 +737,10 @@
     contexts:
     - interaction
     - event
+    - export_interaction
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 0896b92b-3499-e211-a939-e4115bead28a
   fields:
@@ -737,13 +774,17 @@
     contexts:
     - interaction
     - event
+    - export_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 340bba2b-3499-e211-a939-e4115bead28a
   fields:
     disabled_on:
     name: Events - Market Visit Support (MVS)
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 350bba2b-3499-e211-a939-e4115bead28a
@@ -753,7 +794,11 @@
     contexts:
     - interaction
     - event
+    - export_interaction
+    - export_service_delivery
     - investment_project_interaction
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: 360bba2b-3499-e211-a939-e4115bead28a
   fields:
@@ -763,12 +808,15 @@
     - interaction
     - event
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 370bba2b-3499-e211-a939-e4115bead28a
   fields:
     disabled_on:
     name: Events - Inward Missions
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 380bba2b-3499-e211-a939-e4115bead28a
@@ -776,7 +824,11 @@
     disabled_on:
     name: Tradeshow Access Programme (TAP)
     contexts:
+    - export_interaction
+    - export_service_delivery
     - service_delivery
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: 390bba2b-3499-e211-a939-e4115bead28a
   fields:
@@ -795,6 +847,7 @@
     - interaction
     - event
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: 5359ba2b-3499-e211-a939-e4115bead28a
   fields:
@@ -849,7 +902,9 @@
     contexts:
     - interaction
     - event
+    - investment_interaction
     - investment_project_interaction
+    - other_interaction
 - model: metadata.service
   pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
   fields:
@@ -876,7 +931,11 @@
     contexts:
     - interaction
     - event
+    - export_interaction
+    - export_service_delivery
     - investment_project_interaction
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
   fields:
@@ -885,7 +944,11 @@
     contexts:
     - interaction
     - event
+    - export_interaction
+    - export_service_delivery
     - investment_project_interaction
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: 12907483-1ff3-e411-bcbe-e4115bead28a
   fields:
@@ -901,22 +964,29 @@
     disabled_on:
     name: Bank Referral
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: a4a733b6-eb95-e611-be23-e4115bead28a
   fields:
     disabled_on:
-    name: 'Account Managment: Northern Powerhouse'
+    name: 'Account Management: Northern Powerhouse'
     contexts:
     - interaction
+    - export_interaction
     - event
     - investment_project_interaction
+    - other_interaction
+    - other_service_delivery
 - model: metadata.service
   pk: e7238b26-653c-e711-8a1f-e4115bead28a
   fields:
     disabled_on:
     name: EiG Referral
     contexts:
+    - export_service_delivery
+    - other_service_delivery
     - service_delivery
 - model: metadata.service
   pk: 3b679865-ea99-e711-ba5d-e4115bead28a

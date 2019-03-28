@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='service',
             name='contexts',
-            field=datahub.core.fields.MultipleChoiceField(choices=(('event', 'Event'), ('interaction', 'Interaction'), ('investment_project_interaction', 'Investment project interaction'), ('policy_feedback', 'Policy feedback'), ('service_delivery', 'Service delivery')), default=['event', 'interaction', 'investment_project_interaction', 'service_delivery'], max_length=255, blank=True),
+            field=datahub.core.fields.MultipleChoiceField(choices=(('event', 'Event'), ('export_interaction', 'Export interaction'), ('export_service_delivery', 'Export service delivery'), ('investment_interaction', 'Investment interaction'), ('investment_project_interaction', 'Investment project interaction'), ('other_interaction', 'Other interaction'), ('other_service_delivery', 'Other service delivery'), ('interaction', 'Interaction (deprecated)'), ('service_delivery', 'Service delivery (deprecated)')), default=['event', 'interaction', 'investment_project_interaction', 'service_delivery'], max_length=255, blank=True),
             preserve_default=False,
         ),
         migrations.AddIndex(
