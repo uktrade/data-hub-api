@@ -1,9 +1,23 @@
+from decimal import Decimal
 from enum import Enum
 
 
 class EmployeesIndicator(Enum):
     """
     Indicates if the field Employees Total/Here is an actual value,
+    estimated value or not available.
+    """
+
+    NOT_AVAILABLE = ''
+    ACTUAL = '0'
+    LOW_END_OF_RANGE = '1'
+    ESTIMATED = '2'
+    MODELLED = '3'
+
+
+class TurnoverIndicator(Enum):
+    """
+    Indicates if the field 'Annual Sales in US dollars' is an actual value,
     estimated value or not available.
     """
 
@@ -42,3 +56,25 @@ def _extract_employees(wb_record):
     is_number_of_employees_estimated = employees_indicator != EmployeesIndicator.ACTUAL
 
     return number_of_employees, is_number_of_employees_estimated
+
+
+def _extract_turnover(wb_record):
+    """
+    Returns a tuple with the turnover as an int and a bool indicating if the value
+    is estimated or not.
+    None values are returned if the data is not available in the Worldbase record.
+
+    :returns: (turnover, is_turnover_estimated) for the given D&B Worldbase record
+        or (None, None) if the data is not available in the record
+    """
+    turnover = round(Decimal(wb_record['Annual Sales in US dollars']))
+    turnover_indicator = TurnoverIndicator(wb_record['Annual Sales Indicator'])
+
+    if turnover_indicator == turnover_indicator.NOT_AVAILABLE:
+        assert not turnover
+
+        return None, None
+
+    is_turnover_estimated = turnover_indicator != turnover_indicator.ACTUAL
+
+    return turnover, is_turnover_estimated
