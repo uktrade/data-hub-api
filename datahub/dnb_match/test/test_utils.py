@@ -9,9 +9,11 @@ from datahub.dnb_match.utils import (
     _extract_companies_house_number,
     _extract_country,
     _extract_employees,
+    _extract_out_of_business,
     _extract_turnover,
     EmployeesIndicator,
     NATIONAL_ID_SYSTEM_CODE_UK,
+    OutOfBusinessIndicator,
     TurnoverIndicator,
 )
 from datahub.metadata.models import Country
@@ -545,3 +547,55 @@ class TestExtractCompaniesHouseNumber:
         """
         with pytest.raises(ValueError):
             _extract_companies_house_number(wb_record)
+
+
+class TestExtractOutOfBusiness:
+    """Tests for the _extract_out_of_business function."""
+
+    @pytest.mark.parametrize(
+        'wb_record,expected_output',
+        (
+            (
+                {
+                    'Out of Business indicator': OutOfBusinessIndicator.OUT_OF_BUSINESS,
+                },
+                True,
+            ),
+
+            (
+                {
+                    'Out of Business indicator': OutOfBusinessIndicator.NOT_OUT_OF_BUSINESS,
+                },
+                False,
+            ),
+        ),
+    )
+    def test_success(self, wb_record, expected_output):
+        """
+        Test successful cases related to _extract_out_of_business().
+        """
+        actual_output = _extract_out_of_business(wb_record)
+        assert actual_output == expected_output
+
+    @pytest.mark.parametrize(
+        'wb_record',
+        (
+            {
+                'Out of Business indicator': 'M',
+            },
+
+            {
+                'Out of Business indicator': '',
+            },
+
+            {
+                'Out of Business indicator': 1,
+            },
+        ),
+    )
+    def test_bad_data(self, wb_record):
+        """
+        Test cases related to bad input data when calling _extract_out_of_business().
+        """
+        with pytest.raises(ValueError):
+            _extract_out_of_business(wb_record)

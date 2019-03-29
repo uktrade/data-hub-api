@@ -35,6 +35,13 @@ class TurnoverIndicator(Enum):
     MODELLED = '3'
 
 
+class OutOfBusinessIndicator(Enum):
+    """Indicates if a business is out of business."""
+
+    OUT_OF_BUSINESS = 'Y'
+    NOT_OUT_OF_BUSINESS = 'N'
+
+
 def _extract_employees(wb_record):
     """
     Returns a tuple with number of employees as an int and a bool indicating
@@ -143,3 +150,12 @@ def _extract_companies_house_number(wb_record):
         return companies_house_number.zfill(8)
 
     return ''
+
+
+def _extract_out_of_business(wb_record):
+    """
+    :returns: Yes if the given D&B worldbase indicates that the record is out
+        of business
+    """
+    raw_value = wb_record['Out of Business indicator']
+    return OutOfBusinessIndicator(raw_value) == OutOfBusinessIndicator.OUT_OF_BUSINESS
