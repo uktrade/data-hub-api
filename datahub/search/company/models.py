@@ -83,9 +83,7 @@ class Company(BaseESModel):
     registered_address_2 = Text()
     registered_address_town = fields.NormalizedKeyword()
     registered_address_county = Text()
-    registered_address_country = fields.id_name_partial_field(
-        'registered_address_country',
-    )
+    registered_address_country = fields.id_name_partial_field()
     registered_address_postcode = Text(
         copy_to=[
             'registered_address_postcode_trigram',
@@ -100,9 +98,7 @@ class Company(BaseESModel):
         copy_to=['trading_address_postcode_trigram'],
     )
     trading_address_postcode_trigram = fields.TrigramText()
-    trading_address_country = fields.id_name_partial_field(
-        'trading_address_country',
-    )
+    trading_address_country = fields.id_name_partial_field()
 
     trading_names = Text(
         copy_to=['trading_names_trigram'],
