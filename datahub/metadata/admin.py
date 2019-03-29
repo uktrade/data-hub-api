@@ -114,12 +114,44 @@ class CountryAdmin(ViewOnlyAdmin):
     list_filter = (DisabledOnFilter, 'overseas_region')
 
 
+class ServiceContextFilter(admin.SimpleListFilter):
+    """
+    Admin filter for the Service.contexts field.
+
+    The logic will work for any datahub.core.fields.MultipleChoiceField model field.
+    """
+
+    field = 'contexts'
+    parameter_name = 'context'
+    title = 'context'
+
+    def lookups(self, request, model_admin):
+        """Returns choices from the model field."""
+        model_field = model_admin.model._meta.get_field(self.field)
+        return model_field.get_base_field_choices()
+
+    def queryset(self, request, queryset):
+        """Filter a queryset using the selected value."""
+        value = self.value()
+        if value is None:
+            return queryset
+
+        filter_kwargs = {
+            f'{self.field}__overlap': [value],
+        }
+        return queryset.filter(**filter_kwargs)
+
+
 @admin.register(models.Service)
 class ServiceAdmin(DisableableMetadataAdmin):
     """Admin for services."""
 
     fields = ('id', 'name', 'contexts', 'disabled_on')
     list_display = ('name', 'get_contexts_display', 'disabled_on')
+    list_filter = (
+        DisabledOnFilter,
+        ServiceContextFilter,
+    )
 
 
 @admin.register(models.Team)
