@@ -216,17 +216,17 @@ class TestServiceView:
     @pytest.mark.parametrize(
         'contexts',
         (
-            [Service.CONTEXTS.interaction],
+            [Service.CONTEXTS.export_interaction],
             ['non-existent-context'],
-            [Service.CONTEXTS.interaction, Service.CONTEXTS.service_delivery],
+            [Service.CONTEXTS.export_interaction, Service.CONTEXTS.export_service_delivery],
         ),
     )
     def test_list_filter_by_has_any(self, api_client, contexts):
         """Test listing services, filtered by context."""
         test_data_contexts = (
-            [Service.CONTEXTS.interaction],
-            [Service.CONTEXTS.service_delivery],
-            [Service.CONTEXTS.interaction, Service.CONTEXTS.service_delivery],
+            [Service.CONTEXTS.export_interaction],
+            [Service.CONTEXTS.export_service_delivery],
+            [Service.CONTEXTS.export_interaction, Service.CONTEXTS.export_service_delivery],
         )
 
         ServiceFactory.create_batch(

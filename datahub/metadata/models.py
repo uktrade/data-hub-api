@@ -176,10 +176,26 @@ class Service(BaseConstantModel):
     """Service."""
 
     CONTEXTS = Choices(
+        # Services that can be attached to an event
         ('event', 'Event'),
-        ('interaction', 'Interaction'),
+        # For interactions added to a company that are about export
+        ('export_interaction', 'Export interaction'),
+        # For service deliveries added to a company that are about export
+        ('export_service_delivery', 'Export service delivery'),
+        # For interactions added to a company about investment (but not a
+        # specific investment project)
+        ('investment_interaction', 'Investment interaction'),
+        # For interactions added to a particular investment project
         ('investment_project_interaction', 'Investment project interaction'),
-        ('service_delivery', 'Service delivery'),
+        # For interactions added to a company that are about not about export or investment
+        ('other_interaction', 'Other interaction'),
+        # For service deliveries added to a company that are about not about export or investment
+        ('other_service_delivery', 'Other service delivery'),
+
+        # TODO: Deprecated contexts  – remove once the front end has been updated to use
+        # other contexts
+        ('interaction', 'Interaction (deprecated)'),
+        ('service_delivery', 'Service delivery (deprecated)'),
     )
 
     contexts = MultipleChoiceField(
