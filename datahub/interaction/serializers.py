@@ -351,6 +351,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_feedback_notes',
             'policy_issue_types',
             'was_policy_feedback_provided',
+            'state',
+            'location',
         )
         read_only_fields = (
             'archived_documents_url_path',

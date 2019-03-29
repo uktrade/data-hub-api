@@ -1,5 +1,6 @@
 import icalendar
 import base64
+from logging import getLogger
 
 from django.db import transaction
 
@@ -8,6 +9,8 @@ from datahub.company.models.contact import Contact
 from datahub.interaction.models import Interaction, InteractionDITParticipant
 from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.email_ingestion.validation import email_sent_by_dit
+
+logger = getLogger(__name__)
 
 
 class CalendarInteractionEmailProcessor(EmailProcessor):
@@ -46,23 +49,33 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         if not calendar_string:
             return False
         calendar = icalendar.Calendar.from_ical(calendar_string)
+        # TODO: Review how naive this approach is - what if an adviser sent their
+        # whole calendar to datahub for whatever reason..?
         for component in calendar.walk():
             if component.name == "VEVENT":
                 return {
-                    "subject": component.decoded('summary'),
+                    "subject": str(component.get('summary')),
                     "start": component.decoded('dtstart'),
                     "end": component.decoded('dtend'),
-                    "organiser": component.decoded('organizer'),
-                    "attendee": component.decoded('attendee'),
+                    "organiser": str(component.get('organizer')),
+                    "attendee": str(component.get('attendee')),
                     "sent": component.decoded('dtstamp'),
-                    "location": component.decoded('location'),
+                    "location": str(component.get('location')),
+                    "status": str(component.get('status')),
+                    "uid": str(component.get('uid')),
                 }
         return False
 
     @transaction.atomic
-    def build_incomplete_interaction(self, sender_adviser, secondary_advisers, contacts, company, calendar_event):
+    def build_incomplete_interaction(
+        self, 
+        sender_adviser, 
+        secondary_advisers, 
+        contacts, 
+        company, 
+        calendar_event):
         # TODO: Sort out signature of this method
-        # TODO: Evaluate whether this needs to be moved in to the modelling 
+        # TODO: Evaluate whether this method needs to be moved in to the modelling 
         # layer
         interaction = Interaction.objects.create(
             kind=Interaction.KINDS.interaction,
@@ -96,7 +109,6 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         sender_adviser = self.get_adviser_for_email(sender_email)
         if not sender_adviser:
             return (False, "Email not sent by recognised DIT Adviser")
-
         all_recipients = [item[1] for item in message.to]
         all_recipients.extend([item[1] for item in message.cc])
         all_recipients = set(all_recipients)
@@ -108,8 +120,10 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             return (False, "No email receipients were recognised as Contacts")
         company = self.get_company_from_contacts(contacts)
         calendar_event = self.get_calendar_event_metadata(message)
+        logger.info(calendar_event)
         if not calendar_event:
             return (False, "No calendar event could be extracted")
+        # TODO: Add a check to avoid creating a duplicate interaction
         # We've validated and marshalled everything we need to build an 
         # interaction
         interaction = self.build_incomplete_interaction(

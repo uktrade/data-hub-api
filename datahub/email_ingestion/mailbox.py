@@ -1,13 +1,23 @@
 import imaplib
 import mailparser
-from email.errors import MessageParseError
+from logging import getLogger
 
 from django.conf import settings
+from django.utils.module_loading import import_string
 
+from email.errors import MessageParseError
+
+logger = getLogger(__name__)
 
 class Mailbox:
 
-    def __init__(self, email, password, imap_domain, imap_port=None, use_ssl=True):
+    def __init__(self, 
+        email, 
+        password, 
+        imap_domain, 
+        mail_processor_classes, 
+        imap_port=None, 
+        use_ssl=True):
         self.email = email
         self.password = password
         self.imap_domain = imap_domain
@@ -19,6 +29,10 @@ class Mailbox:
             else:
                 self.imap_port = 465
         self.use_ssl = use_ssl
+        self.processors = []
+        for processor_class_path in mail_processor_classes:
+            processor_class = import_string(processor_class_path)
+            self.processors.append(processor_class())
 
     def connect(self):
         transport = imaplib.IMAP4_SSL
@@ -38,6 +52,13 @@ class Mailbox:
         if message_id_string:
             return message_id_string.decode().split(' ')
         return []
+
+    def _process_email(self, message):
+        for processor in self.processors:
+            processed, message = processor.process_email(message)
+            logger.info("Processed: %s Message: %s" % (processed, message))
+            if processed:
+                break
 
     def get_new_mail(self):
         self.connect()
@@ -67,8 +88,27 @@ class Mailbox:
         self.server.expunge()
         return
 
+    def process_new_mail(self):
+        messages = self.get_new_mail()
+        for message in messages:
+            logger.info("Attachments:")
+            logger.info(message.attachments)
+            logger.info("Headers:")
+            logger.info(message._message.keys())
+            logger.info(dir(message))
+            logger.info("Subject: %s" % message.subject)
+            logger.info("To: %s" % message.to)
+            logger.info("From: %s" % message.from_)
+            logger.info("CC: %s" % message.cc)
+            logger.info("Authentication: %s" % message.authentication_results)
+            logger.info("Text-plain:")
+            logger.info(message.text_plain)
+            logger.info("Text-html:")
+            logger.info(message.text_html)
+            self._process_email(message)
 
-class Mailboxes:
+
+class MailboxManager:
 
     def __init__(self):
         self.mailboxes = {}
@@ -78,7 +118,13 @@ class Mailboxes:
         for mailbox_name, config in settings.MAILBOXES.items():
             if not (config['email'] and config['password'] and config['imap_domain']):
                 continue
-            mailbox = Mailbox(config['email'], config['password'], config['imap_domain'])
+            processor_classes = config.get('processor_classes', [])
+            mailbox = Mailbox(
+                config['email'],
+                config['password'],
+                config['imap_domain'],
+                processor_classes,
+            )
             self.mailboxes[mailbox_name] = mailbox
 
     def get_all_mailboxes(self):
@@ -88,4 +134,4 @@ class Mailboxes:
         return self.mailboxes[identifier]
 
 
-mailboxes = Mailboxes()
+mailbox_manager = MailboxManager()
