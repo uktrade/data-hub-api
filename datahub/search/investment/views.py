@@ -23,7 +23,9 @@ class SearchInvestmentProjectAPIViewMixin:
     search_app = InvestmentSearchApp
     serializer_class = SearchInvestmentProjectQuerySerializer
     es_sort_by_remappings = {
+        'investor_company.name': 'investor_company.name.keyword',
         'name': 'name.keyword',
+        'uk_company.name': 'uk_company.name.keyword',
     }
 
     FILTER_FIELDS = (
