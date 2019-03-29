@@ -21,6 +21,7 @@ class MultipleChoiceField(ArrayField):
     default_error_messages = {
         'item_duplicated': _('An item was specified more than once.'),
     }
+    default_widget = forms.CheckboxSelectMultiple
 
     def __init__(self, max_length=None, choices=None, **kwargs):
         """Initialises the field."""
@@ -68,9 +69,14 @@ class MultipleChoiceField(ArrayField):
 
     def formfield(self, **kwargs):
         """Returns a MultipleChoiceField instance as the default form field."""
+        field_kwargs = {
+            'widget': self.default_widget,
+            **kwargs,
+        }
         return super(ArrayField, self).formfield(
             form_class=forms.MultipleChoiceField,
             choices=self.base_field.choices,
+            **field_kwargs,
         )
 
     def validate(self, value, model_instance):
