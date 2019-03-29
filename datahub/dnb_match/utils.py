@@ -159,3 +159,52 @@ def _extract_out_of_business(wb_record):
     """
     raw_value = wb_record['Out of Business indicator']
     return OutOfBusinessIndicator(raw_value) == OutOfBusinessIndicator.OUT_OF_BUSINESS
+
+
+def extract_wb_record_into_company_fields(wb_record):
+    """
+    :returns (fields, is_out_of_business) where:
+        fields: dict of company field names and new values
+        is_out_of_business: True if the record is out of business
+    """
+    duns_number = wb_record['DUNS Number']
+    name = wb_record['Business Name']
+    trading_name = wb_record['Secondary Name']
+    number_of_employees, is_number_of_employees_estimated = _extract_employees(wb_record)
+    turnover, is_turnover_estimated = _extract_turnover(wb_record)
+    companies_house_number = _extract_companies_house_number(wb_record)
+    is_out_of_business = _extract_out_of_business(wb_record)
+    address = _extract_address(wb_record)
+
+    company_fields = {
+        'name': name,
+        'trading_names': [trading_name] if trading_name else [],
+        'company_number': companies_house_number,
+        'duns_number': duns_number,
+        'number_of_employees': number_of_employees,
+        'is_number_of_employees_estimated': is_number_of_employees_estimated,
+        'employee_range': None,  # resetting it as deprecated
+        'turnover': turnover,
+        'is_turnover_estimated': is_turnover_estimated,
+        'turnover_range': None,  # resetting it as deprecated
+    }
+
+    # TODO: registered_address is been currently set as the frontend has not moved to
+    # the new address logic yet. If that happens before this logic is run or re-run,
+    # it would be more accurate to set registered_address fields to None or
+    # process the Worldbase field 'Registered Address Indicator'.
+    # This is because the given D&B address is the principal address which is
+    # different from the registered one unless 'Registered Address Indicator' = 'Y'
+    company_fields.update(
+        **address,
+        **{
+            f'trading_{address_field}': address_value
+            for address_field, address_value in address.items()
+        },
+        **{
+            f'registered_{address_field}': address_value
+            for address_field, address_value in address.items()
+        },
+    )
+
+    return company_fields, is_out_of_business
