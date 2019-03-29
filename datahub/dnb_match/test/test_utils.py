@@ -12,11 +12,30 @@ from datahub.dnb_match.utils import (
     _extract_out_of_business,
     _extract_turnover,
     EmployeesIndicator,
+    extract_wb_record_into_company_fields,
     NATIONAL_ID_SYSTEM_CODE_UK,
     OutOfBusinessIndicator,
     TurnoverIndicator,
 )
 from datahub.metadata.models import Country
+
+
+def _resolve_countries(company_fields):
+    """
+    Replaces all the country fields in company_fields (the ones ending in *_country)
+    with an instance of metadata.Country.
+    """
+    fields_to_resolve = [
+        'address_country',
+        'trading_address_country',
+        'registered_address_country',
+    ]
+
+    for country_field in fields_to_resolve:
+        if country_field in company_fields:
+            company_fields[country_field] = Country.objects.get(
+                iso_alpha2_code=company_fields[country_field],
+            )
 
 
 class TestExtractEmployees:
@@ -456,9 +475,7 @@ class TestExtractAddress:
         """
         Test successful cases related to _extract_address().
         """
-        expected_output['address_country'] = Country.objects.get(
-            iso_alpha2_code=expected_output['address_country'],
-        )
+        _resolve_countries(expected_output)
 
         actual_output = _extract_address(wb_record)
         assert actual_output == expected_output
@@ -599,3 +616,149 @@ class TestExtractOutOfBusiness:
         """
         with pytest.raises(ValueError):
             _extract_out_of_business(wb_record)
+
+
+@pytest.mark.django_db
+class TestExtractWbRecordIntoCompanyFields:
+    """Tests for the extract_wb_record_into_company_fields function."""
+
+    @pytest.mark.parametrize(
+        'wb_record,expected_output',
+        (
+            # Complete record
+            (
+                {
+                    'DUNS Number': '112233445566',
+                    'Business Name': 'WB Corp',
+                    'Secondary Name': 'Known as...',
+                    'Employees Total': '11',
+                    'Employees Total Indicator': EmployeesIndicator.ESTIMATED,
+                    'Employees Here': '0',
+                    'Employees Here Indicator': EmployeesIndicator.ESTIMATED,
+                    'Annual Sales in US dollars': '100',
+                    'Annual Sales Indicator': TurnoverIndicator.ESTIMATED,
+                    'Street Address': '1',
+                    'Street Address 2': 'Main Street',
+                    'City Name': 'London',
+                    'State/Province Name': 'Camden',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': 'SW1A 1AA',
+                    'National Identification Number': '12345678',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                    'Out of Business indicator': OutOfBusinessIndicator.NOT_OUT_OF_BUSINESS,
+                },
+                (
+                    {
+                        'duns_number': '112233445566',
+                        'name': 'WB Corp',
+                        'trading_names': ['Known as...'],
+                        'company_number': '12345678',
+                        'number_of_employees': 11,
+                        'is_number_of_employees_estimated': True,
+                        'employee_range': None,
+                        'turnover': 100,
+                        'is_turnover_estimated': True,
+                        'turnover_range': None,
+                        'address_1': '1',
+                        'address_2': 'Main Street',
+                        'address_town': 'London',
+                        'address_county': 'Camden',
+                        # the body of the test replaces the ISO code in 'address_country'
+                        # with an instance of metadata.Country before any comparison
+                        'address_country': 'GB',
+                        'address_postcode': 'SW1A 1AA',
+                        'registered_address_1': '1',
+                        'registered_address_2': 'Main Street',
+                        'registered_address_town': 'London',
+                        'registered_address_county': 'Camden',
+                        # the body of the test replaces the ISO code in
+                        # 'registered_address_country' with an instance of metadata.Country
+                        # before any comparison
+                        'registered_address_country': 'GB',
+                        'registered_address_postcode': 'SW1A 1AA',
+                        'trading_address_1': '1',
+                        'trading_address_2': 'Main Street',
+                        'trading_address_town': 'London',
+                        'trading_address_county': 'Camden',
+                        # the body of the test replaces the ISO code in 'trading_address_country'
+                        # with an instance of metadata.Country before any comparison
+                        'trading_address_country': 'GB',
+                        'trading_address_postcode': 'SW1A 1AA',
+                    },
+                    False,
+                ),
+            ),
+
+            # Minimal record
+            (
+                {
+                    'DUNS Number': '112233445566',
+                    'Business Name': 'WB Corp',
+                    'Secondary Name': '',
+                    'Employees Total': '0',
+                    'Employees Total Indicator': EmployeesIndicator.NOT_AVAILABLE,
+                    'Employees Here': '0',
+                    'Employees Here Indicator': EmployeesIndicator.NOT_AVAILABLE,
+                    'Annual Sales in US dollars': '0',
+                    'Annual Sales Indicator': TurnoverIndicator.NOT_AVAILABLE,
+                    'Street Address': '',
+                    'Street Address 2': '',
+                    'City Name': '',
+                    'State/Province Name': '',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': '',
+                    'National Identification Number': '',
+                    'National Identification System Code': '',
+                    'Out of Business indicator': OutOfBusinessIndicator.OUT_OF_BUSINESS,
+                },
+                (
+                    {
+                        'duns_number': '112233445566',
+                        'name': 'WB Corp',
+                        'trading_names': [],
+                        'company_number': '',
+                        'number_of_employees': None,
+                        'is_number_of_employees_estimated': None,
+                        'employee_range': None,
+                        'turnover': None,
+                        'is_turnover_estimated': None,
+                        'turnover_range': None,
+                        'address_1': '',
+                        'address_2': '',
+                        'address_town': '',
+                        'address_county': '',
+                        # the body of the test replaces the ISO code in 'address_country'
+                        # with an instance of metadata.Country before any comparison
+                        'address_country': 'GB',
+                        'address_postcode': '',
+                        'registered_address_1': '',
+                        'registered_address_2': '',
+                        'registered_address_town': '',
+                        'registered_address_county': '',
+                        # the body of the test replaces the ISO code in
+                        # 'registered_address_country' with an instance of metadata.Country
+                        # before any comparison
+                        'registered_address_country': 'GB',
+                        'registered_address_postcode': '',
+                        'trading_address_1': '',
+                        'trading_address_2': '',
+                        'trading_address_town': '',
+                        'trading_address_county': '',
+                        # the body of the test replaces the ISO code in 'trading_address_country'
+                        # with an instance of metadata.Country before any comparison
+                        'trading_address_country': 'GB',
+                        'trading_address_postcode': '',
+                    },
+                    True,
+                ),
+            ),
+        ),
+    )
+    def test_success(self, wb_record, expected_output):
+        """
+        Test successful cases related to extract_wb_record_into_company_fields().
+        """
+        _resolve_countries(expected_output[0])
+
+        actual_output = extract_wb_record_into_company_fields(wb_record)
+        assert actual_output == expected_output
