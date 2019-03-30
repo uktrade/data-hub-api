@@ -46,6 +46,7 @@ def setup_data(setup_es):
     """Sets up data for the tests."""
     investment_projects = [
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='abc defg',
             description='investmentproject1',
             estimated_land_date=datetime.date(2011, 6, 13),
@@ -60,8 +61,10 @@ def setup_data(setup_es):
             ],
             level_of_involvement_id=Involvement.hq_and_post_only.value.id,
             likelihood_to_land_id=LikelihoodToLand.high.value.id,
+            foreign_equity_investment=100000,
         ),
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='delayed project',
             description='investmentproject2',
             estimated_land_date=datetime.date(2057, 6, 13),
@@ -81,6 +84,7 @@ def setup_data(setup_es):
             likelihood_to_land_id=LikelihoodToLand.medium.value.id,
         ),
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='won project',
             description='investmentproject3',
             estimated_land_date=datetime.date(2027, 9, 13),
@@ -97,6 +101,7 @@ def setup_data(setup_es):
             ],
             level_of_involvement_id=Involvement.hq_only.value.id,
             likelihood_to_land_id=None,
+            foreign_equity_investment=200000,
         ),
         InvestmentProjectFactory(
             name='new project',
@@ -149,6 +154,57 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
+
+    @pytest.mark.parametrize(
+        'search,expected_gross_value_added,expected_project_name',
+        (
+            (
+                {
+                    'gross_value_added_start': 0,
+                    'gross_value_added_end': 6000,
+                },
+                [5810],
+                ['abc defg'],
+            ),
+            (
+                {
+                    'gross_value_added_start': 20000,
+                },
+                [],
+                [],
+            ),
+            (
+                {
+                    'gross_value_added_end': 100000,
+                },
+                [5810, 11620],
+                ['abc defg', 'won project'],
+            ),
+        ),
+    )
+    def test_gross_value_added_filters(
+        self, setup_data, search, expected_gross_value_added, expected_project_name,
+    ):
+        """Test Gross Value Added (GVA) filters."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data=search,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        expected_number_of_results = len(expected_gross_value_added)
+        assert response.data['count'] == expected_number_of_results, response.data['results']
+        assert len(response.data['results']) == expected_number_of_results
+        assert (
+            Counter(result['gross_value_added'] for result in response.data['results'])
+            == Counter(expected_gross_value_added)
+        ), expected_gross_value_added
+        assert (
+            Counter(result['name'] for result in response.data['results'])
+            == Counter(expected_project_name)
+        ), expected_project_name
 
     def test_search_adviser_filter(self, setup_es):
         """Tests the adviser filter."""
@@ -1080,6 +1136,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,
+                'Gross Value Added': project.gross_value_added,
             }
             for project in sorted_projects
         ]

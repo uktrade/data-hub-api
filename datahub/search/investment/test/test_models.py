@@ -57,6 +57,7 @@ def test_investment_project_to_dict(setup_es):
         'total_investment',
         'client_cannot_provide_foreign_investment',
         'foreign_equity_investment',
+        'gross_value_added',
         'government_assistance',
         'some_new_jobs',
         'specific_programme',
