@@ -300,6 +300,16 @@ class IProjectValueAbstract(models.Model):
         'GVAMultiplier', null=True, blank=True, on_delete=models.SET_NULL,
         related_name='investment_projects',
     )
+    gross_value_added = models.DecimalField(
+        max_digits=25,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        help_text=(
+            'Denormalised GVA value which is automatically populated using '
+            'the gva multiplier and the foreign equity investment value.'
+        ),
+    )
 
 
 class IProjectRequirementsAbstract(models.Model):
@@ -680,7 +690,10 @@ class GVAMultiplier(models.Model):
         related_name='gva_multipliers',
         on_delete=models.CASCADE,
     )
-    multiplier = models.FloatField()
+    multiplier = models.DecimalField(
+        max_digits=7,
+        decimal_places=6,
+    )
     financial_year = models.IntegerField(
         help_text='The year from which the gva multiplier should apply from.',
     )
