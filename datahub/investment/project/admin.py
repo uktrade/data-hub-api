@@ -53,6 +53,8 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'allow_blank_estimated_land_date',
         'allow_blank_possible_uk_regions',
         'archived_documents_url_path',
+        'gross_value_added',
+        'gva_multiplier',
         'comments',
         'created',
         'modified',

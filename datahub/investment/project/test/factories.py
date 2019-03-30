@@ -19,6 +19,7 @@ from datahub.core.constants import (
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.project.constants import (
+    FDISICGrouping,
     InvestmentActivityType,
     InvestorType,
     Involvement,
@@ -174,3 +175,14 @@ class InvestmentActivityFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentActivity'
+
+
+class GVAMultiplierFactory(factory.django.DjangoModelFactory):
+    """GVA Multiplier factory."""
+
+    fdi_sic_grouping_id = FDISICGrouping.retail.value.id
+    financial_year = 2019
+    multiplier = float(0.1250)
+
+    class Meta:
+        model = 'investment.GVAMultiplier'

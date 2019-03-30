@@ -300,6 +300,9 @@ class IProjectValueAbstract(models.Model):
         'GVAMultiplier', null=True, blank=True, on_delete=models.SET_NULL,
         related_name='investment_projects',
     )
+    gross_value_added = models.IntegerField(
+        null=True,
+    )
 
 
 class IProjectRequirementsAbstract(models.Model):
@@ -691,7 +694,7 @@ class GVAMultiplier(models.Model):
 
     def __str__(self):
         """Human-readable representation"""
-        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.year}'
+        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.financial_year}'
 
 
 class SpecificProgramme(BaseConstantModel):
