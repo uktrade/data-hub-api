@@ -81,6 +81,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             kind=Interaction.KINDS.interaction,
             state=Interaction.STATES.incomplete,
             location=calendar_event['location'],
+            meeting_uid=calendar_event['uid'],
             date=calendar_event['start'],
             company=company,
             contact=contacts[0],
