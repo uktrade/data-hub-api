@@ -40,7 +40,7 @@ elasticsearch-dsl==6.3.1
 # Celery
 celery[redis]==4.2.1
 billiard==3.5.0.4  # pinned due to https://github.com/celery/billiard/issues/260
-kombu==4.3.0
+kombu==4.5.0
 
 # Testing and dev
 pytest==4.4.0
