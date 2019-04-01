@@ -43,7 +43,7 @@ billiard==3.5.0.4  # pinned due to https://github.com/celery/billiard/issues/260
 kombu==4.3.0
 
 # Testing and dev
-pytest==4.3.1
+pytest==4.4.0
 pytest-django==3.4.8
 pytest-sugar==0.9.2
 pytest-cov==2.6.1
