@@ -171,7 +171,7 @@ class InteractionSerializer(serializers.ModelSerializer):
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     modified_by = NestedAdviserField(read_only=True)
-    service = NestedRelatedField(Service)
+    service = NestedRelatedField(Service, required=False, allow_null=True)
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
@@ -353,6 +353,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'was_policy_feedback_provided',
             'state',
             'location',
+            'meeting_uid',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -393,7 +394,15 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=AndRule(
+                        EqualsRule('kind', Interaction.KINDS.interaction),
+                        EqualsRule('state', Interaction.STATES.complete),
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('service', bool),
+                    when=EqualsRule('state', Interaction.STATES.complete),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
