@@ -17,7 +17,7 @@ class Event(BaseESModel):
     address_county = fields.NormalizedKeyword()
     address_postcode = Text(copy_to='address_postcode_trigram')
     address_postcode_trigram = fields.TrigramText()
-    address_country = fields.id_name_partial_field('address_country')
+    address_country = fields.id_name_partial_field()
     created_on = Date()
     disabled_on = Date()
     end_date = Date()
@@ -33,11 +33,11 @@ class Event(BaseESModel):
     )
     notes = fields.EnglishText()
     organiser = fields.contact_or_adviser_field('organiser')
-    related_programmes = fields.id_name_partial_field('related_programmes')
+    related_programmes = fields.id_name_partial_field()
     service = fields.id_name_field()
     start_date = Date()
-    teams = fields.id_name_partial_field('teams')
-    uk_region = fields.id_name_partial_field('uk_region')
+    teams = fields.id_name_partial_field()
+    uk_region = fields.id_name_partial_field()
 
     MAPPINGS = {
         'address_country': dict_utils.id_name_dict,
@@ -57,14 +57,14 @@ class Event(BaseESModel):
         'id',
         'name',
         'name.trigram',
-        'address_country.name_trigram',
+        'address_country.name.trigram',
         'address_postcode_trigram',
-        'uk_region.name_trigram',
+        'uk_region.name.trigram',
         'organiser.name_trigram',
         'teams.name',
-        'teams.name_trigram',
+        'teams.name.trigram',
         'related_programmes.name',
-        'related_programmes.name_trigram',
+        'related_programmes.name.trigram',
     )
 
     class Meta:
