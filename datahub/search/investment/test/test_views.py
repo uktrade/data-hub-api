@@ -1136,6 +1136,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,
+                'Gross Value Added': project.gross_value_added,
             }
             for project in sorted_projects
         ]
