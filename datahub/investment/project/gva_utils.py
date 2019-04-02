@@ -1,3 +1,5 @@
+from django.utils.functional import cached_property
+
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
@@ -26,19 +28,15 @@ class GrossValueAddedCalculator:
     """
 
     def __init__(self, investment_project):
-        """Sets the investment project and cache value for the gva multiplier."""
+        """Sets the investment project."""
         self.investment_project = investment_project
-        self._gva_multiplier = None
 
-    @property
+    @cached_property
     def gva_multiplier(self):
         """:returns the GVA multiplier if one is found."""
-        if self._gva_multiplier:
-            return self._gva_multiplier
-        self._gva_multiplier = self._get_gva_multiplier_for_investment_project()
-        return self._gva_multiplier
+        return self._get_gva_multiplier_for_investment_project()
 
-    @property
+    @cached_property
     def gross_value_added(self):
         """Calculates the Gross Value Added (GVA) for an investment project."""
         if not self.investment_project.foreign_equity_investment or not self.gva_multiplier:

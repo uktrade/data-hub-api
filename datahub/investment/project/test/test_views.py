@@ -1072,8 +1072,8 @@ class TestPartialUpdateView(APITestMixin):
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['foreign_equity_investment'] == 200
-        assert response_data['gross_value_added'] == 12
+        assert str(response_data['foreign_equity_investment']) == '200'
+        assert str(response_data['gross_value_added']) == '12'
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
