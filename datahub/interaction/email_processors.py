@@ -127,6 +127,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         logger.info(calendar_event)
         if not calendar_event:
             return (False, "No calendar event could be extracted")
+        meeting_confirmed = calendar_event['status'] == 'CONFIRMED'
+        if not meeting_confirmed:
+            return (False, "Calendar event was not status: CONFIRMED")
         matching_interactions = Interaction.objects.filter(meeting_uid=calendar_event['uid'])
         meeting_exists = matching_interactions.count() > 0
         if meeting_exists:
