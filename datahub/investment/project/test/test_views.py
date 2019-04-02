@@ -1054,6 +1054,27 @@ class TestPartialUpdateView(APITestMixin):
     These cover PATCH /v3/investment/<id>
     """
 
+    def test_change_foreign_equity_investment_updates_gross_value_added(self):
+        """Test that updating the foreign equity investment updated gross value added."""
+        project = InvestmentProjectFactory(
+            foreign_equity_investment=100,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            actual_land_date=date(2019, 1, 1),
+        )
+        # GVA Multiplier - Transportation & storage - 2019 - 0.0621
+        assert project.gross_value_added == 6
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'foreign_equity_investment': 200,
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['foreign_equity_investment'] == 200
+        assert response_data['gross_value_added'] == 12
+
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
         project = InvestmentProjectFactory()

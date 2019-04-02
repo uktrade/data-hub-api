@@ -91,8 +91,9 @@ def update_gross_value_added_for_investment_project(investment_project):
     calculate_gross_value_added = CalculateGrossValueAdded(investment_project)
     gva_multiplier = calculate_gross_value_added.gva_multiplier
     gva_multiplier_id = getattr(gva_multiplier, 'id', None)
-    if gva_multiplier_id == investment_project.gva_multiplier_id:
-        return
-    investment_project.gva_multiplier_id = gva_multiplier_id
-    investment_project.gross_value_added = calculate_gross_value_added.gross_value_added
+    if gva_multiplier_id != investment_project.gva_multiplier_id:
+        investment_project.gva_multiplier_id = gva_multiplier_id
+    gross_value_added = calculate_gross_value_added.gross_value_added
+    if gross_value_added != investment_project.gross_value_added:
+        investment_project.gross_value_added = calculate_gross_value_added.gross_value_added
     return investment_project
