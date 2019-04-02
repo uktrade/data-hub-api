@@ -1,3 +1,4 @@
+import pytz
 import icalendar
 import base64
 from logging import getLogger
@@ -42,6 +43,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
                 return encoded_cal_text.decode("utf-8", "ignore")
         return False
 
+    def _get_utc_datetime(self, localised_datetime):
+        return localised_datetime.astimezone(pytz.utc)
+
     def get_calendar_event_metadata(self, message):
         calendar_string = self._grab_calendar_string_from_text(message)
         if not calendar_string:
@@ -55,11 +59,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             if component.name == "VEVENT":
                 return {
                     "subject": str(component.get('summary')),
-                    "start": component.decoded('dtstart'),
-                    "end": component.decoded('dtend'),
-                    "organiser": str(component.get('organizer')),
-                    "attendee": str(component.get('attendee')),
-                    "sent": component.decoded('dtstamp'),
+                    "start": self._get_utc_datetime(component.decoded('dtstart')),
+                    "end": self._get_utc_datetime(component.decoded('dtend')),
+                    "sent": self._get_utc_datetime(component.decoded('dtstamp')),
                     "location": str(component.get('location')),
                     "status": str(component.get('status')),
                     "uid": str(component.get('uid')),
@@ -68,14 +70,15 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
     @transaction.atomic
     def build_incomplete_interaction(
-        self, 
-        sender_adviser, 
-        secondary_advisers, 
-        contacts, 
-        company, 
-        calendar_event):
+        self,
+        sender_adviser,
+        secondary_advisers,
+        contacts,
+        company,
+        calendar_event
+    ):
         # TODO: Sort out signature of this method
-        # TODO: Evaluate whether this method needs to be moved in to the modelling 
+        # TODO: Evaluate whether this method needs to be moved in to the modelling
         # layer
         interaction = Interaction.objects.create(
             kind=Interaction.KINDS.interaction,
@@ -124,8 +127,11 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         logger.info(calendar_event)
         if not calendar_event:
             return (False, "No calendar event could be extracted")
-        # TODO: Add a check to avoid creating a duplicate interaction
-        # We've validated and marshalled everything we need to build an 
+        matching_interactions = Interaction.objects.filter(meeting_uid=calendar_event['uid'])
+        meeting_exists = matching_interactions.count() > 0
+        if meeting_exists:
+            return (False, "Meeting already exists as an interaction")
+        # We've validated and marshalled everything we need to build an
         # interaction
         interaction = self.build_incomplete_interaction(
             sender_adviser=sender_adviser,

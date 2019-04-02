@@ -9,15 +9,18 @@ from email.errors import MessageParseError
 
 logger = getLogger(__name__)
 
+
 class Mailbox:
 
-    def __init__(self, 
-        email, 
-        password, 
-        imap_domain, 
-        mail_processor_classes, 
-        imap_port=None, 
-        use_ssl=True):
+    def __init__(
+        self,
+        email,
+        password,
+        imap_domain,
+        mail_processor_classes,
+        imap_port=None,
+        use_ssl=True
+    ):
         self.email = email
         self.password = password
         self.imap_domain = imap_domain
