@@ -17,8 +17,8 @@ from datahub.metadata.test.factories import SectorFactory
 pytestmark = pytest.mark.django_db
 
 
-class TestGrossValueAdded:
-    """Test for Gross Value Added"""
+class TestGrossValueAddedCalculator:
+    """Test for Gross Value Added Calculator."""
 
     @pytest.mark.parametrize(
         'investment_type,sector,business_activities,multiplier_value',
@@ -115,7 +115,7 @@ class TestGrossValueAdded:
         """Test when a GVA Multiplier is not present for a financial year."""
         with mock.patch(
             'datahub.investment.project.gva_utils.'
-            'CalculateGrossValueAdded._get_gva_multiplier_financial_year',
+            'GrossValueAddedCalculator._get_gva_multiplier_financial_year',
         ) as mock_get_financial_year:
             mock_get_financial_year.return_value = 1980
             project = InvestmentProjectFactory(
@@ -158,7 +158,7 @@ class TestGrossValueAdded:
         )
 
         with mock.patch(
-            'datahub.investment.project.gva_utils.CalculateGrossValueAdded._get_gva_multiplier',
+            'datahub.investment.project.gva_utils.GrossValueAddedCalculator._get_gva_multiplier',
         ) as mock_get_multiplier:
             mock_get_multiplier.return_value = gva_multiplier
             project = InvestmentProjectFactory(
