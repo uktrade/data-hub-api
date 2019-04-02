@@ -48,6 +48,8 @@ class SearchInvestmentProjectAPIViewMixin:
         'uk_region_location',
         'level_of_involvement_simplified',
         'likelihood_to_land',
+        'gross_value_added_start',
+        'gross_value_added_end',
     )
 
     REMAP_FIELDS = {
