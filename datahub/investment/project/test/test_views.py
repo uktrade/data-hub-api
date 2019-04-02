@@ -735,6 +735,9 @@ class TestRetrieveView(APITestMixin):
             non_fdi_r_and_d_budget=False,
             new_tech_to_uk=False,
             export_revenue=True,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            actual_land_date=date(2019, 1, 1),
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -757,6 +760,8 @@ class TestRetrieveView(APITestMixin):
         assert response_data['new_tech_to_uk'] is False
         assert response_data['export_revenue'] is True
         assert response_data['value_complete'] is True
+        # GVA Multiplier - Transportation & storage - 2019 - 0.0621
+        assert response_data['gross_value_added'] == 6
 
     def test_get_requirements_success(self):
         """Test successfully getting a project requirements object."""
