@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Case, F, Func, OuterRef, Subquery, Value, When
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, NullIf
 
 
 class ConcatWS(Func):
@@ -25,18 +25,6 @@ class PreferNullConcat(Func):
 
     template = '%(expressions)s'
     arg_joiner = ' || '
-
-
-class NullIf(Func):
-    """
-    Returns None if a field equals a particular expression.
-
-    Usage example:
-        NullIf('first_name', Value(''))  # returns None if first_name is an empty string
-    """
-
-    function = 'nullif'
-    arity = 2
 
 
 def get_string_agg_subquery(model, expression, delimiter=', '):
