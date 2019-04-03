@@ -1185,8 +1185,8 @@ def _format_actual_csv_value(key, value):
     Sorts the value of multi-value fields for a row alphabetically as they are unordered at
     present.
 
-    TODO Django 2.2 adds ordering support to StringAgg, which will remove the need for this as we
-      will be able to perform the sorting in the export query.
+    TODO Django 2.2 added ordering support to StringAgg, which will remove the need for this.
+     However, it is not currently used due to https://code.djangoproject.com/ticket/30315.
     """
     multi_value_fields_and_separators = {
         'Contacts': ', ',
