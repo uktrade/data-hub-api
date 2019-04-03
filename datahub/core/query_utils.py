@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Case, F, Func, OuterRef, Subquery, Value, When
+from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Concat, NullIf
 
 
@@ -146,10 +146,10 @@ def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
         )
     """
     if person_field_name is None:
-        return _full_name_concat(
+        return get_bracketed_concat_expression(
             'first_name',
             'last_name',
-            bracketed_field=bracketed_field_name,
+            expression_to_bracket=bracketed_field_name,
         )
 
     evaluated_bracketed_field_name = (
@@ -159,31 +159,62 @@ def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
     return Case(
         When(
             **{f'{person_field_name}__isnull': False},
-            then=_full_name_concat(
+            then=get_bracketed_concat_expression(
                 f'{person_field_name}__first_name',
                 f'{person_field_name}__last_name',
-                bracketed_field=evaluated_bracketed_field_name,
+                expression_to_bracket=evaluated_bracketed_field_name,
             ),
         ),
         default=None,
     )
 
 
-def _full_name_concat(first_name_field, last_name_field, bracketed_field=None):
+def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
+    """
+    Gets an SQL expression that concatenates a number of expressions and optionally another
+    field surrounded by brackets.
+
+    For simple annotation of full names of contacts or advisers, get_full_name_expression() should
+    be preferred. However, this function can handle other or more complex scenarios.
+
+    Usage examples:
+
+        # Effectively '{Contact.first_name} {Contact.last_name}'
+        Contact.objects.annotate(
+            name=get_bracketed_concat_expression('first_name', 'last_name'),
+        )
+
+        # Effectively '{Contact.first_name} {Contact.last_name} ({Contact.job_title})'
+        # (but the job title would be omitted if blank or NULL)
+        Contact.objects.annotate(
+            name=get_bracketed_concat_expression(
+                'first_name',
+                'last_name',
+                expression_to_bracket='job_title',
+            ),
+        )
+
+        # Effectively '{Interaction.dit_adviser.first_name} {Interaction.dit_adviser.last_name}'
+        Interaction.objects.annotate(
+            dit_adviser_name=get_bracketed_concat_expression(
+                'dit_adviser__first_name',
+                'dit_adviser__last_name',
+            ),
+        )
+    """
     parts = [
-        NullIf(first_name_field, Value('')),
-        NullIf(last_name_field, Value('')),
+        NullIf(field, Value('')) for field in expressions
     ]
 
-    if bracketed_field:
+    if expression_to_bracket:
         bracketed_expression = PreferNullConcat(
             Value('('),
-            NullIf(bracketed_field, Value('')),
+            NullIf(expression_to_bracket, Value('')),
             Value(')'),
         )
         parts.append(bracketed_expression)
 
-    return ConcatWS(Value(' '), *parts)
+    return ConcatWS(Value(' '), *parts, output_field=CharField())
 
 
 def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
