@@ -100,8 +100,8 @@ class GrossValueAddedCalculator:
         return 2019
 
 
-def update_gross_value_added_for_investment_project(investment_project):
-    """Updates the Gross Value Added data for investment project."""
+def set_gross_value_added_for_investment_project(investment_project):
+    """Sets the Gross Value Added data for investment project."""
     calculate_gross_value_added = GrossValueAddedCalculator(investment_project)
     gva_multiplier = calculate_gross_value_added.gva_multiplier
     gva_multiplier_id = getattr(gva_multiplier, 'id', None)
