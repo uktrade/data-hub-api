@@ -52,6 +52,7 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
     readonly_fields = (
         'allow_blank_estimated_land_date',
         'allow_blank_possible_uk_regions',
+        'gva_multiplier',
         'archived_documents_url_path',
         'comments',
         'created',
