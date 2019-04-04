@@ -296,6 +296,11 @@ class IProjectValueAbstract(models.Model):
     new_tech_to_uk = models.BooleanField(null=True)
     export_revenue = models.BooleanField(null=True)
 
+    gva_multiplier = models.ForeignKey(
+        'GVAMultiplier', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='investment_projects',
+    )
+
 
 class IProjectRequirementsAbstract(models.Model):
     """The requirements part of an investment project."""
@@ -628,6 +633,65 @@ class InvestmentProjectCode(models.Model):
     """
 
     project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
+
+
+class InvestmentSector(models.Model):
+    """Investment Sector a link between a DIT Sector and an FDI SIC Grouping."""
+
+    sector = models.OneToOneField(
+        'metadata.Sector',
+        primary_key=True,
+        on_delete=models.PROTECT,
+    )
+    fdi_sic_grouping = models.ForeignKey(
+        'investment.FDISICGrouping',
+        related_name='investment_sectors',
+        on_delete=models.PROTECT,
+    )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.sector} Sector - {self.fdi_sic_grouping}'
+
+
+class FDISICGrouping(BaseConstantModel):
+    """FDI Standard Industrial Classification Grouping used for GVA."""
+
+    class Meta(BaseConstantModel.Meta):
+        verbose_name = 'FDI SIC Grouping'
+
+
+class GVAMultiplier(models.Model):
+    """
+    Gross Value Added Multiplier.
+
+    To calculate the GVA of an investment project a constant (multiplier) is multiplied
+    by the foreign equity investment value.
+
+    The multiplier has been derived from historical investment project data and could change for
+    each financial year when more data is analysed.
+
+    The multiplier value is linked to an fdi sic grouping.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    fdi_sic_grouping = models.ForeignKey(
+        'investment.FDISICGrouping',
+        related_name='gva_multipliers',
+        on_delete=models.CASCADE,
+    )
+    multiplier = models.FloatField()
+    financial_year = models.IntegerField(
+        help_text='The year from which the gva multiplier should apply from.',
+    )
+
+    class Meta:
+        verbose_name = 'GVA Multiplier'
+        unique_together = (('fdi_sic_grouping', 'financial_year'),)
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.year}'
 
 
 class SpecificProgramme(BaseConstantModel):
