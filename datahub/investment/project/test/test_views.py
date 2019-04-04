@@ -1058,16 +1058,17 @@ class TestPartialUpdateView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'foreign_equity_investment,expected_gross_value_added',
+        'foreign_equity_investment,expected_gross_value_added,expected_multiplier_value',
         (
-            (20000, 1242),
-            (None, None),
+            (20000, 1242, 0.0621),
+            (None, None, 0.0621),
         ),
     )
     def test_change_foreign_equity_investment_updates_gross_value_added(
         self,
         foreign_equity_investment,
         expected_gross_value_added,
+        expected_multiplier_value,
     ):
         """Test that updating the foreign equity investment updated gross value added."""
         project = InvestmentProjectFactory(
@@ -1087,11 +1088,18 @@ class TestPartialUpdateView(APITestMixin):
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+
         if foreign_equity_investment:
             assert response_data['foreign_equity_investment'] == str(foreign_equity_investment)
         else:
             assert not response_data['foreign_equity_investment']
         assert response_data['gross_value_added'] == expected_gross_value_added
+
+        project.refresh_from_db()
+        if expected_multiplier_value:
+            assert project.gva_multiplier.multiplier == expected_multiplier_value
+        else:
+            assert not project.gva_multiplier
 
     @pytest.mark.parametrize(
         'business_activity,expected_gross_value_added',
