@@ -21,7 +21,7 @@ class TestGrossValueAddedCalculator:
     """Test for Gross Value Added Calculator."""
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,multiplier_value',
+        'investment_type,sector,business_activities,expected_multiplier_value',
         (
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -85,7 +85,7 @@ class TestGrossValueAddedCalculator:
         investment_type,
         sector,
         business_activities,
-        multiplier_value,
+        expected_multiplier_value,
     ):
         """Test the GVA Multiplier correctly gets set on an investment project."""
         project = InvestmentProjectFactory(
@@ -93,10 +93,10 @@ class TestGrossValueAddedCalculator:
             business_activities=business_activities,
             investment_type_id=investment_type,
         )
-        if not multiplier_value:
+        if not expected_multiplier_value:
             assert project.gva_multiplier is None
         else:
-            assert project.gva_multiplier.multiplier == multiplier_value
+            assert project.gva_multiplier.multiplier == expected_multiplier_value
 
     def test_no_investment_sector_linking_sector_to_fdi_sic_grouping_returns_none(self):
         """

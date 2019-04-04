@@ -433,6 +433,7 @@ class TestCreateView(APITestMixin):
             'project_manager_request_status': {
                 'id': str(project_manager_request_status_id),
             },
+            'foreign_equity_investment': 1000,
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_201_CREATED
@@ -470,6 +471,8 @@ class TestCreateView(APITestMixin):
             response_data['project_manager_request_status']['id']
             == str(project_manager_request_status_id)
         )
+        # GVA Multiplier - Transportation & storage - 2019 - 0.0621 * 1000
+        assert response_data['gross_value_added'] == 62
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -1057,13 +1060,14 @@ class TestPartialUpdateView(APITestMixin):
     def test_change_foreign_equity_investment_updates_gross_value_added(self):
         """Test that updating the foreign equity investment updated gross value added."""
         project = InvestmentProjectFactory(
-            foreign_equity_investment=100,
+            foreign_equity_investment=10000,
             sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
             investment_type_id=constants.InvestmentType.fdi.value.id,
             actual_land_date=date(2019, 1, 1),
+            business_activities=[],
         )
         # GVA Multiplier - Transportation & storage - 2019 - 0.0621
-        assert project.gross_value_added == 6
+        assert project.gross_value_added == 621
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1074,6 +1078,32 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert str(response_data['foreign_equity_investment']) == '200'
         assert str(response_data['gross_value_added']) == '12'
+
+    def test_change_business_activity_to_retail_updated_gross_value_added(self):
+        """Test that updating business activity updated the gross value added."""
+        project = InvestmentProjectFactory(
+            foreign_equity_investment=100000,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            actual_land_date=date(2019, 1, 1),
+            business_activities=[],
+        )
+        # GVA Multiplier - Transportation & storage - 2019 - 0.0621
+        assert project.gross_value_added == 6210
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'business_activities': [
+                {'id': constants.InvestmentBusinessActivity.retail.value.id},
+            ],
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert str(response_data['foreign_equity_investment']) == '100000'
+
+        # GVA Multiplier for Retails & wholesale trade - 2019 - 0.0581
+        assert str(response_data['gross_value_added']) == '5810'
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
