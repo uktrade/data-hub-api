@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from django.utils.functional import cached_property
 
 from datahub.core.constants import (
@@ -8,6 +10,8 @@ from datahub.investment.project.constants import (
     FDISICGrouping as FDI_SICGroupingConstant,
 )
 from datahub.investment.project.models import GVAMultiplier, InvestmentSector
+
+logger = getLogger(__name__)
 
 
 class GrossValueAddedCalculator:
@@ -96,6 +100,9 @@ class GrossValueAddedCalculator:
         try:
             return root_sector.investmentsector
         except InvestmentSector.DoesNotExist:
+            logger.warning(
+                f'Unable to find InvestmentSector for DIT Sector {root_sector}',
+            )
             return None
 
     def _get_gva_multiplier_financial_year(self):
