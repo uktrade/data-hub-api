@@ -6,6 +6,7 @@ from django.contrib.admin.sites import site
 from django.urls import reverse
 from django.utils.timezone import now, utc
 from freezegun import freeze_time
+from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
@@ -40,7 +41,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         data['project_manager'] = project_manager.pk
 
         response = self.client.post(url, data, follow=True)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
         investment_project.refresh_from_db()
         assert investment_project.project_manager == project_manager
@@ -74,7 +75,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
 
         response = self.client.post(url, data, follow=True)
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
         investment_project.refresh_from_db()
         assert investment_project.project_manager == project_manager
@@ -102,7 +103,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
             'id': investment_project_pk,
         }
         response = self.client.post(url, data, follow=True)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
         investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
         assert investment_project.project_manager == project_manager
@@ -124,10 +125,17 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
             'proposal_deadline': '2017-04-19',
             'id': investment_project_pk,
         }
+
         response = self.client.post(url, data, follow=True)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
         investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
         assert investment_project.project_manager is None
         assert investment_project.project_manager_first_assigned_on is None
         assert investment_project.project_manager_first_assigned_by is None
+
+    def test_add_investment_project_view_returns_200_response(self):
+        """Test that add investment project returns HTTP 200 OK."""
+        url = reverse('admin:investment_investmentproject_add')
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
