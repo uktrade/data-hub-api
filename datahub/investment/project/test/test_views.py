@@ -1057,7 +1057,18 @@ class TestPartialUpdateView(APITestMixin):
     These cover PATCH /v3/investment/<id>
     """
 
-    def test_change_foreign_equity_investment_updates_gross_value_added(self):
+    @pytest.mark.parametrize(
+        'foreign_equity_investment,expected_gross_value_added',
+        (
+            (20000, 1242),
+            (None, None),
+        ),
+    )
+    def test_change_foreign_equity_investment_updates_gross_value_added(
+        self,
+        foreign_equity_investment,
+        expected_gross_value_added,
+    ):
         """Test that updating the foreign equity investment updated gross value added."""
         project = InvestmentProjectFactory(
             foreign_equity_investment=10000,
@@ -1071,15 +1082,31 @@ class TestPartialUpdateView(APITestMixin):
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'foreign_equity_investment': 200,
+            'foreign_equity_investment': foreign_equity_investment,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert str(response_data['foreign_equity_investment']) == '200'
-        assert str(response_data['gross_value_added']) == '12'
+        if foreign_equity_investment:
+            assert response_data['foreign_equity_investment'] == str(foreign_equity_investment)
+        else:
+            assert not response_data['foreign_equity_investment']
+        assert response_data['gross_value_added'] == expected_gross_value_added
 
-    def test_change_business_activity_to_retail_updated_gross_value_added(self):
+    @pytest.mark.parametrize(
+        'business_activity,expected_gross_value_added',
+        (
+            # GVA Multiplier for Retails & wholesale trade - 2019 - 0.0581
+            (constants.InvestmentBusinessActivity.retail.value.id, 5810),
+            # No change - GVA Multiplier - Transportation & storage - 2019 - 0.0621
+            (constants.InvestmentBusinessActivity.other.value.id, 6210),
+        ),
+    )
+    def test_change_business_activity_to_retail_updated_gross_value_added(
+        self,
+        business_activity,
+        expected_gross_value_added,
+    ):
         """Test that updating business activity updated the gross value added."""
         project = InvestmentProjectFactory(
             foreign_equity_investment=100000,
@@ -1094,16 +1121,14 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'business_activities': [
-                {'id': constants.InvestmentBusinessActivity.retail.value.id},
+                {'id': business_activity},
             ],
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert str(response_data['foreign_equity_investment']) == '100000'
-
-        # GVA Multiplier for Retails & wholesale trade - 2019 - 0.0581
-        assert str(response_data['gross_value_added']) == '5810'
+        assert response_data['gross_value_added'] == expected_gross_value_added
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
