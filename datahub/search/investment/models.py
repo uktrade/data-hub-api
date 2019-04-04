@@ -91,7 +91,7 @@ class InvestmentProject(BaseESModel):
     foreign_equity_investment = Double()
     government_assistance = Boolean()
     intermediate_company = fields.id_name_field()
-    investor_company = fields.id_name_partial_field('investor_company')
+    investor_company = fields.id_name_partial_field()
     investor_company_country = fields.id_name_field()
     investment_type = fields.id_name_field()
     investor_type = fields.id_name_field()
@@ -137,7 +137,7 @@ class InvestmentProject(BaseESModel):
     status = fields.NormalizedKeyword()
     team_members = fields.contact_or_adviser_field('team_members', include_dit_team=True)
     total_investment = Double()
-    uk_company = fields.id_name_partial_field('uk_company')
+    uk_company = fields.id_name_partial_field()
     uk_company_decided = Boolean()
     uk_region_locations = fields.id_name_field()
     will_new_jobs_last_two_years = Boolean()
@@ -192,9 +192,9 @@ class InvestmentProject(BaseESModel):
         'name',
         'name.trigram',
         'uk_company.name',
-        'uk_company.name_trigram',
+        'uk_company.name.trigram',
         'investor_company.name',
-        'investor_company.name_trigram',
+        'investor_company.name.trigram',
         'project_code_trigram',
     )
 

@@ -55,8 +55,8 @@ class Interaction(BaseESModel):
     dit_adviser = fields.contact_or_adviser_field('dit_adviser')
     dit_participants = Object(_DITParticipant)
     # TODO: dit_team is deprecated. Remove after deprecation period.
-    dit_team = fields.id_name_partial_field('dit_team')
-    event = fields.id_name_partial_field('event')
+    dit_team = fields.id_name_partial_field()
+    event = fields.id_name_partial_field()
     investment_project = fields.id_name_field()
     investment_project_sector = fields.sector_field()
     is_event = Boolean(index=False)
@@ -105,7 +105,7 @@ class Interaction(BaseESModel):
         'contacts.name',  # to find 2-letter words
         'contacts.name.trigram',
         'event.name',
-        'event.name_trigram',
+        'event.name.trigram',
         'subject_english',
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',
