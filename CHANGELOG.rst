@@ -1,3 +1,96 @@
+Data Hub API 11.4.0 (2019-04-04)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET /metadata/service/``: The following values for the ``contexts`` field are deprecated and will be removed on or after 8 April 2019:
+
+  - ``interaction``
+  - ``service_delivery``
+
+  Please see the API section for more details.
+
+Features
+--------
+
+- **Interactions** The following service contexts were added in Django admin:
+
+  - Export interaction
+  - Export service delivery
+  - Investment interaction
+  - Other interaction
+  - Other service delivery
+
+  All existing, non-disabled services with the 'Interaction' context have also been given the 'Other interaction' context.
+
+  All existing, non-disabled services with the 'Service delivery' context have also been given the 'Other service delivery' context.
+
+  The 'Interaction' context was renamed 'Interaction (deprecated)' and will be removed at a later date.
+
+  The 'Service delivery' context was renamed 'Service delivery (deprecated)' and will be removed at a later date.
+- **Investment** A mapping from ``Sectors`` to ``SIC Groupings`` and ``GVA Multiplier`` information has been added.
+  This mapping will be used to help calculate the GVA of an investment project.
+- The service contexts and team tags fields in the admin site were updated to use tick boxes for better usability.
+- A context filter was added to the service list in the admin site.
+
+API
+---
+
+- **Interactions** ``GET /metadata/service/``: The following values for the ``contexts`` field were added:
+
+  - ``export_interaction``
+  - ``export_service_delivery``
+  - ``investment_interaction``
+  - ``other_interaction``
+  - ``other_service_delivery``
+
+  The following contexts are deprecated and will be removed on or after 8 April 2019:
+
+  - ``interaction``
+  - ``service_delivery``
+
+  Please migrate to the new values above.
+
+Database schema
+---------------
+
+- **Investment** The database table ``investment_fdisicgrouping`` has been added with the following columns:
+
+  - id (uuid) not null,
+  - name (text) not null,
+  - disabled_on (datetime),
+
+
+  The database table ``investment_gva_multiplier`` has been added with the following columns:
+
+  - id (uuid) not null,
+  - multiplier (float) not null,
+  - financial_year (int) not null,
+  - fdisicgrouping_id (uuid) not null,
+
+  Where ``fdi_sicgrouping_id`` is a foreign key to ``investment_fdisicgrouping``.
+
+
+  The database table ``investment_investmentsector`` has been added with the following columns:
+
+  - sector_id (uuid) not null pk,
+  - fdi_sicgrouping_id (uuid) not null,
+
+  Where ``sector_id`` is a foreign key to ``metadata_sector`` and
+  ``fdi_sicgrouping_id`` is a foreign key to ``investment_fdisicgrouping``.
+
+
+
+  The database_table ``investment_investmentproject`` has been updated and the following column has been added:
+
+  - gva_multiplier_id (uuid),
+
+  Where ``gva_multiplier_id`` is a foreign key to ``investment_gvamultiplier``.
+
+
 Data Hub API 11.3.0 (2019-03-28)
 ================================
 
@@ -6,7 +99,7 @@ Data Hub API 11.3.0 (2019-03-28)
 API
 ---
 
-- **Investment** The endpoint ``/v4/large-captial-profile`` now accepts and returns ``required_checks_conducted_on`` (date) and ``required_checks_conducted_by`` (adviser id).
+- **Investment** The endpoint ``/v4/large-capital-profile`` now accepts and returns ``required_checks_conducted_on`` (date) and ``required_checks_conducted_by`` (adviser id).
 
   Both become required fields when ``required_checks_conducted`` is set to ``Cleared`` or ``Issues identified``.
 
@@ -59,7 +152,7 @@ Deprecations and removals
 - **Interactions** ``POST /v3/search/interaction``: The ``dit_adviser_name`` filter is deprecated and will be removed on or after 4 April 2019. There is no replacement for this filter.
 - **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: The ``dit_adviser`` and ``dit_team`` interaction fields are deprecated and will be removed on or after 28 March 2019. Please use ``dit_participants`` instead.
 - **Interactions** ``POST /v3/search/interaction``: The ``dit_team`` filter is deprecated and will be removed on or after 4 April 2019. Please use the ``dit_participants__team`` filter instead.
-- **Investment** The column ``investmentproject.likelhood_of_landing`` was removed from the database.
+- **Investment** The column ``investmentproject.likelihood_of_landing`` was removed from the database.
 
 Features
 --------
