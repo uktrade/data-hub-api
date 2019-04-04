@@ -71,6 +71,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['archived_by.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -132,6 +142,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['client_contacts.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -165,6 +185,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['client_relationship_manager.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -244,6 +274,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['created_by.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -427,6 +467,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['project_assurance_adviser.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -469,6 +519,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['project_manager.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
@@ -647,6 +707,16 @@ def test_mapping(setup_es):
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'copy_to': ['team_members.name_trigram'],
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
