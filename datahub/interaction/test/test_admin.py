@@ -33,6 +33,7 @@ class TestInteractionAdminContacts(AdminTestMixin):
         data = {
             'id': uuid4(),
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date_0': '2018-01-01',
@@ -70,6 +71,7 @@ class TestInteractionAdminContacts(AdminTestMixin):
             # Unchanged values
             'id': interaction.pk,
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'communication_channel': interaction.communication_channel.pk,
             'subject': interaction.subject,
             'date_0': interaction.date.date().isoformat(),
@@ -110,6 +112,7 @@ class TestInteractionAdminContacts(AdminTestMixin):
             # Unchanged values
             'id': interaction.pk,
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'communication_channel': interaction.communication_channel.pk,
             'subject': interaction.subject,
             'date_0': interaction.date.date().isoformat(),

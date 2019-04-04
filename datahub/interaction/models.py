@@ -137,7 +137,7 @@ class Interaction(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
     state = models.CharField(max_length=MAX_LENGTH, choices=STATES, default=STATES.complete)
-    meeting_uid = models.CharField(max_length=MAX_LENGTH, unique=True, null=True)
+    meeting_uid = models.CharField(max_length=MAX_LENGTH, unique=True, null=True, blank=True)
     location = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(

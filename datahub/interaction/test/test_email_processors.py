@@ -103,5 +103,5 @@ class TestCalendarInteractionEmailProcessor:
             email_file,
         )
         message = mailparser.parse_from_file(email_file_path)
-        calendar_event = processor.get_calendar_event_metadata(message)
+        calendar_event = processor._get_calendar_event_metadata(message)
         assert(calendar_event == expected_event_details)

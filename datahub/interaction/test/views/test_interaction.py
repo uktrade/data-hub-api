@@ -129,6 +129,7 @@ class TestAddInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -202,6 +203,8 @@ class TestAddInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': None,
+            'meeting_uid': None,
         }
 
     @pytest.mark.parametrize(
@@ -217,8 +220,27 @@ class TestAddInteraction(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
-                    'service': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
+                },
+            ),
+
+            # service required for complete interaction
+            # required fields
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                },
+                {
+                    'service': ['This field is required.'],
                 },
             ),
 
@@ -395,6 +417,24 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': {
                         api_settings.NON_FIELD_ERRORS_KEY: ['This list may not be empty.'],
                     },
+                },
+            ),
+
+            # dit_participants cannot be None
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+
+                    'dit_participants': None,
+                },
+                {
+                    'dit_participants': ['This field may not be null.'],
                 },
             ),
         ),
