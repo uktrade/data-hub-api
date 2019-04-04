@@ -86,7 +86,7 @@ class TestPopulateGrossValueAddedCommand:
     ):
         """Test populating Gross value added data."""
         with mock.patch(
-            'datahub.investment.project.signals.update_gross_value_added_for_investment_project',
+            'datahub.investment.project.signals.set_gross_value_added_for_investment_project',
         ) as mock_update_gva:
             mock_update_gva.return_value = None
             project = InvestmentProjectFactory(

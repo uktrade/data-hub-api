@@ -7,7 +7,7 @@ from datahub.core.constants import (
 from datahub.investment.project.constants import (
     FDISICGrouping as FDI_SICGroupingConstant,
 )
-from datahub.investment.project.models import GVAMultiplier
+from datahub.investment.project.models import GVAMultiplier, InvestmentSector
 
 
 class GrossValueAddedCalculator:
@@ -59,24 +59,26 @@ class GrossValueAddedCalculator:
 
         if self.investment_project.sector:
             return self._get_sector_gva_multiplier()
+        else:
+            return None
 
     def _get_retail_gva_multiplier(self):
         """:returns the GVA Multiplier for a retail investment project."""
         return self._get_gva_multiplier(FDI_SICGroupingConstant.retail.value.id)
 
     def _get_sector_gva_multiplier(self):
-        """:returns the GVA Multiplier for the a sector."""
-        fdi_sic_grouping = self._get_fid_sic_grouping_for_sector()
+        """:returns the GVA Multiplier for the a sector if one found else returns None."""
+        fdi_sic_grouping = self._get_fdi_sic_grouping_for_sector()
         if not fdi_sic_grouping:
             return None
         return self._get_gva_multiplier(fdi_sic_grouping.id)
 
-    def _get_fid_sic_grouping_for_sector(self):
-        """:returns the FDI SIC Grouping for a DIT Sector."""
+    def _get_fdi_sic_grouping_for_sector(self):
+        """:returns the FDI SIC Grouping for a DIT Sector if one found else returns None."""
         root_sector = self.investment_project.sector.get_root()
-        investment_sector = getattr(root_sector, 'investmentsector', None)
+        investment_sector = self._get_investment_sector(root_sector)
         if not investment_sector:
-            return
+            return None
         return investment_sector.fdi_sic_grouping
 
     def _get_gva_multiplier(self, fdi_sic_grouping_id):
@@ -87,6 +89,13 @@ class GrossValueAddedCalculator:
                 financial_year=self._get_gva_multiplier_financial_year(),
             )
         except GVAMultiplier.DoesNotExist:
+            return None
+
+    def _get_investment_sector(self, root_sector):
+        """:returns the investment sector for a root DIT sector if one found else returns None."""
+        try:
+            return root_sector.investmentsector
+        except InvestmentSector.DoesNotExist:
             return None
 
     def _get_gva_multiplier_financial_year(self):
@@ -104,10 +113,6 @@ def set_gross_value_added_for_investment_project(investment_project):
     """Sets the Gross Value Added data for investment project."""
     calculate_gross_value_added = GrossValueAddedCalculator(investment_project)
     gva_multiplier = calculate_gross_value_added.gva_multiplier
-    gva_multiplier_id = getattr(gva_multiplier, 'id', None)
-    if gva_multiplier_id != investment_project.gva_multiplier_id:
-        investment_project.gva_multiplier_id = gva_multiplier_id
-    gross_value_added = calculate_gross_value_added.gross_value_added
-    if gross_value_added != investment_project.gross_value_added:
-        investment_project.gross_value_added = calculate_gross_value_added.gross_value_added
+    investment_project.gva_multiplier_id = gva_multiplier.id if gva_multiplier else None
+    investment_project.gross_value_added = calculate_gross_value_added.gross_value_added
     return investment_project
