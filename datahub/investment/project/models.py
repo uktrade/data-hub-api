@@ -302,6 +302,11 @@ class IProjectValueAbstract(models.Model):
     )
     gross_value_added = models.IntegerField(
         null=True,
+        blank=True,
+        help_text=(
+            'Denormalised GVA value which is automatically populated using '
+            'the gva multiplier and the foreign equity investment value.'
+        ),
     )
 
 
