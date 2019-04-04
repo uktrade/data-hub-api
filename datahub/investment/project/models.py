@@ -691,7 +691,7 @@ class GVAMultiplier(models.Model):
 
     def __str__(self):
         """Human-readable representation"""
-        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.year}'
+        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.financial_year}'
 
 
 class SpecificProgramme(BaseConstantModel):
