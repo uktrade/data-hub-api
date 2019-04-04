@@ -1,6 +1,7 @@
-from django.core.cache import cache
-from celery.five import monotonic
 from contextlib import contextmanager
+
+from celery.five import monotonic
+from django.core.cache import cache
 
 
 @contextmanager
@@ -14,9 +15,10 @@ def acquire_lock(lock_id, lock_expiry):
 
     Returns:
       True if the lock was acquired successfully, False otherwise.
+
     """
     timeout_at = monotonic() + lock_expiry - 3
-    acquired = cache.add(lock_id, "", lock_expiry)
+    acquired = cache.add(lock_id, '', lock_expiry)
     try:
         yield acquired
     finally:
