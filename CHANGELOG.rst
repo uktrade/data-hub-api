@@ -1,3 +1,14 @@
+Data Hub API 11.4.1 (2019-04-04)
+================================
+
+
+
+Internal changes
+----------------
+
+- **Investment** Fix for investment admin updated GVA multiplier string.
+
+
 Data Hub API 11.4.0 (2019-04-04)
 ================================
 
