@@ -117,7 +117,6 @@ class GrossValueAddedCalculator:
 def set_gross_value_added_for_investment_project(investment_project):
     """Sets the Gross Value Added data for investment project."""
     calculate_gross_value_added = GrossValueAddedCalculator(investment_project)
-    gva_multiplier = calculate_gross_value_added.gva_multiplier
-    investment_project.gva_multiplier_id = gva_multiplier.id if gva_multiplier else None
+    investment_project.gva_multiplier = calculate_gross_value_added.gva_multiplier
     investment_project.gross_value_added = calculate_gross_value_added.gross_value_added
     return investment_project

@@ -24,7 +24,7 @@ class Command(BaseCommand):
         """
         investment_projects = self.get_investment_projects()
         for project in investment_projects.iterator():
-            project.save()
+            project.save(update_fields=['gross_value_added', 'gva_multiplier'])
 
     def get_investment_projects(self):
         """Get investment projects. returns: All projects that GVA could be calculated for."""
