@@ -95,6 +95,16 @@ def test_mapping(setup_es):
                             ],
                             'normalizer': 'lowercase_asciifolding_normalizer',
                             'type': 'keyword',
+                            'fields': {
+                                'keyword': {
+                                    'normalizer': 'lowercase_asciifolding_normalizer',
+                                    'type': 'keyword',
+                                },
+                                'trigram': {
+                                    'analyzer': 'trigram_analyzer',
+                                    'type': 'text',
+                                },
+                            },
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
