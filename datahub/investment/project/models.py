@@ -297,7 +297,7 @@ class IProjectValueAbstract(models.Model):
     export_revenue = models.BooleanField(null=True)
 
     gva_multiplier = models.ForeignKey(
-        'GVAMultiplier', null=True, blank=True, on_delete=models.SET_NULL,
+        'GVAMultiplier', null=True, blank=True, on_delete=models.PROTECT,
         related_name='investment_projects',
     )
     gross_value_added = models.DecimalField(

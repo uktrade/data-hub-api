@@ -3,17 +3,120 @@ from decimal import Decimal
 from unittest import mock
 from uuid import uuid4
 
+import pytest
 from django.contrib.admin.sites import site
 from django.urls import reverse
 from django.utils.timezone import now, utc
 from freezegun import freeze_time
+from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import AdminTestMixin
 from datahub.investment.project.admin import InvestmentProjectAdmin
-from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment.project.constants import FDISICGrouping
+from datahub.investment.project.models import GVAMultiplier, InvestmentProject
+from datahub.investment.project.test.factories import (
+    GVAMultiplierFactory,
+    InvestmentProjectFactory,
+)
+
+
+@pytest.fixture
+def get_gva_multiplier():
+    """Get a GVA Multiplier for the year 3010"""
+    yield GVAMultiplierFactory(
+        financial_year=3010,
+        fdi_sic_grouping_id=FDISICGrouping.retail.value.id,
+        multiplier=2,
+    )
+
+
+class TestGVAMultiplierAdmin(AdminTestMixin):
+    """Tests for GVA Multiplier django admin."""
+
+    def test_adding_new_gva_multiplier(self):
+        """Test adding a new GVA Multiplier."""
+        url = reverse('admin:investment_gvamultiplier_add')
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        multiplier_value = '0.12345'
+        financial_year = 3015
+
+        data = {
+            'financial_year': financial_year,
+            'multiplier': multiplier_value,
+            'fdi_sic_grouping': str(FDISICGrouping.retail.value.id),
+        }
+
+        response = self.client.post(url, data, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        actual_multiplier = GVAMultiplier.objects.get(
+            financial_year=financial_year,
+            fdi_sic_grouping_id=FDISICGrouping.retail.value.id,
+        )
+        assert actual_multiplier.multiplier == Decimal(multiplier_value)
+
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {
+                'financial_year': 3011,
+            },
+            {
+                'fdi_sic_grouping': str(FDISICGrouping.electric.value.id),
+            },
+        ),
+    )
+    def test_updating_gva_multiplier_group_and_year_not_allowed(self, get_gva_multiplier, data):
+        """Test updating financial year and fdi sic grouping not allowed."""
+        gva_multiplier = get_gva_multiplier
+        url = reverse('admin:investment_gvamultiplier_change', args=(gva_multiplier.pk,))
+        response = self.client.get(url, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self.client.post(url, data, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        gva_multiplier.refresh_from_db()
+        assert gva_multiplier.financial_year == 3010
+
+    def test_updating_gva_multiplier_value(self, get_gva_multiplier):
+        """Test updating GVA Multiplier value updates any associated investment projects."""
+        gva_multiplier = get_gva_multiplier
+        with mock.patch(
+            'datahub.investment.project.gva_utils.'
+            'GrossValueAddedCalculator._get_gva_multiplier',
+        ) as mock_get_multiplier:
+            mock_get_multiplier.return_value = gva_multiplier
+            project = InvestmentProjectFactory(
+                foreign_equity_investment=1000,
+                investment_type_id=constants.InvestmentType.fdi.value.id,
+            )
+
+        url = reverse('admin:investment_gvamultiplier_change', args=(gva_multiplier.pk,))
+        response = self.client.get(url, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        with mock.patch(
+            'datahub.investment.project.gva_utils.'
+            'GrossValueAddedCalculator._get_gva_multiplier_financial_year',
+        ) as mock_get_financial_year:
+            mock_get_financial_year.return_value = 3010
+
+            data = {
+                'multiplier': 3,
+            }
+            response = self.client.post(url, data, follow=True)
+            assert response.status_code == status.HTTP_200_OK
+
+        gva_multiplier.refresh_from_db()
+        assert gva_multiplier.multiplier == 3
+
+        project.refresh_from_db()
+        assert project.gross_value_added == 3000
 
 
 class TestInvestmentProjectAdmin(AdminTestMixin):

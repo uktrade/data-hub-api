@@ -11,6 +11,7 @@ from datahub.core.admin import (
     custom_delete_permission,
 )
 from datahub.investment.project.models import (
+    GVAMultiplier,
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
@@ -95,6 +96,22 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
         'investment_project',
         'adviser',
     )
+
+
+@admin.register(GVAMultiplier)
+class GVAMultiplierAdmin(admin.ModelAdmin):
+    """Investor profile admin."""
+
+    list_display = ('fdi_sic_grouping', 'financial_year', 'multiplier')
+    search_fields = ('fdi_sic_grouping__name', 'financial_year', 'id')
+    list_filter = ('financial_year', 'fdi_sic_grouping')
+
+    def get_readonly_fields(self, request, obj=None):
+        """Get readonly fields. If updating a GVA Multiplier only the multiplier can be updated."""
+        if obj:
+            return ['id', 'fdi_sic_grouping', 'financial_year']
+        else:
+            return ['id']
 
 
 admin.site.register(Involvement, ReadOnlyMetadataAdmin)
