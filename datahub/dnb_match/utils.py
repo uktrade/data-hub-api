@@ -2,10 +2,14 @@ from decimal import Decimal
 from enum import Enum
 from functools import lru_cache
 
+from django.utils.timezone import now
+
 from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
+from datahub.dnb_match.exceptions import MismatchedRecordsException
 from datahub.metadata.models import Country
 
 
+ARCHIVED_REASON_DISSOLVED = 'Company is dissolved'
 NATIONAL_ID_SYSTEM_CODE_UK = 12
 
 
@@ -208,3 +212,39 @@ def extract_wb_record_into_company_fields(wb_record):
     )
 
     return company_fields, is_out_of_business
+
+
+def update_company_from_wb_record(company, wb_record):
+    """
+    Updates company with data from the Worldbase record wb_record.
+    :raises MismatchedRecordsException: if the Worldbase record and the Data Hub
+        company have different DUNS numbers.
+    :returns: list of updated fields
+    """
+    company_fields, is_out_of_business = extract_wb_record_into_company_fields(wb_record)
+
+    if company.duns_number and company.duns_number != company_fields['duns_number']:
+        raise MismatchedRecordsException(
+            f'The Worldbase record with DUNS number {company_fields["duns_number"]} cannot '
+            f'be used to update company {company.id} with DUNS number {company.duns_number}.',
+        )
+
+    # update company fields
+    for field_name, field_value in company_fields.items():
+        setattr(company, field_name, field_value)
+    updated_fields = list(company_fields)
+
+    # archive if necessary
+    if is_out_of_business and not company.archived:
+        company.archived = True
+        company.archived_reason = ARCHIVED_REASON_DISSOLVED
+        company.archived_on = now()
+
+        updated_fields += [
+            'archived',
+            'archived_reason',
+            'archived_on',
+        ]
+
+    company.save(update_fields=updated_fields)
+    return updated_fields
