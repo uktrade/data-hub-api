@@ -1028,6 +1028,8 @@ class TestInteractionExportView(APITestMixin):
                 'Adviser': get_attr_or_none(interaction, 'dit_adviser.name'),
                 'Service provider': get_attr_or_none(interaction, 'dit_team.name'),
                 'Event': get_attr_or_none(interaction, 'event.name'),
+                'Communication channel':
+                    get_attr_or_none(interaction, 'communication_channel.name'),
                 'Service delivery status': get_attr_or_none(
                     interaction,
                     'service_delivery_status.name',
