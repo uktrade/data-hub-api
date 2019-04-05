@@ -11,9 +11,8 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast, Coalesce, Concat, ExtractYear
+from django.db.models.functions import Cast, Coalesce, Concat, ExtractYear, NullIf
 
-from datahub.core.query_utils import NullIf
 from datahub.investment.project.constants import Involvement
 from datahub.investment.project.models import IProjectAbstract
 from datahub.metadata.models import Sector

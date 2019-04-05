@@ -22,9 +22,18 @@ from datahub.search.elasticsearch import (
 
 
 def pytest_sessionstart(session):
-    """Enable multi_db support for tests."""
-    from django.test import TransactionTestCase
-    TransactionTestCase.multi_db = True
+    """
+    Set tests to use all databases.
+
+    pytest-django does not directly support the databases attribute, so this is a workaround.
+
+    See PRs #397, #416 and #437 in the pytest-django repository on GitHub for more information.
+    """
+    from django.test import TestCase, TransactionTestCase
+
+    databases_to_enable = {'default', 'mi'}
+    TransactionTestCase.databases = databases_to_enable
+    TestCase.databases = databases_to_enable
 
 
 @pytest.fixture(scope='session')

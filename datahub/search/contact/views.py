@@ -1,4 +1,5 @@
 from django.db.models import Case, F, Max, Value, When
+from django.db.models.functions import NullIf
 
 from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
@@ -7,7 +8,6 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_full_name_expression,
     get_top_related_expression_subquery,
-    NullIf,
 )
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery

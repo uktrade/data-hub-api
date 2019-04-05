@@ -1087,8 +1087,10 @@ class TestInvestmentProjectExportView(APITestMixin):
         expected_rows = format_csv_data(expected_row_data)
         actual_rows = [dict(item) for item in reader]
 
-        # Support for ordering will be added to StringAgg in Django 2.2. In the meantime,
-        # StringAgg fields are unordered and we use this workaround to compare them.
+        # Support for ordering was added to StringAgg in Django 2.2. However, it is not
+        # currently used due to https://code.djangoproject.com/ticket/30315. While that
+        # remains the case, our StringAgg fields are unordered and we use this workaround to
+        # compare them.
         unordered_fields = (
             'Other team members',
             'Delivery partners',
