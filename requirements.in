@@ -58,6 +58,7 @@ werkzeug==0.15.2  # Required by runserver_plus - useful for local dev
 pip-tools==3.6.0
 piprot==0.9.10
 towncrier==19.2.0
+watchdog==0.9.0
 
 # Code static analysis
 flake8==3.7.7
