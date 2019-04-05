@@ -1,11 +1,17 @@
 import uuid
+from datetime import datetime
 from decimal import InvalidOperation
 from unittest import mock
 
 import pytest
+from django.utils.timezone import utc
+from freezegun import freeze_time
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country as CountryConstant
+from datahub.core.test_utils import random_obj_for_model
 from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
+from datahub.dnb_match.exceptions import MismatchedRecordsException
 from datahub.dnb_match.utils import (
     _extract_address,
     _extract_companies_house_number,
@@ -13,15 +19,18 @@ from datahub.dnb_match.utils import (
     _extract_employees,
     _extract_out_of_business,
     _extract_turnover,
+    ARCHIVED_REASON_DISSOLVED,
     EmployeesIndicator,
     extract_wb_record_into_company_fields,
     NATIONAL_ID_SYSTEM_CODE_UK,
     OutOfBusinessIndicator,
     TurnoverIndicator,
+    update_company_from_wb_record,
 )
-from datahub.metadata.models import Country
+from datahub.metadata.models import Country, EmployeeRange, TurnoverRange
 
 
+FROZEN_TIME = datetime(2019, 1, 1, 1, tzinfo=utc)
 UNITED_KINGDOM_COUNTRY_UUID = uuid.UUID(CountryConstant.united_kingdom.value.id)
 
 
@@ -727,3 +736,206 @@ class TestExtractWbRecordIntoCompanyFields:
         """
         actual_output = extract_wb_record_into_company_fields(wb_record)
         assert actual_output == expected_output
+
+
+@pytest.mark.django_db
+class TestUpdateCompanyFromWbRecord:
+    """Tests related to the function update_company_from_wb_record."""
+
+    @pytest.mark.parametrize(
+        'wb_record,expected_fields',
+        (
+            # Complete record
+            (
+                {
+                    'DUNS Number': '123456789',
+                    'Business Name': 'WB Corp',
+                    'Secondary Name': 'Known as...',
+                    'Employees Total': '11',
+                    'Employees Total Indicator': EmployeesIndicator.ESTIMATED,
+                    'Employees Here': '0',
+                    'Employees Here Indicator': EmployeesIndicator.ESTIMATED,
+                    'Annual Sales in US dollars': '100',
+                    'Annual Sales Indicator': TurnoverIndicator.ESTIMATED,
+                    'Street Address': '1',
+                    'Street Address 2': 'Main Street',
+                    'City Name': 'London',
+                    'State/Province Name': 'Camden',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': 'SW1A 1AA',
+                    'National Identification Number': '12345678',
+                    'National Identification System Code': str(NATIONAL_ID_SYSTEM_CODE_UK),
+                    'Out of Business indicator': OutOfBusinessIndicator.NOT_OUT_OF_BUSINESS,
+                },
+                {
+                    'duns_number': '123456789',
+                    'name': 'WB Corp',
+                    'trading_names': ['Known as...'],
+                    'company_number': '12345678',
+                    'number_of_employees': 11,
+                    'is_number_of_employees_estimated': True,
+                    'employee_range': None,
+                    'turnover': 100,
+                    'is_turnover_estimated': True,
+                    'turnover_range': None,
+                    'address_1': '1',
+                    'address_2': 'Main Street',
+                    'address_town': 'London',
+                    'address_county': 'Camden',
+                    'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'address_postcode': 'SW1A 1AA',
+                    'registered_address_1': '1',
+                    'registered_address_2': 'Main Street',
+                    'registered_address_town': 'London',
+                    'registered_address_county': 'Camden',
+                    'registered_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'registered_address_postcode': 'SW1A 1AA',
+                    'trading_address_1': '1',
+                    'trading_address_2': 'Main Street',
+                    'trading_address_town': 'London',
+                    'trading_address_county': 'Camden',
+                    'trading_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'trading_address_postcode': 'SW1A 1AA',
+                },
+            ),
+
+            # Minimal record / archives the Data Hub Company as well
+            (
+                {
+                    'DUNS Number': '123456789',
+                    'Business Name': 'WB Corp',
+                    'Secondary Name': '',
+                    'Employees Total': '0',
+                    'Employees Total Indicator': EmployeesIndicator.NOT_AVAILABLE,
+                    'Employees Here': '0',
+                    'Employees Here Indicator': EmployeesIndicator.NOT_AVAILABLE,
+                    'Annual Sales in US dollars': '0',
+                    'Annual Sales Indicator': TurnoverIndicator.NOT_AVAILABLE,
+                    'Street Address': '',
+                    'Street Address 2': '',
+                    'City Name': '',
+                    'State/Province Name': '',
+                    'Country Code': '785',
+                    'Postal Code for Street Address': '',
+                    'National Identification Number': '',
+                    'National Identification System Code': '',
+                    'Out of Business indicator': OutOfBusinessIndicator.OUT_OF_BUSINESS,
+                },
+                {
+                    'duns_number': '123456789',
+                    'name': 'WB Corp',
+                    'trading_names': [],
+                    'company_number': '',
+                    'number_of_employees': None,
+                    'is_number_of_employees_estimated': None,
+                    'employee_range': None,
+                    'turnover': None,
+                    'is_turnover_estimated': None,
+                    'turnover_range': None,
+                    'address_1': '',
+                    'address_2': '',
+                    'address_town': '',
+                    'address_county': '',
+                    'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'address_postcode': '',
+                    'registered_address_1': '',
+                    'registered_address_2': '',
+                    'registered_address_town': '',
+                    'registered_address_county': '',
+                    'registered_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'registered_address_postcode': '',
+                    'trading_address_1': '',
+                    'trading_address_2': '',
+                    'trading_address_town': '',
+                    'trading_address_county': '',
+                    'trading_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+                    'trading_address_postcode': '',
+                    'archived': True,
+                    'archived_on': FROZEN_TIME,
+                    'archived_reason': ARCHIVED_REASON_DISSOLVED,
+                },
+            ),
+        ),
+    )
+    @freeze_time(FROZEN_TIME)
+    def test_update(self, wb_record, expected_fields):
+        """
+        Test that update_company_from_wb_record updates the company with the data from wb_record.
+        """
+        company = CompanyFactory(
+            duns_number=None,
+            name='Previous name',
+            trading_names=['Previous trading name'],
+            company_number='87654321',
+            number_of_employees=999,
+            is_number_of_employees_estimated=False,
+            employee_range=random_obj_for_model(EmployeeRange),
+            turnover=888,
+            is_turnover_estimated=False,
+            turnover_range=random_obj_for_model(TurnoverRange),
+            address_1='999',
+            address_2='Street Main',
+            address_town='Manchester',
+            address_county='Manchester',
+            address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
+            address_postcode='M90 1QX',
+            registered_address_1='999',
+            registered_address_2='Street Main',
+            registered_address_town='Manchester',
+            registered_address_county='Manchester',
+            registered_address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
+            registered_address_postcode='M90 1QX',
+            trading_address_1='999',
+            trading_address_2='Street Main',
+            trading_address_town='Manchester',
+            trading_address_county='Manchester',
+            trading_address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
+            trading_address_postcode='M90 1QX',
+            archived=False,
+            archived_on=None,
+            archived_reason='',
+        )
+        updated_fields = update_company_from_wb_record(company, wb_record)
+
+        actual_fields = {
+            field_name: getattr(company, field_name)
+            for field_name in expected_fields
+        }
+        assert actual_fields == expected_fields
+        assert set(updated_fields) == set(expected_fields)
+
+    def test_fails_if_entities_have_different_duns_numbers(self):
+        """
+        Test that if the DUNS number of the company is different from the
+        one specified in the Worldbase record, a MismatchedRecordsException
+        is raised.
+        """
+        company = CompanyFactory.build(duns_number='987654321')
+        wb_record = {
+            'DUNS Number': '123456789',
+            'Business Name': 'WB Corp',
+            'Secondary Name': '',
+            'Employees Total': '0',
+            'Employees Total Indicator': EmployeesIndicator.NOT_AVAILABLE,
+            'Employees Here': '0',
+            'Employees Here Indicator': EmployeesIndicator.NOT_AVAILABLE,
+            'Annual Sales in US dollars': '0',
+            'Annual Sales Indicator': TurnoverIndicator.NOT_AVAILABLE,
+            'Street Address': '',
+            'Street Address 2': '',
+            'City Name': '',
+            'State/Province Name': '',
+            'Country Code': '785',
+            'Postal Code for Street Address': '',
+            'National Identification Number': '',
+            'National Identification System Code': '',
+            'Out of Business indicator': OutOfBusinessIndicator.OUT_OF_BUSINESS,
+        }
+
+        with pytest.raises(MismatchedRecordsException) as excinfo:
+            update_company_from_wb_record(company, wb_record)
+
+        assert str(excinfo.value) == (
+            'The Worldbase record with DUNS number 123456789 cannot be used to '
+            f'update company {company.id} with DUNS number 987654321.'
+        )
