@@ -234,7 +234,6 @@ class TestAddInteraction(APITestMixin):
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
                     'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
@@ -583,6 +582,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -668,6 +668,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': None,
+            'meeting_uid': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -689,6 +691,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            'state': Interaction.STATES.complete,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -764,6 +767,9 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': None,
+            'meeting_uid': None,
+
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):

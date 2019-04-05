@@ -93,6 +93,7 @@ class TestAddServiceDelivery(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.service_delivery,
+            'state': Interaction.STATES.complete,
             'is_event': request_data['is_event'],
             'service_delivery_status': request_data.get('service_delivery_status'),
             'grant_amount_offered': request_data.get('grant_amount_offered'),
@@ -163,6 +164,8 @@ class TestAddServiceDelivery(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': None,
+            'meeting_uid': None,
         }
 
     @pytest.mark.parametrize(
@@ -178,7 +181,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
-                    'service': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
@@ -192,11 +194,11 @@ class TestAddServiceDelivery(APITestMixin):
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
                     'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
                     'dit_team': Team.healthcare_uk.value.id,
                     'was_policy_feedback_provided': False,
                 },
                 {
+                    'service': ['This field is required.'],
                     'is_event': ['This field is required.'],
                 },
             ),

@@ -137,6 +137,10 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     }
 
+    state = serializers.ChoiceField(
+        default=Interaction.STATES.complete,
+        choices=Interaction.STATES,
+    )
     company = NestedRelatedField(Company)
     contacts = NestedRelatedField(
         Contact,
