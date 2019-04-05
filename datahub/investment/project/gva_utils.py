@@ -46,9 +46,7 @@ class GrossValueAddedCalculator:
         if not self.investment_project.foreign_equity_investment or not self.gva_multiplier:
             return None
         return round(
-            self.gva_multiplier.multiplier * float(
-                self.investment_project.foreign_equity_investment,
-            ),
+            self.gva_multiplier.multiplier * self.investment_project.foreign_equity_investment,
         )
 
     def _get_gva_multiplier_for_investment_project(self):

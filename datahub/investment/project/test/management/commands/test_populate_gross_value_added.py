@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest import mock
 
 import pytest
@@ -32,25 +33,25 @@ class TestPopulateGrossValueAddedCommand:
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [InvestmentBusinessActivityConstant.retail.value.id],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
-                0.0325,
+                '0.0325',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
-                0.0621,
+                '0.0621',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -59,7 +60,7 @@ class TestPopulateGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.retail.value.id,
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
@@ -100,9 +101,9 @@ class TestPopulateGrossValueAddedCommand:
         self._run_populate_command()
         project.refresh_from_db()
         if not multiplier_value:
-            assert project.gva_multiplier is None
+            assert not project.gva_multiplier
         else:
-            assert project.gva_multiplier.multiplier == multiplier_value
+            assert project.gva_multiplier.multiplier == Decimal(multiplier_value)
 
     def _run_populate_command(self):
         cmd = populate_gross_value_added.Command()

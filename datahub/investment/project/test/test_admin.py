@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from unittest import mock
 from uuid import uuid4
 
@@ -151,7 +152,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         response = self.client.post(url, data, follow=True)
         assert response.status_code == 200
         investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
-        assert investment_project.gross_value_added == 6210
+        assert investment_project.gross_value_added == Decimal('6210')
 
         # GVA Multiplier - Transportation & storage - 2019
-        assert investment_project.gva_multiplier.multiplier == 0.0621
+        assert investment_project.gva_multiplier.multiplier == Decimal('0.0621')

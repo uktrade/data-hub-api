@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import date
+from decimal import Decimal
 
 import factory
 from django.utils.timezone import now
@@ -182,7 +183,7 @@ class GVAMultiplierFactory(factory.django.DjangoModelFactory):
 
     fdi_sic_grouping_id = FDISICGrouping.retail.value.id
     financial_year = 2019
-    multiplier = float(0.1250)
+    multiplier = Decimal('0.1250')
 
     class Meta:
         model = 'investment.GVAMultiplier'

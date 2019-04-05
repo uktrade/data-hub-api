@@ -4,6 +4,7 @@ import re
 import uuid
 from collections import Counter
 from datetime import date, datetime
+from decimal import Decimal
 from operator import attrgetter
 from unittest import mock
 
@@ -1060,8 +1061,8 @@ class TestPartialUpdateView(APITestMixin):
     @pytest.mark.parametrize(
         'foreign_equity_investment,expected_gross_value_added,expected_multiplier_value',
         (
-            (20000, 1242, 0.0621),
-            (None, None, 0.0621),
+            (20000, 1242, '0.0621'),
+            (None, None, '0.0621'),
         ),
     )
     def test_change_foreign_equity_investment_updates_gross_value_added(
@@ -1097,7 +1098,7 @@ class TestPartialUpdateView(APITestMixin):
 
         project.refresh_from_db()
         if expected_multiplier_value:
-            assert project.gva_multiplier.multiplier == expected_multiplier_value
+            assert project.gva_multiplier.multiplier == Decimal(expected_multiplier_value)
         else:
             assert not project.gva_multiplier
 

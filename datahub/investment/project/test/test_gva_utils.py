@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest import mock
 
 import pytest
@@ -35,25 +36,25 @@ class TestGrossValueAddedCalculator:
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [InvestmentBusinessActivityConstant.retail.value.id],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
-                0.0325,
+                '0.0325',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
-                0.0621,
+                '0.0621',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -62,7 +63,7 @@ class TestGrossValueAddedCalculator:
                     InvestmentBusinessActivityConstant.retail.value.id,
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
-                0.0581,
+                '0.0581',
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
@@ -94,9 +95,9 @@ class TestGrossValueAddedCalculator:
             investment_type_id=investment_type,
         )
         if not expected_multiplier_value:
-            assert project.gva_multiplier is None
+            assert not project.gva_multiplier
         else:
-            assert project.gva_multiplier.multiplier == expected_multiplier_value
+            assert project.gva_multiplier.multiplier == Decimal(expected_multiplier_value)
 
     def test_no_investment_sector_linking_sector_to_fdi_sic_grouping_returns_none(self):
         """
@@ -129,20 +130,21 @@ class TestGrossValueAddedCalculator:
     @pytest.mark.parametrize(
         'foreign_equity_investment,multiplier_value,expected_gross_value_added',
         (
-            (1, 1, 1),
+            (1, 1, '1'),
             (None, 1, None),
-            (100000, 0.0581, 5810),
-            (130000000, 0.4537, 58981000),
-            (10000000, 0.0621, 621000),
-            (111000, 0.0621, 6893),
-            (12625500, 0.0581, 733542),
-            (296000, 0.0581, 17198),
-            (7002180, 0.0386, 270284),
-            (287732, 0.3939, 113338),
-            (1800000, 0.0264, 47520),
-            (28000, 0.021, 588),
-            (8907560, 0.9526, 8485342),
-            (16717, 0.0853, 1426),
+            (100000, 0.0581, '5810'),
+            (130000000, 0.4537, '58981000'),
+            (10000000, 0.0621, '621000'),
+            (111000, 0.0621, '6893'),
+            (9999999999999999999, 0.9999, '9999000000000000000'),
+            (9999999999999999999, 9.999999, '99999990000000008192'),
+            (296000, 0.0581, '17198'),
+            (7002180, 0.0386, '270284'),
+            (287732, 0.3939, '113338'),
+            (1800000, 0.0264, '47520'),
+            (28000, 0.021, '588'),
+            (8907560, 0.9526, '8485342'),
+            (16717, 0.0853, '1426'),
         ),
     )
     def test_calculate_gva(
@@ -167,4 +169,7 @@ class TestGrossValueAddedCalculator:
                 sector_id=SectorConstant.renewable_energy_wind.value.id,
             )
 
-        assert project.gross_value_added == expected_gross_value_added
+        if not expected_gross_value_added:
+            assert not project.gross_value_added
+        else:
+            assert project.gross_value_added == Decimal(expected_gross_value_added)
