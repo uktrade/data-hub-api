@@ -418,24 +418,6 @@ class TestAddInteraction(APITestMixin):
                     },
                 },
             ),
-
-            # dit_participants cannot be None
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_participants': None,
-                },
-                {
-                    'dit_participants': ['This field may not be null.'],
-                },
-            ),
         ),
     )
     def test_validation(self, data, errors):
