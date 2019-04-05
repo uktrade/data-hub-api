@@ -20,7 +20,7 @@ def _build_model_data(model, obj_pk, fields_data, using):
         # Handle fk fields
         if field.many_to_one:
             try:
-                value = base.deserialize_fk_value(field, field_value, using)
+                value = base.deserialize_fk_value(field, field_value, using, False)
             except Exception as exc:
                 raise base.DeserializationError.WithData(
                     exc,
