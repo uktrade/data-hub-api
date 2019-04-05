@@ -68,3 +68,7 @@ class FDISICGrouping(Enum):
         'Retails & wholesale trade, repair of motor vehicles & motor',
         'c7ba3108-5fb3-486c-8d29-e71b1c0e29cd',
     )
+    electric = Constant(
+        'Electricity, Gas, Water and waste',
+        '3b847399-84a6-4d98-b135-104bfdb9f5fa',
+    )
