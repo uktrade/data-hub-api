@@ -130,7 +130,7 @@ def _extract_address(wb_record):
         'address_2': wb_record['Street Address 2'],
         'address_town': wb_record['City Name'],
         'address_county': wb_record['State/Province Name'],
-        'address_country': country,
+        'address_country_id': country.id,
         'address_postcode': wb_record['Postal Code for Street Address'],
     }
 

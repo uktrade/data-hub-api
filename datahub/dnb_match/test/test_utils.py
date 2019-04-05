@@ -1,8 +1,10 @@
+import uuid
 from decimal import InvalidOperation
 from unittest import mock
 
 import pytest
 
+from datahub.core.constants import Country as CountryConstant
 from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.dnb_match.utils import (
     _extract_address,
@@ -20,22 +22,7 @@ from datahub.dnb_match.utils import (
 from datahub.metadata.models import Country
 
 
-def _resolve_countries(company_fields):
-    """
-    Replaces all the country fields in company_fields (the ones ending in *_country)
-    with an instance of metadata.Country.
-    """
-    fields_to_resolve = [
-        'address_country',
-        'trading_address_country',
-        'registered_address_country',
-    ]
-
-    for country_field in fields_to_resolve:
-        if country_field in company_fields:
-            company_fields[country_field] = Country.objects.get(
-                iso_alpha2_code=company_fields[country_field],
-            )
+UNITED_KINGDOM_COUNTRY_UUID = uuid.UUID(CountryConstant.united_kingdom.value.id)
 
 
 class TestExtractEmployees:
@@ -441,9 +428,7 @@ class TestExtractAddress:
                     'address_2': 'Main Street',
                     'address_town': 'London',
                     'address_county': 'Camden',
-                    # the body of the test replaces the ISO code in 'address_country'
-                    # with an instance of metadata.Country before any comparison
-                    'address_country': 'GB',
+                    'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                     'address_postcode': 'SW1A 1AA',
                 },
             ),
@@ -463,9 +448,7 @@ class TestExtractAddress:
                     'address_2': '',
                     'address_town': '',
                     'address_county': '',
-                    # the body of the test replaces the ISO code in 'address_country'
-                    # with an instance of metadata.Country before any comparison
-                    'address_country': 'GB',
+                    'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                     'address_postcode': '',
                 },
             ),
@@ -475,8 +458,6 @@ class TestExtractAddress:
         """
         Test successful cases related to _extract_address().
         """
-        _resolve_countries(expected_output)
-
         actual_output = _extract_address(wb_record)
         assert actual_output == expected_output
 
@@ -663,26 +644,19 @@ class TestExtractWbRecordIntoCompanyFields:
                         'address_2': 'Main Street',
                         'address_town': 'London',
                         'address_county': 'Camden',
-                        # the body of the test replaces the ISO code in 'address_country'
-                        # with an instance of metadata.Country before any comparison
-                        'address_country': 'GB',
+                        'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'address_postcode': 'SW1A 1AA',
                         'registered_address_1': '1',
                         'registered_address_2': 'Main Street',
                         'registered_address_town': 'London',
                         'registered_address_county': 'Camden',
-                        # the body of the test replaces the ISO code in
-                        # 'registered_address_country' with an instance of metadata.Country
-                        # before any comparison
-                        'registered_address_country': 'GB',
+                        'registered_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'registered_address_postcode': 'SW1A 1AA',
                         'trading_address_1': '1',
                         'trading_address_2': 'Main Street',
                         'trading_address_town': 'London',
                         'trading_address_county': 'Camden',
-                        # the body of the test replaces the ISO code in 'trading_address_country'
-                        # with an instance of metadata.Country before any comparison
-                        'trading_address_country': 'GB',
+                        'trading_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'trading_address_postcode': 'SW1A 1AA',
                     },
                     False,
@@ -727,26 +701,19 @@ class TestExtractWbRecordIntoCompanyFields:
                         'address_2': '',
                         'address_town': '',
                         'address_county': '',
-                        # the body of the test replaces the ISO code in 'address_country'
-                        # with an instance of metadata.Country before any comparison
-                        'address_country': 'GB',
+                        'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'address_postcode': '',
                         'registered_address_1': '',
                         'registered_address_2': '',
                         'registered_address_town': '',
                         'registered_address_county': '',
-                        # the body of the test replaces the ISO code in
-                        # 'registered_address_country' with an instance of metadata.Country
-                        # before any comparison
-                        'registered_address_country': 'GB',
+                        'registered_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'registered_address_postcode': '',
                         'trading_address_1': '',
                         'trading_address_2': '',
                         'trading_address_town': '',
                         'trading_address_county': '',
-                        # the body of the test replaces the ISO code in 'trading_address_country'
-                        # with an instance of metadata.Country before any comparison
-                        'trading_address_country': 'GB',
+                        'trading_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
                         'trading_address_postcode': '',
                     },
                     True,
@@ -758,7 +725,5 @@ class TestExtractWbRecordIntoCompanyFields:
         """
         Test successful cases related to extract_wb_record_into_company_fields().
         """
-        _resolve_countries(expected_output[0])
-
         actual_output = extract_wb_record_into_company_fields(wb_record)
         assert actual_output == expected_output
