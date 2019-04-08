@@ -121,6 +121,7 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         'dit_adviser_name': 'Adviser',
         'dit_team__name': 'Service provider',
         'event__name': 'Event',
+        'communication_channel__name': 'Communication channel',
         'service_delivery_status__name': 'Service delivery status',
         'net_company_receipt': 'Net company receipt',
         'policy_issue_type_names': 'Policy issue types',

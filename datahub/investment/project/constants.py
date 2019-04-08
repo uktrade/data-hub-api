@@ -59,3 +59,12 @@ class InvestmentActivityType(Enum):
     issue = Constant('Issue', '6aa82e79-bfab-4466-8d92-e108fd4c0b42')
     spi_interaction = Constant('SPI Interaction', 'fa6ed4db-4e1d-4903-988b-3e8be45b37c2')
     internal_interaction = Constant('Internal Interaction', 'c50d2f7a-57cd-435e-bf87-d04c1dab11e6')
+
+
+class FDISICGrouping(Enum):
+    """FDI SIC Grouping constants."""
+
+    retail = Constant(
+        'Retails & wholesale trade, repair of motor vehicles & motor',
+        'c7ba3108-5fb3-486c-8d29-e71b1c0e29cd',
+    )
