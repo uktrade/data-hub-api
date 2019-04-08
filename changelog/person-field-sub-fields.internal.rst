@@ -1,1 +1,0 @@
-``name.keyword`` and ``name.trigram`` sub-fields were added to the ``contact_or_adviser_field`` field type in all search models. This is in preparation of the removal of the ``name_trigram`` sub-field, and also so we can change the type of the ``name`` sub-field from ``keyword`` to ``text``.
