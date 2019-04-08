@@ -1,3 +1,43 @@
+Data Hub API 11.5.0 (2019-04-08)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** Communication channel is now included in CSV exports of search results.
+- **Investment** ``Gross Value Added`` has been added to investment projects.
+  This is calculated based on the sector, business activity and the
+  projected foreign equity investment amount.
+
+Internal changes
+----------------
+
+- ``name.keyword`` and ``name.trigram`` sub-fields were added to the ``contact_or_adviser_field`` field type in all search models. This is in preparation of the removal of the ``name_trigram`` sub-field, and also so we can change the type of the ``name`` sub-field from ``keyword`` to ``text``.
+- Django was updated to version 2.2.
+
+API
+---
+
+- **Events** ``POST /v3/event, PATCH /v3/event/<id>``: The ``organiser`` field is now required.
+- **Investment** The following read only field has been added to ``/v3/investment/`` endpoint.
+
+  - ``gross_value_added``
+
+Database schema
+---------------
+
+- **Investment** The database table ``investment_investmentproject`` has been updated with the following columns:
+
+  - gross_value_added (decimal)
+
+
+  The the following columns in database table ``investment_gva_multiplier`` has been updated:
+
+  - ``multiplier (float) not null`` changed to ``multiplier (decimal) not null``
+
+
 Data Hub API 11.4.1 (2019-04-04)
 ================================
 
