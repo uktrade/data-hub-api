@@ -91,6 +91,7 @@ CORE_FIELDS = (
     'country_investment_originates_from',
     'level_of_involvement_simplified',
     'note',
+    'gross_value_added',
 )
 
 VALUE_FIELDS = (
@@ -337,6 +338,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     associated_non_fdi_r_and_d_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code'),
     )
+    gross_value_added = serializers.ReadOnlyField()
 
     # Requirements fields
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
