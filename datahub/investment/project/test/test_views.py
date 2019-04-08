@@ -473,7 +473,7 @@ class TestCreateView(APITestMixin):
             == str(project_manager_request_status_id)
         )
         # GVA Multiplier - Transportation & storage - 2019 - 0.0621 * 1000
-        assert response_data['gross_value_added'] == 62
+        assert response_data['gross_value_added'] == '62'
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -765,7 +765,7 @@ class TestRetrieveView(APITestMixin):
         assert response_data['export_revenue'] is True
         assert response_data['value_complete'] is True
         # GVA Multiplier - Transportation & storage - 2019 - 0.0621
-        assert response_data['gross_value_added'] == 6
+        assert response_data['gross_value_added'] == '6'
 
     def test_get_requirements_success(self):
         """Test successfully getting a project requirements object."""
@@ -1061,7 +1061,7 @@ class TestPartialUpdateView(APITestMixin):
     @pytest.mark.parametrize(
         'foreign_equity_investment,expected_gross_value_added,expected_multiplier_value',
         (
-            (20000, 1242, '0.0621'),
+            (20000, '1242', '0.0621'),
             (None, None, '0.0621'),
         ),
     )
@@ -1106,9 +1106,9 @@ class TestPartialUpdateView(APITestMixin):
         'business_activity,expected_gross_value_added',
         (
             # GVA Multiplier for Retails & wholesale trade - 2019 - 0.0581
-            (constants.InvestmentBusinessActivity.retail.value.id, 5810),
+            (constants.InvestmentBusinessActivity.retail.value.id, '5810'),
             # No change - GVA Multiplier - Transportation & storage - 2019 - 0.0621
-            (constants.InvestmentBusinessActivity.other.value.id, 6210),
+            (constants.InvestmentBusinessActivity.other.value.id, '6210'),
         ),
     )
     def test_change_business_activity_to_retail_updated_gross_value_added(
