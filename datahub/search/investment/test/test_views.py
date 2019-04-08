@@ -155,57 +155,6 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
 
-    @pytest.mark.parametrize(
-        'search,expected_gross_value_added,expected_project_name',
-        (
-            (
-                {
-                    'gross_value_added_start': 0,
-                    'gross_value_added_end': 6000,
-                },
-                [5810],
-                ['abc defg'],
-            ),
-            (
-                {
-                    'gross_value_added_start': 20000,
-                },
-                [],
-                [],
-            ),
-            (
-                {
-                    'gross_value_added_end': 100000,
-                },
-                [5810, 11620],
-                ['abc defg', 'won project'],
-            ),
-        ),
-    )
-    def test_gross_value_added_filters(
-        self, setup_data, search, expected_gross_value_added, expected_project_name,
-    ):
-        """Test Gross Value Added (GVA) filters."""
-        url = reverse('api-v3:search:investment_project')
-
-        response = self.api_client.post(
-            url,
-            data=search,
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        expected_number_of_results = len(expected_gross_value_added)
-        assert response.data['count'] == expected_number_of_results, response.data['results']
-        assert len(response.data['results']) == expected_number_of_results
-        assert (
-            Counter(result['gross_value_added'] for result in response.data['results'])
-            == Counter(expected_gross_value_added)
-        ), expected_gross_value_added
-        assert (
-            Counter(result['name'] for result in response.data['results'])
-            == Counter(expected_project_name)
-        ), expected_project_name
-
     def test_search_adviser_filter(self, setup_es):
         """Tests the adviser filter."""
         adviser = AdviserFactory()
@@ -1136,7 +1085,6 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,
-                'Gross Value Added': project.gross_value_added,
             }
             for project in sorted_projects
         ]

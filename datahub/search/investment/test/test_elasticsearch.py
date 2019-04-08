@@ -333,7 +333,6 @@ def test_mapping(setup_es):
                 },
                 'foreign_equity_investment': {'type': 'double'},
                 'government_assistance': {'type': 'boolean'},
-                'gross_value_added': {'type': 'integer'},
                 'id': {'type': 'keyword'},
                 'intermediate_company': {
                     'properties': {
