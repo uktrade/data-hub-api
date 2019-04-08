@@ -4,7 +4,6 @@ from operator import attrgetter
 from random import sample
 from uuid import UUID
 
-import factory
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -983,8 +982,6 @@ class TestListInteractions(APITestMixin):
         (
             'company.name',
             'created_on',
-            'dit_adviser.first_name',
-            'dit_adviser.last_name',
             'subject',
         ),
     )
@@ -994,22 +991,16 @@ class TestListInteractions(APITestMixin):
             {
                 'created_on': datetime(2015, 1, 1),
                 'company__name': 'Black Group',
-                'dit_adviser__first_name': 'Elaine',
-                'dit_adviser__last_name': 'Johnston',
                 'subject': 'lorem',
             },
             {
                 'created_on': datetime(2005, 4, 1),
                 'company__name': 'Hicks Ltd',
-                'dit_adviser__first_name': 'Connor',
-                'dit_adviser__last_name': 'Webb',
                 'subject': 'ipsum',
             },
             {
                 'created_on': datetime(2019, 1, 1),
                 'company__name': 'Sheppard LLC',
-                'dit_adviser__first_name': 'Hayley',
-                'dit_adviser__last_name': 'Hunt',
                 'subject': 'dolor',
             },
         ]
@@ -1047,41 +1038,6 @@ class TestListInteractions(APITestMixin):
             for result in response_data['results']
         ]
         assert expected == actual
-
-    def test_sort_by_adviser_first_and_last_name(self):
-        """Test sorting interactions by first_name with a secondary last_name sort."""
-        people = [
-            AdviserFactory(first_name='Alfred', last_name='Jones'),
-            AdviserFactory(first_name='Alfred', last_name='Terry'),
-            AdviserFactory(first_name='Thomas', last_name='Richards'),
-            AdviserFactory(first_name='Thomas', last_name='West'),
-        ]
-        interactions = EventServiceDeliveryFactory.create_batch(
-            len(people),
-            **{
-                'dit_adviser': factory.Iterator(sample(people, k=len(people))),
-            },
-        )
-
-        url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(
-            url,
-            data={
-                'sortby': f'dit_adviser__first_name,dit_adviser__last_name',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-        assert response_data['count'] == len(interactions)
-
-        actual_ids = [
-            interaction['dit_adviser']['id']
-            for interaction in response_data['results']
-        ]
-        expected_ids = [str(person.pk) for person in people]
-        assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
         'primary_field,secondary_field',

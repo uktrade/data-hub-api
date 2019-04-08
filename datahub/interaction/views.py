@@ -39,10 +39,6 @@ class InteractionViewSet(CoreViewSet):
         'company__name',
         'created_on',
         'date',
-        # TODO: Remove following deprecation period
-        'dit_adviser__first_name',
-        # TODO: Remove following deprecation period
-        'dit_adviser__last_name',
         'first_name_of_first_contact',
         'last_name_of_first_contact',
         'subject',
