@@ -40,8 +40,21 @@ class TestGrossValueAddedCalculator:
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
+                None,
+                [
+                    InvestmentBusinessActivityConstant.sales.value.id,
+                ],
+                '0.0581',
+            ),
+            (
+                InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
-                [InvestmentBusinessActivityConstant.retail.value.id],
+                [
+                    InvestmentBusinessActivityConstant.retail.value.id,
+                    InvestmentBusinessActivityConstant.sales.value.id,
+                    InvestmentBusinessActivityConstant.other.value.id,
+
+                ],
                 '0.0581',
             ),
             (

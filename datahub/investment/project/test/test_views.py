@@ -1107,6 +1107,7 @@ class TestPartialUpdateView(APITestMixin):
         (
             # GVA Multiplier for Retails & wholesale trade - 2019 - 0.0581
             (constants.InvestmentBusinessActivity.retail.value.id, '5810'),
+            (constants.InvestmentBusinessActivity.sales.value.id, '5810'),
             # No change - GVA Multiplier - Transportation & storage - 2019 - 0.0621
             (constants.InvestmentBusinessActivity.other.value.id, '6210'),
         ),
