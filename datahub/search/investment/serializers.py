@@ -34,8 +34,6 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         child=serializers.ChoiceField(choices=InvestmentProject.INVOLVEMENT),
         required=False,
     )
-    gross_value_added_start = serializers.IntegerField(required=False, min_value=0)
-    gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
 
     SORT_BY_FIELDS = (
         'actual_land_date',
