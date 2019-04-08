@@ -142,6 +142,7 @@ class InvestmentProject(BaseESModel):
     uk_region_locations = fields.id_name_field()
     will_new_jobs_last_two_years = Boolean()
     level_of_involvement_simplified = Keyword()
+    gross_value_added = Integer()
 
     MAPPINGS = {
         'actual_uk_regions': lambda col: [

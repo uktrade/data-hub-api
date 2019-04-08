@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from unittest import mock
 from uuid import uuid4
 
@@ -139,3 +140,27 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         url = reverse('admin:investment_investmentproject_add')
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
+
+    @freeze_time('2018-01-01 00:00:00')
+    def test_creating_project_sets_gross_value_added(self):
+        """Test that gross value added is calculated when a project is created in admin."""
+        url = reverse('admin:investment_investmentproject_add')
+
+        investment_project_pk = str(uuid4())
+        data = {
+            'name': 'name 319',
+            'description': 'desc 319',
+            'investment_type': str(constants.InvestmentType.fdi.value.id),
+            'id': investment_project_pk,
+            'sector': str(constants.Sector.aerospace_assembly_aircraft.value.id),
+            'foreign_equity_investment': 100000,
+            'stage': str(constants.InvestmentProjectStage.active.value.id),
+            'status': 'ongoing',
+        }
+        response = self.client.post(url, data, follow=True)
+        assert response.status_code == 200
+        investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
+        assert investment_project.gross_value_added == Decimal('6210')
+
+        # GVA Multiplier - Transportation & storage - 2019
+        assert investment_project.gva_multiplier.multiplier == Decimal('0.0621')
