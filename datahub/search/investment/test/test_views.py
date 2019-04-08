@@ -46,6 +46,7 @@ def setup_data(setup_es):
     """Sets up data for the tests."""
     investment_projects = [
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='abc defg',
             description='investmentproject1',
             estimated_land_date=datetime.date(2011, 6, 13),
@@ -60,8 +61,10 @@ def setup_data(setup_es):
             ],
             level_of_involvement_id=Involvement.hq_and_post_only.value.id,
             likelihood_to_land_id=LikelihoodToLand.high.value.id,
+            foreign_equity_investment=100000,
         ),
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='delayed project',
             description='investmentproject2',
             estimated_land_date=datetime.date(2057, 6, 13),
@@ -81,6 +84,7 @@ def setup_data(setup_es):
             likelihood_to_land_id=LikelihoodToLand.medium.value.id,
         ),
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
             name='won project',
             description='investmentproject3',
             estimated_land_date=datetime.date(2027, 9, 13),
@@ -97,6 +101,7 @@ def setup_data(setup_es):
             ],
             level_of_involvement_id=Involvement.hq_only.value.id,
             likelihood_to_land_id=None,
+            foreign_equity_investment=200000,
         ),
         InvestmentProjectFactory(
             name='new project',
@@ -1087,8 +1092,10 @@ class TestInvestmentProjectExportView(APITestMixin):
         expected_rows = format_csv_data(expected_row_data)
         actual_rows = [dict(item) for item in reader]
 
-        # Support for ordering will be added to StringAgg in Django 2.2. In the meantime,
-        # StringAgg fields are unordered and we use this workaround to compare them.
+        # Support for ordering was added to StringAgg in Django 2.2. However, it is not
+        # currently used due to https://code.djangoproject.com/ticket/30315. While that
+        # remains the case, our StringAgg fields are unordered and we use this workaround to
+        # compare them.
         unordered_fields = (
             'Other team members',
             'Delivery partners',

@@ -91,6 +91,7 @@ CORE_FIELDS = (
     'country_investment_originates_from',
     'level_of_involvement_simplified',
     'note',
+    'gross_value_added',
 )
 
 VALUE_FIELDS = (
@@ -514,6 +515,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             'archived_documents_url_path',
             'comments',
             'project_manager_requested_on',
+            'gross_value_added',
         )
 
 

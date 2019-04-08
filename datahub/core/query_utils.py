@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Case, F, Func, OuterRef, Subquery, Value, When
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, NullIf
 
 
 class ConcatWS(Func):
@@ -27,28 +27,17 @@ class PreferNullConcat(Func):
     arg_joiner = ' || '
 
 
-class NullIf(Func):
-    """
-    Returns None if a field equals a particular expression.
-
-    Usage example:
-        NullIf('first_name', Value(''))  # returns None if first_name is an empty string
-    """
-
-    function = 'nullif'
-    arity = 2
-
-
 def get_string_agg_subquery(model, expression, delimiter=', '):
     """
     Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
     The passed model must be the model of the query set being annotated.
 
-    At present values are concatenated in an undefined order, however Django 2.2 adds support for
+    At present values are concatenated in an undefined order, however Django 2.2 added support for
     providing an ordering.
 
-    TODO: Add ordering when Django 2.2 is released.
+    TODO: However, the StringAgg ordering keyword argument is not currently used due to the
+     problem described in https://code.djangoproject.com/ticket/30315.
 
     Usage example:
         Company.objects.annotate(
