@@ -338,7 +338,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     associated_non_fdi_r_and_d_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code'),
     )
-    gross_value_added = serializers.ReadOnlyField()
 
     # Requirements fields
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
@@ -516,6 +515,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             'archived_documents_url_path',
             'comments',
             'project_manager_requested_on',
+            'gross_value_added',
         )
 
 
