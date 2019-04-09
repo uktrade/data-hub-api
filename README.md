@@ -101,16 +101,20 @@ Dependencies:
     cd data-hub-leeloo
     ```
 
-2.  Install `virtualenv` if you don’t have it already:
-
-    ```shell
-    pip install virtualenv
+2.  Install Python 3.7.
+    
+    [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
+    
+    On Ubuntu, you should also install `python3.7-dev` and `python3.7-venv`: 
+    
     ```
+    sudo apt install python3.7-dev python3.7-venv
+    ``` 
 
 3.  Create and activate the virtualenv:
 
     ```shell
-    virtualenv --python=python3 env
+    python3.7 -m venv env
     source env/bin/activate
     pip install -U pip
     ```
@@ -143,7 +147,7 @@ Dependencies:
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10.  Populate the database and initialise Elasticsearch:
+10. Populate the database and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
@@ -161,7 +165,7 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-12.  Create a superuser:
+12. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
