@@ -143,6 +143,8 @@ class InvestmentProject(BaseESModel):
     will_new_jobs_last_two_years = Boolean()
     level_of_involvement_simplified = Keyword()
 
+    gross_value_added = Double()
+
     MAPPINGS = {
         'actual_uk_regions': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
