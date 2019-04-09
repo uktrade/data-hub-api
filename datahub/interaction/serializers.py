@@ -28,7 +28,10 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
-from datahub.interaction.validators import ContactsBelongToCompanyValidator
+from datahub.interaction.validators import (
+    ContactsBelongToCompanyValidator,
+    StatusChangeValidator,
+)
 from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 
@@ -137,6 +140,10 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     }
 
+    status = serializers.ChoiceField(
+        default=Interaction.STATUSES.complete,
+        choices=Interaction.STATUSES,
+    )
     company = NestedRelatedField(Company)
     contacts = NestedRelatedField(
         Contact,
@@ -150,6 +157,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     )
     created_by = NestedAdviserField(read_only=True)
+    location = serializers.CharField(default='')
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
@@ -171,7 +179,7 @@ class InteractionSerializer(serializers.ModelSerializer):
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     modified_by = NestedAdviserField(read_only=True)
-    service = NestedRelatedField(Service)
+    service = NestedRelatedField(Service, required=False, allow_null=True)
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
@@ -331,6 +339,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'created_by',
             'event',
             'is_event',
+            'status',
             'kind',
             'modified_by',
             'modified_on',
@@ -351,6 +360,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_feedback_notes',
             'policy_issue_types',
             'was_policy_feedback_provided',
+            'location',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -358,6 +368,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         validators = [
             HasAssociatedInvestmentProjectValidator(),
             ContactsBelongToCompanyValidator(),
+            StatusChangeValidator(),
             RulesBasedValidator(
                 # If dit_adviser and dit_team are *omitted* (note that they already have
                 # allow_null=False) we assume that dit_participants is being used, and return an
@@ -391,7 +402,15 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=AndRule(
+                        EqualsRule('kind', Interaction.KINDS.interaction),
+                        EqualsRule('status', Interaction.STATUSES.complete),
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('service', bool),
+                    when=EqualsRule('status', Interaction.STATUSES.complete),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',

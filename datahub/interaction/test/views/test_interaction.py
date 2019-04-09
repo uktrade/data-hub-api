@@ -82,6 +82,14 @@ class TestAddInteraction(APITestMixin):
             {
                 'notes': 'hello',
             },
+            # interaction with a status
+            {
+                'status': Interaction.STATUSES.draft,
+            },
+            # interaction with a location
+            {
+                'location': 'Windsor House',
+            },
             # investment project interaction
             {
                 'investment_project': InvestmentProjectFactory,
@@ -129,6 +137,7 @@ class TestAddInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            'status': request_data.get('status', Interaction.STATUSES.complete),
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -202,6 +211,108 @@ class TestAddInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': request_data.get('location', ''),
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_draft(self, permissions):
+        """
+        Test that we can successfully add draft Interactions which do not
+        specify service or communication_channel.
+        """
+        adviser = create_test_user(permission_codenames=permissions)
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'status': Interaction.STATUSES.draft,
+            'kind': Interaction.KINDS.interaction,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'dit_team': Team.healthcare_uk.value.id,
+            'was_policy_feedback_provided': False,
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': Interaction.KINDS.interaction,
+            'status': Interaction.STATUSES.draft,
+            'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'net_company_receipt': None,
+            'policy_areas': [],
+            'policy_feedback_notes': '',
+            'policy_issue_types': [],
+            'was_policy_feedback_provided': False,
+            'communication_channel': None,
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(adviser.pk),
+                        'first_name': adviser.first_name,
+                        'last_name': adviser.last_name,
+                        'name': adviser.name,
+                    },
+                    'team': {
+                        'id': str(Team.healthcare_uk.value.id),
+                        'name': Team.healthcare_uk.value.name,
+                    },
+                },
+            ],
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'notes': '',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+            },
+            'contacts': [{
+                'id': str(contact.pk),
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
+            }],
+            'event': None,
+            'service': None,
+            'investment_project': None,
+            'archived_documents_url_path': '',
+            'created_by': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'modified_by': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
+            'location': '',
         }
 
     @pytest.mark.parametrize(
@@ -217,12 +328,30 @@ class TestAddInteraction(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
-                    'service': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
 
-            # interaction fields required
+            # service required for complete interaction
+            # required fields
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                },
+                {
+                    'service': ['This field is required.'],
+                },
+            ),
+
+            # communication_channel required for complete interaction
             (
                 {
                     'kind': Interaction.KINDS.interaction,
@@ -397,6 +526,38 @@ class TestAddInteraction(APITestMixin):
                     },
                 },
             ),
+
+            # status must be a valid choice
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+                    'status': 'foobar',
+                },
+                {
+                    'status': ['"foobar" is not a valid choice.'],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+                    'status': None,
+                },
+                {
+                    'status': ['This field may not be null.'],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -543,6 +704,8 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            # TODO: Change this once we give status a default
+            'status': None,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -628,6 +791,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            # TODO: Change this once we enforce a default
+            'location': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -649,6 +814,8 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
+            # TODO: Change this once we give status a default
+            'status': None,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -724,6 +891,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            # TODO: change this once we enforce a default
+            'location': None,
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
@@ -845,6 +1014,121 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    @pytest.mark.parametrize(
+        'current_status,new_status',
+        (
+            (None, Interaction.STATUSES.draft),
+            (Interaction.STATUSES.draft, Interaction.STATUSES.draft),
+            (None, Interaction.STATUSES.complete),
+            (Interaction.STATUSES.draft, Interaction.STATUSES.complete),
+            (Interaction.STATUSES.complete, Interaction.STATUSES.complete),
+        ),
+    )
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_status_change_valid(self, permissions, current_status, new_status):
+        """
+        Test the different ways that an Interaction's status can change.
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = CompanyInteractionFactory(status=current_status)
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(
+            url,
+            data={
+                'status': new_status,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['status'] == new_status
+
+    @pytest.mark.parametrize(
+        'current_status,new_status,response_body',
+        (
+            (
+                Interaction.STATUSES.draft,
+                None,
+                {'status': ['This field may not be null.']},
+            ),
+            (
+                Interaction.STATUSES.complete,
+                Interaction.STATUSES.draft,
+                {'non_field_errors': ['The status of a complete interaction cannot change.']},
+            ),
+            (
+                Interaction.STATUSES.complete,
+                None,
+                {'status': ['This field may not be null.']},
+            ),
+        ),
+    )
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_status_change_invalid(self, permissions, current_status, new_status, response_body):
+        """
+        Test the different ways that an Interaction's status can change.
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = CompanyInteractionFactory(status=current_status)
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(
+            url,
+            data={
+                'status': new_status,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == response_body
+
+    @pytest.mark.parametrize(
+        'data,error_response',
+        (
+            (
+                {
+                    'status': Interaction.STATUSES.complete,
+                    'service': Service.trade_enquiry.value.id,
+                },
+                {
+                    'communication_channel': ['This field is required.'],
+                },
+            ),
+            (
+                {
+                    'status': Interaction.STATUSES.complete,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                },
+                {
+                    'service': ['This field is required.'],
+                },
+            ),
+        ),
+    )
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_draft_update_enforces_required_fields(self, permissions, data, error_response):
+        """
+        Test that changing a draft to completed will enforce service and
+        communication_channel to be set.
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        draft_interaction = CompanyInteractionFactory(
+            kind=Interaction.KINDS.interaction,
+            status=Interaction.STATUSES.draft,
+            service_id=None,
+            communication_channel=None,
+        )
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': draft_interaction.pk})
+        data = resolve_data(data)
+        response = api_client.patch(url, data=data)
+
+        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.data == error_response
 
 
 class TestListInteractions(APITestMixin):
