@@ -138,7 +138,7 @@ class Interaction(BaseModel):
     # TODO: Ensure that this is required (with default="complete")
     # once we have ensured that a default value "complete" is set on
     # all existing Interactions and we have ensured that new interactions are
-    # being created with a state
+    # being created with a status
     status = models.CharField(
         max_length=MAX_LENGTH,
         choices=STATUSES,
