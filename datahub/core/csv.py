@@ -63,5 +63,6 @@ def _transform_csv_value(value):
     if isinstance(value, datetime):
         return value.strftime('%Y-%m-%d %H:%M:%S')
     if isinstance(value, Decimal):
-        return value.normalize()
+        normalized_value = value.normalize()
+        return f'{normalized_value:f}'
     return value
