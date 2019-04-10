@@ -89,6 +89,12 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
         model = 'investment.InvestmentProject'
 
 
+class FDIInvestmentProjectFactory(InvestmentProjectFactory):
+    """FDI Investment project factory."""
+
+    investment_type_id = InvestmentType.fdi.value.id
+
+
 class AssignPMInvestmentProjectFactory(InvestmentProjectFactory):
     """Investment project in the Assign PM stage."""
 
