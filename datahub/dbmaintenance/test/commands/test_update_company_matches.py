@@ -68,7 +68,7 @@ def test_run(s3_stubber, caplog):
 
     assert 'Company matching query does not exist' in caplog.text
     assert 'json.decoder.JSONDecodeError' in caplog.text
-    assert 'binascii.Error: Incorrect padding' in caplog.text
+    assert 'binascii.Error: Invalid base64-encoded string' in caplog.text
     assert len(caplog.records) == 3
 
     matches = DnBMatchingResult.objects.filter(company__in=companies)
@@ -127,7 +127,7 @@ def test_simulate(s3_stubber, caplog):
 
     assert 'Company matching query does not exist' in caplog.text
     assert 'json.decoder.JSONDecodeError' in caplog.text
-    assert 'binascii.Error: Incorrect padding' in caplog.text
+    assert 'binascii.Error: Invalid base64-encoded string' in caplog.text
     assert len(caplog.records) == 3
 
     num_matches = DnBMatchingResult.objects.filter(company__in=companies).count()
