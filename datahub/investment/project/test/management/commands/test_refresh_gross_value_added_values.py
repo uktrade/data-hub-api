@@ -8,15 +8,15 @@ from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
     Sector as SectorConstant,
 )
-from datahub.investment.project.management.commands import populate_gross_value_added
+from datahub.investment.project.management.commands import refresh_gross_value_added_values
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 pytestmark = pytest.mark.django_db
 
 
-class TestPopulateGrossValueAddedCommand:
-    """Test populate gross value added command."""
+class TestRefreshGrossValueAddedCommand:
+    """Test refreshing gross value added values command."""
 
     @pytest.mark.parametrize(
         'investment_type,sector,business_activities,multiplier_value',
@@ -32,6 +32,14 @@ class TestPopulateGrossValueAddedCommand:
                 None,
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
+                ],
+                '0.0581',
+            ),
+            (
+                InvestmentTypeConstant.fdi.value.id,
+                None,
+                [
+                    InvestmentBusinessActivityConstant.sales.value.id,
                 ],
                 '0.0581',
             ),
@@ -78,7 +86,7 @@ class TestPopulateGrossValueAddedCommand:
             ),
         ),
     )
-    def test_populate_gross_value_added(
+    def test_refresh_gross_value_added(
         self,
         investment_type,
         sector,
@@ -98,13 +106,13 @@ class TestPopulateGrossValueAddedCommand:
             )
 
         assert not project.gva_multiplier
-        self._run_populate_command()
+        self._run_command()
         project.refresh_from_db()
         if not multiplier_value:
             assert not project.gva_multiplier
         else:
             assert project.gva_multiplier.multiplier == Decimal(multiplier_value)
 
-    def _run_populate_command(self):
-        cmd = populate_gross_value_added.Command()
+    def _run_command(self):
+        cmd = refresh_gross_value_added_values.Command()
         cmd.handle()
