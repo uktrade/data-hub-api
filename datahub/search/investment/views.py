@@ -48,6 +48,8 @@ class SearchInvestmentProjectAPIViewMixin:
         'uk_region_location',
         'level_of_involvement_simplified',
         'likelihood_to_land',
+        'gross_value_added_start',
+        'gross_value_added_end',
     )
 
     REMAP_FIELDS = {
@@ -168,4 +170,8 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
         'new_tech_to_uk': 'New to world tech',
         'likelihood_to_land__name': 'Likelihood to land',
+        'fdi_type__name': 'FDI type',
+        'foreign_equity_investment': 'Foreign equity investment',
+        'gva_multiplier__multiplier': 'GVA multiplier',
+        'gross_value_added': 'GVA',
     }
