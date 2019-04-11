@@ -403,7 +403,8 @@ def _format_csv_value(value):
     if value is None:
         return ''
     if isinstance(value, Decimal):
-        return str(value.normalize())
+        normalized_value = value.normalize()
+        return f'{normalized_value:f}'
     if isinstance(value, datetime):
         return value.strftime('%Y-%m-%d %H:%M:%S')
     return str(value)

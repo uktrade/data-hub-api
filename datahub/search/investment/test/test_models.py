@@ -1,9 +1,55 @@
+import datetime
+from decimal import Decimal
+from unittest import mock
+
 import pytest
 
-from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.core import constants
+from datahub.investment.project.constants import Involvement
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    GVAMultiplierFactory,
+    InvestmentProjectFactory,
+)
 from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def project_with_max_gross_value_added():
+    """Test fixture returns an investment project with the max gross value."""
+    gva_multiplier = GVAMultiplierFactory(
+        multiplier=Decimal('9.999999'),
+        financial_year=1980,
+    )
+
+    with mock.patch(
+        'datahub.investment.project.gva_utils.GrossValueAddedCalculator._get_gva_multiplier',
+    ) as mock_get_multiplier:
+        mock_get_multiplier.return_value = gva_multiplier
+        yield InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            name='won project',
+            description='investmentproject3',
+            estimated_land_date=datetime.date(2027, 9, 13),
+            actual_land_date=datetime.date(2022, 11, 13),
+            investor_company=CompanyFactory(
+                address_country_id=constants.Country.united_kingdom.value.id,
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.STATUSES.won,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ],
+            level_of_involvement_id=Involvement.hq_only.value.id,
+            likelihood_to_land_id=None,
+            foreign_equity_investment=9999999999999999999,
+        )
 
 
 def test_investment_project_to_dict(setup_es):
@@ -57,6 +103,7 @@ def test_investment_project_to_dict(setup_es):
         'total_investment',
         'client_cannot_provide_foreign_investment',
         'foreign_equity_investment',
+        'gross_value_added',
         'government_assistance',
         'some_new_jobs',
         'specific_programme',
@@ -109,3 +156,48 @@ def test_investment_project_dbmodels_to_es_documents(setup_es):
     result = ESInvestmentProject.db_objects_to_es_documents(projects)
 
     assert len(list(result)) == len(projects)
+
+
+def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
+    setup_es,
+    project_with_max_gross_value_added,
+):
+    """
+    Tests the max value of gross value added and foreign equity investment.
+
+    Both gross_value_added and foreign_equity_investment are decimal fields but the elasticsearch
+    library casts them to floats so are treated as floats.
+
+    The test highlights a known inaccuracy when dealing with large floating point numbers.
+
+    https://docs.python.org/3.6/tutorial/floatingpoint.html
+
+    This inaccuracy is going to be ignored as although possible this shouldn't happen in
+    the real world with the gva multiplier value unlikely to exceed 2.
+
+    """
+    foreign_equity_investment_value = 9999999999999999999
+    less_accurate_expected_foreign_equity_investment_value = 10000000000000000000
+
+    expected_gross_value_added_value = 99999989999999999990
+    less_accurate_expected_gross_value_added = 99999989999999991808
+
+    project = project_with_max_gross_value_added
+    assert project.gross_value_added == expected_gross_value_added_value
+
+    result = ESInvestmentProject.db_object_to_dict(project)
+    assert result['foreign_equity_investment'] == foreign_equity_investment_value
+    assert result['gross_value_added'] == expected_gross_value_added_value
+
+    # Re-fetch the project from elasticsearch and
+    # re-check the values against the less accurate values.
+    project_in_es = ESInvestmentProject.get(
+        id=project.pk,
+        index=ESInvestmentProject.get_read_alias(),
+    )
+
+    assert (
+        project_in_es['foreign_equity_investment']
+        == less_accurate_expected_foreign_equity_investment_value
+    )
+    assert project_in_es['gross_value_added'] == less_accurate_expected_gross_value_added
