@@ -214,9 +214,10 @@ def extract_wb_record_into_company_fields(wb_record):
     return company_fields, is_out_of_business
 
 
-def update_company_from_wb_record(company, wb_record):
+def update_company_from_wb_record(company, wb_record, commit=True):
     """
     Updates company with data from the Worldbase record wb_record.
+    :param commit: if False, the changes will not be saved
     :raises MismatchedRecordsException: if the Worldbase record and the Data Hub
         company have different DUNS numbers.
     :returns: list of updated fields
@@ -246,5 +247,6 @@ def update_company_from_wb_record(company, wb_record):
             'archived_on',
         ]
 
-    company.save(update_fields=updated_fields)
+    if commit:
+        company.save(update_fields=updated_fields)
     return updated_fields
