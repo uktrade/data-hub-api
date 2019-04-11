@@ -2,8 +2,10 @@ import datetime
 from cgi import parse_header
 from collections import Counter
 from csv import DictReader
+from decimal import Decimal
 from io import StringIO
 from itertools import chain
+from unittest import mock
 from uuid import UUID
 
 import factory
@@ -29,6 +31,7 @@ from datahub.core.test_utils import (
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.project.test.factories import (
+    GVAMultiplierFactory,
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory,
@@ -42,7 +45,42 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(setup_es):
+def project_with_max_gross_value_added():
+    """Test fixture returns an investment project with the max gross value."""
+    gva_multiplier = GVAMultiplierFactory(
+        multiplier=Decimal('9.999999'),
+        financial_year=1980,
+    )
+
+    with mock.patch(
+        'datahub.investment.project.gva_utils.GrossValueAddedCalculator._get_gva_multiplier',
+    ) as mock_get_multiplier:
+        mock_get_multiplier.return_value = gva_multiplier
+        project = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            name='won project',
+            description='investmentproject3',
+            estimated_land_date=datetime.date(2027, 9, 13),
+            actual_land_date=datetime.date(2022, 11, 13),
+            investor_company=CompanyFactory(
+                address_country_id=constants.Country.united_kingdom.value.id,
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.STATUSES.won,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ],
+            level_of_involvement_id=Involvement.hq_only.value.id,
+            likelihood_to_land_id=None,
+            foreign_equity_investment=9999999999999999999,
+        )
+    return project
+
+
+@pytest.fixture
+def setup_data(setup_es, project_with_max_gross_value_added):
     """Sets up data for the tests."""
     investment_projects = [
         InvestmentProjectFactory(
@@ -83,26 +121,7 @@ def setup_data(setup_es):
             level_of_involvement_id=Involvement.no_involvement.value.id,
             likelihood_to_land_id=LikelihoodToLand.medium.value.id,
         ),
-        InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            name='won project',
-            description='investmentproject3',
-            estimated_land_date=datetime.date(2027, 9, 13),
-            actual_land_date=datetime.date(2022, 11, 13),
-            investor_company=CompanyFactory(
-                address_country_id=constants.Country.united_kingdom.value.id,
-            ),
-            project_manager=AdviserFactory(),
-            project_assurance_adviser=AdviserFactory(),
-            fdi_value_id=constants.FDIValue.higher.value.id,
-            status=InvestmentProject.STATUSES.won,
-            uk_region_locations=[
-                constants.UKRegion.north_west.value.id,
-            ],
-            level_of_involvement_id=Involvement.hq_only.value.id,
-            likelihood_to_land_id=None,
-            foreign_equity_investment=200000,
-        ),
+        project_with_max_gross_value_added,
         InvestmentProjectFactory(
             name='new project',
             description='investmentproject4',
@@ -154,6 +173,66 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
+
+    @pytest.mark.parametrize(
+        'search,expected_gross_value_added,expected_project_name',
+        (
+            (
+                {
+                    'gross_value_added_start': 99999999999999,
+                },
+                ['99999989999999991808'],
+                ['won project'],
+            ),
+            (
+                {
+                    'gross_value_added_end': 99999999999999,
+                },
+                ['5810'],
+                ['abc defg'],
+            ),
+            (
+                {
+                    'gross_value_added_start': 0,
+                    'gross_value_added_end': 6000,
+                },
+                ['5810'],
+                ['abc defg'],
+            ),
+            (
+                {
+                    'gross_value_added_start': 20000000000000000000000,
+                },
+                [],
+                [],
+            ),
+        ),
+    )
+    def test_gross_value_added_filters(
+        self,
+        setup_data,
+        search,
+        expected_gross_value_added,
+        expected_project_name,
+    ):
+        """Test Gross Value Added (GVA) filters."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data=search,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert (
+            Counter(
+                str(Decimal(result['gross_value_added'])) for result in response.data['results']
+            ) == Counter(expected_gross_value_added)
+        ), expected_gross_value_added
+        assert (
+            Counter(result['name'] for result in response.data['results'])
+            == Counter(expected_project_name)
+        ), expected_project_name
 
     def test_search_adviser_filter(self, setup_es):
         """Tests the adviser filter."""
@@ -1085,6 +1164,10 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,
+                'FDI type': project.fdi_type,
+                'Foreign equity investment': project.foreign_equity_investment,
+                'GVA multiplier': get_attr_or_none(project, 'gva_multiplier.multiplier'),
+                'GVA': project.gross_value_added,
             }
             for project in sorted_projects
         ]

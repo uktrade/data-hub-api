@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 import base64
 import os
-import ssl
 import stat
 from datetime import timedelta
 from urllib.parse import urlencode
@@ -310,6 +309,12 @@ BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 
 AV_V2_SERVICE_URL = env('AV_V2_SERVICE_URL', default=None)
 
+
+def _build_redis_url(base_url, db_number, **query_args):
+    encoded_query_args = urlencode(query_args)
+    return f'{base_url}/{db_number}?{encoded_query_args}'
+
+
 # CACHE / REDIS
 if 'redis' in VCAP_SERVICES:
     REDIS_BASE_URL = VCAP_SERVICES['redis'][0]['credentials']['uri']
@@ -318,39 +323,25 @@ else:
 
 if REDIS_BASE_URL:
     REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
-    if REDIS_BASE_URL.startswith('rediss://'):
-        _REDIS_CONNECTION_POOL_KWARGS = {
-            'ssl_ca_certs': env(
-                'REDIS_SSL_CA_CERTS_PATH',
-                default='/etc/ssl/certs/ca-certificates.crt',
-            ),
-        }
-    else:
-        _REDIS_CONNECTION_POOL_KWARGS = {}
 
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
+            'LOCATION': _build_redis_url(REDIS_BASE_URL, REDIS_CACHE_DB),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'CONNECTION_POOL_KWARGS': _REDIS_CONNECTION_POOL_KWARGS
             }
         }
     }
 
-# CELERY (it does not understand rediss:// yet so extra work needed)
+
 if REDIS_BASE_URL:
-    # REDIS_BASIC_URL == REDIS_BASE_URL without the SSL
-    REDIS_BASIC_URL = REDIS_BASE_URL.replace('rediss://', 'redis://')
     REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
-    CELERY_BROKER_URL = f'{REDIS_BASIC_URL}/{REDIS_CELERY_DB}'
+    is_rediss = REDIS_BASE_URL.startswith('rediss://')
+    url_args = {'ssl_cert_reqs': 'CERT_REQUIRED'} if is_rediss else {}
+
+    CELERY_BROKER_URL = _build_redis_url(REDIS_BASE_URL, REDIS_CELERY_DB, **url_args)
     CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-    if 'rediss://' in REDIS_BASE_URL:
-        CELERY_REDIS_BACKEND_USE_SSL = {
-            'ssl_cert_reqs': ssl.CERT_NONE
-        }
-        CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL
 
     # Increase timeout from one hour for long-running tasks
     # (If the timeout is reached before a task, Celery will start it again. This

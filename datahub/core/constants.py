@@ -298,6 +298,7 @@ class ReferralSourceActivity(Enum):
 class InvestmentBusinessActivity(Enum):
     """Investment business activity constants."""
 
+    sales = Constant('Sales', '71946309-c92c-4c5b-9c42-8502cc74c72e')
     retail = Constant('Retail', 'a2dbd807-ae52-421c-8d1d-88adfc7a506b')
     other = Constant('Other', 'befab707-5abd-4f47-8477-57f091e6dac9')
 

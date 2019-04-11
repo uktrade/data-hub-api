@@ -1,3 +1,55 @@
+Data Hub API 11.6.0 (2019-04-11)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET /v3/interaction``: The deprecated ``dit_adviser__first_name`` and ``dit_adviser__last_name`` values for the ``sortby`` query parameter were removed.
+
+Features
+--------
+
+- **Companies** Company match candidates can now be updated with a management command using data from CSV file
+- **Investment** The following fields have been added to Investment Search:
+
+  - gross_value_added
+
+  To allow ``gross_value added`` to be filtered by a range the following filters have been added:
+
+  - gross_value_added_start
+  - gross_value_added_end
+- **Investment** The following fields have been added to the investment csv download:
+
+  - FDI type
+  - Foreign equity investment
+  - GVA multiplier
+  - GVA
+
+Internal changes
+----------------
+
+- **Investment** An investment project with a business activity of sales now uses the
+  GVA Multiplier for retail to calculate Gross Value Added.
+- **Investment** New Django Admin page to update and add GVA Multipliers.
+- **Investment** Renamed command ``populate_gross_value_addded`` to ``refresh_gross_value_added_values``
+  and updated to include projects with a business activity of ``sales`` that do not have a sector.
+- ``name.keyword``, ``name.trigram`` and ``trading_names.trigram`` sub-fields were added to the ``company_field_with_copy_to_name_trigram``
+  field type in all search models. These will replace the existing ``name_trigram`` and ``trading_names_trigram`` sub-fields and allow the type of the ``name``
+  sub-field to be changed from ``keyword`` to ``text``.
+- Celery was updated to version 4.3.
+- Python was updated from version 3.6.8 to 3.7.2.
+
+API
+---
+
+- **Investment** Investment project search endpoint ``/v3/search/investment_project`` now returns ``gross_value_added`` for each investment project.
+
+  Search results can now be filtered by ``gross_value_added`` using the range filters
+  ``gross_value_added_start`` and ``gross_value_added_end``.
+
+
 Data Hub API 11.5.0 (2019-04-08)
 ================================
 

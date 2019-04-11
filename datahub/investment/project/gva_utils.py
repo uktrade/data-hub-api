@@ -54,15 +54,25 @@ class GrossValueAddedCalculator:
         if str(self.investment_project.investment_type_id) != InvestmentTypeConstant.fdi.value.id:
             return None
 
-        if self.investment_project.business_activities.filter(
-            id=InvestmentBusinessActivityConstant.retail.value.id,
-        ).exists():
+        if self._has_business_activity_of_retail_or_sales():
             return self._get_retail_gva_multiplier()
 
         if self.investment_project.sector:
             return self._get_sector_gva_multiplier()
         else:
             return None
+
+    def _has_business_activity_of_retail_or_sales(self):
+        """
+        :returns True or False. Checks if an investment project has either a
+        business activity of retail or sales.
+        """
+        return self.investment_project.business_activities.filter(
+            id__in=[
+                InvestmentBusinessActivityConstant.retail.value.id,
+                InvestmentBusinessActivityConstant.sales.value.id,
+            ],
+        ).exists()
 
     def _get_retail_gva_multiplier(self):
         """:returns the GVA Multiplier for a retail investment project."""

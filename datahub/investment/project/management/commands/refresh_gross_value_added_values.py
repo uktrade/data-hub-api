@@ -9,9 +9,9 @@ from datahub.investment.project.models import InvestmentProject
 
 
 class Command(BaseCommand):
-    """Command to populate the Gross Value Added for all fdi investment projects."""
+    """Command to refresh the Gross Value Added values for all fdi investment projects."""
 
-    help = 'Updates all FDI investment projects that require a GVA multiplier to be set.'
+    help = 'Refreshes all FDI investment projects that have or require a GVA to be set.'
 
     def handle(self, *args, **options):
         """
@@ -27,7 +27,7 @@ class Command(BaseCommand):
             project.save(update_fields=['gross_value_added', 'gva_multiplier'])
 
     def get_investment_projects(self):
-        """Get investment projects. returns: All projects that GVA could be calculated for."""
+        """Get investment projects. returns: All projects that GVA can be calculated for."""
         return InvestmentProject.objects.filter(
             investment_type_id=InvestmentTypeConstant.fdi.value.id,
             foreign_equity_investment__isnull=False,
@@ -35,6 +35,9 @@ class Command(BaseCommand):
             Q(
                 sector__isnull=False,
             ) | Q(
-                business_activities=InvestmentBusinessActivityConstant.retail.value.id,
+                business_activities__in=[
+                    InvestmentBusinessActivityConstant.retail.value.id,
+                    InvestmentBusinessActivityConstant.sales.value.id,
+                ],
             ),
         )

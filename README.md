@@ -89,7 +89,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
 Dependencies:
 
--   Python 3.6.x
+-   Python 3.7.x
 -   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
 -   Elasticsearch 6.4
@@ -101,16 +101,20 @@ Dependencies:
     cd data-hub-leeloo
     ```
 
-2.  Install `virtualenv` if you don’t have it already:
-
-    ```shell
-    pip install virtualenv
+2.  Install Python 3.7.
+    
+    [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
+    
+    On Ubuntu, you should also install `python3.7-dev` and `python3.7-venv`: 
+    
     ```
+    sudo apt install python3.7-dev python3.7-venv
+    ``` 
 
 3.  Create and activate the virtualenv:
 
     ```shell
-    virtualenv --python=python3 env
+    python3.7 -m venv env
     source env/bin/activate
     pip install -U pip
     ```
@@ -143,7 +147,7 @@ Dependencies:
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10.  Populate the database and initialise Elasticsearch:
+10. Populate the database and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
@@ -161,7 +165,7 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-12.  Create a superuser:
+12. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
@@ -297,7 +301,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
 | `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
-| `REDIS_SSL_CA_CERTS_PATH` | No | Location of SSL CA certs (default /etc/ssl/certs/ca-certificates.crt) |
 | `REPORT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for reports. |
 | `REPORT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports. |
 | `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
