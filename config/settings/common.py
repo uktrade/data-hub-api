@@ -357,6 +357,13 @@ if REDIS_BASE_URL:
                 'age_check': 60  # in minutes
             }
         },
+        'refresh_gross_value_added_values': {
+            'task': (
+                'datahub.investment.project.tasks.'
+                'refresh_gross_value_added_value_for_fdi_investment_projects'
+            ),
+            'schedule': crontab(minute=0, hour=3, day_of_month=21)
+        }
     }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
         CELERY_BEAT_SCHEDULE['sync_es'] = {
