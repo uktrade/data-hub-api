@@ -1,3 +1,4 @@
+from datetime import datetime
 from logging import getLogger
 
 from django.utils.functional import cached_property
@@ -6,6 +7,7 @@ from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
 )
+from datahub.core.utils import get_financial_year
 from datahub.investment.project.constants import (
     FDISICGrouping as FDI_SICGroupingConstant,
 )
@@ -94,14 +96,40 @@ class GrossValueAddedCalculator:
         return investment_sector.fdi_sic_grouping
 
     def _get_gva_multiplier(self, fdi_sic_grouping_id):
-        """:returns a GVA Sector."""
+        """
+        :returns a GVA Multiplier or None.
+
+        Firstly retrieves all the GVA Multipliers for a FDI SIC Grouping. Then checks
+        if there is a multiplier for the given financial year. If one is not found
+        then returns the GVA Multiplier for the last year there is an entry for.
+
+        GVA multipliers will be reviewed each year to ensure they continue to be accurate with
+        a changing economy. If the GVA values have not been updated, the latest year's information
+        should continue to be used as it represents the most accurate data available
+
+        If there are no entries returns None.
+
+        """
+        gva_multipliers_for_grouping = GVAMultiplier.objects.filter(
+            fdi_sic_grouping_id=fdi_sic_grouping_id,
+        ).order_by(
+            '-financial_year',
+        )
+
+        financial_year = self._get_gva_multiplier_financial_year()
         try:
-            return GVAMultiplier.objects.get(
-                fdi_sic_grouping_id=fdi_sic_grouping_id,
-                financial_year=self._get_gva_multiplier_financial_year(),
+            return gva_multipliers_for_grouping.get(
+                financial_year=financial_year,
             )
         except GVAMultiplier.DoesNotExist:
-            return None
+            if gva_multipliers_for_grouping.filter(
+                financial_year__gt=financial_year,
+            ).exists():
+                logger.exception(
+                    f'Unable to find a GVA Multiplier for financial year {financial_year} '
+                    f'fdi sic grouping id {fdi_sic_grouping_id}',
+                )
+            return gva_multipliers_for_grouping.first()
 
     def _get_investment_sector(self, root_sector):
         """:returns the investment sector for a root DIT sector if one found else returns None."""
@@ -115,13 +143,24 @@ class GrossValueAddedCalculator:
 
     def _get_gva_multiplier_financial_year(self):
         """
-        TODO: Check the investment project actual land date and
-        to future proof when new GVA multiplier data is added and when no
-        GVA Multiplier data exists for a given year.
-
         :returns the financial year that should be used for the investment project.
+
+        If the investment project does not have an actual land date return the current
+        financial year. If the actual land date is less than or equal to 2019 return 2019
+        this is because there is no multiplier data prior to the 2019 financial year.
+
+        Due to the multiplier data being for a financial year for all investment projects
+        with actual land date greater than 2019 return the financial year that the project landed.
         """
-        return 2019
+        if not self.investment_project.actual_land_date:
+            return get_financial_year(
+                datetime.today(),
+            )
+
+        return max(
+            get_financial_year(self.investment_project.actual_land_date),
+            2019,
+        )
 
 
 def set_gross_value_added_for_investment_project(investment_project):
