@@ -857,51 +857,62 @@ class TestUpdateCompanyFromWbRecord:
             ),
         ),
     )
+    @pytest.mark.parametrize('commit', (True, False))
     @freeze_time(FROZEN_TIME)
-    def test_update(self, wb_record, expected_fields):
+    def test_update(self, wb_record, expected_fields, commit):
         """
         Test that update_company_from_wb_record updates the company with the data from wb_record.
         """
-        company = CompanyFactory(
-            duns_number=None,
-            name='Previous name',
-            trading_names=['Previous trading name'],
-            company_number='87654321',
-            number_of_employees=999,
-            is_number_of_employees_estimated=False,
-            employee_range=random_obj_for_model(EmployeeRange),
-            turnover=888,
-            is_turnover_estimated=False,
-            turnover_range=random_obj_for_model(TurnoverRange),
-            address_1='999',
-            address_2='Street Main',
-            address_town='Manchester',
-            address_county='Manchester',
-            address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
-            address_postcode='M90 1QX',
-            registered_address_1='999',
-            registered_address_2='Street Main',
-            registered_address_town='Manchester',
-            registered_address_county='Manchester',
-            registered_address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
-            registered_address_postcode='M90 1QX',
-            trading_address_1='999',
-            trading_address_2='Street Main',
-            trading_address_town='Manchester',
-            trading_address_county='Manchester',
-            trading_address_country_id=UNITED_KINGDOM_COUNTRY_UUID,
-            trading_address_postcode='M90 1QX',
-            archived=False,
-            archived_on=None,
-            archived_reason='',
-        )
-        updated_fields = update_company_from_wb_record(company, wb_record)
-
-        actual_fields = {
-            field_name: getattr(company, field_name)
-            for field_name in expected_fields
+        factory_data = {
+            'duns_number': None,
+            'name': 'Previous name',
+            'trading_names': ['Previous trading name'],
+            'company_number': '87654321',
+            'number_of_employees': 999,
+            'is_number_of_employees_estimated': False,
+            'employee_range': random_obj_for_model(EmployeeRange),
+            'turnover': 888,
+            'is_turnover_estimated': False,
+            'turnover_range': random_obj_for_model(TurnoverRange),
+            'address_1': '999',
+            'address_2': 'Street Main',
+            'address_town': 'Manchester',
+            'address_county': 'Manchester',
+            'address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+            'address_postcode': 'M90 1QX',
+            'registered_address_1': '999',
+            'registered_address_2': 'Street Main',
+            'registered_address_town': 'Manchester',
+            'registered_address_county': 'Manchester',
+            'registered_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+            'registered_address_postcode': 'M90 1QX',
+            'trading_address_1': '999',
+            'trading_address_2': 'Street Main',
+            'trading_address_town': 'Manchester',
+            'trading_address_county': 'Manchester',
+            'trading_address_country_id': UNITED_KINGDOM_COUNTRY_UUID,
+            'trading_address_postcode': 'M90 1QX',
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': '',
         }
-        assert actual_fields == expected_fields
+        company = CompanyFactory(**factory_data)
+        updated_fields = update_company_from_wb_record(company, wb_record, commit=commit)
+
+        company.refresh_from_db()
+        if commit:
+            actual_fields = {
+                field_name: getattr(company, field_name)
+                for field_name in expected_fields
+            }
+            assert actual_fields == expected_fields
+        else:
+            actual_fields = {
+                field_name: getattr(company, field_name)
+                for field_name in factory_data
+            }
+            assert actual_fields == factory_data
+
         assert set(updated_fields) == set(expected_fields)
 
     def test_fails_if_entities_have_different_duns_numbers(self):
