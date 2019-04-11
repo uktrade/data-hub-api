@@ -1,3 +1,14 @@
+Data Hub API 11.7.0 (2019-04-11)
+================================
+
+
+
+Internal changes
+----------------
+
+- A Django command was added to data cleanse some Data Hub companies using the D&B Worldbase matches.
+
+
 Data Hub API 11.6.0 (2019-04-11)
 ================================
 
