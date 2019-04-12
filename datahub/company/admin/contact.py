@@ -1,68 +1,29 @@
-import csv
-import io
 from logging import getLogger
 from typing import NamedTuple
 
 import reversion
-from chardet import UniversalDetector
-from django import forms
 from django.contrib import admin, messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.validators import FileExtensionValidator
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
-from django.utils.translation import gettext_lazy
 from reversion.admin import VersionAdmin
 
 from datahub.company.models import Contact
 from datahub.core.admin import BaseModelAdminMixin
+from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.search.signals import disable_search_signal_receivers
 
 
 logger = getLogger(__name__)
 
 
-class LoadEmailMarketingOptOutsForm(forms.Form):
+class LoadEmailMarketingOptOutsForm(BaseCSVImportForm):
     """Form used for loading a CSV file to opt out contacts from email marketing."""
 
-    UNICODE_DECODE_ERROR_MESSAGE = gettext_lazy('There was an error decoding the file contents.')
-    NO_EMAIL_COLUMN_MESSAGE = gettext_lazy('This file does not contain an email column.')
-
-    email_list = forms.FileField(
-        label='Email list (CSV file)',
-        validators=[FileExtensionValidator(allowed_extensions=('csv',))],
-    )
-
-    def clean_email_list(self):
-        """Validates the uploaded CSV file and creates a CSV DictReader from it."""
-        # This could be an instance of InMemoryUploadedFile or TemporaryUploadedFile
-        # (depending on the file size)
-        file_field = self.cleaned_data['email_list']
-
-        # Guess the file encoding (primarily to check for a UTF-8 BOM)
-        encoding_detector = UniversalDetector()
-        for chunk in file_field.chunks():
-            encoding_detector.feed(chunk)
-            if encoding_detector.done:
-                break
-
-        detection_result = encoding_detector.close()
-        encoding = detection_result['encoding']
-
-        # Check that the file can actually be decoded using the detected encoding so that
-        # we don't need to worry about encoding errors when reading the CSV
-        file_field.seek(0)
-        self._validate_encoding(file_field, encoding)
-
-        file_field.seek(0)
-        csv_reader = csv.DictReader(io.TextIOWrapper(file_field, encoding=encoding))
-
-        # Check that the CSV file has the required column
-        self._validate_columns(csv_reader)
-
-        return csv_reader
+    csv_file_field_label = 'Email list (CSV file)'
+    required_columns = {'email'}
 
     @reversion.create_revision()
     @disable_search_signal_receivers(Contact)
@@ -75,7 +36,7 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
         num_contacts_updated = 0
         num_non_matching_email_addresses = 0
 
-        for row in self.cleaned_data['email_list']:
+        for row in self.cleaned_data['csv_file']:
             email = row['email'].strip()
 
             if not email:
@@ -103,26 +64,6 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
         )
 
     save.alters_data = True
-
-    @classmethod
-    def _validate_encoding(cls, file_field, encoding):
-        try:
-            stream = io.TextIOWrapper(file_field, encoding=encoding)
-            for _ in stream:
-                pass
-
-            # Detach the file from TextIOWrapper; this stops it being automatically closed
-            stream.detach()
-        except UnicodeError as exc:
-            raise ValidationError(
-                cls.UNICODE_DECODE_ERROR_MESSAGE,
-                code='unicode-decode-error',
-            ) from exc
-
-    @classmethod
-    def _validate_columns(cls, csv_reader):
-        if 'email' not in csv_reader.fieldnames:
-            raise ValidationError(cls.NO_EMAIL_COLUMN_MESSAGE, code='no-email-column')
 
 
 class _ProcessOptOutResult(NamedTuple):
