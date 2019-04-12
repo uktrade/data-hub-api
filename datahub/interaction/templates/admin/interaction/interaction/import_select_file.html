@@ -1,0 +1,131 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+  <p>{% trans 'Select a CSV file to import interactions into Data Hub. The CSV file should contain the following columns (in any order):' %}</p>
+
+  {% trans "Yes" as yes %}
+  {% trans "No" as no %}
+
+  <table>
+    <tr>
+      <th>{% trans 'Column name' %}</th>
+      <th>{% trans 'Required' %}</th>
+      <th>{% trans 'Description' %}</th>
+    </tr>
+    <tr>
+      <td><code>{% trans 'kind' %}</code></td>
+      <td>{{ yes }}</td>
+      <td>{% trans '<code>interaction</code> or <code>service_delivery</code>' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'date' %}</code></td>
+      <td>{{ yes }}</td>
+      <td>{% trans 'The date of the interaction in DD/MM/YYYY or YYYY-MM-DD format' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'service' %}</code></td>
+      <td>{{ yes }}</td>
+      <td>{% trans 'The name of the service of the interaction e.g. <code>Account Management</code>' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'contact_email' %}</code></td>
+      <td>{{ yes }}</td>
+      <td>{% trans 'The email address of the contact the interaction was with' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'adviser_1' %}</code></td>
+      <td>{{ yes }}</td>
+      <td>{% trans 'The full name of a DIT adviser' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'team_1' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'The team that <code>adviser_1</code> belongs to' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'adviser_2' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'The full name of an additional DIT adviser' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'team_2' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'The team that <code>adviser_2</code> belongs to' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'communication_channel' %}</code></td>
+      <td>{% trans 'For interactions only' %}</td>
+      <td>{% trans 'The name of the communication channel e.g. <code>Email/Website</code>. Ignored for service deliveries' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'event_id' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'The ID of an event associated with a service delivery e.g. <code>aa819ab9-9f4e-4c99-8a30-d89a32957951</code>. Invalid for interactions' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'subject' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'The subject of the interaction. Defaults to the service name if not provided' %}</td>
+    </tr>
+    <tr>
+      <td><code>{% trans 'notes' %}</code></td>
+      <td>{{ no }}</td>
+      <td>{% trans 'Notes about the interaction' %}</td>
+    </tr>
+  </table>
+
+  <br>
+
+  <p>
+    {% blocktrans %}
+      Interactions are matched to a contact by looking for a unique match on all contacts' primary email addresses.
+      If no match is found, alternative email addresses are then checked.
+    {% endblocktrans %}
+  </p>
+  <p>
+    {% trans 'The interaction will not be loaded if multiple matches are found at either stage of matching.' %}
+  </p>
+  <p>
+    {% trans 'You will have a chance to review the records that will be loaded on the next page.' %}
+  </p>
+
+  <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="fieldWrapper">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div>
+      <input type="submit" value="{% trans 'Submit' %}">
+    </div>
+  </form>
+{% endblock %}
