@@ -1,7 +1,5 @@
 import io
-from codecs import BOM_UTF8
 from datetime import datetime
-from os.path import splitext
 
 import factory
 import pytest
@@ -107,32 +105,6 @@ class TestContactAdminOptOutForm(AdminTestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize('filename', ('noext', 'file.blah', 'test.test', 'test.csv.docx'))
-    def test_does_not_allow_invalid_file_extensions(self, filename):
-        """Test that the form rejects various invalid file extensions."""
-        file = io.BytesIO(b'test')
-        file.name = filename
-
-        url = reverse(
-            admin_urlname(Contact._meta, 'load-email-marketing-opt-outs'),
-        )
-        response = self.client.post(
-            url,
-            data={
-                'email_list': file,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        form = response.context['form']
-        _, ext = splitext(filename)
-
-        assert 'email_list' in form.errors
-        assert form.errors['email_list'] == [
-            f"File extension '{ext[1:]}' is not allowed. Allowed extensions are: 'csv'.",
-        ]
-
     def test_does_not_allow_file_without_email_column(self):
         """Test that the form rejects a CSV file that doesn't contain an email column."""
         file = io.BytesIO(b'test\r\nrow')
@@ -144,7 +116,7 @@ class TestContactAdminOptOutForm(AdminTestMixin):
         response = self.client.post(
             url,
             data={
-                'email_list': file,
+                'csv_file': file,
             },
         )
 
@@ -152,40 +124,10 @@ class TestContactAdminOptOutForm(AdminTestMixin):
 
         form = response.context['form']
 
-        assert 'email_list' in form.errors
-        assert form.errors['email_list'] == ['This file does not contain an email column.']
-
-    @pytest.mark.parametrize(
-        'file_contents',
-        (
-            b'test\xc3\x28\r\nrow',
-            b"""email\r
-test1@datahub\r
-\xc3\x28
-""",
-        ),
-    )
-    def test_does_not_allow_files_with_invalid_utf8(self, file_contents):
-        """Test that the form rejects a CSV file with invalid UTF-8."""
-        file = io.BytesIO(BOM_UTF8 + file_contents)
-        file.name = 'test.csv'
-
-        url = reverse(
-            admin_urlname(Contact._meta, 'load-email-marketing-opt-outs'),
-        )
-        response = self.client.post(
-            url,
-            data={
-                'email_list': file,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        form = response.context['form']
-
-        assert 'email_list' in form.errors
-        assert form.errors['email_list'] == ['There was an error decoding the file contents.']
+        assert 'csv_file' in form.errors
+        assert form.errors['csv_file'] == [
+            'This file is missing the following required columns: email.',
+        ]
 
     @pytest.mark.parametrize('encoding', ('utf-8', 'utf-8-sig'))
     def test_opts_out_contacts(self, encoding):
@@ -229,7 +171,7 @@ test6@datahub\r
                 url,
                 follow=True,
                 data={
-                    'email_list': file,
+                    'csv_file': file,
                 },
             )
 
@@ -292,7 +234,7 @@ test1@datahub\r
                 url,
                 follow=True,
                 data={
-                    'email_list': file,
+                    'csv_file': file,
                 },
             )
 
