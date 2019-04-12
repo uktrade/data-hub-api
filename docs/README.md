@@ -3,6 +3,7 @@
 This page contains a non-exhaustive list of documents related to specific development topics. More documentation is always welcome.
 
 * [Coding style](./Coding&#32;style.md)
+* [Code Review guidelines](./Code&#32;review&#32;guidelines.md)
 * [Managing dependencies](./Managing&#32;dependencies.md)
 * [Document upload architectural design](./Document&#32;upload.md)
 * [How elasticsearch mapping migration works and how to use it](./Elasticsearch&#32;migrations.md)
