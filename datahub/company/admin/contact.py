@@ -13,7 +13,7 @@ from django.core.validators import FileExtensionValidator
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
-from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy
 from reversion.admin import VersionAdmin
 
 from datahub.company.models import Contact
@@ -27,12 +27,12 @@ logger = getLogger(__name__)
 class LoadEmailMarketingOptOutsForm(forms.Form):
     """Form used for loading a CSV file to opt out contacts from email marketing."""
 
-    HEADER_DECODE_ERROR_MESSAGE = gettext('There was an error decoding the file contents.')
-    BODY_DECODE_ERROR_MESSAGE = gettext(
+    HEADER_DECODE_ERROR_MESSAGE = gettext_lazy('There was an error decoding the file contents.')
+    BODY_DECODE_ERROR_MESSAGE = gettext_lazy(
         'There was an error decoding the text in the file provided. No records have been '
         'modified.',
     )
-    NO_EMAIL_COLUMN_MESSAGE = gettext('This file does not contain an email column.')
+    NO_EMAIL_COLUMN_MESSAGE = gettext_lazy('This file does not contain an email column.')
 
     email_list = forms.FileField(
         label='Email list (CSV file)',
