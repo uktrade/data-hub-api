@@ -8,6 +8,7 @@ from datahub.core.admin import (
     custom_add_permission,
     custom_change_permission,
     custom_delete_permission,
+    custom_view_permission,
     get_change_link,
     get_change_url,
     RawIdWidget,
@@ -97,6 +98,22 @@ class TestRawIdWidget:
                 'value': value,
             },
         }
+
+
+def test_custom_view_permission():
+    """Tests that the decorator correctly overrides has_view_permission()."""
+    @custom_view_permission('custom_permission')
+    class Admin:
+        opts = Mock(app_label='admin')
+
+        def has_view_permission(self, request, obj=None):
+            return False
+
+    request = Mock()
+    admin = Admin()
+    admin.has_view_permission(request)
+
+    request.user.has_perm.assert_called_once_with('admin.custom_permission')
 
 
 def test_add_change_permission():
