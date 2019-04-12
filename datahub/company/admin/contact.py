@@ -27,11 +27,7 @@ logger = getLogger(__name__)
 class LoadEmailMarketingOptOutsForm(forms.Form):
     """Form used for loading a CSV file to opt out contacts from email marketing."""
 
-    HEADER_DECODE_ERROR_MESSAGE = gettext_lazy('There was an error decoding the file contents.')
-    BODY_DECODE_ERROR_MESSAGE = gettext_lazy(
-        'There was an error decoding the text in the file provided. No records have been '
-        'modified.',
-    )
+    UNICODE_DECODE_ERROR_MESSAGE = gettext_lazy('There was an error decoding the file contents.')
     NO_EMAIL_COLUMN_MESSAGE = gettext_lazy('This file does not contain an email column.')
 
     email_list = forms.FileField(
@@ -55,45 +51,23 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
         detection_result = encoding_detector.close()
         encoding = detection_result['encoding']
 
+        # Check that the file can actually be decoded using the detected encoding so that
+        # we don't need to worry about encoding errors when reading the CSV
+        file_field.seek(0)
+        self._validate_encoding(file_field, encoding)
+
         file_field.seek(0)
         csv_reader = csv.DictReader(io.TextIOWrapper(file_field, encoding=encoding))
 
+        # Check that the CSV file has the required column
         self._validate_columns(csv_reader)
+
         return csv_reader
-
-    def save(self, user):
-        """
-        Persists the data to the database.
-
-        :raises ValidationError: Occurs if there is a problem while reading the data from the
-                                 CSV file.
-        """
-        try:
-            return self._save(user)
-        except UnicodeError:
-            # This will only be triggered for invalid Unicode that is relatively deep in the file,
-            # as invalid Unicode near the beginning of the file will be picked up by
-            # clean_email_list().
-            raise ValidationError(self.BODY_DECODE_ERROR_MESSAGE, code='body-unicode-error')
-
-    save.alters_data = True
-
-    @classmethod
-    def _validate_columns(cls, csv_reader):
-        try:
-            fieldnames = csv_reader.fieldnames
-        except UnicodeError as exc:
-            raise ValidationError(
-                cls.HEADER_DECODE_ERROR_MESSAGE,
-                code='header-unicode-error',
-            ) from exc
-
-        if 'email' not in fieldnames:
-            raise ValidationError(cls.NO_EMAIL_COLUMN_MESSAGE, code='no-email-column')
 
     @reversion.create_revision()
     @disable_search_signal_receivers(Contact)
-    def _save(self, user):
+    def save(self, user):
+        """Persists the data to the database."""
         reversion.set_user(user)
         reversion.set_comment('Loaded bulk email opt-out list.')
 
@@ -127,6 +101,28 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
             num_contacts_updated,
             num_non_matching_email_addresses,
         )
+
+    save.alters_data = True
+
+    @classmethod
+    def _validate_encoding(cls, file_field, encoding):
+        try:
+            stream = io.TextIOWrapper(file_field, encoding=encoding)
+            for _ in stream:
+                pass
+
+            # Detach the file from TextIOWrapper; this stops it being automatically closed
+            stream.detach()
+        except UnicodeError as exc:
+            raise ValidationError(
+                cls.UNICODE_DECODE_ERROR_MESSAGE,
+                code='unicode-decode-error',
+            ) from exc
+
+    @classmethod
+    def _validate_columns(cls, csv_reader):
+        if 'email' not in csv_reader.fieldnames:
+            raise ValidationError(cls.NO_EMAIL_COLUMN_MESSAGE, code='no-email-column')
 
 
 class _ProcessOptOutResult(NamedTuple):
@@ -199,11 +195,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         if not form.is_valid():
             return self._opt_out_form_response(request, form)
 
-        try:
-            opt_out_res = form.save(request.user)
-        except ValidationError as exc:
-            return self._opt_out_error_response(request, exc.messages)
-
+        opt_out_res = form.save(request.user)
         return self._opt_out_success_response(request, opt_out_res)
 
     def _opt_out_form_response(self, request, form):
@@ -217,12 +209,6 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
             'form': form,
         }
         return TemplateResponse(request, template_name, context)
-
-    def _opt_out_error_response(self, request, messages):
-        for message in messages:
-            self.message_user(request, message, django_messages.ERROR)
-
-        return self._opt_out_form_response(request, LoadEmailMarketingOptOutsForm())
 
     def _opt_out_success_response(self, request, opt_out_res):
         success_msg = (

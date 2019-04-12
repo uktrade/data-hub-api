@@ -2,7 +2,6 @@ import io
 from codecs import BOM_UTF8
 from datetime import datetime
 from os.path import splitext
-from unittest.mock import Mock
 
 import factory
 import pytest
@@ -156,11 +155,19 @@ class TestContactAdminOptOutForm(AdminTestMixin):
         assert 'email_list' in form.errors
         assert form.errors['email_list'] == ['This file does not contain an email column.']
 
-    def test_does_not_allow_file_with_bad_utf8_in_header(self):
-        """Test that the form rejects a CSV file with invalid UTF-8 in its header."""
-        file = io.BytesIO(
-            b''.join((BOM_UTF8, b'test\xc3\x28\r\nrow')),
-        )
+    @pytest.mark.parametrize(
+        'file_contents',
+        (
+            b'test\xc3\x28\r\nrow',
+            b"""email\r
+test1@datahub\r
+\xc3\x28
+""",
+        ),
+    )
+    def test_does_not_allow_files_with_invalid_utf8(self, file_contents):
+        """Test that the form rejects a CSV file with invalid UTF-8."""
+        file = io.BytesIO(BOM_UTF8 + file_contents)
         file.name = 'test.csv'
 
         url = reverse(
@@ -179,62 +186,6 @@ class TestContactAdminOptOutForm(AdminTestMixin):
 
         assert 'email_list' in form.errors
         assert form.errors['email_list'] == ['There was an error decoding the file contents.']
-
-    def test_does_not_allow_file_with_bad_utf8_after_header(self, monkeypatch):
-        """
-        Test that the form rejects a CSV file with invalid UTF-8 after its header.
-
-        As reading and decoding happens in chunks, we patch the the function to validate the
-        columns in the form because it can decode text that is close to the header.
-
-        (That means in reality, this check will only be triggered for invalid Unicode sequences
-        that are relatively deep in the file.)
-        """
-        monkeypatch.setattr(
-            'datahub.company.admin.contact.LoadEmailMarketingOptOutsForm._validate_columns',
-            Mock(),
-        )
-
-        creation_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
-        with freeze_time(creation_time):
-            contact = ContactFactory(
-                email='test1@datahub',
-                accepts_dit_email_marketing=True,
-            )
-        csv_body = b""""email\r
-test1@datahub\r
-\xc3\x28
-"""
-        file = io.BytesIO(
-            b''.join((BOM_UTF8, csv_body)),
-        )
-        file.name = 'test.csv'
-
-        url = reverse(
-            admin_urlname(Contact._meta, 'load-email-marketing-opt-outs'),
-        )
-        with freeze_time('2014-05-03 19:00:16'):
-            response = self.client.post(
-                url,
-                data={
-                    'email_list': file,
-                },
-            )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        messages = list(response.context['messages'])
-        assert len(messages) == 1
-        assert messages[0].level == django_messages.ERROR
-        assert messages[0].message == (
-            'There was an error decoding the text in the file provided. No records have been '
-            'modified.'
-        )
-
-        # Changes should have been rolled back
-        contact.refresh_from_db()
-        assert contact.accepts_dit_email_marketing is True
-        assert contact.modified_on == creation_time
 
     @pytest.mark.parametrize('encoding', ('utf-8', 'utf-8-sig'))
     def test_opts_out_contacts(self, encoding):
