@@ -347,10 +347,11 @@ def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
 
     for relation in get_relations_to_delete(model):
         related_meta = relation.related_model._meta
-        assert (
+        expected_related_log = (
             f'{related_meta.verbose_name_plural} to delete '
             f'(via {related_meta.model_name}.{relation.remote_field.name}): '
-        ) in log_text
+        ).lower()
+        assert expected_related_log in log_text
         assert f'from "{related_meta.db_table}"' in log_text
 
 

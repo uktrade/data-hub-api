@@ -156,6 +156,10 @@ class InvestorProfile(BaseModel):
 
     class Meta:
         unique_together = ('investor_company', 'profile_type')
+        verbose_name_plural = 'large capital profiles'
+        permissions = (
+            ('export_investorprofile', 'Can export investor profiles'),
+        )
 
     def __str__(self):
         """Human-readable representation"""
