@@ -94,7 +94,7 @@ class Command(BaseCommand):
 
     def _get_companies_queryset(self):
         # subquery used to only get the matches without duplicates
-        subquery = DnBMatchingResult.objects.filter(
+        subquery_for_matched_duns_numbers = DnBMatchingResult.objects.filter(
             company__archived=False,
         ).annotate(
             dnb_match=KeyTransform('dnb_match', 'data'),
@@ -109,7 +109,13 @@ class Command(BaseCommand):
         ).filter(
             matched_duns_number__isnull=False,
             group_count=1,
-        )
+        ).values('matched_duns_number')
+
+        # subquery used to exclude all the duns_numbers already being used
+        # (there's a unique constraint on the Company.duns_number field)
+        subquery_for_existing_duns_numbers = Company.objects.filter(
+            duns_number__isnull=False,
+        ).values('duns_number')
 
         return Company.objects.annotate(
             wb_record=KeyTransform('wb_record', 'dnbmatchingresult__data'),
@@ -120,7 +126,9 @@ class Command(BaseCommand):
         ).filter(
             duns_number__isnull=True,
             archived=False,
-            matched_duns_number__in=subquery.values('matched_duns_number'),
+            matched_duns_number__in=subquery_for_matched_duns_numbers,
+        ).exclude(
+            matched_duns_number__in=subquery_for_existing_duns_numbers,
         )
 
     @disable_search_signal_receivers(Company)
