@@ -2,7 +2,12 @@ from django.contrib import admin
 from django.db.transaction import atomic
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, custom_add_permission, custom_change_permission
+from datahub.core.admin import (
+    BaseModelAdminMixin,
+    custom_add_permission,
+    custom_change_permission,
+    custom_view_permission,
+)
 from datahub.core.utils import join_truthy_strings
 from datahub.interaction.models import (
     CommunicationChannel,
@@ -62,6 +67,7 @@ class InteractionDITParticipantInline(admin.TabularInline):
 @admin.register(Interaction)
 @custom_add_permission(InteractionPermission.add_all)
 @custom_change_permission(InteractionPermission.change_all)
+@custom_view_permission(InteractionPermission.view_all)
 class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     """Interaction admin."""
 

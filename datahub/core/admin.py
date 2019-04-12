@@ -171,6 +171,24 @@ class RawIdWidget(forms.TextInput):
         return str(obj), url
 
 
+def custom_view_permission(permission_codename):
+    """
+    Decorator that allows a custom view permission to be used with ModelAdmin subclasses.
+
+    Usage example::
+
+        @admin.register(InvestmentProject)
+        @custom_view_permission('view_all_investmentproject')
+        class InvestmentProjectAdmin(admin.ModelAdmin):
+            pass
+    """
+    def decorator(admin_cls):
+        admin_cls.has_view_permission = _make_admin_permission_getter(permission_codename)
+        return admin_cls
+
+    return decorator
+
+
 def custom_add_permission(permission_codename):
     """
     Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
