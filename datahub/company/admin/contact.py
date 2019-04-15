@@ -1,99 +1,34 @@
-import csv
-import io
 from logging import getLogger
 from typing import NamedTuple
 
 import reversion
-from chardet import UniversalDetector
-from django import forms
 from django.contrib import admin, messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.validators import FileExtensionValidator
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
-from django.utils.translation import gettext
 from reversion.admin import VersionAdmin
 
 from datahub.company.models import Contact
 from datahub.core.admin import BaseModelAdminMixin
+from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.search.signals import disable_search_signal_receivers
 
 
 logger = getLogger(__name__)
 
 
-class LoadEmailMarketingOptOutsForm(forms.Form):
+class LoadEmailMarketingOptOutsForm(BaseCSVImportForm):
     """Form used for loading a CSV file to opt out contacts from email marketing."""
 
-    HEADER_DECODE_ERROR_MESSAGE = gettext('There was an error decoding the file contents.')
-    BODY_DECODE_ERROR_MESSAGE = gettext(
-        'There was an error decoding the text in the file provided. No records have been '
-        'modified.',
-    )
-    NO_EMAIL_COLUMN_MESSAGE = gettext('This file does not contain an email column.')
-
-    email_list = forms.FileField(
-        label='Email list (CSV file)',
-        validators=[FileExtensionValidator(allowed_extensions=('csv',))],
-    )
-
-    def clean_email_list(self):
-        """Validates the uploaded CSV file and creates a CSV DictReader from it."""
-        # This could be an instance of InMemoryUploadedFile or TemporaryUploadedFile
-        # (depending on the file size)
-        file_field = self.cleaned_data['email_list']
-
-        # Guess the file encoding (primarily to check for a UTF-8 BOM)
-        encoding_detector = UniversalDetector()
-        for chunk in file_field.chunks():
-            encoding_detector.feed(chunk)
-            if encoding_detector.done:
-                break
-
-        detection_result = encoding_detector.close()
-        encoding = detection_result['encoding']
-
-        file_field.seek(0)
-        csv_reader = csv.DictReader(io.TextIOWrapper(file_field, encoding=encoding))
-
-        self._validate_columns(csv_reader)
-        return csv_reader
-
-    def save(self, user):
-        """
-        Persists the data to the database.
-
-        :raises ValidationError: Occurs if there is a problem while reading the data from the
-                                 CSV file.
-        """
-        try:
-            return self._save(user)
-        except UnicodeError:
-            # This will only be triggered for invalid Unicode that is relatively deep in the file,
-            # as invalid Unicode near the beginning of the file will be picked up by
-            # clean_email_list().
-            raise ValidationError(self.BODY_DECODE_ERROR_MESSAGE, code='body-unicode-error')
-
-    save.alters_data = True
-
-    @classmethod
-    def _validate_columns(cls, csv_reader):
-        try:
-            fieldnames = csv_reader.fieldnames
-        except UnicodeError as exc:
-            raise ValidationError(
-                cls.HEADER_DECODE_ERROR_MESSAGE,
-                code='header-unicode-error',
-            ) from exc
-
-        if 'email' not in fieldnames:
-            raise ValidationError(cls.NO_EMAIL_COLUMN_MESSAGE, code='no-email-column')
+    csv_file_field_label = 'Email list (CSV file)'
+    required_columns = {'email'}
 
     @reversion.create_revision()
     @disable_search_signal_receivers(Contact)
-    def _save(self, user):
+    def save(self, user):
+        """Persists the data to the database."""
         reversion.set_user(user)
         reversion.set_comment('Loaded bulk email opt-out list.')
 
@@ -101,7 +36,7 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
         num_contacts_updated = 0
         num_non_matching_email_addresses = 0
 
-        for row in self.cleaned_data['email_list']:
+        for row in self.cleaned_data['csv_file']:
             email = row['email'].strip()
 
             if not email:
@@ -127,6 +62,8 @@ class LoadEmailMarketingOptOutsForm(forms.Form):
             num_contacts_updated,
             num_non_matching_email_addresses,
         )
+
+    save.alters_data = True
 
 
 class _ProcessOptOutResult(NamedTuple):
@@ -199,11 +136,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         if not form.is_valid():
             return self._opt_out_form_response(request, form)
 
-        try:
-            opt_out_res = form.save(request.user)
-        except ValidationError as exc:
-            return self._opt_out_error_response(request, exc.messages)
-
+        opt_out_res = form.save(request.user)
         return self._opt_out_success_response(request, opt_out_res)
 
     def _opt_out_form_response(self, request, form):
@@ -217,12 +150,6 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
             'form': form,
         }
         return TemplateResponse(request, template_name, context)
-
-    def _opt_out_error_response(self, request, messages):
-        for message in messages:
-            self.message_user(request, message, django_messages.ERROR)
-
-        return self._opt_out_form_response(request, LoadEmailMarketingOptOutsForm())
 
     def _opt_out_success_response(self, request, opt_out_res):
         success_msg = (
