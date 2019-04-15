@@ -180,6 +180,10 @@ class Interaction(BaseModel):
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
     subject = models.TextField()
+    # TODO: Ensure that this is required (with default='')
+    # once we have ensured that a default value '' is set on
+    # all existing Interactions and we have ensured that new interactions are
+    # being created with a '' location
     location = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
     #  removed once the migration is complete
@@ -223,6 +227,7 @@ class Interaction(BaseModel):
         on_delete=models.CASCADE,
         help_text='For interactions only.',
     )
+    # Grants
     grant_amount_offered = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',

@@ -42,7 +42,8 @@ class ContactsBelongToCompanyValidator:
 class StatusChangeValidator:
     """
     Validates that an interaction's status cannot change from complete back to
-    draft.
+    draft.  An interaction with status='complete' means that the interaction
+    occurred successfully and any extra details for it have been logged.
     """
 
     def __init__(self):
@@ -64,7 +65,8 @@ class StatusChangeValidator:
         if not self.instance:
             return
         existing_interaction_complete = self.instance.status == Interaction.STATUSES.complete
-        new_status = data.get('status', Interaction.STATUSES.complete)
+        combiner = DataCombiner(self.instance, data)
+        new_status = combiner.get_value('status')
         update_changes_status = new_status != self.instance.status
         if existing_interaction_complete and update_changes_status:
             raise ValidationError(

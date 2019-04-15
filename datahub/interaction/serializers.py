@@ -140,10 +140,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     }
 
-    status = serializers.ChoiceField(
-        default=Interaction.STATUSES.complete,
-        choices=Interaction.STATUSES,
-    )
     company = NestedRelatedField(Company)
     contacts = NestedRelatedField(
         Contact,
@@ -157,7 +153,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     )
     created_by = NestedAdviserField(read_only=True)
-    location = serializers.CharField(default='')
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
@@ -330,6 +325,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
+            'status': {'default': Interaction.STATUSES.complete, 'allow_null': False},
+            'location': {'default': ''},
         }
         fields = (
             'id',
