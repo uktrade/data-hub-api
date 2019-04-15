@@ -105,13 +105,21 @@ Dependencies:
     
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
     
-    On Ubuntu, you should also install `python3.7-dev` and `python3.7-venv`: 
+3.  Install system dependencies:
     
+    On Ubuntu:
+    
+    ```shell
+    sudo apt install build-essential libpq-dev python3.7-dev python3.7-venv
     ```
-    sudo apt install python3.7-dev python3.7-venv
-    ``` 
+    
+    On macOS:
+    
+    ```shell
+    brew install libpq
+    ```
 
-3.  Create and activate the virtualenv:
+4.  Create and activate the virtualenv:
 
     ```shell
     python3.7 -m venv env
@@ -119,35 +127,35 @@ Dependencies:
     pip install -U pip
     ```
 
-4.  Install the dependencies:
+5.  Install the dependencies:
 
     ```shell
     pip install -r requirements.txt
     ```
 
-5.  Create an `.env` settings file (it’s gitignored by default):
+6.  Create an `.env` settings file (it’s gitignored by default):
 
     ```shell
     cp config/settings/sample.env config/settings/.env
     ```
 
-6.  Set `DOCKER_DEV=False` in `.env`
-7.  Create the db. By default, the dev version uses postgres:
+7.  Set `DOCKER_DEV=False` in `.env`
+8.  Create the db. By default, the dev version uses postgres:
 
     ```shell
     psql -p5432
     create database datahub;
     ```
 
-8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
+9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     ```
 
-9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
+10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10. Populate the database and initialise Elasticsearch:
+11. Populate the database and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
@@ -157,7 +165,7 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-11. Optionally, you can load some test data and update Elasticsearch:
+12. Optionally, you can load some test data and update Elasticsearch:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
@@ -165,19 +173,19 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-12. Create a superuser:
+13. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
     ```
 
-13. Start the server:
+14. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-14. Start celery:
+15. Start celery:
 
     ```shell
     celery worker -A config -l info -Q celery,long-running -B
