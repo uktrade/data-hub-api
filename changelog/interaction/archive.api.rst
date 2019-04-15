@@ -8,4 +8,11 @@
 * ``archived_reason`` - string, nullable - free-form text explaining the reason
   for archiving the interaction
 
-These can both modified with ``PATCH`` requests.
+These fields cannot be modified with PATCH or POST requests.
+
+Two additional API endpoints were added:
+
+``POST /v3/interaction/<uid>/archive`` - requires a ``"reason"`` parameter.  This
+will archive an interaction with the supplied reason.
+
+``POST /v3/interaction/<uid>/unarchive`` This will 'un-archive' an interaction.
