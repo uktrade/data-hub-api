@@ -236,6 +236,41 @@ TEST_DATA = [
             'archived_reason': ARCHIVED_REASON_DISSOLVED,
         },
     },
+
+    # Should be ignored as a Data Hub company with 'duns_number == '000000007'
+    # already exists in the database
+    {
+        'company': {
+            'id': uuid.UUID('00000000-0000-0000-0000-000000000007'),
+            'duns_number': None,
+        },
+        'dnbmatchingresult_data': {
+            'dnb_match': {
+                'duns_number': '000000007',
+            },
+            'wb_record': {
+                'DUNS Number': '000000007',
+                'Business Name': 'WB Corp 3',
+                'Secondary Name': '',
+                'Employees Total': '0',
+                'Employees Total Indicator': EmployeesIndicator.NOT_AVAILABLE.value,
+                'Employees Here': '0',
+                'Employees Here Indicator': EmployeesIndicator.NOT_AVAILABLE.value,
+                'Annual Sales in US dollars': '0',
+                'Annual Sales Indicator': TurnoverIndicator.NOT_AVAILABLE.value,
+                'Street Address': '',
+                'Street Address 2': '',
+                'City Name': '',
+                'State/Province Name': '',
+                'Country Code': '785',
+                'Postal Code for Street Address': '',
+                'National Identification Number': '',
+                'National Identification System Code': '',
+                'Out of Business indicator': OutOfBusinessIndicator.OUT_OF_BUSINESS.value,
+            },
+        },
+        'expected_fields': {},
+    },
 ]
 
 
@@ -265,6 +300,8 @@ def test_run(caplog, monkeypatch, simulate):
         OrderFactory(company=company)
 
         DnBMatchingResultFactory(company=company, data=test_data_item['dnbmatchingresult_data'])
+
+    CompanyFactory(duns_number='000000007')
 
     call_command('cleanse_companies_using_worldbase_match', simulate=simulate)
 
