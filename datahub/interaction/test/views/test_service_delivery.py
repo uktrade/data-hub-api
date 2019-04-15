@@ -64,6 +64,11 @@ class TestAddServiceDelivery(APITestMixin):
                 'policy_feedback_notes': 'Policy feedback notes',
                 'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
+            # Interaction with a status
+            {
+                'is_event': False,
+                'status': Interaction.STATUSES.draft,
+            },
         ),
     )
     def test_add(self, extra_data):
@@ -93,7 +98,7 @@ class TestAddServiceDelivery(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.service_delivery,
-            'status': Interaction.STATUSES.complete,
+            'status': request_data.get('status', Interaction.STATUSES.complete),
             'is_event': request_data['is_event'],
             'service_delivery_status': request_data.get('service_delivery_status'),
             'grant_amount_offered': request_data.get('grant_amount_offered'),
