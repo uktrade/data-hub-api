@@ -153,6 +153,10 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     )
     created_by = NestedAdviserField(read_only=True)
+    # TODO: make this read-only once we have migrated all existing interactions
+    # to have archived=False
+    archived = serializers.BooleanField(default=False)
+    archived_by = NestedAdviserField(read_only=True)
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
@@ -358,9 +362,17 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_issue_types',
             'was_policy_feedback_provided',
             'location',
+            'archived',
+            'archived_by',
+            'archived_on',
+            'archived_reason',
         )
         read_only_fields = (
             'archived_documents_url_path',
+            'archived',
+            'archived_by',
+            'archived_on',
+            'archived_reason',
         )
         validators = [
             HasAssociatedInvestmentProjectValidator(),

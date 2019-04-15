@@ -5,7 +5,12 @@ from django.db import models
 from model_utils import Choices
 
 from datahub.core import reversion
-from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
+from datahub.core.models import (
+    ArchivableModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
+)
 from datahub.core.utils import get_front_end_url, StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -120,7 +125,7 @@ class InteractionDITParticipant(models.Model):
 
 
 @reversion.register_base_model()
-class Interaction(BaseModel):
+class Interaction(ArchivableModel, BaseModel):
     """Interaction."""
 
     KINDS = Choices(
@@ -145,6 +150,11 @@ class Interaction(BaseModel):
         null=True,
         blank=True,
     )
+    # TODO: Remove this override (the field is provided with a default by ArchivableModel)
+    # once we have ensured that a default value False is set on
+    # all existing Interactions and we have ensured that new interactions are
+    # being created with archived=False
+    archived = models.BooleanField(blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
