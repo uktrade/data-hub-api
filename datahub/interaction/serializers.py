@@ -234,9 +234,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         # Ensure that archived=False is set for creations/updates, when the
         # existing instance does not have a value for it
         # TODO: remove this once we give archived a model-level default
-        is_create = not self.instance
-        archived_not_set = not is_create and self.instance.archived is None
-        if is_create or archived_not_set:
+        if not self.instance or self.instance.archived is None:
             data['archived'] = False
 
         return data
