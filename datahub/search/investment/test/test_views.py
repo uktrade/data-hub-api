@@ -1173,6 +1173,9 @@ class TestInvestmentProjectExportView(APITestMixin):
         ]
 
         expected_rows = format_csv_data(expected_row_data)
+
+        # item is an ordered dict so is cast to a dict to make the comparison easier to
+        # interpret in the event of the assert actual_rows == expected_rows failing.
         actual_rows = [dict(item) for item in reader]
 
         # Support for ordering was added to StringAgg in Django 2.2. However, it is not
