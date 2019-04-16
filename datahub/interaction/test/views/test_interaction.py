@@ -25,42 +25,14 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactoryWithPolicyFeedback,
     InvestmentProjectInteractionFactory,
 )
+from datahub.interaction.test.permissions import (
+    NON_RESTRICTED_ADD_PERMISSIONS,
+    NON_RESTRICTED_CHANGE_PERMISSIONS,
+    NON_RESTRICTED_VIEW_PERMISSIONS,
+)
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-
-
-NON_RESTRICTED_VIEW_PERMISSIONS = (
-    (
-        InteractionPermission.view_all,
-    ),
-    (
-        InteractionPermission.view_all,
-        InteractionPermission.view_associated_investmentproject,
-    ),
-)
-
-
-NON_RESTRICTED_ADD_PERMISSIONS = (
-    (
-        InteractionPermission.add_all,
-    ),
-    (
-        InteractionPermission.add_all,
-        InteractionPermission.add_associated_investmentproject,
-    ),
-)
-
-
-NON_RESTRICTED_CHANGE_PERMISSIONS = (
-    (
-        InteractionPermission.change_all,
-    ),
-    (
-        InteractionPermission.change_all,
-        InteractionPermission.change_associated_investmentproject,
-    ),
-)
 
 
 class TestAddInteraction(APITestMixin):
@@ -212,6 +184,10 @@ class TestAddInteraction(APITestMixin):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'location': request_data.get('location', ''),
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @pytest.mark.parametrize(
@@ -692,6 +668,10 @@ class TestGetInteraction(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             # TODO: Change this once we enforce a default
             'location': None,
+            'archived': None,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -792,6 +772,11 @@ class TestGetInteraction(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             # TODO: change this once we enforce a default
             'location': None,
+            # TODO: Change this once we enforce a default
+            'archived': None,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):

@@ -26,6 +26,7 @@ def get_interaction_queryset():
     ).select_related(
         'company',
         'created_by',
+        'archived_by',
         'dit_adviser',
         'dit_team',
         'communication_channel',

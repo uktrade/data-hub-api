@@ -153,6 +153,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     )
     created_by = NestedAdviserField(read_only=True)
+    archived_by = NestedAdviserField(read_only=True)
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
@@ -229,6 +230,12 @@ class InteractionSerializer(serializers.ModelSerializer):
             first_participant = data['dit_participants'][0]
             data['dit_adviser'] = first_participant['adviser']
             data['dit_team'] = first_participant['adviser'].dit_team
+
+        # Ensure that archived=False is set for creations/updates, when the
+        # existing instance does not have a value for it
+        # TODO: remove this once we give archived a model-level default
+        if not self.instance or self.instance.archived is None:
+            data['archived'] = False
 
         return data
 
@@ -358,9 +365,17 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_issue_types',
             'was_policy_feedback_provided',
             'location',
+            'archived',
+            'archived_by',
+            'archived_on',
+            'archived_reason',
         )
         read_only_fields = (
             'archived_documents_url_path',
+            'archived',
+            'archived_by',
+            'archived_on',
+            'archived_reason',
         )
         validators = [
             HasAssociatedInvestmentProjectValidator(),
