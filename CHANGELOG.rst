@@ -1,3 +1,73 @@
+Data Hub API 11.8.0 (2019-04-16)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The first page of admin site tool for importing interactions was added, allowing a CSV file to be selected.
+  This feature is currently behind the ``admin-interaction-csv-importer`` feature flag as it is incomplete.
+- **Investment** Large capital profiles can now be downloaded as a csv file
+
+Internal changes
+----------------
+
+- The ``cleanse_companies_using_worldbase_match`` command now ignores matches for duns numbers already used in Data Hub as there can be only one Data Hub company record with a given duns number.
+
+API
+---
+
+- **Interactions** ``GET /v3/interaction`` and ``GET /v3/interaction/<uid>``: The following fields were added:
+
+  * ``status`` - string - one of ``'draft'`` or ``'complete'``, defaults to 
+    ``'complete'``
+  * ``location`` - string - free text representing the location of a meeting,
+    defaults to ``''``
+
+  These can both modified with ``PATCH`` requests.
+
+  When creating or updating an interaction whose ``status='draft'``, both ``service``
+  and ``communication_channel`` are no longer required.
+- **Investment** The following endpoint has been added ``/v4/search/large-investor-profile/export`` to allow large capital profiles to be download as a csv file.
+
+  The following data columns are returned per large capital profile in the csv (in this order):
+
+  - Date created
+  - Data Hub profile reference
+  - Data Hub link
+  - Investor company
+  - Investor type
+  - Investable capital
+  - Global assets under management
+  - Investor description
+  - Required checks conducted
+  - Required checks conducted by
+  - Required checks conducted on
+  - Deal ticket sizes
+  - Asset classes of interest
+  - Investment types
+  - Minimum return rate
+  - Time horizons
+  - Restrictions
+  - Construction risks
+  - Minimum equity percentage
+  - Desired deal roles
+  - UK regions of interest
+  - Other countries being considered
+  - Notes on locations
+  - Date last modified
+
+Database schema
+---------------
+
+- **Interactions** Two supporting fields were added to ``interaction_interaction`` for the 
+  purpose of recording meetings:
+
+  * ``status`` (text, nullable) - one of ``"draft"`` or ``"complete"``
+  * ``location`` (text, nullable) - free text representing the location of a meeting
+
+
 Data Hub API 11.7.0 (2019-04-11)
 ================================
 
