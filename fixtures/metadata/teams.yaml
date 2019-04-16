@@ -388,6 +388,9 @@
     - - view_investorprofile
       - investor_profile
       - investorprofile
+    - - export_investorprofile
+      - investor_profile
+      - investorprofile
   model: auth.group
 
 

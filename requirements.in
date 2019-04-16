@@ -12,7 +12,7 @@ django-filter==2.1.0
 django-reversion==3.0.3
 django-pglocks==1.0.2
 django-model-utils==3.1.2
-django-mptt==0.9.1
+django-mptt==0.10.0
 django-oauth-toolkit==1.2.0
 oauthlib==2.1.0
 whitenoise==4.1.2
@@ -22,7 +22,7 @@ pyyaml==5.1
 python-dateutil==2.8.0
 
 # Persistency layer
-psycopg2==2.7.7
+psycopg2==2.8.1
 psycogreen==1.0.1
 
 boto3==1.9.130
@@ -58,6 +58,7 @@ werkzeug==0.15.2  # Required by runserver_plus - useful for local dev
 pip-tools==3.6.0
 piprot==0.9.10
 towncrier==19.2.0
+watchdog==0.9.0
 
 # Code static analysis
 flake8==3.7.7

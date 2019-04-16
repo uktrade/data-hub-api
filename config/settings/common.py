@@ -400,6 +400,9 @@ MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
+
+# TODO: Update to include the large-capital-profile url and
+#  support urls that have object pks within the url.
 DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',

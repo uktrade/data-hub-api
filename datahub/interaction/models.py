@@ -128,8 +128,23 @@ class Interaction(BaseModel):
         ('service_delivery', 'Service delivery'),
     )
 
+    STATUSES = Choices(
+        ('draft', 'Draft'),
+        ('complete', 'Complete'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
+    # TODO: Ensure that this is required (with default="complete")
+    # once we have ensured that a default value "complete" is set on
+    # all existing Interactions and we have ensured that new interactions are
+    # being created with a status
+    status = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=STATUSES,
+        null=True,
+        blank=True,
+    )
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -165,6 +180,11 @@ class Interaction(BaseModel):
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
     subject = models.TextField()
+    # TODO: Ensure that this is required (with default='')
+    # once we have ensured that a default value '' is set on
+    # all existing Interactions and we have ensured that new interactions are
+    # being created with a '' location
+    location = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
     #  removed once the migration is complete
     dit_adviser = models.ForeignKey(
@@ -188,14 +208,6 @@ class Interaction(BaseModel):
         on_delete=models.SET_NULL,
         help_text='For interactions only.',
     )
-    investment_project = models.ForeignKey(
-        'investment.InvestmentProject',
-        related_name='%(class)ss',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        help_text='For interactions only.',
-    )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this '
@@ -206,6 +218,16 @@ class Interaction(BaseModel):
         verbose_name='status',
         help_text='For service deliveries only.',
     )
+    # Investments
+    investment_project = models.ForeignKey(
+        'investment.InvestmentProject',
+        related_name='%(class)ss',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text='For interactions only.',
+    )
+    # Grants
     grant_amount_offered = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
@@ -214,6 +236,7 @@ class Interaction(BaseModel):
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
     )
+    # Policy feedback
     was_policy_feedback_provided = models.BooleanField()
     policy_areas = models.ManyToManyField(
         'PolicyArea',
