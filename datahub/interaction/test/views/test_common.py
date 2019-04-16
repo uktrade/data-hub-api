@@ -5,6 +5,7 @@ from random import sample
 from uuid import UUID
 
 import pytest
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -21,11 +22,14 @@ from datahub.core.test_utils import (
     random_obj_for_model,
 )
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     EventServiceDeliveryFactory,
     InteractionDITParticipantFactory,
+)
+from datahub.interaction.test.permissions import (
+    NON_RESTRICTED_CHANGE_PERMISSIONS,
 )
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -492,18 +496,31 @@ class TestUpdateInteraction(APITestMixin):
         """Test updating read-only fields."""
         interaction = CompanyInteractionFactory(
             archived_documents_url_path='old_path',
+            archived=False,
+            archived_by=None,
+            archived_on=None,
+            archived_reason=None,
         )
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        # TODO: also test `archived` field once we have made it read-only
         response = self.api_client.patch(
             url,
             data={
                 'archived_documents_url_path': 'new_path',
+                'archived': True,
+                'archived_by': 123,
+                'archived_on': date.today(),
+                'archived_reason': 'test',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+        assert response.data['archived'] is False
+        assert response.data['archived_by'] is None
+        assert response.data['archived_on'] is None
+        assert response.data['archived_reason'] is None
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -1232,3 +1249,212 @@ class TestInteractionVersioning(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(service_delivery).count() == 0
+
+
+class TestArchiveViews(APITestMixin):
+    """
+    Tests for the archive and unarchive views.
+    """
+
+    @pytest.mark.parametrize(
+        'permissions', NON_RESTRICTED_CHANGE_PERMISSIONS,
+    )
+    def test_archive_interaction_non_restricted_user(self, permissions):
+        """
+        Tests archiving an interaction for a non-restricted user.
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        interaction = CompanyInteractionFactory()
+        url = reverse(
+            'api-v3:interaction:archive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is True
+        assert response_data['archived_by']['id'] == str(requester.pk)
+        assert response_data['archived_reason'] == 'archive reason'
+
+    def test_archive_interaction_restricted_user_associated_project(self):
+        """
+        Tests archiving an interaction for a restricted user.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+            dit_team=project_creator.dit_team,  # same dit team as the project creator
+        )
+        api_client = self.create_api_client(user=requester)
+        interaction = CompanyInteractionFactory(investment_project=project)
+        url = reverse(
+            'api-v3:interaction:archive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is True
+        assert response_data['archived_by']['id'] == str(requester.pk)
+        assert response_data['archived_reason'] == 'archive reason'
+
+    def test_archive_interaction_restricted_user_non_associated_project(self):
+        """
+        Test that a restricted user cannot archive a non-associated interaction.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        # Ensure the requester is created for a different DIT team
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+        )
+        api_client = self.create_api_client(user=requester)
+        interaction = CompanyInteractionFactory(investment_project=project)
+        url = reverse(
+            'api-v3:interaction:archive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'data,response_data',
+        (
+            (
+                {},
+                {'reason': ['This field is required.']},
+            ),
+            (
+                {'reason': ''},
+                {'reason': ['This field may not be blank.']},
+            ),
+            (
+                {'reason': None},
+                {'reason': ['This field may not be null.']},
+            ),
+        ),
+    )
+    def test_archive_failures(self, data, response_data):
+        """
+        Test archive an interaction without providing a reason.
+        """
+        interaction = CompanyInteractionFactory()
+        url = reverse(
+            'api-v3:interaction:archive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = self.api_client.post(url, data=data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == response_data
+
+    @pytest.mark.parametrize(
+        'permissions', NON_RESTRICTED_CHANGE_PERMISSIONS,
+    )
+    def test_unarchive_interaction_non_restricted_user(self, permissions):
+        """
+        Tests un-archiving an interaction for a non-restricted user.
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        interaction = CompanyInteractionFactory(
+            archived=True,
+            archived_by=requester,
+            archived_reason='just cos',
+            archived_on=now(),
+        )
+        url = reverse(
+            'api-v3:interaction:unarchive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is False
+        assert response_data['archived_by'] is None
+        assert response_data['archived_reason'] == ''
+        assert response_data['archived_on'] is None
+
+    def test_unarchive_interaction_restricted_user_associated_project(self):
+        """
+        Tests archiving an interaction for a restricted user.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+            dit_team=project_creator.dit_team,  # same dit team as the project creator
+        )
+        api_client = self.create_api_client(user=requester)
+        interaction = CompanyInteractionFactory(
+            investment_project=project,
+            archived=True,
+            archived_by=project_creator,
+            archived_on=now(),
+            archived_reason='why not',
+        )
+        url = reverse(
+            'api-v3:interaction:unarchive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(
+            url,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is False
+        assert response_data['archived_by'] is None
+        assert response_data['archived_reason'] == ''
+        assert response_data['archived_on'] is None
+
+    def test_unarchive_interaction_restricted_user_non_associated_project(self):
+        """
+        Test that a restricted user cannot un-archive a non-associated interaction.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        # Ensure the requester is created for a different DIT team
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+        )
+        api_client = self.create_api_client(user=requester)
+        interaction = CompanyInteractionFactory(
+            investment_project=project,
+            archived=True,
+            archived_by=project_creator,
+            archived_on=now(),
+            archived_reason='why not',
+        )
+        url = reverse(
+            'api-v3:interaction:unarchive-item',
+            kwargs={'pk': interaction.pk},
+        )
+        response = api_client.post(
+            url,
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
