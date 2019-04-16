@@ -9,11 +9,12 @@ from datahub.search.large_investor_profile.models import (
 
 
 class LargeInvestorProfileSearchApp(SearchApp):
-    """SearchApp for investor profile."""
+    """SearchApp for large investor profile."""
 
     name = LARGE_INVESTOR_PROFILE_DOC_TYPE
     es_model = LargeInvestorProfile
     view_permissions = (f'investor_profile.{InvestorProfilePermission.view_investor_profile}',)
+    export_permission = f'investor_profile.{InvestorProfilePermission.export}'
     exclude_from_global_search = True
     queryset = DBInvestorProfile.objects.filter(
         profile_type_id=ProfileType.large.value.id,

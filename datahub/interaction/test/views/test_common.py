@@ -896,6 +896,72 @@ class TestUpdateInteraction(APITestMixin):
             for adviser, team in expected_advisers_and_teams
         ]
 
+    @pytest.mark.parametrize(
+        'current_status,new_status',
+        (
+            (None, Interaction.STATUSES.draft),
+            (Interaction.STATUSES.draft, Interaction.STATUSES.draft),
+            (None, Interaction.STATUSES.complete),
+            (Interaction.STATUSES.draft, Interaction.STATUSES.complete),
+            (Interaction.STATUSES.complete, Interaction.STATUSES.complete),
+        ),
+    )
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_status_change_valid(self, current_status, new_status):
+        """
+        Test the different ways that an Interaction's status can change.
+        """
+        interaction = CompanyInteractionFactory(status=current_status)
+        api_client = self.create_api_client()
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(
+            url,
+            data={
+                'status': new_status,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['status'] == new_status
+
+    @pytest.mark.parametrize(
+        'current_status,new_status,response_body',
+        (
+            (
+                Interaction.STATUSES.draft,
+                None,
+                {'status': ['This field may not be null.']},
+            ),
+            (
+                Interaction.STATUSES.complete,
+                Interaction.STATUSES.draft,
+                {'non_field_errors': ['The status of a complete interaction cannot change.']},
+            ),
+            (
+                Interaction.STATUSES.complete,
+                None,
+                {'status': ['This field may not be null.']},
+            ),
+        ),
+    )
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_status_change_invalid(self, current_status, new_status, response_body):
+        """
+        Test the different ways that an Interaction's status can change.
+        """
+        interaction = CompanyInteractionFactory(status=current_status)
+        api_client = self.create_api_client()
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(
+            url,
+            data={
+                'status': new_status,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == response_body
+
 
 class TestListInteractions(APITestMixin):
     """Tests for the list interactions view."""
