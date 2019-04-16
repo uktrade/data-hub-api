@@ -21,21 +21,6 @@ DNB_COUNTRY_MAPPING = {
 class Command(CSVBaseCommand):
     """Command to update DnBMatchingCSVRecord."""
 
-    EXPECTED_FIELDS = {
-        'duns_number',
-        'name',
-        'global_ultimate_duns_number',
-        'global_ultimate_name',
-        'global_ultimate_country',
-        'address_1',
-        'address_2',
-        'address_town',
-        'address_postcode',
-        'address_country',
-        'confidence',
-        'source',
-    }
-
     def add_arguments(self, parser):
         """Define extra arguments."""
         super().add_arguments(parser)
@@ -80,7 +65,7 @@ class Command(CSVBaseCommand):
             )
 
     def _validate_data(self, data):
-        return all(row.keys() == self.EXPECTED_FIELDS for row in data)
+        return all(row.keys() == DnBMatchingCSVRecord.EXPECTED_DATA_FIELDS for row in data)
 
     def _resolve_dnb_address_country(self, data):
         """Resolve DnB address_country with Data Hub country."""
