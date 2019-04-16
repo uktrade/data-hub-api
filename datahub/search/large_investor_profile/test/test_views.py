@@ -1,16 +1,29 @@
+from cgi import parse_header
 from collections import Counter
+from csv import DictReader
+from io import StringIO
+from itertools import chain
 
 import pytest
+from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, TeamFactory
 from datahub.core.constants import (
     Country as CountryConstant,
     UKRegion as UKRegionConstant,
 )
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    join_attr_values,
+)
+from datahub.investment.investor_profile.models import InvestorProfile
+from datahub.investment.investor_profile.permissions import InvestorProfilePermission
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
     ConstructionRisk as ConstructionRiskConstant,
@@ -23,8 +36,10 @@ from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import (
+    CompleteLargeInvestorProfileFactory,
     LargeInvestorProfileFactory,
 )
+from datahub.search.large_investor_profile.views import SearchLargeInvestorProfileExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -561,3 +576,185 @@ class TestSearch(APITestMixin):
         for key in check_item_key_list:
             item = item[key] if item else result[key]
         return item
+
+
+class TestLargeInvestorProfileExportView(APITestMixin):
+    """Tests large capital investor profile export view."""
+
+    @pytest.mark.parametrize(
+        'permissions,expected_status_code',
+        (
+            (
+                (),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                (
+                    InvestorProfilePermission.view_investor_profile,
+                ),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                (
+                    InvestorProfilePermission.export,
+                ),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                (
+                    InvestorProfilePermission.view_investor_profile,
+                    InvestorProfilePermission.export,
+                ),
+                status.HTTP_200_OK,
+            ),
+        ),
+    )
+    def test_user_needs_correct_permissions_to_export_data(
+        self, setup_es, permissions, expected_status_code,
+    ):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:search:large-investor-profile-export')
+        response = api_client.post(url)
+        assert response.status_code == expected_status_code
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('created_on:desc', '-created_on'),
+            ('modified_on:desc', '-modified_on'),
+            ('investable_capital:asc', 'investable_capital'),
+            ('global_assets_under_management:desc', '-global_assets_under_management'),
+            ('investor_company.name', 'investor_company__name'),
+        ),
+    )
+    def test_export(self, setup_es, request_sortby, orm_ordering):
+        """Test export large capital investor profile search results."""
+        url = reverse('api-v4:search:large-investor-profile-export')
+
+        CompleteLargeInvestorProfileFactory(
+            investable_capital=10000,
+            global_assets_under_management=20000,
+        )
+        with freeze_time('2018-01-01 11:12:13'):
+            LargeInvestorProfileFactory(
+                investable_capital=300,
+                global_assets_under_management=200,
+            )
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {
+                'filename': 'Data Hub - Large capital profiles - 2018-01-01-11-12-13.csv',
+            },
+        )
+
+        sorted_profiles = InvestorProfile.objects.order_by(orm_ordering, 'pk')
+        response_text = response.getvalue().decode('utf-8-sig')
+        reader = DictReader(StringIO(response_text))
+
+        assert reader.fieldnames == list(
+            SearchLargeInvestorProfileExportAPIView.field_titles.values(),
+        )
+
+        expected_row_data = [
+            {
+                'Date created': profile.created_on,
+                'Global assets under management': profile.global_assets_under_management,
+                'Investable capital': profile.investable_capital,
+                'Investor company': get_attr_or_none(
+                    profile, 'investor_company.name',
+                ),
+                'Investor description': profile.investor_description,
+                'Notes on locations': profile.notes_on_locations,
+                'Investor type': get_attr_or_none(
+                    profile, 'investor_type.name',
+                ),
+                'Required checks conducted': get_attr_or_none(
+                    profile, 'required_checks_conducted.name',
+                ),
+                'Minimum return rate': get_attr_or_none(
+                    profile, 'minimum_return_rate.name',
+                ),
+                'Minimum equity percentage': get_attr_or_none(
+                    profile, 'minimum_equity_percentage.name',
+                ),
+                'Date last modified': profile.modified_on,
+                'UK regions of interest': join_attr_values(
+                    profile.uk_region_locations.all(),
+                ),
+                'Restrictions': join_attr_values(
+                    profile.restrictions.all(),
+                ),
+                'Time horizons': join_attr_values(
+                    profile.time_horizons.all(),
+                ),
+                'Investment types': join_attr_values(
+                    profile.investment_types.all(),
+                ),
+                'Deal ticket sizes': join_attr_values(
+                    profile.deal_ticket_sizes.all(),
+                ),
+                'Desired deal roles': join_attr_values(
+                    profile.desired_deal_roles.all(),
+                ),
+                'Required checks conducted by': get_attr_or_none(
+                    profile, 'required_checks_conducted_by.name',
+                ),
+                'Required checks conducted on': profile.required_checks_conducted_on,
+                'Other countries being considered': join_attr_values(
+                    profile.other_countries_being_considered.all(),
+                ),
+                'Construction risks': join_attr_values(
+                    profile.construction_risks.all(),
+                ),
+                'Data Hub profile reference': str(profile.pk),
+                'Asset classes of interest': join_attr_values(
+                    profile.asset_classes_of_interest.all(),
+                ),
+                'Data Hub link': (
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                    f'/{profile.investor_company.pk}/investments/large-capital-profile'
+                ),
+            }
+            for profile in sorted_profiles
+        ]
+
+        expected_rows = format_csv_data(expected_row_data)
+
+        # item is an ordered dict so is cast to a dict to make the comparison easier to
+        # interpret in the event of the assert actual_rows == expected_rows failing.
+        actual_rows = [dict(item) for item in reader]
+
+        # Support for ordering was added to StringAgg in Django 2.2. However, it is not
+        # currently used due to https://code.djangoproject.com/ticket/30315. While that
+        # remains the case, our StringAgg fields are unordered and we use this workaround to
+        # compare them.
+        unordered_fields = [
+            'Asset classes of interest',
+            'Construction risks',
+            'Deal ticket sizes',
+            'Desired deal roles',
+            'Investment types',
+            'Other countries being considered',
+            'Restrictions',
+            'Time horizons',
+            'UK regions of interest',
+        ]
+
+        for row in chain(actual_rows, expected_rows):
+            for field in unordered_fields:
+                row[field] = frozenset(row[field].split(', '))
+
+        assert actual_rows == expected_rows
