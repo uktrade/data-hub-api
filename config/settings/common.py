@@ -398,6 +398,13 @@ MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
     ('investor_company_country', ''),
 )
 
+# ADMIN CSV IMPORT
+
+INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE = env.int(
+    'INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE',
+    default=2 * 1024 * 1024,  # 2MB
+)
+
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 

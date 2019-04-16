@@ -1,9 +1,13 @@
+from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.template.defaultfilters import filesizeformat
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils.decorators import method_decorator
 
+from datahub.core.admin import max_upload_size
 from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.feature_flag.utils import feature_flagged_view
 
@@ -15,6 +19,9 @@ class InteractionCSVForm(BaseCSVImportForm):
     """Form used for loading a CSV file to import interactions."""
 
     csv_file_field_label = 'Interaction list (CSV file)'
+    csv_file_field_help_text = (
+        f'Maximum file size: {filesizeformat(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE)}'
+    )
     required_columns = {
         'kind',
         'date',
@@ -49,6 +56,7 @@ class InteractionCSVImportAdmin:
         ]
 
     @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
+    @method_decorator(max_upload_size(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE))
     def select_file(self, request, *args, **kwargs):
         """View containing a form to select a CSV file to import."""
         if not self.model_admin.has_change_permission(request):

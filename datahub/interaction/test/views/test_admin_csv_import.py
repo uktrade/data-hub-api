@@ -1,6 +1,8 @@
 import io
 
 import pytest
+from django.conf import settings
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.test import Client
 from django.urls import reverse
@@ -145,6 +147,31 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             'This file is missing the following required columns: '
             'adviser_1, contact_email, date, kind, service.',
         ]
+
+    def test_rejects_large_files(self, interaction_importer_feature_flag):
+        """
+        Test that large files are rejected.
+
+        Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 1024 in config.settings.test
+        """
+        file_size = settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE + 1
+        file = io.BytesIO(b'-' * file_size)
+        file.name = 'test.csv'
+
+        response = self.client.post(
+            import_interactions_url,
+            data={
+                'csv_file': file,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        messages = list(response.context['messages'])
+        assert len(messages) == 1
+        assert messages[0].level == django_messages.ERROR
+        assert messages[0].message == (
+            'The file test.csv was too large. Files must be less than 1.0 KB.'
+        )
 
     def test_redirects_on_valid_file(self, interaction_importer_feature_flag):
         """

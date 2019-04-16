@@ -43,6 +43,8 @@ OMIS_NOTIFICATION_API_KEY = ''
 
 GOVUK_PAY_URL = 'https://payments.example.com/'
 
+INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE = 1024
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache'

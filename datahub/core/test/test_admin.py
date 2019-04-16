@@ -1,8 +1,11 @@
+import io
 from unittest.mock import Mock
 
 import pytest
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
+from rest_framework import status
 
 from datahub.core.admin import (
     custom_add_permission,
@@ -15,6 +18,7 @@ from datahub.core.admin import (
 )
 from datahub.core.test.support.factories import BookFactory
 from datahub.core.test.support.models import Book
+from datahub.core.test.support.views import MAX_UPLOAD_SIZE
 
 
 class TestRawIdWidget:
@@ -114,6 +118,48 @@ def test_custom_view_permission():
     admin.has_view_permission(request)
 
     request.user.has_perm.assert_called_once_with('admin.custom_permission')
+
+
+class TestMaxUploadSize:
+    """Tests the max_upload_size decorator."""
+
+    @pytest.mark.parametrize(
+        'file_size,error_expected',
+        (
+            (MAX_UPLOAD_SIZE, False),
+            (MAX_UPLOAD_SIZE + 1, True),
+        ),
+    )
+    @pytest.mark.urls('datahub.core.test.support.urls')
+    @pytest.mark.django_db
+    def test_rejects_large_files(self, file_size, error_expected, client):
+        """
+        Test that the max_upload_size() rejects files above the set limit.
+
+        This test uses the datahub.core.test.support.views.max_upload_size_view view.
+        """
+        file = io.BytesIO(b'-' * file_size)
+        file.name = 'test.csv'
+
+        url = reverse('test-max-upload-size')
+        response = client.post(
+            url,
+            data={
+                'file': file,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        messages = list(response.context['messages'])
+
+        if error_expected:
+            assert len(messages) == 1
+            assert messages[0].level == django_messages.ERROR
+            assert messages[0].message == (
+                'The file test.csv was too large. Files must be less than 50 bytes.'
+            )
+        else:
+            assert not messages
 
 
 def test_add_change_permission():
