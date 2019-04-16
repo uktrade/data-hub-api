@@ -22,13 +22,14 @@ class TestBaseCSVImportForm:
         form = ExampleCSVImportForm()
         assert form.fields['csv_file'].label == form.csv_file_field_label
 
-    def test_valid_file_is_loaded(self):
+    @pytest.mark.parametrize('encoding', ('windows-1252', 'utf-8', 'utf-8-sig'))
+    def test_valid_file_is_loaded(self, encoding):
         """Test that the form validates with a valid file and reads its data."""
         csv_contents = """data\r
-row1\r
-row2\r
+row1à\r
+row2é\r
 """
-        file = SimpleUploadedFile('test.csv', csv_contents.encode('utf-8'))
+        file = SimpleUploadedFile('test.csv', csv_contents.encode(encoding))
         form = ExampleCSVImportForm(
             {},
             {'csv_file': file},
@@ -36,8 +37,8 @@ row2\r
 
         assert form.is_valid()
         assert list(form.cleaned_data['csv_file']) == [
-            {'data': 'row1'},
-            {'data': 'row2'},
+            {'data': 'row1à'},
+            {'data': 'row2é'},
         ]
 
     @pytest.mark.parametrize('filename', ('noext', 'file.blah', 'test.test', 'test.csv.docx'))
