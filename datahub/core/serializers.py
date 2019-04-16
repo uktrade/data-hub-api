@@ -67,6 +67,7 @@ class NestedRelatedField(serializers.RelatedField):
         'does_not_exist': 'Invalid pk "{pk_value}" - object does not exist.',
         'incorrect_type': 'Incorrect type. Expected object, received {'
                           'data_type}.',
+        'unsaved_object': 'Model instances must be saved.',
     }
 
     def __init__(self, model, extra_fields=('name',), **kwargs):
@@ -98,6 +99,11 @@ class NestedRelatedField(serializers.RelatedField):
 
     def to_internal_value(self, data):
         """Converts a user-provided value to a model instance."""
+        if isinstance(data, self._model):
+            if data._state.adding:
+                self.fail('unsaved_object')
+            return data
+
         try:
             if isinstance(data, str):
                 id_repr = data

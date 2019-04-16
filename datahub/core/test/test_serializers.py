@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import call, Mock
 from uuid import uuid4
 
 import pytest
@@ -12,7 +12,16 @@ from rest_framework.serializers import IntegerField
 from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField, RelaxedDateField, RelaxedURLField
 from datahub.core.test.support.factories import MultiAddressModelFactory
+from datahub.core.test.support.models import MetadataModel
 from datahub.core.test_utils import APITestMixin
+
+
+def create_mock_model():
+    """Creates a simple mock model."""
+    class MockModel:
+        objects = Mock()
+
+    return MockModel
 
 
 class TestNestedRelatedField:
@@ -20,7 +29,7 @@ class TestNestedRelatedField:
 
     def test_to_internal_dict(self):
         """Tests that model instances are returned for a dict with an 'id' key."""
-        model = MagicMock()
+        model = create_mock_model()
         field = NestedRelatedField(model)
         uuid_ = uuid4()
         assert field.to_internal_value({'id': str(uuid_)})
@@ -28,7 +37,7 @@ class TestNestedRelatedField:
 
     def test_to_internal_str(self):
         """Tests that model instances are returned for a dict with an 'id' key."""
-        model = MagicMock()
+        model = create_mock_model()
         field = NestedRelatedField(model)
         uuid_ = uuid4()
         assert field.to_internal_value(str(uuid_))
@@ -36,36 +45,54 @@ class TestNestedRelatedField:
 
     def test_to_internal_invalid_id(self):
         """Tests that a dict with an invalid UUID raises an exception."""
-        model = MagicMock()
+        model = create_mock_model()
         field = NestedRelatedField(model)
         with pytest.raises(ValidationError):
             field.to_internal_value({'id': 'xxx'})
 
     def test_to_internal_no_id(self):
         """Tests that a dict without an id raises an exception."""
-        model = MagicMock()
+        model = create_mock_model()
         field = NestedRelatedField(model)
         with pytest.raises(ValidationError):
             field.to_internal_value({})
 
     def test_to_internal_wrong_type(self):
         """Tests that a non-dict value raises an exception."""
-        model = MagicMock()
+        model = create_mock_model()
         field = NestedRelatedField(model)
         with pytest.raises(ValidationError):
             field.to_internal_value([])
 
     def test_to_internal_non_existent_id(self):
         """Tests an id of a non-existent object raises an exception."""
-        model = MagicMock()
+        model = create_mock_model()
         model.objects().all.get.return_value = ObjectDoesNotExist
         field = NestedRelatedField(model)
         with pytest.raises(ValidationError):
             field.to_internal_value({})
 
+    @pytest.mark.django_db
+    def test_to_internal_raises_error_on_unsaved_object(self):
+        """Tests that an unsaved model instance is passed causes an error to be raised."""
+        obj = MetadataModel()
+        field = NestedRelatedField(MetadataModel)
+        with pytest.raises(ValidationError) as excinfo:
+            field.to_internal_value(obj)
+
+        assert excinfo.value.detail == ['Model instances must be saved.']
+
+    @pytest.mark.django_db
+    def test_to_internal_with_saved_object(self):
+        """Tests that a saved model instance is accepted."""
+        obj = MetadataModel()
+        obj.save()
+        field = NestedRelatedField(MetadataModel)
+        assert field.to_internal_value(obj) == obj
+
     def test_to_representation(self):
         """Tests that a model instance is converted to a dict."""
-        model = Mock()
+        model = create_mock_model()
         uuid_ = uuid4()
         instance = Mock(id=uuid_, pk=uuid_)
         instance.name = 'instance name'
@@ -77,7 +104,7 @@ class TestNestedRelatedField:
 
     def test_to_representation_extra_fields(self):
         """Tests that a model instance is converted to a dict with extra fields."""
-        model = Mock()
+        model = create_mock_model()
         uuid_ = uuid4()
         uuid2_ = uuid4()
         instance = Mock(id=uuid_, pk=uuid_, test_field='12as', test2=uuid2_, test3='10')
@@ -153,7 +180,7 @@ class TestNestedRelatedField:
 
     def test_to_choices(self):
         """Tests that model choices are returned."""
-        model = Mock()
+        model = create_mock_model()
         uuid_ = uuid4()
         instance = Mock(id=uuid_, pk=uuid_)
         instance.name = 'instance name'
@@ -163,7 +190,7 @@ class TestNestedRelatedField:
 
     def test_to_choices_limit(self):
         """Tests that model choices are limited and returned."""
-        model = Mock()
+        model = create_mock_model()
         uuid_ = uuid4()
         instance = Mock(id=uuid_, pk=uuid_)
         instance.name = 'instance name'
