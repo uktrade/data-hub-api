@@ -496,6 +496,10 @@ class TestUpdateInteraction(APITestMixin):
         """Test updating read-only fields."""
         interaction = CompanyInteractionFactory(
             archived_documents_url_path='old_path',
+            archived=False,
+            archived_by=None,
+            archived_on=None,
+            archived_reason=None,
         )
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -504,6 +508,7 @@ class TestUpdateInteraction(APITestMixin):
             url,
             data={
                 'archived_documents_url_path': 'new_path',
+                'archived': True,
                 'archived_by': 123,
                 'archived_on': date.today(),
                 'archived_reason': 'test',
@@ -512,6 +517,7 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+        assert response.data['archived'] is False
         assert response.data['archived_by'] is None
         assert response.data['archived_on'] is None
         assert response.data['archived_reason'] is None

@@ -153,9 +153,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
     )
     created_by = NestedAdviserField(read_only=True)
-    # TODO: make this read-only once we have migrated all existing interactions
-    # to have archived=False
-    archived = serializers.BooleanField(default=False)
     archived_by = NestedAdviserField(read_only=True)
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
@@ -233,6 +230,14 @@ class InteractionSerializer(serializers.ModelSerializer):
             first_participant = data['dit_participants'][0]
             data['dit_adviser'] = first_participant['adviser']
             data['dit_team'] = first_participant['adviser'].dit_team
+
+        # Ensure that archived=False is set for creations/updates, when the
+        # existing instance does not have a value for it
+        # TODO: remove this once we give archived a model-level default
+        is_create = not self.instance
+        archived_not_set = not is_create and self.instance.archived is None
+        if is_create or archived_not_set:
+            data['archived'] = False
 
         return data
 
