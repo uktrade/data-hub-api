@@ -3,8 +3,6 @@ from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.timezone import now
-
-
 from model_utils import Choices
 
 
@@ -91,28 +89,37 @@ class DnBMatchingCSVRecord(models.Model):
         self,
         by,
         selected_duns_number,
-        no_match_reason=None,
-        no_match_description=None,
     ):
         """
         Select match candidate.
-        If selected_duns_number is None, provide no_match_reason and no_match_description.
 
         :param by: the adviser who selected the match candidate
-        :param selected_duns_number: duns number or None if candidate cannot be matched
-        :param no_match_reason: if selected_duns_number is None, provide the reason
-        :param no_match_description: if selected_duns_number is None, provide description why
+        :param selected_duns_number: duns number
         :return:
         """
-        if not selected_duns_number:
-            self.no_match_reason = no_match_reason
-            self.no_match_description = no_match_description
-        else:
-            self.selected_duns_number = selected_duns_number
+        self.selected_duns_number = selected_duns_number
+        self.no_match_reason = None
+        self.no_match_description = None
+        return self._update_selected_by(by)
 
-        self.selected_by = by
-        self.selected_on = now()
-        self.save()
+    def record_no_match(
+        self,
+        by,
+        no_match_reason,
+        no_match_description=None,
+    ):
+        """
+        Record that there is no match.
+
+        :param by: the adviser who selected the match candidate
+        :param no_match_reason: provide one the pre-defined reasons
+        :param no_match_description: provide description of no match
+        :return:
+        """
+        self.selected_duns_number = None
+        self.no_match_reason = no_match_reason
+        self.no_match_description = no_match_description
+        return self._update_selected_by(by)
 
     def save(self, *args, **kwargs):
         """
@@ -143,3 +150,8 @@ class DnBMatchingCSVRecord(models.Model):
         not_selected = '(no candidate selected)'
         selected = self.selected_duns_number if self.selected_duns_number else not_selected
         return f'{self.company_id} – {self.data} {selected}'
+
+    def _update_selected_by(self, by):
+        self.selected_by = by
+        self.selected_on = now()
+        self.save()

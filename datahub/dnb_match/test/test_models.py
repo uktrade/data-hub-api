@@ -5,9 +5,8 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.dnb_match.test.factories import DnBMatchingCSVRecord
 from datahub.dnb_match.models import NoMatchReason
-
+from datahub.dnb_match.test.factories import DnBMatchingCSVRecord
 
 pytestmark = pytest.mark.django_db
 
@@ -79,7 +78,7 @@ class TestDnbMatchingCSVRecord:
         """Test that a model with selected match candidate can be saved."""
         record = DnBMatchingCSVRecord(data=_get_match_candidates())
         adviser = AdviserFactory()
-        record.select_match_candidate(adviser, None, NoMatchReason.other, 'Cats know')
+        record.record_no_match(adviser, NoMatchReason.other, 'Cats know')
         record.save()
 
         record.refresh_from_db()
