@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dnbmatchingcsvrecord',
             name='no_match_reason',
-            field=models.CharField(blank=True, help_text='Reason why does not match.', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[('not_listed', 'The correct company is not listed, it is not possible to make a match'), ('more_than_one', 'There is more than one company in the list that could be a match'), ('not_confident', 'I am not confident to make the match'), ('other', 'Other')], help_text='Reason why does not match.', max_length=255, null=True),
         ),
         migrations.AddField(
             model_name='dnbmatchingcsvrecord',

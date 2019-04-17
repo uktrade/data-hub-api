@@ -6,6 +6,8 @@ from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.dnb_match.test.factories import DnBMatchingCSVRecord
+from datahub.dnb_match.models import NoMatchReason
+
 
 pytestmark = pytest.mark.django_db
 
@@ -77,14 +79,14 @@ class TestDnbMatchingCSVRecord:
         """Test that a model with selected match candidate can be saved."""
         record = DnBMatchingCSVRecord(data=_get_match_candidates())
         adviser = AdviserFactory()
-        record.select_match_candidate(adviser, None, 'I do not know', 'Cats know')
+        record.select_match_candidate(adviser, None, NoMatchReason.other, 'Cats know')
         record.save()
 
         record.refresh_from_db()
         assert record.selected_duns_number is None
         assert record.selected_by == adviser
         assert record.selected_on == FROZEN_TIME
-        assert record.no_match_reason == 'I do not know'
+        assert record.no_match_reason == NoMatchReason.other
         assert record.no_match_description == 'Cats know'
 
 

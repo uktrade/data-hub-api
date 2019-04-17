@@ -5,6 +5,17 @@ from django.db import models
 from django.utils.timezone import now
 
 
+from model_utils import Choices
+
+
+NoMatchReason = Choices(
+    ('not_listed', 'The correct company is not listed, it is not possible to make a match'),
+    ('more_than_one', 'There is more than one company in the list that could be a match'),
+    ('not_confident', 'I am not confident to make the match'),
+    ('other', 'Other'),
+)
+
+
 class DnBMatchingResult(models.Model):
     """
     Model containing support data for resolved D&B matching information.
@@ -72,6 +83,7 @@ class DnBMatchingCSVRecord(models.Model):
         null=True,
         help_text='The reason that a match could not be found.',
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=NoMatchReason,
     )
     no_match_description = models.TextField(blank=True, null=True)
 
