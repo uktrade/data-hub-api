@@ -369,7 +369,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_by',
             'archived_on',
             'archived_reason',
-            'source',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -377,7 +376,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_by',
             'archived_on',
             'archived_reason',
-            'source',
         )
         validators = [
             HasAssociatedInvestmentProjectValidator(),
