@@ -70,7 +70,7 @@ class DnBMatchingCSVRecord(models.Model):
     no_match_reason = models.CharField(
         blank=True,
         null=True,
-        help_text='Reason why does not match.',
+        help_text='The reason that a match could not be found.',
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
     )
     no_match_description = models.TextField(blank=True, null=True)
