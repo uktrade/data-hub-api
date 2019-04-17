@@ -29,22 +29,16 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 3.  Build and run the necessary containers for the required environment:
 
     ```shell
-    docker-compose build
+    docker-compose up -d
     ```
 
-4.  Populate the database and initialise Elasticsearch:
-
-    ```shell
-    docker-compose run leeloo ./manage.py migrate
-    docker-compose run leeloo ./manage.py init_es
-    docker-compose run leeloo ./manage.py loadinitialmetadata
-    docker-compose run leeloo ./manage.py createinitialrevisions
-    ```
-
+    * It will take time for the leeloo API container to come up - it will run
+      migrations on both DBs, load initial data, sync elasticsearch etc. Watch
+      along in the api container's logs.
     * **NOTE:** 
-      If you are using a linux system, these commands may hang on 
-      waiting for the elasticsearch container to come up (`data-hub-leeloo_es_1`) - 
-      it might be perpetually restarting.
+      If you are using a linux system, the  elasticsearch container may not 
+      come up successfully (`data-hub-leeloo_es_1`) - it might be perpetually 
+      restarting.
       If the logs for that container mention something like 
       `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
       you will need to run the following on your host machine:
@@ -62,26 +56,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
       For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
 
-5. Optionally, you can load some test data and update elasticsearch:
-
-    ```shell
-    docker-compose run leeloo ./manage.py loaddata /app/fixtures/test_data.yaml
-    docker-compose run leeloo ./manage.py sync_es
-    ```
-
-6.  Create a superuser:
-
-    ```shell
-    docker-compose run leeloo ./manage.py createsuperuser
-    ```
-
-7.  Run the services:
-
-    ```shell
-    docker-compose up
-    ```
-
-8.  Optionally, you may want to run a local copy of the data hub frontend. 
+4.  Optionally, you may want to run a local copy of the data hub frontend. 
     By default, you can run both leeloo and the frontend under one docker-compose
     project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#setting-up-with-docker-compose).
 
