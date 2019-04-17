@@ -188,7 +188,6 @@ class TestAddInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'source': request_data.get('source'),
         }
 
     @pytest.mark.parametrize(
@@ -673,7 +672,6 @@ class TestGetInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'source': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -779,7 +777,6 @@ class TestGetInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'source': None,
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):

@@ -174,7 +174,6 @@ class TestAddServiceDelivery(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'source': request_data.get('source'),
         }
 
     @pytest.mark.parametrize(

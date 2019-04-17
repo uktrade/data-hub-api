@@ -500,7 +500,6 @@ class TestUpdateInteraction(APITestMixin):
             archived_by=None,
             archived_on=None,
             archived_reason=None,
-            source={'id': 'fooo'},
         )
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -513,7 +512,6 @@ class TestUpdateInteraction(APITestMixin):
                 'archived_by': 123,
                 'archived_on': date.today(),
                 'archived_reason': 'test',
-                'source': {'foo': 'bar'},
             },
         )
 
@@ -523,7 +521,6 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['archived_by'] is None
         assert response.data['archived_on'] is None
         assert response.data['archived_reason'] is None
-        assert response.data['source'] == {'id': 'fooo'}
 
     @pytest.mark.parametrize(
         'data,errors',
