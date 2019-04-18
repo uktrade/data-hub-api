@@ -1,6 +1,8 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from model_utils import Choices
 
@@ -155,6 +157,10 @@ class Interaction(ArchivableModel, BaseModel):
     # all existing Interactions and we have ensured that new interactions are
     # being created with archived=False
     archived = models.BooleanField(blank=True, null=True)
+    # If source is set, it provides details of an external source that this
+    # interaction represents.  e.g. a calendar event
+    # {'id': 'abc123', 'type': 'calendar'}
+    source = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
