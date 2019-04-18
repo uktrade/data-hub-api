@@ -36,34 +36,18 @@ class TextWithKeyword(Text):
         )
 
 
-def contact_or_adviser_field(field, include_dit_team=False):
-    """
-    Object field for advisers and contacts.
-
-    The `name` field is being migrated away from using `copy_to` to being a multi-field.
-    `name_trigram` and `name.trigram` are both defined while the switch takes place.
-
-    Additionally, the `name` field should have had a data type of text, but it was mistakenly made
-    a keyword field. Hence, a `keyword` sub-field has also been added so type of `name` can be
-    changed to text once sorting operations have been migrated to using the `keyword` sub-field.
-
-    TODO:
-        - remove name_trigram once related logic has been updated to use name.trigram
-        - change name use Text instead of NormalizedKeyword once sorting options have been
-        updated to use name.keyword
-    """
+def contact_or_adviser_field(include_dit_team=False):
+    """Object field for advisers and contacts."""
     props = {
         'id': Keyword(),
         'first_name': NormalizedKeyword(),
         'last_name': NormalizedKeyword(),
-        'name': NormalizedKeyword(
-            copy_to=f'{field}.name_trigram',
+        'name': Text(
             fields={
                 'keyword': NormalizedKeyword(),
                 'trigram': TrigramText(),
             },
         ),
-        'name_trigram': TrigramText(),
     }
 
     if include_dit_team:

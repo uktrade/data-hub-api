@@ -40,7 +40,7 @@ class SearchEventAPIViewMixin:
 
     COMPOSITE_FILTERS = {
         'name': ['name', 'name.trigram'],
-        'organiser_name': ['organiser.name', 'organiser.name_trigram'],
+        'organiser_name': ['organiser.name', 'organiser.name.trigram'],
     }
 
 
