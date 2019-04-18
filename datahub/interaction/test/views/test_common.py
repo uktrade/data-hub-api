@@ -180,48 +180,6 @@ class TestAddInteraction(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
 
-    def test_contacts_copied_to_contact(self):
-        """
-        Test that the value provided in the contacts field is copied to contact when an
-        interaction is created.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        company = CompanyFactory()
-        contacts = ContactFactory.create_batch(2, company=company)
-        communication_channel = random_obj_for_model(CommunicationChannel)
-
-        url = reverse('api-v3:interaction:collection')
-        request_data = {
-            'kind': Interaction.KINDS.interaction,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': {
-                'id': self.user.pk,
-            },
-            'company': {
-                'id': company.pk,
-            },
-            'contacts': [{
-                'id': contact.pk,
-            } for contact in contacts],
-            'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
-            },
-            'dit_team': {
-                'id': self.user.dit_team.pk,
-            },
-            'was_policy_feedback_provided': False,
-        }
-
-        api_client = self.create_api_client()
-        response = api_client.post(url, request_data)
-        assert response.status_code == status.HTTP_201_CREATED
-        interaction = Interaction.objects.get(pk=response.json()['id'])
-        assert interaction.contact == contacts[0]
-        assert set(interaction.contacts.all()) == set(contacts)
-
     def test_error_returned_if_contacts_dont_belong_to_company(self):
         """
         Test that an error is returned if the contacts don't belong to the specified company.
@@ -559,29 +517,6 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
-
-    def test_contacts_copied_to_contact(self):
-        """
-        Test that the value provided in the contact field is copied to contacts when an
-        interaction is updated.
-
-        TODO: remove once the contacts field has fully replaced the contact field.
-        """
-        interaction = CompanyInteractionFactory(contacts=[])
-        new_contacts = ContactFactory.create_batch(2, company=interaction.company)
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        data = {
-            'contacts': [{
-                'id': contact.pk,
-            } for contact in new_contacts],
-        }
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_200_OK
-        interaction.refresh_from_db()
-        assert interaction.contact == new_contacts[0]
-        assert set(interaction.contacts.all()) == set(new_contacts)
 
     @pytest.mark.parametrize(
         'request_data',
@@ -1019,7 +954,7 @@ class TestListInteractions(APITestMixin):
         project = InvestmentProjectFactory()
         company = CompanyFactory()
 
-        CompanyInteractionFactory.create_batch(3, contact=contact)
+        CompanyInteractionFactory.create_batch(3, contacts=[contact])
         CompanyInteractionFactory.create_batch(3, company=company)
         project_interactions = CompanyInteractionFactory.create_batch(
             2, investment_project=project,
@@ -1045,7 +980,7 @@ class TestListInteractions(APITestMixin):
         contact = ContactFactory()
         event = EventFactory()
 
-        CompanyInteractionFactory.create_batch(3, contact=contact)
+        CompanyInteractionFactory.create_batch(3, contacts=[contact])
         EventServiceDeliveryFactory.create_batch(3)
         service_deliveries = EventServiceDeliveryFactory.create_batch(3, event=event)
 

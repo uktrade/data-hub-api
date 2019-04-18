@@ -82,7 +82,6 @@ class Command(BaseCleanupCommand):
                 # Contacts are not deleted if they have any related interactions, investment
                 # projects, OMIS orders or OMIS quotes. We wait for those records to expire
                 # before we delete the related contacts.
-                Interaction._meta.get_field('contact').remote_field: (),
                 Contact._meta.get_field('interactions'): (),
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
