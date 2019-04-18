@@ -29,7 +29,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 3.  Build and run the necessary containers for the required environment:
 
     ```shell
-    docker-compose up -d
+    docker-compose up
     ```
 
     * It will take time for the leeloo API container to come up - it will run
