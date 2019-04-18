@@ -37,7 +37,7 @@ class Sector(MPTTModel, DisableableModel):
         on_delete=models.PROTECT,
     )
     parent = TreeForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True,
+        'self', null=True, blank=True, related_name='children',
         on_delete=models.PROTECT,
     )
 
