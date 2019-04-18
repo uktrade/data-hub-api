@@ -216,13 +216,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         if 'is_event' in data:
             del data['is_event']
 
-        # Copies the first contact specific to contact (for backwards compatibility with
-        # anything consuming the database)
-        # TODO Remove following deprecation period.
-        if 'contacts' in data:
-            contacts = data['contacts']
-            data['contact'] = contacts[0] if contacts else None
-
         # If dit_participants has been provided, this copies the first participant to
         # dit_adviser and dit_team (for backwards compatibility).
         # TODO Remove once dit_adviser and dit_team removed from the database.

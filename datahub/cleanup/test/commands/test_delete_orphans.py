@@ -11,10 +11,7 @@ from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.cleanup.query_utils import get_relations_to_delete
-from datahub.cleanup.test.commands.factories import (
-    CompanyInteractionFactoryWithoutContacts,
-    ShallowInvestmentProjectFactory,
-)
+from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
@@ -47,8 +44,7 @@ MAPPINGS = {
     'company.Contact': {
         'factory': ContactFactory,
         'dependent_models': (
-            (CompanyInteractionFactoryWithoutContacts, 'contact'),
-            (CompanyInteractionFactoryWithoutContacts, 'contacts'),
+            (CompanyInteractionFactory, 'contacts'),
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
