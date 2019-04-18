@@ -47,6 +47,10 @@ class TestAddInteraction(APITestMixin):
             # company interaction
             {
             },
+            # company interaction with theme
+            {
+                'theme': Interaction.THEMES.export,
+            },
             # company interaction with blank notes
             {
                 'notes': '',
@@ -111,6 +115,7 @@ class TestAddInteraction(APITestMixin):
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
             'status': request_data.get('status', Interaction.STATUSES.complete),
+            'theme': request_data.get('theme', None),
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -583,6 +588,7 @@ class TestGetInteraction(APITestMixin):
             'kind': Interaction.KINDS.interaction,
             # TODO: Change this once we give status a default
             'status': None,
+            'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -701,6 +707,7 @@ class TestGetInteraction(APITestMixin):
             'kind': Interaction.KINDS.interaction,
             # TODO: Change this once we give status a default
             'status': None,
+            'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -907,6 +914,51 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    @pytest.mark.parametrize(
+        'initial_value,new_value',
+        (
+            (
+                None,
+                Interaction.THEMES.export,
+            ),
+            (
+                None,
+                None,
+            ),
+        ),
+    )
+    def test_update_theme(self, initial_value, new_value):
+        """Test that the theme field can be updated."""
+        interaction = CompanyInteractionFactory(theme=initial_value)
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'theme': new_value,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['theme'] == new_value
+
+    def test_cannot_unset_theme(self):
+        """Test that a theme can't be removed from an interaction."""
+        interaction = CompanyInteractionFactory(theme=Interaction.THEMES.export)
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'theme': None,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'theme': ["A theme can't be removed once set."],
+        }
 
     @pytest.mark.parametrize(
         'data,error_response',

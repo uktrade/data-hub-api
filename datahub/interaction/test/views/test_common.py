@@ -79,6 +79,46 @@ class TestAddInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'data,errors',
         (
+            # empty string not allowed for theme
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+
+                    'theme': '',
+                },
+                {
+                    'theme': ['"" is not a valid choice.'],
+                },
+            ),
+
+            # invalid theme not allowed
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'service': Service.trade_enquiry.value.id,
+                    'was_policy_feedback_provided': False,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+
+                    'theme': 'not_valid',
+                },
+                {
+                    'theme': ['"not_valid" is not a valid choice.'],
+                },
+            ),
+
             # cannot provide dit_adviser + dit_team and dit_participants
             # TODO: Remove once dit_adviser and dit_team removed from API.
             (
@@ -483,6 +523,26 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'data,errors',
         (
+            # empty string not allowed for theme
+            (
+                {
+                    'theme': '',
+                },
+                {
+                    'theme': ['"" is not a valid choice.'],
+                },
+            ),
+
+            # invalid theme not allowed
+            (
+                {
+                    'theme': 'not_valid',
+                },
+                {
+                    'theme': ['"not_valid" is not a valid choice.'],
+                },
+            ),
+
             # date validation
             (
                 {
