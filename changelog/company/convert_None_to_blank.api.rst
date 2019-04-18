@@ -1,0 +1,1 @@
+``POST /v3/company`` and ``PATCH /v3/company/<uuid:pk>``: None values for address CharFields are now internally converted to empty strings as Django recommends: https://docs.djangoproject.com/en/2.1/ref/models/fields/#null
