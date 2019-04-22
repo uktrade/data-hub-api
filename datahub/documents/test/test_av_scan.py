@@ -89,7 +89,7 @@ def test_virus_scan_document_bad_response_body(get_signed_url_mock, requests_moc
     )
 
     error_message = (
-        f'Unexpected response from AV service: {{\'too_many_cats\': \'never\'}} '
+        f"Unexpected response from AV service: {{'too_many_cats': 'never'}} "
         f'when scanning document with ID {document.pk}'
     )
 
