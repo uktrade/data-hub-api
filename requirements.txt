@@ -119,7 +119,7 @@ text-unidecode==1.2       # via faker
 toml==0.10.0              # via towncrier
 towncrier==19.2.0
 traitlets==4.3.2          # via ipython
-urllib3==1.24.1           # via botocore, elasticsearch, requests
+urllib3==1.24.2           # via botocore, elasticsearch, requests
 vine==1.3.0               # via amqp, celery
 watchdog==0.9.0
 wcwidth==0.1.7            # via prompt-toolkit
