@@ -282,6 +282,9 @@ def test_mapping(setup_es):
                     'preserve_position_increments': True,
                     'preserve_separators': True,
                     'type': 'completion',
+                    'contexts': [
+                        {'name': 'country', 'type': 'CATEGORY'},
+                    ],
                 },
                 'trading_address_1': {'type': 'text'},
                 'trading_address_2': {'type': 'text'},
