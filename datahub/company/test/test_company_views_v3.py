@@ -4,6 +4,7 @@ from datetime import datetime
 import factory
 import pytest
 import reversion
+from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
@@ -652,6 +653,73 @@ class TestUpdateCompany(APITestMixin):
         assert not response_data['is_turnover_estimated']
         assert response_data['number_of_employees'] == 95
         assert not response_data['is_number_of_employees_estimated']
+
+    def test_none_address_fields_are_converted_to_blank(self):
+        """
+        Tests that address charfields are converted to empty strings
+        if None values are used in data.
+        """
+        company = CompanyFactory(
+            registered_address_1='lorem',
+            registered_address_2='lorem',
+            registered_address_town='lorem',
+            registered_address_county='lorem',
+            registered_address_postcode='lorem',
+            registered_address_country_id=Country.united_states.value.id,
+            trading_address_1='lorem',
+            trading_address_2='lorem',
+            trading_address_town='lorem',
+            trading_address_county='lorem',
+            trading_address_postcode='lorem',
+            trading_address_country_id=Country.united_states.value.id,
+        )
+
+        none_fields_expected_to_become_blank = [
+            'registered_address_2',
+            'registered_address_county',
+            'registered_address_postcode',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+        ]
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                **{
+                    field: None
+                    for field in none_fields_expected_to_become_blank
+                },
+                'trading_address_country': None,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company.refresh_from_db()
+
+        # check that model fields are empty (not None)
+        actual_model_fields = model_to_dict(
+            company,
+            fields=none_fields_expected_to_become_blank,
+        )
+        expected_model_fields = {
+            field: ''
+            for field in none_fields_expected_to_become_blank
+        }
+        assert actual_model_fields == expected_model_fields
+
+        # check that the response fields are empty strings (not None)
+        response_data = response.json()
+        actual_response_fields = {
+            field: response_data[field]
+            for field in none_fields_expected_to_become_blank
+        }
+        expected_response_fields = expected_model_fields
+        assert actual_response_fields == expected_response_fields
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -1370,6 +1438,67 @@ class TestAddCompany(APITestMixin):
         response_data = response.json()
         for field, value in expected_response.items():
             assert response_data[field] == value
+
+    def test_none_address_fields_are_converted_to_blank(self):
+        """
+        Tests that address charfields are converted to empty strings
+        if None values are used in data.
+        """
+        none_fields_expected_to_become_blank = [
+            'registered_address_2',
+            'registered_address_county',
+            'registered_address_postcode',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+        ]
+
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(
+            url,
+            data={
+                'name': 'Acme',
+                'business_type': BusinessTypeConstant.company.value.id,
+                'sector': random_obj_for_model(Sector).id,
+                'registered_address_1': '75 Stramford Road',
+                'registered_address_town': 'London',
+                'registered_address_country': Country.united_kingdom.value.id,
+                'trading_address_country': None,
+                'uk_region': UKRegion.england.value.id,
+
+                **{
+                    field: None
+                    for field in none_fields_expected_to_become_blank
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+
+        company = Company.objects.get(pk=response_data['id'])
+
+        # check that model fields are empty strings (not None)
+        actual_model_fields = model_to_dict(
+            company,
+            fields=none_fields_expected_to_become_blank,
+        )
+        expected_model_fields = {
+            field: ''
+            for field in none_fields_expected_to_become_blank
+        }
+        assert actual_model_fields == expected_model_fields
+
+        # check that the response fields are empty strings (not None)
+        response_data = response.json()
+        actual_response_fields = {
+            field: response_data[field]
+            for field in none_fields_expected_to_become_blank
+        }
+        expected_response_fields = expected_model_fields
+        assert actual_response_fields == expected_response_fields
 
     def test_required_fields(self):
         """Test required fields."""

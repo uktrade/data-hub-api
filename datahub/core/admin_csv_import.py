@@ -17,6 +17,7 @@ class BaseCSVImportForm(forms.Form):
     )
 
     csv_file_field_label = 'CSV file'
+    csv_file_field_help_text = None
     required_columns = set()
 
     csv_file = forms.FileField(
@@ -27,6 +28,7 @@ class BaseCSVImportForm(forms.Form):
         """Initialises the form, dynamically setting the label of the csv_file field."""
         super().__init__(*args, **kwargs)
         self.fields['csv_file'].label = self.csv_file_field_label
+        self.fields['csv_file'].help_text = self.csv_file_field_help_text
 
     def clean_csv_file(self):
         """Validates the uploaded CSV file and creates a CSV DictReader from it."""

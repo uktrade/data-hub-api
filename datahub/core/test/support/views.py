@@ -1,8 +1,10 @@
+from django.template.response import TemplateResponse
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
+from datahub.core.admin import max_upload_size
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -16,6 +18,9 @@ from datahub.core.test.support.serializers import (
 )
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.test.scopes import TestScope
+
+
+MAX_UPLOAD_SIZE = 50
 
 
 class MyDisableableModelViewset(CoreViewSet):
@@ -64,3 +69,11 @@ class HawkViewWithScope(HawkResponseSigningMixin, APIView):
     def get(self, request):
         """Simple test view with fixed response."""
         return Response({'content': 'hawk-test-view-with-scope'})
+
+
+@max_upload_size(MAX_UPLOAD_SIZE)
+def max_upload_size_view(request):
+    """View for testing upload file size limiting."""
+    # Force files to be processed
+    request.FILES
+    return TemplateResponse(request, 'empty.html')
