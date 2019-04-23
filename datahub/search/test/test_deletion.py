@@ -141,6 +141,8 @@ def test_update_es_after_deletions(setup_es):
     Test that the context manager update_es_after_deletions collects and deletes
     all the django objects deleted.
     """
+    assert SimpleModel.objects.count() == 0
+
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
     setup_es.indices.refresh()

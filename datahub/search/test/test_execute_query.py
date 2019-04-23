@@ -19,6 +19,7 @@ class TestExecuteQueryBuilder:
                 'hello',
                 10,
                 ['id', 'name'],
+                {},
             )
         assert result == fake_result
         assert mock_es_execute.called
