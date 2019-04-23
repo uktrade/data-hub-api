@@ -1,0 +1,1 @@
+The ``name.keyword`` and ``name.trigram`` sub-fields of the ``contact_or_adviser_field`` field type are now used in search queries. Hence, the ``name_trigram`` sub-field of ``contact_or_adviser_field`` has been removed, and the type of the ``name`` sub-field has been changed from ``keyword`` to ``text``.

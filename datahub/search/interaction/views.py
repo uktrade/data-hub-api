@@ -62,7 +62,7 @@ class SearchInteractionAPIViewMixin:
         ],
         'dit_adviser_name': [
             'dit_adviser.name',
-            'dit_adviser.name_trigram',
+            'dit_adviser.name.trigram',
         ],
         'sector_descends': [
             'company_sector.id',

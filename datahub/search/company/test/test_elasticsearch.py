@@ -36,9 +36,7 @@ def test_mapping(setup_es):
                             'type': 'keyword',
                         },
                         'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'copy_to': ['archived_by.name_trigram'],
-                            'type': 'keyword',
+                            'type': 'text',
                             'fields': {
                                 'keyword': {
                                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -49,10 +47,6 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                        },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
                         },
                     },
                     'type': 'object',
@@ -390,7 +384,7 @@ def test_get_basic_search_query():
                                 'company.name_trigram',
                                 'company_number',
                                 'contact.name',
-                                'contact.name_trigram',
+                                'contact.name.trigram',
                                 'contacts.name',
                                 'contacts.name.trigram',
                                 'dit_participants.adviser.name',
@@ -406,7 +400,7 @@ def test_get_basic_search_query():
                                 'investor_company.name.trigram',
                                 'name',
                                 'name.trigram',
-                                'organiser.name_trigram',
+                                'organiser.name.trigram',
                                 'project_code_trigram',
                                 'reference_code',
                                 'reference_trigram',
