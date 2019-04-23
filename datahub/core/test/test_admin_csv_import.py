@@ -36,10 +36,11 @@ row2é\r
         )
 
         assert form.is_valid()
-        assert list(form.cleaned_data['csv_file']) == [
-            {'data': 'row1à'},
-            {'data': 'row2é'},
-        ]
+        with form.open_file_as_dict_reader() as dict_reader:
+            assert list(dict_reader) == [
+                {'data': 'row1à'},
+                {'data': 'row2é'},
+            ]
 
     @pytest.mark.parametrize('filename', ('noext', 'file.blah', 'test.test', 'test.csv.docx'))
     def test_does_not_allow_invalid_file_extensions(self, filename):
