@@ -1,3 +1,52 @@
+Data Hub API 11.9.0 (2019-04-23)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** The deprecated ``interaction_interaction.contact`` column is being prepared for removal and will shortly be removed. Please use the ``interaction_interaction_contacts`` table instead.
+
+API
+---
+
+- **Companies** ``POST /v3/company`` and ``PATCH /v3/company/<uuid:pk>``: None values for address CharFields are now internally converted to empty strings as Django recommends: https://docs.djangoproject.com/en/2.1/ref/models/fields/#null
+- **Interactions** ``GET /v3/interaction`` and ``GET /v3/interaction/<uid>``: The following fields were added:
+
+  * ``archived`` - boolean - whether the interaction has been archived or not, 
+    defaults to ``False``
+  * ``archived_on`` - datetime string, nullable - the datetime at which the interaction
+    was archived
+  * ``archived_by`` - object, nullable - the Adviser that archived the interaction
+  * ``archived_reason`` - string, nullable - free-form text explaining the reason
+    for archiving the interaction
+
+  These fields cannot be modified with PATCH or POST requests.
+
+  Two additional API endpoints were added:
+
+  ``POST /v3/interaction/<uid>/archive`` - requires a ``"reason"`` parameter.  This
+  will archive an interaction with the supplied reason.
+
+  ``POST /v3/interaction/<uid>/unarchive`` This will 'un-archive' an interaction.
+
+Database schema
+---------------
+
+- **Interactions** Four supporting fields were added to ``interaction_interaction`` for the 
+  purpose of allowing interactions to be archived:
+
+  * ``archived`` (boolean, nullable)
+  * ``archived_on`` (datetime string, nullable) 
+  * ``archived_by_id`` (uuid, nullable) - foreign key to ``company_adviser``
+  * ``archived_reason`` (string, nullable)
+- **Interactions** A supporting field was added to ``interaction_interaction`` for the 
+  purpose of logging the external source of an interaction:
+
+  * ``source`` (JSONB, nullable)
+
+
 Data Hub API 11.8.0 (2019-04-16)
 ================================
 
