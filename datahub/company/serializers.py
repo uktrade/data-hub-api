@@ -586,6 +586,15 @@ class CompanySerializerV3(BaseCompanySerializer):
 
         return data
 
+    def _get_address_field_names_in_data(self, data):
+        all_address_field_names = {
+            field
+            for mapping in self.ADDRESS_FIELDS_MAPPING.values()
+            for field in mapping.values()
+        }
+
+        return all_address_field_names & data.keys()
+
     def _populate_address_fields(self, combiner, data):
         """
         Populates the address_* fields with the values from trading address or
@@ -596,14 +605,8 @@ class CompanySerializerV3(BaseCompanySerializer):
         Doing this will allow us to implement a variant that updates the addresses
         in a different way.
         """
-        all_address_field_names = {
-            field
-            for mapping in self.ADDRESS_FIELDS_MAPPING.values()
-            for field in mapping.values()
-        }
-
         # was any address field specified?
-        if not all_address_field_names & data.keys():
+        if not self._get_address_field_names_in_data(data):
             return
 
         trading_fields_mapping = Company.TRADING_ADDRESS_VALIDATION_MAPPING
@@ -621,7 +624,46 @@ class CompanySerializerV3(BaseCompanySerializer):
             target_value = combiner.get_value(source_field_name)
             data[target_field_name] = target_value
 
+    def run_validation(self, data=serializers.empty):
+        """
+        Converts all None address values into their default (if default != None).
+
+        This is to make sure CharFields are saved with empty strings instead of
+        None values when using the API so that we can make those fields
+        null=False as django recommends:
+        https://docs.djangoproject.com/en/2.1/ref/models/fields/#null
+        """
+        converted_data = data
+        if converted_data is not serializers.empty:
+            address_fields_in_data = {
+                field_name: converted_data[field_name]
+                for field_name in self._get_address_field_names_in_data(converted_data)
+            }
+
+            converted_address_data = {
+                field_name: self.fields[field_name].default
+                for field_name, field_value in address_fields_in_data.items()
+                if field_value is None and self.fields[field_name].default != serializers.empty
+            }
+
+            converted_data = {
+                **converted_data,
+                **converted_address_data,
+            }
+
+        return super().run_validation(data=converted_data)
+
     class Meta(BaseCompanySerializer.Meta):
+        extra_kwargs = {
+            'registered_address_2': {'default': ''},
+            'registered_address_county': {'default': ''},
+            'registered_address_postcode': {'default': ''},
+            'trading_address_1': {'default': ''},
+            'trading_address_2': {'default': ''},
+            'trading_address_town': {'default': ''},
+            'trading_address_county': {'default': ''},
+            'trading_address_postcode': {'default': ''},
+        }
         fields = (
             *BaseCompanySerializer.Meta.fields,
 

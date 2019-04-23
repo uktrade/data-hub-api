@@ -1,5 +1,7 @@
+import json
+
 from django.contrib import admin
-from django.db.transaction import atomic
+from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
@@ -106,6 +108,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified',
         'dit_adviser',
         'dit_team',
+        'pretty_source',
     )
     list_select_related = (
         'company',
@@ -117,7 +120,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
-        'contact',
+        'source',
     )
 
     def get_contact_names(self, obj):
@@ -136,19 +139,13 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
 
     get_contact_names.short_description = 'contacts'
 
-    @atomic
-    def save_model(self, request, obj, form, change):
+    def pretty_source(self, obj):
         """
-        Saves the object, while also:
-            - copying contacts to contact
-            - copying dit_adviser and dit_team to dit_participants
+        Return the source field formatted with indentation.
         """
-        # TODO: Remove once the migration from contact to contacts is complete.
-        if 'contacts' in form.cleaned_data:
-            contacts = form.cleaned_data['contacts']
-            obj.contact = contacts[0] if contacts else None
+        return format_html('<pre>{0}</pre>', json.dumps(obj.source, indent=2))
 
-        super().save_model(request, obj, form, change)
+    pretty_source.short_description = 'source'
 
     def changelist_view(self, request, extra_context=None):
         """

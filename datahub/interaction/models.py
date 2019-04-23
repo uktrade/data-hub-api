@@ -1,11 +1,18 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from model_utils import Choices
 
 from datahub.core import reversion
-from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
+from datahub.core.models import (
+    ArchivableModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
+)
 from datahub.core.utils import get_front_end_url, StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -120,7 +127,7 @@ class InteractionDITParticipant(models.Model):
 
 
 @reversion.register_base_model()
-class Interaction(BaseModel):
+class Interaction(ArchivableModel, BaseModel):
     """Interaction."""
 
     KINDS = Choices(
@@ -145,6 +152,15 @@ class Interaction(BaseModel):
         null=True,
         blank=True,
     )
+    # TODO: Remove this override (the field is provided with a default by ArchivableModel)
+    # once we have ensured that a default value False is set on
+    # all existing Interactions and we have ensured that new interactions are
+    # being created with archived=False
+    archived = models.BooleanField(blank=True, null=True)
+    # If source is set, it provides details of an external source that this
+    # interaction represents.  e.g. a calendar event
+    # {'id': 'abc123', 'type': 'calendar'}
+    source = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -153,18 +169,8 @@ class Interaction(BaseModel):
         null=True,
         on_delete=models.CASCADE,
     )
-    # TODO: contact is being replaced with contacts, and contact will be removed once the
-    # migration to a to-many field is complete
-    contact = models.ForeignKey(
-        'company.Contact',
-        related_name='+',
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-    )
     contacts = models.ManyToManyField(
         'company.Contact',
-        # TODO: change related_name to interactions once this field has fully replaced contact
         related_name='%(class)ss',
         blank=True,
     )

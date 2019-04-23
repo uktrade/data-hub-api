@@ -3,6 +3,7 @@ from django.urls import path
 from datahub.core.test.support.views import (
     HawkViewWithoutScope,
     HawkViewWithScope,
+    max_upload_size_view,
     MultiAddressModelViewset,
     MyDisableableModelViewset,
 )
@@ -40,5 +41,10 @@ urlpatterns = [
         'test-hawk-with-scope/',
         HawkViewWithScope.as_view(),
         name='test-hawk-with-scope',
+    ),
+    path(
+        'test-max-upload-size/',
+        max_upload_size_view,
+        name='test-max-upload-size',
     ),
 ]

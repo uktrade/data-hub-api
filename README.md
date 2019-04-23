@@ -290,6 +290,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
 | `HAWK_RECEIVER_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
+| `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE` | No | Maximum file size in bytes for interaction admin CSV uploads (default=2MB). |
 | `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |

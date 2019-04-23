@@ -124,7 +124,7 @@ def test_updating_contact_name_updates_interaction(setup_es):
         id=interaction.pk,
     )
     assert result['_source']['contacts'][0] == {
-        'id': str(interaction.contact.id),
+        'id': str(contact.pk),
         'first_name': new_first_name,
         'last_name': new_last_name,
         'name': f'{new_first_name} {new_last_name}',
