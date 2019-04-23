@@ -52,7 +52,7 @@ class Company(BaseESModel):
 
     id = Keyword()
     archived = Boolean()
-    archived_by = fields.contact_or_adviser_field('archived_by')
+    archived_by = fields.contact_or_adviser_field()
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.id_name_field()

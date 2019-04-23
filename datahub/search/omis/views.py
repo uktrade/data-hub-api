@@ -57,7 +57,7 @@ class SearchOrderAPIViewMixin:
     COMPOSITE_FILTERS = {
         'contact_name': [
             'contact.name',
-            'contact.name_trigram',
+            'contact.name.trigram',
         ],
         'company_name': [
             'company.name',

@@ -60,7 +60,7 @@ class InvestmentProject(BaseESModel):
     allow_blank_possible_uk_regions = Boolean(index=False)
     anonymous_description = fields.EnglishText()
     archived = Boolean()
-    archived_by = fields.contact_or_adviser_field('archived_by')
+    archived_by = fields.contact_or_adviser_field()
     archived_on = Date()
     archived_reason = Text()
     associated_non_fdi_r_and_d_project = _related_investment_project_field()
@@ -68,18 +68,14 @@ class InvestmentProject(BaseESModel):
     business_activities = fields.id_name_field()
     client_cannot_provide_foreign_investment = Boolean()
     client_cannot_provide_total_investment = Boolean()
-    client_contacts = fields.contact_or_adviser_field('client_contacts')
-    client_relationship_manager = fields.contact_or_adviser_field(
-        'client_relationship_manager', include_dit_team=True,
-    )
+    client_contacts = fields.contact_or_adviser_field()
+    client_relationship_manager = fields.contact_or_adviser_field(include_dit_team=True)
     client_requirements = fields.TextWithKeyword()
     comments = fields.EnglishText()
     country_investment_originates_from = fields.id_name_field()
     country_lost_to = _country_lost_to_mapping()
     created_on = Date()
-    created_by = fields.contact_or_adviser_field(
-        'created_by', include_dit_team=True,
-    )
+    created_by = fields.contact_or_adviser_field(include_dit_team=True)
     date_abandoned = Date()
     date_lost = Date()
     delivery_partners = fields.id_name_field()
@@ -97,12 +93,8 @@ class InvestmentProject(BaseESModel):
     investor_type = fields.id_name_field()
     level_of_involvement = fields.id_name_field()
     likelihood_to_land = fields.id_name_field()
-    project_assurance_adviser = fields.contact_or_adviser_field(
-        'project_assurance_adviser', include_dit_team=True,
-    )
-    project_manager = fields.contact_or_adviser_field(
-        'project_manager', include_dit_team=True,
-    )
+    project_assurance_adviser = fields.contact_or_adviser_field(include_dit_team=True)
+    project_manager = fields.contact_or_adviser_field(include_dit_team=True)
     name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
@@ -135,7 +127,7 @@ class InvestmentProject(BaseESModel):
     specific_programme = fields.id_name_field()
     stage = fields.id_name_field()
     status = fields.NormalizedKeyword()
-    team_members = fields.contact_or_adviser_field('team_members', include_dit_team=True)
+    team_members = fields.contact_or_adviser_field(include_dit_team=True)
     total_investment = Double()
     uk_company = fields.id_name_partial_field()
     uk_company_decided = Boolean()
