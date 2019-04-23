@@ -1,15 +1,18 @@
+from functools import wraps
 from urllib.parse import urlencode
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.views.main import TO_FIELD_VAR
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import date as date_filter, time as time_filter
+from django.core.files.uploadhandler import FileUploadHandler, SkipFile
+from django.template.defaultfilters import date as date_filter, filesizeformat, time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 
 class DisabledOnFilter(admin.SimpleListFilter):
@@ -169,6 +172,71 @@ class RawIdWidget(forms.TextInput):
         url = reverse(change_route_name, args=(obj.pk,), current_app=self.admin_site.name)
 
         return str(obj), url
+
+
+class MaxSizeFileUploadHandler(FileUploadHandler):
+    """
+    File upload handler that stops uploads that exceed a certain size.
+
+    This aborts the process before the file has been loaded into memory or saved to disk.
+
+    It is useful for protection against large files being uploaded and filling up
+    temporary file storage space (when using the default upload handlers).
+
+    You will probably want to use the max_upload_size decorator rather than using
+    this class directly.
+    """
+
+    FILE_TOO_LARGE_MESSAGE = gettext_lazy(
+        'The file {file_name} was too large. Files must be less than {max_size}.',
+    )
+
+    def __init__(self, request, max_size):
+        """Initialises the handler with a request and maximum size."""
+        super().__init__(request)
+        self.max_size = max_size
+
+    def receive_data_chunk(self, raw_data, start):
+        """Checks if a chunk of data will take the upload over the limit."""
+        if start + len(raw_data) > self.max_size:
+            formatted_file_size = filesizeformat(self.max_size)
+            error_msg = self.FILE_TOO_LARGE_MESSAGE.format(
+                file_name=self.file_name,
+                max_size=formatted_file_size,
+            )
+            django_messages.error(self.request, error_msg)
+
+            raise SkipFile()
+        return raw_data
+
+    def file_complete(self, file_size):
+        """Does nothing, so that the next handler processes the upload."""
+
+
+def max_upload_size(max_size):
+    """
+    View decorator to enforce a maximum size on uploads.
+
+    Note: If you want to make a view exempt from CSRF protection, you must ensure that
+    the @csrf_exempt decorator is applied first. For example::
+
+        @max_upload_size(...)
+        @csrf_exempt
+        def view():
+            ...
+    """
+    def decorator(view_func):
+        @csrf_exempt
+        @wraps(view_func)
+        def wrapped_view(request, *args, **kwargs):
+            # Note: request.upload_handlers must be manipulated before CSRF-protection
+            # routines run
+            request.upload_handlers.insert(0, MaxSizeFileUploadHandler(request, max_size))
+            return csrf_protect(view_func)(request, *args, **kwargs)
+
+        return wrapped_view
+
+    return decorator
 
 
 def custom_view_permission(permission_codename):
