@@ -10,7 +10,7 @@ from rest_framework import status
 
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.admin_csv_import import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
+from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
 from datahub.interaction.models import Interaction, InteractionPermission
 
 

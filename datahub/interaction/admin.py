@@ -12,7 +12,7 @@ from datahub.core.admin import (
 )
 from datahub.core.utils import join_truthy_strings
 from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.interaction.admin_csv_import import (
+from datahub.interaction.admin_csv_import.views import (
     INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
     InteractionCSVImportAdmin,
 )
