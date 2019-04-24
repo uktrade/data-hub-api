@@ -24,6 +24,8 @@ class SearchContactAPIViewMixin:
     search_app = ContactSearchApp
     serializer_class = SearchContactQuerySerializer
     es_sort_by_remappings = {
+        'adviser.name': 'adviser.name.keyword',
+        'archived_by.name': 'archived_by.name.keyword',
         'first_name': 'first_name.keyword',
         'last_name': 'last_name.keyword',
         'name': 'name.keyword',
