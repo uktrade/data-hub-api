@@ -37,6 +37,8 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     gross_value_added_start = serializers.IntegerField(required=False, min_value=0)
     gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
 
+    # TODO: Deprecate unused sort by values, and add logging to double-check that they aren't
+    #  being used
     SORT_BY_FIELDS = (
         'actual_land_date',
         'approved_commitment_to_invest',
@@ -46,12 +48,12 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'approved_landed',
         'approved_non_fdi',
         'archived',
-        'archived_by.name.keyword',
+        'archived_by.name',
         'average_salary.name',
         'business_activities.name',
         'client_cannot_provide_total_investment',
-        'client_contacts.name.keyword',
-        'client_relationship_manager.name.keyword',
+        'client_contacts.name',
+        'client_relationship_manager.name',
         'created_on',
         'estimated_land_date',
         'export_revenue',
@@ -68,9 +70,9 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'new_tech_to_uk',
         'non_fdi_r_and_d_budget',
         'number_new_jobs',
-        'project_assurance_adviser.name.keyword',
+        'project_assurance_adviser.name',
         'project_code',
-        'project_manager.name.keyword',
+        'project_manager.name',
         'r_and_d_budget',
         'referral_source_activity.name',
         'referral_source_activity_event',
