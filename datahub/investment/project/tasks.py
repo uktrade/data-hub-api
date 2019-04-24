@@ -1,8 +1,14 @@
 from logging import getLogger
 
 from celery import shared_task
+from django.db.models import Q
 
-from datahub.investment.project.models import GVAMultiplier
+from datahub.core.constants import (
+    InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+    InvestmentType as InvestmentTypeConstant,
+)
+from datahub.investment.project.models import GVAMultiplier, InvestmentProject
+
 
 logger = getLogger(__name__)
 
@@ -38,3 +44,37 @@ def _update_investment_projects_for_gva_multiplier(gva_multiplier):
     investment_projects = gva_multiplier.investment_projects.all()
     for investment_project in investment_projects.iterator():
         investment_project.save(update_fields=['gross_value_added'])
+
+
+@shared_task(
+    queue='long-running',
+)
+def refresh_gross_value_added_value_for_fdi_investment_projects():
+    """
+    Loops over all investment projects that GVA
+    could be calculated for and saving the project.
+
+    Saving the project in turn calls the pre_save method
+    'update_gross_value_added_for_investment_project_pre_save'
+    which sets the Gross Value added data for a project.
+    """
+    investment_projects = get_investment_projects_to_refresh_gva_values()
+    for project in investment_projects.iterator():
+        project.save(update_fields=['gross_value_added', 'gva_multiplier'])
+
+
+def get_investment_projects_to_refresh_gva_values():
+    """Get investment projects. returns: All projects that GVA can be calculated for."""
+    return InvestmentProject.objects.filter(
+        investment_type_id=InvestmentTypeConstant.fdi.value.id,
+        foreign_equity_investment__isnull=False,
+    ).filter(
+        Q(
+            sector__isnull=False,
+        ) | Q(
+            business_activities__in=[
+                InvestmentBusinessActivityConstant.retail.value.id,
+                InvestmentBusinessActivityConstant.sales.value.id,
+            ],
+        ),
+    )
