@@ -1,3 +1,4 @@
+from datetime import date
 from enum import Enum
 from uuid import UUID
 
@@ -6,6 +7,7 @@ import pytest
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
+    get_financial_year,
     join_truthy_strings,
     load_constants_to_database,
     reverse_with_query_string,
@@ -97,3 +99,21 @@ def test_load_constants_to_database():
 def test_reverse_with_query_string(query_args, expected_url):
     """Test reverse_with_query_string() for various query arguments."""
     assert reverse_with_query_string('test-disableable-collection', query_args) == expected_url
+
+
+@pytest.mark.parametrize(
+    'date_obj,expected_financial_year',
+    (
+        (None, None),
+        (date(1980, 1, 1), 1979),
+        (date(2018, 1, 1), 2017),
+        (date(2019, 3, 1), 2018),
+        (date(2019, 8, 1), 2019),
+        (date(2025, 3, 1), 2024),
+        (date(2025, 4, 1), 2025),
+        (date(2025, 3, 31), 2024),
+    ),
+)
+def test_get_financial_year(date_obj, expected_financial_year):
+    """Test for get financial year"""
+    assert get_financial_year(date_obj) == expected_financial_year
