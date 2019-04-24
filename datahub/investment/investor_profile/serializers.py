@@ -123,6 +123,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     investor_type = NestedRelatedField(
         InvestorType,
         required=False,
+        allow_null=True,
     )
 
     required_checks_conducted = NestedRelatedField(
@@ -154,6 +155,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     minimum_return_rate = NestedRelatedField(
         ReturnRate,
         required=False,
+        allow_null=True,
     )
 
     time_horizons = NestedRelatedField(
@@ -177,6 +179,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
     minimum_equity_percentage = NestedRelatedField(
         EquityPercentage,
         required=False,
+        allow_null=True,
     )
 
     desired_deal_roles = NestedRelatedField(
