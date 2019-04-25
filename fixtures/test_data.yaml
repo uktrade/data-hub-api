@@ -504,6 +504,7 @@
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:
+    theme: other
     kind: interaction
     subject: Provided alpha service
     date: '2017-06-01T00:00:00Z'
@@ -532,6 +533,7 @@
 - model: interaction.interaction
   pk: 6015dbf3-d777-4947-a254-afd5f0d0499c
   fields:
+    theme: export
     kind: interaction
     subject: Discussed exports event
     date: '2017-06-03T00:00:00Z'
@@ -560,6 +562,7 @@
 - model: interaction.interaction
   pk: 2a162e87-06d5-423d-963e-1ecbe46c62af
   fields:
+    theme: export
     kind: service_delivery
     subject: Provided beta service
     date: '2017-06-05T00:00:00Z'
@@ -592,6 +595,7 @@
 - model: interaction.interaction
   pk: d07a8109-0b7a-4053-9970-82a81e2cda1d
   fields:
+    theme: export
     kind: interaction
     subject: Want to export to the USA
     date: '2018-04-06T00:00:00Z'
@@ -629,6 +633,7 @@
 - model: interaction.interaction
   pk: e8c3534f-4f60-4c93-9880-09c22e4fc011
   fields:
+    theme: export
     kind: service_delivery
     subject: Exported to Canada
     date: '2018-06-06T00:00:00Z'
@@ -666,6 +671,7 @@
 - model: interaction.interaction
   pk: ec4a46ef-6e50-4a5c-bba0-e311f0471312
   fields:
+    theme: export
     kind: service_delivery
     subject: Attended gamma event
     date: '2017-09-05T00:00:00Z'
@@ -699,6 +705,7 @@
 - model: interaction.interaction
   pk: aa350238-5d84-4bed-be68-b08dea7ea6d5
   fields:
+    theme: export
     kind: service_delivery
     subject: TAP grant
     date: '2017-09-15T00:00:00Z'
@@ -1360,6 +1367,7 @@
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
   fields:
+    theme: investment
     kind: interaction
     date: '2017-06-03T00:00:00Z'
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
@@ -1386,6 +1394,7 @@
 - model: interaction.interaction
   pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
   fields:
+    theme: investment
     kind: interaction
     date: '2017-06-05T00:00:00Z'
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
@@ -1412,6 +1421,7 @@
 - model: interaction.interaction
   pk: 6861510c-e287-4f81-a76b-e0a0427daaef
   fields:
+    theme: investment
     kind: interaction
     date: '2018-01-02T00:00:00Z'
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
@@ -1438,6 +1448,7 @@
 - model: interaction.interaction
   pk: b862665f-a1a9-4daf-9410-8b12ed9adf86
   fields:
+    theme: investment
     kind: interaction
     date: '2018-01-10T00:00:00Z'
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
@@ -1464,6 +1475,7 @@
 - model: interaction.interaction
   pk: 7283bd7c-7031-4257-9417-a500fec3b017
   fields:
+    theme: investment
     kind: interaction
     date: '2018-01-05T00:00:00Z'
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
@@ -1490,6 +1502,7 @@
 - model: interaction.interaction
   pk: 4e5c8f03-32b3-45cf-85b7-533033cd3d4c
   fields:
+    theme: investment
     kind: interaction
     date: '2018-01-02T00:00:00Z'
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba

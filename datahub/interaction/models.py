@@ -140,7 +140,20 @@ class Interaction(ArchivableModel, BaseModel):
         ('complete', 'Complete'),
     )
 
+    THEMES = Choices(
+        (None, 'Not set'),
+        ('export', 'Export'),
+        ('investment', 'Investment'),
+        ('other', 'Something else'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    theme = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=THEMES,
+        null=True,
+        blank=True,
+    )
     kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
     # TODO: Ensure that this is required (with default="complete")
     # once we have ensured that a default value "complete" is set on

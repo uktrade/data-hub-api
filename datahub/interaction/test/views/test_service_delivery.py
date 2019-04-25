@@ -41,6 +41,11 @@ class TestAddServiceDelivery(APITestMixin):
                 'is_event': True,
                 'event': EventFactory,
             },
+            # non-event service delivery with theme
+            {
+                'is_event': False,
+                'theme': Interaction.THEMES.export,
+            },
             # non-event service delivery with blank notes
             {
                 'is_event': False,
@@ -99,6 +104,7 @@ class TestAddServiceDelivery(APITestMixin):
             'id': response_data['id'],
             'kind': Interaction.KINDS.service_delivery,
             'status': request_data.get('status', Interaction.STATUSES.complete),
+            'theme': request_data.get('theme', None),
             'is_event': request_data['is_event'],
             'service_delivery_status': request_data.get('service_delivery_status'),
             'grant_amount_offered': request_data.get('grant_amount_offered'),
