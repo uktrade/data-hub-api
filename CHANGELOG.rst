@@ -1,3 +1,38 @@
+Data Hub API 11.10.0 (2019-04-25)
+=================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** The deprecated ``interaction_interaction.contact_id`` column was deleted from the database. Please use the ``interaction_interaction_contacts`` many-to-many table instead.
+
+Internal changes
+----------------
+
+- **Investment** The logic has been updated for selecting which financial year's data is used to calculate the GVA for an investment project.
+- The ``name.keyword`` and ``name.trigram`` sub-fields of the ``contact_or_adviser_field`` field type are now used in search queries. Hence, the ``name_trigram`` sub-field of ``contact_or_adviser_field`` has been removed, and the type of the ``name`` sub-field has been changed from ``keyword`` to ``text``.
+
+API
+---
+
+- **Interactions** ``GET /v3/interaction``, ``GET /v3/interaction/<id>``: A ``theme`` field was added to responses with possible values ``"export"``, ``"investment"``, ``"other"`` and ``null``.
+- **Interactions** ``POST /v3/interaction``, ``PATCH /v3/interaction/<id>``: An optional ``theme`` field was added to request bodies with possible values ``"export"``, ``"investment"``, ``"other"`` and ``null``.
+- **Investment** The endpoint ``/v4/large-investor-profile`` has been updated to
+  allow the following fields to be set to empty values.
+
+  - investor_type
+  - minimum_return_rate
+  - minimum_equity_percentage
+
+Database schema
+---------------
+
+- **Interactions** The deprecated ``interaction_interaction.contact_id`` column was deleted from the database. Please use the ``interaction_interaction_contacts`` many-to-many table instead.
+- **Interactions** A nullable ``theme varchar(255)`` column was added to the ``interaction_interaction`` table with possible values ``'export'``, ``'investment'``, ``'other'`` and NULL. This column is primarily for internal use.
+
+
 Data Hub API 11.9.0 (2019-04-23)
 ================================
 
