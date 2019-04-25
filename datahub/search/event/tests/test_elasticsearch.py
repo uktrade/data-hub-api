@@ -117,11 +117,7 @@ def test_mapping(setup_es):
                             'type': 'keyword',
                         },
                         'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'copy_to': [
-                                'organiser.name_trigram',
-                            ],
-                            'type': 'keyword',
+                            'type': 'text',
                             'fields': {
                                 'keyword': {
                                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -132,10 +128,6 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                        },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
                         },
                     },
                     'type': 'object',

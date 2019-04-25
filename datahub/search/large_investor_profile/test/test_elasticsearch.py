@@ -90,11 +90,7 @@ def test_mapping(setup_es):
                             'type': 'keyword',
                         },
                         'name': {
-                            'copy_to': [
-                                'created_by.name_trigram',
-                            ],
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
+                            'type': 'text',
                             'fields': {
                                 'keyword': {
                                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -105,10 +101,6 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                        },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
                         },
                     },
                     'type': 'object',

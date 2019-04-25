@@ -63,6 +63,7 @@ class CompanyInteractionFactory(InteractionFactoryBase):
     """Factory for creating an interaction relating to a company."""
 
     kind = Interaction.KINDS.interaction
+    theme = factory.Iterator(tuple(filter(None, Interaction.THEMES._db_values)))
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
     )
@@ -104,6 +105,7 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
     """Factory for creating an interaction relating to an investment project."""
 
     kind = Interaction.KINDS.interaction
+    theme = Interaction.THEMES.investment
     investment_project = factory.SubFactory(InvestmentProjectFactory)
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
@@ -132,6 +134,7 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
     """Event service delivery factory."""
 
     kind = Interaction.KINDS.service_delivery
+    theme = Interaction.THEMES.export
     event = factory.SubFactory(EventFactory)
 
 

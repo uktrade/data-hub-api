@@ -52,7 +52,7 @@ class Interaction(BaseESModel):
     created_on = Date()
     date = Date()
     # TODO: dit_adviser is deprecated. Remove after deprecation period.
-    dit_adviser = fields.contact_or_adviser_field('dit_adviser')
+    dit_adviser = fields.contact_or_adviser_field()
     dit_participants = Object(_DITParticipant)
     # TODO: dit_team is deprecated. Remove after deprecation period.
     dit_team = fields.id_name_partial_field()
