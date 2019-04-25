@@ -1,1 +1,0 @@
-A nullable ``theme varchar(255)`` column was added to the ``interaction_interaction`` table with possible values ``'export'``, ``'investment'``, ``'other'`` and NULL. This column is primarily for internal use.
