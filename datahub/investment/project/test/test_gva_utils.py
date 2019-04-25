@@ -1,13 +1,17 @@
+from datetime import date
 from decimal import Decimal
 from unittest import mock
 
 import pytest
+from freezegun import freeze_time
 
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
     Sector as SectorConstant,
 )
+from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
+from datahub.investment.project.gva_utils import GrossValueAddedCalculator
 from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
@@ -125,20 +129,58 @@ class TestGrossValueAddedCalculator:
         )
         assert project.gva_multiplier is None
 
-    def test_no_gva_multiplier_for_financial_year(self):
-        """Test when a GVA Multiplier is not present for a financial year."""
-        with mock.patch(
-            'datahub.investment.project.gva_utils.'
-            'GrossValueAddedCalculator._get_gva_multiplier_financial_year',
-        ) as mock_get_financial_year:
-            mock_get_financial_year.return_value = 1980
-            project = InvestmentProjectFactory(
-                sector_id=SectorConstant.renewable_energy_wind.value.id,
-                business_activities=[],
-                investment_type_id=InvestmentTypeConstant.fdi.value.id,
-                foreign_equity_investment=1000,
-            )
-        assert project.gva_multiplier is None
+    @freeze_time('2050-01-01 01:01:01')
+    def test_no_gva_multiplier_for_financial_year_returns_latest_year(self):
+        """
+        Test when a GVA Multiplier is not present for the financial year 2050.
+        """
+        GVAMultiplierFactory(
+            multiplier=Decimal('0.5'),
+            financial_year=2040,
+            fdi_sic_grouping_id=FDISICGroupingConstant.electric.value.id,
+        )
+        project = InvestmentProjectFactory(
+            sector_id=SectorConstant.renewable_energy_wind.value.id,
+            business_activities=[],
+            investment_type_id=InvestmentTypeConstant.fdi.value.id,
+            foreign_equity_investment=1000,
+        )
+        assert project.gva_multiplier.financial_year == 2040
+
+    def test_no_gva_multiplier_for_financial_year_logs_if_later_multiplier_available(
+        self,
+        caplog,
+    ):
+        """
+        Test when a GVA Multiplier is not present for the financial year 2050 but one is
+        present for 2052. Checks a log is added to the exception log to flag
+        that data is missing for that year.
+        """
+        caplog.set_level('WARNING')
+
+        GVAMultiplierFactory(
+            multiplier=Decimal('0.5'),
+            financial_year=2052,
+            fdi_sic_grouping_id=FDISICGroupingConstant.electric.value.id,
+        )
+        GVAMultiplierFactory(
+            multiplier=Decimal('0.5'),
+            financial_year=2049,
+            fdi_sic_grouping_id=FDISICGroupingConstant.electric.value.id,
+        )
+
+        project = InvestmentProjectFactory(
+            sector_id=SectorConstant.renewable_energy_wind.value.id,
+            business_activities=[],
+            investment_type_id=InvestmentTypeConstant.fdi.value.id,
+            foreign_equity_investment=1000,
+            actual_land_date=date(2050, 5, 1),
+        )
+        assert project.gva_multiplier.financial_year == 2052
+        assert caplog.messages[0] == (
+            'Unable to find a GVA Multiplier for financial year 2050'
+            f' fdi sic grouping id {FDISICGroupingConstant.electric.value.id}'
+        )
 
     @pytest.mark.parametrize(
         'foreign_equity_investment,multiplier_value,expected_gross_value_added',
@@ -186,3 +228,25 @@ class TestGrossValueAddedCalculator:
             assert not project.gross_value_added
         else:
             assert project.gross_value_added == Decimal(expected_gross_value_added)
+
+    @pytest.mark.parametrize(
+        'actual_land_date,expected_financial_year',
+        (
+            (None, 2029),
+            (date(1980, 1, 1), 2019),
+            (date(2018, 1, 1), 2019),
+            (date(2019, 3, 1), 2019),
+            (date(2019, 8, 1), 2019),
+            (date(2025, 3, 1), 2024),
+            (date(2025, 4, 1), 2025),
+            (date(2025, 3, 31), 2024),
+            (date(2035, 1, 1), 2034),
+            (date(2035, 4, 1), 2035),
+        ),
+    )
+    @freeze_time('2030-01-01 01:00:00')
+    def test_get_gva_multiplier_financial_year(self, actual_land_date, expected_financial_year):
+        """Test for getting the financial that should be used for a given investment project."""
+        investment_project = InvestmentProjectFactory(actual_land_date=actual_land_date)
+        gva = GrossValueAddedCalculator(investment_project=investment_project)
+        assert gva._get_gva_multiplier_financial_year() == expected_financial_year

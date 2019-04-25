@@ -32,7 +32,7 @@ class Event(BaseESModel):
         },
     )
     notes = fields.EnglishText()
-    organiser = fields.contact_or_adviser_field('organiser')
+    organiser = fields.contact_or_adviser_field()
     related_programmes = fields.id_name_partial_field()
     service = fields.id_name_field()
     start_date = Date()
@@ -60,7 +60,7 @@ class Event(BaseESModel):
         'address_country.name.trigram',
         'address_postcode_trigram',
         'uk_region.name.trigram',
-        'organiser.name_trigram',
+        'organiser.name.trigram',
         'teams.name',
         'teams.name.trigram',
         'related_programmes.name',

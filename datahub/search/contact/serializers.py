@@ -21,6 +21,8 @@ class SearchContactQuerySerializer(EntitySearchQuerySerializer):
     created_by = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_exists = serializers.BooleanField(required=False)
 
+    # TODO: Deprecate unused sort by values, and add logging to double-check that they aren't
+    #  being used
     SORT_BY_FIELDS = (
         'address_country.name',
         'address_county',

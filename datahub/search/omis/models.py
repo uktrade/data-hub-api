@@ -16,8 +16,8 @@ class Order(BaseESModel):
     reference_trigram = fields.TrigramText()
     status = fields.NormalizedKeyword()
     company = fields.company_field_with_copy_to_name_trigram('company')
-    contact = fields.contact_or_adviser_field('contact')
-    created_by = fields.contact_or_adviser_field('created_by', include_dit_team=True)
+    contact = fields.contact_or_adviser_field()
+    created_by = fields.contact_or_adviser_field(include_dit_team=True)
     created_on = Date()
     modified_on = Date()
     primary_market = fields.id_name_field()
@@ -31,8 +31,8 @@ class Order(BaseESModel):
     service_types = fields.id_name_field()
     contact_email = fields.NormalizedKeyword()
     contact_phone = Keyword()
-    subscribers = fields.contact_or_adviser_field('subscribers', include_dit_team=True)
-    assignees = fields.contact_or_adviser_field('assignees', include_dit_team=True)
+    subscribers = fields.contact_or_adviser_field(include_dit_team=True)
+    assignees = fields.contact_or_adviser_field(include_dit_team=True)
     po_number = Keyword(index=False)
     discount_value = Integer(index=False)
     vat_status = Keyword(index=False)
@@ -46,9 +46,9 @@ class Order(BaseESModel):
     total_cost = Integer(copy_to=['total_cost_string'])
     payment_due_date = Date()
     paid_on = Date()
-    completed_by = fields.contact_or_adviser_field('completed_by')
+    completed_by = fields.contact_or_adviser_field()
     completed_on = Date()
-    cancelled_by = fields.contact_or_adviser_field('cancelled_by')
+    cancelled_by = fields.contact_or_adviser_field()
     cancelled_on = Date()
     cancellation_reason = fields.id_name_field()
 
@@ -93,7 +93,7 @@ class Order(BaseESModel):
         'company.name',
         'company.name_trigram',
         'contact.name',
-        'contact.name_trigram',
+        'contact.name.trigram',
         'total_cost_string',
         'subtotal_cost_string',
     )

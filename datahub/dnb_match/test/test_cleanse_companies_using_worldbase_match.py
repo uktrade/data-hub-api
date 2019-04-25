@@ -310,7 +310,7 @@ def test_run(caplog, monkeypatch, simulate):
         'Company WB Corp - OK',
         (
             'Company Dean-Gordon - 00000000-0000-0000-0000-000000000002 '
-            'failed: KeyError(\'Business Name\')'
+            "failed: KeyError('Business Name')"
         ),
         'Company WB Corp 2 - OK',
         'Finished - succeeded: 2, failed: 1, archived: 1',

@@ -37,6 +37,8 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     gross_value_added_start = serializers.IntegerField(required=False, min_value=0)
     gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
 
+    # TODO: Deprecate unused sort by values, and add logging to double-check that they aren't
+    #  being used
     SORT_BY_FIELDS = (
         'actual_land_date',
         'approved_commitment_to_invest',

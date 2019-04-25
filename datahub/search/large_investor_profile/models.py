@@ -24,9 +24,7 @@ class LargeInvestorProfile(BaseESModel):
     investor_company = fields.company_field()
     country_of_origin = fields.country_field()
     asset_classes_of_interest = fields.id_unindexed_name_field()
-    created_by = fields.contact_or_adviser_field(
-        'created_by', include_dit_team=True,
-    )
+    created_by = fields.contact_or_adviser_field(include_dit_team=True)
 
     investor_type = fields.id_unindexed_name_field()
     global_assets_under_management = Long()

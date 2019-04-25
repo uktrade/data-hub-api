@@ -112,3 +112,12 @@ def get_front_end_url(obj):
     """Gets the URL for the object in the Data Hub internal front end."""
     url_prefix = settings.DATAHUB_FRONTEND_URL_PREFIXES[obj._meta.model_name]
     return f'{url_prefix}/{obj.pk}'
+
+
+def get_financial_year(date_obj):
+    """Gets the financial year for a given date."""
+    if not date_obj:
+        return None
+    if date_obj.month > 3:
+        return date_obj.year
+    return date_obj.year - 1
