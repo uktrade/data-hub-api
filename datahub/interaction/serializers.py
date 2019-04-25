@@ -9,7 +9,7 @@ from rest_framework.settings import api_settings
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import is_blank, is_not_blank
+from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
     AllIsBlankRule,
     AndRule,
@@ -138,6 +138,9 @@ class InteractionSerializer(serializers.ModelSerializer):
         'one_participant_field': ugettext_lazy(
             'If dit_participants is provided, dit_adviser and dit_team must be omitted.',
         ),
+        'cannot_unset_theme': ugettext_lazy(
+            "A theme can't be removed once set.",
+        ),
     }
 
     company = NestedRelatedField(Company)
@@ -202,6 +205,8 @@ class InteractionSerializer(serializers.ModelSerializer):
           - copies the first value in `contacts` to `contact`
           - copies the first value in `dit_participants` to `dit_adviser` and `dit_team`
         """
+        self._validate_theme(data)
+
         has_dit_adviser_or_dit_team = {'dit_adviser', 'dit_team'} & data.keys()
         has_dit_participants = 'dit_participants' in data
 
@@ -249,6 +254,17 @@ class InteractionSerializer(serializers.ModelSerializer):
         Overridden to handle updating of dit_participants.
         """
         return self._create_or_update(validated_data, instance=instance, is_update=True)
+
+    def _validate_theme(self, data):
+        """Make sure that a theme is not unset once it has been set for an interaction."""
+        combiner = DataCombiner(self.instance, data)
+        if self.instance and self.instance.theme and not combiner.get_value('theme'):
+            error = {
+                'theme': [
+                    self.error_messages['cannot_unset_theme'],
+                ],
+            }
+            raise serializers.ValidationError(error, code='cannot_unset_theme')
 
     def _create_or_update(self, validated_data, instance=None, is_update=False):
         dit_participants = validated_data.pop('dit_participants', None)
@@ -327,6 +343,10 @@ class InteractionSerializer(serializers.ModelSerializer):
             'net_company_receipt': {'min_value': 0},
             'status': {'default': Interaction.STATUSES.complete, 'allow_null': False},
             'location': {'default': ''},
+            'theme': {
+                'allow_blank': False,
+                'default': None,
+            },
         }
         fields = (
             'id',
@@ -351,6 +371,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'service',
             'service_delivery_status',
             'subject',
+            'theme',
             'notes',
             'archived_documents_url_path',
             'policy_areas',
