@@ -1,3 +1,4 @@
+import csv
 import io
 
 import pytest
@@ -8,6 +9,7 @@ from django.test import Client
 from django.urls import reverse
 from rest_framework import status
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
@@ -71,35 +73,42 @@ class TestInteractionAdminChangeList(AdminTestMixin):
 
 @pytest.mark.usefixtures('interaction_importer_feature_flag')
 @pytest.mark.parametrize(
-    'url',
+    'http_method,url',
     (
-        import_interactions_url,
+        ('get', import_interactions_url),
+        ('post', import_interactions_url),
     ),
 )
 class TestAccessRestrictions(AdminTestMixin):
     """Tests permissions and other access restrictions on import interaction-related views."""
 
-    def test_redirects_to_login_page_if_not_logged_in(self, url):
+    def test_redirects_to_login_page_if_not_logged_in(self, http_method, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
-        response = client.get(url, follow=True)
+        # Note: Client.generic() doesn't support follow=True
+        request_func = getattr(client, http_method)
+        response = request_func(url, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.redirect_chain == [
+            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
+        ]
 
-    def test_redirects_to_login_page_if_not_staff(self, url):
+    def test_redirects_to_login_page_if_not_staff(self, url, http_method):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
         client = self.create_client(user=user)
-        response = client.get(url, follow=True)
+        # Note: Client.generic() doesn't support follow=True
+        request_func = getattr(client, http_method)
+        response = request_func(url, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.redirect_chain == [
+            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
+        ]
 
-    def test_permission_denied_if_staff_and_without_change_permission(self, url):
+    def test_permission_denied_if_staff_and_without_change_permission(self, url, http_method):
         """
         Test that the view returns a 403 response if the staff user does not have the
         change interaction permission.
@@ -111,7 +120,7 @@ class TestAccessRestrictions(AdminTestMixin):
         )
 
         client = self.create_client(user=user)
-        response = client.get(url)
+        response = client.generic(http_method, url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -141,7 +150,7 @@ class Test404IfFeatureFlagDisabled(AdminTestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.usefixtures('interaction_importer_feature_flag')
+@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
 class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
 
@@ -157,8 +166,10 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
     def test_does_not_allow_file_without_correct_columns(self):
         """Test that the form rejects a CSV file that doesn't have the required columns."""
-        file = io.BytesIO(b'test\r\nrow')
-        file.name = 'test.csv'
+        file = _make_csv(
+            ('test',),
+            ('row',),
+        )
 
         response = self.client.post(
             import_interactions_url,
@@ -204,11 +215,11 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
     def test_redirects_on_valid_file(self):
         """Test that the user is redirected to the change list when a valid file is loaded."""
-        filename = 'filea.csv'
-        file = io.BytesIO("""kind,date,adviser_1,contact_email,service\r
-interaction,01/01/2018,John Dreary,person@company,Account Management
-""".encode(encoding='utf-8'))
-        file.name = filename
+        adviser = AdviserFactory()
+        file = _make_csv(
+            ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
+            ('interaction', '01/01/2018', adviser.name, 'person@company.uk', 'Account Management'),
+        )
 
         response = self.client.post(
             import_interactions_url,
@@ -219,5 +230,55 @@ interaction,01/01/2018,John Dreary,person@company,Account Management
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == interaction_change_list_url
+        assert response.redirect_chain == [
+            (interaction_change_list_url, status.HTTP_302_FOUND),
+        ]
+
+    @pytest.mark.parametrize(
+        'max_errors,should_be_truncated',
+        (
+            (5, True),
+            (10, False),
+        ),
+    )
+    def test_displays_errors_for_file_with_invalid_rows(
+        self,
+        max_errors,
+        should_be_truncated,
+        monkeypatch,
+    ):
+        """Test that errors are displayed for a file with invalid rows."""
+        monkeypatch.setattr(
+            'datahub.interaction.admin_csv_import.views.MAX_ERRORS_TO_DISPLAY',
+            max_errors,
+        )
+
+        # This file should have 10 errors
+        file = _make_csv(
+            ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
+            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
+            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
+        )
+
+        response = self.client.post(
+            import_interactions_url,
+            data={
+                'csv_file': file,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.context['errors']) == min(10, max_errors)
+        assert response.context['are_errors_truncated'] == should_be_truncated
+
+
+def _make_csv(*rows, encoding='utf-8', filename='test.csv'):
+    with io.StringIO() as text_stream:
+        writer = csv.writer(text_stream)
+        writer.writerows(rows)
+
+        data = text_stream.getvalue().encode(encoding)
+
+    stream = io.BytesIO(data)
+    stream.name = filename
+    return stream

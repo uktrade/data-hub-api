@@ -1,3 +1,4 @@
+from collections import Counter
 from collections.abc import Mapping
 from datetime import date
 
@@ -10,6 +11,7 @@ from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
+    CSVRowError,
     INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE,
     InteractionCSVRowForm,
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
@@ -543,6 +545,52 @@ class TestInteractionCSVRowForm:
             assert actual_email.lower() == input_email.lower()
         else:
             assert not contact
+
+    def test_get_flat_error_list_iterator(self):
+        """Test that get_flat_error_list_iterator() returns a flat list of errors."""
+        data = {
+            'kind': 'invalid',
+            'date': 'invalid',
+            'adviser_1': '',
+            'contact_email': '',
+            'service': '',
+        }
+
+        form = InteractionCSVRowForm(data=data, row_index=5)
+        form.is_valid()
+        expected_errors = [
+            CSVRowError(
+                5,
+                'kind',
+                'invalid',
+                'Select a valid choice. invalid is not one of the available choices.',
+            ),
+            CSVRowError(
+                5,
+                'date',
+                'invalid',
+                'Enter a valid date.',
+            ),
+            CSVRowError(
+                5,
+                'adviser_1',
+                '',
+                'This field is required.',
+            ),
+            CSVRowError(
+                5,
+                'contact_email',
+                '',
+                'This field is required.',
+            ),
+            CSVRowError(
+                5,
+                'service',
+                '',
+                'This field is required.',
+            ),
+        ]
+        assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
 
 
 def _random_communication_channel(disabled=False):

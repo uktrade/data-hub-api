@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
@@ -28,6 +30,15 @@ INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE = gettext_lazy(
 def _validate_not_disabled(obj):
     if obj.disabled_on:
         raise ValidationError(OBJECT_DISABLED_MESSAGE, code='object_is_disabled')
+
+
+class CSVRowError(NamedTuple):
+    """A flattened validation error."""
+
+    source_row: int
+    field: str
+    value: str
+    error: str
 
 
 class NoDuplicatesModelChoiceField(forms.ModelChoiceField):
@@ -100,6 +111,11 @@ class InteractionCSVRowForm(forms.Form):
     subject = forms.CharField(required=False)
     notes = forms.CharField(required=False)
 
+    def __init__(self, *args, row_index=None, **kwargs):
+        """Initialise the form with an optional zero-based row index."""
+        super().__init__(*args, **kwargs)
+        self.row_index = row_index
+
     @classmethod
     def get_required_field_names(cls):
         """Get the required base fields of this form."""
@@ -143,6 +159,14 @@ class InteractionCSVRowForm(forms.Form):
         )
 
         return data
+
+    def get_flat_error_list_iterator(self):
+        """Get a generator of CSVRowError instances representing validation errors."""
+        return (
+            CSVRowError(self.row_index, field, self.data.get(field, ''), error)
+            for field, errors in self.errors.items()
+            for error in errors
+        )
 
     def _populate_adviser(self, data, adviser_field, team_field):
         try:

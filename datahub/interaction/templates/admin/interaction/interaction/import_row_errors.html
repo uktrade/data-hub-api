@@ -1,0 +1,31 @@
+{% extends "admin/interaction/interaction/base_import.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+  <p>
+    The file selected could not be loaded due the following errors.
+    Edit the file and <a href="{% url 'admin:interaction_interaction_import' %}">then try again</a>.
+  </p>
+
+  {% if are_errors_truncated %}
+  <p>
+    Only the first {{ max_errors }} errors are displayed.
+  </p>
+  {% endif %}
+  <table>
+    <tr>
+      <th>Row</th>
+      <th>Field</th>
+      <th>Value</th>
+      <th>Error</th>
+    </tr>
+  {% for error in errors %}
+    <tr>
+      <td>{{ error.source_row|add:1 }}</td>
+      <td>{{ error.field }}</td>
+      <td>{{ error.value }}</td>
+      <td>{{ error.error }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}
