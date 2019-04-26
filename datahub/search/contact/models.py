@@ -26,7 +26,7 @@ class Contact(BaseESModel):
     archived_by = fields.contact_or_adviser_field()
     archived_on = Date()
     archived_reason = Text()
-    company = fields.company_field_with_copy_to_name_trigram('company')
+    company = fields.company_field()
     company_sector = fields.sector_field()
     company_uk_region = fields.id_name_field()
     created_by = fields.contact_or_adviser_field(include_dit_team=True)
@@ -84,7 +84,7 @@ class Contact(BaseESModel):
         'email',
         'email_alternative',
         'company.name',
-        'company.name_trigram',
+        'company.name.trigram',
     )
 
     class Meta:
