@@ -10,7 +10,7 @@ from rest_framework import status
 
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.admin_csv_import import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
+from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
 from datahub.interaction.models import Interaction, InteractionPermission
 
 
@@ -31,7 +31,8 @@ interaction_change_list_url = reverse(
 class TestInteractionAdminChangeList(AdminTestMixin):
     """Tests for the contact admin change list."""
 
-    def test_load_import_link_exists(self, interaction_importer_feature_flag):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_load_import_link_exists(self):
         """
         Test that there is a link to import interactions on the interaction change list page.
         """
@@ -71,7 +72,8 @@ class TestInteractionAdminChangeList(AdminTestMixin):
 class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
 
-    def test_redirects_to_login_page_if_not_logged_in(self, interaction_importer_feature_flag):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_redirects_to_login_page_if_not_logged_in(self):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
         response = client.get(import_interactions_url, follow=True)
@@ -82,7 +84,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             import_interactions_url,
         )
 
-    def test_redirects_to_login_page_if_not_staff(self, interaction_importer_feature_flag):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_redirects_to_login_page_if_not_staff(self):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
@@ -95,10 +98,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             import_interactions_url,
         )
 
-    def test_permission_denied_if_staff_and_without_change_permission(
-        self,
-        interaction_importer_feature_flag,
-    ):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_permission_denied_if_staff_and_without_change_permission(self):
         """
         Test that the view returns a 403 response if the staff user does not have the
         change interaction permission.
@@ -113,7 +114,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         response = client.get(import_interactions_url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_displays_page_if_with_correct_permissions(self, interaction_importer_feature_flag):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_displays_page_if_with_correct_permissions(self):
         """
         Test that the view returns displays the form if the feature flag is active
         and the user has the correct permissions.
@@ -123,10 +125,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert 'form' in response.context
 
-    def test_does_not_allow_file_without_correct_columns(
-        self,
-        interaction_importer_feature_flag,
-    ):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_does_not_allow_file_without_correct_columns(self):
         """Test that the form rejects a CSV file that doesn't have the required columns."""
         file = io.BytesIO(b'test\r\nrow')
         file.name = 'test.csv'
@@ -148,7 +148,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             'adviser_1, contact_email, date, kind, service.',
         ]
 
-    def test_rejects_large_files(self, interaction_importer_feature_flag):
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_rejects_large_files(self):
         """
         Test that large files are rejected.
 
@@ -173,11 +174,9 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             'The file test.csv was too large. Files must be less than 1.0 KB.'
         )
 
-    def test_redirects_on_valid_file(self, interaction_importer_feature_flag):
-        """
-        Test that accepts_dit_email_marketing is updated for the contacts specified in the CSV
-        file.
-        """
+    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+    def test_redirects_on_valid_file(self):
+        """Test that the user is redirected to the change list when a valid file is loaded."""
         filename = 'filea.csv'
         file = io.BytesIO("""kind,date,adviser_1,contact_email,service\r
 interaction,01/01/2018,John Dreary,person@company,Account Management

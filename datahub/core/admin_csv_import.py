@@ -1,5 +1,6 @@
 import csv
 import io
+from contextlib import contextmanager
 
 from chardet import UniversalDetector
 from django import forms
@@ -44,42 +45,66 @@ class BaseCSVImportForm(forms.Form):
                 break
 
         detection_result = encoding_detector.close()
-        encoding = detection_result['encoding']
+        self.cleaned_data['csv_file_encoding'] = detection_result['encoding']
 
         # Check that the file can actually be decoded using the detected encoding so that
         # we don't need to worry about encoding errors when reading the CSV
         file_field.seek(0)
-        self._validate_encoding(file_field, encoding)
+        self._validate_encoding()
 
         file_field.seek(0)
-        csv_reader = csv.DictReader(io.TextIOWrapper(file_field, encoding=encoding))
-
         # Check that the CSV file has the required column
-        self._validate_columns(csv_reader)
+        self._validate_columns()
 
-        return csv_reader
+        file_field.seek(0)
+        return file_field
 
-    @classmethod
-    def _validate_encoding(cls, file_field, encoding):
+    @contextmanager
+    def open_file_as_text_stream(self):
+        """
+        Opens the CSV file in the csv_file field as a text stream.
+
+        Must only be called if is_valid() has returned True.
+        """
+        encoding = self.cleaned_data['csv_file_encoding']
+        csv_file = self.cleaned_data['csv_file']
+        csv_file.seek(0)
+        stream = io.TextIOWrapper(csv_file, encoding=encoding)
+
+        yield stream
+
+        # Detach the file from TextIOWrapper; this stops it being automatically closed
+        stream.detach()
+
+    @contextmanager
+    def open_file_as_dict_reader(self):
+        """
+        Opens the CSV file in the csv_file field as a csv.DictReader.
+
+        Must only be called if is_valid() has returned True.
+        """
+        with self.open_file_as_text_stream() as stream:
+            yield csv.DictReader(stream)
+
+    def _validate_encoding(self):
         try:
-            stream = io.TextIOWrapper(file_field, encoding=encoding)
-            for _ in stream:
-                pass
-
-            # Detach the file from TextIOWrapper; this stops it being automatically closed
-            stream.detach()
+            # Read the entire file one line at a time to trigger any decoding errors.
+            with self.open_file_as_text_stream() as stream:
+                for _ in stream:
+                    pass
         except UnicodeError as exc:
             raise ValidationError(
-                cls.UNICODE_DECODE_ERROR_MESSAGE,
+                self.UNICODE_DECODE_ERROR_MESSAGE,
                 code='unicode-decode-error',
             ) from exc
 
-    @classmethod
-    def _validate_columns(cls, csv_reader):
-        missing_columns = sorted(cls.required_columns - set(csv_reader.fieldnames))
+    def _validate_columns(self):
+        with self.open_file_as_text_stream() as stream:
+            csv_reader = csv.DictReader(stream)
+            missing_columns = sorted(self.required_columns - set(csv_reader.fieldnames))
 
         if missing_columns:
-            msg = cls.MISSING_COLUMNS_MESSAGE.format(
+            msg = self.MISSING_COLUMNS_MESSAGE.format(
                 missing_columns=', '.join(missing_columns),
             )
 
