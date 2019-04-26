@@ -56,9 +56,8 @@ class Mailbox:
             else:
                 self.imap_port = 465
         self.use_ssl = use_ssl
-        self.processor_classes = []
-        for processor_class in mail_processor_classes:
-            self.processor_classes.append(processor_class)
+        # Make a copy of the processor class iterable
+        self.processor_classes = [processor_class for processor_class in mail_processor_classes]
 
     @contextmanager
     def _connect(self):

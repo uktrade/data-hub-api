@@ -24,9 +24,4 @@ class EmailProcessor(ABC):
 
             (False, "The email was not sent by a known DIT address")
         """
-        raise NotImplementedError(
-            (
-                'EmailProcessor subclass %s does not implement `process_email` '
-                'method'
-            ) % self.__class__.__name__,
-        )
+        pass
