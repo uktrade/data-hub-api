@@ -15,7 +15,7 @@ class Order(BaseESModel):
     reference = fields.NormalizedKeyword(copy_to=['reference_trigram'])
     reference_trigram = fields.TrigramText()
     status = fields.NormalizedKeyword()
-    company = fields.company_field_with_copy_to_name_trigram('company')
+    company = fields.company_field()
     contact = fields.contact_or_adviser_field()
     created_by = fields.contact_or_adviser_field(include_dit_team=True)
     created_on = Date()
@@ -91,7 +91,7 @@ class Order(BaseESModel):
         'id',
         'reference_trigram',
         'company.name',
-        'company.name_trigram',
+        'company.name.trigram',
         'contact.name',
         'contact.name.trigram',
         'total_cost_string',
