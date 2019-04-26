@@ -125,6 +125,19 @@ class Mailbox:
     def _parse_message(self, message_bytes):
         return mailparser.parse_from_bytes(message_bytes)
 
+    def _get_message(self, uid, server):
+        typ, msg_contents = server.uid('fetch', uid, '(RFC822)')
+        if not msg_contents:
+            return None
+        try:
+            message = self._parse_message(msg_contents[0][1])
+        except TypeError:
+            # This may happen if another thread/process deletes the
+            # message between our generating the ID list and our
+            # processing it here.
+            raise
+        return message
+
     def get_new_mail(self):
         """
         Generator method which gets new messages from the email inbox. After a
@@ -141,16 +154,9 @@ class Mailbox:
 
             for uid in message_ids:
                 try:
-                    typ, msg_contents = server.uid('fetch', uid, '(RFC822)')
-                    if not msg_contents:
+                    message = self._get_message(uid, server)
+                    if not message:
                         continue
-                    try:
-                        message = self._parse_message(msg_contents[0][1])
-                    except TypeError:
-                        # This may happen if another thread/process deletes the
-                        # message between our generating the ID list and our
-                        # processing it here.
-                        raise
                     yield message
                 except (MessageParseError, MailParserError):
                     # If we have some problem parsing the email, it's likely

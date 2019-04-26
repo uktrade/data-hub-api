@@ -1,5 +1,4 @@
 import copy
-from contextlib import contextmanager
 from email.errors import MessageParseError
 from unittest import mock
 
@@ -24,45 +23,53 @@ EXPECTED_EMAIL_MESSAGES = [
 ]
 
 
+def _get_mocked_imap(email_messages, mocked_imap_class):
+    mocked_imap = mocked_imap_class.return_value
+    email_ids = [message['uid'] for message in email_messages]
+    email_bodies = {
+        message['uid']: message['message_content'].encode('utf-8')
+        for message in email_messages
+    }
+    encoded_ids = ' '.join(email_ids).encode('utf-8')
+
+    # Set our mocked imap server's uid method to return certain values
+    # when called with certain signatures
+    def uid_side_effect(action, *args):
+        # A search call should return our email message ids
+        if action == 'search':
+            return (None, (encoded_ids,))
+        # Fetch calls should return the email message bodies in the expected
+        # format
+        if action == 'fetch':
+            # The expected format is pretty naff...
+            return (None, ((None, email_bodies[args[0]]),))
+    mocked_imap.uid.side_effect = uid_side_effect
+    return mocked_imap
+
+
+def patch_imap(email_messages):
+    """
+    Decorator to patch IMAP4_SSL which is used in the Mailbox
+    class. We can specify email details returned by our mocked instance by
+    providing sample email messages.
+
+    :param email_messages: iterable of email message dictionaries with keys
+        uid (the email uid) and message_content (a string of message payload)
+    """
+    def patch_imap_decorator(function):
+        def wrapper(self, *args, **kwargs):
+            with mock.patch('datahub.email_ingestion.mailbox.imaplib.IMAP4_SSL') as imap_class:
+                mocked_imap = _get_mocked_imap(email_messages, imap_class)
+                retval = function(self, mocked_imap, *args, **kwargs)
+                return retval
+        return wrapper
+    return patch_imap_decorator
+
+
 class TestMailbox:
     """
     Test the Mailbox class.
     """
-
-    @contextmanager
-    def patch_imap(self, email_messages):
-        """
-        Helper contextmanager to patch IMAP4_SSL which is used in the Mailbox
-        class. We can specify email details returned by our mocked instance by
-        providing sample email messages.
-
-        :param email_messages: iterable of email message dictionaries with keys
-            uid (the email uid) and message_content (a string of message payload)
-        :yields: A mock.Mock object which has been patched in place of the IMAP4_SSL
-            object in the datahub.email_ingestion.mailbox module
-        """
-        with mock.patch('datahub.email_ingestion.mailbox.imaplib.IMAP4_SSL') as mocked_imap_class:
-            mocked_imap = mocked_imap_class.return_value
-            email_ids = [message['uid'] for message in email_messages]
-            email_bodies = {
-                message['uid']: message['message_content'].encode('utf-8')
-                for message in email_messages
-            }
-            encoded_ids = ' '.join(email_ids).encode('utf-8')
-
-            # Set our mocked imap server's uid method to return certain values
-            # when called with certain signatures
-            def uid_side_effect(action, *args):
-                # A search call should return our email message ids
-                if action == 'search':
-                    return (None, (encoded_ids,))
-                # Fetch calls should return the email message bodies in the expected
-                # format
-                if action == 'fetch':
-                    # The expected format is pretty naff...
-                    return (None, ((None, email_bodies[args[0]]),))
-            mocked_imap.uid.side_effect = uid_side_effect
-            yield mocked_imap
 
     def mock_mailbox_parse_message(self, mailbox):
         """
@@ -75,118 +82,118 @@ class TestMailbox:
             return message.decode()
         mailbox._parse_message.side_effect = parse_message_side_effect
 
-    def test_get_new_mail(self):
+    @patch_imap(EXPECTED_EMAIL_MESSAGES)
+    def test_get_new_mail(self, mocked_imap):
         """
         Functional test for get_new_mail method. We must mock out a couple of
         external dependencies here; namely the IMAP gateway and message parsing
         code.
         """
         expected_email_messages = copy.deepcopy(EXPECTED_EMAIL_MESSAGES)
-        with self.patch_imap(expected_email_messages) as mocked_imap:
-            mailbox = Mailbox(
-                'foobar@example.net',
-                'foobarbaz1',
-                'domain.example.net',
-                mail_processor_classes=[],
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[],
+        )
+        # Ensure that we also mock the Mailbox._parse_message method - this should
+        # mean that the mailbox method gives us our messages in an expected format
+        self.mock_mailbox_parse_message(mailbox)
+
+        messages = list(mailbox.get_new_mail())
+        assert len(messages) == len(expected_email_messages)
+        # Go through all of the returned messages and ensure that the parsed
+        # message content is as expected
+        for count, message in enumerate(messages):
+            expected_email_message = expected_email_messages[count]
+            # Ensure that the messages our mailbox retrieves are those that we expect
+            assert message == expected_email_message['message_content']
+            # Ensure that a deletion call was made for each message retrieved
+            mocked_imap.uid.assert_any_call(
+                'store',
+                expected_email_message['uid'],
+                '+FLAGS',
+                '(\\Deleted)',
             )
-            # Ensure that we also mock the Mailbox._parse_message method - this should
-            # mean that the mailbox method gives us our messages in an expected format
-            self.mock_mailbox_parse_message(mailbox)
+        # Ensure that an expunge was called on the imap server - to clear the
+        # messages flagged for deletion
+        mocked_imap.expunge.assert_called_once()
+        # Ensure that the imap connection was cleaned up
+        mocked_imap.close.assert_called_once()
+        mocked_imap.logout.assert_called_once()
 
-            messages = list(mailbox.get_new_mail())
-            assert len(messages) == len(expected_email_messages)
-            # Go through all of the returned messages and ensure that the parsed
-            # message content is as expected
-            for count, message in enumerate(messages):
-                expected_email_message = expected_email_messages[count]
-                # Ensure that the messages our mailbox retrieves are those that we expect
-                assert message == expected_email_message['message_content']
-                # Ensure that a deletion call was made for each message retrieved
-                mocked_imap.uid.assert_any_call(
-                    'store',
-                    expected_email_message['uid'],
-                    '+FLAGS',
-                    '(\\Deleted)',
-                )
-            # Ensure that an expunge was called on the imap server - to clear the
-            # messages flagged for deletion
-            mocked_imap.expunge.assert_called_once()
-            # Ensure that the imap connection was cleaned up
-            mocked_imap.close.assert_called_once()
-            mocked_imap.logout.assert_called_once()
-
-    def test_get_new_mail_parsing_failure(self):
+    @patch_imap(EXPECTED_EMAIL_MESSAGES)
+    def test_get_new_mail_parsing_failure(self, mocked_imap):
         """
         Functional test to ensure that the get_new_mail method can handle a
         parsing failure as expected.
         """
         expected_email_messages = copy.deepcopy(EXPECTED_EMAIL_MESSAGES)
-        with self.patch_imap(expected_email_messages) as mocked_imap:
-            mailbox = Mailbox(
-                'foobar@example.net',
-                'foobarbaz1',
-                'domain.example.net',
-                mail_processor_classes=[],
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[],
+        )
+
+        # Mock the Mailbox._parse_message method - this allows us to simulate
+        # a problem when parsing a particular message
+        mailbox._parse_message = mock.Mock()
+
+        def parse_message_side_effect(message):
+            message_str = message.decode()
+            if message_str == 'abc2foobar':
+                raise MessageParseError()
+            return message_str
+        mailbox._parse_message.side_effect = parse_message_side_effect
+
+        messages = list(mailbox.get_new_mail())
+        # We expect that the messages returned will omit the problematic message
+        expected_email_messages.pop(1)
+        assert len(messages) == len(expected_email_messages)
+        # Go through all of the returned messages and ensure that the parsed
+        # message content is as expected
+        for count, message in enumerate(messages):
+            expected_email_message = expected_email_messages[count]
+            # Ensure that the messages our mailbox retrieves are those that we expect
+            assert message == expected_email_message['message_content']
+            # Ensure that a deletion call was made for each message retrieved
+            mocked_imap.uid.assert_any_call(
+                'store',
+                expected_email_message['uid'],
+                '+FLAGS',
+                '(\\Deleted)',
             )
+        # Ensure that an expunge was called on the imap server - to clear the
+        # messages flagged for deletion
+        mocked_imap.expunge.assert_called_once()
+        # Ensure that the imap connection was cleaned up
+        mocked_imap.close.assert_called_once()
+        mocked_imap.logout.assert_called_once()
 
-            # Mock the Mailbox._parse_message method - this allows us to simulate
-            # a problem when parsing a particular message
-            mailbox._parse_message = mock.Mock()
-
-            def parse_message_side_effect(message):
-                message_str = message.decode()
-                if message_str == 'abc2foobar':
-                    raise MessageParseError()
-                return message_str
-            mailbox._parse_message.side_effect = parse_message_side_effect
-
-            messages = list(mailbox.get_new_mail())
-            # We expect that the messages returned will omit the problematic message
-            expected_email_messages.pop(1)
-            assert len(messages) == len(expected_email_messages)
-            # Go through all of the returned messages and ensure that the parsed
-            # message content is as expected
-            for count, message in enumerate(messages):
-                expected_email_message = expected_email_messages[count]
-                # Ensure that the messages our mailbox retrieves are those that we expect
-                assert message == expected_email_message['message_content']
-                # Ensure that a deletion call was made for each message retrieved
-                mocked_imap.uid.assert_any_call(
-                    'store',
-                    expected_email_message['uid'],
-                    '+FLAGS',
-                    '(\\Deleted)',
-                )
-            # Ensure that an expunge was called on the imap server - to clear the
-            # messages flagged for deletion
-            mocked_imap.expunge.assert_called_once()
-            # Ensure that the imap connection was cleaned up
-            mocked_imap.close.assert_called_once()
-            mocked_imap.logout.assert_called_once()
-
-    def test_process_new_mail(self):
+    @patch_imap(EXPECTED_EMAIL_MESSAGES)
+    def test_process_new_mail(self, mocked_imap):
         """
         Functional test to ensure that a processor class has the opportunity to
         process messages as expected.
         """
         expected_email_messages = copy.deepcopy(EXPECTED_EMAIL_MESSAGES)
-        with self.patch_imap(expected_email_messages):
-            processor_class = mock.Mock(spec=EmailProcessor)
-            processor = processor_class.return_value
-            processor.process_email.return_value = (False, 'Bad email')
-            mailbox = Mailbox(
-                'foobar@example.net',
-                'foobarbaz1',
-                'domain.example.net',
-                mail_processor_classes=[processor_class],
-            )
-            # Ensure that we also mock the Mailbox._parse_message method - this should
-            # mean that the mailbox method gives us our messages in an expected format
-            self.mock_mailbox_parse_message(mailbox)
+        processor_class = mock.Mock(spec=EmailProcessor)
+        processor = processor_class.return_value
+        processor.process_email.return_value = (False, 'Bad email')
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[processor_class],
+        )
+        # Ensure that we also mock the Mailbox._parse_message method - this should
+        # mean that the mailbox method gives us our messages in an expected format
+        self.mock_mailbox_parse_message(mailbox)
 
-            mailbox.process_new_mail()
-            for message in expected_email_messages:
-                processor.process_email.assert_any_call(message['message_content'])
+        mailbox.process_new_mail()
+        for message in expected_email_messages:
+            processor.process_email.assert_any_call(message['message_content'])
 
     @pytest.mark.parametrize(
         'processor_count,processor_results,email_processed',
