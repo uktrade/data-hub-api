@@ -69,37 +69,37 @@ class TestInteractionAdminChangeList(AdminTestMixin):
         assert import_interactions_url not in response.rendered_content
 
 
-class TestImportInteractionsSelectFileView(AdminTestMixin):
-    """Tests for the import interaction select file form."""
+@pytest.mark.usefixtures('interaction_importer_feature_flag')
+@pytest.mark.parametrize(
+    'url',
+    (
+        import_interactions_url,
+    ),
+)
+class TestAccessRestrictions(AdminTestMixin):
+    """Tests permissions and other access restrictions on import interaction-related views."""
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
-    def test_redirects_to_login_page_if_not_logged_in(self):
+    def test_redirects_to_login_page_if_not_logged_in(self, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
-        response = client.get(import_interactions_url, follow=True)
+        response = client.get(url, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(
-            import_interactions_url,
-        )
+        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
-    def test_redirects_to_login_page_if_not_staff(self):
+    def test_redirects_to_login_page_if_not_staff(self, url):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
         client = self.create_client(user=user)
-        response = client.get(import_interactions_url, follow=True)
+        response = client.get(url, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(
-            import_interactions_url,
-        )
+        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
-    def test_permission_denied_if_staff_and_without_change_permission(self):
+    def test_permission_denied_if_staff_and_without_change_permission(self, url):
         """
         Test that the view returns a 403 response if the staff user does not have the
         change interaction permission.
@@ -111,10 +111,40 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
         client = self.create_client(user=user)
-        response = client.get(import_interactions_url)
+        response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
+
+@pytest.mark.parametrize(
+    'http_method,url',
+    (
+        ('get', import_interactions_url),
+        ('post', import_interactions_url),
+    ),
+)
+class Test404IfFeatureFlagDisabled(AdminTestMixin):
+    """
+    Tests that import interaction-related views return a 404 if the feature flag is not
+    active.
+
+    (The feature flag not being active is implicit by it not being created,)
+    """
+
+    def test_returns_404_if_feature_flag_inactive(self, http_method, url):
+        """Test that the a 404 is returned if the feature flag is inactive."""
+        response = self.client.generic(
+            http_method,
+            url,
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.usefixtures('interaction_importer_feature_flag')
+class TestImportInteractionsSelectFileView(AdminTestMixin):
+    """Tests for the import interaction select file form."""
+
     def test_displays_page_if_with_correct_permissions(self):
         """
         Test that the view returns displays the form if the feature flag is active
@@ -125,7 +155,6 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert 'form' in response.context
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
     def test_does_not_allow_file_without_correct_columns(self):
         """Test that the form rejects a CSV file that doesn't have the required columns."""
         file = io.BytesIO(b'test\r\nrow')
@@ -148,7 +177,6 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             'adviser_1, contact_email, date, kind, service.',
         ]
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
     def test_rejects_large_files(self):
         """
         Test that large files are rejected.
@@ -174,7 +202,6 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             'The file test.csv was too large. Files must be less than 1.0 KB.'
         )
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
     def test_redirects_on_valid_file(self):
         """Test that the user is redirected to the change list when a valid file is loaded."""
         filename = 'filea.csv'
@@ -194,14 +221,3 @@ interaction,01/01/2018,John Dreary,person@company,Account Management
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
         assert response.redirect_chain[0][0] == interaction_change_list_url
-
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
-    def test_returns_404_if_feature_flag_inactive(self, http_method):
-        """Test that the a 404 is returned if the feature flag is inactive."""
-        response = self.client.generic(
-            http_method,
-            import_interactions_url,
-            data={},
-        )
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
