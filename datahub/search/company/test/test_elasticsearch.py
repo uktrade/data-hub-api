@@ -381,7 +381,7 @@ def test_get_basic_search_query():
                                 'address_country.name.trigram',
                                 'address_postcode_trigram',
                                 'company.name',
-                                'company.name_trigram',
+                                'company.name.trigram',
                                 'company_number',
                                 'contact.name',
                                 'contact.name.trigram',

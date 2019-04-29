@@ -153,43 +153,6 @@ def address_field(index_country=True):
     )
 
 
-def company_field_with_copy_to_name_trigram(field):
-    """
-    Company field with copy to, deprecated in favour of company_field.
-
-    The `name` and `trading_names` fields is being migrated away from using `copy_to` to being a
-    multi-field. The sub-fields and `_trigram`-suffixed fields are both defined while the switch
-    takes place.
-
-    Additionally, the `name` field should have had a data type of text, but it was mistakenly made
-    a keyword field. Hence, a `keyword` sub-field has also been added so type of `name` can be
-    changed to text once sorting operations have been migrated to using the `keyword` sub-field.
-
-    TODO: replace usages of this with company_field once search logic has been updated to use
-     name.keyword, name.trigram and trading_names.trigram where necessary.
-    """
-    return Object(
-        properties={
-            'id': Keyword(),
-            'name': NormalizedKeyword(
-                copy_to=f'{field}.name_trigram',
-                fields={
-                    'trigram': TrigramText(),
-                    'keyword': NormalizedKeyword(),
-                },
-            ),
-            'name_trigram': TrigramText(),
-            'trading_names': Text(
-                copy_to=f'{field}.trading_names_trigram',
-                fields={
-                    'trigram': TrigramText(),
-                },
-            ),
-            'trading_names_trigram': TrigramText(),
-        },
-    )
-
-
 def ch_company_field():
     """Object field with id and company_number sub-fields."""
     return Object(properties={
