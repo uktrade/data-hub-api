@@ -61,9 +61,9 @@ class SearchOrderAPIViewMixin:
         ],
         'company_name': [
             'company.name',
-            'company.name_trigram',
+            'company.name.trigram',
             'company.trading_names',  # to find 2-letter words
-            'company.trading_names_trigram',
+            'company.trading_names.trigram',
         ],
         'sector_descends': [
             'sector.id',

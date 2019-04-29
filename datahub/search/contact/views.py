@@ -26,6 +26,7 @@ class SearchContactAPIViewMixin:
     es_sort_by_remappings = {
         'adviser.name': 'adviser.name.keyword',
         'archived_by.name': 'archived_by.name.keyword',
+        'company.name': 'company.name.keyword',
         'first_name': 'first_name.keyword',
         'last_name': 'last_name.keyword',
         'name': 'name.keyword',
@@ -59,9 +60,9 @@ class SearchContactAPIViewMixin:
         ],
         'company_name': [
             'company.name',
-            'company.name_trigram',
+            'company.name.trigram',
             'company.trading_names',  # to find 2-letter words
-            'company.trading_names_trigram',
+            'company.trading_names.trigram',
         ],
         'company_sector_descends': [
             'company_sector.id',
