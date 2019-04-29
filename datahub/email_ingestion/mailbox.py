@@ -114,9 +114,17 @@ class Mailbox:
         """
         for processor_class in self.processor_classes:
             processor = processor_class()
-            processed, message = processor.process_email(message)
+            processor_name = processor_class.__name__
+            try:
+                processed, message = processor.process_email(message)
+            except Exception as e:
+                message = (
+                    f'Error "{e.__class__.__name__}" processing email "{message}" '
+                    f'which was processed by processor "{processor_name}"'
+                )
+                logger.error(message)
+                raise e
             if processed:
-                processor_name = processor_class.__name__
                 message = f'Email {message} was processed by processor: {processor_name}'
                 logger.info(message)
                 return True

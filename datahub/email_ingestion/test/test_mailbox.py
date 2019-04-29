@@ -179,6 +179,7 @@ class TestMailbox:
         """
         expected_email_messages = copy.deepcopy(EXPECTED_EMAIL_MESSAGES)
         processor_class = mock.Mock(spec=EmailProcessor)
+        processor_class.__name__ = ''
         processor = processor_class.return_value
         processor.process_email.return_value = (False, 'Bad email')
         mailbox = Mailbox(
@@ -263,3 +264,38 @@ class TestMailbox:
                 assert processor.process_email.called_with(message)
             except IndexError:
                 assert not processor.process_email.called
+
+    def test_process_email_processing_error(self, caplog):
+        """
+        Test that _process_email can handle processing errors from a bad email
+        processor class.
+        """
+        processor_classes = []
+        for i in range(2):
+            mocked_processor_class = mock.Mock(spec=EmailProcessor)
+            mocked_processor_class.__name__ = f'Processor {i}'
+            mocked_processor = mocked_processor_class.return_value
+            mocked_processor.process_email.return_value = (False, 'Bad email')
+            processor_classes.append(mocked_processor_class)
+        bad_processor = processor_classes[0].return_value
+
+        def processing_error(*args, **kwargs):
+            raise TypeError('Ooops!')
+        bad_processor.process_email.side_effect = processing_error
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=processor_classes,
+        )
+        message = mock.Mock()
+        message.__repr__ = lambda self: 'My message'
+        with pytest.raises(TypeError):
+            mailbox._process_email(message)
+        expected_message = (
+            'datahub.email_ingestion.mailbox',
+            40,
+            'Error "TypeError" processing email "My message" which was processed by '
+            'processor "Processor 0"',
+        )
+        assert expected_message in caplog.record_tuples
