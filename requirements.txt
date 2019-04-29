@@ -62,7 +62,7 @@ idna==2.8                 # via requests
 incremental==17.5.0       # via towncrier
 ipdb==0.12
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.4.0
+ipython==7.5.0
 jedi==0.13.3              # via ipython
 jinja2==2.10.1            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
