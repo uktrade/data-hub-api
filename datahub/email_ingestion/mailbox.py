@@ -25,7 +25,7 @@ class Mailbox:
     them using associated processing classes.
 
     When an email is retrieved from the inbox successfully, it is marked as
-    deleted on the upstream IMAP inbox.  This is the mechanism we use to ensure
+    SEEN on the upstream IMAP inbox.  This is the mechanism we use to ensure
     that emails are only ever processed once.
 
     The first processor to successfully consume and process the message will stop
@@ -99,7 +99,7 @@ class Mailbox:
         :returns: A list of message id strings.
         """
         # Fetch all the message uids
-        response, message_ids = connection.uid('search', None, 'ALL')
+        response, message_ids = connection.uid('search', None, '(UNSEEN)')
         message_id_string = message_ids[0].strip()
         # Usually `message_id_string` will be a list of space-separated
         # ids; we must make sure that it isn't an empty string before
@@ -150,7 +150,7 @@ class Mailbox:
         try:
             typ, msg_contents = connection.uid('fetch', uid, '(RFC822)')
         except TypeError:
-            # This may happen if another thread/process deletes the
+            # This may happen if something deletes the
             # message between our generating the ID list and our
             # processing it here.
             raise EmailRetrievalError()
@@ -162,8 +162,9 @@ class Mailbox:
     def get_new_mail(self):
         """
         Generator method which gets new messages from the email inbox. After a
-        message has been yielded, it is flagged as deleted on the inbox so that
-        it will not be ingested again later.
+        message has been yielded, it is flagged as SEEN on the inbox so that
+        it will not be ingested again later - we only consider messages that
+        have not been seen for ingestion.
 
         :yields: A mailparser.Message object for each parsed message.
         """
@@ -197,10 +198,8 @@ class Mailbox:
                     continue
                 yield message
 
-                # Mark the email for deletion in the inbox
-                connection.uid('store', uid, '+FLAGS', '(\\Deleted)')
-            # Carry out deletion for the emails marked for deletion
-            connection.expunge()
+                # Mark the email as read in the inbox
+                connection.uid('store', uid, '+FLAGS', '(\\SEEN)')
 
     def process_new_mail(self):
         """

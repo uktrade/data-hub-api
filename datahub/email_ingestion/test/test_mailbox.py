@@ -108,16 +108,13 @@ class TestMailbox:
             expected_email_message = expected_email_messages[count]
             # Ensure that the messages our mailbox retrieves are those that we expect
             assert message == expected_email_message['message_content']
-            # Ensure that a deletion call was made for each message retrieved
+            # Ensure that a call was made to mark each message retrieved as SEEN
             mocked_imap.uid.assert_any_call(
                 'store',
                 expected_email_message['uid'],
                 '+FLAGS',
-                '(\\Deleted)',
+                '(\\SEEN)',
             )
-        # Ensure that an expunge was called on the imap server - to clear the
-        # messages flagged for deletion
-        mocked_imap.expunge.assert_called_once()
         # Ensure that the imap connection was cleaned up
         mocked_imap.close.assert_called_once()
         mocked_imap.logout.assert_called_once()
@@ -157,16 +154,13 @@ class TestMailbox:
             expected_email_message = expected_email_messages[count]
             # Ensure that the messages our mailbox retrieves are those that we expect
             assert message == expected_email_message['message_content']
-            # Ensure that a deletion call was made for each message retrieved
+            # Ensure that a call was made to mark each message retrieved as SEEN
             mocked_imap.uid.assert_any_call(
                 'store',
                 expected_email_message['uid'],
                 '+FLAGS',
-                '(\\Deleted)',
+                '(\\SEEN)',
             )
-        # Ensure that an expunge was called on the imap server - to clear the
-        # messages flagged for deletion
-        mocked_imap.expunge.assert_called_once()
         # Ensure that the imap connection was cleaned up
         mocked_imap.close.assert_called_once()
         mocked_imap.logout.assert_called_once()
