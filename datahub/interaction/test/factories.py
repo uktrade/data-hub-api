@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import factory
 from django.utils.timezone import utc
 
@@ -14,6 +16,16 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+
+
+class CommunicationChannelFactory(factory.django.DjangoModelFactory):
+    """CommunicationChannel factory."""
+
+    id = factory.LazyFunction(uuid4)
+    name = factory.Faker('word')
+
+    class Meta:
+        model = 'interaction.CommunicationChannel'
 
 
 class InteractionFactoryBase(factory.django.DjangoModelFactory):

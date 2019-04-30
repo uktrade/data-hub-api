@@ -32,11 +32,17 @@ class LoadEmailMarketingOptOutsForm(BaseCSVImportForm):
         reversion.set_user(user)
         reversion.set_comment('Loaded bulk email opt-out list.')
 
+        with self.open_file_as_dict_reader() as dict_reader:
+            return self._save(dict_reader, user)
+
+    save.alters_data = True
+
+    def _save(self, dict_reader, user):
         num_contacts_matched = 0
         num_contacts_updated = 0
         num_non_matching_email_addresses = 0
 
-        for row in self.cleaned_data['csv_file']:
+        for row in dict_reader:
             email = row['email'].strip()
 
             if not email:
@@ -62,8 +68,6 @@ class LoadEmailMarketingOptOutsForm(BaseCSVImportForm):
             num_contacts_updated,
             num_non_matching_email_addresses,
         )
-
-    save.alters_data = True
 
 
 class _ProcessOptOutResult(NamedTuple):

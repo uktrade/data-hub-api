@@ -18,6 +18,9 @@ class SearchInteractionAPIViewMixin:
     required_scopes = (Scope.internal_front_end,)
     search_app = InteractionSearchApp
     serializer_class = SearchInteractionQuerySerializer
+    es_sort_by_remappings = {
+        'company.name': 'company.name.keyword',
+    }
 
     FILTER_FIELDS = (
         'kind',
@@ -56,9 +59,9 @@ class SearchInteractionAPIViewMixin:
     COMPOSITE_FILTERS = {
         'company_name': [
             'company.name',
-            'company.name_trigram',
+            'company.name.trigram',
             'company.trading_names',  # to find 2-letter words
-            'company.trading_names_trigram',
+            'company.trading_names.trigram',
         ],
         'dit_adviser_name': [
             'dit_adviser.name',
