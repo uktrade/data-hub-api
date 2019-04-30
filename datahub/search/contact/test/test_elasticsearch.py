@@ -103,9 +103,7 @@ def test_mapping(setup_es):
                     'properties': {
                         'id': {'type': 'keyword'},
                         'name': {
-                            'copy_to': ['company.name_trigram'],
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
+                            'type': 'text',
                             'fields': {
                                 'keyword': {
                                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -117,12 +115,7 @@ def test_mapping(setup_es):
                                 },
                             },
                         },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
-                        },
                         'trading_names': {
-                            'copy_to': ['company.trading_names_trigram'],
                             'type': 'text',
                             'fields': {
                                 'trigram': {
@@ -130,10 +123,6 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                        },
-                        'trading_names_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
                         },
                     },
                     'type': 'object',
@@ -291,7 +280,7 @@ def test_get_basic_search_query():
                                 'address_country.name.trigram',
                                 'address_postcode_trigram',
                                 'company.name',
-                                'company.name_trigram',
+                                'company.name.trigram',
                                 'company_number',
                                 'contact.name',
                                 'contact.name.trigram',
@@ -411,7 +400,7 @@ def test_get_limited_search_by_entity_query():
                                             'email',
                                             'email_alternative',
                                             'company.name',
-                                            'company.name_trigram',
+                                            'company.name.trigram',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',

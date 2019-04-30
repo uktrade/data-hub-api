@@ -157,9 +157,7 @@ def test_mapping(setup_es):
                             'type': 'keyword',
                         },
                         'name': {
-                            'copy_to': ['company.name_trigram'],
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
+                            'type': 'text',
                             'fields': {
                                 'keyword': {
                                     'normalizer': 'lowercase_asciifolding_normalizer',
@@ -171,12 +169,7 @@ def test_mapping(setup_es):
                                 },
                             },
                         },
-                        'name_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
-                        },
                         'trading_names': {
-                            'copy_to': ['company.trading_names_trigram'],
                             'type': 'text',
                             'fields': {
                                 'trigram': {
@@ -184,10 +177,6 @@ def test_mapping(setup_es):
                                     'type': 'text',
                                 },
                             },
-                        },
-                        'trading_names_trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
                         },
                     },
                     'type': 'object',

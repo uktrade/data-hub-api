@@ -45,7 +45,7 @@ class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    company = fields.company_field_with_copy_to_name_trigram('company')
+    company = fields.company_field()
     company_sector = fields.sector_field()
     communication_channel = fields.id_name_field()
     contacts = _contact_field()
@@ -101,7 +101,7 @@ class Interaction(BaseESModel):
     SEARCH_FIELDS = (
         'id',
         'company.name',
-        'company.name_trigram',
+        'company.name.trigram',
         'contacts.name',  # to find 2-letter words
         'contacts.name.trigram',
         'event.name',
