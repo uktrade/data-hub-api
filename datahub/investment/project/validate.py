@@ -70,7 +70,7 @@ class InvestmentProjectStageValidationConfig:
             'address_postcode': Stage.verify_win.value,
             'actual_uk_regions': Stage.verify_win.value,
             'delivery_partners': Stage.verify_win.value,
-            'actual_land_date': Stage.won.value,
+            'actual_land_date': Stage.verify_win.value,
         }
 
     def get_conditional_rules_after_stage(self):
