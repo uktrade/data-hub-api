@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField
@@ -12,9 +12,9 @@ class EventSerializer(serializers.ModelSerializer):
     """Event serialiser."""
 
     default_error_messages = {
-        'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
-        'end_date_before_start_date': ugettext_lazy('End date cannot be before start date.'),
-        'uk_region_non_uk_country': ugettext_lazy(
+        'lead_team_not_in_teams': gettext_lazy('Lead team must be in teams array.'),
+        'end_date_before_start_date': gettext_lazy('End date cannot be before start date.'),
+        'uk_region_non_uk_country': gettext_lazy(
             'Cannot specify a UK region for a non-UK country.',
         ),
     }
