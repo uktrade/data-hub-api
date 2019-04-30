@@ -5,7 +5,7 @@ from functools import partial
 import reversion
 from django.db.transaction import atomic
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
@@ -275,11 +275,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     """Serialiser for investment project endpoints."""
 
     default_error_messages = {
-        'only_pm_or_paa_can_move_to_verify_win': ugettext_lazy(
+        'only_pm_or_paa_can_move_to_verify_win': gettext_lazy(
             'Only the Project Manager or Project Assurance Adviser can move the project'
             ' to the ‘Verify win’ stage.',
         ),
-        'only_ivt_can_move_to_won': ugettext_lazy(
+        'only_ivt_can_move_to_won': gettext_lazy(
             'Only the Investment Verification Team can move the project to the ‘Won’ stage.',
         ),
     }
@@ -529,7 +529,7 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
     """Team member list serialiser that adds validation for duplicates."""
 
     default_error_messages = {
-        'duplicate_adviser': ugettext_lazy(
+        'duplicate_adviser': gettext_lazy(
             'You cannot add the same adviser as a team member more than once.',
         ),
     }
