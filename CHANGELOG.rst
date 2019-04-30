@@ -1,3 +1,48 @@
+Data Hub API 11.11.0 (2019-04-30)
+=================================
+
+Deprecations and removals
+-------------------------
+
+- **Companies** On the 4th of May 2019, all data in the ``company_company`` registered address fields will be replaced by the official data from the Companies House record identified by the ``company_company.company_number`` field.
+  In cases where ``company_company.company_number`` is invalid or blank (e.g. for non-UK companies), the registered address fields will be made blank and the related data lost.
+  List of registered address fields:
+
+  - ``registered_address_1``
+  - ``registered_address_2``
+  - ``registered_address_town``
+  - ``registered_address_county``
+  - ``registered_address_postcode``
+  - ``registered_address_country_id``
+
+
+Internal changes
+----------------
+
+- **Companies** The field ``company.Company.registered_address_country`` was made blankable so that it becomes optional in the Django admin.
+- The ``company_field_with_copy_to_name_trigram`` search field type was removed and uses of it replaced with ``company_field``. The ``name.keyword``, ``name.trigram`` and ``trading_names.trigram`` sub-fields are now used in search queries. This change also means that the type of the ``name`` sub-field has been corrected from ``keyword`` to ``text``.
+- Python was updated from version 3.7.2 to 3.7.3 in deployed environments.
+
+Database schema
+---------------
+
+- **Companies** The following columns were made ``NOT NULL`` - optional values will be represented by empty strings:
+
+  - ``company_company.registered_address_2``
+  - ``company_company.registered_address_county``
+  - ``company_company.registered_address_postcode``
+  - ``company_company.address_1``
+  - ``company_company.address_2``
+  - ``company_company.address_town``
+  - ``company_company.address_county``
+  - ``company_company.address_postcode``
+  - ``company_company.trading_address_1``
+  - ``company_company.trading_address_2``
+  - ``company_company.trading_address_town``
+  - ``company_company.trading_address_county``
+  - ``company_company.trading_address_postcode``
+
+
 Data Hub API 11.10.0 (2019-04-25)
 =================================
 
@@ -49,7 +94,7 @@ API
 - **Companies** ``POST /v3/company`` and ``PATCH /v3/company/<uuid:pk>``: None values for address CharFields are now internally converted to empty strings as Django recommends: https://docs.djangoproject.com/en/2.1/ref/models/fields/#null
 - **Interactions** ``GET /v3/interaction`` and ``GET /v3/interaction/<uid>``: The following fields were added:
 
-  * ``archived`` - boolean - whether the interaction has been archived or not, 
+  * ``archived`` - boolean - whether the interaction has been archived or not,
     defaults to ``False``
   * ``archived_on`` - datetime string, nullable - the datetime at which the interaction
     was archived
@@ -69,14 +114,14 @@ API
 Database schema
 ---------------
 
-- **Interactions** Four supporting fields were added to ``interaction_interaction`` for the 
+- **Interactions** Four supporting fields were added to ``interaction_interaction`` for the
   purpose of allowing interactions to be archived:
 
   * ``archived`` (boolean, nullable)
-  * ``archived_on`` (datetime string, nullable) 
+  * ``archived_on`` (datetime string, nullable)
   * ``archived_by_id`` (uuid, nullable) - foreign key to ``company_adviser``
   * ``archived_reason`` (string, nullable)
-- **Interactions** A supporting field was added to ``interaction_interaction`` for the 
+- **Interactions** A supporting field was added to ``interaction_interaction`` for the
   purpose of logging the external source of an interaction:
 
   * ``source`` (JSONB, nullable)
@@ -104,7 +149,7 @@ API
 
 - **Interactions** ``GET /v3/interaction`` and ``GET /v3/interaction/<uid>``: The following fields were added:
 
-  * ``status`` - string - one of ``'draft'`` or ``'complete'``, defaults to 
+  * ``status`` - string - one of ``'draft'`` or ``'complete'``, defaults to
     ``'complete'``
   * ``location`` - string - free text representing the location of a meeting,
     defaults to ``''``
@@ -145,7 +190,7 @@ API
 Database schema
 ---------------
 
-- **Interactions** Two supporting fields were added to ``interaction_interaction`` for the 
+- **Interactions** Two supporting fields were added to ``interaction_interaction`` for the
   purpose of recording meetings:
 
   * ``status`` (text, nullable) - one of ``"draft"`` or ``"complete"``

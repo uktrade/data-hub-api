@@ -1,1 +1,0 @@
-The ``company_field_with_copy_to_name_trigram`` search field type was removed and uses of it replaced with ``company_field``. The ``name.keyword``, ``name.trigram`` and ``trading_names.trigram`` sub-fields are now used in search queries. This change also means that the type of the ``name`` sub-field has been corrected from ``keyword`` to ``text``.
