@@ -8,6 +8,7 @@ from decimal import Decimal
 from operator import attrgetter
 from unittest import mock
 
+import factory
 import pytest
 import reversion
 from django.utils.timezone import now, utc
@@ -1431,6 +1432,7 @@ class TestPartialUpdateView(APITestMixin):
             'average_salary': ['This field is required.'],
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
+            'actual_land_date': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1465,6 +1467,7 @@ class TestPartialUpdateView(APITestMixin):
             address_postcode='SW1A 2AA',
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
+            actual_land_date=factory.Faker('past_date'),
             **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
