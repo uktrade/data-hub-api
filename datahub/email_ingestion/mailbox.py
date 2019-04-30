@@ -9,6 +9,15 @@ from mailparser.exceptions import MailParserError
 logger = getLogger(__name__)
 
 
+class EmailRetrievalError(Exception):
+    """
+    Custom exception for when an email was not successfully retrieved from the
+    IMAP server.
+    """
+
+    pass
+
+
 class Mailbox:
     """
     The Mailbox class acts as a gateway to an email inbox - accessed via IMAP.
@@ -67,29 +76,30 @@ class Mailbox:
 
         :yields: An active imaplib server connection object.
         """
-        transport = imaplib.IMAP4_SSL
-        if not self.use_ssl:
+        if self.use_ssl:
+            transport = imaplib.IMAP4_SSL
+        else:
             transport = imaplib.IMAP4
-        server = transport(self.imap_domain, self.imap_port)
-        server.login(self.email, self.password)
-        server.select()
+        connection = transport(self.imap_domain, self.imap_port)
+        connection.login(self.email, self.password)
+        connection.select()
         try:
-            yield server
+            yield connection
         finally:
-            server.close()
-            server.logout()
+            connection.close()
+            connection.logout()
 
-    def _get_all_message_ids(self, server):
+    def _get_all_message_ids(self, connection):
         """
         Fetch all of the message ids that are present in the inbox.
 
-        :param server: imaplib connection object - the active connection to
+        :param connection: imaplib connection object - the active connection to
             use to retrieve message ids from
 
         :returns: A list of message id strings.
         """
         # Fetch all the message uids
-        response, message_ids = server.uid('search', None, 'ALL')
+        response, message_ids = connection.uid('search', None, 'ALL')
         message_id_string = message_ids[0].strip()
         # Usually `message_id_string` will be a list of space-separated
         # ids; we must make sure that it isn't an empty string before
@@ -116,34 +126,37 @@ class Mailbox:
             processor = processor_class()
             processor_name = processor_class.__name__
             try:
-                processed, message = processor.process_email(message)
+                processed, processing_output = processor.process_email(message)
             except Exception as e:
-                message = (
-                    f'Error "{e.__class__.__name__}" processing email "{message}" '
+                error_message = (
+                    f'Error "{e.__class__.__name__}" processing email "{message.message_id}" '
                     f'which was processed by processor "{processor_name}"'
                 )
-                logger.error(message)
+                logger.error(error_message)
                 raise e
             if processed:
-                message = f'Email {message} was processed by processor: {processor_name}'
-                logger.info(message)
+                success_message = (
+                    f'Email {message.message_id} was processed by processor: '
+                    f'{processor_name}'
+                )
+                logger.info(success_message)
                 return True
         return False
 
     def _parse_message(self, message_bytes):
         return mailparser.parse_from_bytes(message_bytes)
 
-    def _get_message(self, uid, server):
-        typ, msg_contents = server.uid('fetch', uid, '(RFC822)')
-        if not msg_contents:
-            return None
+    def _get_message(self, uid, connection):
         try:
-            message = self._parse_message(msg_contents[0][1])
+            typ, msg_contents = connection.uid('fetch', uid, '(RFC822)')
         except TypeError:
             # This may happen if another thread/process deletes the
             # message between our generating the ID list and our
             # processing it here.
-            raise
+            raise EmailRetrievalError()
+        if not msg_contents:
+            return None
+        message = self._parse_message(msg_contents[0][1])
         return message
 
     def get_new_mail(self):
@@ -154,27 +167,40 @@ class Mailbox:
 
         :yields: A mailparser.Message object for each parsed message.
         """
-        with self._connect() as server:
-            message_ids = self._get_all_message_ids(server)
+        with self._connect() as connection:
+            message_ids = self._get_all_message_ids(connection)
             if not message_ids:
                 # No new messages to ingest
                 return
 
             for uid in message_ids:
                 try:
-                    message = self._get_message(uid, server)
-                    if not message:
-                        continue
-                    yield message
-                except (MessageParseError, MailParserError):
+                    message = self._get_message(uid, connection)
+                except (MessageParseError, MailParserError) as e:
                     # If we have some problem parsing the email, it's likely
                     # to be spam/malicious so skip it
+                    error_message = (
+                        f'Mailbox "{self.email}" failed to parse message '
+                        f'{uid} with error {e}'
+                    )
+                    logger.error(error_message)
                     continue
+                except EmailRetrievalError:
+                    # We should fail and exit immediately in this case, as it's
+                    # probable that another process is processing the inbox
+                    error_message = (
+                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully'
+                    )
+                    logger.error(error_message)
+                    raise
+                if not message:
+                    continue
+                yield message
 
                 # Mark the email for deletion in the inbox
-                server.uid('store', uid, '+FLAGS', '(\\Deleted)')
+                connection.uid('store', uid, '+FLAGS', '(\\Deleted)')
             # Carry out deletion for the emails marked for deletion
-            server.expunge()
+            connection.expunge()
 
     def process_new_mail(self):
         """

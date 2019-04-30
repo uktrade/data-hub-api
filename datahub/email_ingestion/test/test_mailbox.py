@@ -289,13 +289,12 @@ class TestMailbox:
             mail_processor_classes=processor_classes,
         )
         message = mock.Mock()
-        message.__repr__ = lambda self: 'My message'
         with pytest.raises(TypeError):
             mailbox._process_email(message)
-        expected_message = (
+        expected_error_message = (
             'datahub.email_ingestion.mailbox',
             40,
-            'Error "TypeError" processing email "My message" which was processed by '
+            f'Error "TypeError" processing email "{message.message_id}" which was processed by '
             'processor "Processor 0"',
         )
-        assert expected_message in caplog.record_tuples
+        assert expected_error_message in caplog.record_tuples
