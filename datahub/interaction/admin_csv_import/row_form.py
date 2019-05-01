@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 
+from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models import Advisor
 from datahub.core.query_utils import get_full_name_expression
 from datahub.event.models import Event
@@ -56,6 +57,9 @@ class InteractionCSVRowForm(forms.Form):
 
     kind = forms.ChoiceField(choices=Interaction.KINDS)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
+    # Used to attempt to find a matching contact (and company) for the interaction
+    # Note that if a matching contact is not found, the interaction in question is
+    # skipped (and the user informed) rather than the whole process aborting
     contact_email = forms.EmailField()
     # Represents an InteractionDITParticipant for the interaction.
     # The adviser will be looked up by name (case-insensitive) with inactive advisers
@@ -132,6 +136,11 @@ class InteractionCSVRowForm(forms.Form):
         # If no subject was provided, set it to the name of the service
         if not subject and service:
             data['subject'] = service.name
+
+        # Attempt to look up the contact
+        data['contact'], data['contact_matching_status'] = find_active_contact_by_email_address(
+            data.get('contact_email'),
+        )
 
         return data
 
