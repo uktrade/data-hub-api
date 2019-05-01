@@ -4,8 +4,9 @@ from functools import lru_cache
 
 from django.utils.timezone import now
 
-from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
+from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING, DNB_COUNTRY_MAPPING
 from datahub.dnb_match.exceptions import MismatchedRecordsException
+from datahub.dnb_match.models import DnBMatchingCSVRecord
 from datahub.metadata.models import Country
 
 
@@ -250,3 +251,29 @@ def update_company_from_wb_record(company, wb_record, commit=True):
     if commit:
         company.save(update_fields=updated_fields)
     return updated_fields
+
+
+def _get_list_of_latest_match_candidates(company_pk):
+    """Get latest match candidates."""
+    candidates = DnBMatchingCSVRecord.objects.filter(
+        company_id=company_pk,
+    ).order_by('-batch_number').first()
+    if candidates:
+        return candidates.data or []
+    return []
+
+
+@lru_cache()
+def resolve_dnb_country_to_dh_country_dict(country_name):
+    """Resolve DnB country name with Data Hub country dict."""
+    country_code = DNB_COUNTRY_MAPPING.get(country_name.upper())
+    country = Country.objects.get(
+        iso_alpha2_code=country_code,
+    ) if country_code else None
+    if not country:
+        return None
+
+    return {
+        'id': str(country.id),
+        'name': country.name,
+    }

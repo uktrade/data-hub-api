@@ -1,3 +1,5 @@
+from model_utils import Choices
+
 # Countries in the DnB Worldbase record are represented as numbers.
 # The mapping below can be used to determine the related iso_alpha2_code.
 # Not all countries have an iso_alpha2_code but this should not be a problem
@@ -268,3 +270,15 @@ DNB_COUNTRY_CODE_MAPPING = {
     '873': {'iso_alpha2_code': 'ZW', 'name': 'ZIMBABWE'},
     '000': {'iso_alpha2_code': None, 'name': 'Unknown'},
 }
+
+DNB_COUNTRY_MAPPING = {
+    entry['name']: entry['iso_alpha2_code']
+    for entry in DNB_COUNTRY_CODE_MAPPING.values()
+}
+
+NoMatchReason = Choices(
+    ('not_listed', 'The correct company is not listed, it is not possible to make a match'),
+    ('more_than_one', 'There is more than one company in the list that could be a match'),
+    ('not_confident', 'I am not confident to make the match'),
+    ('other', 'Other'),
+)
