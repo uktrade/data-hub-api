@@ -1,0 +1,1705 @@
+# This file contains administrative areas for:
+# Australia (5 states and territories)
+# Russia (states, 22 Republics, 9 Krais, 3 Federal Cities)
+# Argentina, Brazil, Chile, 
+# Colombia (32 Departments and 1 Capital District)
+# Mexico (31 states and 1 Federal entity), 
+# Peru (25 Departments), 
+# India (36 states and union territories)
+
+# Australia
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: New South Wales
+  model: metadata.administrativearea
+  pk: 70d79bbd-118d-45dd-9262-41c3fa2f0d89
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Victoria
+  model: metadata.administrativearea
+  pk: 8caa0806-786b-4f41-83c1-fbf132e87fb7
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Queensland
+  model: metadata.administrativearea
+  pk: 422f09d4-6e73-44f8-b3a5-14a2fd34461d
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Western Australia
+  model: metadata.administrativearea
+  pk: a623710a-3985-4d9a-a3d7-0744d984e178
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: South Australia
+  model: metadata.administrativearea
+  pk: 88f26277-ca6a-43f4-b076-ca93d1ef7a6b
+- fields:
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tasmania
+  model: metadata.administrativearea
+  pk: 6d75d8e3-b67a-4e27-8dd3-e09c877e827e
+
+
+
+# Russia
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Moscow Oblast
+  model: metadata.administrativearea
+  pk: c50cd960-252e-4378-8e60-3f2c9f19aef5
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sverdlovsk Oblast
+  model: metadata.administrativearea
+  pk: e47318f8-0f60-4be6-932a-2a7ceac92acc
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rostov Oblast
+  model: metadata.administrativearea
+  pk: 42f0137c-00c7-4efd-a4dd-9bafaf5f6943
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chelyabinsk Oblast
+  model: metadata.administrativearea
+  pk: a3b90614-92dd-41a2-9f7a-6c27e2083d82
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Nizhny Novgorod Oblast
+  model: metadata.administrativearea
+  pk: df683dd1-329c-414e-9499-744c63a6c300
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tyumen Oblast
+  model: metadata.administrativearea
+  pk: cfe05430-1943-4fbc-b52e-581b7f4421c8
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Samara Oblast
+  model: metadata.administrativearea
+  pk: a71b67aa-4ab1-4f07-800d-f886c6e06dd4
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kemerovo Oblast
+  model: metadata.administrativearea
+  pk: 6bbef06a-68ac-4979-913c-b88fac47cd3a
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Volgograd Oblast
+  model: metadata.administrativearea
+  pk: 3f8520a5-ec7d-4068-89e5-558d5968bc05
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Novosibirsk Oblast
+  model: metadata.administrativearea
+  pk: ded0baad-990a-4f58-bc26-9944ff648bc8
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Saratov Oblast
+  model: metadata.administrativearea
+  pk: e15db609-22da-49b1-a1bf-c95b042d543a
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Irkutsk Oblast
+  model: metadata.administrativearea
+  pk: 6cc9631a-92e9-461d-95ff-8ceaba062072
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Voronezh Oblast
+  model: metadata.administrativearea
+  pk: 2f9a63ab-4001-4c24-98a8-47d7daeca969
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Orenburg Oblast
+  model: metadata.administrativearea
+  pk: 7c9f9666-4433-4418-b08e-02bc11557556
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Omsk Oblast
+  model: metadata.administrativearea
+  pk: a130fdc4-1158-4ede-a17b-cf466e40d9b4
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tula Oblast
+  model: metadata.administrativearea
+  pk: dc4f064a-6d3e-4888-be37-f0d6c4a2298e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Leningrad Oblast
+  model: metadata.administrativearea
+  pk: 8a685926-c002-4d4f-9ce7-b80a9925c93e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Vladimir Oblast
+  model: metadata.administrativearea
+  pk: f217a910-0962-46f9-9370-d295ebd9fce4
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Belgorod Oblast
+  model: metadata.administrativearea
+  pk: c310ef86-9c3c-4e34-b179-6bc47624fb6b
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kirov Oblast
+  model: metadata.administrativearea
+  pk: 9735c9e0-430f-43e9-854b-4d7133b051be
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tver Oblast
+  model: metadata.administrativearea
+  pk: 3b7ad605-3cc8-4227-b970-feb6bede4ad9
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Penza Oblast
+  model: metadata.administrativearea
+  pk: 52f465a7-907d-49e3-bda8-025f92cc0525
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ulyanovsk Oblast
+  model: metadata.administrativearea
+  pk: 6ff6f889-a146-45b6-bc14-a899be98929f
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bryansk Oblast
+  model: metadata.administrativearea
+  pk: bc2812c2-4ec0-4376-a9c8-23c2420219d7
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Yaroslavl Oblast
+  model: metadata.administrativearea
+  pk: 61d8fb02-05ef-4ca9-b81d-6235bf12e201
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Arkhangelsk Oblast
+  model: metadata.administrativearea
+  pk: 8a1dfdce-6190-483c-9c84-28d3a3fc5477
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Vologda Oblast
+  model: metadata.administrativearea
+  pk: ffea2ba8-0880-487a-8077-39913fc2ac10
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kursk Oblast
+  model: metadata.administrativearea
+  pk: c5457ef9-4837-4b9f-af55-7065b31c6b17
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ryazan Oblast
+  model: metadata.administrativearea
+  pk: 8aa4b2a8-519b-443f-a5c9-0da61318b6e7
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Lipetsk Oblast
+  model: metadata.administrativearea
+  pk: 4afdc0b2-7ed2-4de4-b0f7-df3a31f5239e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tambov Oblast
+  model: metadata.administrativearea
+  pk: 6e5ea9d1-99fe-499a-8825-ff07b142a5de
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ivanovo Oblast
+  model: metadata.administrativearea
+  pk: 4bab3d57-9e22-4b52-a1d9-2ca67867bced
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Smolensk Oblast
+  model: metadata.administrativearea
+  pk: 821b2e70-fbf8-406d-86c7-b0a57edda5e6
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tomsk Oblast
+  model: metadata.administrativearea
+  pk: be696ad4-c9ea-456f-877f-24a9519c4169
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kaluga Oblast
+  model: metadata.administrativearea
+  pk: 338a310f-4d54-488c-a09e-0c68c8763572
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kurgan Oblast
+  model: metadata.administrativearea
+  pk: 37952d97-d6f7-4ba7-a2ec-4165e7292c01
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Astrakhan Oblast
+  model: metadata.administrativearea
+  pk: 80b78ddb-d0c6-47af-916b-713500c701ce
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kaliningrad Oblast
+  model: metadata.administrativearea
+  pk: f9ee3b1a-4dbf-4fb5-b665-f98e1c85d214
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Amur Oblast
+  model: metadata.administrativearea
+  pk: 11100824-13d0-4c49-9f51-097ac9a9c3a0
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Murmansk Oblast
+  model: metadata.administrativearea
+  pk: c0e97f6a-28c2-4e92-8333-4e563cf6e91d
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Oryol Oblast
+  model: metadata.administrativearea
+  pk: 17cf6ac5-64c8-4fea-b951-e020e4267acd
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Psvok Oblast
+  model: metadata.administrativearea
+  pk: c56384f0-d094-49a1-bade-abab5c91b009
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kostroma Oblast
+  model: metadata.administrativearea
+  pk: 7a23e51c-670c-4320-a99a-c30c6c9487f1
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Novgorod Oblast
+  model: metadata.administrativearea
+  pk: fced06a0-5c2e-4510-ae32-696812612894
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sakhalin Oblast
+  model: metadata.administrativearea
+  pk: cd804d48-48b7-4647-a1cc-2072dc1e7485
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Magadan Oblast
+  model: metadata.administrativearea
+  pk: af54a565-45e6-49c5-a235-72ccf78f725d
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bashkortostan
+  model: metadata.administrativearea
+  pk: 283be0c1-39bd-4826-b18a-ca7650e832da
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tatarstan
+  model: metadata.administrativearea
+  pk: c7f23e8b-62f4-46e6-8eab-7944362bd43d
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Dagestan
+  model: metadata.administrativearea
+  pk: 94210fa1-494e-4568-a6e1-a2371a3e4c51
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Crimea
+  model: metadata.administrativearea
+  pk: c94f226e-ad2a-4ca3-a112-5ce0bfff6162
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Udmurtia
+  model: metadata.administrativearea
+  pk: ad3bd9a9-df0c-4319-97a1-41bff12e146b
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chuvashia
+  model: metadata.administrativearea
+  pk: 8d0c2b17-9415-49f8-8d65-a47f48d7cecf
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chechnya
+  model: metadata.administrativearea
+  pk: 220b0daa-bf98-40fd-be78-99cd42ba1adf
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Komi Republic
+  model: metadata.administrativearea
+  pk: 0064eafd-57b0-4c95-9065-4d80fb439f13
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Buryatia
+  model: metadata.administrativearea
+  pk: b9587f59-4f8d-4e7e-8841-3902ed27a630
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Yakutia
+  model: metadata.administrativearea
+  pk: 36abca6f-33f6-4732-aa80-5bf875d28bcc
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kabardino-Balkaria
+  model: metadata.administrativearea
+  pk: f4106ce7-20f3-42d7-a548-d60bd3af9f0f
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mordovia
+  model: metadata.administrativearea
+  pk: be4221b9-fbd8-4297-81a5-a9e3a8a583e6
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mari El
+  model: metadata.administrativearea
+  pk: 685c15f7-d3ca-4c03-ae91-c8ef22a00b5e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Karelia
+  model: metadata.administrativearea
+  pk: 519bd3ce-a364-4c78-8211-491de4e1d7f4
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: North Ossetia-Alania
+  model: metadata.administrativearea
+  pk: b5e0bb64-a637-4b61-9224-b976afa1c59a
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Khakassia
+  model: metadata.administrativearea
+  pk: 23d56a11-d0a7-4169-9f5d-d98bfad90d5c
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ingushetia
+  model: metadata.administrativearea
+  pk: ebe1ebf0-c414-49b9-9297-c8272fa66071
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Adygea
+  model: metadata.administrativearea
+  pk: 539aacb1-9778-4db9-b992-7be49b7503d7
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Karachay-Cherkessia
+  model: metadata.administrativearea
+  pk: 620964ae-b0e6-473e-99c7-a9e38a629f0a
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tuva
+  model: metadata.administrativearea
+  pk: 7424c619-b407-4e95-ba17-a15671f82fa2
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kalmykia
+  model: metadata.administrativearea
+  pk: 3c1610ef-cbb2-41b1-a18e-c616d9e02c7e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Altai Republic
+  model: metadata.administrativearea
+  pk: d91f2ed5-026d-4094-ac19-a085844da820
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Krasnodar Krai
+  model: metadata.administrativearea
+  pk: 0da1a086-2700-49cf-a4c0-7185e2687558
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Krasnoyarsk Krai
+  model: metadata.administrativearea
+  pk: 5295e058-ca5f-46a2-a04f-18558953eb1e
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Perm Krai
+  model: metadata.administrativearea
+  pk: f7a5f05e-5b46-4bcc-8e0a-b23db2930455
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Stavropol Krai
+  model: metadata.administrativearea
+  pk: ac8548eb-ef13-4a92-8c84-56c983a334d0
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Altai Krai
+  model: metadata.administrativearea
+  pk: fcb2edca-91b0-4c5d-8dde-d2245c54a20b
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Primorsky Krai
+  model: metadata.administrativearea
+  pk: b23ca60f-0065-40dd-848f-7ecfd34621de
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Khabarovsk Krai
+  model: metadata.administrativearea
+  pk: 5bcacc1a-5ba6-4f88-8fd4-a166ac293f64
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Zabaykalsky Krai
+  model: metadata.administrativearea
+  pk: 646a6a1c-02d2-49f4-ab36-91dd4407f246
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kamchatka Krai
+  model: metadata.administrativearea
+  pk: 9430a880-d00b-4e52-9b54-43cd751d9cd1
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Moscow
+  model: metadata.administrativearea
+  pk: 2384702f-01e9-4792-857b-026b2623f2fa
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Saint Petersburg
+  model: metadata.administrativearea
+  pk: a28a4c36-863b-423e-bae9-b0dc9ca2b7f9
+- fields:
+    country: 5961b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sevastop
+  model: metadata.administrativearea
+  pk: 8c02e8a2-1dc4-49ca-a1ea-087a64a207b3
+
+
+# Argentina
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: City of Buenos Aires
+  model: metadata.administrativearea
+  pk: 2a6d390d-a2b2-4fb2-a109-76645266511b
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Buenos Aires
+  model: metadata.administrativearea
+  pk: 225e6d3c-6b84-4d5d-9d28-7d0aed7f2317
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Catamarca
+  model: metadata.administrativearea
+  pk: b55f1666-40ff-4270-8dbe-110d0f7c51c3
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chaco
+  model: metadata.administrativearea
+  pk: 6de7a857-c802-4ef8-a519-db8e560c6f4e
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chubut
+  model: metadata.administrativearea
+  pk: 1ab227e2-2790-47f8-aa6c-383fda1e2c69
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cordoba
+  model: metadata.administrativearea
+  pk: 2be86663-5e61-4316-9653-786ce1b41f05
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Corrientes
+  model: metadata.administrativearea
+  pk: a9a0fed4-6bca-4468-8183-9ab16b824701
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Entre Rios
+  model: metadata.administrativearea
+  pk: 8fb4735f-a413-4352-81fd-0b78e9a73b90
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Formosa
+  model: metadata.administrativearea
+  pk: 6907e6a4-dd55-4dbf-8b8f-e822dcd5aea7
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Jujuy
+  model: metadata.administrativearea
+  pk: 845c2a80-2378-40d6-a9bb-4a599b347b25
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: La Pampa
+  model: metadata.administrativearea
+  pk: 0c23c8c8-fa9d-4712-9010-ac902a91d4b6
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: La Rioja
+  model: metadata.administrativearea
+  pk: 5da9a694-18fd-47ef-b1ef-e95b2e606d94
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mendoza
+  model: metadata.administrativearea
+  pk: 5da7f724-af30-4397-987a-84de9a5002d1
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Misiones
+  model: metadata.administrativearea
+  pk: 0d6aeb15-f011-4008-8006-3065802170ec
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Neuquen
+  model: metadata.administrativearea
+  pk: ae7aba10-e5d2-422a-9d89-50b03bde0da7
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rio Negro
+  model: metadata.administrativearea
+  pk: 6ef6be70-2d72-4ba3-abdd-0be518152283
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Salta
+  model: metadata.administrativearea
+  pk: be031449-684e-4f32-ac87-d32e30cad4c8
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: San Juan
+  model: metadata.administrativearea
+  pk: 86b1d913-4a4f-4458-8189-1e3df0b74faf
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: San Luis
+  model: metadata.administrativearea
+  pk: 48c84d65-0760-409d-8577-287b1a8282f8
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santa Cruz
+  model: metadata.administrativearea
+  pk: a92a23ac-20e5-470f-9ba8-25a5abd2a850
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santa Fe
+  model: metadata.administrativearea
+  pk: aefa92a6-aced-4019-8eb4-a005a9802b5c
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santiago
+  model: metadata.administrativearea
+  pk: 61fd2d47-e424-4714-9c26-a5e1be544e2e
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tierra del Fuego
+  model: metadata.administrativearea
+  pk: 451d4085-647a-48ba-b30d-3951a17cf43a
+- fields:
+    country: 9c5f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tucuman
+  model: metadata.administrativearea
+  pk: d7eaedb4-ea8b-43f3-b95d-33af88338a7c
+
+
+# Brazil
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Acre
+  model: metadata.administrativearea
+  pk: b5d03d97-fef5-4da6-9117-98a4d633b581
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Alagoas
+  model: metadata.administrativearea
+  pk: 6523317b-d02f-4725-b5f1-cc4184f69397
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Amapa
+  model: metadata.administrativearea
+  pk: d79ca3c2-9ffe-4a43-bb73-5f3b81a524fe
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Amazonas
+  model: metadata.administrativearea
+  pk: f4142b7a-f034-4e1e-97a3-fe4ae7873b5e
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bahia
+  model: metadata.administrativearea
+  pk: 5b76e167-a548-4aca-8d49-39c19e646425
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ceara
+  model: metadata.administrativearea
+  pk: b0dd060f-4627-499a-a298-7289c5abb89b
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Brasilia (Federal District of)
+  model: metadata.administrativearea
+  pk: 1cc60a33-5ca4-4f93-886c-c6c6189bded7
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Espirito Santo
+  model: metadata.administrativearea
+  pk: 82b76fb1-a7fe-4b47-b42a-70868a7bc7af
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Goias
+  model: metadata.administrativearea
+  pk: 6cff3ba8-da5b-4713-b13d-897d4de1c8b8
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Maranhao
+  model: metadata.administrativearea
+  pk: 3d7127e9-742a-4abb-a095-14323345de24
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mato Grosso
+  model: metadata.administrativearea
+  pk: b9a5e822-369c-4c5d-b625-440851266b93
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mato Grosso do Sul
+  model: metadata.administrativearea
+  pk: e25a4b92-5046-4baf-aa65-2d424f5b4013
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Minas Gerais
+  model: metadata.administrativearea
+  pk: 85cd6777-c6e3-464c-a168-6e926656e6ef
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Para
+  model: metadata.administrativearea
+  pk: 695439a8-5b46-4be9-987c-c72aca543ced
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Paraiba
+  model: metadata.administrativearea
+  pk: f3404989-19f3-49dd-bc57-a4bc631506b2
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Parana
+  model: metadata.administrativearea
+  pk: 4f90b4b9-36f3-49dd-aefe-8bea99565c4e
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Pernambuco
+  model: metadata.administrativearea
+  pk: 272ea717-9905-4d91-bc1f-959c11e020f2
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Piaul
+  model: metadata.administrativearea
+  pk: 98774975-2159-402a-950d-98cd59fee648
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rio de Janeiro
+  model: metadata.administrativearea
+  pk: 3d4f0b93-b16e-4f61-98e8-006a2c290f95
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rio Grande do Norte
+  model: metadata.administrativearea
+  pk: 44f0bf32-0175-41d6-a4bc-4a15536d6d51
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rio Grande do Sul
+  model: metadata.administrativearea
+  pk: 585d5d41-38de-460c-a2c2-4abe262aea7e
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rondonia
+  model: metadata.administrativearea
+  pk: 4e5391c8-5feb-49c2-83b7-ca9c7f193144
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Roraima
+  model: metadata.administrativearea
+  pk: 8da3c5d8-8aeb-4259-a41f-fe512e60e8bf
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santa Catarina
+  model: metadata.administrativearea
+  pk: 5a3e6f78-e2e2-4bdd-a1d9-e049cf102343
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sao Paulo
+  model: metadata.administrativearea
+  pk: 71f66703-64eb-4e00-85db-4644b9f10be8
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sergipe
+  model: metadata.administrativearea
+  pk: 0b2c3b04-f69f-4a51-bd15-f2cf498e8dcd
+- fields:
+    country: b05f66a0-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tocantins
+  model: metadata.administrativearea
+  pk: b4054507-6e99-4023-bc53-f0a8f562580d
+
+
+# Chile
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Arica and Parinacota
+  model: metadata.administrativearea
+  pk: 395916cf-5cad-4536-87fc-78f5daf60953
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tarapaca
+  model: metadata.administrativearea
+  pk: b2890555-64de-43fb-b990-d2141c661aea
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Antofagasta
+  model: metadata.administrativearea
+  pk: 3227e965-b3a0-4214-aadc-98045a60d671
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Atacama
+  model: metadata.administrativearea
+  pk: 91d8b71c-430d-4e4a-afd0-7147578f41d9
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Coquimbo
+  model: metadata.administrativearea
+  pk: 6abfe0d6-464e-4a79-82a0-b58b0a6c939c
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Valparaiso
+  model: metadata.administrativearea
+  pk: 6463947c-0da7-4032-bf07-a21e756eb11c
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santiago
+  model: metadata.administrativearea
+  pk: d21ea723-13cf-4cba-a36c-2577b2f2e309
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: "O\u2019Higgins"
+  model: metadata.administrativearea
+  pk: dfb83eda-bb42-40e5-b31f-a8bdd5f7b709
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Maule
+  model: metadata.administrativearea
+  pk: 489b356a-de2e-422d-a0f3-846adf49f2ec
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Nuble
+  model: metadata.administrativearea
+  pk: a5a2d421-5274-49ca-9c33-ea3282f5c618
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Biobio
+  model: metadata.administrativearea
+  pk: 322545fd-9b3d-42de-9654-9bbb30451de3
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Araucania
+  model: metadata.administrativearea
+  pk: c27fea64-64fd-45e9-8598-b693b542f947
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Los Rios
+  model: metadata.administrativearea
+  pk: af8b5925-a7f4-422f-981d-788351a8d27f
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Los Lagos
+  model: metadata.administrativearea
+  pk: f6aa56c4-a7c2-49de-8cbf-f6a62f4dc299
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Aysen
+  model: metadata.administrativearea
+  pk: b4a5774f-d21c-418f-b312-77c7658e6feb
+- fields:
+    country: 62af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Magallanes
+  model: metadata.administrativearea
+  pk: 84699c34-b663-45d8-89c1-db0f04310d0e
+
+
+
+# Colombia
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bogota (Capital District of)
+  model: metadata.administrativearea
+  pk: a92d2863-58c8-4f59-909a-99d06740571f
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Amazonas
+  model: metadata.administrativearea
+  pk: 98aef82c-e813-4ccb-b55b-806d4c410f22
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Antioquia
+  model: metadata.administrativearea
+  pk: d579fe02-feb7-41fe-8cd7-946e96b0e440
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Arauca
+  model: metadata.administrativearea
+  pk: aa1d6ff2-57d7-4cce-9c57-50e95a302013
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Atlantico
+  model: metadata.administrativearea
+  pk: 40708d6e-6929-4a3b-8b5e-a7f054395626
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bolivar
+  model: metadata.administrativearea
+  pk: e20730a4-cfe3-45b0-a554-39bdd72b75e5
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Boyaca
+  model: metadata.administrativearea
+  pk: 28af5502-d197-4de2-b979-5c6120530f6c
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Caldas
+  model: metadata.administrativearea
+  pk: c991adad-3b3e-4d9e-86b3-fabc3c8917ac
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Caqueta
+  model: metadata.administrativearea
+  pk: ab57d0e3-6989-42a6-aeba-4e6178716f0d
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Casanare
+  model: metadata.administrativearea
+  pk: a817af37-db82-4eee-9dc0-86b55c6f6614
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cauca
+  model: metadata.administrativearea
+  pk: a1dc0093-8783-480c-9fbf-748c0cab1dd7
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cesar
+  model: metadata.administrativearea
+  pk: 8ee8e9b7-b420-4b3a-89bd-0120c9928b42
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Choco
+  model: metadata.administrativearea
+  pk: 62cd2112-20cc-4944-ae32-7467c1137006
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cordoba
+  model: metadata.administrativearea
+  pk: 3382ed2c-b0c4-46f6-864e-5763db4632c9
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cundinamarca
+  model: metadata.administrativearea
+  pk: 3076d152-e322-44c3-8d56-768e7e0201dc
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Guainia
+  model: metadata.administrativearea
+  pk: 8313911c-9520-4b3e-862b-66b5f36f2eb4
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Guaviare
+  model: metadata.administrativearea
+  pk: 27781726-74f8-4ae1-a2de-c955accd3a23
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Huila
+  model: metadata.administrativearea
+  pk: dcc1a45c-3cd6-4fdb-8ec3-e1bc8927e687
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: La Guajira
+  model: metadata.administrativearea
+  pk: 7eac8ff9-06a4-491f-bdf8-55f35ce59f73
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Magdalena
+  model: metadata.administrativearea
+  pk: a5690ea5-c9f7-4cf0-815f-321db2b8a451
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Meta
+  model: metadata.administrativearea
+  pk: 1005383f-0334-4022-b697-6edd45c24f15
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Narino
+  model: metadata.administrativearea
+  pk: f4a3ef1f-4998-4f1b-bf63-e9754adb1cf0
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Norte de Santander
+  model: metadata.administrativearea
+  pk: b9d50960-28a5-4c5d-9fa8-fd0ea7b9dd8e
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Putumayo
+  model: metadata.administrativearea
+  pk: 71f031b4-9280-42c6-a819-4dc16fe54866
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Quindio
+  model: metadata.administrativearea
+  pk: d9999710-286e-4c75-8f40-84ca8d9a7f27
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Risaralda
+  model: metadata.administrativearea
+  pk: 051d2da3-487c-4c44-9fbf-1a9ae8e8fc23
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: San Andreas and Providencia
+  model: metadata.administrativearea
+  pk: cd305431-d63f-4874-9402-9570c1081153
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Santander
+  model: metadata.administrativearea
+  pk: f527ceda-fb39-4c1c-9ee2-ce08f2188fca
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sucre
+  model: metadata.administrativearea
+  pk: e880806d-b5a5-4131-bc77-2249a3ac356e
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tolima
+  model: metadata.administrativearea
+  pk: 53fbe778-eaeb-409e-b0e0-0c71948b8948
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Valle del Cauca
+  model: metadata.administrativearea
+  pk: e13cdb10-c02d-4d78-b2ae-7f6c05045b3e
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Vaupes
+  model: metadata.administrativearea
+  pk: ef729bab-9c8d-4a87-b7eb-096d21656df8
+- fields:
+    country: 66af72a6-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Vichada
+  model: metadata.administrativearea
+  pk: 4abdb998-17c0-4073-9466-0e47dfdc4b71
+
+
+
+# Mexico
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Aguascalientes
+  model: metadata.administrativearea
+  pk: efaeb97e-4b71-4856-9590-45cb4f8eba8c
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Baja California
+  model: metadata.administrativearea
+  pk: ddd20660-47d2-4899-a83e-73968e292b6b
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Baja California Sur
+  model: metadata.administrativearea
+  pk: d7395937-96f9-4d35-a1f6-c446fa805373
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Campeche
+  model: metadata.administrativearea
+  pk: 25b0d4b3-79f1-4ae9-a878-d57fd3b5b3d2
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chiapas
+  model: metadata.administrativearea
+  pk: 735c1174-4cd0-4f50-9913-56e95d424c71
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mexico City (Federal entity of)
+  model: metadata.administrativearea
+  pk: d7c63efc-6937-433f-8a7b-57165091bcac
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chihuahua
+  model: metadata.administrativearea
+  pk: 19968a03-683e-4cd6-a652-b45e435a530b
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Coahuila
+  model: metadata.administrativearea
+  pk: 72c462f7-3542-479d-a5d9-d7d4e15f192d
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Colima
+  model: metadata.administrativearea
+  pk: 934ef3a4-7379-41b4-aefd-6a265cf41b7a
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Durango
+  model: metadata.administrativearea
+  pk: 9f1c85c0-6ac2-49ef-b637-0815a7ae2ff7
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Guanajuato
+  model: metadata.administrativearea
+  pk: 36922a15-9afa-46e7-add7-7a677277d3d2
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Guerrero
+  model: metadata.administrativearea
+  pk: 594f9527-93f8-4390-9627-f78b298c6a2d
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Hidalgo
+  model: metadata.administrativearea
+  pk: 1736ca2e-1d30-4ed9-9ed3-ca81e5ea0633
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Jalisco
+  model: metadata.administrativearea
+  pk: 397383a7-6520-4222-b317-b61149cb84e0
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mexico
+  model: metadata.administrativearea
+  pk: bc6de65c-5126-4607-b3d2-4035b8d0d7ad
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Michoacan
+  model: metadata.administrativearea
+  pk: a0b80cfb-d3db-4043-843b-c189ba0a2c48
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Morelos
+  model: metadata.administrativearea
+  pk: 70801613-5096-4463-8b66-86f533a708b9
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Nayarit
+  model: metadata.administrativearea
+  pk: 1db85179-908c-44a6-894e-c817a051eb5a
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Nuevo Leon
+  model: metadata.administrativearea
+  pk: f4e076be-1a72-4ad5-a3cb-d4dd2ef3b0f8
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Oaxaca
+  model: metadata.administrativearea
+  pk: 8e1c7145-7893-4c7d-834e-09f9c069fcc1
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Puebla
+  model: metadata.administrativearea
+  pk: 2e9e930b-05c6-4bd2-aa7f-3fbe52485010
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Queretaro
+  model: metadata.administrativearea
+  pk: 1c5dc891-d46f-4931-81c2-3672e6914d57
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Quintana Roo
+  model: metadata.administrativearea
+  pk: 3567a2a6-878a-4ec6-9cb8-03e1b9ed6df5
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: San Luis Potosi
+  model: metadata.administrativearea
+  pk: f742f8ab-5cec-4396-a79a-7de7de099e76
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sinaloa
+  model: metadata.administrativearea
+  pk: e1a7ca7b-7d6b-45ec-ac9b-42c437c8e7db
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sonora
+  model: metadata.administrativearea
+  pk: 14a25126-d2a0-44c5-9690-575d7602f077
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tabasco
+  model: metadata.administrativearea
+  pk: d1793bb9-0147-4ddf-affd-d719fffcd606
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tamaulipas
+  model: metadata.administrativearea
+  pk: 07057716-dc4b-4c4b-98e5-71c03298865b
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tlaxcala
+  model: metadata.administrativearea
+  pk: 3942afe0-0731-4034-b356-71b806e839d8
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Veracruz
+  model: metadata.administrativearea
+  pk: a5eb0e69-a567-48e7-975b-a1307d87ce99
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Yucatan
+  model: metadata.administrativearea
+  pk: 1dd1bfc7-45fd-4726-a35d-5c9b522d7cf7
+- fields:
+    country: 0e50bdb8-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Zacatecas
+  model: metadata.administrativearea
+  pk: a9b9b429-8eda-4808-b2c7-c06b5ca78f05
+
+
+# Peru
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Amazonas
+  model: metadata.administrativearea
+  pk: 5e59a4f0-d618-4d7e-90b6-1f0d2e204cbd
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ancash
+  model: metadata.administrativearea
+  pk: 82c7ccec-d654-4d82-8917-2de097a1bad0
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Apurimac
+  model: metadata.administrativearea
+  pk: f226fa09-3977-49c9-bd7a-5d764ade1a9f
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Arequipa
+  model: metadata.administrativearea
+  pk: 1ab8ced7-576d-4dc8-bb3b-c399f0f59299
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ayacucho
+  model: metadata.administrativearea
+  pk: 3abbe10a-206b-45b8-a9c7-92b1db253a9e
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cajamarca
+  model: metadata.administrativearea
+  pk: 3de01b6a-032d-4050-8619-266be59adfd4
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Callao
+  model: metadata.administrativearea
+  pk: 5736a877-6f11-41a1-8a51-5d4ed3b7c1ca
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Cusco
+  model: metadata.administrativearea
+  pk: 03691e9d-b3a7-4803-93b4-a78cacad4117
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Huancavelica
+  model: metadata.administrativearea
+  pk: bf7d43d8-fdab-4923-86cc-72ba37b989d1
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Huanuco
+  model: metadata.administrativearea
+  pk: be3d892d-06c5-46ef-8c84-57f79ed763a9
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ica
+  model: metadata.administrativearea
+  pk: 1671e7f2-39f7-4e92-a7ec-1cf751ae918a
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Junin
+  model: metadata.administrativearea
+  pk: 9b433a96-94ac-4cd5-8aeb-2d80ee15660d
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: La Libertad
+  model: metadata.administrativearea
+  pk: 86b143b1-8bee-4e9a-8ffe-419c7e2c95a1
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Lambayeque
+  model: metadata.administrativearea
+  pk: 1d6518c6-2b37-4494-bc21-30dbc3026c07
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Lima
+  model: metadata.administrativearea
+  pk: d03f5fdb-26af-449a-9286-7930827f1922
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Madre de Dios
+  model: metadata.administrativearea
+  pk: 99f96e7c-0655-4562-8500-8015b7fc5418
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Moquegua
+  model: metadata.administrativearea
+  pk: b0e4df2b-2294-459f-96c8-9066462a9213
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Pasco
+  model: metadata.administrativearea
+  pk: 4a90300e-8e64-4c76-84e2-338b1ebeabe3
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Piura
+  model: metadata.administrativearea
+  pk: a070e39d-b8fd-4dd6-afac-fe925ab5c69e
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Puno
+  model: metadata.administrativearea
+  pk: ada02a5f-4043-4ceb-830b-c97ee25aae33
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: San Martin
+  model: metadata.administrativearea
+  pk: e4856e73-2fa6-41a6-9819-d7f550be1de3
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tacna
+  model: metadata.administrativearea
+  pk: 26256919-805b-468d-babe-9998820b21f3
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tumbes
+  model: metadata.administrativearea
+  pk: 296ac414-7aed-4248-9d52-d053c52a5607
+- fields:
+    country: 5061b8be-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Ucayali
+  model: metadata.administrativearea
+  pk: ba27fc7d-fe8c-44e1-b9ba-3c731a6e349b
+
+
+# India
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Andaman and Nicobar Islands
+  model: metadata.administrativearea
+  pk: 2f811d77-5c02-46a8-a24f-277bb765b047
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Andhra Pradesh
+  model: metadata.administrativearea
+  pk: 1ce5548a-1293-4288-84e4-ae7f9118633a
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Arunachal Pradesh
+  model: metadata.administrativearea
+  pk: 09c0db0a-dabf-42c7-b282-0aa983140022
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Assam
+  model: metadata.administrativearea
+  pk: 18659fce-69b7-4fb2-bcc1-32284aa97261
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Bihar
+  model: metadata.administrativearea
+  pk: 104201ad-fc9a-42ae-97cb-0aa974f42bf7
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chandigarh
+  model: metadata.administrativearea
+  pk: 84f3e645-0aa2-4bcf-ba1c-6dd654e17f3c
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Chhattisgarh
+  model: metadata.administrativearea
+  pk: 8a43f055-e70e-469b-8124-a682a52b90ce
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Dadra and Nagar Haveli
+  model: metadata.administrativearea
+  pk: c99047a9-5f0f-4a65-9d26-eda7795b7520
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Daman & Diu
+  model: metadata.administrativearea
+  pk: e967a758-dff1-49c6-ae7d-a604930934e3
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Goa
+  model: metadata.administrativearea
+  pk: 8aca5a9b-94c2-461f-b1a9-fc1d053f6c9b
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Gujarat
+  model: metadata.administrativearea
+  pk: 5b00344b-26d7-4d2b-9af4-a1a132cb4855
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Haryana
+  model: metadata.administrativearea
+  pk: 513b99da-a22a-48f9-8dc1-0a75b4bc61e1
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Himachal Pradesh
+  model: metadata.administrativearea
+  pk: 6273f548-97a1-4bbc-ae03-a12408e4d6db
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Jammu & Kashmir
+  model: metadata.administrativearea
+  pk: 1cde9bf3-d627-47e8-a60c-7e549df28254
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Jharkhand
+  model: metadata.administrativearea
+  pk: cebec24a-0718-4f20-9229-f2067b9cbef2
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Karnataka
+  model: metadata.administrativearea
+  pk: 39c6f417-9384-47e4-aeeb-0873f184fed5
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Kerala
+  model: metadata.administrativearea
+  pk: 0600ee21-d525-492f-b660-e4361adde13c
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Lakshadweep
+  model: metadata.administrativearea
+  pk: 506bd7b5-9eb9-4d6f-a410-2137c7886b37
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Madhya Pradesh
+  model: metadata.administrativearea
+  pk: 7e961eb5-7cda-4349-b5b3-f1a8967d01c5
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Maharashtra
+  model: metadata.administrativearea
+  pk: 64187574-70de-421e-9c19-d4b4c6474138
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Manipur
+  model: metadata.administrativearea
+  pk: 73ef4f49-c3db-42c9-a741-314118d1829f
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Meghalaya
+  model: metadata.administrativearea
+  pk: b5ea03d3-f353-49eb-83ba-dce114722f3c
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Mizoram
+  model: metadata.administrativearea
+  pk: 504bb3e1-7c46-4022-a736-9104e67ca50f
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Nagaland
+  model: metadata.administrativearea
+  pk: d8e72571-097d-4e0a-aa48-dee1e6021bd3
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Odisha
+  model: metadata.administrativearea
+  pk: 4301abfb-2d1a-44a2-997c-0166be6153b6
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Puducherry
+  model: metadata.administrativearea
+  pk: 54739fc0-c9b8-49ee-98b3-bb3575c10208
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Punjab
+  model: metadata.administrativearea
+  pk: 84515d9a-836c-4249-a290-debf64817c35
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Rajasthan
+  model: metadata.administrativearea
+  pk: eac2bbf5-18dc-4ed5-ab18-e9f3a6b416de
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Sikkim
+  model: metadata.administrativearea
+  pk: 223c17d5-0375-44ef-94f7-60140f02777c
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tamil Nadu
+  model: metadata.administrativearea
+  pk: 422d3db2-d9e1-408a-925d-10809fedf617
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Telangana
+  model: metadata.administrativearea
+  pk: a1ed69a1-b43d-491a-bc2d-2aedfaaf1899
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: The Government of NCT of Delhi
+  model: metadata.administrativearea
+  pk: e5c36c67-cfb3-4ef6-8659-5573b9ee2426
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Tripura
+  model: metadata.administrativearea
+  pk: a0bfabe1-7ddc-47e3-b0d9-e6dadc73b953
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Uttarakhand
+  model: metadata.administrativearea
+  pk: 33fc0ffc-448a-4700-b4a3-9f675b41b80f
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: Uttar Pradesh
+  model: metadata.administrativearea
+  pk: 488648bb-498e-45f1-855b-252c3ea4df07
+- fields:
+    country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+    disabled_on: null
+    name: West Bengal
+  model: metadata.administrativearea
+  pk: 80b93b3e-f658-4653-b419-6c014e6bb2e9
