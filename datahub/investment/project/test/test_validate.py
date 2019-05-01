@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
@@ -291,6 +293,7 @@ def test_validate_verify_win_instance_failure():
         'average_salary': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
+        'actual_land_date': 'This field is required.',
     }
 
 
@@ -355,6 +358,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         actual_uk_regions=[random_obj_for_model(UKRegion)],
         delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
         average_salary_id=constants.SalaryRange.below_25000.value.id,
+        actual_land_date=date.today(),
     )
     errors = validate(instance=project)
     assert not errors
@@ -399,7 +403,10 @@ class TestValidationConfig:
         assert required_fields['number_new_jobs'] == self.EXPECTED_STAGE
         assert required_fields['strategic_drivers'] == self.EXPECTED_STAGE
         assert required_fields['project_manager'] == constants.InvestmentProjectStage.active.value
-        assert required_fields['actual_land_date'] == constants.InvestmentProjectStage.won.value
+        assert (
+            required_fields['actual_land_date']
+            == constants.InvestmentProjectStage.verify_win.value
+        )
 
     def test_conditional_rules_after_stage(self):
         """Tests get conditional rules after stage for all project stages."""
