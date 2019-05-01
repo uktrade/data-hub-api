@@ -124,7 +124,7 @@ class TestMailbox:
     @patch_imap([])
     def test_get_new_mail_no_new_messages(self, mocked_imap):
         """
-        Functional test to ensure that get_new_mail operates as expected when 
+        Functional test to ensure that get_new_mail operates as expected when
         there are no email messages to ingest.
 
         """
