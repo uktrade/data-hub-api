@@ -2,7 +2,7 @@ from collections import Counter
 from operator import not_
 
 from django.db.transaction import atomic
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
@@ -40,7 +40,7 @@ class InteractionDITParticipantListSerializer(serializers.ListSerializer):
     """Interaction DIT participant list serialiser that adds validation for duplicates."""
 
     default_error_messages = {
-        'duplicate_adviser': ugettext_lazy(
+        'duplicate_adviser': gettext_lazy(
             'You cannot add the same adviser more than once.',
         ),
     }
@@ -114,31 +114,31 @@ class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
     default_error_messages = {
-        'invalid_for_non_service_delivery': ugettext_lazy(
+        'invalid_for_non_service_delivery': gettext_lazy(
             'This field is only valid for service deliveries.',
         ),
-        'invalid_for_service_delivery': ugettext_lazy(
+        'invalid_for_service_delivery': gettext_lazy(
             'This field is not valid for service deliveries.',
         ),
-        'invalid_for_non_interaction': ugettext_lazy(
+        'invalid_for_non_interaction': gettext_lazy(
             'This field is only valid for interactions.',
         ),
-        'invalid_for_non_interaction_or_service_delivery': ugettext_lazy(
+        'invalid_for_non_interaction_or_service_delivery': gettext_lazy(
             'This value is only valid for interactions and service deliveries.',
         ),
-        'invalid_for_non_event': ugettext_lazy(
+        'invalid_for_non_event': gettext_lazy(
             'This field is only valid for event service deliveries.',
         ),
-        'invalid_when_no_policy_feedback': ugettext_lazy(
+        'invalid_when_no_policy_feedback': gettext_lazy(
             'This field is only valid when policy feedback has been provided.',
         ),
-        'too_many_contacts_for_event_service_delivery': ugettext_lazy(
+        'too_many_contacts_for_event_service_delivery': gettext_lazy(
             'Only one contact can be provided for event service deliveries.',
         ),
-        'one_participant_field': ugettext_lazy(
+        'one_participant_field': gettext_lazy(
             'If dit_participants is provided, dit_adviser and dit_team must be omitted.',
         ),
-        'cannot_unset_theme': ugettext_lazy(
+        'cannot_unset_theme': gettext_lazy(
             "A theme can't be removed once set.",
         ),
     }

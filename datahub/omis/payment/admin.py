@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import date as date_formatter
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from datahub.core.admin import BaseModelAdminMixin
 from datahub.omis.order.constants import OrderStatus
