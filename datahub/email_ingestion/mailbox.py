@@ -40,7 +40,6 @@ class Mailbox:
         imap_domain,
         mail_processor_classes,
         imap_port=None,
-        use_ssl=True,
     ):
         """
         Initialise a Mailbox object.
@@ -51,8 +50,6 @@ class Mailbox:
         :param mail_processor_classes: iterable - EmailProcessor classes which
             should be used to process incoming mail to this mailbox
         :param imap_port: optional int - the port to use when connecting with imap
-        :param use_ssl: optional boolean - whether or not to use SSL with imap, defaults
-            to True
         """
         self.email = email
         self.password = password
@@ -60,11 +57,7 @@ class Mailbox:
         if imap_port:
             self.imap_port = imap_port
         else:
-            if use_ssl:
-                self.imap_port = 993
-            else:
-                self.imap_port = 465
-        self.use_ssl = use_ssl
+            self.imap_port = 993
         # Make a copy of the processor class iterable
         self.processor_classes = [processor_class for processor_class in mail_processor_classes]
 
@@ -76,11 +69,7 @@ class Mailbox:
 
         :yields: An active imaplib server connection object.
         """
-        if self.use_ssl:
-            transport = imaplib.IMAP4_SSL
-        else:
-            transport = imaplib.IMAP4
-        connection = transport(self.imap_domain, self.imap_port)
+        connection = imaplib.IMAP4_SSL(self.imap_domain, self.imap_port)
         connection.login(self.email, self.password)
         connection.select()
         try:

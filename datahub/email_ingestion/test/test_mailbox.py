@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 
 from datahub.email_ingestion.email_processor import EmailProcessor
-from datahub.email_ingestion.mailbox import Mailbox
+from datahub.email_ingestion.mailbox import EmailRetrievalError, Mailbox
 
 EXPECTED_EMAIL_MESSAGES = [
     {
@@ -73,7 +73,8 @@ class TestMailbox:
 
     def mock_mailbox_parse_message(self, mailbox):
         """
-        Helper to ensure that the _parse_message method of a supplied mailbox
+        Helper to ensure that the _a
+        EmailRetrievalError as expected.parse_message method of a supplied mailbox
         object is mocked.
         """
         mailbox._parse_message = mock.Mock()
@@ -95,6 +96,7 @@ class TestMailbox:
             'foobarbaz1',
             'domain.example.net',
             mail_processor_classes=[],
+            imap_port=465,
         )
         # Ensure that we also mock the Mailbox._parse_message method - this should
         # mean that the mailbox method gives us our messages in an expected format
@@ -118,6 +120,69 @@ class TestMailbox:
         # Ensure that the imap connection was cleaned up
         mocked_imap.close.assert_called_once()
         mocked_imap.logout.assert_called_once()
+
+    @patch_imap([])
+    def test_get_new_mail_no_new_messages(self, mocked_imap):
+        """
+        Functional test to ensure that get_new_mail operates as expected when 
+        there are no email messages to ingest.
+
+        """
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[],
+        )
+
+        messages = list(mailbox.get_new_mail())
+        assert messages == []
+
+    @patch_imap(EXPECTED_EMAIL_MESSAGES)
+    def test_get_new_mail_empty_message_contents(self, mocked_imap):
+        """
+        Functional test to ensure that the get_new_mail method can handle when
+        message contents are empty and skip as appropriate.
+        """
+        expected_email_messages = copy.deepcopy(EXPECTED_EMAIL_MESSAGES)
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[],
+        )
+
+        # Ensure that we also mock the Mailbox._parse_message method - this should
+        # mean that the mailbox method gives us our messages in an expected format
+        self.mock_mailbox_parse_message(mailbox)
+
+        original_side_effect = mocked_imap.uid.side_effect
+
+        def uid_side_effect(action, *args):
+            if action == 'fetch':
+                uid = args[0]
+                if uid == 'abc2':
+                    return [None, None]
+            return original_side_effect(action, *args)
+        mocked_imap.uid.side_effect = uid_side_effect
+
+        messages = list(mailbox.get_new_mail())
+        # We expect that the messages returned will omit the empty message
+        expected_email_messages.pop(1)
+        assert len(messages) == len(expected_email_messages)
+        # Go through all of the returned messages and ensure that the parsed
+        # message content is as expected
+        for count, message in enumerate(messages):
+            expected_email_message = expected_email_messages[count]
+            # Ensure that the messages our mailbox retrieves are those that we expect
+            assert message == expected_email_message['message_content']
+            # Ensure that a call was made to mark each message retrieved as SEEN
+            mocked_imap.uid.assert_any_call(
+                'store',
+                expected_email_message['uid'],
+                '+FLAGS',
+                '(\\SEEN)',
+            )
 
     @patch_imap(EXPECTED_EMAIL_MESSAGES)
     def test_get_new_mail_parsing_failure(self, mocked_imap):
@@ -164,6 +229,36 @@ class TestMailbox:
         # Ensure that the imap connection was cleaned up
         mocked_imap.close.assert_called_once()
         mocked_imap.logout.assert_called_once()
+
+    @patch_imap(EXPECTED_EMAIL_MESSAGES)
+    def test_get_new_mail_retrieval_error(self, mocked_imap):
+        """
+        Functional test to ensure that the get_new_mail method can handle a
+        EmailRetrievalError as expected.
+        """
+        mailbox = Mailbox(
+            'foobar@example.net',
+            'foobarbaz1',
+            'domain.example.net',
+            mail_processor_classes=[],
+        )
+
+        # Ensure that we also mock the Mailbox._parse_message method - this should
+        # mean that the mailbox method gives us our messages in an expected format
+        self.mock_mailbox_parse_message(mailbox)
+
+        original_side_effect = mocked_imap.uid.side_effect
+
+        def uid_side_effect(action, *args):
+            if action == 'fetch':
+                raise TypeError
+            else:
+                return original_side_effect(action, *args)
+        mocked_imap.uid.side_effect = uid_side_effect
+
+        with pytest.raises(EmailRetrievalError):
+            # Cast generator method call to list to force execution
+            list(mailbox.get_new_mail())
 
     @patch_imap(EXPECTED_EMAIL_MESSAGES)
     def test_process_new_mail(self, mocked_imap):
