@@ -3,7 +3,8 @@ from datetime import date
 
 import pytest
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.contact_matching import ContactMatchingStatus
+from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.test_utils import random_obj_for_queryset
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.row_form import (
@@ -18,6 +19,26 @@ from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.interaction.test.factories import CommunicationChannelFactory
 from datahub.metadata.models import Service
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
+
+
+EMAIL_MATCHING_CONTACT_TEST_DATA = [
+    {
+        'email': 'unique1@primary.com',
+        'email_alternative': '',
+    },
+    {
+        'email': 'unique2@primary.com',
+        'email_alternative': 'unique2@alternative.com',
+    },
+    {
+        'email': 'duplicate@primary.com',
+        'email_alternative': '',
+    },
+    {
+        'email': 'duplicate@primary.com',
+        'email_alternative': '',
+    },
+]
 
 
 @pytest.mark.django_db
@@ -472,6 +493,56 @@ class TestInteractionCSVRowForm:
         form = InteractionCSVRowForm(data=data)
         assert not form.errors
         assert form.cleaned_data['subject'] == service.name
+
+    @pytest.mark.parametrize(
+        'input_email,matching_status,match_on_alternative',
+        (
+            # unique match of a contact on primary email
+            ('unique1@primary.com', ContactMatchingStatus.matched, False),
+            # unique match of a contact on alternative email
+            ('unique2@alternative.com', ContactMatchingStatus.matched, True),
+            # no match of a contact
+            ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched, False),
+            # multiple matches of a contact
+            ('duplicate@primary.com', ContactMatchingStatus.multiple_matches, None),
+        ),
+    )
+    def test_contact_lookup(self, input_email, matching_status, match_on_alternative):
+        """
+        Test that various contact matching scenarios.
+
+        Note that the matching logic is tested more extensively in the company app.
+        """
+        for factory_kwargs in EMAIL_MATCHING_CONTACT_TEST_DATA:
+            ContactFactory(**factory_kwargs)
+
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        service = random_obj_for_queryset(
+            Service.objects.filter(disabled_on__isnull=True),
+        )
+
+        data = {
+            'kind': 'interaction',
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'service': service.name,
+
+            'contact_email': input_email,
+        }
+        form = InteractionCSVRowForm(data=data)
+        assert not form.errors
+
+        assert form.cleaned_data['contact_matching_status'] == matching_status
+
+        assert 'contact' in form.cleaned_data
+        contact = form.cleaned_data['contact']
+
+        if matching_status == ContactMatchingStatus.matched:
+            assert contact
+            actual_email = contact.email_alternative if match_on_alternative else contact.email
+            assert actual_email.lower() == input_email.lower()
+        else:
+            assert not contact
 
 
 def _random_communication_channel(disabled=False):
