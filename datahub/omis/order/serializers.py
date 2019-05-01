@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -75,7 +75,7 @@ class OrderSerializer(serializers.ModelSerializer):
     cancelled_by = NestedRelatedField(Advisor, read_only=True)
 
     default_error_messages = {
-        'readonly': ugettext_lazy('This field cannot be changed at this stage.'),
+        'readonly': gettext_lazy('This field cannot be changed at this stage.'),
     }
 
     class Meta:
@@ -584,7 +584,7 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
     is_lead = serializers.BooleanField(required=False)
 
     default_error_messages = {
-        'readonly': ugettext_lazy(
+        'readonly': gettext_lazy(
             'This field cannot be changed at this stage.',
         ),
     }

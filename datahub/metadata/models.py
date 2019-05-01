@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from mptt.models import MPTTModel, TreeForeignKey
 
