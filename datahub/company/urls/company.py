@@ -58,7 +58,6 @@ urls_v3 = [
     path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
     path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
-    path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
 ]
 
 urls_v4 = [
