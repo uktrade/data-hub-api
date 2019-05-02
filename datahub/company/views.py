@@ -19,7 +19,6 @@ from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializerV3,
     CompaniesHouseCompanySerializerV4,
-    CompanySerializerV3,
     CompanySerializerV4,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
@@ -78,16 +77,6 @@ class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
     )
-
-
-class CompanyViewSetV3(BaseCompanyViewSet):
-    """
-    Company view set V3.
-
-    TODO: delete once the migration to address and registered address is complete
-    """
-
-    serializer_class = CompanySerializerV3
 
 
 class CompanyViewSetV4(BaseCompanyViewSet):
