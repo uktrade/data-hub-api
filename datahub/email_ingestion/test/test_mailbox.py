@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 
 from datahub.email_ingestion.email_processor import EmailProcessor
-from datahub.email_ingestion.mailbox import EmailRetrievalError, Mailbox
+from datahub.email_ingestion.mailbox import Mailbox
 
 EXPECTED_EMAIL_MESSAGES = [
     {
@@ -73,8 +73,7 @@ class TestMailbox:
 
     def mock_mailbox_parse_message(self, mailbox):
         """
-        Helper to ensure that the _a
-        EmailRetrievalError as expected.parse_message method of a supplied mailbox
+        Helper to ensure that the parse_message method of a supplied mailbox
         object is mocked.
         """
         mailbox._parse_message = mock.Mock()
@@ -256,9 +255,9 @@ class TestMailbox:
                 return original_side_effect(action, *args)
         mocked_imap.uid.side_effect = uid_side_effect
 
-        with pytest.raises(EmailRetrievalError):
-            # Cast generator method call to list to force execution
-            list(mailbox.get_new_mail())
+        # Cast generator method call to list to force execution
+        new_mail = list(mailbox.get_new_mail())
+        assert new_mail == []
 
     @patch_imap(EXPECTED_EMAIL_MESSAGES)
     def test_process_new_mail(self, mocked_imap):
@@ -371,6 +370,7 @@ class TestMailbox:
         def processing_error(*args, **kwargs):
             raise TypeError('Ooops!')
         bad_processor.process_email.side_effect = processing_error
+        uncalled_processor = processor_classes[1].return_value
         mailbox = Mailbox(
             'foobar@example.net',
             'foobarbaz1',
@@ -378,8 +378,11 @@ class TestMailbox:
             mail_processor_classes=processor_classes,
         )
         message = mock.Mock()
-        with pytest.raises(TypeError):
-            mailbox._process_email(message)
+        result = mailbox._process_email(message)
+        assert result is False
+        # Ensure that we failed early and the second processor was not called at all
+        assert uncalled_processor.process_email.called is False
+        # Ensure that an error message was logged
         expected_error_message = (
             'datahub.email_ingestion.mailbox',
             40,

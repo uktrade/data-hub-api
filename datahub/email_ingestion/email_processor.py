@@ -24,4 +24,3 @@ class EmailProcessor(ABC):
 
             (False, "The email was not sent by a known DIT address")
         """
-        pass

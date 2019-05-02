@@ -31,6 +31,21 @@ class Mailbox:
     The first processor to successfully consume and process the message will stop
     the chain.  Processors will be called in order - so ordering of
     `mail_processor_classes` is important.
+
+    **Important** Any calling code which attempts to get/process new mail using
+    a Mailbox should firstly acquire a lock using django_pglocks' advisory_lock mechanism.
+    e.g.
+
+    ```
+    from django_pglocks import advisory_lock
+
+    with advisory_lock('ingest_emails', wait=False) as acquired:
+        if not acquired:
+            logger.info('Emails are already being ingested by something else')
+            return
+        mailbox.process_new_mail()
+    ```
+
     """
 
     def __init__(
@@ -122,7 +137,7 @@ class Mailbox:
                     f'which was processed by processor "{processor_name}"'
                 )
                 logger.error(error_message)
-                raise e
+                return False
             if processed:
                 success_message = (
                     f'Email {message.message_id} was processed by processor: '
@@ -138,11 +153,11 @@ class Mailbox:
     def _get_message(self, uid, connection):
         try:
             typ, msg_contents = connection.uid('fetch', uid, '(RFC822)')
-        except TypeError:
+        except TypeError as exc:
             # This may happen if something deletes the
             # message between our generating the ID list and our
             # processing it here.
-            raise EmailRetrievalError()
+            raise EmailRetrievalError() from exc
         if not msg_contents:
             return None
         message = self._parse_message(msg_contents[0][1])
@@ -151,9 +166,9 @@ class Mailbox:
     def get_new_mail(self):
         """
         Generator method which gets new messages from the email inbox. After a
-        message has been yielded, it is flagged as SEEN on the inbox so that
-        it will not be ingested again later - we only consider messages that
-        have not been seen for ingestion.
+        message has been yielded (or an error has been logged while parsing it),
+        it is flagged as SEEN on the inbox so that it will not be ingested again later.
+        We only consider messages that have not been seen for ingestion.
 
         :yields: A mailparser.Message object for each parsed message.
         """
@@ -174,18 +189,20 @@ class Mailbox:
                         f'{uid} with error {e}'
                     )
                     logger.error(error_message)
-                    continue
-                except EmailRetrievalError:
+                    # Just set the message to None so that we still mark it as
+                    # read later
+                    message = None
+                except EmailRetrievalError as e:
                     # We should fail and exit immediately in this case, as it's
                     # probable that another process is processing the inbox
                     error_message = (
-                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully'
+                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully '
+                        f'with error {e}'
                     )
                     logger.error(error_message)
-                    raise
-                if not message:
-                    continue
-                yield message
+                    return
+                if message:
+                    yield message
 
                 # Mark the email as read in the inbox
                 connection.uid('store', uid, '+FLAGS', '(\\SEEN)')
