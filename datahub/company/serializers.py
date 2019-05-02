@@ -4,7 +4,7 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.constants import BusinessTypeConstant
@@ -189,10 +189,10 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
     default_error_messages = {
-        'address_same_as_company_and_has_address': ugettext_lazy(
+        'address_same_as_company_and_has_address': gettext_lazy(
             'Please select either address_same_as_company or enter an address manually, not both!',
         ),
-        'no_address': ugettext_lazy(
+        'no_address': gettext_lazy(
             'Please select either address_same_as_company or enter an address manually.',
         ),
     }
@@ -283,23 +283,23 @@ class BaseCompanySerializer(PermittedFieldsModelSerializer):
     """
 
     default_error_messages = {
-        'invalid_uk_establishment_number_prefix': ugettext_lazy(
+        'invalid_uk_establishment_number_prefix': gettext_lazy(
             'This must be a valid UK establishment number, beginning with BR.',
         ),
-        'invalid_uk_establishment_number_characters': ugettext_lazy(
+        'invalid_uk_establishment_number_characters': gettext_lazy(
             'This field can only contain the letters A to Z and numbers (no symbols, punctuation '
             'or spaces).',
         ),
-        'global_headquarters_hq_type_is_not_global_headquarters': ugettext_lazy(
+        'global_headquarters_hq_type_is_not_global_headquarters': gettext_lazy(
             'Company to be linked as global headquarters must be a global headquarters.',
         ),
-        'invalid_global_headquarters': ugettext_lazy(
+        'invalid_global_headquarters': gettext_lazy(
             'Global headquarters cannot point to itself.',
         ),
-        'global_headquarters_has_subsidiaries': ugettext_lazy(
+        'global_headquarters_has_subsidiaries': gettext_lazy(
             'Subsidiaries have to be unlinked before changing headquarter type.',
         ),
-        'subsidiary_cannot_be_a_global_headquarters': ugettext_lazy(
+        'subsidiary_cannot_be_a_global_headquarters': gettext_lazy(
             'A company cannot both be and have a global headquarters.',
         ),
     }
@@ -543,7 +543,7 @@ class CompanySerializerV3(BaseCompanySerializer):
     """
 
     default_error_messages = {
-        'uk_establishment_not_in_uk': ugettext_lazy(
+        'uk_establishment_not_in_uk': gettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
     }
@@ -735,7 +735,7 @@ class CompanySerializerV4(BaseCompanySerializer):
     }
 
     default_error_messages = {
-        'uk_establishment_not_in_uk': ugettext_lazy(
+        'uk_establishment_not_in_uk': gettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
     }
