@@ -33,11 +33,6 @@ company_archive_v3 = CompanyViewSetV3.as_view({
     'post': 'archive',
 })
 
-# TODO: delete once the migration to address and registered address is complete
-company_unarchive_v3 = CompanyViewSetV3.as_view({
-    'post': 'unarchive',
-})
-
 company_archive_v4 = CompanyViewSetV4.as_view({
     'post': 'archive',
 })
@@ -56,7 +51,6 @@ public_company_item_v4 = PublicCompanyViewSet.as_view({
 
 urls_v3 = [
     path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
-    path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
 ]
 
 urls_v4 = [
