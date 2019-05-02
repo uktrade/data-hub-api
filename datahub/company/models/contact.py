@@ -50,8 +50,9 @@ class Contact(ArchivableModel, BaseModel):
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
-    # Note: An index on UPPER(email) exists for use with iexact filtering
-    # See the 0038_add_index_contact_email_upper migration
+    # Note: An index on `UPPER(email)` (with name `company_contact_upper_email_244368`) exists
+    # for use with iexact filtering
+    # See the migrations for the definition
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -64,6 +65,10 @@ class Contact(ArchivableModel, BaseModel):
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    # Note: An index on `UPPER(email_alternative)` (with name
+    # `company_contact_upper_email_alternative_eb17a977`) exists for use with iexact
+    # filtering.
+    # See the migrations for the definition
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
