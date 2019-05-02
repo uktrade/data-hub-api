@@ -189,7 +189,7 @@ class Interaction(ArchivableModel, BaseModel):
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
     subject = models.TextField()
-    location = models.CharField(max_length=MAX_LENGTH, default='')
+    location = models.CharField(max_length=MAX_LENGTH, blank=True)
     # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
     #  removed once the migration is complete
     dit_adviser = models.ForeignKey(
