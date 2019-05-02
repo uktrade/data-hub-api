@@ -12,7 +12,6 @@ from datahub.company.views import (
 
 # TODO: delete once the migration to address and registered address is complete
 company_item_v3 = CompanyViewSetV3.as_view({
-    'get': 'retrieve',
     'patch': 'partial_update',
 })
 
