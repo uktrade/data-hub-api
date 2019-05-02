@@ -6,16 +6,11 @@ from logging import getLogger
 from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
-from datahub.dnb_match.constants import DNB_COUNTRY_CODE_MAPPING
 from datahub.dnb_match.models import DnBMatchingCSVRecord
+from datahub.dnb_match.utils import resolve_dnb_country_to_dh_country_dict
 from datahub.metadata.models import Country
 
 logger = getLogger(__name__)
-
-DNB_COUNTRY_MAPPING = {
-    entry['name']: entry['iso_alpha2_code']
-    for entry in DNB_COUNTRY_CODE_MAPPING.values()
-}
 
 
 class Command(CSVBaseCommand):
@@ -85,15 +80,10 @@ class Command(CSVBaseCommand):
     def _resolve_dnb_address_country(self, data):
         """Resolve DnB address_country with Data Hub country."""
         for row in data:
-            country_code = DNB_COUNTRY_MAPPING.get(row['address_country'])
-            country = self._get_dh_country_by_country_code(country_code) if country_code else None
+            country = resolve_dnb_country_to_dh_country_dict(row['address_country'])
             if not country:
                 return None
-
-            row['address_country'] = {
-                'id': country.id,
-                'name': country.name,
-            }
+            row['address_country'] = country
         return data
 
     @lru_cache(maxsize=None)
