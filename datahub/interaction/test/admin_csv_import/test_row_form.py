@@ -17,7 +17,11 @@ from datahub.interaction.admin_csv_import.row_form import (
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
     OBJECT_DISABLED_MESSAGE,
 )
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.admin_csv_import.utils import (
+    random_communication_channel,
+    random_service,
+)
 from datahub.interaction.test.factories import CommunicationChannelFactory
 from datahub.metadata.models import Service
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
@@ -152,7 +156,7 @@ class TestInteractionCSVRowForm:
             # service is disabled
             (
                 {
-                    'service': lambda: _random_service(disabled=True).name,
+                    'service': lambda: random_service(disabled=True).name,
                 },
                 {
                     'service': [OBJECT_DISABLED_MESSAGE],
@@ -193,7 +197,7 @@ class TestInteractionCSVRowForm:
             # communication_channel is disabled
             (
                 {
-                    'communication_channel': lambda: _random_communication_channel(
+                    'communication_channel': lambda: random_communication_channel(
                         disabled=True,
                     ).name,
                 },
@@ -244,7 +248,7 @@ class TestInteractionCSVRowForm:
     def test_validation_errors(self, data, errors):
         """Test validation for various fields."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
 
         resolved_data = {
             'kind': 'interaction',
@@ -297,7 +301,7 @@ class TestInteractionCSVRowForm:
     def test_simple_value_cleaning(self, field, input_value, expected_value):
         """Test the conversion and cleaning of various non-relationship fields."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
 
         resolved_data = {
             'kind': 'interaction',
@@ -376,7 +380,7 @@ class TestInteractionCSVRowForm:
         service deliveries.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
         obj = object_creator()
 
         resolved_data = {
@@ -399,13 +403,13 @@ class TestInteractionCSVRowForm:
             # communication channel look-up (same case)
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name,
             ),
             # communication channel look-up (case-insensitive)
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name.upper(),
             ),
         ),
@@ -413,7 +417,7 @@ class TestInteractionCSVRowForm:
     def test_interaction_relation_fields(self, field, object_creator, input_transformer):
         """Test the looking up of values for relationship fields specific to interactions."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
         obj = object_creator()
 
         resolved_data = {
@@ -436,7 +440,7 @@ class TestInteractionCSVRowForm:
             # communication channel should be ignored
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name,
                 lambda obj: None,
             ),
@@ -458,7 +462,7 @@ class TestInteractionCSVRowForm:
     ):
         """Test the looking up of values for relationship fields specific to service deliveries."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
         obj = object_creator()
 
         resolved_data = {
@@ -482,7 +486,7 @@ class TestInteractionCSVRowForm:
     def test_subject_falls_back_to_service(self, kind):
         """Test that if subject is not specified, the name of the service is used instead."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
 
         data = {
             'kind': kind,
@@ -591,18 +595,6 @@ class TestInteractionCSVRowForm:
             ),
         ]
         assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
-
-
-def _random_communication_channel(disabled=False):
-    return random_obj_for_queryset(
-        CommunicationChannel.objects.filter(disabled_on__isnull=not disabled),
-    )
-
-
-def _random_service(disabled=False):
-    return random_obj_for_queryset(
-        Service.objects.filter(disabled_on__isnull=not disabled),
-    )
 
 
 def _resolve_data(data):
