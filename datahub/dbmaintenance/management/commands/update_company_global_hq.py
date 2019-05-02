@@ -1,7 +1,7 @@
 import reversion
 
 from datahub.company.models import Company
-from datahub.company.serializers import CompanySerializerV3
+from datahub.company.serializers import CompanySerializerV4
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 
@@ -42,7 +42,7 @@ class Command(CSVBaseCommand):
                 'global_headquarters': global_hq,
             }
 
-            serializer = CompanySerializerV3(
+            serializer = CompanySerializerV4(
                 instance=company,
                 data=data,
                 partial=True,
