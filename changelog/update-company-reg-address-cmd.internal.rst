@@ -1,1 +1,0 @@
-The ``update_company_registered_address`` Django command is now available for internal use. This copies the ``registered_address`` of all CompaniesHouseCompany records to the corresponding Company record with the same ``company_number``. If a CompaniesHouseCompany is not found, it resets the ``registered_address``.
