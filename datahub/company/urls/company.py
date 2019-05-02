@@ -9,10 +9,6 @@ from datahub.company.views import (
     PublicCompanyViewSet,
 )
 
-# TODO: delete once the migration to address and registered address is complete
-company_collection_v3 = CompanyViewSetV3.as_view({
-    'post': 'create',
-})
 
 # TODO: delete once the migration to address and registered address is complete
 company_item_v3 = CompanyViewSetV3.as_view({
@@ -65,7 +61,6 @@ public_company_item_v4 = PublicCompanyViewSet.as_view({
 })
 
 urls_v3 = [
-    path('company', company_collection_v3, name='collection'),
     path('company/<uuid:pk>', company_item_v3, name='item'),
     path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
     path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
