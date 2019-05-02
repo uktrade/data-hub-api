@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 
+from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models import Advisor
 from datahub.core.query_utils import get_full_name_expression
 from datahub.event.models import Event
@@ -56,6 +57,9 @@ class InteractionCSVRowForm(forms.Form):
 
     kind = forms.ChoiceField(choices=Interaction.KINDS)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
+    # Used to attempt to find a matching contact (and company) for the interaction
+    # Note that if a matching contact is not found, the interaction in question is
+    # skipped (and the user informed) rather than the whole process aborting
     contact_email = forms.EmailField()
     # Represents an InteractionDITParticipant for the interaction.
     # The adviser will be looked up by name (case-insensitive) with inactive advisers
@@ -133,41 +137,46 @@ class InteractionCSVRowForm(forms.Form):
         if not subject and service:
             data['subject'] = service.name
 
+        # Attempt to look up the contact
+        data['contact'], data['contact_matching_status'] = find_active_contact_by_email_address(
+            data.get('contact_email'),
+        )
+
         return data
 
     def _populate_adviser(self, data, adviser_field, team_field):
         try:
-            data[adviser_field] = self._look_up_adviser(
+            data[adviser_field] = _look_up_adviser(
                 data.get(adviser_field),
                 data.get(team_field),
             )
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
 
-    @staticmethod
-    def _look_up_adviser(adviser_name, team):
-        if not adviser_name:
-            return None
 
-        get_kwargs = {
-            'is_active': True,
-            'name__iexact': adviser_name,
-        }
+def _look_up_adviser(adviser_name, team):
+    if not adviser_name:
+        return None
 
+    get_kwargs = {
+        'is_active': True,
+        'name__iexact': adviser_name,
+    }
+
+    if team:
+        get_kwargs['dit_team'] = team
+
+    queryset = Advisor.objects.annotate(name=get_full_name_expression())
+
+    try:
+        return queryset.get(**get_kwargs)
+    except Advisor.DoesNotExist:
         if team:
-            get_kwargs['dit_team'] = team
+            raise ValidationError(
+                ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
+                code='adviser_and_team_not_found',
+            )
 
-        queryset = Advisor.objects.annotate(name=get_full_name_expression())
-
-        try:
-            return queryset.get(**get_kwargs)
-        except Advisor.DoesNotExist:
-            if team:
-                raise ValidationError(
-                    ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
-                    code='adviser_and_team_not_found',
-                )
-
-            raise ValidationError(ADVISER_NOT_FOUND_MESSAGE, code='adviser_not_found')
-        except Advisor.MultipleObjectsReturned:
-            raise ValidationError(MULTIPLE_ADVISERS_FOUND_MESSAGE, code='multiple_advisers_found')
+        raise ValidationError(ADVISER_NOT_FOUND_MESSAGE, code='adviser_not_found')
+    except Advisor.MultipleObjectsReturned:
+        raise ValidationError(MULTIPLE_ADVISERS_FOUND_MESSAGE, code='multiple_advisers_found')
