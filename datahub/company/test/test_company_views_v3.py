@@ -1,12 +1,10 @@
 import uuid
-from datetime import datetime
 
 import factory
 import pytest
 import reversion
 from django.forms.models import model_to_dict
 from django.utils.timezone import now
-from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
@@ -31,157 +29,6 @@ from datahub.core.test_utils import (
     random_obj_for_model,
 )
 from datahub.metadata.models import Sector
-from datahub.metadata.test.factories import TeamFactory
-
-
-class TestListCompanies(APITestMixin):
-    """Tests for listing companies."""
-
-    def test_companies_list_no_permissions(self):
-        """Should return 403"""
-        user = create_test_user(dit_team=TeamFactory())
-        api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:company:collection')
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_list_companies(self):
-        """List the companies."""
-        CompanyFactory.create_batch(2)
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 2
-
-    def test_filter_by_global_headquarters(self):
-        """Test filtering by global_headquarters_id."""
-        ghq = CompanyFactory()
-        subsidiaries = CompanyFactory.create_batch(2, global_headquarters=ghq)
-        CompanyFactory.create_batch(2)
-
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.get(
-            url,
-            data={
-                'global_headquarters_id': ghq.pk,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(subsidiaries)
-        expected_ids = {str(subsidiary.pk) for subsidiary in subsidiaries}
-        actual_ids = {result['id'] for result in response_data['results']}
-        assert expected_ids == actual_ids
-
-    def test_sort_by_name(self):
-        """Test sorting by name."""
-        companies = CompanyFactory.create_batch(
-            5,
-            name=factory.Iterator(
-                (
-                    'Mercury Ltd',
-                    'Venus Ltd',
-                    'Mars Components Ltd',
-                    'Exports Ltd',
-                    'Lambda Plc',
-                ),
-            ),
-        )
-
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.get(
-            url,
-            data={'sortby': 'name'},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(companies)
-
-        actual_names = [result['name'] for result in response_data['results']]
-        assert actual_names == [
-            'Exports Ltd',
-            'Lambda Plc',
-            'Mars Components Ltd',
-            'Mercury Ltd',
-            'Venus Ltd',
-        ]
-
-    def test_sort_by_created_on(self):
-        """Test sorting by created_on."""
-        creation_times = [
-            datetime(2015, 1, 1),
-            datetime(2016, 1, 1),
-            datetime(2019, 1, 1),
-            datetime(2020, 1, 1),
-            datetime(2005, 1, 1),
-        ]
-        for creation_time in creation_times:
-            with freeze_time(creation_time):
-                CompanyFactory()
-
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.get(
-            url,
-            data={
-                'sortby': 'created_on',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(creation_times)
-        expected_timestamps = [
-            format_date_or_datetime(creation_time)
-            for creation_time in sorted(creation_times)
-        ]
-        actual_timestamps = [result['created_on'] for result in response_data['results']]
-        assert expected_timestamps == actual_timestamps
-
-    def test_list_companies_without_view_document_permission(self):
-        """List the companies by user without view document permission."""
-        CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
-
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-            ),
-        )
-        api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:company:collection')
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 5
-        assert all(
-            'archived_documents_url_path' not in company
-            for company in response_data['results']
-        )
-
-    def test_list_companies_with_view_document_permission(self):
-        """List the companies by user with view document permission."""
-        CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
-
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_company_document',
-            ),
-        )
-        api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:company:collection')
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 5
-        assert all(
-            company['archived_documents_url_path'] == 'hello world'
-            for company in response_data['results']
-        )
 
 
 class TestGetCompany(APITestMixin):
