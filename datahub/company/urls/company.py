@@ -59,11 +59,6 @@ urls_v3 = [
     path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
     path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
-    path(
-        'company/<uuid:pk>/one-list-group-core-team',
-        one_list_group_core_team,
-        name='one-list-group-core-team',
-    ),
 ]
 
 urls_v4 = [
