@@ -1,19 +1,15 @@
-import reversion
 from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
-from reversion.models import Version
 
 from datahub.company.test.factories import (
     CompanyFactory,
     DuplicateCompanyFactory,
 )
 from datahub.core.constants import Country
-from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
-    format_date_or_datetime,
 )
 
 
@@ -111,46 +107,3 @@ class TestUnarchiveCompany(APITestMixin):
                     'record for the following reason: Duplicate record.',
                 ],
         }
-
-
-class TestAuditLogView(APITestMixin):
-    """Tests for the audit log view."""
-
-    def test_audit_log_view(self):
-        """Test retrieval of audit log."""
-        initial_datetime = now()
-        with reversion.create_revision():
-            company = CompanyFactory(
-                description='Initial desc',
-            )
-
-            reversion.set_comment('Initial')
-            reversion.set_date_created(initial_datetime)
-            reversion.set_user(self.user)
-
-        changed_datetime = now()
-        with reversion.create_revision():
-            company.description = 'New desc'
-            company.save()
-
-            reversion.set_comment('Changed')
-            reversion.set_date_created(changed_datetime)
-            reversion.set_user(self.user)
-
-        versions = Version.objects.get_for_object(company)
-        version_id = versions[0].id
-        url = reverse('api-v3:company:audit-item', kwargs={'pk': company.pk})
-
-        response = self.api_client.get(url)
-        response_data = response.json()['results']
-
-        # No need to test the whole response
-        assert len(response_data) == 1
-        entry = response_data[0]
-
-        assert entry['id'] == version_id
-        assert entry['user']['name'] == self.user.name
-        assert entry['comment'] == 'Changed'
-        assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
-        assert entry['changes']['description'] == ['Initial desc', 'New desc']
-        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()

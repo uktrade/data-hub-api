@@ -57,7 +57,6 @@ public_company_item_v4 = PublicCompanyViewSet.as_view({
 urls_v3 = [
     path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
     path('company/<uuid:pk>/unarchive', company_unarchive_v3, name='unarchive'),
-    path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
 ]
 
 urls_v4 = [
