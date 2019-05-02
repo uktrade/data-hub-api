@@ -3,7 +3,6 @@ from django.urls import path
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
     CompanyAuditViewSet,
-    CompanyViewSetV3,
     CompanyViewSetV4,
     OneListGroupCoreTeamViewSet,
     PublicCompanyViewSet,
@@ -28,11 +27,6 @@ company_timeline = CompanyTimelineViewSet.as_view({
     'get': 'list',
 })
 
-# TODO: delete once the migration to address and registered address is complete
-company_archive_v3 = CompanyViewSetV3.as_view({
-    'post': 'archive',
-})
-
 company_archive_v4 = CompanyViewSetV4.as_view({
     'post': 'archive',
 })
@@ -48,10 +42,6 @@ one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
 public_company_item_v4 = PublicCompanyViewSet.as_view({
     'get': 'retrieve',
 })
-
-urls_v3 = [
-    path('company/<uuid:pk>/archive', company_archive_v3, name='archive'),
-]
 
 urls_v4 = [
     path('company', company_collection_v4, name='collection'),
