@@ -87,6 +87,18 @@ class PolicyIssueType(BaseOrderedConstantModel):
     """
 
 
+class ExportAdviceTopic(BaseOrderedConstantModel):
+    """
+    Export advice topic for export advice and information service.
+    """
+
+
+class InvestmentAdviceTopic(BaseOrderedConstantModel):
+    """
+    Investment advice topic for investment advice and information service.
+    """
+
+
 class InteractionDITParticipant(models.Model):
     """
     Many-to-many model between an interaction and an adviser (called a DIT participant).
@@ -209,17 +221,22 @@ class Interaction(ArchivableModel, BaseModel):
         help_text='This field is deprecated and has been replaced by DIT participants.',
     )
     communication_channel = models.ForeignKey(
-        'CommunicationChannel', blank=True, null=True,
+        'CommunicationChannel',
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
-        help_text='For interactions only.',
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this '
                   'interaction.',
     )
     service_delivery_status = models.ForeignKey(
-        'ServiceDeliveryStatus', blank=True, null=True, on_delete=models.PROTECT,
+        'ServiceDeliveryStatus',
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
         verbose_name='status',
         help_text='For service deliveries only.',
     )
@@ -234,11 +251,17 @@ class Interaction(ArchivableModel, BaseModel):
     )
     # Grants
     grant_amount_offered = models.DecimalField(
-        null=True, blank=True, max_digits=19, decimal_places=2,
+        null=True,
+        blank=True,
+        max_digits=19,
+        decimal_places=2,
         help_text='For service deliveries only.',
     )
     net_company_receipt = models.DecimalField(
-        null=True, blank=True, max_digits=19, decimal_places=2,
+        null=True,
+        blank=True,
+        max_digits=19,
+        decimal_places=2,
         help_text='For service deliveries only.',
     )
     # Policy feedback
@@ -254,6 +277,24 @@ class Interaction(ArchivableModel, BaseModel):
         related_name='interactions',
     )
     policy_feedback_notes = models.TextField(blank=True, default='')
+
+    # Export and investment advice topics
+    export_advice_topic = models.ForeignKey(
+        'ExportAdviceTopic',
+        blank=True,
+        related_name='%(class)ss',
+        null=True,
+        on_delete=models.CASCADE,
+        help_text='For export advice and information service only.',
+    )
+    investment_advice_topic = models.ForeignKey(
+        'InvestmentAdviceTopic',
+        blank=True,
+        related_name='%(class)ss',
+        null=True,
+        on_delete=models.CASCADE,
+        help_text='For investment advice and information service only.',
+    )
 
     @property
     def is_event(self):

@@ -1,0 +1,24 @@
+- model: interaction.investmentadvicetopic
+  pk: b172fdb0-1390-4b4e-aa42-3828dd3e4af1
+  fields: {disabled_on: null, name: Banking & Funding, order: 100.0}
+- model: interaction.investmentadvicetopic
+  pk: 6fa49e9f-d6f0-41d0-8ea6-00e946f5432f
+  fields: {disabled_on: null, name: DIT or Government Services, order: 200.0}
+- model: interaction.investmentadvicetopic
+  pk: 8ff9b279-3cd9-413c-8982-d81cfbd7e773
+  fields: {disabled_on: null, name: Market & Sector Information, order: 300.0}
+- model: interaction.investmentadvicetopic
+  pk: bc9184bb-e833-4e78-9b18-6a47ccdce0b9
+  fields: {disabled_on: null, name: Marketing & Communication, order: 400.0}
+- model: interaction.investmentadvicetopic
+  pk: 0aa33837-f534-4620-b7b3-08894161e478
+  fields: {disabled_on: null, name: Rules & Regulations, order: 500.0}
+- model: interaction.investmentadvicetopic
+  pk: e34d8d5a-f07d-423f-88be-1fbbf59f3742
+  fields: {disabled_on: null, name: Skills & Recruitment, order: 600.0}
+- model: interaction.investmentadvicetopic
+  pk: 34300216-2b36-44d8-adca-b6f560a44b3d
+  fields: {disabled_on: null, name: UK Locations, order: 700.0}
+- model: interaction.investmentadvicetopic
+  pk: e7e59787-c324-4a72-8cf4-710dbe114423
+  fields: {disabled_on: null, name: General, order: 800.0}

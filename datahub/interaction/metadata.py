@@ -21,3 +21,13 @@ registry.register(
     metadata_id='policy-issue-type',
     model=models.PolicyIssueType,
 )
+
+registry.register(
+    metadata_id='expert-advice-topic',
+    model=models.ExportAdviceTopic,
+)
+
+registry.register(
+    metadata_id='investment-advice-tooic',
+    model=models.InvestmentAdviceTopic,
+)

@@ -1,0 +1,21 @@
+- model: interaction.exportadvicetopic
+  pk: a9de07a0-f35c-4051-983d-fd3f198c8f33
+  fields: {disabled_on: null, name: Banking & Funding, order: 100.0}
+- model: interaction.exportadvicetopic
+  pk: 6ba1e60f-770f-4b5e-a3c9-7e57c12ad3e5
+  fields: {disabled_on: null, name: DIT or Government Services, order: 200.0}
+- model: interaction.exportadvicetopic
+  pk: 3bb2fe2a-0a2e-456e-aada-843f93432454
+  fields: {disabled_on: null, name: Documents & Regulations, order: 300.0}
+- model: interaction.exportadvicetopic
+  pk: 5352ee59-d89b-425e-86e3-f16f2e95693e
+  fields: {disabled_on: null, name: Market & Sector Information, order: 400.0}
+- model: interaction.exportadvicetopic
+  pk: db0136c5-2440-4e86-8b0b-c362ba636e11
+  fields: {disabled_on: null, name: Marketing & Communication, order: 500.0}
+- model: interaction.exportadvicetopic
+  pk: 168c8c20-63f3-4b01-a01b-ac080437e73a
+  fields: {disabled_on: null, name: Skills & Recruitment, order: 600.0}
+- model: interaction.exportadvicetopic
+  pk: c55db6b1-fc85-4629-8171-b5b9db12a240
+  fields: {disabled_on: null, name: General, order: 700.0}

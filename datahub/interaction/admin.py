@@ -18,9 +18,11 @@ from datahub.interaction.admin_csv_import.views import (
 )
 from datahub.interaction.models import (
     CommunicationChannel,
+    ExportAdviceTopic,
     Interaction,
     InteractionDITParticipant,
     InteractionPermission,
+    InvestmentAdviceTopic,
     PolicyArea,
     PolicyIssueType,
 )
@@ -28,6 +30,7 @@ from datahub.metadata.admin import DisableableMetadataAdmin, OrderedMetadataAdmi
 
 admin.site.register(CommunicationChannel, DisableableMetadataAdmin)
 admin.site.register((PolicyArea, PolicyIssueType), OrderedMetadataAdmin)
+admin.site.register((ExportAdviceTopic, InvestmentAdviceTopic), OrderedMetadataAdmin)
 
 
 class InteractionDITParticipantInline(admin.TabularInline):
