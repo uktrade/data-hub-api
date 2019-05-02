@@ -37,9 +37,10 @@ from datahub.investment.project.queryset import get_slim_investment_project_quer
 from datahub.oauth.scopes import Scope
 
 
-class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """Base Company view set."""
+class CompanyViewSetV4(ArchivableViewSetMixin, CoreViewSet):
+    """Company view set V4."""
 
+    serializer_class = CompanySerializerV4
     required_scopes = (Scope.internal_front_end,)
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
@@ -77,12 +78,6 @@ class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
     )
-
-
-class CompanyViewSetV4(BaseCompanyViewSet):
-    """Company view set V4."""
-
-    serializer_class = CompanySerializerV4
 
 
 class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):
