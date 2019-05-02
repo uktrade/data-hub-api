@@ -66,6 +66,15 @@ def patch_imap(email_messages):
     return patch_imap_decorator
 
 
+class MockedParsedMessage(str):
+    """
+    A simple mock to replace MailParser objects - subclassing string is convenient
+    for equality checks.
+    """
+
+    message_id = 'foobar'
+
+
 class TestMailbox:
     """
     Test the Mailbox class.
@@ -78,8 +87,9 @@ class TestMailbox:
         """
         mailbox._parse_message = mock.Mock()
 
-        def parse_message_side_effect(message):
-            return message.decode()
+        def parse_message_side_effect(message_body_bytes):
+            parsed_message = MockedParsedMessage(message_body_bytes.decode())
+            return parsed_message
         mailbox._parse_message.side_effect = parse_message_side_effect
 
     @patch_imap(EXPECTED_EMAIL_MESSAGES)

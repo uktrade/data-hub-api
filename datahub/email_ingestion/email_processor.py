@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class EmailProcessor(ABC):
     """
     EmailProcessor subclasses should take a message and perform some actions
-    based on it's metadata/content in order to process it.  EmailProcessor is
+    based on its metadata/content in order to process it.  EmailProcessor is
     an abstract superclass.
     """
 

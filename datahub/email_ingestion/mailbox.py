@@ -131,12 +131,12 @@ class Mailbox:
             processor_name = processor_class.__name__
             try:
                 processed, processing_output = processor.process_email(message)
-            except Exception as e:
+            except Exception as exc:
                 error_message = (
-                    f'Error "{e.__class__.__name__}" processing email "{message.message_id}" '
+                    f'Error "{exc.__class__.__name__}" processing email "{message.message_id}" '
                     f'which was processed by processor "{processor_name}"'
                 )
-                logger.error(error_message)
+                logger.exception(error_message)
                 return False
             if processed:
                 success_message = (
@@ -145,6 +145,11 @@ class Mailbox:
                 )
                 logger.info(success_message)
                 return True
+            else:
+                logger.debug(
+                    f'Email {message.message_id} could not be processed by {processor_name}. '
+                    f'Reason: "{processing_output}"',
+                )
         return False
 
     def _parse_message(self, message_bytes):
@@ -181,25 +186,23 @@ class Mailbox:
             for uid in message_ids:
                 try:
                     message = self._get_message(uid, connection)
-                except (MessageParseError, MailParserError) as e:
+                except (MessageParseError, MailParserError):
                     # If we have some problem parsing the email, it's likely
                     # to be spam/malicious so skip it
                     error_message = (
-                        f'Mailbox "{self.email}" failed to parse message '
-                        f'{uid} with error {e}'
+                        f'Mailbox "{self.email}" failed to parse message'
                     )
-                    logger.error(error_message)
+                    logger.exception(error_message)
                     # Just set the message to None so that we still mark it as
                     # read later
                     message = None
-                except EmailRetrievalError as e:
+                except EmailRetrievalError:
                     # We should fail and exit immediately in this case, as it's
                     # probable that another process is processing the inbox
                     error_message = (
-                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully '
-                        f'with error {e}'
+                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully'
                     )
-                    logger.error(error_message)
+                    logger.exception(error_message)
                     return
                 if message:
                     yield message
