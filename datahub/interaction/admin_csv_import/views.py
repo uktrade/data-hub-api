@@ -1,16 +1,30 @@
+from itertools import islice
+
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy
 
 from datahub.core.admin import max_upload_size
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm
+from datahub.interaction.models import Interaction, InteractionPermission
 
 INTERACTION_IMPORTER_FEATURE_FLAG_NAME = 'admin-interaction-csv-importer'
+MAX_ERRORS_TO_DISPLAY = 50
+PAGE_TITLE = gettext_lazy('Import interactions')
+
+
+interaction_change_all_permission_required = method_decorator(
+    permission_required(
+        f'interaction.{InteractionPermission.change_all}',
+        raise_exception=True,
+    ),
+)
 
 
 class InteractionCSVImportAdmin:
@@ -38,12 +52,10 @@ class InteractionCSVImportAdmin:
         ]
 
     @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
+    @interaction_change_all_permission_required
     @method_decorator(max_upload_size(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE))
     def select_file(self, request, *args, **kwargs):
         """View containing a form to select a CSV file to import."""
-        if not self.model_admin.has_change_permission(request):
-            raise PermissionDenied
-
         if request.method != 'POST':
             return self._select_file_form_response(request, InteractionCSVForm())
 
@@ -51,19 +63,44 @@ class InteractionCSVImportAdmin:
         if not form.is_valid():
             return self._select_file_form_response(request, form)
 
+        if not form.are_all_rows_valid():
+            return self._error_list_response(request, form.get_row_error_iterator())
+
         # Next page not yet implemented; redirect to the change list for now
-        changelist_route_name = admin_urlname(self.model_admin.model._meta, 'changelist')
-        changelist_url = reverse(changelist_route_name)
-        return HttpResponseRedirect(changelist_url)
+        return _redirect_response('changelist')
 
     def _select_file_form_response(self, request, form):
-        template_name = 'admin/interaction/interaction/import_select_file.html'
-        title = 'Import interactions'
+        return self._template_response(
+            request,
+            'admin/interaction/interaction/import_select_file.html',
+            PAGE_TITLE,
+            form=form,
+        )
 
+    def _error_list_response(self, request, errors):
+        limited_errors = list(islice(errors, MAX_ERRORS_TO_DISPLAY))
+        are_errors_truncated = bool(next(errors, None))
+
+        return self._template_response(
+            request,
+            'admin/interaction/interaction/import_row_errors.html',
+            PAGE_TITLE,
+            errors=limited_errors,
+            are_errors_truncated=are_errors_truncated,
+            max_errors=MAX_ERRORS_TO_DISPLAY,
+        )
+
+    def _template_response(self, request, template, title, **extra_context):
         context = {
             **self.model_admin.admin_site.each_context(request),
             'opts': self.model_admin.model._meta,
             'title': title,
-            'form': form,
+            **extra_context,
         }
-        return TemplateResponse(request, template_name, context)
+        return TemplateResponse(request, template, context)
+
+
+def _redirect_response(admin_view_name, **kwargs):
+    import_errors_route_name = admin_urlname(Interaction._meta, admin_view_name)
+    import_errors_url = reverse(import_errors_route_name, kwargs=kwargs)
+    return HttpResponseRedirect(import_errors_url)
