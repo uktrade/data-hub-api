@@ -71,16 +71,6 @@ class SearchCompanyAPIViewMixin:
     }
 
 
-@register_v3_view()
-class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view V3."""
-
-    fields_to_exclude = (
-        'address',
-        'registered_address',
-    )
-
-
 @register_v4_view()
 class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view V4."""
