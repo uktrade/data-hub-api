@@ -341,8 +341,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
-            'status': {'default': Interaction.STATUSES.complete, 'allow_null': False},
-            'location': {'default': ''},
+            'status': {'default': Interaction.STATUSES.complete},
             'theme': {
                 'allow_blank': False,
                 'default': None,
