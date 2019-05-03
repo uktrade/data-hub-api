@@ -3,9 +3,12 @@ from email.errors import MessageParseError
 from unittest import mock
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 
 from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.email_ingestion.mailbox import Mailbox
+from datahub.email_ingestion.mailbox import MailboxManager
 
 EXPECTED_EMAIL_MESSAGES = [
     {
@@ -397,3 +400,86 @@ class TestMailbox:
             'processor "Processor 0"',
         )
         assert expected_error_message in caplog.record_tuples
+
+
+MAILBOXES = {
+    'mybox1': {
+        'email': 'mybox1@example.net',
+        'password': 'foobarbaz1',
+        'imap_domain': 'imap.example.net',
+        'processor_classes': [
+            'datahub.email_ingestion.processor_1.Processor',
+            'datahub.email_ingestion.processor_2.Processor',
+        ],
+    },
+    'mybox2': {
+        'email': 'mybox2@example.net',
+        'password': 'foobarbaz2',
+        'imap_domain': 'imap.example.net',
+        'processor_classes': [
+            'datahub.email_ingestion.processor_1.Processor',
+            'datahub.email_ingestion.processor_2.Processor',
+        ],
+    },
+}
+
+# Mailbox missing password configuration
+BAD_MAILBOXES = {
+    'mybox1': {
+        'email': 'mybox1@example.net',
+        'imap_domain': 'imap.example.net',
+        'processor_classes': [
+            'datahub.email_ingestion.processor_1.Processor',
+            'datahub.email_ingestion.processor_2.Processor',
+        ],
+    },
+}
+
+
+class TestMailboxManager:
+    """
+    Test the MailboxManager class.
+    """
+
+    @override_settings(MAILBOXES=MAILBOXES)
+    def test_manager_initialisation(self, monkeypatch):
+        """
+        Functional test to ensure that MailboxManager is initialised as expected.
+        """
+        import_string_mock = mock.Mock()
+        monkeypatch.setattr(
+            'datahub.email_ingestion.mailbox.import_string',
+            import_string_mock,
+        )
+        mailbox_manager = MailboxManager()
+        for mailbox_name, mailbox_config in MAILBOXES.items():
+            instantiated_mailbox = mailbox_manager.get_mailbox(mailbox_name)
+            # ensure that the Mailbox object has the expected attributes
+            assert instantiated_mailbox.email == mailbox_config['email']
+            assert instantiated_mailbox.password == mailbox_config['password']
+            assert instantiated_mailbox.imap_domain == mailbox_config['imap_domain']
+            # ensure that the processor class paths were imported
+            for processor_class_path in mailbox_config['processor_classes']:
+                import_string_mock.assert_any_call(processor_class_path)
+            for processor_class in instantiated_mailbox.processor_classes:
+                assert processor_class == import_string_mock.return_value
+        all_mailboxes = mailbox_manager.get_all_mailboxes()
+        assert len(all_mailboxes) == len(MAILBOXES.values())
+
+    @override_settings(MAILBOXES=BAD_MAILBOXES)
+    def test_manager_initialisation_badly_configured(self):
+        """
+        Functional test to ensure that MailboxManager raises the correct error
+        when badly configured.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            MailboxManager()
+
+    @override_settings(MAILBOXES={})
+    def test_manager_initialisation_no_mailboxes(self):
+        """
+        Functional test to ensure that MailboxManager works as expected when
+        there are no mailboxes in the application settings.
+        """
+        mailbox_manager = MailboxManager()
+        assert mailbox_manager.get_all_mailboxes() == []

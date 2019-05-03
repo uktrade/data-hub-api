@@ -520,3 +520,16 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     }
 }
+
+MAILBOXES = {
+    # Illustrative example...
+    # TODO: remove this when we have a real mailbox
+    #"meetings": {
+    #    "email": env("MAILBOX_MEETINGS_EMAIL", default=''),
+    #    "password": env("MAILBOX_MEETINGS_PASSWORD", default=''),
+    #    "imap_domain": env("MAILBOX_MEETINGS_IMAP_DOMAIN", default=''),
+    #    "processor_classes": [
+    #        "datahub.interaction.email_processors.CalendarInteractionEmailProcessor",
+    #    ],
+    #},
+}

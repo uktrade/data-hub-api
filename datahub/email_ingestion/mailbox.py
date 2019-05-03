@@ -4,6 +4,9 @@ from email.errors import MessageParseError
 from logging import getLogger
 
 import mailparser
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
 from mailparser.exceptions import MailParserError
 
 logger = getLogger(__name__)
@@ -217,3 +220,76 @@ class Mailbox:
         messages = self.get_new_mail()
         for message in messages:
             self._process_email(message)
+
+
+class MailboxManager:
+    """
+    Manages all of the mailboxes that are active in our application. This is a
+    singleton and should be considered the single gateway for accessing IMAP
+    Mailboxes.
+
+    **Important** Any calling code which attempts to get/process new mail using
+    a Mailbox should firstly acquire a lock using django_pglocks' advisory_lock mechanism.
+    e.g.
+
+    ```
+    from django_pglocks import advisory_lock
+
+    with advisory_lock('ingest_emails', wait=False) as acquired:
+        if not acquired:
+            logger.info('Emails are already being ingested by something else')
+            return
+        mailbox.process_new_mail()
+    ```
+    """
+
+    def __init__(self):
+        """
+        Initialise the MailboxManager object.
+        """
+        self.mailboxes = {}
+        self.initialise_mailboxes()
+
+    def initialise_mailboxes(self):
+        """
+        Initialise all of the mailboxes detailed in the MAILBOXES django setting.
+        """
+        for mailbox_name, config in settings.MAILBOXES.items():
+            properly_configured = (
+                config.get('email') and config.get('password') and config.get('imap_domain')
+            )
+            if not properly_configured:
+                message = f'Mailbox "{mailbox_name}" was not configured properly in settings'
+                raise ImproperlyConfigured(message)
+            processor_class_paths = config.get('processor_classes', [])
+            processor_classes = []
+            for processor_class_path in processor_class_paths:
+                processor_class = import_string(processor_class_path)
+                processor_classes.append(processor_class)
+            mailbox = Mailbox(
+                config['email'],
+                config['password'],
+                config['imap_domain'],
+                processor_classes,
+            )
+            self.mailboxes[mailbox_name] = mailbox
+
+    def get_all_mailboxes(self):
+        """
+        Get all active Mailbox objects in a list.
+        """
+        return list(self.mailboxes.values())
+
+    def get_mailbox(self, identifier):
+        """
+        Get a single Mailbox object for the specified identifier.
+
+        :param identifier: string - the name of the mailbox to get
+
+        :returns: A Mailbox object.
+        """
+        return self.mailboxes[identifier]
+
+
+# Initialise the singleton at module load
+mailbox_manager = MailboxManager()
