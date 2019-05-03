@@ -321,7 +321,7 @@ class TestMailbox:
             # Ensure that when there are no processors, the email is not processed
             (
                 0,
-                tuple(),
+                (),
                 False,
             ),
         ),
@@ -335,8 +335,7 @@ class TestMailbox:
         # Set up our mocked processor classes, ensuring that they return the
         # results we expect
         for i in range(processor_count):
-            mocked_processor_class = mock.Mock(spec=EmailProcessor)
-            mocked_processor_class.__name__ = ''
+            mocked_processor_class = mock.Mock(spec=EmailProcessor, __name__='')
             mocked_processor = mocked_processor_class.return_value
             try:
                 mocked_processor.process_email.return_value = processor_results[i]
@@ -377,9 +376,7 @@ class TestMailbox:
             processor_classes.append(mocked_processor_class)
         bad_processor = processor_classes[0].return_value
 
-        def processing_error(*args, **kwargs):
-            raise TypeError('Ooops!')
-        bad_processor.process_email.side_effect = processing_error
+        bad_processor.process_email.side_effect = TypeError('Ooops!')
         uncalled_processor = processor_classes[1].return_value
         mailbox = Mailbox(
             'foobar@example.net',
@@ -396,7 +393,7 @@ class TestMailbox:
         expected_error_message = (
             'datahub.email_ingestion.mailbox',
             40,
-            f'Error "TypeError" processing email "{message.message_id}" which was processed by '
+            f'Error processing email "{message.message_id}" which was processed by '
             'processor "Processor 0"',
         )
         assert expected_error_message in caplog.record_tuples

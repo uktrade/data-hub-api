@@ -131,9 +131,9 @@ class Mailbox:
             processor_name = processor_class.__name__
             try:
                 processed, processing_output = processor.process_email(message)
-            except Exception as exc:
+            except Exception:
                 error_message = (
-                    f'Error "{exc.__class__.__name__}" processing email "{message.message_id}" '
+                    f'Error processing email "{message.message_id}" '
                     f'which was processed by processor "{processor_name}"'
                 )
                 logger.exception(error_message)
@@ -145,11 +145,10 @@ class Mailbox:
                 )
                 logger.info(success_message)
                 return True
-            else:
-                logger.debug(
-                    f'Email {message.message_id} could not be processed by {processor_name}. '
-                    f'Reason: "{processing_output}"',
-                )
+            logger.debug(
+                f'Email {message.message_id} could not be processed by {processor_name}. '
+                f'Reason: "{processing_output}"',
+            )
         return False
 
     def _parse_message(self, message_bytes):
