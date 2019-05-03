@@ -390,6 +390,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_on',
             'archived_reason',
         )
+        # Note: These validators are also used by the admin site import interactions tool
+        # (see the admin_csv_import sub-package)
         validators = [
             HasAssociatedInvestmentProjectValidator(),
             ContactsBelongToCompanyValidator(),
