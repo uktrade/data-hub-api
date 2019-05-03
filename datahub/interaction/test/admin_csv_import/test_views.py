@@ -14,6 +14,10 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
 from datahub.interaction.models import Interaction, InteractionPermission
+from datahub.interaction.test.admin_csv_import.utils import (
+    random_communication_channel,
+    random_service,
+)
 
 
 @pytest.fixture()
@@ -216,9 +220,25 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
     def test_redirects_on_valid_file(self):
         """Test that the user is redirected to the change list when a valid file is loaded."""
         adviser = AdviserFactory()
+        service = random_service()
+        communication_channel = random_communication_channel()
         file = _make_csv(
-            ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
-            ('interaction', '01/01/2018', adviser.name, 'person@company.uk', 'Account Management'),
+            (
+                'kind',
+                'date',
+                'adviser_1',
+                'contact_email',
+                'service',
+                'communication_channel',
+            ),
+            (
+                'interaction',
+                '01/01/2018',
+                adviser.name,
+                'person@company.uk',
+                service.name,
+                communication_channel.name,
+            ),
         )
 
         response = self.client.post(

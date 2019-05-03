@@ -22,7 +22,7 @@
   {% for error in errors %}
     <tr>
       <td>{{ error.source_row|add:1 }}</td>
-      <td>{{ error.field }}</td>
+      <td>{{ error.display_field }}</td>
       <td>{{ error.value }}</td>
       <td>{{ error.error }}</td>
     </tr>
