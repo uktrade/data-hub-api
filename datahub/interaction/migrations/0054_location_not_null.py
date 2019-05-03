@@ -11,6 +11,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interaction',
             name='location',
-            field=models.CharField(default='', max_length=255),
+            field=models.CharField(blank=True, max_length=255),
         ),
     ]
