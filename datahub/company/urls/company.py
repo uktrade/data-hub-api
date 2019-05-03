@@ -3,18 +3,18 @@ from django.urls import path
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
     CompanyAuditViewSet,
-    CompanyViewSetV4,
+    CompanyViewSet,
     OneListGroupCoreTeamViewSet,
     PublicCompanyViewSet,
 )
 
 
-company_collection_v4 = CompanyViewSetV4.as_view({
+company_collection_v4 = CompanyViewSet.as_view({
     'get': 'list',
     'post': 'create',
 })
 
-company_item_v4 = CompanyViewSetV4.as_view({
+company_item_v4 = CompanyViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
 })
@@ -27,11 +27,11 @@ company_timeline = CompanyTimelineViewSet.as_view({
     'get': 'list',
 })
 
-company_archive_v4 = CompanyViewSetV4.as_view({
+company_archive_v4 = CompanyViewSet.as_view({
     'post': 'archive',
 })
 
-company_unarchive_v4 = CompanyViewSetV4.as_view({
+company_unarchive_v4 = CompanyViewSet.as_view({
     'post': 'unarchive',
 })
 
