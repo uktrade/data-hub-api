@@ -37,7 +37,7 @@ from datahub.investment.project.queryset import get_slim_investment_project_quer
 from datahub.oauth.scopes import Scope
 
 
-class CompanyViewSetV4(ArchivableViewSetMixin, CoreViewSet):
+class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company view set V4."""
 
     serializer_class = CompanySerializerV4
