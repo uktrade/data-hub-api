@@ -273,7 +273,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
-class CompanySerializerV4(PermittedFieldsModelSerializer):
+class CompanySerializer(PermittedFieldsModelSerializer):
     """
     Base Company read/write serializer
 
@@ -590,7 +590,7 @@ class CompanySerializerV4(PermittedFieldsModelSerializer):
             data[target_field_name] = target_value
 
 
-class PublicCompanySerializer(CompanySerializerV4):
+class PublicCompanySerializer(CompanySerializer):
     """
     Read-only serialiser for the Hawk-authenticated company view.
 
@@ -598,7 +598,7 @@ class PublicCompanySerializer(CompanySerializerV4):
     containing personal data are deliberately omitted.
     """
 
-    class Meta(CompanySerializerV4.Meta):
+    class Meta(CompanySerializer.Meta):
         fields = (
             'address',
             'archived',
