@@ -121,6 +121,14 @@ class InteractionCSVRowForm(forms.Form):
         """Get the required base fields of this form."""
         return {name for name, field in cls.base_fields.items() if field.required}
 
+    def get_flat_error_list_iterator(self):
+        """Get a generator of CSVRowError instances representing validation errors."""
+        return (
+            CSVRowError(self.row_index, field, self.data.get(field, ''), error)
+            for field, errors in self.errors.items()
+            for error in errors
+        )
+
     def clean(self):
         """Validate and clean the data for this row."""
         data = super().clean()
@@ -159,14 +167,6 @@ class InteractionCSVRowForm(forms.Form):
         )
 
         return data
-
-    def get_flat_error_list_iterator(self):
-        """Get a generator of CSVRowError instances representing validation errors."""
-        return (
-            CSVRowError(self.row_index, field, self.data.get(field, ''), error)
-            for field, errors in self.errors.items()
-            for error in errors
-        )
 
     def _populate_adviser(self, data, adviser_field, team_field):
         try:
