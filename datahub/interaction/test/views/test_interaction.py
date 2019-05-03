@@ -586,8 +586,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
-            # TODO: Change this once we give status a default
-            'status': None,
+            'status': Interaction.STATUSES.complete,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -677,9 +676,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            # TODO: Change this once we enforce a default
-            'location': None,
-            'archived': None,
+            'location': '',
+            'archived': False,
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
@@ -705,8 +703,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
-            # TODO: Change this once we give status a default
-            'status': None,
+            'status': Interaction.STATUSES.complete,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -786,10 +783,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            # TODO: change this once we enforce a default
-            'location': None,
-            # TODO: Change this once we enforce a default
-            'archived': None,
+            'location': '',
+            'archived': False,
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
