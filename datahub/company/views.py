@@ -38,7 +38,7 @@ from datahub.oauth.scopes import Scope
 
 
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """Company view set V4."""
+    """Company view set."""
 
     serializer_class = CompanySerializerV4
     required_scopes = (Scope.internal_front_end,)
