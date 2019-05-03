@@ -476,19 +476,28 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'required',
-                    OperatorRule('event', bool),
-                    when=OperatorRule('is_event', bool),
-                ),
-                ValidationRule(
                     'too_many_contacts_for_event_service_delivery',
                     OperatorRule('contacts', lambda value: len(value) <= 1),
                     when=OperatorRule('is_event', bool),
                 ),
+                # These two rules are only checked for service deliveries as there's a separate
+                # check that event is blank for interactions above which takes precedence (to
+                # avoid duplicate or contradictory error messages)
+                ValidationRule(
+                    'required',
+                    OperatorRule('event', bool),
+                    when=AndRule(
+                        OperatorRule('is_event', bool),
+                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    ),
+                ),
                 ValidationRule(
                     'invalid_for_non_event',
                     OperatorRule('event', not_),
-                    when=OperatorRule('is_event', not_),
+                    when=AndRule(
+                        OperatorRule('is_event', not_),
+                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    ),
                 ),
             ),
         ]
