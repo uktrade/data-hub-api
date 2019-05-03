@@ -154,7 +154,6 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
     }
 
 
-@register_v3_view(sub_path='export')
 @register_v4_view(sub_path='export')
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
