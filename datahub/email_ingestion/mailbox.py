@@ -289,7 +289,3 @@ class MailboxManager:
         :returns: A Mailbox object.
         """
         return self.mailboxes[identifier]
-
-
-# Initialise the singleton at module load
-mailbox_manager = MailboxManager()

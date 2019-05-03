@@ -9,6 +9,11 @@ from django.test.utils import override_settings
 from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.email_ingestion.mailbox import Mailbox
 from datahub.email_ingestion.mailbox import MailboxManager
+from datahub.email_ingestion.test.utils import (
+    BAD_MAILBOXES_SETTING,
+    MAILBOXES_SETTING,
+    mock_import_string,
+)
 
 EXPECTED_EMAIL_MESSAGES = [
     {
@@ -402,57 +407,20 @@ class TestMailbox:
         assert expected_error_message in caplog.record_tuples
 
 
-MAILBOXES = {
-    'mybox1': {
-        'email': 'mybox1@example.net',
-        'password': 'foobarbaz1',
-        'imap_domain': 'imap.example.net',
-        'processor_classes': [
-            'datahub.email_ingestion.processor_1.Processor',
-            'datahub.email_ingestion.processor_2.Processor',
-        ],
-    },
-    'mybox2': {
-        'email': 'mybox2@example.net',
-        'password': 'foobarbaz2',
-        'imap_domain': 'imap.example.net',
-        'processor_classes': [
-            'datahub.email_ingestion.processor_1.Processor',
-            'datahub.email_ingestion.processor_2.Processor',
-        ],
-    },
-}
-
-# Mailbox missing password configuration
-BAD_MAILBOXES = {
-    'mybox1': {
-        'email': 'mybox1@example.net',
-        'imap_domain': 'imap.example.net',
-        'processor_classes': [
-            'datahub.email_ingestion.processor_1.Processor',
-            'datahub.email_ingestion.processor_2.Processor',
-        ],
-    },
-}
-
-
 class TestMailboxManager:
     """
     Test the MailboxManager class.
     """
 
-    @override_settings(MAILBOXES=MAILBOXES)
+    @override_settings(MAILBOXES=MAILBOXES_SETTING)
     def test_manager_initialisation(self, monkeypatch):
         """
         Functional test to ensure that MailboxManager is initialised as expected.
         """
-        import_string_mock = mock.Mock()
-        monkeypatch.setattr(
-            'datahub.email_ingestion.mailbox.import_string',
-            import_string_mock,
-        )
+        # Mock import_string to avoid import errors for processor_class path strings
+        import_string_mock = mock_import_string(monkeypatch)
         mailbox_manager = MailboxManager()
-        for mailbox_name, mailbox_config in MAILBOXES.items():
+        for mailbox_name, mailbox_config in MAILBOXES_SETTING.items():
             instantiated_mailbox = mailbox_manager.get_mailbox(mailbox_name)
             # ensure that the Mailbox object has the expected attributes
             assert instantiated_mailbox.email == mailbox_config['email']
@@ -464,9 +432,9 @@ class TestMailboxManager:
             for processor_class in instantiated_mailbox.processor_classes:
                 assert processor_class == import_string_mock.return_value
         all_mailboxes = mailbox_manager.get_all_mailboxes()
-        assert len(all_mailboxes) == len(MAILBOXES.values())
+        assert len(all_mailboxes) == len(MAILBOXES_SETTING.values())
 
-    @override_settings(MAILBOXES=BAD_MAILBOXES)
+    @override_settings(MAILBOXES=BAD_MAILBOXES_SETTING)
     def test_manager_initialisation_badly_configured(self):
         """
         Functional test to ensure that MailboxManager raises the correct error
