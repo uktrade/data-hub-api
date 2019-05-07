@@ -20,7 +20,6 @@ from datahub.search.company.serializers import (
 )
 from datahub.search.views import (
     AutocompleteSearchListAPIView,
-    register_v3_view,
     register_v4_view,
     SearchAPIView,
     SearchExportAPIView,
@@ -193,32 +192,6 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
     }
-
-
-@register_v3_view(sub_path='autocomplete')
-class CompanyAutocompleteSearchListAPIViewV3(
-    SearchCompanyAPIViewMixin,
-    AutocompleteSearchListAPIView,
-):
-    """Company autocomplete search view V3."""
-
-    document_fields = [
-        'id',
-        'name',
-        'trading_names',
-        'trading_address_1',
-        'trading_address_2',
-        'trading_address_town',
-        'trading_address_county',
-        'trading_address_country',
-        'trading_address_postcode',
-        'registered_address_1',
-        'registered_address_2',
-        'registered_address_town',
-        'registered_address_county',
-        'registered_address_country',
-        'registered_address_postcode',
-    ]
 
 
 @register_v4_view(sub_path='autocomplete')
