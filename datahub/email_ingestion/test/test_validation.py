@@ -2,11 +2,11 @@ from unittest import mock
 
 import pytest
 
-from datahub.email_ingestion.validation import email_sent_by_dit
+from datahub.email_ingestion.validation import was_email_sent_by_dit
 
 
 @pytest.mark.parametrize(
-    'email,authentication_results,is_valid',
+    'email,authentication_results,expected_result',
     (
         # Valid trade.gov.uk email
         (
@@ -95,12 +95,12 @@ from datahub.email_ingestion.validation import email_sent_by_dit
         ),
     ),
 )
-def test_email_sent_by_dit(email, authentication_results, is_valid):
+def test_email_sent_by_dit(email, authentication_results, expected_result):
     """
     Tests for email_sent_by_dit validator.
     """
     message = mock.Mock()
     message.from_ = [['Bill Adama', email]]
     message.authentication_results = authentication_results
-    result = email_sent_by_dit(message)
-    assert result == is_valid
+    result = was_email_sent_by_dit(message)
+    assert result == expected_result

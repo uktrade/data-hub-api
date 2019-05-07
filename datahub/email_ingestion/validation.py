@@ -25,7 +25,7 @@ def _verify_authentication(message, from_email):
     return all_auth_pass
 
 
-def email_sent_by_dit(message):
+def was_email_sent_by_dit(message):
     """
     Checks whether an email message was sent by a valid DIT address.
 
