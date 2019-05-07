@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, OneListTier
-from datahub.company.serializers import CompanySerializerV4
+from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
 from datahub.core.test_utils import (
@@ -700,7 +700,7 @@ class TestUpdateCompany(APITestMixin):
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
         Test that if company.duns_number is not blank, the client cannot update the
-        fields defined by CompanySerializerV4.Meta.dnb_read_only_fields.
+        fields defined by CompanySerializer.Meta.dnb_read_only_fields.
         """
         company = CompanyFactory(
             duns_number='012345678',
@@ -759,8 +759,8 @@ class TestUpdateCompany(APITestMixin):
             'global_headquarters': company.id,
         }
 
-        assert set(data.keys()) == set(CompanySerializerV4.Meta.dnb_read_only_fields), (
-            'It looks like you have changed CompanySerializerV4.Meta.dnb_read_only_fields, '
+        assert set(data.keys()) == set(CompanySerializer.Meta.dnb_read_only_fields), (
+            'It looks like you have changed CompanySerializer.Meta.dnb_read_only_fields, '
             'please update this test accordingly.'
         )
 
