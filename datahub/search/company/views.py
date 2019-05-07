@@ -71,8 +71,8 @@ class SearchCompanyAPIViewMixin:
 
 
 @register_v4_view()
-class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view V4."""
+class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
+    """Filtered company search view."""
 
     # TODO: delete once the migration to v4 is complete
     fields_to_exclude = (
@@ -195,11 +195,11 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
 
 
 @register_v4_view(sub_path='autocomplete')
-class CompanyAutocompleteSearchListAPIViewV4(
+class CompanyAutocompleteSearchListAPIView(
     SearchCompanyAPIViewMixin,
     AutocompleteSearchListAPIView,
 ):
-    """Company autocomplete search view V4."""
+    """Company autocomplete search view."""
 
     document_fields = [
         'id',
