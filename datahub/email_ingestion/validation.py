@@ -12,18 +12,15 @@ def _verify_authentication(message, from_email):
         'dmarc': False,
     }
     for line in authentication_lines:
-        try:
-            if line.startswith('dkim'):
-                auth_results['dkim'] = line.startswith('dkim=pass')
-            if line.startswith('spf'):
-                spf_valid = (
-                    line.startswith('spf=pass') and line.endswith('smtp.mailfrom=%s;' % from_email)
-                )
-                auth_results['spf'] = spf_valid
-            if line.startswith('dmarc'):
-                auth_results['dmarc'] = line.startswith('dmarc=pass')
-        except AssertionError:
-            return False
+        if line.startswith('dkim'):
+            auth_results['dkim'] = line.startswith('dkim=pass')
+        if line.startswith('spf'):
+            spf_valid = (
+                line.startswith('spf=pass') and line.endswith(f'smtp.mailfrom={from_email};')
+            )
+            auth_results['spf'] = spf_valid
+        if line.startswith('dmarc'):
+            auth_results['dmarc'] = line.startswith('dmarc=pass')
     all_auth_pass = all(auth_results.values())
     return all_auth_pass
 
