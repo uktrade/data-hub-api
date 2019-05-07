@@ -228,40 +228,6 @@ def test_mapping(setup_es):
                         },
                     },
                 },
-                'registered_address_1': {'type': 'text'},
-                'registered_address_2': {'type': 'text'},
-                'registered_address_country': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
-                            },
-                        },
-                    },
-                    'type': 'object',
-                },
-                'registered_address_county': {'type': 'text'},
-                'registered_address_postcode': {
-                    'copy_to': ['registered_address_postcode_trigram'],
-                    'type': 'text',
-                },
-                'registered_address_postcode_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
-                },
-                'registered_address_town': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
-                },
                 'sector': {
                     'properties': {
                         'ancestors': {
@@ -285,40 +251,6 @@ def test_mapping(setup_es):
                     'contexts': [
                         {'name': 'country', 'type': 'CATEGORY'},
                     ],
-                },
-                'trading_address_1': {'type': 'text'},
-                'trading_address_2': {'type': 'text'},
-                'trading_address_country': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
-                            },
-                        },
-                    },
-                    'type': 'object',
-                },
-                'trading_address_county': {'type': 'text'},
-                'trading_address_postcode': {
-                    'copy_to': ['trading_address_postcode_trigram'],
-                    'type': 'text',
-                },
-                'trading_address_postcode_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
-                },
-                'trading_address_town': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
                 },
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
@@ -609,20 +541,8 @@ def test_indexed_doc(setup_es):
         'reference_code',
         'address',
         'registered_address',
-        'registered_address_1',
-        'registered_address_2',
-        'registered_address_country',
-        'registered_address_county',
-        'registered_address_postcode',
-        'registered_address_town',
         'sector',
         'suggest',
-        'trading_address_1',
-        'trading_address_2',
-        'trading_address_country',
-        'trading_address_county',
-        'trading_address_postcode',
-        'trading_address_town',
         'trading_names',
         'turnover_range',
         'uk_based',
