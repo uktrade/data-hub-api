@@ -44,20 +44,6 @@ class TestCompanyElasticModel:
             'address',
             'registered_address',
 
-            # TODO: delete once the migration to address and registered address is complete
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_country',
-            'registered_address_county',
-            'registered_address_postcode',
-            'registered_address_town',
-            'trading_address_1',
-            'trading_address_2',
-            'trading_address_country',
-            'trading_address_county',
-            'trading_address_postcode',
-            'trading_address_town',
-
             'trading_names',
             'turnover_range',
             'uk_based',
