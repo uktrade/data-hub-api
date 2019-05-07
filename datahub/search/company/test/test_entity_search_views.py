@@ -839,7 +839,7 @@ class TestAutocompleteSearch(APITestMixin):
 
     @mock.patch(
         'datahub.search.company.views.'
-        'CompanyAutocompleteSearchListAPIViewV4._get_permission_filters',
+        'CompanyAutocompleteSearchListAPIView._get_permission_filters',
     )
     def test_raise_datahub_error_when_search_app_has_permission_search_filters(
         self, mock_get_app_permission_filters,
