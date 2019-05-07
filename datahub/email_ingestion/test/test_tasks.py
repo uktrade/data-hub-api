@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 from django.test.utils import override_settings
 
+from datahub.email_ingestion.mailbox import MailboxHandler
 from datahub.email_ingestion.tasks import ingest_emails
 from datahub.email_ingestion.test.utils import MAILBOXES_SETTING, mock_import_string
 
@@ -21,9 +22,15 @@ class TestIngestEmails:
         # Mock import_string to avoid import errors for processor_class path strings
         mock_import_string(monkeypatch)
         process_new_mail_patch = mock.Mock()
+        # ensure that the process_new_mail method is a mock so we can interrogate later
         monkeypatch.setattr(
             'datahub.email_ingestion.mailbox.Mailbox.process_new_mail',
             process_new_mail_patch,
+        )
+        # Refresh the mailbox_handler singleton as we have overidden the MAILBOXES setting
+        monkeypatch.setattr(
+            'datahub.email_ingestion.tasks.mailbox_handler',
+            MailboxHandler(),
         )
         ingest_emails()
         assert process_new_mail_patch.call_count == 2
@@ -34,6 +41,7 @@ class TestIngestEmails:
         Test that our mailboxes are not processed when the lock cannot be acquired successfully.
         """
         process_new_mail_patch = mock.Mock()
+        # ensure that the process_new_mail method is a mock so we can interrogate later
         monkeypatch.setattr(
             'datahub.email_ingestion.mailbox.Mailbox.process_new_mail',
             process_new_mail_patch,

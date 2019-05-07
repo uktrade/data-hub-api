@@ -533,3 +533,5 @@ MAILBOXES = {
     #    ],
     #},
 }
+
+DIT_EMAIL_DOMAINS = ['trade.gov.uk', 'digital.trade.gov.uk']

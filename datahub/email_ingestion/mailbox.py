@@ -222,9 +222,9 @@ class Mailbox:
             self._process_email(message)
 
 
-class MailboxManager:
+class MailboxHandler:
     """
-    Manages all of the mailboxes that are active in our application. This is a
+    Handles all of the mailboxes that are active in our application. This is a
     singleton and should be considered the single gateway for accessing IMAP
     Mailboxes.
 
@@ -245,7 +245,7 @@ class MailboxManager:
 
     def __init__(self):
         """
-        Initialise the MailboxManager object.
+        Initialise the MailboxHandler object.
         """
         self.mailboxes = {}
         self.initialise_mailboxes()
@@ -255,9 +255,7 @@ class MailboxManager:
         Initialise all of the mailboxes detailed in the MAILBOXES django setting.
         """
         for mailbox_name, config in settings.MAILBOXES.items():
-            properly_configured = (
-                config.get('email') and config.get('password') and config.get('imap_domain')
-            )
+            properly_configured = config.keys() >= {'email', 'password', 'imap_domain'}
             if not properly_configured:
                 message = f'Mailbox "{mailbox_name}" was not configured properly in settings'
                 raise ImproperlyConfigured(message)

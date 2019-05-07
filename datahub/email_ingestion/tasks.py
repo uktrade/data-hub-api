@@ -2,7 +2,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django_pglocks import advisory_lock
 
-from datahub.email_ingestion.mailbox import MailboxManager
+from datahub.email_ingestion import mailbox_handler
 
 logger = get_task_logger(__name__)
 
@@ -21,6 +21,5 @@ def ingest_emails():
         if not acquired:
             logger.info('Emails are already being ingested by another worker')
             return
-        mailbox_manager = MailboxManager()
-        for mailbox in mailbox_manager.get_all_mailboxes():
+        for mailbox in mailbox_handler.get_all_mailboxes():
             mailbox.process_new_mail()
