@@ -292,7 +292,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.context['are_errors_truncated'] == should_be_truncated
 
 
-def _make_csv(*rows, encoding='utf-8', filename='test.csv'):
+def _make_csv(*rows, encoding='utf-8-sig', filename='test.csv'):
     with io.StringIO() as text_stream:
         writer = csv.writer(text_stream)
         writer.writerows(rows)
