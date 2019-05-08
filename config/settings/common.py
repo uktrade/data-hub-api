@@ -238,6 +238,7 @@ if SSO_ENABLED:
 
 LANGUAGE_CODE = 'en-gb'
 USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
 PUBLIC_ROOT = str(CONFIG_DIR('public'))
 STATIC_ROOT = str(CONFIG_DIR('staticfiles'))
 STATIC_URL = '/static/'
