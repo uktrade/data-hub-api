@@ -1,14 +1,22 @@
+from datetime import datetime, time
 from typing import NamedTuple
 
 from django import forms
-from django.core.exceptions import ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
+from rest_framework import serializers
 
-from datahub.company.contact_matching import find_active_contact_by_email_address
+from datahub.company.contact_matching import (
+    ContactMatchingStatus,
+    find_active_contact_by_email_address,
+)
 from datahub.company.models import Advisor
 from datahub.core.query_utils import get_full_name_expression
+from datahub.core.utils import join_truthy_strings
 from datahub.event.models import Event
 from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import Service, Team
 
 
@@ -21,9 +29,6 @@ ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE = gettext_lazy(
 )
 MULTIPLE_ADVISERS_FOUND_MESSAGE = gettext_lazy(
     'Multiple matching advisers were found.',
-)
-INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE = gettext_lazy(
-    'An interaction cannot have an event.',
 )
 
 
@@ -39,6 +44,11 @@ class CSVRowError(NamedTuple):
     field: str
     value: str
     error: str
+
+    @property
+    def display_field(self):
+        """Returns the field name suitable for displaying to the user."""
+        return '' if self.field == NON_FIELD_ERRORS else self.field
 
 
 class NoDuplicatesModelChoiceField(forms.ModelChoiceField):
@@ -65,6 +75,12 @@ class NoDuplicatesModelChoiceField(forms.ModelChoiceField):
 
 class InteractionCSVRowForm(forms.Form):
     """Form used for validating a single row in a CSV of interactions."""
+
+    # Used to map errors from serializer fields to fields in this form
+    # when running the serializer validators in full_clean()
+    SERIALIZER_FIELD_MAPPING = {
+        'event': 'event_id',
+    }
 
     kind = forms.ChoiceField(choices=Interaction.KINDS)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
@@ -121,12 +137,26 @@ class InteractionCSVRowForm(forms.Form):
         """Get the required base fields of this form."""
         return {name for name, field in cls.base_fields.items() if field.required}
 
+    def get_flat_error_list_iterator(self):
+        """Get a generator of CSVRowError instances representing validation errors."""
+        return (
+            CSVRowError(self.row_index, field, self.data.get(field, ''), error)
+            for field, errors in self.errors.items()
+            for error in errors
+        )
+
+    def is_valid_and_matched(self):
+        """Return if the form is valid and the interaction has been matched to a contact."""
+        return (
+            self.is_valid()
+            and self.cleaned_data['contact_matching_status'] == ContactMatchingStatus.matched
+        )
+
     def clean(self):
         """Validate and clean the data for this row."""
         data = super().clean()
 
         kind = data.get('kind')
-        event = data.get('event_id')
         subject = data.get('subject')
         service = data.get('service')
 
@@ -134,16 +164,6 @@ class InteractionCSVRowForm(forms.Form):
         # service deliveries, but we are likely to get it in provided data anyway)
         if kind == Interaction.KINDS.service_delivery:
             data['communication_channel'] = None
-
-        # Reject if an event has been given but it's an interaction (as the event field is only
-        # valid for service deliveries – we don't know if the kind field is wrong or the event
-        # has been set in error)
-        if kind == Interaction.KINDS.interaction and event:
-            error = ValidationError(
-                INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE,
-                code='interaction_cannot_have_event',
-            )
-            self.add_error('event_id', error)
 
         # Look up values for adviser_1 and adviser_2 (adding errors if the look-up fails)
         self._populate_adviser(data, 'adviser_1', 'team_1')
@@ -160,13 +180,42 @@ class InteractionCSVRowForm(forms.Form):
 
         return data
 
-    def get_flat_error_list_iterator(self):
-        """Get a generator of CSVRowError instances representing validation errors."""
-        return (
-            CSVRowError(self.row_index, field, self.data.get(field, ''), error)
-            for field, errors in self.errors.items()
-            for error in errors
-        )
+    def full_clean(self):
+        """
+        Performs full validation, additionally performing validation using the validators
+        from InteractionSerializer if the interaction was matched to a contact.
+
+        Errors are mapped to CSV fields where possible. If not possible, they are
+        added to NON_FIELD_ERRORS (but this should not happen).
+        """
+        super().full_clean()
+
+        if not self.is_valid_and_matched():
+            return
+
+        transformed_data = self._cleaned_data_as_serializer_dict()
+        serializer = InteractionSerializer(context={'is_bulk_import': True})
+
+        try:
+            serializer.run_validators(transformed_data)
+        except serializers.ValidationError as exc:
+            # Make sure that errors are wrapped in a dict, and values are always a list
+            normalised_errors = serializers.as_serializer_error(exc)
+
+            for field, errors in normalised_errors.items():
+                self._add_serializer_error(field, errors)
+
+    def _add_serializer_error(self, field, errors):
+        mapped_field = self.SERIALIZER_FIELD_MAPPING.get(field, field)
+
+        if mapped_field in self.fields:
+            self.add_error(mapped_field, errors)
+        else:
+            mapped_errors = [
+                join_truthy_strings(field, error, sep=': ')
+                for error in errors
+            ]
+            self.add_error(None, mapped_errors)
 
     def _populate_adviser(self, data, adviser_field, team_field):
         try:
@@ -176,6 +225,43 @@ class InteractionCSVRowForm(forms.Form):
             )
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
+
+    def _cleaned_data_as_serializer_dict(self):
+        """
+        Transforms cleaned data into a dict suitable for use with the validators from
+        InteractionSerializer.
+        """
+        data = self.cleaned_data
+
+        subject = data.get('subject') or data['service'].name
+        dit_participants = [
+            {
+                'adviser': adviser,
+                'team': adviser.dit_team,
+            }
+            for adviser in (data['adviser_1'], data.get('adviser_2'))
+            if adviser
+        ]
+
+        creation_data = {
+            'contacts': [data['contact']],
+            'communication_channel': data.get('communication_channel'),
+            'company': data['contact'].company,
+            'date': datetime.combine(data['date'], time(), tzinfo=utc),
+            'dit_participants': dit_participants,
+            'event': data.get('event_id'),
+            'kind': data['kind'],
+            'notes': data.get('notes'),
+            'service': data['service'],
+            'status': Interaction.STATUSES.complete,
+            'subject': subject,
+            'was_policy_feedback_provided': False,
+        }
+
+        if data['kind'] == Interaction.KINDS.service_delivery:
+            creation_data['is_event'] = bool(data.get('event_id'))
+
+        return creation_data
 
 
 def _look_up_adviser(adviser_name, team):

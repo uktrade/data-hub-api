@@ -3,6 +3,8 @@ from collections.abc import Mapping
 from datetime import date
 
 import pytest
+from django.core.exceptions import NON_FIELD_ERRORS
+from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
@@ -12,12 +14,15 @@ from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
     CSVRowError,
-    INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE,
     InteractionCSVRowForm,
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
     OBJECT_DISABLED_MESSAGE,
 )
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.admin_csv_import.utils import (
+    random_communication_channel,
+    random_service,
+)
 from datahub.interaction.test.factories import CommunicationChannelFactory
 from datahub.metadata.models import Service
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
@@ -41,6 +46,22 @@ EMAIL_MATCHING_CONTACT_TEST_DATA = [
         'email_alternative': '',
     },
 ]
+
+
+class TestCSVRowError:
+    """Tests for CSVRowError."""
+
+    @pytest.mark.parametrize(
+        'field,expected_display_field',
+        (
+            ('a_field', 'a_field'),
+            (NON_FIELD_ERRORS, ''),
+        ),
+    )
+    def test_display_field(self, field, expected_display_field):
+        """Tests the display_field property."""
+        csv_row_error = CSVRowError(1, field, '', '')
+        assert csv_row_error.display_field == expected_display_field
 
 
 @pytest.mark.django_db
@@ -152,7 +173,7 @@ class TestInteractionCSVRowForm:
             # service is disabled
             (
                 {
-                    'service': lambda: _random_service(disabled=True).name,
+                    'service': lambda: random_service(disabled=True).name,
                 },
                 {
                     'service': [OBJECT_DISABLED_MESSAGE],
@@ -193,12 +214,23 @@ class TestInteractionCSVRowForm:
             # communication_channel is disabled
             (
                 {
-                    'communication_channel': lambda: _random_communication_channel(
+                    'communication_channel': lambda: random_communication_channel(
                         disabled=True,
                     ).name,
                 },
                 {
                     'communication_channel': [OBJECT_DISABLED_MESSAGE],
+                },
+            ),
+            # communication_channel required for interactions
+            # Note: This error comes from the serialiser validation rules
+            (
+                {
+                    'communication_channel': '',
+                    'kind': Interaction.KINDS.interaction,
+                },
+                {
+                    'communication_channel': ['This field is required.'],
                 },
             ),
             # event_id invalid
@@ -230,13 +262,14 @@ class TestInteractionCSVRowForm:
                 },
             ),
             # cannot specify event_id for an interaction
+            # Note: This error comes from the serialiser validation rules
             (
                 {
                     'kind': Interaction.KINDS.interaction,
                     'event_id': lambda: str(EventFactory().pk),
                 },
                 {
-                    'event_id': [INTERACTION_CANNOT_HAVE_AN_EVENT_MESSAGE],
+                    'event_id': ['This field is only valid for service deliveries.'],
                 },
             ),
         ),
@@ -244,14 +277,17 @@ class TestInteractionCSVRowForm:
     def test_validation_errors(self, data, errors):
         """Test validation for various fields."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
 
         resolved_data = {
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
-            'contact_email': 'person@company.com',
+            'contact_email': contact.email,
             'service': service.name,
+            'communication_channel': communication_channel.name,
 
             **_resolve_data(data),
         }
@@ -297,7 +333,8 @@ class TestInteractionCSVRowForm:
     def test_simple_value_cleaning(self, field, input_value, expected_value):
         """Test the conversion and cleaning of various non-relationship fields."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
+        communication_channel = random_communication_channel()
 
         resolved_data = {
             'kind': 'interaction',
@@ -305,6 +342,7 @@ class TestInteractionCSVRowForm:
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
             'service': service.name,
+            'communication_channel': communication_channel.name,
 
             field: input_value,
         }
@@ -376,7 +414,8 @@ class TestInteractionCSVRowForm:
         service deliveries.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
+        communication_channel = random_communication_channel()
         obj = object_creator()
 
         resolved_data = {
@@ -385,6 +424,7 @@ class TestInteractionCSVRowForm:
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
             'service': service.name,
+            'communication_channel': communication_channel.name,
 
             field: input_transformer(obj),
         }
@@ -399,13 +439,13 @@ class TestInteractionCSVRowForm:
             # communication channel look-up (same case)
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name,
             ),
             # communication channel look-up (case-insensitive)
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name.upper(),
             ),
         ),
@@ -413,14 +453,15 @@ class TestInteractionCSVRowForm:
     def test_interaction_relation_fields(self, field, object_creator, input_transformer):
         """Test the looking up of values for relationship fields specific to interactions."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
         obj = object_creator()
 
         resolved_data = {
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
-            'contact_email': 'person@company.com',
+            'contact_email': contact.email,
             'service': service.name,
 
             field: input_transformer(obj),
@@ -436,7 +477,7 @@ class TestInteractionCSVRowForm:
             # communication channel should be ignored
             (
                 'communication_channel',
-                lambda: _random_communication_channel(),
+                lambda: random_communication_channel(),
                 lambda obj: obj.name,
                 lambda obj: None,
             ),
@@ -458,14 +499,15 @@ class TestInteractionCSVRowForm:
     ):
         """Test the looking up of values for relationship fields specific to service deliveries."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
         obj = object_creator()
 
         resolved_data = {
             'kind': 'service_delivery',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
-            'contact_email': 'person@company.com',
+            'contact_email': contact.email,
             'service': service.name,
 
             field: input_transformer(obj),
@@ -482,7 +524,8 @@ class TestInteractionCSVRowForm:
     def test_subject_falls_back_to_service(self, kind):
         """Test that if subject is not specified, the name of the service is used instead."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = _random_service()
+        service = random_service()
+        communication_channel = random_communication_channel()
 
         data = {
             'kind': kind,
@@ -490,6 +533,7 @@ class TestInteractionCSVRowForm:
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
             'service': service.name,
+            'communication_channel': communication_channel.name,
         }
 
         form = InteractionCSVRowForm(data=data)
@@ -522,12 +566,14 @@ class TestInteractionCSVRowForm:
         service = random_obj_for_queryset(
             Service.objects.filter(disabled_on__isnull=True),
         )
+        communication_channel = random_communication_channel()
 
         data = {
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'service': service.name,
+            'communication_channel': communication_channel.name,
 
             'contact_email': input_email,
         }
@@ -558,6 +604,7 @@ class TestInteractionCSVRowForm:
 
         form = InteractionCSVRowForm(data=data, row_index=5)
         form.is_valid()
+
         expected_errors = [
             CSVRowError(
                 5,
@@ -592,17 +639,62 @@ class TestInteractionCSVRowForm:
         ]
         assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
 
+    def test_serializer_error_for_invalid_form(self, monkeypatch):
+        """
+        Test that an unmapped error from the serializer validators is not added to
+        NON_FIELD_ERRORS if the form was otherwise invalid.
+        """
+        def validator(_):
+            raise serializers.ValidationError(
+                {'non_existent_field': 'test error'},
+            )
 
-def _random_communication_channel(disabled=False):
-    return random_obj_for_queryset(
-        CommunicationChannel.objects.filter(disabled_on__isnull=not disabled),
-    )
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
 
+        data = {'kind': 'invalid'}
+        form = InteractionCSVRowForm(data=data)
 
-def _random_service(disabled=False):
-    return random_obj_for_queryset(
-        Service.objects.filter(disabled_on__isnull=not disabled),
-    )
+        assert NON_FIELD_ERRORS not in form.errors
+
+    def test_serializer_errors_for_valid_form(self, monkeypatch):
+        """Test that errors from the serializer validators are added to the form."""
+        def validator(_):
+            raise serializers.ValidationError(
+                {
+                    # This rule should be mapped to NON_FIELD_ERRORS
+                    'non_existent_field': 'unmapped test error',
+                    # This rule should be mapped to adviser_2
+                    'adviser_2': 'adviser test error',
+                },
+            )
+
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
+
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+
+        form = InteractionCSVRowForm(data=data)
+        assert form.errors == {
+            'adviser_2': ['adviser test error'],
+            NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
+        }
 
 
 def _resolve_data(data):
