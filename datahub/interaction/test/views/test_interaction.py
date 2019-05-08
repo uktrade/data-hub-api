@@ -370,6 +370,51 @@ class TestAddInteraction(APITestMixin):
                 },
             ),
 
+            # no contradictory messages if event is None but and is_event is True
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'event': None,
+                    'is_event': True,
+                },
+                {
+                    'is_event': ['This field is only valid for service deliveries.'],
+                },
+            ),
+
+            # no duplicate messages for event if provided and is_event is False
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'event': EventFactory,
+                    'is_event': False,
+                },
+                {
+                    'is_event': ['This field is only valid for service deliveries.'],
+                    'event': ['This field is only valid for service deliveries.'],
+                },
+            ),
+
             # dit_participants cannot be None
             (
                 {

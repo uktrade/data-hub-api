@@ -99,6 +99,12 @@ class HasAssociatedInvestmentProjectValidator:
 
         :param attrs:   Serializer data (post-field-validation/processing)
         """
+        # If the validator is being called from the admin site import interactions tool
+        # do nothing, as the logic below is irrelevant for admin site users, and is only
+        # functional for API requests via DRF views
+        if self.serializer.context.get('is_bulk_import'):
+            return
+
         if self.serializer.instance:
             return
 
