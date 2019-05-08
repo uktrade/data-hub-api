@@ -284,7 +284,7 @@ class Interaction(ArchivableModel, BaseModel):
         blank=True,
         related_name='%(class)ss',
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text='For export advice and information service only.',
     )
     investment_advice_topic = models.ForeignKey(
@@ -292,7 +292,7 @@ class Interaction(ArchivableModel, BaseModel):
         blank=True,
         related_name='%(class)ss',
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text='For investment advice and information service only.',
     )
 

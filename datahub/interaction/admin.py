@@ -29,8 +29,15 @@ from datahub.interaction.models import (
 from datahub.metadata.admin import DisableableMetadataAdmin, OrderedMetadataAdmin
 
 admin.site.register(CommunicationChannel, DisableableMetadataAdmin)
-admin.site.register((PolicyArea, PolicyIssueType), OrderedMetadataAdmin)
-admin.site.register((ExportAdviceTopic, InvestmentAdviceTopic), OrderedMetadataAdmin)
+admin.site.register(
+    (
+        PolicyArea,
+        PolicyIssueType,
+        ExportAdviceTopic,
+        InvestmentAdviceTopic,
+    ),
+    OrderedMetadataAdmin,
+)
 
 
 class InteractionDITParticipantInline(admin.TabularInline):
