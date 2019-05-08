@@ -74,7 +74,6 @@ class Company(BaseESModel):
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.id_name_field()
-    companies_house_data = fields.ch_company_field()
     company_number = fields.NormalizedKeyword()
     created_on = Date()
     description = fields.EnglishText()
@@ -123,7 +122,6 @@ class Company(BaseESModel):
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
-        'companies_house_data': dict_utils.ch_company_dict,
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],

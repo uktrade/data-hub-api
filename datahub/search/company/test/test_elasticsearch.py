@@ -63,16 +63,6 @@ def test_mapping(setup_es):
                     },
                     'type': 'object',
                 },
-                'companies_house_data': {
-                    'properties': {
-                        'company_number': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'id': {'type': 'keyword'},
-                    },
-                    'type': 'object',
-                },
                 'company_number': {
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
@@ -525,7 +515,6 @@ def test_indexed_doc(setup_es):
         'archived_on',
         'archived_reason',
         'business_type',
-        'companies_house_data',
         'company_number',
         'created_on',
         'description',

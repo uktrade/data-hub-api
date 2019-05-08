@@ -24,7 +24,6 @@ class TestCompanyElasticModel:
             'archived_on',
             'archived_reason',
             'business_type',
-            'companies_house_data',
             'company_number',
             'created_on',
             'description',
