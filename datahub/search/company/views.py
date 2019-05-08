@@ -74,7 +74,7 @@ class SearchCompanyAPIViewMixin:
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
-    fields_to_exclude = ('companies_house_data', )
+    pass
 
 
 @register_v4_view(is_public=True)
