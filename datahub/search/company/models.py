@@ -74,7 +74,6 @@ class Company(BaseESModel):
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.id_name_field()
-    companies_house_data = fields.ch_company_field()
     company_number = fields.NormalizedKeyword()
     created_on = Date()
     description = fields.EnglishText()
@@ -95,29 +94,6 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     address = fields.address_field()
     registered_address = fields.address_field()
-
-    # TODO: delete once the migration to address and registered address is complete
-    registered_address_1 = Text()
-    registered_address_2 = Text()
-    registered_address_town = fields.NormalizedKeyword()
-    registered_address_county = Text()
-    registered_address_country = fields.id_name_partial_field()
-    registered_address_postcode = Text(
-        copy_to=[
-            'registered_address_postcode_trigram',
-        ],
-    )
-    registered_address_postcode_trigram = fields.TrigramText()
-    trading_address_1 = Text()
-    trading_address_2 = Text()
-    trading_address_town = fields.NormalizedKeyword()
-    trading_address_county = Text()
-    trading_address_postcode = Text(
-        copy_to=['trading_address_postcode_trigram'],
-    )
-    trading_address_postcode_trigram = fields.TrigramText()
-    trading_address_country = fields.id_name_partial_field()
-
     trading_names = Text(
         copy_to=['trading_names_trigram'],
     )
@@ -146,7 +122,6 @@ class Company(BaseESModel):
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
-        'companies_house_data': dict_utils.ch_company_dict,
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
@@ -154,10 +129,6 @@ class Company(BaseESModel):
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
-
-        # TODO: delete once the migration to address and registered address is complete
-        'registered_address_country': dict_utils.id_name_dict,
-        'trading_address_country': dict_utils.id_name_dict,
 
         'turnover_range': dict_utils.id_name_dict,
         'uk_based': bool,

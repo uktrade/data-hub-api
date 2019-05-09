@@ -20,7 +20,6 @@ from datahub.search.company.serializers import (
 )
 from datahub.search.views import (
     AutocompleteSearchListAPIView,
-    register_v3_view,
     register_v4_view,
     SearchAPIView,
     SearchExportAPIView,
@@ -71,36 +70,11 @@ class SearchCompanyAPIViewMixin:
     }
 
 
-@register_v3_view()
-class SearchCompanyAPIViewV3(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view V3."""
-
-    fields_to_exclude = (
-        'address',
-        'registered_address',
-    )
-
-
 @register_v4_view()
-class SearchCompanyAPIViewV4(SearchCompanyAPIViewMixin, SearchAPIView):
-    """Filtered company search view V4."""
+class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
+    """Filtered company search view."""
 
-    # TODO: delete once the migration to v4 is complete
-    fields_to_exclude = (
-        'companies_house_data',
-        'trading_address_1',
-        'trading_address_2',
-        'trading_address_town',
-        'trading_address_county',
-        'trading_address_country',
-        'trading_address_postcode',
-        'registered_address_1',
-        'registered_address_2',
-        'registered_address_town',
-        'registered_address_county',
-        'registered_address_country',
-        'registered_address_postcode',
-    )
+    pass
 
 
 @register_v4_view(is_public=True)
@@ -164,7 +138,6 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
     }
 
 
-@register_v3_view(sub_path='export')
 @register_v4_view(sub_path='export')
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
@@ -206,38 +179,12 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
     }
 
 
-@register_v3_view(sub_path='autocomplete')
-class CompanyAutocompleteSearchListAPIViewV3(
-    SearchCompanyAPIViewMixin,
-    AutocompleteSearchListAPIView,
-):
-    """Company autocomplete search view V3."""
-
-    document_fields = [
-        'id',
-        'name',
-        'trading_names',
-        'trading_address_1',
-        'trading_address_2',
-        'trading_address_town',
-        'trading_address_county',
-        'trading_address_country',
-        'trading_address_postcode',
-        'registered_address_1',
-        'registered_address_2',
-        'registered_address_town',
-        'registered_address_county',
-        'registered_address_country',
-        'registered_address_postcode',
-    ]
-
-
 @register_v4_view(sub_path='autocomplete')
-class CompanyAutocompleteSearchListAPIViewV4(
+class CompanyAutocompleteSearchListAPIView(
     SearchCompanyAPIViewMixin,
     AutocompleteSearchListAPIView,
 ):
-    """Company autocomplete search view V4."""
+    """Company autocomplete search view."""
 
     document_fields = [
         'id',
