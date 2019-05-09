@@ -1,0 +1,9 @@
+{% if count %}
+  <li>
+    {% if count == 1 %}
+      {{ count }} {{ singular_text }}
+    {% else %}
+      {{ count }} {{ plural_text }}
+    {% endif %}
+  </li>
+{%  endif %}
