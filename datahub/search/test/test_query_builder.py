@@ -4,6 +4,7 @@ from uuid import UUID
 
 import pytest
 
+from datahub.core.constants import Country as CountryConstant
 from datahub.search.query_builder import (
     _build_entity_permission_query,
     _build_field_query,
@@ -297,12 +298,13 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
 
 
 @pytest.mark.parametrize(
-    'keyword,size,only_fields,expected',
+    'keyword,size,only_fields,context,expected',
     (
         (
             'hello',
             20,
             None,
+            {},
             {
                 'suggest': {
                     'autocomplete': {
@@ -316,6 +318,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
             'goodbye',
             1,
             ['id', 'name'],
+            {},
             {
                 '_source': {'includes': ['id', 'name']},
                 'suggest': {
@@ -326,11 +329,55 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                 },
             },
         ),
+        (
+            'goodbye',
+            1,
+            ['id', 'name'],
+            {'country': [CountryConstant.canada.value.id]},
+            {
+                '_source': {'includes': ['id', 'name']},
+                'suggest': {
+                    'autocomplete': {
+                        'completion': {
+                            'field': 'suggest',
+                            'size': 1,
+                            'context': {'country': [CountryConstant.canada.value.id]},
+                        },
+                        'text': 'goodbye',
+                    },
+                },
+            },
+        ),
+        (
+            'goodbye',
+            1,
+            ['id', 'name'],
+            {'country': 'hello'},
+            {
+                '_source': {'includes': ['id', 'name']},
+                'suggest': {
+                    'autocomplete': {
+                        'completion': {
+                            'field': 'suggest',
+                            'size': 1,
+                            'context': {'country': 'hello'},
+                        },
+                        'text': 'goodbye',
+                    },
+                },
+            },
+        ),
     ),
 )
-def test_build_autocomplete_search_query(keyword, size, only_fields, expected):
+def test_build_autocomplete_search_query(keyword, size, only_fields, context, expected):
     """Test for building an autocomplete search query."""
-    query = build_autocomplete_query(SimpleModelSearchApp.es_model, keyword, size, only_fields)
+    query = build_autocomplete_query(
+        SimpleModelSearchApp.es_model,
+        keyword,
+        size,
+        only_fields,
+        context,
+    )
     assert query.to_dict() == expected
     assert query._index == [SimpleModelSearchApp.es_model.get_read_alias()]
 

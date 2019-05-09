@@ -600,49 +600,158 @@ class TestAutocompleteSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_response_body(self, setup_es):
+    @pytest.mark.parametrize(
+        'search,use_context_serializer,expected_companies',
+        (
+            (
+                {'term': 'abc', 'country': constants.UKRegion.north_east.value.id},
+                True,
+                [],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.canada.value.id},
+                True,
+                ['abc'],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.ireland.value.id},
+                True,
+                [],
+            ),
+            (
+                {'term': 'abc', 'country': ''},
+                True,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.united_kingdom.value.id},
+                True,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc'},
+                True,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'one', 'country': constants.Country.canada.value.id},
+                True,
+                [],
+            ),
+            (
+                {'term': 'abc', 'country': constants.UKRegion.north_east.value.id},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.canada.value.id},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.ireland.value.id},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc', 'country': ''},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc', 'country': constants.Country.united_kingdom.value.id},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'abc'},
+                False,
+                ['abc', 'abc 2'],
+            ),
+            (
+                {'term': 'one', 'country': constants.Country.canada.value.id},
+                False,
+                [],
+            ),
+        ),
+    )
+    def test_response_body(
+        self,
+        setup_es,
+        monkeypatch,
+        search,
+        use_context_serializer,
+        expected_companies,
+    ):
         """Tests the response body of autocomplete search query."""
-        company = CompanyFactory(
+        if not use_context_serializer:
+            # Set autocomplete_context_serializer class to None to test
+            # that the autocomplete still works without context filtering
+            # and any specified filters are ignored.
+            monkeypatch.setattr(
+                'datahub.search.company.views.CompanyAutocompleteSearchListAPIViewV4.'
+                'autocomplete_context_serializer_class',
+                None,
+            )
+        CompanyFactory(
             name='abc',
             trading_names=['Xyz trading', 'Abc trading'],
+            registered_address_country_id=constants.Country.canada.value.id,
+            address_country_id=constants.Country.united_kingdom.value.id,
         )
+
+        CompanyFactory(
+            name='abc 2',
+            trading_names=['Xyz trading 2', 'Abc trading 2'],
+            registered_address_country_id=constants.Country.united_kingdom.value.id,
+        )
+
         setup_es.indices.refresh()
 
         url = reverse('api-v4:search:company-autocomplete')
-        response = self.api_client.get(url, data={'term': 'abc'})
+        response = self.api_client.get(
+            url,
+            data=search,
+        )
 
         assert response.status_code == status.HTTP_200_OK
+
+        results = [
+            self._get_company_search_result(Company.objects.get(name=company_name))
+            for company_name in expected_companies
+        ]
         assert response.json() == {
-            'count': 1,
-            'results': [
-                {
-                    'id': str(company.id),
-                    'name': company.name,
-                    'address': {
-                        'line_1': company.address_1,
-                        'line_2': company.address_2 or '',
-                        'town': company.address_town,
-                        'county': company.address_county or '',
-                        'postcode': company.address_postcode or '',
-                        'country': {
-                            'id': str(company.address_country.id),
-                            'name': company.address_country.name,
-                        },
-                    },
-                    'registered_address': {
-                        'line_1': company.registered_address_1,
-                        'line_2': company.registered_address_2 or '',
-                        'town': company.registered_address_town,
-                        'county': company.registered_address_county or '',
-                        'postcode': company.registered_address_postcode or '',
-                        'country': {
-                            'id': str(company.registered_address_country.id),
-                            'name': company.registered_address_country.name,
-                        },
-                    },
-                    'trading_names': ['Xyz trading', 'Abc trading'],
+            'count': len(results),
+            'results': results,
+        }
+
+    def _get_company_search_result(self, company):
+        return {
+            'id': str(company.id),
+            'name': company.name,
+            'address': {
+                'line_1': company.address_1,
+                'line_2': company.address_2 or '',
+                'town': company.address_town,
+                'county': company.address_county or '',
+                'postcode': company.address_postcode or '',
+                'country': {
+                    'id': str(company.address_country.id),
+                    'name': company.address_country.name,
                 },
-            ],
+            },
+            'registered_address': {
+                'line_1': company.registered_address_1,
+                'line_2': company.registered_address_2 or '',
+                'town': company.registered_address_town,
+                'county': company.registered_address_county or '',
+                'postcode': company.registered_address_postcode or '',
+                'country': {
+                    'id': str(company.registered_address_country.id),
+                    'name': company.registered_address_country.name,
+                },
+            },
+            'trading_names': company.trading_names,
         }
 
     @pytest.mark.parametrize(

@@ -6,6 +6,7 @@ from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
 from datahub.search import dict_utils
 from datahub.search import fields
 from datahub.search.models import BaseESModel
+from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
 
 
 DOC_TYPE = 'company'
@@ -13,7 +14,8 @@ DOC_TYPE = 'company'
 
 def get_suggestions(db_company):
     """
-    A list of fields used by the completion suggester to
+    Returns a dictionary with the keys input and context.
+    input contains a list of fields used by the completion suggester to
     find a record when using an autocomplete search.
 
     https://www.elastic.co/guide/en/elasticsearch/
@@ -28,9 +30,15 @@ def get_suggestions(db_company):
 
     Optional weighting could be added here to boost particular suggestions.
     See above link.
+
+    contexts contains a dictionary with any supported filters.
+
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/suggester-context.html
+
+    context - country a list of UUIDs of the countries where the company is based.
     """
     if db_company.archived:
-        return []
+        return {}
 
     names = [
         db_company.name,
@@ -44,7 +52,17 @@ def get_suggestions(db_company):
         *names,
     ]
 
-    return list(filter(None, set(data)))
+    countries = [
+        db_company.registered_address_country_id,
+        db_company.address_country_id,
+    ]
+
+    return {
+        'input': get_unique_values_and_exclude_nulls_from_list(data),
+        'contexts': {
+            'country': get_unique_values_and_exclude_nulls_from_list(countries),
+        },
+    }
 
 
 class Company(BaseESModel):
@@ -110,7 +128,14 @@ class Company(BaseESModel):
     vat_number = Keyword(index=False)
     duns_number = Keyword()
     website = Text()
-    suggest = Completion()
+    suggest = Completion(
+        contexts=[
+            {
+                'name': 'country',
+                'type': 'category',
+            },
+        ],
+    )
 
     COMPUTED_MAPPINGS = {
         'suggest': get_suggestions,
