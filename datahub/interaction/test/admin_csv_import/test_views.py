@@ -1,4 +1,3 @@
-import csv
 import io
 
 import pytest
@@ -15,6 +14,7 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
 from datahub.interaction.models import Interaction, InteractionPermission
 from datahub.interaction.test.admin_csv_import.utils import (
+    make_csv_file,
     random_communication_channel,
     random_service,
 )
@@ -170,7 +170,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
     def test_does_not_allow_file_without_correct_columns(self):
         """Test that the form rejects a CSV file that doesn't have the required columns."""
-        file = _make_csv(
+        file = make_csv_file(
             ('test',),
             ('row',),
         )
@@ -222,7 +222,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         adviser = AdviserFactory()
         service = random_service()
         communication_channel = random_communication_channel()
-        file = _make_csv(
+        file = make_csv_file(
             (
                 'kind',
                 'date',
@@ -274,7 +274,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
         # This file should have 10 errors
-        file = _make_csv(
+        file = make_csv_file(
             ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
             ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
             ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
@@ -290,15 +290,3 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.context['errors']) == min(10, max_errors)
         assert response.context['are_errors_truncated'] == should_be_truncated
-
-
-def _make_csv(*rows, encoding='utf-8-sig', filename='test.csv'):
-    with io.StringIO() as text_stream:
-        writer = csv.writer(text_stream)
-        writer.writerows(rows)
-
-        data = text_stream.getvalue().encode(encoding)
-
-    stream = io.BytesIO(data)
-    stream.name = filename
-    return stream
