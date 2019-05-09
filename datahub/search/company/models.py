@@ -6,6 +6,7 @@ from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
 from datahub.search import dict_utils
 from datahub.search import fields
 from datahub.search.models import BaseESModel
+from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
 
 
 DOC_TYPE = 'company'
@@ -13,7 +14,8 @@ DOC_TYPE = 'company'
 
 def get_suggestions(db_company):
     """
-    A list of fields used by the completion suggester to
+    Returns a dictionary with the keys input and context.
+    input contains a list of fields used by the completion suggester to
     find a record when using an autocomplete search.
 
     https://www.elastic.co/guide/en/elasticsearch/
@@ -28,9 +30,15 @@ def get_suggestions(db_company):
 
     Optional weighting could be added here to boost particular suggestions.
     See above link.
+
+    contexts contains a dictionary with any supported filters.
+
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/suggester-context.html
+
+    context - country a list of UUIDs of the countries where the company is based.
     """
     if db_company.archived:
-        return []
+        return {}
 
     names = [
         db_company.name,
@@ -44,7 +52,17 @@ def get_suggestions(db_company):
         *names,
     ]
 
-    return list(filter(None, set(data)))
+    countries = [
+        db_company.registered_address_country_id,
+        db_company.address_country_id,
+    ]
+
+    return {
+        'input': get_unique_values_and_exclude_nulls_from_list(data),
+        'contexts': {
+            'country': get_unique_values_and_exclude_nulls_from_list(countries),
+        },
+    }
 
 
 class Company(BaseESModel):
@@ -56,7 +74,6 @@ class Company(BaseESModel):
     archived_on = Date()
     archived_reason = Text()
     business_type = fields.id_name_field()
-    companies_house_data = fields.ch_company_field()
     company_number = fields.NormalizedKeyword()
     created_on = Date()
     description = fields.EnglishText()
@@ -77,29 +94,6 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     address = fields.address_field()
     registered_address = fields.address_field()
-
-    # TODO: delete once the migration to address and registered address is complete
-    registered_address_1 = Text()
-    registered_address_2 = Text()
-    registered_address_town = fields.NormalizedKeyword()
-    registered_address_county = Text()
-    registered_address_country = fields.id_name_partial_field()
-    registered_address_postcode = Text(
-        copy_to=[
-            'registered_address_postcode_trigram',
-        ],
-    )
-    registered_address_postcode_trigram = fields.TrigramText()
-    trading_address_1 = Text()
-    trading_address_2 = Text()
-    trading_address_town = fields.NormalizedKeyword()
-    trading_address_county = Text()
-    trading_address_postcode = Text(
-        copy_to=['trading_address_postcode_trigram'],
-    )
-    trading_address_postcode_trigram = fields.TrigramText()
-    trading_address_country = fields.id_name_partial_field()
-
     trading_names = Text(
         copy_to=['trading_names_trigram'],
     )
@@ -110,7 +104,14 @@ class Company(BaseESModel):
     vat_number = Keyword(index=False)
     duns_number = Keyword()
     website = Text()
-    suggest = Completion()
+    suggest = Completion(
+        contexts=[
+            {
+                'name': 'country',
+                'type': 'category',
+            },
+        ],
+    )
 
     COMPUTED_MAPPINGS = {
         'suggest': get_suggestions,
@@ -121,7 +122,6 @@ class Company(BaseESModel):
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
-        'companies_house_data': dict_utils.ch_company_dict,
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
@@ -129,10 +129,6 @@ class Company(BaseESModel):
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
-
-        # TODO: delete once the migration to address and registered address is complete
-        'registered_address_country': dict_utils.id_name_dict,
-        'trading_address_country': dict_utils.id_name_dict,
 
         'turnover_range': dict_utils.id_name_dict,
         'uk_based': bool,

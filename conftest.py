@@ -73,11 +73,11 @@ def api_client():
 class _ReturnValueTracker:
     def __init__(self, cls, method_name):
         self.return_values = []
-        self.original_method = getattr(cls, method_name)
+        self.original_callable = getattr(cls, method_name)
 
     def make_mock(self):
-        def _spy(obj, *args, **kwargs):
-            return_value = self.original_method(obj, *args, **kwargs)
+        def _spy(*args, **kwargs):
+            return_value = self.original_callable(*args, **kwargs)
             self.return_values.append(return_value)
             return return_value
 
@@ -87,20 +87,21 @@ class _ReturnValueTracker:
 @pytest.fixture
 def track_return_values(monkeypatch):
     """
-    Fixture that can be used to track the return values of a method.
+    Fixture that can be used to track the return values of a callable.
 
     Usage example:
 
+        # obj could be a class or a module (for example)
         def test_something(track_return_values):
-            tracker = track_return_values(cls, 'method_name')
+            tracker = track_return_values(obj, 'name_of_callable')
 
             ...
 
             assert tracker.return_values == [1, 2, 3]
     """
-    def _patch(cls, method_name):
-        tracker = _ReturnValueTracker(cls, method_name)
-        monkeypatch.setattr(cls, method_name, tracker.make_mock())
+    def _patch(obj, callable_name):
+        tracker = _ReturnValueTracker(obj, callable_name)
+        monkeypatch.setattr(obj, callable_name, tracker.make_mock())
         return tracker
 
     yield _patch

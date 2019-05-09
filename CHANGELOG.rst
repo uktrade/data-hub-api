@@ -1,3 +1,65 @@
+Data Hub API 12.0.0 (2019-05-09)
+=================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** On 16 May 2019, the ``company_company.trading_address_<xyz>`` columns will be removed from the database. These include:
+
+  | ``trading_address_1``
+  | ``trading_address_2``
+  | ``trading_address_town``
+  | ``trading_address_county``
+  | ``trading_address_country_id``
+  | ``trading_address_postcode``
+- **Companies** The ``/v3/company`` endpoints have been removed. These include:
+
+  | ``/v3/company``
+  | ``/v3/company/<uuid:pk>``
+  | ``/v3/company/<uuid:pk>/archive``
+  | ``/v3/company/<uuid:pk>/audit``
+  | ``/v3/company/<uuid:pk>/one-list-group-core-team``
+  | ``/v3/company/<uuid:pk>/timeline``
+  | ``/v3/company/<uuid:pk>/unarchive``
+- The ``/v3/search/company/`` endpoints have been removed. These include:
+
+  | ``/v3/search/company``
+  | ``/v3/search/company/autocomplete``
+  | ``/v3/search/company/export``
+
+
+Features
+--------
+
+- **Interactions** Validation of rows in the input file was added to the admin site tool for importing interactions.
+  The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it is incomplete.
+
+Internal changes
+----------------
+
+- **Investment** The logic to streamline the investment flow by removing the assign pm stage has been removed.
+  The logic was hidden behind a feature flag that was never activated.
+
+API
+---
+
+- **Companies** The endpoint ``/v4/search/company/autocomplete`` has been updated to accept an optional parameter of ``country``.
+
+  Company typeahead searches are now filterable by ``country`` the filter accepts a single or list of country ids.
+
+Database schema
+---------------
+
+- **Interactions** The ``interaction_interaction`` table has been modified such that the following
+  columns are no longer nullable:
+
+  - ``status`` - this has an application-enforced default of 'complete'
+  - ``location`` - this has an application-enforced default of ''
+  - ``archived`` - this has an application-enforced default of false
+
+
 Data Hub API 11.12.0 (2019-05-02)
 =================================
 

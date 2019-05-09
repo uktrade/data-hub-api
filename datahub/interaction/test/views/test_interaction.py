@@ -370,6 +370,51 @@ class TestAddInteraction(APITestMixin):
                 },
             ),
 
+            # no contradictory messages if event is None but and is_event is True
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'event': None,
+                    'is_event': True,
+                },
+                {
+                    'is_event': ['This field is only valid for service deliveries.'],
+                },
+            ),
+
+            # no duplicate messages for event if provided and is_event is False
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+
+                    'event': EventFactory,
+                    'is_event': False,
+                },
+                {
+                    'is_event': ['This field is only valid for service deliveries.'],
+                    'event': ['This field is only valid for service deliveries.'],
+                },
+            ),
+
             # dit_participants cannot be None
             (
                 {
@@ -586,8 +631,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
-            # TODO: Change this once we give status a default
-            'status': None,
+            'status': Interaction.STATUSES.complete,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -677,9 +721,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            # TODO: Change this once we enforce a default
-            'location': None,
-            'archived': None,
+            'location': '',
+            'archived': False,
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
@@ -705,8 +748,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
-            # TODO: Change this once we give status a default
-            'status': None,
+            'status': Interaction.STATUSES.complete,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -786,10 +828,8 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            # TODO: change this once we enforce a default
-            'location': None,
-            # TODO: Change this once we enforce a default
-            'archived': None,
+            'location': '',
+            'archived': False,
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,

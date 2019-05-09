@@ -155,21 +155,11 @@ class Interaction(ArchivableModel, BaseModel):
         blank=True,
     )
     kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
-    # TODO: Ensure that this is required (with default="complete")
-    # once we have ensured that a default value "complete" is set on
-    # all existing Interactions and we have ensured that new interactions are
-    # being created with a status
     status = models.CharField(
         max_length=MAX_LENGTH,
         choices=STATUSES,
-        null=True,
-        blank=True,
+        default=STATUSES.complete,
     )
-    # TODO: Remove this override (the field is provided with a default by ArchivableModel)
-    # once we have ensured that a default value False is set on
-    # all existing Interactions and we have ensured that new interactions are
-    # being created with archived=False
-    archived = models.BooleanField(blank=True, null=True)
     # If source is set, it provides details of an external source that this
     # interaction represents.  e.g. a calendar event
     # {'id': 'abc123', 'type': 'calendar'}
@@ -199,11 +189,7 @@ class Interaction(ArchivableModel, BaseModel):
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
     subject = models.TextField()
-    # TODO: Ensure that this is required (with default='')
-    # once we have ensured that a default value '' is set on
-    # all existing Interactions and we have ensured that new interactions are
-    # being created with a '' location
-    location = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    location = models.CharField(max_length=MAX_LENGTH, blank=True)
     # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
     #  removed once the migration is complete
     dit_adviser = models.ForeignKey(

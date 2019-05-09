@@ -281,6 +281,7 @@ class AutocompleteSearchListAPIView(ListAPIView):
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
     document_fields = None
+    autocomplete_context_serializer_class = None
 
     def list(self, request, *args, **kwargs):
         """Executes the elasticsearch query"""
@@ -294,17 +295,27 @@ class AutocompleteSearchListAPIView(ListAPIView):
             validated_params['term'],
             validated_params['limit'],
             self.document_fields,
+            self.get_search_context(request.query_params),
         )
-
         return Response(data={
             'count': len(results),
             'results': [result['_source'].to_dict() for result in results],
         })
 
+    def get_search_context(self, query_params):
+        """
+        Add context (filters) to the autocomplete search if provided.
+        """
+        if not self.autocomplete_context_serializer_class:
+            return {}
+        serializer = self.autocomplete_context_serializer_class(data=query_params)
+        serializer.is_valid()
+        return serializer.validated_data
+
     def check_permission_filters(self):
         """
         Checks for permission filters associated with the search app
-        and if present rasies an error.
+        and if present raises an error.
         """
         permission_filters = self._get_permission_filters()
         if permission_filters is not None:

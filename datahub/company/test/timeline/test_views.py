@@ -44,7 +44,7 @@ class TestCompanyTimelineViews(APITestMixin):
         )
 
         company = CompanyFactory(company_number='0125694')
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -82,7 +82,7 @@ class TestCompanyTimelineViews(APITestMixin):
         requests_mock.get(stubbed_url, status_code=status.HTTP_404_NOT_FOUND)
 
         company = CompanyFactory(company_number='0125694')
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -99,7 +99,7 @@ class TestCompanyTimelineViews(APITestMixin):
     def test_list_with_no_company_number(self, company_number):
         """Test the retrieval of the timeline for a company without a valid company number."""
         company = CompanyFactory(company_number=company_number)
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -138,7 +138,7 @@ class TestCompanyTimelineViews(APITestMixin):
         requests_mock.get(stubbed_url, status_code=status_code)
 
         company = CompanyFactory(company_number='125694')
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -189,7 +189,7 @@ class TestCompanyTimelineViews(APITestMixin):
         requests_mock.get(stubbed_url, json=stubbed_response_data, headers=response_signature)
 
         company = CompanyFactory(company_number='1000')
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -213,7 +213,7 @@ class TestCompanyTimelineViews(APITestMixin):
         user = create_test_user(permission_codenames=permission_codenames)
         api_client = self.create_api_client(user=user)
         company = CompanyFactory()
-        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+        url = reverse('api-v4:company:timeline-collection', kwargs={'pk': company.pk})
 
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
