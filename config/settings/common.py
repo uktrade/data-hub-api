@@ -534,4 +534,4 @@ MAILBOXES = {
     #},
 }
 
-DIT_EMAIL_DOMAINS = ['trade.gov.uk', 'digital.trade.gov.uk']
+DIT_EMAIL_DOMAINS = env.list('DIT_EMAIL_DOMAINS', default=[])
