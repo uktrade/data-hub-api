@@ -196,7 +196,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         """
         Test that large files are rejected.
 
-        Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 1024 in config.settings.test
+        Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 5 kB in config.settings.test
         """
         file_size = settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE + 1
         file = io.BytesIO(b'-' * file_size)
@@ -214,7 +214,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert len(messages) == 1
         assert messages[0].level == django_messages.ERROR
         assert messages[0].message == (
-            'The file test.csv was too large. Files must be less than 1.0 KB.'
+            'The file test.csv was too large. Files must be less than 5.0 KB.'
         )
 
     def test_redirects_on_valid_file(self):
