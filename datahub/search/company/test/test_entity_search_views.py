@@ -689,7 +689,7 @@ class TestAutocompleteSearch(APITestMixin):
             # that the autocomplete still works without context filtering
             # and any specified filters are ignored.
             monkeypatch.setattr(
-                'datahub.search.company.views.CompanyAutocompleteSearchListAPIViewV4.'
+                'datahub.search.company.views.CompanyAutocompleteSearchListAPIView.'
                 'autocomplete_context_serializer_class',
                 None,
             )
