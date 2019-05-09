@@ -11,8 +11,6 @@ from datahub.core.constants import (
     ReferralSourceActivity as Activity,
 )
 from datahub.core.validate_utils import DataCombiner
-from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.investment.project.constants import FEATURE_FLAG_STREAMLINED_FLOW
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.validate import field_incomplete
 
@@ -38,24 +36,15 @@ def _get_to_many_id(instance):
 class InvestmentProjectStageValidationConfig:
     """Investment Project stage validation config."""
 
-    def __init__(self):
-        """Checking feature flags that alter validation mapping."""
-        self.is_streamlined_flow = is_feature_flag_active(FEATURE_FLAG_STREAMLINED_FLOW)
-
-    def _get_next_stage_for_prospect(self):
-        if self.is_streamlined_flow:
-            return Stage.active.value
-        return Stage.assign_pm.value
-
-    def get_required_fields_after_stage(self):
+    @classmethod
+    def get_required_fields_after_stage(cls):
         """Mapping from field name to the stage the field becomes required."""
-        next_stage_for_prospect = self._get_next_stage_for_prospect()
         return {
-            'client_cannot_provide_total_investment': next_stage_for_prospect,
-            'number_new_jobs': next_stage_for_prospect,
-            'strategic_drivers': next_stage_for_prospect,
-            'client_requirements': next_stage_for_prospect,
-            'client_considering_other_countries': next_stage_for_prospect,
+            'client_cannot_provide_total_investment': Stage.assign_pm.value,
+            'number_new_jobs': Stage.assign_pm.value,
+            'strategic_drivers': Stage.assign_pm.value,
+            'client_requirements': Stage.assign_pm.value,
+            'client_considering_other_countries': Stage.assign_pm.value,
             'project_manager': Stage.active.value,
             'project_assurance_adviser': Stage.active.value,
             'client_cannot_provide_foreign_investment': Stage.verify_win.value,
@@ -73,9 +62,9 @@ class InvestmentProjectStageValidationConfig:
             'actual_land_date': Stage.verify_win.value,
         }
 
-    def get_conditional_rules_after_stage(self):
+    @classmethod
+    def get_conditional_rules_after_stage(cls):
         """Conditional validation rules. Mapping from field names to validation rules."""
-        next_stage_for_prospect = self._get_next_stage_for_prospect()
         return {
             'referral_source_activity_event':
                 CondValRule(
@@ -101,15 +90,15 @@ class InvestmentProjectStageValidationConfig:
                 ),
             'total_investment':
                 CondValRule(
-                    'client_cannot_provide_total_investment', not_, next_stage_for_prospect,
+                    'client_cannot_provide_total_investment', not_, Stage.assign_pm.value,
                 ),
             'competitor_countries':
                 CondValRule(
-                    'client_considering_other_countries', True, next_stage_for_prospect,
+                    'client_considering_other_countries', True, Stage.assign_pm.value,
                 ),
             'uk_region_locations':
                 CondValRule(
-                    'allow_blank_possible_uk_regions', False, next_stage_for_prospect,
+                    'allow_blank_possible_uk_regions', False, Stage.assign_pm.value,
                 ),
             'foreign_equity_investment':
                 CondValRule(
@@ -136,16 +125,19 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
     desired_stage_order = _get_desired_stage_order(desired_stage, next_stage)
 
     errors = {}
-    validation_config = InvestmentProjectStageValidationConfig()
 
-    for field, req_stage in validation_config.get_required_fields_after_stage().items():
+    for field, req_stage in (
+        InvestmentProjectStageValidationConfig.get_required_fields_after_stage().items()
+    ):
         if _should_skip_rule(field, fields, desired_stage_order, req_stage.order):
             continue
 
         if field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
-    for field, rule in validation_config.get_conditional_rules_after_stage().items():
+    for field, rule in (
+        InvestmentProjectStageValidationConfig.get_conditional_rules_after_stage().items()
+    ):
         if _should_skip_rule(field, fields, desired_stage_order, rule.stage.order):
             continue
 
@@ -173,10 +165,5 @@ def _check_rule(combiner, rule):
 def _get_desired_stage_order(desired_stage, next_stage):
     if not next_stage:
         return desired_stage.order
-
-    is_streamlined_flow_active = is_feature_flag_active(FEATURE_FLAG_STREAMLINED_FLOW)
-
-    if is_streamlined_flow_active and str(desired_stage.id) == Stage.prospect.value.id:
-        return desired_stage.order + 200.0
 
     return desired_stage.order + 100.0

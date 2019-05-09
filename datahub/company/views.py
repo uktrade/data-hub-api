@@ -19,8 +19,7 @@ from datahub.company.serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializerV3,
     CompaniesHouseCompanySerializerV4,
-    CompanySerializerV3,
-    CompanySerializerV4,
+    CompanySerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
@@ -38,9 +37,10 @@ from datahub.investment.project.queryset import get_slim_investment_project_quer
 from datahub.oauth.scopes import Scope
 
 
-class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """Base Company view set."""
+class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Company view set."""
 
+    serializer_class = CompanySerializer
     required_scopes = (Scope.internal_front_end,)
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
@@ -78,22 +78,6 @@ class BaseCompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
     )
-
-
-class CompanyViewSetV3(BaseCompanyViewSet):
-    """
-    Company view set V3.
-
-    TODO: delete once the migration to address and registered address is complete
-    """
-
-    serializer_class = CompanySerializerV3
-
-
-class CompanyViewSetV4(BaseCompanyViewSet):
-    """Company view set V4."""
-
-    serializer_class = CompanySerializerV4
 
 
 class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):

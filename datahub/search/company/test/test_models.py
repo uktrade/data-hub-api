@@ -3,6 +3,7 @@ from collections import Counter
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.constants import Country as CountryConstant
 from datahub.search.company.models import Company as ESCompany, get_suggestions
 
 pytestmark = pytest.mark.django_db
@@ -23,7 +24,6 @@ class TestCompanyElasticModel:
             'archived_on',
             'archived_reason',
             'business_type',
-            'companies_house_data',
             'company_number',
             'created_on',
             'description',
@@ -42,20 +42,6 @@ class TestCompanyElasticModel:
 
             'address',
             'registered_address',
-
-            # TODO: delete once the migration to address and registered address is complete
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_country',
-            'registered_address_county',
-            'registered_address_postcode',
-            'registered_address_town',
-            'trading_address_1',
-            'trading_address_2',
-            'trading_address_country',
-            'trading_address_county',
-            'trading_address_postcode',
-            'trading_address_town',
 
             'trading_names',
             'turnover_range',
@@ -77,30 +63,41 @@ class TestCompanyElasticModel:
         assert len(list(result)) == len(companies)
 
     @pytest.mark.parametrize(
-        'name,trading_names,archived,expected_suggestions',
+        'name,trading_names,archived,registered_address_country,'
+        'expected_input_suggestions,expected_contexts',
         (
             (
                 'Hello Hello uk',
                 ['Good Hello us', 'fr'],
                 False,
+                CountryConstant.united_kingdom.value.id,
                 [
                     'Good', 'uk', 'Hello Hello uk',
                     'us', 'Good Hello us', 'fr', 'Hello',
+                ],
+                [
+                    CountryConstant.united_kingdom.value.id,
                 ],
             ),
             (
                 'Hello      gb',
                 [],
                 False,
+                CountryConstant.canada.value.id,
                 ['Hello', 'gb', 'Hello      gb'],
+                [
+                    CountryConstant.canada.value.id,
+                    CountryConstant.united_kingdom.value.id,
+                ],
             ),
             (
                 'Hello      gb',
                 [],
                 True,
+                CountryConstant.united_kingdom.value.id,
+                {},
                 [],
             ),
-
         ),
     )
     def test_company_get_suggestions(
@@ -108,15 +105,24 @@ class TestCompanyElasticModel:
         name,
         trading_names,
         archived,
-        expected_suggestions,
+        registered_address_country,
+        expected_input_suggestions,
+        expected_contexts,
     ):
         """Test get an autocomplete search suggestions for a company"""
         db_company = CompanyFactory(
             name=name,
             trading_names=trading_names,
             archived=archived,
+            registered_address_country_id=registered_address_country,
+            address_country_id=CountryConstant.united_kingdom.value.id,
         )
 
         result = get_suggestions(db_company)
+        if result:
+            assert Counter(result['input']) == Counter(expected_input_suggestions)
+            assert 'country' in result['contexts']
+            assert Counter(result['contexts']['country']) == Counter(expected_contexts)
 
-        assert Counter(result) == Counter(expected_suggestions)
+        else:
+            assert Counter(result) == Counter(expected_input_suggestions)

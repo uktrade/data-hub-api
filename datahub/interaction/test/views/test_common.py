@@ -911,9 +911,7 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'current_status,new_status',
         (
-            (None, Interaction.STATUSES.draft),
             (Interaction.STATUSES.draft, Interaction.STATUSES.draft),
-            (None, Interaction.STATUSES.complete),
             (Interaction.STATUSES.draft, Interaction.STATUSES.complete),
             (Interaction.STATUSES.complete, Interaction.STATUSES.complete),
         ),

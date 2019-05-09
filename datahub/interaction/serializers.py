@@ -341,8 +341,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
-            'status': {'default': Interaction.STATUSES.complete, 'allow_null': False},
-            'location': {'default': ''},
+            'status': {'default': Interaction.STATUSES.complete},
             'theme': {
                 'allow_blank': False,
                 'default': None,
@@ -391,6 +390,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_on',
             'archived_reason',
         )
+        # Note: These validators are also used by the admin site import interactions tool
+        # (see the admin_csv_import sub-package)
         validators = [
             HasAssociatedInvestmentProjectValidator(),
             ContactsBelongToCompanyValidator(),
@@ -477,19 +478,28 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'required',
-                    OperatorRule('event', bool),
-                    when=OperatorRule('is_event', bool),
-                ),
-                ValidationRule(
                     'too_many_contacts_for_event_service_delivery',
                     OperatorRule('contacts', lambda value: len(value) <= 1),
                     when=OperatorRule('is_event', bool),
                 ),
+                # These two rules are only checked for service deliveries as there's a separate
+                # check that event is blank for interactions above which takes precedence (to
+                # avoid duplicate or contradictory error messages)
+                ValidationRule(
+                    'required',
+                    OperatorRule('event', bool),
+                    when=AndRule(
+                        OperatorRule('is_event', bool),
+                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    ),
+                ),
                 ValidationRule(
                     'invalid_for_non_event',
                     OperatorRule('event', not_),
-                    when=OperatorRule('is_event', not_),
+                    when=AndRule(
+                        OperatorRule('is_event', not_),
+                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    ),
                 ),
             ),
         ]
