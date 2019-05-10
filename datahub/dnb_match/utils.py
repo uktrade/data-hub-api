@@ -203,10 +203,6 @@ def extract_wb_record_into_company_fields(wb_record):
     company_fields.update(
         **address,
         **{
-            f'trading_{address_field}': address_value
-            for address_field, address_value in address.items()
-        },
-        **{
             f'registered_{address_field}': address_value
             for address_field, address_value in address.items()
         },
