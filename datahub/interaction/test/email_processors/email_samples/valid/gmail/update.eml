@@ -1,0 +1,387 @@
+Delivered-To: brendan@bsmitty.co.uk
+Received: by 2002:a02:3941:0:0:0:0:0 with SMTP id w1csp1969755jae;
+        Fri, 29 Mar 2019 04:39:16 -0700 (PDT)
+X-Received: by 2002:ac2:482f:: with SMTP id 15mr5926311lft.57.1553859555622;
+        Fri, 29 Mar 2019 04:39:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1553859555; cv=none;
+        d=google.com; s=arc-20160816;
+        b=Dn7VBxWhG8aBjWcFRfZyqQT0GIzwNV9LlBasTJmkAqhENkGaZbuFIq4LVz3CPtMmhw
+         vdSAuFRccs0MM3f8VvgstlT1rNjt/t8Bxg8bzqY2DmlVZJ6AZbf5DF+39oH72NnIBS55
+         ZklPmGkxc3OQautQEyyuDHbtXxn/Tz0i70tmO0i5+9F31vXQByzR5n4MENa/jZFLilFh
+         JVDkdqzM4QeZTg3K7tJG4grEoeQ4IdF0lKn3ceulnRthgf6aBgqjHawNpuKM2Ca0Hnsg
+         pz8ZecqtC3ohcKx2m7fotk6peNbbzlxTYtCb1InpXg+ZXhQDMJ5AFKlDsPTcnk8B74Lm
+         8NOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=to:from:subject:date:message-id:auto-submitted:sender:reply-to
+         :mime-version:dkim-signature:dkim-signature;
+        bh=rgEerD/wSlJqLmhBSRi50IoCeLvIFMydfhiQjCX2DSU=;
+        b=fAC1yxqgbNaUSK1z5Xhuf/aPIp7az9c68yb9imnKaVDp4a5qD4RUfuqhVniNOzzFT6
+         Is0oOSrhutW2JcXP1DW4fwQkQ9rrgebNl8lOSO9xqAw0Nxcygt0qv9cLOrqdflHRiOLg
+         s4laH6MKBiwM4p5Mk5ytpVGuag2cj7GCpI9904dI7NnE42uk3BL1vU/gFCtSZTDBKQFc
+         vzVdtUsPLCtBttY+e6a7UnMznSiJS2WsXRDB3xsLq4hRX7AMJS+B/SxMkWk6kZyQ/5DY
+         5wAPlBZ0WoIAXTU/F7+8NhUDrfWR4MavZ3gQ1KzGK3PJuN/zPe7f8mR9EWNCOmGhJGQt
+         G8QQ==
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@google.com header.s=20161025 header.b=fdzhTI+1;
+       dkim=pass header.i=@digital-trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b="gkK/l5zk";
+       spf=pass (google.com: domain of 34woexa0uae4r7u3tq3.82y9xtywy9q1.97qtu.w4b.a0@calendar-server.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=34wOeXA0UAE4r7u3tq3.82y9xtywy9q1.97qtu.w4B.A0@calendar-server.bounces.google.com;
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=digital.trade.gov.uk
+Return-Path: <34wOeXA0UAE4r7u3tq3.82y9xtywy9q1.97qtu.w4B.A0@calendar-server.bounces.google.com>
+Received: from mail-sor-f73.google.com (mail-sor-f73.google.com. [209.85.220.73])
+        by mx.google.com with SMTPS id 16sor1197578ljf.13.2019.03.29.04.39.15
+        for <brendan@bsmitty.co.uk>
+        (Google Transport Security);
+        Fri, 29 Mar 2019 04:39:15 -0700 (PDT)
+Received-SPF: pass (google.com: domain of 34woexa0uae4r7u3tq3.82y9xtywy9q1.97qtu.w4b.a0@calendar-server.bounces.google.com designates 209.85.220.73 as permitted sender) client-ip=209.85.220.73;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@google.com header.s=20161025 header.b=fdzhTI+1;
+       dkim=pass header.i=@digital-trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b="gkK/l5zk";
+       spf=pass (google.com: domain of 34woexa0uae4r7u3tq3.82y9xtywy9q1.97qtu.w4b.a0@calendar-server.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=34wOeXA0UAE4r7u3tq3.82y9xtywy9q1.97qtu.w4B.A0@calendar-server.bounces.google.com;
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=digital.trade.gov.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:reply-to:sender:auto-submitted:message-id:date:subject
+         :from:to;
+        bh=rgEerD/wSlJqLmhBSRi50IoCeLvIFMydfhiQjCX2DSU=;
+        b=fdzhTI+1ZjDp+3YC9115Ud2lcxmzM+DIDGgCsUGnLXUBb11BBpZi6pGmbQa8MlzgV2
+         BaQhB5UW2+ynMjmYwguUuwqF7DhTdllmjcJDGde+B0VpGFmATik23NAJNDl0vM1o5zu+
+         Jd0kuBuhkg40dsDHpR/PprWGGG2H5e07t953I+YWGbnlRlzl23r7rmLUdE5jfML4Z3Ef
+         t41GuzTIAAp8HX1On5sD7zfbO4OzOgPYECyiQQWq/P0euQOZqHm5ZQC/VmNzguEfINXX
+         Q/cpqtJv4l6EZ7sp45oggsc1C3K5HD/0s6tmEAGVSrvHemxZTp9k/N7SMMvvUzj2eNdJ
+         s8nw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digital-trade-gov-uk.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:reply-to:sender:auto-submitted:message-id:date:subject
+         :from:to;
+        bh=rgEerD/wSlJqLmhBSRi50IoCeLvIFMydfhiQjCX2DSU=;
+        b=gkK/l5zkrBlo4XNptcwRu5D4JamqhIxtmnSEyF5XJkHHoS5oeyogN5+FJPZeVLWrjW
+         2u5yc7GQS636+JJhGIQMVKDGtUgRPQnDPETycUkIQKTn4MBnPSI0Jmne6TKzGN5mOVX+
+         1ToML9nOkq34QNOI+wcaTrofQal3LikRciMhlceOiPfS0idPJRPF7dADW8N/2Khxvw7z
+         ye8GpdSfNq0DMOU7KG/mq18wgRjek539YMLhfJgP1mpAhy95hU7VOkdOTNWruet8/o1f
+         fFJO/EkPPPmzlfVIoPRIpG8NGDqerBkgyAFB7UHN1RQLWCJoAr/R+8rRbdvn08us5X7A
+         NaPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:sender:auto-submitted
+         :message-id:date:subject:from:to;
+        bh=rgEerD/wSlJqLmhBSRi50IoCeLvIFMydfhiQjCX2DSU=;
+        b=C6ex1voxOeN1PCZPxtM24U+675/1QgGugXE7koPJJ0MObgIqIGxDiTNuXMw6996OJT
+         PaKtjwvnM4oZjXc7XqwVDpiM95JLMn9vZ11JVZPbbgeuxIpRyJiUMtgkvO7P7VflXz4L
+         NRwkS9gXezUPsEXgVjVzYTx1QD/KyOef33/XrPpRIKZwaCO2vHEPVzCfj9kOnXN35Yp0
+         bPpBVvLHpfu2YOrwvLpK26Q/7Hj6zYU3kbt5abyiJ2LvB2lNh8VfVf9WyoZ9iuIb7sk6
+         sbtJ1aGo1I4h7NYfYieHotrVbLGrhvZMJnteoYPV8nJ/wEuX9tw+SOPDD6NgQaVcaOS1
+         zdTA==
+X-Gm-Message-State: APjAAAUhsCAG3oeJyUf/AuJ463goc9a/uH0U8oUOjVQ4FPVqOVhSK29y
+	ny6OvTUYOoD6u15i3iuazXNfTG0kCfUHPqprN40V0jI7JqtGUHVMzn8hqr1PIZOjd2OwK0EjGdS
+	5NMOS8PQLElOvjP9l7hOQhKHShA==
+X-Google-Smtp-Source: APXvYqzPLjzJtgd4tzUdmJmeQU34WfPtOhSvm+gkyEIIf6JL0V9gNOOvK+2WbEK7hwHulEOCkQJ3Yl8bRWSxmt+MShvi
+MIME-Version: 1.0
+X-Received: by 2002:a2e:361a:: with SMTP id d26mr660572lja.21.1553859555338;
+ Fri, 29 Mar 2019 04:39:15 -0700 (PDT)
+Reply-To: brendan.smith@digital.trade.gov.uk
+Sender: Google Calendar <calendar-notification@google.com>
+Auto-Submitted: auto-generated
+Message-ID: <000000000000d3ba0005853a1e84@google.com>
+Date: Fri, 29 Mar 2019 11:39:15 +0000
+Subject: Updated invitation: update @ Fri 29 Mar 2019 4:30pm - 6pm (GMT) (brendan@bsmitty.co.uk)
+From: brendan.smith@digital.trade.gov.uk
+To: brendan@bsmitty.co.uk
+Content-Type: multipart/mixed; boundary="000000000000d3b9ee05853a1e83"
+
+--000000000000d3b9ee05853a1e83
+Content-Type: multipart/alternative; boundary="000000000000d3b9ec05853a1e81"
+
+--000000000000d3b9ec05853a1e81
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: quoted-printable
+
+This event has been changed.
+
+Title: update (changed)
+foooobar
+When: Fri 29 Mar 2019 4:30pm =E2=80=93 6pm United Kingdom Time (changed)
+Where: Somewhere, Unit FF - 305 - =D8=B4=D8=A7=D8=B1=D8=B9 =D8=A7=D9=84=D9=
+=85=D8=B1=D9=83=D8=B2 =D8=A7=D9=84=D9=85=D8=A7=D9=84=D9=8A - =D8=AF=D8=A8=
+=D9=8A - United Arab =20
+Emirates
+Joining info: meet.google.com/tep-mywp-icw =20
+<https://meet.google.com/tep-mywp-icw>
+Or dial: +1 443-671-4739  PIN: 601383231#
+Calendar: brendan@bsmitty.co.uk
+Who:
+     * brendan.smith@digital.trade.gov.uk- organiser
+     * brendan@bsmitty.co.uk
+
+Event details: =20
+https://www.google.com/calendar/event?action=3DVIEW&eid=3DNWlnZ3IxZTJsdWdsc=
+3M2Yzc4OWIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&tok=3DMzQjYnJlbmRhbi5zbWl0a=
+EBkaWdpdGFsLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1=
+Y2E0NmI&ctz=3DEurope%2FLondon&hl=3Den_GB&es=3D1
+
+Invitation from Google Calendar: https://www.google.com/calendar/
+
+You are receiving this email at the account brendan@bsmitty.co.uk because =
+=20
+you are subscribed for updated invitations on calendar =20
+brendan@bsmitty.co.uk.
+
+To stop receiving these emails, please log in to =20
+https://www.google.com/calendar/ and change your notification settings for =
+=20
+this calendar.
+
+Forwarding this invitation could allow any recipient to modify your RSVP =
+=20
+response. Learn more at =20
+https://support.google.com/calendar/answer/37135#forwarding
+
+--=20
+Communications with the Department for International Trade may be=20
+automatically logged, monitored and/or recorded for legal purposes.
+
+--000000000000d3b9ec05853a1e81
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<span itemscope itemtype=3D"http://schema.org/InformAction"><span style=3D"=
+display:none" itemprop=3D"about" itemscope itemtype=3D"http://schema.org/Th=
+ing/Paragraph"><meta itemprop=3D"description" content=3D"Title updated"/></=
+span><span style=3D"display:none" itemprop=3D"about" itemscope itemtype=3D"=
+http://schema.org/Thing/Clock"><meta itemprop=3D"description" content=3D"Ti=
+me updated"/></span><span itemprop=3D"object" itemscope itemtype=3D"http://=
+schema.org/Event"><div style=3D""><table cellspacing=3D"0" cellpadding=3D"8=
+" border=3D"0" summary=3D"" style=3D"width:100%;font-family:Arial,Sans-seri=
+f;border:1px Solid #ccc;border-width:1px 2px 2px 1px;background-color:#fff;=
+"><tr><td><meta itemprop=3D"eventStatus" content=3D"http://schema.org/Event=
+Rescheduled"/><h4 style=3D"padding:6px 10px;margin:0 0 4px 0;font-family:Ar=
+ial,Sans-serif;font-size:13px;line-height:1.4;border:1px Solid #d9f2db;back=
+ground:#d9f2db;color:#222;font-weight:normal"><strong>This event has been c=
+hanged.</strong></h4><div style=3D"padding:2px"><span itemprop=3D"publisher=
+" itemscope itemtype=3D"http://schema.org/Organization"><meta itemprop=3D"n=
+ame" content=3D"Google Calendar"/></span><meta itemprop=3D"eventId/googleCa=
+lendar" content=3D"5iggr1e2luglss6c789b0scvgr"/><div style=3D"float:right;f=
+ont-weight:bold;font-size:13px"> <a href=3D"https://www.google.com/calendar=
+/event?action=3DVIEW&amp;eid=3DNWlnZ3IxZTJsdWdsc3M2Yzc4OWIwc2N2Z3IgYnJlbmRh=
+bkBic21pdHR5LmNvLnVr&amp;tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdv=
+di51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&amp;ctz=3DEurop=
+e%2FLondon&amp;hl=3Den_GB&amp;es=3D1" style=3D"color:#20c;white-space:nowra=
+p" itemprop=3D"url">more details &raquo;</a><br></div><h3 style=3D"padding:=
+0 0 6px 0;margin:0;font-family:Arial,Sans-serif;font-size:16px;font-weight:=
+bold;color:#222"><strong style=3D"color:#080">Changed: </strong><span itemp=
+rop=3D"name">update</span></h3><div style=3D"padding-bottom:15px;font-famil=
+y:Arial,Sans-serif;font-size:13px;color:#222;white-space:pre-wrap!important=
+;white-space:-moz-pre-wrap!important;white-space:-pre-wrap!important;white-=
+space:-o-pre-wrap!important;white-space:pre;word-wrap:break-word"><span>foo=
+oobar</span><meta itemprop=3D"description" content=3D"foooobar"/></div><tab=
+le cellpadding=3D"0" cellspacing=3D"0" border=3D"0" summary=3D"Event detail=
+s"><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font-=
+size:13px;color:#888;white-space:nowrap" valign=3D"top"><div><i style=3D"fo=
+nt-style:normal">When</i></div></td><td style=3D"padding-bottom:10px;font-f=
+amily:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"top"><strong st=
+yle=3D"color:#080">Changed: </strong><time itemprop=3D"startDate" datetime=
+=3D"20190329T163000Z"></time><time itemprop=3D"endDate" datetime=3D"2019032=
+9T180000Z"></time>Fri 29 Mar 2019 4:30pm =E2=80=93 6pm <span style=3D"color=
+:#888">United Kingdom Time</span></td></tr><tr><td style=3D"padding:0 1em 1=
+0px 0;font-family:Arial,Sans-serif;font-size:13px;color:#888;white-space:no=
+wrap" valign=3D"top"><div><i style=3D"font-style:normal">Where</i></div></t=
+d><td style=3D"padding-bottom:10px;font-family:Arial,Sans-serif;font-size:1=
+3px;color:#222" valign=3D"top"><span itemprop=3D"location" itemscope itemty=
+pe=3D"http://schema.org/Place"><span itemprop=3D"name" class=3D"notranslate=
+">Somewhere, Unit FF - 305 - =D8=B4=D8=A7=D8=B1=D8=B9 =D8=A7=D9=84=D9=85=D8=
+=B1=D9=83=D8=B2 =D8=A7=D9=84=D9=85=D8=A7=D9=84=D9=8A - =D8=AF=D8=A8=D9=8A -=
+ United Arab Emirates</span><span dir=3D"ltr"> (<a href=3D"https://maps.goo=
+gle.com/maps?q=3DSomewhere,+Unit+FF+-+305+-+%D8%B4%D8%A7%D8%B1%D8%B9+%D8%A7=
+%D9%84%D9%85%D8%B1%D9%83%D8%B2+%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A+-+%D8%A=
+F%D8%A8%D9%8A+-+United+Arab+Emirates&amp;hl=3Den-GB" style=3D"color:#20c;wh=
+ite-space:nowrap" target=3D"_blank" itemprop=3D"map">map</a>)</span></span>=
+</td></tr><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-seri=
+f;font-size:13px;color:#888;white-space:nowrap" valign=3D"top"><div><i styl=
+e=3D"font-style:normal">Joining info</i></div></td><td style=3D"padding-bot=
+tom:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"=
+top"><span itemprop=3D"potentialaction" itemscope itemtype=3D"http://schema=
+.org/JoinAction"><span itemprop=3D"name" content=3D"meet.google.com/tep-myw=
+p-icw"><span itemprop=3D"target" itemscope itemtype=3D"http://schema.org/En=
+tryPoint"><span itemprop=3D"url" content=3D"https://meet.google.com/tep-myw=
+p-icw"><span itemprop=3D"httpMethod" content=3D"GET"><a href=3D"https://mee=
+t.google.com/tep-mywp-icw" style=3D"color:#20c;white-space:nowrap" target=
+=3D"_blank">meet.google.com/tep-mywp-icw</a></span></span></span></span></s=
+pan></td></tr><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-=
+serif;font-size:13px;color:#888;white-space:nowrap"></td><td><table cellspa=
+cing=3D"0" cellpadding=3D"0"><tr><td style=3D"padding-bottom:10px;font-fami=
+ly:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"top"><span style=
+=3D"color:#888">Or dial: <span itemprop=3D"phoneNumber">+1 443-671-4739</sp=
+an><span itemprop=3D"rtcPhoneNumberPassCodeLabel">&nbsp; PIN:</span><span i=
+temprop=3D"passCode"> 601383231#</span></span></td></tr></table></td></tr><=
+tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font-size=
+:13px;color:#888;white-space:nowrap" valign=3D"top"><div><i style=3D"font-s=
+tyle:normal">Calendar</i></div></td><td style=3D"padding-bottom:10px;font-f=
+amily:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"top">brendan@bs=
+mitty.co.uk</td></tr><tr><td style=3D"padding:0 1em 10px 0;font-family:Aria=
+l,Sans-serif;font-size:13px;color:#888;white-space:nowrap" valign=3D"top"><=
+div><i style=3D"font-style:normal">Who</i></div></td><td style=3D"padding-b=
+ottom:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222" valign=
+=3D"top"><table cellspacing=3D"0" cellpadding=3D"0"><tr><td style=3D"paddin=
+g-right:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222"><span =
+style=3D"font-family:Courier New,monospace">&#x2022;</span></td><td style=
+=3D"padding-right:10px;font-family:Arial,Sans-serif;font-size:13px;color:#2=
+22"><div><div style=3D"margin:0 0 0.3em 0"><span itemprop=3D"attendee" item=
+scope itemtype=3D"http://schema.org/Person"><span itemprop=3D"name" class=
+=3D"notranslate">brendan.smith@digital.trade.gov.uk</span><meta itemprop=3D=
+"email" content=3D"brendan.smith@digital.trade.gov.uk"/></span><span itempr=
+op=3D"organizer" itemscope itemtype=3D"http://schema.org/Person"><meta item=
+prop=3D"name" content=3D"brendan.smith@digital.trade.gov.uk"/><meta itempro=
+p=3D"email" content=3D"brendan.smith@digital.trade.gov.uk"/></span><span st=
+yle=3D"font-size:11px;color:#888">- organiser</span></div></div></td></tr><=
+tr><td style=3D"padding-right:10px;font-family:Arial,Sans-serif;font-size:1=
+3px;color:#222"><span style=3D"font-family:Courier New,monospace">&#x2022;<=
+/span></td><td style=3D"padding-right:10px;font-family:Arial,Sans-serif;fon=
+t-size:13px;color:#222"><div><div style=3D"margin:0 0 0.3em 0"><span itempr=
+op=3D"attendee" itemscope itemtype=3D"http://schema.org/Person"><span itemp=
+rop=3D"name" class=3D"notranslate">brendan@bsmitty.co.uk</span><meta itempr=
+op=3D"email" content=3D"brendan@bsmitty.co.uk"/></span></div></div></td></t=
+r></table></td></tr></table></div><p style=3D"color:#222;font-size:13px;mar=
+gin:0"><span style=3D"color:#888">Going (brendan@bsmitty.co.uk)?&nbsp;&nbsp=
+;&nbsp;</span><wbr><strong><span itemprop=3D"potentialaction" itemscope ite=
+mtype=3D"http://schema.org/RsvpAction"><meta itemprop=3D"attendance" conten=
+t=3D"http://schema.org/RsvpAttendance/Yes"/><span itemprop=3D"handler" item=
+scope itemtype=3D"http://schema.org/HttpActionHandler"><link itemprop=3D"me=
+thod" href=3D"http://schema.org/HttpRequestMethod/GET"/><a href=3D"https://=
+www.google.com/calendar/event?action=3DRESPOND&amp;eid=3DNWlnZ3IxZTJsdWdsc3=
+M2Yzc4OWIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&amp;rst=3D1&amp;tok=3DMzQjYn=
+JlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4N=
+zRlODk1Y2ViOTQ1Y2E0NmI&amp;ctz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D1"=
+ style=3D"color:#20c;white-space:nowrap" itemprop=3D"url">Yes</a></span></s=
+pan><span style=3D"margin:0 0.4em;font-weight:normal"> - </span><span itemp=
+rop=3D"potentialaction" itemscope itemtype=3D"http://schema.org/RsvpAction"=
+><meta itemprop=3D"attendance" content=3D"http://schema.org/RsvpAttendance/=
+Maybe"/><span itemprop=3D"handler" itemscope itemtype=3D"http://schema.org/=
+HttpActionHandler"><link itemprop=3D"method" href=3D"http://schema.org/Http=
+RequestMethod/GET"/><a href=3D"https://www.google.com/calendar/event?action=
+=3DRESPOND&amp;eid=3DNWlnZ3IxZTJsdWdsc3M2Yzc4OWIwc2N2Z3IgYnJlbmRhbkBic21pdH=
+R5LmNvLnVr&amp;rst=3D3&amp;tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLm=
+dvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&amp;ctz=3DEur=
+ope%2FLondon&amp;hl=3Den_GB&amp;es=3D1" style=3D"color:#20c;white-space:now=
+rap" itemprop=3D"url">Maybe</a></span></span><span style=3D"margin:0 0.4em;=
+font-weight:normal"> - </span><span itemprop=3D"potentialaction" itemscope =
+itemtype=3D"http://schema.org/RsvpAction"><meta itemprop=3D"attendance" con=
+tent=3D"http://schema.org/RsvpAttendance/No"/><span itemprop=3D"handler" it=
+emscope itemtype=3D"http://schema.org/HttpActionHandler"><link itemprop=3D"=
+method" href=3D"http://schema.org/HttpRequestMethod/GET"/><a href=3D"https:=
+//www.google.com/calendar/event?action=3DRESPOND&amp;eid=3DNWlnZ3IxZTJsdWds=
+c3M2Yzc4OWIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&amp;rst=3D2&amp;tok=3DMzQj=
+YnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk=
+4NzRlODk1Y2ViOTQ1Y2E0NmI&amp;ctz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D=
+1" style=3D"color:#20c;white-space:nowrap" itemprop=3D"url">No</a></span></=
+span></strong>&nbsp;&nbsp;&nbsp;&nbsp;<wbr><a href=3D"https://www.google.co=
+m/calendar/event?action=3DVIEW&amp;eid=3DNWlnZ3IxZTJsdWdsc3M2Yzc4OWIwc2N2Z3=
+IgYnJlbmRhbkBic21pdHR5LmNvLnVr&amp;tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLn=
+RyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&amp;c=
+tz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D1" style=3D"color:#20c;white-s=
+pace:nowrap" itemprop=3D"url">more options &raquo;</a></p></td></tr><tr><td=
+ style=3D"background-color:#f6f6f6;color:#888;border-top:1px Solid #ccc;fon=
+t-family:Arial,Sans-serif;font-size:11px"><p>Invitation from <a href=3D"htt=
+ps://www.google.com/calendar/" target=3D"_blank" style=3D"">Google Calendar=
+</a></p><p>You are receiving this email at the account brendan@bsmitty.co.u=
+k because you are subscribed for updated invitations on calendar brendan@bs=
+mitty.co.uk.</p><p>To stop receiving these emails, please log in to https:/=
+/www.google.com/calendar/ and change your notification settings for this ca=
+lendar.</p><p>Forwarding this invitation could allow any recipient to modif=
+y your RSVP response. <a href=3D"https://support.google.com/calendar/answer=
+/37135#forwarding">Learn More</a>.</p></td></tr></table></div></span></span=
+>
+<br>
+<span style=3D"color:rgb(34,34,34);font-family:arial,sans-serif;font-size:1=
+2.8px;background-color:rgb(255,255,255)">Communications with the Department=
+ for International Trade may be automatically logged, monitored and/or reco=
+rded for legal purposes.</span>
+--000000000000d3b9ec05853a1e81
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: quoted-printable
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20190329T163000Z
+DTEND:20190329T180000Z
+DTSTAMP:20190329T113915Z
+ORGANIZER;CN=3Dbrendan.smith@digital.trade.gov.uk:mailto:brendan.smith@digi=
+ta
+ l.trade.gov.uk
+UID:5iggr1e2luglss6c789b0scvgr@google.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DACCEPTED;RSV=
+P=3DTRUE
+ ;CN=3Dbrendan.smith@digital.trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
+mith@
+ digital.trade.gov.uk
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3Dbrendan@bsmitty.co.uk;X-NUM-GUESTS=3D0:mailto:brendan@bsmitty.co=
+.uk
+CREATED:20190329T113628Z
+DESCRIPTION:foooobar\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of t=
+h
+ e description.\n\nThis event has a video call.\nJoin: https://meet.google.=
+c
+ om/tep-mywp-icw\n+1 443-671-4739 PIN: 601383231#\n\nView your event at htt=
+p
+ s://www.google.com/calendar/event?action=3DVIEW&eid=3DNWlnZ3IxZTJsdWdsc3M2=
+Yzc4O
+ WIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdp=
+dGF
+ sLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&c=
+t
+ z=3DEurope%2FLondon&hl=3Den_GB&es=3D1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:=
+~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20190329T113914Z
+LOCATION:Somewhere\, Unit FF - 305 - =D8=B4=D8=A7=D8=B1=D8=B9 =D8=A7=D9=84=
+=D9=85=D8=B1=D9=83=D8=B2 =D8=A7=D9=84=D9=85=D8=A7=D9=84=D9=8A - =D8=AF=D8=
+=A8=D9=8A - United Arab
+  Emirates
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:update
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000d3b9ec05853a1e81--
+--000000000000d3b9ee05853a1e83
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VkVWRU5UDQpEVFNUQVJUOjIwMTkwMzI5VDE2MzAwMFoNCkRURU5EOjIwMTkwMzI5
+VDE4MDAwMFoNCkRUU1RBTVA6MjAxOTAzMjlUMTEzOTE1Wg0KT1JHQU5JWkVSO0NOPWJyZW5kYW4u
+c21pdGhAZGlnaXRhbC50cmFkZS5nb3YudWs6bWFpbHRvOmJyZW5kYW4uc21pdGhAZGlnaXRhDQog
+bC50cmFkZS5nb3YudWsNClVJRDo1aWdncjFlMmx1Z2xzczZjNzg5YjBzY3ZnckBnb29nbGUuY29t
+DQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtST0xFPVJFUS1QQVJUSUNJUEFOVDtQQVJUU1RB
+VD1BQ0NFUFRFRDtSU1ZQPVRSVUUNCiA7Q049YnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdv
+di51aztYLU5VTS1HVUVTVFM9MDptYWlsdG86YnJlbmRhbi5zbWl0aEANCiBkaWdpdGFsLnRyYWRl
+Lmdvdi51aw0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7
+UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1JTVlA9DQogVFJVRTtDTj1icmVuZGFuQGJzbWl0dHkuY28u
+dWs7WC1OVU0tR1VFU1RTPTA6bWFpbHRvOmJyZW5kYW5AYnNtaXR0eS5jby51aw0KQ1JFQVRFRDoy
+MDE5MDMyOVQxMTM2MjhaDQpERVNDUklQVElPTjpmb29vb2JhclxuXG4tOjp+On46On46fjp+On46
+fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+On4NCiA6fjp+On46fjp+On46fjp+On46
+fjp+On46fjp+Ojp+On46Oi1cblBsZWFzZSBkbyBub3QgZWRpdCB0aGlzIHNlY3Rpb24gb2YgdGgN
+CiBlIGRlc2NyaXB0aW9uLlxuXG5UaGlzIGV2ZW50IGhhcyBhIHZpZGVvIGNhbGwuXG5Kb2luOiBo
+dHRwczovL21lZXQuZ29vZ2xlLmMNCiBvbS90ZXAtbXl3cC1pY3dcbisxIDQ0My02NzEtNDczOSBQ
+SU46IDYwMTM4MzIzMSNcblxuVmlldyB5b3VyIGV2ZW50IGF0IGh0dHANCiBzOi8vd3d3Lmdvb2ds
+ZS5jb20vY2FsZW5kYXIvZXZlbnQ/YWN0aW9uPVZJRVcmZWlkPU5XbG5aM0l4WlRKc2RXZHNjM00y
+WXpjNE8NCiBXSXdjMk4yWjNJZ1luSmxibVJoYmtCaWMyMXBkSFI1TG1OdkxuVnImdG9rPU16UWpZ
+bkpsYm1SaGJpNXpiV2wwYUVCa2FXZHBkR0YNCiBzTG5SeVlXUmxMbWR2ZGk1MWF6Qm1ZV0kwT0RN
+NFpXRTNOR05pWXpNMk1qVm1PVGs0TnpSbE9EazFZMlZpT1RRMVkyRTBObUkmY3QNCiB6PUV1cm9w
+ZSUyRkxvbmRvbiZobD1lbl9HQiZlcz0xLlxuLTo6fjp+Ojp+On46fjp+On46fjp+On46fjp+On46
+fjp+On46fjp+On4NCiA6fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjo6fjp+
+OjotDQpMQVNULU1PRElGSUVEOjIwMTkwMzI5VDExMzkxNFoNCkxPQ0FUSU9OOlNvbWV3aGVyZVws
+IFVuaXQgRkYgLSAzMDUgLSDYtNin2LHYuSDYp9mE2YXYsdmD2LIg2KfZhNmF2KfZhNmKIC0g2K/Y
+qNmKIC0gVW5pdGVkIEFyYWINCiAgRW1pcmF0ZXMNClNFUVVFTkNFOjANClNUQVRVUzpDT05GSVJN
+RUQNClNVTU1BUlk6dXBkYXRlDQpUUkFOU1A6T1BBUVVFDQpFTkQ6VkVWRU5UDQpFTkQ6VkNBTEVO
+REFSDQo=
+--000000000000d3b9ee05853a1e83--
