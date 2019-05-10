@@ -52,11 +52,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     registered_address_postcode = factory.Faker('postcode')
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
-    trading_address_1 = factory.SelfAttribute('.address_1')
-    trading_address_town = factory.SelfAttribute('.address_town')
-    trading_address_postcode = factory.SelfAttribute('.address_postcode')
-    trading_address_country_id = factory.SelfAttribute('.address_country_id')
-
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
