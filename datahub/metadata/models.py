@@ -136,7 +136,12 @@ class TeamRole(BaseConstantModel):
 
 
 class Team(BaseConstantModel):
-    """Team."""
+    """
+    Team.
+
+    Note: An index on `UPPER(name)` (with name `metadata_team_upper_name_ed973c5a`) exists for
+    use with iexact filtering. See the migrations for the definition.
+    """
 
     TAGS = Choices(
         ('investment_services_team', 'Investment Services Team'),
