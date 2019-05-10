@@ -147,13 +147,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'registered_address_county',
                     'registered_address_postcode',
                     'registered_address_country',
-
-                    'trading_address_1',
-                    'trading_address_2',
-                    'trading_address_town',
-                    'trading_address_county',
-                    'trading_address_postcode',
-                    'trading_address_country',
                 ),
             },
         ),
