@@ -1,10 +1,19 @@
+import gzip
+from datetime import timedelta
+from secrets import token_urlsafe
+
 from django.conf import settings
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import filesizeformat
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
+
+
+FILE_CACHE_TIMEOUT_SECS = int(timedelta(minutes=30).total_seconds())
 
 
 class InteractionCSVForm(BaseCSVImportForm):
@@ -57,3 +66,56 @@ class InteractionCSVForm(BaseCSVImportForm):
                     matched_rows.append(form.cleaned_data_as_serializer_dict())
 
         return matching_counts, matched_rows
+
+    def save_to_cache(self):
+        """
+        Generate a token and store the file in the configured cache with a timeout.
+
+        Can only be called on a validated form.
+        """
+        csv_file = self.cleaned_data['csv_file']
+        csv_file.seek(0)
+        data = csv_file.read()
+        compressed_data = gzip.compress(data)
+
+        token = _make_token()
+        data_key, name_key = _cache_keys_for_token(token)
+        cache_keys_and_values = {
+            data_key: compressed_data,
+            name_key: csv_file.name,
+        }
+        cache.set_many(cache_keys_and_values, timeout=FILE_CACHE_TIMEOUT_SECS)
+        return token
+
+    @classmethod
+    def from_token(cls, token):
+        """
+        Create a InteractionCSVForm instance using a token.
+
+        Returns None if serialised data for the token can't be found in the cache.
+        """
+        data_key, name_key = _cache_keys_for_token(token)
+        cache_keys_and_values = cache.get_many((data_key, name_key))
+
+        any_cache_keys_missing = {data_key, name_key} - cache_keys_and_values.keys()
+        if any_cache_keys_missing:
+            return None
+
+        decompressed_data = gzip.decompress(cache_keys_and_values[data_key])
+        name = cache_keys_and_values[name_key]
+        csv_file = SimpleUploadedFile(name=name, content=decompressed_data)
+
+        return cls(
+            files={
+                'csv_file': csv_file,
+            },
+        )
+
+
+def _make_token():
+    return token_urlsafe()
+
+
+def _cache_keys_for_token(token):
+    prefix = f'interaction-csv-import:{token}'
+    return f'{prefix}:data', f'{prefix}:name'
