@@ -123,7 +123,12 @@ def local_memory_cache(monkeypatch):
         'default',
         {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
     )
-    monkeypatch.setattr('django.core.cache.caches', CacheHandler())
+    cache_handler = CacheHandler()
+    monkeypatch.setattr('django.core.cache.caches', cache_handler)
+
+    yield
+
+    cache_handler['default'].clear()
 
 
 @pytest.fixture
