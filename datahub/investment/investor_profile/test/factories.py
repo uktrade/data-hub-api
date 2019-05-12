@@ -9,7 +9,6 @@ from datahub.core.constants import (
 )
 from datahub.core.test.factories import to_many_field
 from datahub.investment.investor_profile.constants import (
-    ProfileType as ProfileTypeConstant,
     RequiredChecksConducted as RequiredChecksConductedConstant,
 )
 from datahub.investment.investor_profile.test.constants import (
@@ -26,11 +25,10 @@ from datahub.investment.investor_profile.test.constants import (
 )
 
 
-class LargeInvestorProfileFactory(factory.django.DjangoModelFactory):
-    """Large Capital Investor profile factory."""
+class LargeCapitalInvestorProfileFactory(factory.django.DjangoModelFactory):
+    """Large capital investor profile factory."""
 
     investor_company = factory.SubFactory(CompanyFactory)
-    profile_type_id = ProfileTypeConstant.large.value.id
 
     @to_many_field
     def construction_risks(self):
@@ -78,10 +76,10 @@ class LargeInvestorProfileFactory(factory.django.DjangoModelFactory):
         return []
 
     class Meta:
-        model = 'investor_profile.InvestorProfile'
+        model = 'investor_profile.LargeCapitalInvestorProfile'
 
 
-class CompleteLargeInvestorProfileFactory(LargeInvestorProfileFactory):
+class CompleteLargeCapitalInvestorProfileFactory(LargeCapitalInvestorProfileFactory):
     """Complete Large Capital Investor profile factory."""
 
     investor_description = factory.Faker('text')
@@ -161,9 +159,3 @@ class CompleteLargeInvestorProfileFactory(LargeInvestorProfileFactory):
             CountryConstant.ireland.value.id,
             CountryConstant.canada.value.id,
         ]
-
-
-class GrowthInvestorProfileFactory(LargeInvestorProfileFactory):
-    """Growth Capital Investor profile factory."""
-
-    profile_type_id = ProfileTypeConstant.growth.value.id

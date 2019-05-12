@@ -62,13 +62,20 @@ def test_sync_object_task_retries_on_error(monkeypatch, setup_es):
     assert sync_object_mock.call_count == 2
 
 
+@pytest.mark.parametrize(
+    'related_obj_filter',
+    (
+        None,
+        {'simpleton__name': 'hello'},
+    ),
+)
 @pytest.mark.django_db
-def test_sync_related_objects_task_syncs(monkeypatch):
+def test_sync_related_objects_task_syncs(related_obj_filter, monkeypatch):
     """Test that related objects are synced to Elasticsearch."""
     sync_object_task_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.sync_object_task', sync_object_task_mock)
 
-    simpleton = SimpleModel.objects.create()
+    simpleton = SimpleModel.objects.create(name='hello')
     relation_1 = RelatedModel.objects.create(simpleton=simpleton)
     relation_2 = RelatedModel.objects.create(simpleton=simpleton)
     RelatedModel.objects.create()  # Unrelated object, should not get synced
@@ -78,6 +85,7 @@ def test_sync_related_objects_task_syncs(monkeypatch):
             SimpleModel._meta.label,
             str(simpleton.pk),
             'relatedmodel_set',
+            related_obj_filter,
         ),
     )
 

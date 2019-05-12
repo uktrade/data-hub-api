@@ -1,5 +1,6 @@
-from datahub.investment.investor_profile.constants import ProfileType
-from datahub.investment.investor_profile.models import InvestorProfile as DBInvestorProfile
+from datahub.investment.investor_profile.models import (
+    LargeCapitalInvestorProfile as DBLargeCapitalInvestorProfile,
+)
 from datahub.investment.investor_profile.permissions import InvestorProfilePermission
 from datahub.search.apps import SearchApp
 from datahub.search.large_investor_profile.models import (
@@ -16,9 +17,7 @@ class LargeInvestorProfileSearchApp(SearchApp):
     view_permissions = (f'investor_profile.{InvestorProfilePermission.view_investor_profile}',)
     export_permission = f'investor_profile.{InvestorProfilePermission.export}'
     exclude_from_global_search = True
-    queryset = DBInvestorProfile.objects.filter(
-        profile_type_id=ProfileType.large.value.id,
-    ).select_related(
+    queryset = DBLargeCapitalInvestorProfile.objects.select_related(
         'investor_company',
         'investor_type',
         'required_checks_conducted',
