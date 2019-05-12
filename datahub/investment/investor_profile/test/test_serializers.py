@@ -1,7 +1,9 @@
 import pytest
 
 from datahub.investment.investor_profile.serializers import LargeCapitalInvestorProfileSerializer
-from datahub.investment.investor_profile.test.factories import CompleteLargeInvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import (
+    CompleteLargeCapitalInvestorProfileFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -32,7 +34,7 @@ class TestLargeCapitalInvestorProfileSerializer:
     )
     def test_validate_fields_allow_null(self, field, empty_value, expected_value):
         """Test validates fields allow null or empty values."""
-        profile = CompleteLargeInvestorProfileFactory()
+        profile = CompleteLargeCapitalInvestorProfileFactory()
         serializer = LargeCapitalInvestorProfileSerializer(
             data={field: empty_value},
             instance=profile,

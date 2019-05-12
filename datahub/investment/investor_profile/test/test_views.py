@@ -28,10 +28,7 @@ from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
 )
-from datahub.investment.investor_profile.test.factories import (
-    GrowthInvestorProfileFactory,
-    LargeInvestorProfileFactory,
-)
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 
 
 INVALID_CHOICE_ERROR_MESSAGE = (
@@ -42,12 +39,9 @@ INVALID_CHOICE_ERROR_MESSAGE = (
 @pytest.fixture
 def get_large_capital_profile_for_search():
     """Sets up search list test by adding many profiles and returning a large capital profile."""
-    LargeInvestorProfileFactory.create_batch(5)
+    LargeCapitalInvestorProfileFactory.create_batch(5)
     investor_company = CompanyFactory()
-    large_capital_profile = LargeInvestorProfileFactory(
-        investor_company=investor_company,
-    )
-    GrowthInvestorProfileFactory(
+    large_capital_profile = LargeCapitalInvestorProfileFactory(
         investor_company=investor_company,
     )
     yield large_capital_profile
@@ -126,7 +120,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         """Test creating a large investor profile with minimum required fields."""
         url = reverse('api-v4:large-investor-profile:collection')
         investor_company = CompanyFactory()
-        LargeInvestorProfileFactory(
+        LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
 
@@ -215,7 +209,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         """Test updating a large capital profile."""
         new_description = 'Description 2'
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
             investor_description='Description 1',
         )
@@ -241,7 +235,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         """
         investor_company = CompanyFactory()
         new_investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -262,7 +256,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         """Test updating the details fields for a large capital profile"""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -307,7 +301,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             LargeCapitalInvestmentTypesConstant.direct_investment_in_project_equity.value.id
         )
 
-        investor_profile = LargeInvestorProfileFactory()
+        investor_profile = LargeCapitalInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'deal_ticket_sizes': [
@@ -399,7 +393,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def test_patch_large_capital_profile_all_location_fields(self):
         """Test updating the location fields for a large capital profile."""
-        investor_profile = LargeInvestorProfileFactory()
+        investor_profile = LargeCapitalInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'uk_region_locations': [
@@ -516,7 +510,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
     ):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -545,7 +539,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
             required_checks_conducted_id=RequiredChecksConductedConstant.cleared.value.id,
             required_checks_conducted_on=date.today(),
@@ -575,7 +569,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         conducted is blank.
         """
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         request_data = {

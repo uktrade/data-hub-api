@@ -13,7 +13,6 @@ from datahub.core.validators import (
     ValidationRule,
 )
 from datahub.investment.investor_profile.constants import (
-    ProfileType as ProfileTypeConstant,
     REQUIRED_CHECKS_THAT_DO_NOT_NEED_ADDITIONAL_INFORMATION,
     REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION,
 )
@@ -24,9 +23,9 @@ from datahub.investment.investor_profile.models import (
     DealTicketSize,
     DesiredDealRole,
     EquityPercentage,
-    InvestorProfile,
     InvestorType,
     LargeCapitalInvestmentType,
+    LargeCapitalInvestorProfile,
     RequiredChecksConducted,
     Restriction,
     ReturnRate,
@@ -233,9 +232,7 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Investor company can not be updated',
             )
-        queryset = value.investor_profiles.filter(
-            profile_type_id=ProfileTypeConstant.large.value.id,
-        )
+        queryset = value.investor_profiles.all()
         if self.instance:
             queryset = queryset.exclude(id=self.instance.id)
         if queryset.exists():
@@ -263,13 +260,8 @@ class LargeCapitalInvestorProfileSerializer(serializers.ModelSerializer):
                 validated_data['required_checks_conducted_by'] = None
         return validated_data
 
-    def create(self, validated_data):
-        """Overrides the create method to add the large profile type id into the data."""
-        validated_data['profile_type_id'] = ProfileTypeConstant.large.value.id
-        return super().create(validated_data)
-
     class Meta:
-        model = InvestorProfile
+        model = LargeCapitalInvestorProfile
         fields = ALL_LARGE_CAPITAL_FIELDS
         validators = [
             RulesBasedValidator(
