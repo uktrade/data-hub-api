@@ -3,9 +3,16 @@ from email.errors import MessageParseError
 from unittest import mock
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 
 from datahub.email_ingestion.email_processor import EmailProcessor
-from datahub.email_ingestion.mailbox import Mailbox
+from datahub.email_ingestion.mailbox import Mailbox, MailboxHandler
+from datahub.email_ingestion.test.utils import (
+    BAD_MAILBOXES_SETTING,
+    MAILBOXES_SETTING,
+    mock_import_string,
+)
 
 EXPECTED_EMAIL_MESSAGES = [
     {
@@ -397,3 +404,49 @@ class TestMailbox:
             'processor "Processor 0"',
         )
         assert expected_error_message in caplog.record_tuples
+
+
+class TestMailboxHandler:
+    """
+    Test the MailboxHandler class.
+    """
+
+    @override_settings(MAILBOXES=MAILBOXES_SETTING)
+    def test_handler_initialisation(self, monkeypatch):
+        """
+        Functional test to ensure that MailboxHandler is initialised as expected.
+        """
+        # Mock import_string to avoid import errors for processor_class path strings
+        import_string_mock = mock_import_string(monkeypatch)
+        mailbox_handler = MailboxHandler()
+        for mailbox_name, mailbox_config in MAILBOXES_SETTING.items():
+            instantiated_mailbox = mailbox_handler.get_mailbox(mailbox_name)
+            # ensure that the Mailbox object has the expected attributes
+            assert instantiated_mailbox.email == mailbox_config['email']
+            assert instantiated_mailbox.password == mailbox_config['password']
+            assert instantiated_mailbox.imap_domain == mailbox_config['imap_domain']
+            # ensure that the processor class paths were imported
+            for processor_class_path in mailbox_config['processor_classes']:
+                import_string_mock.assert_any_call(processor_class_path)
+            for processor_class in instantiated_mailbox.processor_classes:
+                assert processor_class == import_string_mock.return_value
+        all_mailboxes = mailbox_handler.get_all_mailboxes()
+        assert len(all_mailboxes) == len(MAILBOXES_SETTING.values())
+
+    @override_settings(MAILBOXES=BAD_MAILBOXES_SETTING)
+    def test_handler_initialisation_badly_configured(self):
+        """
+        Functional test to ensure that MailboxHandler raises the correct error
+        when badly configured.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            MailboxHandler()
+
+    @override_settings(MAILBOXES={})
+    def test_handler_initialisation_no_mailboxes(self):
+        """
+        Functional test to ensure that MailboxHandler works as expected when
+        there are no mailboxes in the application settings.
+        """
+        mailbox_handler = MailboxHandler()
+        assert mailbox_handler.get_all_mailboxes() == []
