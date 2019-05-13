@@ -1,9 +1,10 @@
 from collections import Counter
 from collections.abc import Mapping
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.utils.timezone import utc
 from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
@@ -694,6 +695,85 @@ class TestInteractionCSVRowForm:
         assert form.errors == {
             'adviser_2': ['adviser test error'],
             NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
+        }
+
+    def test_cleaned_data_as_serializer_dict_for_interaction(self):
+        """Test that cleaned_data_as_serializer_dict() transforms an interaction."""
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        assert form.cleaned_data_as_serializer_dict() == {
+            'contacts': [contact],
+            'communication_channel': communication_channel,
+            'company': contact.company,
+            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'dit_participants': [
+                {
+                    'adviser': adviser,
+                    'team': adviser.dit_team,
+                },
+            ],
+            'event': None,
+            'kind': data['kind'],
+            'notes': '',
+            'service': service,
+            'status': Interaction.STATUSES.complete,
+            'subject': service.name,
+            'was_policy_feedback_provided': False,
+        }
+
+    def test_cleaned_data_as_serializer_dict_for_service_delivery(self):
+        """Test that cleaned_data_as_serializer_dict() transforms a service delivery."""
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        event = EventFactory()
+
+        data = {
+            'kind': Interaction.KINDS.service_delivery,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'event_id': str(event.pk),
+            'subject': 'Test subject',
+            'notes': 'Some notes',
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        assert form.cleaned_data_as_serializer_dict() == {
+            'contacts': [contact],
+            'communication_channel': None,
+            'company': contact.company,
+            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'dit_participants': [
+                {
+                    'adviser': adviser,
+                    'team': adviser.dit_team,
+                },
+            ],
+            'event': event,
+            'is_event': True,
+            'kind': data['kind'],
+            'notes': data['notes'],
+            'service': service,
+            'status': Interaction.STATUSES.complete,
+            'subject': data['subject'],
+            'was_policy_feedback_provided': False,
         }
 
 

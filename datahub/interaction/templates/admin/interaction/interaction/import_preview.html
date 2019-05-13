@@ -1,0 +1,95 @@
+{% extends 'admin/interaction/interaction/base_import.html' %}
+{% load admin_urls static i18n %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'interaction/admin/css/import-preview.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h2>{% trans 'Ready to import interactions' %}</h2>
+  <p>{% trans 'The file was successfully validated and is now ready to import.' %}</p>
+
+  <ul>
+    {% trans 'interaction is ready to import' as matched_singular_text %}
+    {% trans 'interactions are ready to import' as matched_plural_text %}
+    {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_matched singular_text=matched_singular_text plural_text=matched_plural_text only %}
+
+    {% trans 'record will be skipped as it could not be matched with an active contact' as unmatched_singular_text %}
+    {% trans 'records will be skipped as they could not be matched with an active contact' as unmatched_plural_text %}
+    {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_unmatched singular_text=unmatched_singular_text plural_text=unmatched_plural_text only %}
+
+    {% trans 'record will be skipped as it was matched with more than one active contact' as multiple_matches_singular_text %}
+    {% trans 'records will be skipped as they were matched with more than one active contact' as multiple_matches_plural_text %}
+    {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_multiple_matches singular_text=multiple_matches_singular_text plural_text=multiple_matches_plural_text only %}
+  </ul>
+
+  <p>
+    {% trans 'Review the interactions that will be imported below and click Import to complete the process.' %}
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>{% trans 'Kind' %}</th>
+        <th>{% trans 'Date' %}</th>
+        <th>{% trans 'Advisers' %}</th>
+        <th>{% trans 'Service' %}</th>
+        <th>{% trans 'Contact' %}</th>
+        <th>{% trans 'Company' %}</th>
+        <th>{% trans 'Communication channel' %}</th>
+        <th>{% trans 'Event' %}</th>
+        <th>{% trans 'Subject' %}</th>
+        <th>{% trans 'Notes' %}</th>
+      </tr>
+    </thead>
+  {% for row in matched_rows %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+      <td>{{ row.kind }}</td>
+      <td>{{ row.date }}</td>
+      <td>
+        {% for dit_participant in row.dit_participants %}
+          {% if not forloop.first %}<br>{%  endif %}
+          {{ dit_participant.adviser }} ({{ dit_participant.adviser.dit_team }})
+        {% endfor %}
+      </td>
+      <td>{{ row.service }}</td>
+      <td>
+        {% for contact in row.contacts %}
+          {% if not forloop.first %}<br>{%  endif %}
+          {{ contact.name }}
+        {% endfor %}
+      </td>
+      <td>{{ row.company }}</td>
+      <td>{{ row.communication_channel }}</td>
+      <td>{{ row.event }}</td>
+      <td>{{ row.subject }}</td>
+      <td>{{ row.notes }}</td>
+    </tr>
+
+  {% endfor %}
+
+  {% if num_matched_omitted %}
+    <tfoot>
+      <tr>
+        <td colspan="10">
+          {% blocktrans %}
+            ...and {{ num_matched_omitted }} more records (not shown)
+          {% endblocktrans %}
+        </td>
+      </tr>
+    </tfoot>
+  {% endif %}
+
+  </table>
+
+  <p>
+  </p>
+
+  <p>
+    <a href="{% url opts|admin_urlname:'changelist' %}">
+      {% trans 'Cancel and return to the interaction list' %}
+    </a>
+  </p>
+
+{% endblock %}

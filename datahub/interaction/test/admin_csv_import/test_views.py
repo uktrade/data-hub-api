@@ -1,4 +1,3 @@
-import csv
 import io
 
 import pytest
@@ -15,6 +14,9 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
 from datahub.interaction.models import Interaction, InteractionPermission
 from datahub.interaction.test.admin_csv_import.utils import (
+    make_csv_file,
+    make_csv_file_from_dicts,
+    make_matched_rows,
     random_communication_channel,
     random_service,
 )
@@ -170,7 +172,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
     def test_does_not_allow_file_without_correct_columns(self):
         """Test that the form rejects a CSV file that doesn't have the required columns."""
-        file = _make_csv(
+        file = make_csv_file(
             ('test',),
             ('row',),
         )
@@ -196,7 +198,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         """
         Test that large files are rejected.
 
-        Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 1024 in config.settings.test
+        Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 5 kB in config.settings.test
         """
         file_size = settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE + 1
         file = io.BytesIO(b'-' * file_size)
@@ -214,45 +216,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert len(messages) == 1
         assert messages[0].level == django_messages.ERROR
         assert messages[0].message == (
-            'The file test.csv was too large. Files must be less than 1.0 KB.'
+            'The file test.csv was too large. Files must be less than 5.0 KB.'
         )
-
-    def test_redirects_on_valid_file(self):
-        """Test that the user is redirected to the change list when a valid file is loaded."""
-        adviser = AdviserFactory()
-        service = random_service()
-        communication_channel = random_communication_channel()
-        file = _make_csv(
-            (
-                'kind',
-                'date',
-                'adviser_1',
-                'contact_email',
-                'service',
-                'communication_channel',
-            ),
-            (
-                'interaction',
-                '01/01/2018',
-                adviser.name,
-                'person@company.uk',
-                service.name,
-                communication_channel.name,
-            ),
-        )
-
-        response = self.client.post(
-            import_interactions_url,
-            follow=True,
-            data={
-                'csv_file': file,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.redirect_chain == [
-            (interaction_change_list_url, status.HTTP_302_FOUND),
-        ]
 
     @pytest.mark.parametrize(
         'max_errors,should_be_truncated',
@@ -274,7 +239,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
         # This file should have 10 errors
-        file = _make_csv(
+        file = make_csv_file(
             ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
             ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
             ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
@@ -291,14 +256,86 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert len(response.context['errors']) == min(10, max_errors)
         assert response.context['are_errors_truncated'] == should_be_truncated
 
+    def test_displays_no_matches_message_if_no_matches(self):
+        """
+        Test that if a valid file is uploaded but no records are matched to contacts,
+        the import_no_matches.html template is used.
+        """
+        adviser = AdviserFactory()
+        service = random_service()
+        communication_channel = random_communication_channel()
+        file = make_csv_file(
+            (
+                'kind',
+                'date',
+                'adviser_1',
+                'contact_email',
+                'service',
+                'communication_channel',
+            ),
+            (
+                'interaction',
+                '01/01/2018',
+                adviser.name,
+                'person@company.uk',
+                service.name,
+                communication_channel.name,
+            ),
+        )
 
-def _make_csv(*rows, encoding='utf-8-sig', filename='test.csv'):
-    with io.StringIO() as text_stream:
-        writer = csv.writer(text_stream)
-        writer.writerows(rows)
+        response = self.client.post(
+            import_interactions_url,
+            data={
+                'csv_file': file,
+            },
+        )
 
-        data = text_stream.getvalue().encode(encoding)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.template_name.endswith('/import_no_matches.html')
+        assert response.context['num_matched'] == 0
+        assert response.context['num_unmatched'] == 1
+        assert response.context['num_multiple_matches'] == 0
+        assert response.context['matched_rows'] == []
+        assert response.context['num_matched_omitted'] == 0
 
-    stream = io.BytesIO(data)
-    stream.name = filename
-    return stream
+    @pytest.mark.parametrize(
+        'num_input_rows,expected_num_omitted_rows',
+        (
+            (2, 0),
+            (10, 5),
+        ),
+    )
+    def test_shows_preview_if_matches(
+        self,
+        num_input_rows,
+        expected_num_omitted_rows,
+        monkeypatch,
+        # _,
+    ):
+        """
+        Test that if a valid file is uploaded and some records are matched to contacts,
+        the import_preview.html template is used with an appropriate context.
+        """
+        max_preview_rows = 5
+        monkeypatch.setattr(
+            'datahub.interaction.admin_csv_import.views.MAX_PREVIEW_ROWS_TO_DISPLAY',
+            max_preview_rows,
+        )
+
+        csv_rows = make_matched_rows(num_input_rows)
+        file = make_csv_file_from_dicts(*csv_rows)
+
+        response = self.client.post(
+            import_interactions_url,
+            data={
+                'csv_file': file,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.template_name.endswith('/import_preview.html')
+        assert response.context['num_matched'] == num_input_rows
+        assert response.context['num_unmatched'] == 0
+        assert response.context['num_multiple_matches'] == 0
+        assert len(response.context['matched_rows']) == min(max_preview_rows, num_input_rows)
+        assert response.context['num_matched_omitted'] == expected_num_omitted_rows
