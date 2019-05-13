@@ -1,3 +1,27 @@
+Data Hub API 12.1.0 (2019-05-13)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The trading_address fields have now been removed from the codebase. These include:
+
+  | trading_address_1
+  | trading_address_2
+  | trading_address_town
+  | trading_address_county
+  | trading_address_country
+  | trading_address_postcode
+
+Features
+--------
+
+- **Interactions** A preview page was added to the admin site tool for importing interactions.
+  The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it is incomplete.
+
+
 Data Hub API 12.0.0 (2019-05-09)
 =================================
 
