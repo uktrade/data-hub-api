@@ -193,7 +193,7 @@ class InteractionCSVRowForm(forms.Form):
         if not self.is_valid_and_matched():
             return
 
-        transformed_data = self._cleaned_data_as_serializer_dict()
+        transformed_data = self.cleaned_data_as_serializer_dict()
         serializer = InteractionSerializer(context={'is_bulk_import': True})
 
         try:
@@ -226,7 +226,7 @@ class InteractionCSVRowForm(forms.Form):
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
 
-    def _cleaned_data_as_serializer_dict(self):
+    def cleaned_data_as_serializer_dict(self):
         """
         Transforms cleaned data into a dict suitable for use with the validators from
         InteractionSerializer.

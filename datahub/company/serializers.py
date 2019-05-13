@@ -282,14 +282,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     have to enter company numbers for UK establishments manually.
     """
 
-    ADDRESS_FIELDS_MAPPING = {
-        'address_1': 'trading_address_1',
-        'address_2': 'trading_address_2',
-        'address_town': 'trading_address_town',
-        'address_county': 'trading_address_county',
-        'address_postcode': 'trading_address_postcode',
-        'address_country': 'trading_address_country',
-    }
     default_error_messages = {
         'invalid_uk_establishment_number_prefix': gettext_lazy(
             'This must be a valid UK establishment number, beginning with BR.',
@@ -393,7 +385,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 })
 
         combiner = DataCombiner(self.instance, data)
-        self._populate_address_fields(combiner, data)
 
         return data
 
@@ -576,18 +567,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{CompanyPermission.view_company_document}': 'archived_documents_url_path',
         }
-
-    def _populate_address_fields(self, combiner, data):
-        """
-        Populates the trading_address_* fields with the values from address.
-        """
-        # was any address field specified?
-        if not self.ADDRESS_FIELDS_MAPPING.keys() & data.keys():
-            return
-
-        for source_field_name, target_field_name in self.ADDRESS_FIELDS_MAPPING.items():
-            target_value = combiner.get_value(source_field_name)
-            data[target_field_name] = target_value
 
 
 class PublicCompanySerializer(CompanySerializer):

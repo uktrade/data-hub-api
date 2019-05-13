@@ -54,14 +54,6 @@ class OneListTier(BaseOrderedConstantModel):
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
-    TRADING_ADDRESS_VALIDATION_MAPPING = {
-        'trading_address_1': {'required': True},
-        'trading_address_2': {'required': False},
-        'trading_address_town': {'required': True},
-        'trading_address_county': {'required': False},
-        'trading_address_postcode': {'required': False},
-        'trading_address_country': {'required': True},
-    }
     TRANSFER_REASONS = Choices(
         ('duplicate', 'Duplicate record'),
     )
@@ -173,20 +165,6 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
-
-    # TODO: delete once the migration to address and registered address is complete
-    trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_country = models.ForeignKey(
-        metadata_models.Country,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='companies_with_country_trading_address',
-    )
-    trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     headquarter_type = models.ForeignKey(
         metadata_models.HeadquarterType, blank=True, null=True,

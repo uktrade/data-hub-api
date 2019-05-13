@@ -36,12 +36,12 @@ class TestArchiveCompany(APITestMixin):
 
     def test_archive_company_invalid_address(self):
         """
-        Test archiving a company when the company has an invalid trading address and missing
-        UK region.
+        Test archiving a company when the company has an invalid address and a
+        missing UK region.
         """
         company = CompanyFactory(
             registered_address_country_id=Country.united_kingdom.value.id,
-            trading_address_town='',
+            address_town='',
             uk_region_id=None,
         )
         url = reverse('api-v4:company:archive', kwargs={'pk': company.id})
@@ -58,12 +58,12 @@ class TestUnarchiveCompany(APITestMixin):
 
     def test_unarchive_company_invalid_address(self):
         """
-        Test unarchiving a company when the company has an invalid trading address and missing
-        UK region.
+        Test unarchiving a company when the company has an invalid address and
+        a missing UK region.
         """
         company = CompanyFactory(
             address_country_id=Country.united_kingdom.value.id,
-            trading_address_town='',
+            address_town='',
             uk_region_id=None,
             archived=True,
             archived_reason='Dissolved',

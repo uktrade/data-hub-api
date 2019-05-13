@@ -36,6 +36,7 @@ job_defaults: &job_defaults
     SSO_ENABLED: 'True'
     RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
     RESOURCE_SERVER_AUTH_TOKEN: sso-token
+    DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
 
   working_directory: ~/app
 
