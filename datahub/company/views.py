@@ -17,7 +17,7 @@ from datahub.company.models import (
 from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
-    CompaniesHouseCompanySerializerV4,
+    CompaniesHouseCompanySerializer,
     CompanySerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
@@ -149,7 +149,7 @@ class CompaniesHouseCompanyViewSet(
     """Companies House company read-only views V4."""
 
     required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompaniesHouseCompanySerializerV4
+    serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
 
