@@ -8,7 +8,10 @@ from django.utils.timezone import utc
 
 from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
+from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
+from datahub.interaction.models import Interaction
+from datahub.interaction.serializers import InteractionSerializer
 
 
 logger = getLogger(__name__)
@@ -96,6 +99,76 @@ def _get_utc_datetime(localised_datetime):
     # When the calendar event is just a date
     except AttributeError:
         return localised_datetime
+
+
+class CalendarInteractionEmailProcessor(EmailProcessor):
+    """
+    An EmailProcessor which checks whether incoming email is a valid DIT/company
+    meeting and creates an incomplete Interaction model for it if so.
+    """
+
+    def _transform(self, data):
+        dit_participants = [
+            {
+                'adviser': adviser,
+                'team': adviser.dit_team,
+            }
+            for adviser in (data['sender'], *data['secondary_advisers'])
+            if adviser
+        ]
+
+        creation_data = {
+            'contacts': [contact.id for contact in data['contacts']],
+            'company': data['company'],
+            'date': data['date'],
+            'dit_participants': dit_participants,
+            'kind': Interaction.KINDS.interaction,
+            'status': Interaction.STATUSES.draft,
+            'subject': data['subject'],
+        }
+
+        return creation_data
+
+    def validate_with_serializer(self, data):
+        """
+        Transforms extracted data into a dict suitable for use with InteractionSerializer
+        and then runs data through this serializer for validation.
+
+        Returns the instantiated serializer.
+        """
+        transformed_data = self._transform(data)
+        serializer = InteractionSerializer(context={'is_bulk_import': True}, data=transformed_data)
+        serializer.is_valid(raise_exception=True)
+        return serializer
+
+    def process_email(self, message):
+        """
+        Review the metadata and calendar attachment (if present) of an email
+        message to see if it fits the our criteria of a valid Data Hub meeting
+        reqquest.  If it does, create an incomplete Interaction for it.
+
+        :param message: mailparser.MailParser object - the message to process
+        """
+        email_parser = CalendarInteractionEmailParser(message)
+        try:
+            interaction_data = email_parser.extract_interaction_data_from_email(message)
+            serializer = self.validate_with_serializer(interaction_data)
+        except ValidationError as exc:
+            return (False, exc.message)
+        # For our initial iteration, we are ignoring meeting updates
+        matching_interactions = Interaction.objects.filter(
+            source__id=interaction_data['meeting_details']['uid'],
+            source__type='meeting',
+        )
+        meeting_exists = matching_interactions.count() > 0
+        if meeting_exists:
+            return (False, 'Meeting already exists as an interaction')
+        # We've validated and marshalled everything we need to build an
+        # incomplete interaction
+        interaction = serializer.save(
+            source={'id': interaction_data['meeting_uid'], 'type': 'meeting'},
+        )
+        return (True, f'Successfully created interaction #{interaction.id}')
 
 
 class CalendarInteractionEmailParser:
