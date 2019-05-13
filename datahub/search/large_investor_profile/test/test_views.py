@@ -22,7 +22,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     join_attr_values,
 )
-from datahub.investment.investor_profile.models import InvestorProfile
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.investment.investor_profile.permissions import InvestorProfilePermission
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
@@ -36,8 +36,8 @@ from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import (
-    CompleteLargeInvestorProfileFactory,
-    LargeInvestorProfileFactory,
+    CompleteLargeCapitalInvestorProfileFactory,
+    LargeCapitalInvestorProfileFactory,
 )
 from datahub.search.large_investor_profile.views import SearchLargeInvestorProfileExportAPIView
 
@@ -53,7 +53,7 @@ def setup_data(setup_es):
         address_country_id=CountryConstant.argentina.value.id,
     )
     with freeze_time('2010-02-01'):
-        frozen_created_on_profile = LargeInvestorProfileFactory(
+        frozen_created_on_profile = LargeCapitalInvestorProfileFactory(
             investor_company=CompanyFactory(
                 name='Frozen limited',
             ),
@@ -73,7 +73,7 @@ def setup_data(setup_es):
             ],
         )
     with freeze_time('2018-01-01 10:00:00'):
-        south_project = LargeInvestorProfileFactory(
+        south_project = LargeCapitalInvestorProfileFactory(
             investor_company=CompanyFactory(
                 name='South',
             ),
@@ -84,7 +84,7 @@ def setup_data(setup_es):
             global_assets_under_management=60,
         )
     with freeze_time('2018-01-01 11:00:00'):
-        north_project = LargeInvestorProfileFactory(
+        north_project = LargeCapitalInvestorProfileFactory(
             investable_capital=20,
             investor_company=CompanyFactory(
                 name='North',
@@ -103,7 +103,7 @@ def setup_data(setup_es):
 
     with freeze_time('2019-01-01'):
         investor_profiles = [
-            LargeInvestorProfileFactory(
+            LargeCapitalInvestorProfileFactory(
                 investor_description='Operational construction',
                 investor_company=investor_company,
                 investable_capital=950,
@@ -117,7 +117,7 @@ def setup_data(setup_es):
                 ],
                 global_assets_under_management=20,
             ),
-            LargeInvestorProfileFactory(
+            LargeCapitalInvestorProfileFactory(
                 investor_description='Argentina project',
                 investor_company=argentina_investor_company,
                 investable_capital=1490,
@@ -133,7 +133,7 @@ def setup_data(setup_es):
                 global_assets_under_management=30,
             ),
             frozen_created_on_profile,
-            LargeInvestorProfileFactory(
+            LargeCapitalInvestorProfileFactory(
                 investor_company=CompanyFactory(
                     address_country_id=CountryConstant.argentina.value.id,
                     name='2 constructions ltd',
@@ -152,7 +152,7 @@ def setup_data(setup_es):
                 ],
                 global_assets_under_management=40,
             ),
-            LargeInvestorProfileFactory(
+            LargeCapitalInvestorProfileFactory(
                 investor_company=CompanyFactory(
                     name='Deal up ltd',
                 ),
@@ -634,12 +634,12 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         """Test export large capital investor profile search results."""
         url = reverse('api-v4:search:large-investor-profile-export')
 
-        CompleteLargeInvestorProfileFactory(
+        CompleteLargeCapitalInvestorProfileFactory(
             investable_capital=10000,
             global_assets_under_management=20000,
         )
         with freeze_time('2018-01-01 11:12:13'):
-            LargeInvestorProfileFactory(
+            LargeCapitalInvestorProfileFactory(
                 investable_capital=300,
                 global_assets_under_management=200,
             )
@@ -660,7 +660,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
             },
         )
 
-        sorted_profiles = InvestorProfile.objects.order_by(orm_ordering, 'pk')
+        sorted_profiles = LargeCapitalInvestorProfile.objects.order_by(orm_ordering, 'pk')
         response_text = response.getvalue().decode('utf-8-sig')
         reader = DictReader(StringIO(response_text))
 

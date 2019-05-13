@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search.large_investor_profile.models import (
     LargeInvestorProfile as ESLargeInvestorProfile,
 )
@@ -13,7 +13,7 @@ class TestLargeInvestorProfileElasticModel:
 
     def test_large_investor_profile_dbmodel_to_dict(self, setup_es):
         """Tests conversion of db model to dict."""
-        large_investor_profile = LargeInvestorProfileFactory()
+        large_investor_profile = LargeCapitalInvestorProfileFactory()
 
         result = ESLargeInvestorProfile.db_object_to_dict(large_investor_profile)
         keys = {
@@ -45,7 +45,7 @@ class TestLargeInvestorProfileElasticModel:
 
     def test_investment_project_dbmodels_to_es_documents(self, setup_es):
         """Tests conversion of db models to Elasticsearch documents."""
-        large_profiles = LargeInvestorProfileFactory.create_batch(2)
+        large_profiles = LargeCapitalInvestorProfileFactory.create_batch(2)
 
         result = ESLargeInvestorProfile.db_objects_to_es_documents(large_profiles)
 

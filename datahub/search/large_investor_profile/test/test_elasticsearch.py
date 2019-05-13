@@ -3,7 +3,7 @@ import pytest
 from elasticsearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search import elasticsearch
 from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.models import (
@@ -306,7 +306,7 @@ def test_indexed_doc(setup_es):
     """Test the ES data of an Large investor profile."""
     investor_company = CompanyFactory()
 
-    large_investor_profile = LargeInvestorProfileFactory(
+    large_investor_profile = LargeCapitalInvestorProfileFactory(
         investor_company=investor_company,
     )
 

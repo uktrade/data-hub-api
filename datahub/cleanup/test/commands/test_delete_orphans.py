@@ -21,7 +21,7 @@ from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.investor_profile.test.factories import LargeInvestorProfileFactory
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import (
     OrderFactory,
@@ -64,7 +64,7 @@ MAPPINGS = {
             (CompanyFactory, 'transferred_to'),
             (CompanyFactory, 'global_headquarters'),
             (OneListCoreTeamMemberFactory, 'company'),
-            (LargeInvestorProfileFactory, 'investor_company'),
+            (LargeCapitalInvestorProfileFactory, 'investor_company'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
