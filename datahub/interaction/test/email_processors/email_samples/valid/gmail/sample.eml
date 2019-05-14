@@ -1,0 +1,493 @@
+Received: from CWXP123MB2248.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:8a::23)
+ by LO2P123MB2253.GBRP123.PROD.OUTLOOK.COM with HTTPS via
+ LO2P265CA0251.GBRP265.PROD.OUTLOOK.COM; Mon, 13 May 2019 12:37:27 +0000
+Received: from CWXP123CA0022.GBRP123.PROD.OUTLOOK.COM (2603:10a6:401:73::34)
+ by CWXP123MB2248.GBRP123.PROD.OUTLOOK.COM (2603:10a6:401:7e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1878.22; Mon, 13 May
+ 2019 12:37:25 +0000
+Received: from AM5EUR02FT061.eop-EUR02.prod.protection.outlook.com
+ (2a01:111:f400:7e1e::207) by CWXP123CA0022.outlook.office365.com
+ (2603:10a6:401:73::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1878.21 via Frontend
+ Transport; Mon, 13 May 2019 12:37:25 +0000
+Authentication-Results: spf=pass (sender IP is 209.85.208.201)
+ smtp.mailfrom=digital.trade.gov.uk; trade.gov.uk; dkim=pass (signature was
+ verified) header.d=google.com;trade.gov.uk; dmarc=pass action=none
+ header.from=digital.trade.gov.uk;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of digital.trade.gov.uk
+ designates 209.85.208.201 as permitted sender)
+ receiver=protection.outlook.com; client-ip=209.85.208.201;
+ helo=mail-lj1-f201.google.com;
+Received: from mail-lj1-f201.google.com (209.85.208.201) by
+ AM5EUR02FT061.mail.protection.outlook.com (10.152.9.198) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1856.11 via Frontend Transport; Mon, 13 May 2019 12:37:25 +0000
+Received: by mail-lj1-f201.google.com with SMTP id h1so2705455ljk.22
+        for <meetings-dev@trade.gov.uk>; Mon, 13 May 2019 05:37:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:reply-to:sender:message-id:date:subject:from:to;
+        bh=T++GtP46mZLtNKpH+QfuSbSDlvkdmDCnAV07SZcfic4=;
+        b=Q5s33s3WWdy/ggLXqwy9u5YLc8LxOrSYlCORHhz1AfLUV9k14oUDbseNRwbW8hpn6c
+         IQdLQ7deZB6gxVaUWKYqwOPGKPSFtlUZhA0dDWymY0p+d/BS5QUvFIVbxjrr0XDJ1d18
+         tSLJZf/CKEKNXMRTczis+zytqjXK2etUB4JCBEhiYYjovVlI2TaaQhubkJZmOIlSOj42
+         v5KxSJHTItOQni4uH4Wlub2LRanb/Y3jfL2C6vo8P+hWsp1447m85OGFYi6X99Pf6DWk
+         3H3lEjGQ5Ug38Eo+oMNkUOXfUJliNPtaQtzWyOnN7XNzcZlXgHJ+beWVfrB03Di9wpkk
+         XS+g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digital-trade-gov-uk.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:reply-to:sender:message-id:date:subject:from:to;
+        bh=T++GtP46mZLtNKpH+QfuSbSDlvkdmDCnAV07SZcfic4=;
+        b=AxhnqAgTkMj35YvqlVVc/kzd9cv7Eqimdh78itilZGoLs9zf9BCcAs0+myC3JRfDCx
+         iPWsUBKBHIkn8vvF4dkYEMiMk5u78Ao5iniS7yw0s8EVZw1ueDif6r5iFw3Afbl44Bb3
+         xIep/7/uhxliUz3R9hAPhohQ2zFtAmmPBZ2jEdpkcElapWZ/YiGBYoUJ4IRlqwzZ4DVd
+         7I6is+Vonlbb/BviGT58fNy6hBOTjdOwY+91ocJuVHPETvfGZ8YtrZf2E7TapzAjcbfu
+         Z3YHunzh/+zgo9xijraokdzS1TL7vMd7KPtTi7OSLFOgbb6S/invb7nXJ4LPdzViL3BN
+         dLsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:sender:message-id:date
+         :subject:from:to;
+        bh=T++GtP46mZLtNKpH+QfuSbSDlvkdmDCnAV07SZcfic4=;
+        b=Aw2tx+Iv/Xv1PIEuvcrZ2/OXFpd8U7RFYjSn7M9LHZA2gkHh+cY/9u5dC3SKZscbzO
+         f4N1OoLs6j1hlYWVoV9MaWZRZl8B85CFTVttEucnx5S0c4nh5/cYX+1t3T72J3oSb5jM
+         z+mr0o7Lu4tVsIMLRgcxPiFRwWzZJnvQyFbKaAyYj05jGVZvRylIYTuT+o+bsLIZwZn5
+         oSWciC+JvgMtKdujin+2Os8MERu7bfjflryyReecCRjCCHHdQIdgu8pjmIAJ8V8VgKS7
+         nHjRQSx3sFgJHgjVWpDYhWnt6fVjpn6TbHRtSI7mAlCzNWbS9JdvdobyamKpChsaYO15
+         kStw==
+X-Gm-Message-State: APjAAAW0wesxNKSC0K2y3iv1I2RItmGYcmKOSmYIryYeiqndIGVFNl44
+	dmowRc4hkYWhWGad5yzqBDSSmbzyzy5kPDe7fj+LjwLPEw==
+X-Google-Smtp-Source: APXvYqz3Vwhk+OJyVoi+2xwW9KxY/zjRMDW4yb2HLPSjahtGlabo3uOMSxHSbiT10yT42sp44N9ubx0aSaJmkEJzoVOb
+X-Received: by 2002:a19:5015:: with SMTP id e21mr13823180lfb.62.1557751045208;
+ Mon, 13 May 2019 05:37:25 -0700 (PDT)
+Reply-To: brendan.smith@digital.trade.gov.uk
+Sender: Google Calendar <calendar-notification@google.com>
+Message-ID: <000000000000b2d17d0588c42df4@google.com>
+Date: Mon, 13 May 2019 12:37:25 +0000
+Subject: Invitation: Test meeting gmail @ Mon 13 May 2019 3pm - 4pm (BST) (meetings-dev@trade.gov.uk)
+From: brendan.smith@digital.trade.gov.uk
+To: meetings-dev@trade.gov.uk
+Content-Type: multipart/mixed; boundary="000000000000b2d15c0588c42df3"
+Return-Path: brendan.smith@digital.trade.gov.uk
+X-MS-Exchange-Organization-ExpirationStartTime: 13 May 2019 12:37:25.7649
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 2:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ 35f24579-1da2-42f0-a83b-08d6d79fc105
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 8fa217ec-33aa-46fb-ad96-dfe68006bb86:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-Forefront-Antispam-Report:
+ CIP:209.85.208.201;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(2980300002)(189003)(199004)(37854004)(8156004)(5024004)(14444005)(26005)(2351001)(2361001)(19627405001)(336012)(2476003)(568964002)(71190400001)(34206002)(58800400003)(222073003)(476003)(486006)(126002)(36756003)(7576002)(15003)(106002)(86362001)(6392003)(7846003)(5660300002)(61266001)(95326003)(59536001)(305945005)(7596002)(7636002)(236005)(246002)(33964004)(1096003)(55446002)(8676002)(8576002)(9686003)(606006)(6306002)(43066004)(356004)(45080400002)(53376002)(85782001)(16586007)(42186006)(966005)(63966002)(84326002)(85772001);DIR:INB;SFP:;SCL:1;SRVR:CWXP123MB2248;H:mail-lj1-f201.google.com;FPR:;SPF:Pass;LANG:en;PTR:mail-lj1-f201.google.com;MX:1;A:0;
+X-MS-Exchange-Organization-AuthSource:
+ AM5EUR02FT061.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 35f24579-1da2-42f0-a83b-08d6d79fc105
+X-Microsoft-Antispam:
+ BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(5600141)(711020)(4605104)(4709054)(49563074)(1401320)(8001031)(1421009)(1402095)(71702078);SRVR:CWXP123MB2248;
+X-MS-TrafficTypeDiagnostic: CWXP123MB2248:
+X-MS-Exchange-PUrlCount: 7
+X-MS-Exchange-AtpMessageProperties: sap=1;slp=1;
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-Safelinks-Url-KeyVer: 1
+X-MS-Exchange-Safelinks-Url-KeyVer: 1
+X-MS-Exchange-ATPSafeLinks-Stat: 0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2019 12:37:25.7409
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35f24579-1da2-42f0-a83b-08d6d79fc105
+X-MS-Exchange-CrossTenant-Id: 8fa217ec-33aa-46fb-ad96-dfe68006bb86
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB2248
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:01.2638448
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.1878.000
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(20160514016)(750119)(520011016)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SU9GSnlNMHQwaE02U2I0VGdwcEw0Nm05bVBQUjMrTXlVSmNOaGhzbUM0QVU5?=
+ =?utf-8?B?WVVuMThzYlhNYit3cFlpV2V2VENWQXFBWGM2YnZHUHprN1JUeE4ybkNzaTYr?=
+ =?utf-8?B?VytFRWhudFloTnBNdnU0WUxZeGtLaFF3ZkMrQTdsaWJPemJkbzlhOWZPaU4x?=
+ =?utf-8?B?cFNuUUdYNXE4U0pCZHpTOEd3RktnOWgzUFRRcVJxQ0VRMEQyYS9OYkNLMzBX?=
+ =?utf-8?B?SFNOV09Ocmh6aXUvU04raG1PRDR6MWRNYW9WZ1ZnM3ZBalJ4VmVrcmcvRjJK?=
+ =?utf-8?B?NzI4a1AzU3RuRkNCRlpPVnpHMFFrWmJUdFVTZVlTYzRDU2tGSWkya3JxL0FM?=
+ =?utf-8?B?bjhiS1BEb3pVdjVnS2Zsb2IrcVpKd01udVg1Wmd2V0lxSC9HZVZIT2VUUFps?=
+ =?utf-8?B?c20waG8xSFhsSms0K0hNSUNzbmNrT1l1Y2piOWFnSkMraXRkcGZEc01zL3Qz?=
+ =?utf-8?B?V1NST0FRc3RTaU4zYTB4UDBaZi9iUDZxZWtHNklKMTNpK01LUFhjNEJRZWZ5?=
+ =?utf-8?B?eVlURE1YSmxGemdTTUNoRFFpMENRMEN3NTU3Y25RL1dsVm9XVnpsR09raXd4?=
+ =?utf-8?B?ZUN4UGxxMlc3QTV3elh0V3hFc1h3eGdZSHg2SUNYc1JiWTh6UzhPN0p5NVVS?=
+ =?utf-8?B?UWhDeldXanZVSVRWRWpVQy9wNjZrdTI4SnR2MExFQzdQK1hHOXMrQkN2OEk2?=
+ =?utf-8?B?bTEvTGoxeTZLc0lrNTc4WmY2TTNFeUhUemFEeG9xaFFrYm5CaVBPZkNybTBZ?=
+ =?utf-8?B?WkV3ZUk2T2U2TEtCT2t0azY1RHptdncvMDdLV2xOcDUwY3FDTTU0bXZWYWh3?=
+ =?utf-8?B?cWszOCsxN3dCTnFKU1pOcDRab2NycjEvVnV3aTBTVElrbFFZa0RScU03UHZy?=
+ =?utf-8?B?bTBJSG8zRGlJN21JeGUyM0t4Z1phd1FndXFJSjN0TkQ3ek9kMEtUQnp4NUUz?=
+ =?utf-8?B?d1B5Q2RwNjcvaHBBR1lodGVMdXNDcXlYQnZhV1BBdDlZUGxVdWFNNDFqUktS?=
+ =?utf-8?B?NDlqQmhlcDdsVXhZdWo4QmFGUTBXSGt2ZzJJK3lqckI5SUtLT05BdWsyWWFa?=
+ =?utf-8?B?QXZGb09CaVVzR2tzVERmTXlKUUFteEVYcGFYOHlvMUdDZTNlLy9iRHg5eW1C?=
+ =?utf-8?B?SnBtd0RzZGJEdlI3UGlleVg1TnVGYXZFbUpFaTl4SFZPSnhXQnpLMTlBNVJP?=
+ =?utf-8?B?UE1ENENCb3NxUnBnREVPYitnNll2TTB6VlRDSzhzYm9VVCtqVXBkNEhlVm5h?=
+ =?utf-8?B?MHFaNXd5a29WRTJvOU82ZzJyVjgzeWdaUmxmYWNJaHV0M1Uya3ljN1BudldY?=
+ =?utf-8?B?aFRoc2VtNzRTYmZBMWJ1SEx2N0NkTnVEb1pKdW0vN0FVRkQzUTdub1FEeXgx?=
+ =?utf-8?B?TktJSlVobVlHUEFueUx2ZnV3dHhOUFA0MG0zcDMrcW83QlI0akJLZFpheFg0?=
+ =?utf-8?B?N3l0TWtBem1teWdIMFh1RWVJUVhhSUFSVEI4d3loRXVWcU5YWGc4QVBoWFhx?=
+ =?utf-8?Q?aLnB44=3D?=
+MIME-Version: 1.0
+
+--000000000000b2d15c0588c42df3
+Content-Type: multipart/alternative; boundary="000000000000b2d1560588c42df1"
+
+--000000000000b2d1560588c42df1
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+
+WW91IGhhdmUgYmVlbiBpbnZpdGVkIHRvIHRoZSBmb2xsb3dpbmcgZXZlbnQuDQoNClRpdGxlOiBU
+ZXN0IG1lZXRpbmcgZ21haWwNCldoZW46IE1vbiAxMyBNYXkgMjAxOSAzcG0g4oCTIDRwbSBVbml0
+ZWQgS2luZ2RvbSBUaW1lDQpKb2luaW5nIGluZm86IG1lZXQuZ29vZ2xlLmNvbS9nY2ctcm90dS1p
+ZncgIA0KPGh0dHBzOi8vZXVyMDIuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0bG9vay5jb20vP3Vy
+bD1odHRwcyUzQSUyRiUyRm1lZXQuZ29vZ2xlLmNvbSUyRmdjZy1yb3R1LWlmdyZhbXA7ZGF0YT0w
+MiU3QzAxJTdDbWVldGluZ3MuZGV2JTQwREJJUy5vbm1pY3Jvc29mdC5jb20lN0MzNWYyNDU3OTFk
+YTI0MmYwYTgzYjA4ZDZkNzlmYzEwNSU3QzhmYTIxN2VjMzNhYTQ2ZmJhZDk2ZGZlNjgwMDZiYjg2
+JTdDMCU3QzAlN0M2MzY5MzM0Nzg0NjgxMjI2MTQmYW1wO3NkYXRhPU1YSFZtbzFDQVZrcVF6U2tY
+d0pjJTJGaE0lMkJlSmh5QVF3TnMwemx3JTJCdmJQJTJGcyUzRCZhbXA7cmVzZXJ2ZWQ9MD4NCk9y
+IGRpYWw6ICsxIDkyOS0yNjYtMjMzNiAgUElOOiA4MDI0Nzg2NzYjDQpDYWxlbmRhcjogbWVldGlu
+Z3MtZGV2QHRyYWRlLmdvdi51aw0KV2hvOg0KICAgICAqIGJyZW5kYW4uc21pdGhAZGlnaXRhbC50
+cmFkZS5nb3YudWstIG9yZ2FuaXNlcg0KICAgICAqIG1lZXRpbmdzLWRldkB0cmFkZS5nb3YudWsN
+Cg0KRXZlbnQgZGV0YWlsczogIA0KaHR0cHM6Ly9ldXIwMi5zYWZlbGlua3MucHJvdGVjdGlvbi5v
+dXRsb29rLmNvbS8/dXJsPWh0dHBzJTNBJTJGJTJGd3d3Lmdvb2dsZS5jb20lMkZjYWxlbmRhciUy
+RmV2ZW50JTNGYWN0aW9uJTNEVklFVyUyNmVpZCUzRE1ISnRZM1V4ZG1kMVkyVnRjamRxZEdKbGJt
+RnJibXh4TVRFZ2JXVmxkR2x1WjNNdFpHVjJRSFJ5WVdSbExtZHZkaTUxYXclMjZ0b2slM0RNelFq
+WW5KbGJtUmhiaTV6YldsMGFFQmthV2RwZEdGc0xuUnlZV1JsTG1kdmRpNTFhelkyWXpsa1lqQTBZ
+bVF6T0dVMk1qVmpaalZoWTJSaVl6TmxOV0U1TnpFd1pHWXpZemxtTnpZJTI2Y3R6JTNERXVyb3Bl
+JTI1MkZMb25kb24lMjZobCUzRGVuX0dCJTI2ZXMlM0QwJmFtcDtkYXRhPTAyJTdDMDElN0NtZWV0
+aW5ncy5kZXYlNDBEQklTLm9ubWljcm9zb2Z0LmNvbSU3QzM1ZjI0NTc5MWRhMjQyZjBhODNiMDhk
+NmQ3OWZjMTA1JTdDOGZhMjE3ZWMzM2FhNDZmYmFkOTZkZmU2ODAwNmJiODYlN0MwJTdDMCU3QzYz
+NjkzMzQ3ODQ2ODEyMjYxNCZhbXA7c2RhdGE9ZDFtQ2dXc1A5RXFtcUh1aFRqTXdPZzlESDcyRVFa
+VHppRTl1eXRxelpnayUzRCZhbXA7cmVzZXJ2ZWQ9MA0KDQpJbnZpdGF0aW9uIGZyb20gR29vZ2xl
+IENhbGVuZGFyOiBodHRwczovL2V1cjAyLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29t
+Lz91cmw9aHR0cHMlM0ElMkYlMkZ3d3cuZ29vZ2xlLmNvbSUyRmNhbGVuZGFyJTJGJmFtcDtkYXRh
+PTAyJTdDMDElN0NtZWV0aW5ncy5kZXYlNDBEQklTLm9ubWljcm9zb2Z0LmNvbSU3QzM1ZjI0NTc5
+MWRhMjQyZjBhODNiMDhkNmQ3OWZjMTA1JTdDOGZhMjE3ZWMzM2FhNDZmYmFkOTZkZmU2ODAwNmJi
+ODYlN0MwJTdDMCU3QzYzNjkzMzQ3ODQ2ODEyMjYxNCZhbXA7c2RhdGE9NUh4ekgyNllwV1ZrWE9v
+SzlmdFc1MWphbyUyRkFqZUxZNGFoTFhuemwlMkZXQW8lM0QmYW1wO3Jlc2VydmVkPTANCg0KWW91
+IGFyZSByZWNlaXZpbmcgdGhpcyBjb3VydGVzeSBlbWFpbCBhdCB0aGUgYWNjb3VudCAgDQptZWV0
+aW5ncy1kZXZAdHJhZGUuZ292LnVrIGJlY2F1c2UgeW91IGFyZSBhbiBhdHRlbmRlZSBvZiB0aGlz
+IGV2ZW50Lg0KDQpUbyBzdG9wIHJlY2VpdmluZyBmdXR1cmUgdXBkYXRlcyBmb3IgdGhpcyBldmVu
+dCwgZGVjbGluZSB0aGlzIGV2ZW50LiAgDQpBbHRlcm5hdGl2ZWx5LCB5b3UgY2FuIHNpZ24gdXAg
+Zm9yIGEgR29vZ2xlIEFjY291bnQgYXQgIA0KaHR0cHM6Ly9ldXIwMi5zYWZlbGlua3MucHJvdGVj
+dGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHBzJTNBJTJGJTJGd3d3Lmdvb2dsZS5jb20lMkZjYWxl
+bmRhciUyRiZhbXA7ZGF0YT0wMiU3QzAxJTdDbWVldGluZ3MuZGV2JTQwREJJUy5vbm1pY3Jvc29m
+dC5jb20lN0MzNWYyNDU3OTFkYTI0MmYwYTgzYjA4ZDZkNzlmYzEwNSU3QzhmYTIxN2VjMzNhYTQ2
+ZmJhZDk2ZGZlNjgwMDZiYjg2JTdDMCU3QzAlN0M2MzY5MzM0Nzg0NjgxMjI2MTQmYW1wO3NkYXRh
+PTVIeHpIMjZZcFdWa1hPb0s5ZnRXNTFqYW8lMkZBamVMWTRhaExYbnpsJTJGV0FvJTNEJmFtcDty
+ZXNlcnZlZD0wIGFuZCBjb250cm9sIHlvdXIgbm90aWZpY2F0aW9uIHNldHRpbmdzIGZvciAgDQp5
+b3VyIGVudGlyZSBjYWxlbmRhci4NCg0KRm9yd2FyZGluZyB0aGlzIGludml0YXRpb24gY291bGQg
+YWxsb3cgYW55IHJlY2lwaWVudCB0byBzZW5kIGEgcmVzcG9uc2UgdG8gIA0KdGhlIG9yZ2FuaXNl
+ciBhbmQgYmUgYWRkZWQgdG8gdGhlIGd1ZXN0IGxpc3QsIGludml0ZSBvdGhlcnMgcmVnYXJkbGVz
+cyBvZiAgDQp0aGVpciBvd24gaW52aXRhdGlvbiBzdGF0dXMgb3IgdG8gbW9kaWZ5IHlvdXIgUlNW
+UC4gTGVhcm4gbW9yZSBhdCAgDQpodHRwczovL2V1cjAyLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91
+dGxvb2suY29tLz91cmw9aHR0cHMlM0ElMkYlMkZzdXBwb3J0Lmdvb2dsZS5jb20lMkZjYWxlbmRh
+ciUyRmFuc3dlciUyRjM3MTM1JTIzZm9yd2FyZGluZyZhbXA7ZGF0YT0wMiU3QzAxJTdDbWVldGlu
+Z3MuZGV2JTQwREJJUy5vbm1pY3Jvc29mdC5jb20lN0MzNWYyNDU3OTFkYTI0MmYwYTgzYjA4ZDZk
+NzlmYzEwNSU3QzhmYTIxN2VjMzNhYTQ2ZmJhZDk2ZGZlNjgwMDZiYjg2JTdDMCU3QzAlN0M2MzY5
+MzM0Nzg0NjgxMjI2MTQmYW1wO3NkYXRhPWc0V3FPVXB6RmFvJTJGS2lmUGpSOXBSWEtZTVZMJTJG
+UlFBeiUyQklIJTJCQUM4N0pTRSUzRCZhbXA7cmVzZXJ2ZWQ9MA0K
+
+--000000000000b2d1560588c42df1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8"><s=
+pan itemscope=3D"" itemtype=3D"http://schema.org/InformAction"><span style=
+=3D"display:none" itemprop=3D"about" itemscope=3D"" itemtype=3D"http://sche=
+ma.org/Person"><meta itemprop=3D"description" content=3D"Invitation from br=
+endan.smith@digital.trade.gov.uk"></span><span itemprop=3D"object" itemscop=
+e=3D"" itemtype=3D"http://schema.org/Event"><div style=3D""><table cellspac=
+ing=3D"0" cellpadding=3D"8" border=3D"0" summary=3D"" style=3D"width:100%;f=
+ont-family:Arial,Sans-serif;border:1px Solid #ccc;border-width:1px 2px 2px =
+1px;background-color:#fff;"><tr><td><meta itemprop=3D"eventStatus" content=
+=3D"http://schema.org/EventScheduled"><h4 style=3D"padding:6px 0;margin:0 0=
+ 4px 0;font-family:Arial,Sans-serif;font-size:13px;line-height:1.4;border:1=
+px Solid #fff;background:#fff;color:#090;font-weight:normal"><strong>You ha=
+ve been invited to the following event.</strong></h4><div style=3D"padding:=
+2px"><span itemprop=3D"publisher" itemscope=3D"" itemtype=3D"http://schema.=
+org/Organization"><meta itemprop=3D"name" content=3D"Google Calendar"></spa=
+n><meta itemprop=3D"eventId/googleCalendar" content=3D"0rmcu1vgucemr7jtbena=
+knlq11"><div style=3D"float:right;font-weight:bold;font-size:13px"> <a href=
+=3D"https://eur02.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww=
+.google.com%2Fcalendar%2Fevent%3Faction%3DVIEW%26eid%3DMHJtY3Uxdmd1Y2Vtcjdq=
+dGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw%26tok%3DMzQjYnJlbmRhbi5z=
+bWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzE=
+wZGYzYzlmNzY%26ctz%3DEurope%252FLondon%26hl%3Den_GB%26es%3D0&amp;data=3D02%=
+7C01%7Cmeetings.dev%40DBIS.onmicrosoft.com%7C35f245791da242f0a83b08d6d79fc1=
+05%7C8fa217ec33aa46fbad96dfe68006bb86%7C0%7C0%7C636933478468172584&amp;sdat=
+a=3D93wrzaeNNn%2FGk%2FpcBj5DghieIPyP%2BnciQzmp6pFytSI%3D&amp;reserved=3D0" =
+originalsrc=3D"https://www.google.com/calendar/event?action=3DVIEW&amp;eid=
+=3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw&a=
+mp;tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOG=
+U2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY&amp;ctz=3DEurope%2FLondon&amp;hl=3Den=
+_GB&amp;es=3D0" shash=3D"LSxsmE03trjZvA2lp6C5ZE4lkmEpYYlk9CmVJGBRW0LstrBaMx=
+i9Om4NbB0e6TvjcyBn6erHii2VDu88XJl361AQVsgUdoss9tO6cl&#43;C2JNjQv6sGvOpRa6y3=
+Of2s317LBHuA3spmt05seKi&#43;n8O6ZsfDb07zgqDSK76qg8PLo8=3D" style=3D"color:#=
+20c;white-space:nowrap" itemprop=3D"url">more details =C2=BB</a><br></div><=
+h3 style=3D"padding:0 0 6px 0;margin:0;font-family:Arial,Sans-serif;font-si=
+ze:16px;font-weight:bold;color:#222"><span itemprop=3D"name">Test meeting g=
+mail</span></h3><table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" sum=
+mary=3D"Event details"><tr><td style=3D"padding:0 1em 10px 0;font-family:Ar=
+ial,Sans-serif;font-size:13px;color:#888;white-space:nowrap;width:90px" val=
+ign=3D"top"><div><i style=3D"font-style:normal">When</i></div></td><td styl=
+e=3D"padding-bottom:10px;font-family:Arial,Sans-serif;font-size:13px;color:=
+#222" valign=3D"top"><div style=3D"text-indent:-1px"><time itemprop=3D"star=
+tDate" datetime=3D"20190513T140000Z"></time><time itemprop=3D"endDate" date=
+time=3D"20190513T150000Z"></time>Mon 13 May 2019 3pm =E2=80=93 4pm <span st=
+yle=3D"color:#888">United Kingdom Time</span></div></td></tr><tr><td style=
+=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font-size:13px;color:=
+#888;white-space:nowrap;width:90px" valign=3D"top"><div><i style=3D"font-st=
+yle:normal">Joining info</i></div></td><td style=3D"padding-bottom:10px;fon=
+t-family:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"top"><div st=
+yle=3D"text-indent:-1px"><span itemprop=3D"potentialaction" itemscope=3D"" =
+itemtype=3D"http://schema.org/JoinAction"><span itemprop=3D"name" content=
+=3D"meet.google.com/gcg-rotu-ifw"><span itemprop=3D"target" itemscope=3D"" =
+itemtype=3D"http://schema.org/EntryPoint"><span itemprop=3D"url" content=3D=
+"https://meet.google.com/gcg-rotu-ifw"><span itemprop=3D"httpMethod" conten=
+t=3D"GET"><a href=3D"https://eur02.safelinks.protection.outlook.com/?url=3D=
+https%3A%2F%2Fmeet.google.com%2Fgcg-rotu-ifw&amp;data=3D02%7C01%7Cmeetings.=
+dev%40DBIS.onmicrosoft.com%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec33a=
+a46fbad96dfe68006bb86%7C0%7C0%7C636933478468182580&amp;sdata=3DpVFyE%2BxJVs=
+01fmNv%2F65WxoL9Vo5huW%2B%2Bs9tfXT7978c%3D&amp;reserved=3D0" originalsrc=3D=
+"https://meet.google.com/gcg-rotu-ifw" shash=3D"gmdg1OiHsGm9a1AGEB70YgCoEUn=
+&#43;vMGisJgjA&#43;73TdJP2jmyJ65sSXnd7fZVy/PqD9yloGYD/GYqhPEJryYKWoPoR4MgNj=
+CDvseg6Y0gio13AbcESOwq1cZQYLf&#43;uGe2bXWGBfQ3YhZmyvH5QydFu6qcnXn/lXG18qSr6=
+1t9XQw=3D" style=3D"color:#20c;white-space:nowrap" target=3D"_blank">meet.g=
+oogle.com/gcg-rotu-ifw</a></span></span></span></span></span></div></td></t=
+r><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font-s=
+ize:13px;color:#888;white-space:nowrap;width:90px"></td><td><div style=3D"t=
+ext-indent:-1px"><table cellspacing=3D"0" cellpadding=3D"0"><tr><td style=
+=3D"padding-bottom:10px;font-family:Arial,Sans-serif;font-size:13px;color:#=
+222" valign=3D"top"><div style=3D"text-indent:-1px"><span style=3D"color:#8=
+88">Or dial: <span itemprop=3D"phoneNumber">&#43;1 929-266-2336</span><span=
+ itemprop=3D"rtcPhoneNumberPassCodeLabel">&nbsp; PIN:</span><span itemprop=
+=3D"passCode"> 802478676#</span></span></div></td></tr></table></div></td><=
+/tr><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font=
+-size:13px;color:#888;white-space:nowrap;width:90px" valign=3D"top"><div><i=
+ style=3D"font-style:normal">Calendar</i></div></td><td style=3D"padding-bo=
+ttom:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222" valign=3D=
+"top"><div style=3D"text-indent:-1px">meetings-dev@trade.gov.uk</div></td><=
+/tr><tr><td style=3D"padding:0 1em 10px 0;font-family:Arial,Sans-serif;font=
+-size:13px;color:#888;white-space:nowrap;width:90px" valign=3D"top"><div><i=
+ style=3D"font-style:normal">Who</i></div></td><td style=3D"padding-bottom:=
+10px;font-family:Arial,Sans-serif;font-size:13px;color:#222" valign=3D"top"=
+><table cellspacing=3D"0" cellpadding=3D"0"><tr><td style=3D"padding-right:=
+10px;font-family:Arial,Sans-serif;font-size:13px;color:#222;width:10px"><di=
+v style=3D"text-indent:-1px"><span style=3D"font-family:Courier New,monospa=
+ce">=E2=80=A2</span></div></td><td style=3D"padding-right:10px;font-family:=
+Arial,Sans-serif;font-size:13px;color:#222"><div style=3D"text-indent:-1px"=
+><div><div style=3D"margin:0 0 0.3em 0"><span itemprop=3D"attendee" itemsco=
+pe=3D"" itemtype=3D"http://schema.org/Person"><span itemprop=3D"name" class=
+=3D"notranslate">brendan.smith@digital.trade.gov.uk</span><meta itemprop=3D=
+"email" content=3D"brendan.smith@digital.trade.gov.uk"></span><span itempro=
+p=3D"organizer" itemscope=3D"" itemtype=3D"http://schema.org/Person"><meta =
+itemprop=3D"name" content=3D"brendan.smith@digital.trade.gov.uk"><meta item=
+prop=3D"email" content=3D"brendan.smith@digital.trade.gov.uk"></span><span =
+style=3D"font-size:11px;color:#888">- organiser</span></div></div></div></t=
+d></tr><tr><td style=3D"padding-right:10px;font-family:Arial,Sans-serif;fon=
+t-size:13px;color:#222;width:10px"><div style=3D"text-indent:-1px"><span st=
+yle=3D"font-family:Courier New,monospace">=E2=80=A2</span></div></td><td st=
+yle=3D"padding-right:10px;font-family:Arial,Sans-serif;font-size:13px;color=
+:#222"><div style=3D"text-indent:-1px"><div><div style=3D"margin:0 0 0.3em =
+0"><span itemprop=3D"attendee" itemscope=3D"" itemtype=3D"http://schema.org=
+/Person"><span itemprop=3D"name" class=3D"notranslate">meetings-dev@trade.g=
+ov.uk</span><meta itemprop=3D"email" content=3D"meetings-dev@trade.gov.uk">=
+</span></div></div></div></td></tr></table></td></tr></table></div><p style=
+=3D"color:#222;font-size:13px;margin:0"><span style=3D"color:#888">Going (m=
+eetings-dev@trade.gov.uk)?&nbsp;&nbsp;&nbsp;</span><wbr><strong><span itemp=
+rop=3D"potentialaction" itemscope=3D"" itemtype=3D"http://schema.org/RsvpAc=
+tion"><meta itemprop=3D"attendance" content=3D"http://schema.org/RsvpAttend=
+ance/Yes"><span itemprop=3D"handler" itemscope=3D"" itemtype=3D"http://sche=
+ma.org/HttpActionHandler"><link itemprop=3D"method" href=3D"http://schema.o=
+rg/HttpRequestMethod/GET"><a href=3D"https://eur02.safelinks.protection.out=
+look.com/?url=3Dhttps%3A%2F%2Fwww.google.com%2Fcalendar%2Fevent%3Faction%3D=
+RESPOND%26eid%3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWR=
+lLmdvdi51aw%26rst%3D1%26tok%3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvd=
+i51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY%26ctz%3DEurope%2=
+52FLondon%26hl%3Den_GB%26es%3D0&amp;data=3D02%7C01%7Cmeetings.dev%40DBIS.on=
+microsoft.com%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec33aa46fbad96dfe6=
+8006bb86%7C0%7C0%7C636933478468182580&amp;sdata=3DeECAMihoX%2Fg1xzl6jAX%2FX=
+nCAnw0mB1of84uBN%2FAwRv4%3D&amp;reserved=3D0" originalsrc=3D"https://www.go=
+ogle.com/calendar/event?action=3DRESPOND&amp;eid=3DMHJtY3Uxdmd1Y2VtcjdqdGJl=
+bmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw&amp;rst=3D1&amp;tok=3DMzQjYn=
+JlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiY=
+zNlNWE5NzEwZGYzYzlmNzY&amp;ctz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D0"=
+ shash=3D"PowDxU&#43;XXnSA7&#43;EtDdl3k0cMhMsOKsdTYufPnVPYA5ed&#43;1BnaA9NO=
+vuQ9wR&#43;q&#43;gUtxELjs1JKWI/x3t753tkD24frbv2RCN8cBI&#43;ymI9IJXPgFFTuD1X=
+fUQN2XrbAxIdYqQrKeLzwi5fixHd09KFJY7BEosoBqj4qH2KO2vnFFk=3D" style=3D"color:=
+#20c;white-space:nowrap" itemprop=3D"url">Yes</a></span></span><span style=
+=3D"margin:0 0.4em;font-weight:normal"> - </span><span itemprop=3D"potentia=
+laction" itemscope=3D"" itemtype=3D"http://schema.org/RsvpAction"><meta ite=
+mprop=3D"attendance" content=3D"http://schema.org/RsvpAttendance/Maybe"><sp=
+an itemprop=3D"handler" itemscope=3D"" itemtype=3D"http://schema.org/HttpAc=
+tionHandler"><link itemprop=3D"method" href=3D"http://schema.org/HttpReques=
+tMethod/GET"><a href=3D"https://eur02.safelinks.protection.outlook.com/?url=
+=3Dhttps%3A%2F%2Fwww.google.com%2Fcalendar%2Fevent%3Faction%3DRESPOND%26eid=
+%3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw%2=
+6rst%3D3%26tok%3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYj=
+A0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY%26ctz%3DEurope%252FLondon%26h=
+l%3Den_GB%26es%3D0&amp;data=3D02%7C01%7Cmeetings.dev%40DBIS.onmicrosoft.com=
+%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec33aa46fbad96dfe68006bb86%7C0%=
+7C0%7C636933478468192570&amp;sdata=3DFgyFT9ShVVmL9Eku2xtkiR4Xn%2Bn8wdDUSobm=
+EQr8D%2FY%3D&amp;reserved=3D0" originalsrc=3D"https://www.google.com/calend=
+ar/event?action=3DRESPOND&amp;eid=3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgbWV=
+ldGluZ3MtZGV2QHRyYWRlLmdvdi51aw&amp;rst=3D3&amp;tok=3DMzQjYnJlbmRhbi5zbWl0a=
+EBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYz=
+YzlmNzY&amp;ctz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D0" shash=3D"tBZjQ=
+EcaWPPZFqfLsMdAWt4W&#43;TciT0KWPkIV/cdEI4hJ&#43;uWfxuRo6PsPcY2J35zN8aKNvru6=
+ye28D7KgrNYxYlXKm3hn8y1T&#43;o&#43;uCW1EvXEouimwmXMmboezCZNYDxeisQpn6d7LK&#=
+43;GwRfmHkaFgb&#43;IYTtimuuJNdmSLTfiz1sg=3D" style=3D"color:#20c;white-spac=
+e:nowrap" itemprop=3D"url">Maybe</a></span></span><span style=3D"margin:0 0=
+.4em;font-weight:normal"> - </span><span itemprop=3D"potentialaction" items=
+cope=3D"" itemtype=3D"http://schema.org/RsvpAction"><meta itemprop=3D"atten=
+dance" content=3D"http://schema.org/RsvpAttendance/No"><span itemprop=3D"ha=
+ndler" itemscope=3D"" itemtype=3D"http://schema.org/HttpActionHandler"><lin=
+k itemprop=3D"method" href=3D"http://schema.org/HttpRequestMethod/GET"><a h=
+ref=3D"https://eur02.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+www.google.com%2Fcalendar%2Fevent%3Faction%3DRESPOND%26eid%3DMHJtY3Uxdmd1Y2=
+VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw%26rst%3D2%26tok%3D=
+MzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjV=
+hY2RiYzNlNWE5NzEwZGYzYzlmNzY%26ctz%3DEurope%252FLondon%26hl%3Den_GB%26es%3D=
+0&amp;data=3D02%7C01%7Cmeetings.dev%40DBIS.onmicrosoft.com%7C35f245791da242=
+f0a83b08d6d79fc105%7C8fa217ec33aa46fbad96dfe68006bb86%7C0%7C0%7C63693347846=
+8192570&amp;sdata=3DppN9BmG41yG7052%2F%2BzRbDWkl9pu5ugbXaFv4umCQpJM%3D&amp;=
+reserved=3D0" originalsrc=3D"https://www.google.com/calendar/event?action=
+=3DRESPOND&amp;eid=3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QH=
+RyYWRlLmdvdi51aw&amp;rst=3D2&amp;tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRy=
+YWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY&amp;ctz=
+=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D0" shash=3D"hIRNx8BJc8NQvfkPeK&#=
+43;NlX8iFdbC/2Hl3YjQco41DPxE&#43;wo3RmLuJVfsC2xFf41NfaCl55a8kMtEUwZGPOJJAdO=
+DffzLi4CjKyVvjWnP7nME15NeoYw7uEX7nUm8mzxEXDDXybh093Lpq8SQ2asSQY1AjMWU04WfNT=
+o3cYQ3p0Q=3D" style=3D"color:#20c;white-space:nowrap" itemprop=3D"url">No</=
+a></span></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;<wbr><a href=3D"https://eu=
+r02.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww.google.com%2F=
+calendar%2Fevent%3Faction%3DVIEW%26eid%3DMHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMT=
+EgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw%26tok%3DMzQjYnJlbmRhbi5zbWl0aEBkaWdpdG=
+FsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY%2=
+6ctz%3DEurope%252FLondon%26hl%3Den_GB%26es%3D0&amp;data=3D02%7C01%7Cmeeting=
+s.dev%40DBIS.onmicrosoft.com%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec3=
+3aa46fbad96dfe68006bb86%7C0%7C0%7C636933478468202567&amp;sdata=3DDCeUHAF0Bi=
+vSYz%2FvQW%2ByIANU6gAA68VCqOP0n5BKGMA%3D&amp;reserved=3D0" originalsrc=3D"h=
+ttps://www.google.com/calendar/event?action=3DVIEW&amp;eid=3DMHJtY3Uxdmd1Y2=
+VtcjdqdGJlbmFrbmxxMTEgbWVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw&amp;tok=3DMzQjYnJl=
+bmRhbi5zbWl0aEBkaWdpdGFsLnRyYWRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzN=
+lNWE5NzEwZGYzYzlmNzY&amp;ctz=3DEurope%2FLondon&amp;hl=3Den_GB&amp;es=3D0" s=
+hash=3D"kYIGNBDtn8rA1UBwkQiGz4inAgrQKCIL4sB5dOI9Eoep4f&#43;k6C5DSMSqWbMsrra=
+u4&#43;NhQgBKvQWA9xvYubTn2/6zqKR8i6BmqXzMmHD0eEHTq3oQRrAGwd3Nelh2775s5q1x3&=
+#43;rwhi4bhvm75tLbClvkUoIexDkH&#43;k6FGdfr74Q=3D" style=3D"color:#20c;white=
+-space:nowrap" itemprop=3D"url">more options =C2=BB</a></p></td></tr><tr><t=
+d style=3D"background-color:#f6f6f6;color:#888;border-top:1px Solid #ccc;fo=
+nt-family:Arial,Sans-serif;font-size:11px"><p>Invitation from <a href=3D"ht=
+tps://eur02.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww.googl=
+e.com%2Fcalendar%2F&amp;data=3D02%7C01%7Cmeetings.dev%40DBIS.onmicrosoft.co=
+m%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec33aa46fbad96dfe68006bb86%7C0=
+%7C0%7C636933478468202567&amp;sdata=3D%2FUkgMVH3Z4q0Ah8i4t2Sps%2FvMAU%2BLVo=
+Z9ut3QYjFX7M%3D&amp;reserved=3D0" originalsrc=3D"https://www.google.com/cal=
+endar/" shash=3D"B6JVnjo1Zw9asrYOyz6QsBgriNALE3U2oM1CyZrEnC1gGosbzv6lZIh4&#=
+43;cbO9e33K6oaPy6xgIp2Xn9eSIBFjpqkMTOlaKDofFP97k3uo6D5qexcwwYoDeLP/Sks7cJr0=
+mxy7IXZgqr/t8SNUfM4xLPhGuHU12ejHHQ2svZDrao=3D" target=3D"_blank" style=3D""=
+>Google Calendar</a></p><p>You are receiving this courtesy email at the acc=
+ount meetings-dev@trade.gov.uk because you are an attendee of this event.</=
+p><p>To stop receiving future updates for this event, decline this event. A=
+lternatively, you can sign up for a Google Account at https://www.google.co=
+m/calendar/ and control your notification settings for your entire calendar=
+.</p><p>Forwarding this invitation could allow any recipient to send a resp=
+onse to the organiser and be added to the guest list, invite others regardl=
+ess of their own invitation status or to modify your RSVP. <a href=3D"https=
+://eur02.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fsupport.goog=
+le.com%2Fcalendar%2Fanswer%2F37135%23forwarding&amp;data=3D02%7C01%7Cmeetin=
+gs.dev%40DBIS.onmicrosoft.com%7C35f245791da242f0a83b08d6d79fc105%7C8fa217ec=
+33aa46fbad96dfe68006bb86%7C0%7C0%7C636933478468212560&amp;sdata=3Dwa9XrhUJL=
+Q2WMErkHXNCba8LblndhaHFxi6FpuWjNaY%3D&amp;reserved=3D0" originalsrc=3D"http=
+s://support.google.com/calendar/answer/37135#forwarding" shash=3D"k2c9y3O2u=
+YzFNhdlMatjuJd/qwfcTnR7lz7fu0PuBMal1KTXWwiFKo/PpLmQ5BpJ1sWdZ4CC3VqSC5Z2GCwU=
+wZtjppLBPvHum0XB08LZIRdYAo1tiglzwAbiuGe5qqARo76x8LbKvSrE05zYu3oivMQI1ymEG0B=
+FurKIhoHdkS4=3D">Learn more</a>.</p></td></tr></table></div></span></span>=
+
+--000000000000b2d1560588c42df1
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20190513T140000Z
+DTEND:20190513T150000Z
+DTSTAMP:20190513T123725Z
+ORGANIZER;CN=brendan.smith@digital.trade.gov.uk:mailto:brendan.smith@digita
+ l.trade.gov.uk
+UID:0rmcu1vgucemr7jtbenaknlq11@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=meetings-dev@trade.gov.uk;X-NUM-GUESTS=0:mailto:meetings-dev@trade.
+ gov.uk
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=brendan.smith@digital.trade.gov.uk;X-NUM-GUESTS=0:mailto:brendan.smith@
+ digital.trade.gov.uk
+X-MICROSOFT-CDO-OWNERAPPTID:1987240401
+CREATED:20190513T123720Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descriptio
+ n.\n\nThis event has a video call.\nJoin: https://meet.google.com/gcg-rotu-
+ ifw\n+1 929-266-2336 PIN: 802478676#\n\nView your event at https://www.goog
+ le.com/calendar/event?action=VIEW&eid=MHJtY3Uxdmd1Y2VtcjdqdGJlbmFrbmxxMTEgb
+ WVldGluZ3MtZGV2QHRyYWRlLmdvdi51aw&tok=MzQjYnJlbmRhbi5zbWl0aEBkaWdpdGFsLnRyY
+ WRlLmdvdi51azY2YzlkYjA0YmQzOGU2MjVjZjVhY2RiYzNlNWE5NzEwZGYzYzlmNzY&ctz=Euro
+ pe%2FLondon&hl=en_GB&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20190513T123720Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Test meeting gmail
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000b2d1560588c42df1--
+
+--000000000000b2d15c0588c42df3
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VkVWRU5UDQpEVFNUQVJUOjIwMTkwNTEzVDE0MDAwMFoNCkRURU5EOjIwMTkwNTEz
+VDE1MDAwMFoNCkRUU1RBTVA6MjAxOTA1MTNUMTIzNzI1Wg0KT1JHQU5JWkVSO0NOPWJyZW5kYW4u
+c21pdGhAZGlnaXRhbC50cmFkZS5nb3YudWs6bWFpbHRvOmJyZW5kYW4uc21pdGhAZGlnaXRhDQog
+bC50cmFkZS5nb3YudWsNClVJRDowcm1jdTF2Z3VjZW1yN2p0YmVuYWtubHExMUBnb29nbGUuY29t
+DQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtST0xFPVJFUS1QQVJUSUNJUEFOVDtQQVJUU1RB
+VD1ORUVEUy1BQ1RJT047UlNWUD0NCiBUUlVFO0NOPW1lZXRpbmdzLWRldkB0cmFkZS5nb3YudWs7
+WC1OVU0tR1VFU1RTPTA6bWFpbHRvOm1lZXRpbmdzLWRldkB0cmFkZS4NCiBnb3YudWsNCkFUVEVO
+REVFO0NVVFlQRT1JTkRJVklEVUFMO1JPTEU9UkVRLVBBUlRJQ0lQQU5UO1BBUlRTVEFUPUFDQ0VQ
+VEVEO1JTVlA9VFJVRQ0KIDtDTj1icmVuZGFuLnNtaXRoQGRpZ2l0YWwudHJhZGUuZ292LnVrO1gt
+TlVNLUdVRVNUUz0wOm1haWx0bzpicmVuZGFuLnNtaXRoQA0KIGRpZ2l0YWwudHJhZGUuZ292LnVr
+DQpYLU1JQ1JPU09GVC1DRE8tT1dORVJBUFBUSUQ6MTk4NzI0MDQwMQ0KQ1JFQVRFRDoyMDE5MDUx
+M1QxMjM3MjBaDQpERVNDUklQVElPTjotOjp+On46On46fjp+On46fjp+On46fjp+On46fjp+On46
+fjp+On46fjp+On46fjp+On46fjp+On46fjp+On4NCiA6fjp+On46fjp+On46fjp+Ojp+On46Oi1c
+blBsZWFzZSBkbyBub3QgZWRpdCB0aGlzIHNlY3Rpb24gb2YgdGhlIGRlc2NyaXB0aW8NCiBuLlxu
+XG5UaGlzIGV2ZW50IGhhcyBhIHZpZGVvIGNhbGwuXG5Kb2luOiBodHRwczovL21lZXQuZ29vZ2xl
+LmNvbS9nY2ctcm90dS0NCiBpZndcbisxIDkyOS0yNjYtMjMzNiBQSU46IDgwMjQ3ODY3NiNcblxu
+VmlldyB5b3VyIGV2ZW50IGF0IGh0dHBzOi8vd3d3Lmdvb2cNCiBsZS5jb20vY2FsZW5kYXIvZXZl
+bnQ/YWN0aW9uPVZJRVcmZWlkPU1ISnRZM1V4ZG1kMVkyVnRjamRxZEdKbGJtRnJibXh4TVRFZ2IN
+CiBXVmxkR2x1WjNNdFpHVjJRSFJ5WVdSbExtZHZkaTUxYXcmdG9rPU16UWpZbkpsYm1SaGJpNXpi
+V2wwYUVCa2FXZHBkR0ZzTG5SeVkNCiBXUmxMbWR2ZGk1MWF6WTJZemxrWWpBMFltUXpPR1UyTWpW
+alpqVmhZMlJpWXpObE5XRTVOekV3WkdZell6bG1OelkmY3R6PUV1cm8NCiBwZSUyRkxvbmRvbiZo
+bD1lbl9HQiZlcz0xLlxuLTo6fjp+Ojp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46
+fjp+On4NCiA6fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjo6fjp+OjotDQpMQVNULU1P
+RElGSUVEOjIwMTkwNTEzVDEyMzcyMFoNCkxPQ0FUSU9OOg0KU0VRVUVOQ0U6MA0KU1RBVFVTOkNP
+TkZJUk1FRA0KU1VNTUFSWTpUZXN0IG1lZXRpbmcgZ21haWwNClRSQU5TUDpPUEFRVUUNCkVORDpW
+RVZFTlQNCkVORDpWQ0FMRU5EQVINCg==
+
+--000000000000b2d15c0588c42df3--

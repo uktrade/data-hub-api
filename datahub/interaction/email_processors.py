@@ -5,8 +5,8 @@ import icalendar
 import pytz
 from django.core.exceptions import ValidationError
 
+from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
-from datahub.company.models.contact import Contact
 from datahub.email_ingestion.validation import was_email_sent_by_dit
 
 
@@ -30,12 +30,19 @@ class CalendarInteractionEmailParser:
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
 
+    def _get_adviser_from_email(self, email):
+        for field in ['contact_email', 'email']:
+            criteria = {field: email}
+            try:
+                return Advisor.objects.get(**criteria)
+            except Advisor.DoesNotExist:
+                continue
+        return None
+
     def _extract_sender_adviser(self):
         sender_email = self.message.from_[0][1]
-        # TODO: replace with reupen's util
-        try:
-            sender_adviser = Advisor.objects.get(contact_email=sender_email)
-        except Advisor.DoesNotExist:
+        sender_adviser = self._get_adviser_from_email(sender_email)
+        if not sender_adviser:
             raise ValidationError('Email not sent by recognised DIT Adviser')
         return sender_adviser
 
@@ -48,15 +55,21 @@ class CalendarInteractionEmailParser:
         return all_recipients
 
     def _extract_contacts(self, all_recipients):
-        contacts = list(Contact.objects.filter(email__in=all_recipients))
+        contacts = []
+        for recipient_email in all_recipients:
+            contact, matching_status = find_active_contact_by_email_address(recipient_email)
+            if contact:
+                contacts.append(contact)
         if not contacts:
             raise ValidationError('No email recipients were recognised as Contacts')
         return contacts
 
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
-        secondary_advisers = list(
-            Advisor.objects.filter(email__in=all_recipients).exclude(id=sender_adviser.id),
-        )
+        secondary_advisers = []
+        for recipient_email in all_recipients:
+            adviser = self._get_adviser_from_email(recipient_email)
+            if adviser:
+                secondary_advisers.append(adviser)
         return secondary_advisers
 
     def _get_company_from_contacts(self, contacts):
@@ -119,12 +132,17 @@ class CalendarInteractionEmailParser:
         # whole calendar to datahub for whatever reason..?
         for component in calendar.walk():
             if component.name == 'VEVENT':
+                location = component.get('location')
+                if location:
+                    location = str(location)
+                else:
+                    location = ''
                 return {
                     'subject': str(component.get('summary')),
                     'start': self._get_utc_datetime(component.decoded('dtstart')),
                     'end': self._get_utc_datetime(component.decoded('dtend')),
                     'sent': self._get_utc_datetime(component.decoded('dtstamp')),
-                    'location': str(component.get('location')),
+                    'location': location,
                     'status': str(component.get('status')),
                     'uid': str(component.get('uid')),
                 }

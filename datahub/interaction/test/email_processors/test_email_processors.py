@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import date, datetime
 
 import mailparser
 import pytest
@@ -67,71 +67,33 @@ class TestCalendarInteractionEmailParser:
         'email_file,expected_event_details',
         (
             (
-                'email_samples/valid/outlook_online/initial.eml',
+                'email_samples/valid/outlook_online/sample.eml',
                 {
-                    'subject': 'test meet',
-                    'start': datetime(2019, 3, 29, 12, 0, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=pytz.utc),
+                    'subject': 'Meeting test outlook online',
+                    'start': datetime(2019, 5, 15, 11, 30, tzinfo=pytz.utc),
+                    'end': datetime(2019, 5, 15, 12, 30, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 5, 13, 12, 32, 53, tzinfo=pytz.utc),
                     'location': (
-                        'SOMEWHERE Agency (10 Tunstall Studios, 34-44 '
-                        'Tunstall Road, 10/11 Tunstall Studios, London, '
-                        'England, United Kingdom)'
+                        'Someplace Else - The Park (The Park Hotel, Ground Floor, Near '
+                        'Delhi Public School, Park Street, Kolkata West Bengal, India)'
                     ),
                     'status': 'CONFIRMED',
                     'uid': (
-                        '040000008200E00074C5B7101A82E008000000001670528522E6D4'
-                        '0100000000000000001000000079ABFE8513989A49988F0CF2BF5B0F5A'
+                        '040000008200E00074C5B7101A82E008000000002D3F6AFC8709D50100000'
+                        '00000000000100000009769D9995082A348A13B8F12B2FAB9B0'
                     ),
                 },
             ),
             (
-                'email_samples/valid/outlook_online/update.eml',
+                'email_samples/valid/gmail/sample.eml',
                 {
-                    'subject': 'test meetz',
-                    'start': datetime(2019, 3, 29, 12, 0, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 28, 53, tzinfo=pytz.utc),
-                    'location': (
-                        'SOMEWHERE Agency (10 Tunstall Studios, 34-44 '
-                        'Tunstall Road, 10/11 Tunstall Studios, London, '
-                        'England, United Kingdom)'
-                    ),
+                    'subject': 'Test meeting gmail',
+                    'start': datetime(2019, 5, 13, 14, 00, tzinfo=pytz.utc),
+                    'end': datetime(2019, 5, 13, 15, 00, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 5, 13, 12, 37, 25, tzinfo=pytz.utc),
+                    'location': '',
                     'status': 'CONFIRMED',
-                    'uid': (
-                        '040000008200E00074C5B7101A82E008000000001670528522E6D4'
-                        '0100000000000000001000000079ABFE8513989A49988F0CF2BF5B0F5A'
-                    ),
-                },
-            ),
-            (
-                'email_samples/valid/gmail/initial.eml',
-                {
-                    'subject': 'initial',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=pytz.utc),
-                    'location': (
-                        'Somewhere, Unit FF - 305 - شارع المركز المالي - دبي - '
-                        'United Arab Emirates'
-                    ),
-                    'status': 'CONFIRMED',
-                    'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
-                },
-            ),
-            (
-                'email_samples/valid/gmail/update.eml',
-                {
-                    'subject': 'update',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 18, 0, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 39, 15, tzinfo=pytz.utc),
-                    'location': (
-                        'Somewhere, Unit FF - 305 - شارع المركز المالي - دبي - '
-                        'United Arab Emirates'
-                    ),
-                    'status': 'CONFIRMED',
-                    'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
+                    'uid': '0rmcu1vgucemr7jtbenaknlq11@google.com',
                 },
             ),
             (
@@ -147,6 +109,36 @@ class TestCalendarInteractionEmailParser:
                     ),
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
+                },
+            ),
+            (
+                'email_samples/valid/outlook_iphone/sample.eml',
+                {
+                    'subject': 'Test meeting iPhone 5',
+                    'start': date(2019, 5, 19),
+                    'end': date(2019, 5, 20),
+                    'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=pytz.utc),
+                    'location': '',
+                    'status': 'CONFIRMED',
+                    'uid': (
+                        '040000008200E00074C5B7101A82E00800000000CCE64C7E7709D50100000000000000001'
+                        '00000008EC4E55E2F36B445B797B8311D1418AE'
+                    ),
+                },
+            ),
+            (
+                'email_samples/valid/outlook_desktop/sample.eml',
+                {
+                    'subject': 'Meeting test outlook desktop',
+                    'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=pytz.utc),
+                    'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=pytz.utc),
+                    'location': 'Windsor House',
+                    'status': 'CONFIRMED',
+                    'uid': (
+                        '040000008200E00074C5B7101A82E00800000000399124F77909D501000000'
+                        '000000000010000000DC13FAF364693E4F8EEFE8C770F1C748'
+                    ),
                 },
             ),
         ),
