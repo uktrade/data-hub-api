@@ -69,31 +69,31 @@ class TestCalendarInteractionEmailParser:
             (
                 'email_samples/valid/outlook_online/sample.eml',
                 {
-                    'subject': 'Meeting test outlook online',
-                    'start': datetime(2019, 5, 15, 11, 30, tzinfo=pytz.utc),
-                    'end': datetime(2019, 5, 15, 12, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 5, 13, 12, 32, 53, tzinfo=pytz.utc),
+                    'subject': 'test meet',
+                    'start': datetime(2019, 3, 29, 12, 00, tzinfo=pytz.utc),
+                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=pytz.utc),
                     'location': (
-                        'Someplace Else - The Park (The Park Hotel, Ground Floor, Near '
-                        'Delhi Public School, Park Street, Kolkata West Bengal, India)'
+                        'SOMEWHERE Agency (10 Tunstall Studios, 34-44 Tunstall Road, '
+                        '10/11 Tunstall Studios, London, England, United Kingdom)'
                     ),
                     'status': 'CONFIRMED',
                     'uid': (
-                        '040000008200E00074C5B7101A82E008000000002D3F6AFC8709D50100000'
-                        '00000000000100000009769D9995082A348A13B8F12B2FAB9B0'
+                        '040000008200E00074C5B7101A82E008000000001670528522E6D40100000'
+                        '000000000001000000079ABFE8513989A49988F0CF2BF5B0F5A'
                     ),
                 },
             ),
             (
                 'email_samples/valid/gmail/sample.eml',
                 {
-                    'subject': 'Test meeting gmail',
-                    'start': datetime(2019, 5, 13, 14, 00, tzinfo=pytz.utc),
-                    'end': datetime(2019, 5, 13, 15, 00, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 5, 13, 12, 37, 25, tzinfo=pytz.utc),
+                    'subject': 'initial',
+                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
+                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=pytz.utc),
                     'location': '',
                     'status': 'CONFIRMED',
-                    'uid': '0rmcu1vgucemr7jtbenaknlq11@google.com',
+                    'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
             ),
             (
@@ -157,7 +157,7 @@ class TestCalendarInteractionEmailParser:
         (
             # Test that interaction data can be extracted for an easy case
             (
-                'email_samples/valid/outlook_online/initial.eml',
+                'email_samples/valid/outlook_online/sample.eml',
                 {
                     'adviser_email': 'brendan.smith@trade.gov.uk',
                     'contact_emails': ['bill.adama@example.net'],
@@ -175,7 +175,7 @@ class TestCalendarInteractionEmailParser:
             # Test that interaction data can be extracted for a complicated case
             # with many advisers, contacts and some unknown contacts
             (
-                'email_samples/valid/gmail/initial.eml',
+                'email_samples/valid/gmail/sample.eml',
                 {
                     'adviser_email': 'brendan.smith@trade.gov.uk',
                     'contact_emails': [
@@ -186,10 +186,7 @@ class TestCalendarInteractionEmailParser:
                     'secondary_adviser_emails': ['marco.fucci@digital.trade.gov.uk'],
                     'company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
-                    'location': (
-                        'Somewhere, Unit FF - 305 - شارع المركز المالي - دبي - '
-                        'United Arab Emirates'
-                    ),
+                    'location': '',
                     'subject': 'initial',
                 },
             ),
