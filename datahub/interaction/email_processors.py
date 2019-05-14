@@ -1,4 +1,5 @@
 import base64
+from collections import Counter
 from logging import getLogger
 
 import icalendar
@@ -78,23 +79,8 @@ class CalendarInteractionEmailParser:
         If these contacts are related to different companies, return the company
         with the highest number of contacts in our iterable.
         """
-        companies = {}
-        company_counts = {}
-        for contact in contacts:
-            company = contact.company
-            if not company:
-                continue
-            try:
-                company_counts[company.id] += 1
-            except KeyError:
-                company_counts[company.id] = 1
-                companies[company.id] = company
-        sorted_company_ids = sorted(
-            list(company_counts.items()),
-            key=lambda item: item[1],
-            reverse=True,
-        )
-        top_company = companies[sorted_company_ids[0][0]]
+        company_counts = Counter([contact.company for contact in contacts])
+        top_company = company_counts.most_common()[0]
         return top_company
 
     def _grab_calendar_string_from_text(self):
@@ -117,7 +103,7 @@ class CalendarInteractionEmailParser:
         except AttributeError:
             return localised_datetime
 
-    def _get_calendar_event_metadata(self):
+    def _get_calendar_event_component(self):
         error = ValidationError('No calendar event could be extracted')
         calendar_string = self._grab_calendar_string_from_text()
         if not calendar_string:
@@ -126,27 +112,37 @@ class CalendarInteractionEmailParser:
             raise error
         try:
             calendar = icalendar.Calendar.from_ical(calendar_string)
-        except Exception:
-            raise error
-        # TODO: Review how naive this approach is - what if an adviser sent their
-        # whole calendar to datahub for whatever reason..?
+        except Exception as exc:
+            raise error from exc
+        calendar_event_components = []
         for component in calendar.walk():
             if component.name == 'VEVENT':
-                location = component.get('location')
-                if location:
-                    location = str(location)
-                else:
-                    location = ''
-                return {
-                    'subject': str(component.get('summary')),
-                    'start': self._get_utc_datetime(component.decoded('dtstart')),
-                    'end': self._get_utc_datetime(component.decoded('dtend')),
-                    'sent': self._get_utc_datetime(component.decoded('dtstamp')),
-                    'location': location,
-                    'status': str(component.get('status')),
-                    'uid': str(component.get('uid')),
-                }
-        raise error
+                calendar_event_components.append(component)
+        if len(calendar_event_components) == 0:
+            raise ValidationError('No calendar event was found in the calendar')
+        if len(calendar_event_components) > 1:
+            raise ValidationError(
+                f'There were {len(calendar_event_components)} events in the calendar '
+                '- expected 1 event',
+            )
+        return calendar_event_components[0]
+
+    def _get_calendar_event_metadata(self):
+        event_component = self._get_calendar_event_component()
+        location = event_component.get('location')
+        if location:
+            location = str(location)
+        else:
+            location = ''
+        return {
+            'subject': str(event_component.get('summary')),
+            'start': self._get_utc_datetime(event_component.decoded('dtstart')),
+            'end': self._get_utc_datetime(event_component.decoded('dtend')),
+            'sent': self._get_utc_datetime(event_component.decoded('dtstamp')),
+            'location': location,
+            'status': str(event_component.get('status')),
+            'uid': str(event_component.get('uid')),
+        }
 
     def extract_interaction_data_from_email(self):
         """

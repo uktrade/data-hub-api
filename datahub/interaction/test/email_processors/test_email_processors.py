@@ -241,7 +241,14 @@ class TestCalendarInteractionEmailParser:
             ),
             (
                 'email_samples/invalid/no_calendar_event.eml',
-                ValidationError('No calendar event could be extracted'),
+                ValidationError('No calendar event was found in the calendar'),
+            ),
+            (
+                'email_samples/invalid/multiple_calendar_events.eml',
+                ValidationError(
+                    'There were 3 events in the calendar '
+                    '- expected 1 event',
+                ),
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
