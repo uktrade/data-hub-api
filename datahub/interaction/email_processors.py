@@ -5,6 +5,7 @@ from logging import getLogger
 import icalendar
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
+from rest_framework.exceptions import ValidationError as RestValidationError
 
 from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
@@ -110,24 +111,34 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
     def _transform(self, data):
         dit_participants = [
             {
-                'adviser': adviser,
+                'adviser': {'id': adviser.id},
                 'team': adviser.dit_team,
             }
             for adviser in (data['sender'], *data['secondary_advisers'])
-            if adviser
         ]
 
         creation_data = {
-            'contacts': [contact.id for contact in data['contacts']],
-            'company': data['company'],
+            'contacts': [{'id': contact.id} for contact in data['contacts']],
+            'company': {'id': data['company'].id},
             'date': data['date'],
             'dit_participants': dit_participants,
             'kind': Interaction.KINDS.interaction,
             'status': Interaction.STATUSES.draft,
             'subject': data['subject'],
+            'location': data['location'],
+            'was_policy_feedback_provided': False,
         }
 
         return creation_data
+
+    def _reduce_contacts_to_single_company(self, interaction_data):
+        contacts = interaction_data['contacts']
+        company = interaction_data['company']
+        interaction_data['contacts'] = [
+            contact
+            for contact in contacts
+            if contact.company == company
+        ]
 
     def validate_with_serializer(self, data):
         """
@@ -145,28 +156,38 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         """
         Review the metadata and calendar attachment (if present) of an email
         message to see if it fits the our criteria of a valid Data Hub meeting
-        reqquest.  If it does, create an incomplete Interaction for it.
+        request.  If it does, create an incomplete Interaction for it.
 
         :param message: mailparser.MailParser object - the message to process
         """
         email_parser = CalendarInteractionEmailParser(message)
         try:
             interaction_data = email_parser.extract_interaction_data_from_email(message)
-            serializer = self.validate_with_serializer(interaction_data)
         except ValidationError as exc:
             return (False, exc.message)
+        self._reduce_contacts_to_single_company(interaction_data)
+        try:
+            serializer = self.validate_with_serializer(interaction_data)
+        except RestValidationError as exc:
+            error_parts = []
+            for field_name, details in exc.detail.items():
+                details_string = ','.join([str(detail) for detail in details])
+                error_parts.append(f'{field_name}: {details_string}')
+            return (False, '\n'.join(error_parts))
         # For our initial iteration, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
             source__id=interaction_data['meeting_details']['uid'],
-            source__type='meeting',
+            source__type=Interaction.SOURCE_TYPES.meeting,
         )
-        meeting_exists = matching_interactions.count() > 0
-        if meeting_exists:
+        if matching_interactions:
             return (False, 'Meeting already exists as an interaction')
         # We've validated and marshalled everything we need to build an
         # incomplete interaction
         interaction = serializer.save(
-            source={'id': interaction_data['meeting_uid'], 'type': 'meeting'},
+            source={
+                'id': interaction_data['meeting_details']['uid'],
+                'type': Interaction.SOURCE_TYPES.meeting,
+            },
         )
         return (True, f'Successfully created interaction #{interaction.id}')
 

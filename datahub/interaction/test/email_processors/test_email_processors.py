@@ -1,14 +1,26 @@
 from datetime import date, datetime
 from pathlib import PurePath
+from unittest import mock
+from uuid import UUID
 
 import factory
 import mailparser
 import pytest
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
+from datahub.company.models.adviser import Advisor
+from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.interaction.email_processors import CalendarInteractionEmailParser
+from datahub.interaction.email_processors import (
+    CalendarInteractionEmailParser,
+    CalendarInteractionEmailProcessor,
+)
+from datahub.interaction.models import Interaction
+
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @pytest.fixture()
@@ -54,6 +66,168 @@ def calendar_data_fixture():
         )
         fixture['contacts'].append(contact)
     yield fixture
+
+
+@pytest.fixture()
+def base_interaction_data_fixture():
+    """
+    Basic interaction data which a mock of CalendarInteractionEmailParser can return.
+    """
+    return {
+        'sender': 'brendan.smith@trade.gov.uk',
+        'contacts': ['bill.adama@example.net', 'saul.tigh@example.net'],
+        'secondary_advisers': [],
+        'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
+        'company': 'Company 1',
+        'location': 'Windsor House',
+        'meeting_details': {'uid': '12345'},
+        'subject': 'A meeting',
+    }
+
+
+@pytest.mark.django_db
+class TestCalendarInteractionEmailProcessor:
+    """
+    Test the CalendarInteractionEmailProcessor class.
+    """
+
+    def _get_email_parser_mock(self, interaction_data, monkeypatch):
+        email_parser_mock = mock.Mock()
+        monkeypatch.setattr(
+            (
+                'datahub.interaction.email_processors.CalendarInteractionEmailParser'
+                '.extract_interaction_data_from_email'
+            ),
+            email_parser_mock,
+        )
+        contacts = list(Contact.objects.filter(email__in=interaction_data['contacts']))
+        secondary_advisers = list(
+            Advisor.objects.filter(email__in=interaction_data['secondary_advisers']),
+        )
+        email_parser_mock.return_value = {
+            'sender': Advisor.objects.get(email=interaction_data['sender']),
+            'contacts': contacts,
+            'secondary_advisers': secondary_advisers,
+            'company': Company.objects.get(name=interaction_data['company']),
+            'date': interaction_data['date'],
+            'location': interaction_data['location'],
+            'meeting_details': interaction_data['meeting_details'],
+            'subject': interaction_data['subject'],
+        }
+        return email_parser_mock
+
+    @pytest.mark.parametrize(
+        'interaction_data_overrides',
+        (
+            # Simple case; just the base interaction data
+            {},
+            # Including secondary advisers
+            {
+                'secondary_advisers': [
+                    'marco.fucci@digital.trade.gov.uk',
+                    'ali.zaidi@digital.trade.gov.uk',
+                ],
+            },
+        ),
+    )
+    def test_process_email_successful(
+        self,
+        interaction_data_overrides,
+        calendar_data_fixture,
+        base_interaction_data_fixture,
+        monkeypatch,
+    ):
+        """
+        Test that process_email saves a draft interaction can be saved successfully
+        when the calendar parser yields good data.
+        """
+        interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
+        self._get_email_parser_mock(interaction_data, monkeypatch)
+        processor = CalendarInteractionEmailProcessor()
+        result, message = processor.process_email(mock.Mock())
+        assert result is True
+        interaction_id = message.split()[-1].strip('#')
+        interaction = Interaction.objects.get(id=interaction_id)
+        # Verify dit_participants holds all of the advisers for the interaction
+        expected_advisers = [interaction_data['sender']]
+        expected_advisers.extend(interaction_data['secondary_advisers'])
+        interaction_advisers = interaction.dit_participants.all()
+        for participant in interaction_advisers:
+            assert participant.adviser.email in expected_advisers
+        assert interaction_advisers.count() == len(expected_advisers)
+        # Verify contacts holds all of the contacts for the interaction
+        interaction_contacts = interaction.contacts.all()
+        for contact in interaction_contacts:
+            assert contact.email in interaction_data['contacts']
+        assert len(interaction_data['contacts']) == interaction_contacts.count()
+        assert interaction.company.name == interaction_data['company']
+        assert interaction.date == interaction_data['date']
+        assert interaction.location == interaction_data['location']
+        assert interaction.source == {
+            'type': Interaction.SOURCE_TYPES.meeting,
+            'id': interaction_data['meeting_details']['uid'],
+        }
+        assert interaction.subject == interaction_data['subject']
+        assert interaction.status == Interaction.STATUSES.draft
+
+    def test_process_email_meeting_exists(
+        self,
+        base_interaction_data_fixture,
+        calendar_data_fixture,
+        monkeypatch,
+    ):
+        """
+        Test that process_email does not save another interaction when the meeting
+        already exists as an interaction.
+        """
+        interaction_data = {**base_interaction_data_fixture}
+        self._get_email_parser_mock(interaction_data, monkeypatch)
+        processor = CalendarInteractionEmailProcessor()
+        # Create the calendar interaction initially
+        initial_result, initial_message = processor.process_email(mock.Mock())
+        interaction_id = initial_message.split()[-1].strip('#')
+        assert initial_result is True
+        # Simulate processing the email again
+        duplicate_result, duplicate_message = processor.process_email(mock.Mock())
+        assert duplicate_result is False
+        assert duplicate_message == 'Meeting already exists as an interaction'
+        all_interactions_by_sender = Interaction.objects.filter(
+            dit_participants__adviser=Advisor.objects.get(email=interaction_data['sender']),
+        )
+        assert all_interactions_by_sender.count() == 1
+        assert all_interactions_by_sender[0].id == UUID(interaction_id)
+
+    @pytest.mark.parametrize(
+        'interaction_data_overrides,expected_message',
+        (
+            # string fields too long
+            (
+                {
+                    'location': 'x' * (MAX_LENGTH + 1),
+                },
+                'location: Ensure this field has no more than 255 characters.',
+            ),
+        ),
+    )
+    def test_process_email_validation(
+        self,
+        interaction_data_overrides,
+        expected_message,
+        base_interaction_data_fixture,
+        calendar_data_fixture,
+        monkeypatch,
+    ):
+        """
+        Test that process_email returns expected validation error messages when
+        called with invalid data.
+        """
+        interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
+        self._get_email_parser_mock(interaction_data, monkeypatch)
+        processor = CalendarInteractionEmailProcessor()
+        # Create the calendar interaction initially
+        result, message = processor.process_email(mock.Mock())
+        assert result is False
+        assert message == expected_message
 
 
 @pytest.mark.django_db
