@@ -52,7 +52,7 @@ def calendar_data_fixture():
 @pytest.mark.django_db
 class TestCalendarInteractionEmailParser:
     """
-    Test the CalendarInteractionEmailProcessor class.
+    Test the CalendarInteractionEmailParser class.
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
@@ -150,12 +150,12 @@ class TestCalendarInteractionEmailParser:
         """
         parser = self._get_parser_for_email_file(email_file)
         calendar_event = parser._get_calendar_event_metadata()
-        assert(calendar_event == expected_event_details)
+        assert calendar_event == expected_event_details
 
     @pytest.mark.parametrize(
         'email_file,expected_interaction_data',
         (
-            # Test that interaction data can be extracted for an easy case
+            # Test that interaction data can be extracted for a simple case
             (
                 'email_samples/valid/outlook_online/sample.eml',
                 {
