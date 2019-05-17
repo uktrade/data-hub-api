@@ -160,9 +160,20 @@ class Interaction(ArchivableModel, BaseModel):
         choices=STATUSES,
         default=STATUSES.complete,
     )
-    # If source is set, it provides details of an external source that this
-    # interaction represents.  e.g. a calendar event
-    # {'id': 'abc123', 'type': 'calendar'}
+    # Set if the interaction was imported from an external source
+    # (e.g. an .ics (iCalendar) file or a CSV file).
+    #
+    # Examples
+    #
+    # Imported from a CSV file via the import interactions tool in the admin site:
+    #
+    # {
+    #     "file": {
+    #         "name": "<file name>",
+    #         "size": <file size in bytes>,
+    #         "sha256": "<SHA-256 hash>"
+    #     }
+    # }
     source = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(

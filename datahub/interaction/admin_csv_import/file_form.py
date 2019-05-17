@@ -1,7 +1,9 @@
 import gzip
+import hashlib
 from datetime import timedelta
 from secrets import token_urlsafe
 
+import reversion
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,6 +16,7 @@ from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
 
 FILE_CACHE_TIMEOUT_SECS = int(timedelta(minutes=30).total_seconds())
+REVISION_COMMENT = 'Imported from file via the admin site.'
 
 
 class InteractionCSVForm(BaseCSVImportForm):
@@ -59,6 +62,32 @@ class InteractionCSVForm(BaseCSVImportForm):
                 matched_rows.append(row_form.cleaned_data_as_serializer_dict())
 
         return matching_counts, matched_rows
+
+    @reversion.create_revision()
+    def save(self, user):
+        """Saves all loaded rows matched with contacts."""
+        reversion.set_comment(REVISION_COMMENT)
+
+        csv_file = self.cleaned_data['csv_file']
+        sha256 = _sha256_for_file(csv_file)
+
+        source = {
+            'file': {
+                'name': csv_file.name,
+                'size': csv_file.size,
+                'sha256': sha256.hexdigest(),
+            },
+        }
+
+        matching_counts = {status: 0 for status in ContactMatchingStatus}
+
+        for row_form in self._get_validated_row_form_iterator():
+            if row_form.is_matched():
+                row_form.save(user, source)
+
+            matching_counts[row_form.cleaned_data['contact_matching_status']] += 1
+
+        return matching_counts
 
     def save_to_cache(self):
         """
@@ -129,3 +158,13 @@ def _make_token():
 def _cache_keys_for_token(token):
     prefix = f'interaction-csv-import:{token}'
     return f'{prefix}:data', f'{prefix}:name'
+
+
+def _sha256_for_file(file):
+    file.seek(0)
+
+    sha256 = hashlib.sha256()
+    for line in file:
+        sha256.update(line)
+
+    return sha256
