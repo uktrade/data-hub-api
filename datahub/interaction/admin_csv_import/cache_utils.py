@@ -13,6 +13,7 @@ class CacheKeyType(StrEnum):
 
     file_name = 'file-name'
     file_contents = 'file-contents'
+    result_counts_by_status = 'result_counts_by_status'
 
 
 def load_file_contents_and_name(token):
@@ -46,6 +47,18 @@ def save_file_contents_and_name(token, contents, name):
         name_key: name,
     }
     cache.set_many(cache_keys_and_values, timeout=CACHE_VALUE_TIMEOUT_SECS)
+
+
+def load_result_counts_by_status(token):
+    """Load counts by matching status from the cache for a completed import operation."""
+    result_counts_cache_key = _cache_key_for_token(token, CacheKeyType.result_counts_by_status)
+    return cache.get(result_counts_cache_key)
+
+
+def save_result_counts_by_status(token, counts_by_status):
+    """Saves counts by matching status to the cache for a completed import operation."""
+    result_counts_cache_key = _cache_key_for_token(token, CacheKeyType.result_counts_by_status)
+    cache.set(result_counts_cache_key, counts_by_status, CACHE_VALUE_TIMEOUT_SECS)
 
 
 def _cache_key_for_token(token, type_: CacheKeyType):
