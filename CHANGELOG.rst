@@ -1,3 +1,41 @@
+Data Hub API 12.2.0 (2019-05-17)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The trading_address fields have now been removed from the ``company_company`` table in the database. These include:
+
+  | trading_address_1
+  | trading_address_2
+  | trading_address_town
+  | trading_address_county
+  | trading_address_country
+  | trading_address_postcode
+- **Companies** The ``/v3/ch-company/*`` endpoints have been removed. These include:
+
+  | /v3/ch-company
+  | /v3/ch-company/<company-number>
+
+API
+---
+
+- **Investment** The validation for the endpoint ``PATCH /v4/investor-profile/`` has been updated.
+
+  The field ``required_checks_conducted_on`` now needs to be a date that is within the last 12 months.
+
+Database schema
+---------------
+
+- **Investment** The database table used to store large capital investor profiles has been changed from ``investor_profile_investorprofile`` to ``investor_profile_largecapitalinvestorprofile``.
+
+  The column ``profile_type_id`` was removed.
+
+  The database tables ``investor_profile_investorprofile`` and ``investor_profile_profiletype`` will be removed on or before 27th May.
+
+
 Data Hub API 12.1.0 (2019-05-13)
 ================================
 
