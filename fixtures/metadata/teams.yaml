@@ -65,18 +65,21 @@
     - - delete_associated_evidencedocument
       - evidence
       - evidencedocument
-    - - add_investorprofile
+    - - add_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - change_investorprofile
+      - largecapitalinvestorprofile
+    - - change_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - delete_investorprofile
+      - largecapitalinvestorprofile
+    - - delete_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - view_investorprofile
+      - largecapitalinvestorprofile
+    - - view_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
+      - largecapitalinvestorprofile
+    - - export_largecapitalinvestorprofile
+      - investor_profile
+      - largecapitalinvestorprofile
   model: auth.group
 - fields:
     name: DA
@@ -195,18 +198,21 @@
     - - delete_associated_evidencedocument
       - evidence
       - evidencedocument
-    - - add_investorprofile
+    - - add_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - change_investorprofile
+      - largecapitalinvestorprofile
+    - - change_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - delete_investorprofile
+      - largecapitalinvestorprofile
+    - - delete_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - view_investorprofile
+      - largecapitalinvestorprofile
+    - - view_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
+      - largecapitalinvestorprofile
+    - - export_largecapitalinvestorprofile
+      - investor_profile
+      - largecapitalinvestorprofile
   model: auth.group
 - fields:
     name: DIT_staff
@@ -376,21 +382,21 @@
     - - view_ordersubscriber
       - order
       - ordersubscriber
-    - - add_investorprofile
+    - - add_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - change_investorprofile
+      - largecapitalinvestorprofile
+    - - change_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - delete_investorprofile
+      - largecapitalinvestorprofile
+    - - delete_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - view_investorprofile
+      - largecapitalinvestorprofile
+    - - view_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
-    - - export_investorprofile
+      - largecapitalinvestorprofile
+    - - export_largecapitalinvestorprofile
       - investor_profile
-      - investorprofile
+      - largecapitalinvestorprofile
   model: auth.group
 
 

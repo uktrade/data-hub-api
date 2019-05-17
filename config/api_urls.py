@@ -36,7 +36,6 @@ v3_urls = [
             namespace='activity-stream',
         ),
     ),
-    path('', include((ch_company_urls.urls_v3, 'ch-company'), namespace='ch-company')),
     path('', include((contact_urls.urls_v3, 'contact'), namespace='contact')),
     path('', include((event_urls, 'event'), namespace='event')),
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
@@ -57,7 +56,7 @@ v3_urls = [
 # API V4 - new format for addresses
 
 v4_urls = [
-    path('', include((ch_company_urls.urls_v4, 'ch-company'), namespace='ch-company')),
+    path('', include((ch_company_urls.urls, 'ch-company'), namespace='ch-company')),
     path('', include((company_urls.urls, 'company'), namespace='company')),
     path('dnb-match/', include((dnb_match_urls, 'dnb_match'), namespace='dnb-match')),
     path('', include((search_urls.urls_v4, 'search'), namespace='search')),

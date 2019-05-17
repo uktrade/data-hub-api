@@ -15,8 +15,8 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
-class InvestorProfile(BaseModel):
-    """Investor profile model."""
+class LargeCapitalInvestorProfile(BaseModel):
+    """Large capital investor profile model."""
 
     id = models.UUIDField(
         primary_key=True,
@@ -27,12 +27,6 @@ class InvestorProfile(BaseModel):
         'company.Company',
         related_name='investor_profiles',
         on_delete=models.CASCADE,
-    )
-
-    profile_type = models.ForeignKey(
-        'investor_profile.ProfileType',
-        related_name='+',
-        on_delete=models.PROTECT,
     )
 
     investor_type = models.ForeignKey(
@@ -155,25 +149,20 @@ class InvestorProfile(BaseModel):
     )
 
     class Meta:
-        unique_together = ('investor_company', 'profile_type')
         verbose_name_plural = 'large capital profiles'
         permissions = (
-            ('export_investorprofile', 'Can export investor profiles'),
+            ('export_largecapitalinvestorprofile', 'Can export large capital investor profiles'),
         )
 
     def __str__(self):
         """Human-readable representation"""
-        return f'{self.investor_company}, {self.profile_type} capital profile'
+        return f'{self.investor_company}, Large capital profile'
 
     @property
     def country_of_origin(self):
         """Returns the country of which the investment would originate from."""
         if self.investor_company:
             return self.investor_company.address_country
-
-
-class ProfileType(BaseOrderedConstantModel):
-    """Investor profile type metadata."""
 
 
 class InvestorType(BaseOrderedConstantModel):

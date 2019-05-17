@@ -3,7 +3,9 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
-from datahub.investment.investor_profile.models import InvestorProfile as DBInvestorProfile
+from datahub.investment.investor_profile.models import (
+    LargeCapitalInvestorProfile as DBLargeCapitalInvestorProfile,
+)
 from datahub.oauth.scopes import Scope
 from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.serializers import (
@@ -111,44 +113,44 @@ class SearchLargeInvestorProfileExportAPIView(
 ):
     """Large capital investor profile search export view."""
 
-    queryset = DBInvestorProfile.objects.annotate(
+    queryset = DBLargeCapitalInvestorProfile.objects.annotate(
         required_checks_conducted_by_name=get_full_name_expression(
             'required_checks_conducted_by',
         ),
         deal_ticket_sizes_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'deal_ticket_sizes__name',
         ),
         asset_classes_of_interest_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'asset_classes_of_interest__name',
         ),
         investment_types_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'investment_types__name',
         ),
         time_horizons_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'time_horizons__name',
         ),
         restrictions_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'restrictions__name',
         ),
         construction_risks_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'construction_risks__name',
         ),
         desired_deal_roles_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'desired_deal_roles__name',
         ),
         uk_region_locations_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'uk_region_locations__name',
         ),
         other_countries_being_considered_names=get_string_agg_subquery(
-            DBInvestorProfile,
+            DBLargeCapitalInvestorProfile,
             'other_countries_being_considered__name',
         ),
         link=get_front_end_url_expression(

@@ -28,10 +28,7 @@ from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
 )
-from datahub.investment.investor_profile.test.factories import (
-    GrowthInvestorProfileFactory,
-    LargeInvestorProfileFactory,
-)
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 
 
 INVALID_CHOICE_ERROR_MESSAGE = (
@@ -42,12 +39,9 @@ INVALID_CHOICE_ERROR_MESSAGE = (
 @pytest.fixture
 def get_large_capital_profile_for_search():
     """Sets up search list test by adding many profiles and returning a large capital profile."""
-    LargeInvestorProfileFactory.create_batch(5)
+    LargeCapitalInvestorProfileFactory.create_batch(5)
     investor_company = CompanyFactory()
-    large_capital_profile = LargeInvestorProfileFactory(
-        investor_company=investor_company,
-    )
-    GrowthInvestorProfileFactory(
+    large_capital_profile = LargeCapitalInvestorProfileFactory(
         investor_company=investor_company,
     )
     yield large_capital_profile
@@ -126,7 +120,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         """Test creating a large investor profile with minimum required fields."""
         url = reverse('api-v4:large-investor-profile:collection')
         investor_company = CompanyFactory()
-        LargeInvestorProfileFactory(
+        LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
 
@@ -215,7 +209,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         """Test updating a large capital profile."""
         new_description = 'Description 2'
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
             investor_description='Description 1',
         )
@@ -241,7 +235,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         """
         investor_company = CompanyFactory()
         new_investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -258,12 +252,14 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
                 ['Investor company can not be updated'],
         }
 
+    @freeze_time('2019-05-01')
     def test_patch_large_capital_profile_all_details_fields(self):
         """Test updating the details fields for a large capital profile"""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
+            required_checks_conducted_on='2017-05-01',
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
 
@@ -275,7 +271,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             'required_checks_conducted': {
                 'id': RequiredChecksConductedConstant.cleared.value.id,
             },
-            'required_checks_conducted_on': '2018-01-01',
+            'required_checks_conducted_on': '2017-05-01',
             'required_checks_conducted_by': {
                 'id': required_checks_conducted_by.id,
             },
@@ -295,7 +291,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             response_data['required_checks_conducted']['id']
             == str(RequiredChecksConductedConstant.cleared.value.id)
         )
-        assert response_data['required_checks_conducted_on'] == '2018-01-01'
+        assert response_data['required_checks_conducted_on'] == '2017-05-01'
         assert (
             response_data['required_checks_conducted_by']['id']
             == str(required_checks_conducted_by.id)
@@ -307,7 +303,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             LargeCapitalInvestmentTypesConstant.direct_investment_in_project_equity.value.id
         )
 
-        investor_profile = LargeInvestorProfileFactory()
+        investor_profile = LargeCapitalInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'deal_ticket_sizes': [
@@ -399,7 +395,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def test_patch_large_capital_profile_all_location_fields(self):
         """Test updating the location fields for a large capital profile."""
-        investor_profile = LargeInvestorProfileFactory()
+        investor_profile = LargeCapitalInvestorProfileFactory()
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
         request_data = {
             'uk_region_locations': [
@@ -467,6 +463,40 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
                 },
             ),
             (
+                {
+                    'required_checks_conducted': {
+                        'id': RequiredChecksConductedConstant.cleared.value.id,
+                    },
+                    'required_checks_conducted_on': '2009-09-01',
+                },
+                status.HTTP_400_BAD_REQUEST,
+                {
+                    'required_checks_conducted_on': [
+                        'Date of most recent checks must be within the last 12 months',
+                    ],
+                    'required_checks_conducted_by': [
+                        'Enter the person responsible for the most recent checks',
+                    ],
+                },
+            ),
+            (
+                {
+                    'required_checks_conducted': {
+                        'id': RequiredChecksConductedConstant.cleared.value.id,
+                    },
+                    'required_checks_conducted_on': '2222-09-01',
+                },
+                status.HTTP_400_BAD_REQUEST,
+                {
+                    'required_checks_conducted_on': [
+                        'Date of most recent checks must be within the last 12 months',
+                    ],
+                    'required_checks_conducted_by': [
+                        'Enter the person responsible for the most recent checks',
+                    ],
+                },
+            ),
+            (
                 {'required_checks_conducted_on': '2010-10-01'},
                 status.HTTP_400_BAD_REQUEST,
                 {
@@ -511,12 +541,13 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
             ),
         ),
     )
+    @freeze_time('2011-01-01')
     def test_patch_large_capital_conditional_required_checks_fields(
         self, request_data, expected_status, expected_error_response,
     ):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
@@ -545,7 +576,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
             required_checks_conducted_id=RequiredChecksConductedConstant.cleared.value.id,
             required_checks_conducted_on=date.today(),
@@ -575,7 +606,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         conducted is blank.
         """
         investor_company = CompanyFactory()
-        investor_profile = LargeInvestorProfileFactory(
+        investor_profile = LargeCapitalInvestorProfileFactory(
             investor_company=investor_company,
         )
         request_data = {
@@ -589,3 +620,68 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         assert response_data == {
             'required_checks_conducted': ['Enter a value for required checks conducted'],
         }
+
+    @pytest.mark.parametrize(
+        'request_data,expected_error_response',
+        (
+            (
+                {
+                    'required_checks_conducted': {
+                        'id': RequiredChecksConductedConstant.issues_identified.value.id,
+                    },
+                },
+                {
+                    'required_checks_conducted_on': [
+                        'Enter the date of the most recent checks',
+                    ],
+                    'required_checks_conducted_by': [
+                        'Enter the person responsible for the most recent checks',
+                    ],
+                },
+            ),
+            (
+                {
+                    'required_checks_conducted': {
+                        'id': RequiredChecksConductedConstant.issues_identified.value.id,
+                    },
+                    'required_checks_conducted_on': '2009-09-01',
+                },
+                {
+                    'required_checks_conducted_on': [
+                        'Date of most recent checks must be within the last 12 months',
+                    ],
+                    'required_checks_conducted_by': [
+                        'Enter the person responsible for the most recent checks',
+                    ],
+                },
+            ),
+        ),
+    )
+    @freeze_time('2011-01-01')
+    def test_patch_large_capital_required_checks_conducted_by_error_update(
+        self,
+        request_data,
+        expected_error_response,
+    ):
+        """
+        Test updating required checks conducted errors.
+
+        If the value of required_checks_conducted_id is already set to a value in
+        constants.REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION and is then updated to another
+        value within that same group. required_checks_conducted_on and required_checks_conducted_by
+        need to be provided and the stored values ignored. When they are not or are invalid errors
+        are returned.
+
+        """
+        investor_company = CompanyFactory()
+        investor_profile = LargeCapitalInvestorProfileFactory(
+            investor_company=investor_company,
+            required_checks_conducted_id=RequiredChecksConductedConstant.cleared.value.id,
+            required_checks_conducted_on=date.today(),
+            required_checks_conducted_by=AdviserFactory(),
+        )
+        url = reverse('api-v4:large-investor-profile:item', kwargs={'pk': investor_profile.pk})
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response_data
+        assert response_data == expected_error_response

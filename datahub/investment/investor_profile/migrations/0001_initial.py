@@ -20,7 +20,6 @@ metadata_files = [
     'equity_percentage.yaml',
     'investor_type.yaml',
     'large_capital_investment_type.yaml',
-    'profile_type.yaml',
     'restriction.yaml',
     'return_rate.yaml',
     'time_horizon.yaml'
