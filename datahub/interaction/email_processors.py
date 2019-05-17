@@ -165,6 +165,8 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction_data = email_parser.extract_interaction_data_from_email(message)
         except ValidationError as exc:
             return (False, exc.message)
+        # Make the same-company check easy to remove later if we allow Interactions
+        # to have contacts from more than one company
         self._reduce_contacts_to_single_company(interaction_data)
         try:
             serializer = self.validate_with_serializer(interaction_data)

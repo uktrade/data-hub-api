@@ -128,6 +128,13 @@ class TestCalendarInteractionEmailProcessor:
                     'ali.zaidi@digital.trade.gov.uk',
                 ],
             },
+            # Contacts from different companies
+            {
+                'contacts': [
+                    'bill.adama@example.net',
+                    'laura.roslin@example.net',
+                ],
+            },
         ),
     )
     def test_process_email_successful(
@@ -142,7 +149,7 @@ class TestCalendarInteractionEmailProcessor:
         when the calendar parser yields good data.
         """
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
-        self._get_email_parser_mock(interaction_data, monkeypatch)
+        email_parser_mock = self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock.Mock())
         assert result is True
@@ -155,11 +162,12 @@ class TestCalendarInteractionEmailProcessor:
         for participant in interaction_advisers:
             assert participant.adviser.email in expected_advisers
         assert interaction_advisers.count() == len(expected_advisers)
-        # Verify contacts holds all of the contacts for the interaction
+        # Verify contacts holds all of the expected contacts for the interaction
         interaction_contacts = interaction.contacts.all()
-        for contact in interaction_contacts:
-            assert contact.email in interaction_data['contacts']
-        assert len(interaction_data['contacts']) == interaction_contacts.count()
+        email_contacts = email_parser_mock.return_value['contacts']
+        for contact in email_contacts:
+            if contact.company.name == interaction_data['company']:
+                assert contact in interaction_contacts
         assert interaction.company.name == interaction_data['company']
         assert interaction.date == interaction_data['date']
         assert interaction.location == interaction_data['location']
@@ -206,6 +214,13 @@ class TestCalendarInteractionEmailProcessor:
                     'location': 'x' * (MAX_LENGTH + 1),
                 },
                 'location: Ensure this field has no more than 255 characters.',
+            ),
+            # No contacts present
+            (
+                {
+                    'contacts': [],
+                },
+                'contacts: This list may not be empty.',
             ),
         ),
     )
