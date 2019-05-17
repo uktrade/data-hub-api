@@ -22,12 +22,12 @@ class Command(BaseCommand):
         parser.add_argument(
             'username',
             type=str,
-            help='The superuser\'s username',
+            help="The superuser's username",
         )
         parser.add_argument(
             'password',
             type=str,
-            help='The superuser\'s password',
+            help="The superuser's password",
         )
 
     def handle(self, *args, **options):
