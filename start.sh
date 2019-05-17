@@ -7,9 +7,9 @@ python /app/manage.py init_es
 python /app/manage.py loadinitialmetadata || true
 # Load initial revisions - ignore errors as we may have already loaded it in to
 # this DB
-python /app/manage.py createinitialrevisions || true
 python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml || true
 python /app/manage.py loaddata /app/fixtures/test_data.yaml || true
+python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
 # Create superuser - ignore errors as we may have already loaded it in to
 # this DB.
