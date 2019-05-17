@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
@@ -10,6 +11,9 @@ from datahub.core.validators import (
     EqualsRule,
     FieldAndError,
     InRule,
+    IsFieldBeingUpdatedAndIsNotBlankRule,
+    IsFieldBeingUpdatedRule,
+    IsFieldRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -43,6 +47,53 @@ def test_equals_rule(data, field, test_value, res):
     combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
     condition = EqualsRule(field, test_value)
     assert condition(combiner) == res
+
+
+@pytest.mark.parametrize(
+    'data,instance,expected_result',
+    (
+        ({}, Mock(my_date=None), False),
+        ({'my_date': 1}, Mock(my_date=None), True),
+        ({'my_date': None}, Mock(my_date=None), False),
+        ({'my_date': 1}, Mock(my_date=1), False),
+    ),
+)
+def test_is_field_being_updated_rule(data, instance, expected_result):
+    """Tests IsFieldBeingUpdatedRule for various cases."""
+    combiner = Mock(data=data, instance=instance)
+    condition = IsFieldBeingUpdatedRule('my_date')
+    assert condition(combiner) == expected_result
+
+
+@pytest.mark.parametrize(
+    'data,expected_result',
+    (
+        ({}, False),
+        ({'my_date': 1}, True),
+        ({'my_date': None}, False),
+    ),
+)
+def test_is_field_being_updated_and_is_not_blank_rule(data, expected_result):
+    """Tests IsFieldBeingUpdatedRuleAndIsNotBlankRule for various cases."""
+    combiner = Mock(data=data)
+    condition = IsFieldBeingUpdatedAndIsNotBlankRule('my_date')
+    assert condition(combiner) == expected_result
+
+
+@pytest.mark.parametrize(
+    'data,field,expected_result',
+    (
+        ({}, 'my_date', False),
+        ({'my_date': 1}, 'my_date', True),
+        ({'my_date': None}, 'my_date', False),
+    ),
+)
+@freeze_time('2019-05-01')
+def test_is_field_rule(data, field, expected_result):
+    """Tests IsFieldRule for various cases."""
+    combiner = Mock(data=data)
+    condition = IsFieldRule(field, lambda x: x == 1)
+    assert condition(combiner) == expected_result
 
 
 @pytest.mark.parametrize(
