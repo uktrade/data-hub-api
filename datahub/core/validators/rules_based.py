@@ -36,6 +36,64 @@ class BaseRule(AbstractRule):
         return self._field
 
 
+class IsFieldBeingUpdatedRule(BaseRule):
+    """Rule to check if a field is being updated."""
+
+    def __call__(self, combiner) -> bool:
+        """
+        Returns True if the field is being updated.
+
+        Checks the post data to see if the field has been supplied then if
+        so checks the current value to see if it is being updated.
+        """
+        if self.field not in combiner.data or not combiner.instance:
+            return False
+        return getattr(combiner.instance, self.field) != combiner.data[self.field]
+
+
+class IsFieldBeingUpdatedAndIsNotBlankRule(BaseRule):
+    """Rule to check if a field is being updated and the value is not blank."""
+
+    def __call__(self, combiner) -> bool:
+        """
+        Returns True if the field is being updated and the value is not blank.
+        """
+        if self.field not in combiner.data:
+            return False
+        return is_not_blank(combiner.data[self.field])
+
+
+class IsFieldRule(BaseRule):
+    """
+    Rule to check if a field meets a provided condition.
+
+    A callable function is provided and if the field is present the
+    value from the request data is passed to the function to be evaluated.
+    """
+
+    def __init__(
+        self,
+        field: str,
+        function_: Callable,
+    ):
+        """
+        Initialises the rule.
+
+        :param field:     The name of the field the rule applies to.
+        :param function_: Callable that returns a truthy or falsey value (indicating whether the
+                          value is valid). Will be called with the value
+                          of the field within the request data.
+        """
+        super().__init__(field)
+        self._function = function_
+
+    def __call__(self, combiner) -> bool:
+        """Test whether the rule passes or fails."""
+        if self.field not in combiner.data:
+            return False
+        return self._function(combiner.data[self.field])
+
+
 class OperatorRule(BaseRule):
     """Simple operator-based rule for a field."""
 

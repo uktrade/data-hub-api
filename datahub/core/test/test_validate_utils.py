@@ -3,7 +3,11 @@ from unittest.mock import MagicMock, Mock
 import pytest
 
 from datahub.core import validate_utils
-from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
+from datahub.core.validate_utils import (
+    DataCombiner,
+    is_blank,
+    is_not_blank,
+)
 
 
 @pytest.mark.parametrize(
