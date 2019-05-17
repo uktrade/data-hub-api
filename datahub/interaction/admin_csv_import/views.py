@@ -9,7 +9,7 @@ from django.urls import path, reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 
-from datahub.company.contact_matching import ContactMatchingStatus
+from datahub.company.contact_adviser_matching import MatchingStatus
 from datahub.core.admin import max_upload_size
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm
@@ -93,7 +93,7 @@ class InteractionCSVImportAdmin:
 
     def _preview_response(self, request, form):
         matching_counts, matched_rows = form.get_matching_summary(MAX_PREVIEW_ROWS_TO_DISPLAY)
-        num_matched = matching_counts[ContactMatchingStatus.matched]
+        num_matched = matching_counts[MatchingStatus.matched]
 
         template_filename = 'import_preview.html' if num_matched else 'import_no_matches.html'
 
@@ -102,8 +102,8 @@ class InteractionCSVImportAdmin:
             f'admin/interaction/interaction/{template_filename}',
             PAGE_TITLE,
             num_matched=num_matched,
-            num_unmatched=matching_counts[ContactMatchingStatus.unmatched],
-            num_multiple_matches=matching_counts[ContactMatchingStatus.multiple_matches],
+            num_unmatched=matching_counts[MatchingStatus.unmatched],
+            num_multiple_matches=matching_counts[MatchingStatus.multiple_matches],
             matched_rows=matched_rows,
             num_matched_omitted=num_matched - len(matched_rows),
         )

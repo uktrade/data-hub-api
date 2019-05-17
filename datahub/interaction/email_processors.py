@@ -6,8 +6,10 @@ import icalendar
 import pytz
 from django.core.exceptions import ValidationError
 
-from datahub.company.contact_matching import find_active_contact_by_email_address
-from datahub.company.models.adviser import Advisor
+from datahub.company.contact_adviser_matching import (
+    find_active_adviser_by_email_address,
+    find_active_contact_by_email_address,
+)
 from datahub.email_ingestion.validation import was_email_sent_by_dit
 
 
@@ -31,18 +33,9 @@ class CalendarInteractionEmailParser:
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
 
-    def _get_adviser_from_email(self, email):
-        for field in ['contact_email', 'email']:
-            criteria = {field: email}
-            try:
-                return Advisor.objects.get(**criteria)
-            except Advisor.DoesNotExist:
-                continue
-        return None
-
     def _extract_sender_adviser(self):
         sender_email = self.message.from_[0][1]
-        sender_adviser = self._get_adviser_from_email(sender_email)
+        sender_adviser, matching_status = find_active_adviser_by_email_address(sender_email)
         if not sender_adviser:
             raise ValidationError('Email not sent by recognised DIT Adviser')
         return sender_adviser
@@ -68,7 +61,7 @@ class CalendarInteractionEmailParser:
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
         secondary_advisers = []
         for recipient_email in all_recipients:
-            adviser = self._get_adviser_from_email(recipient_email)
+            adviser, matching_status = find_active_adviser_by_email_address(recipient_email)
             if adviser:
                 secondary_advisers.append(adviser)
         return secondary_advisers

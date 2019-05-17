@@ -9,9 +9,9 @@ from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.contact_matching import (
-    ContactMatchingStatus,
+from datahub.company.contact_adviser_matching import (
     find_active_contact_by_email_address,
+    MatchingStatus,
 )
 from datahub.company.models import Advisor
 from datahub.core.exceptions import DataHubException
@@ -161,7 +161,7 @@ class InteractionCSVRowForm(forms.Form):
 
         Can only be called post-cleaning.
         """
-        return self.cleaned_data['contact_matching_status'] == ContactMatchingStatus.matched
+        return self.cleaned_data['contact_matching_status'] == MatchingStatus.matched
 
     def clean(self):
         """Validate and clean the data for this row."""

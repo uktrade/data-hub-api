@@ -8,7 +8,7 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.utils.timezone import utc
 from rest_framework import serializers
 
-from datahub.company.contact_matching import ContactMatchingStatus
+from datahub.company.contact_adviser_matching import MatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import random_obj_for_queryset
@@ -562,13 +562,13 @@ class TestInteractionCSVRowForm:
         'input_email,matching_status,match_on_alternative',
         (
             # unique match of a contact on primary email
-            ('unique1@primary.com', ContactMatchingStatus.matched, False),
+            ('unique1@primary.com', MatchingStatus.matched, False),
             # unique match of a contact on alternative email
-            ('unique2@alternative.com', ContactMatchingStatus.matched, True),
+            ('unique2@alternative.com', MatchingStatus.matched, True),
             # no match of a contact
-            ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched, False),
+            ('UNIQUE@COMPANY.IO', MatchingStatus.unmatched, False),
             # multiple matches of a contact
-            ('duplicate@primary.com', ContactMatchingStatus.multiple_matches, None),
+            ('duplicate@primary.com', MatchingStatus.multiple_matches, None),
         ),
     )
     def test_contact_lookup(self, input_email, matching_status, match_on_alternative):
@@ -603,7 +603,7 @@ class TestInteractionCSVRowForm:
         assert 'contact' in form.cleaned_data
         contact = form.cleaned_data['contact']
 
-        if matching_status == ContactMatchingStatus.matched:
+        if matching_status == MatchingStatus.matched:
             assert contact
             actual_email = contact.email_alternative if match_on_alternative else contact.email
             assert actual_email.lower() == input_email.lower()
