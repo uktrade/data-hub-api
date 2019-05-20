@@ -103,10 +103,21 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
 )
 def test_email_sent_by_dit(email, authentication_results, expected_result):
     """
-    Tests for email_sent_by_dit validator.
+    Tests for was_email_sent_by_dit validator.
     """
     message = mock.Mock()
     message.from_ = [['Bill Adama', email]]
     message.authentication_results = authentication_results
     result = was_email_sent_by_dit(message)
     assert result == expected_result
+
+
+def test_bad_from_returns_false():
+    """
+    Test was_email_sent_by_dit validator when the from_ attribute is malformed.
+    """
+    message = mock.Mock()
+    # This should be an iterable of pairs - simulate a malformed from attribute
+    message.from_ = []
+    result = was_email_sent_by_dit(message)
+    assert result is False

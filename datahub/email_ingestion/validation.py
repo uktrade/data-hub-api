@@ -2,7 +2,6 @@ from django.conf import settings
 
 
 def _verify_authentication(message, from_email):
-    # TODO: See if there's a library to make this a bit more bulletproof
     authentication_lines = [
         line.strip() for line in message.authentication_results.split('\n')
     ]
@@ -38,8 +37,6 @@ def was_email_sent_by_dit(message):
         from_domain = from_email.split('@')[1]
     except IndexError:
         return False
-    # TODO: See if valid domains are recorded elsewhere in the codebase
-    # and use this to keep things DRY
     from_domain_is_dit = any([
         domain for domain in settings.DIT_EMAIL_DOMAINS
         if from_domain == domain
