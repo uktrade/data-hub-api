@@ -724,10 +724,6 @@ class TestUpdateCompany(APITestMixin):
             business_type_id=BusinessTypeConstant.charity.value.id,
             employee_range_id=EmployeeRange.range_10_to_49.value.id,
             turnover_range_id=TurnoverRange.range_1_34_to_6_7.value.id,
-            headquarter_type_id=HeadquarterType.ehq.value.id,
-            global_headquarters_id=CompanyFactory(
-                headquarter_type_id=HeadquarterType.ghq.value.id,
-            ).id,
         )
 
         data = {
@@ -755,8 +751,6 @@ class TestUpdateCompany(APITestMixin):
             'business_type': BusinessTypeConstant.community_interest_company.value.id,
             'employee_range': EmployeeRange.range_1_to_9.value.id,
             'turnover_range': TurnoverRange.range_33_5_plus.value.id,
-            'headquarter_type': HeadquarterType.ghq.value.id,
-            'global_headquarters': company.id,
         }
 
         assert set(data.keys()) == set(CompanySerializer.Meta.dnb_read_only_fields), (
@@ -931,7 +925,9 @@ class TestUpdateCompany(APITestMixin):
         Tests if adding company that is not a Global HQ as a Global HQ
         will fail or if added company is a Global HQ then it will pass.
         """
-        company = CompanyFactory()
+        company = CompanyFactory(
+            duns_number='123456789',
+        )
         headquarter = CompanyFactory(headquarter_type_id=hq)
 
         # now update it
@@ -957,7 +953,10 @@ class TestUpdateCompany(APITestMixin):
         global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id,
         )
-        company = CompanyFactory(global_headquarters=global_headquarters)
+        company = CompanyFactory(
+            duns_number='123456789',
+            global_headquarters=global_headquarters,
+        )
 
         assert global_headquarters.subsidiaries.count() == 1
 
@@ -1021,6 +1020,9 @@ class TestUpdateCompany(APITestMixin):
     @pytest.mark.parametrize(
         'headquarter_type_id,changed_to,has_subsidiaries,is_valid',
         (
+            (None, HeadquarterType.ghq.value.id, False, True),
+            (None, HeadquarterType.ukhq.value.id, False, True),
+            (None, HeadquarterType.ehq.value.id, False, True),
             (HeadquarterType.ghq.value.id, None, True, False),
             (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, True, False),
             (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, False, True),
@@ -1036,6 +1038,7 @@ class TestUpdateCompany(APITestMixin):
     ):
         """Test updating headquarter type."""
         company = CompanyFactory(
+            duns_number='123456789',
             headquarter_type_id=headquarter_type_id,
         )
         if has_subsidiaries:
