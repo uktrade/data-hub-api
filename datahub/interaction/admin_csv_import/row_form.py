@@ -3,6 +3,7 @@ from typing import NamedTuple
 
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.db.models import Value
 from django.db.transaction import atomic
 from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
@@ -14,7 +15,7 @@ from datahub.company.contact_matching import (
 )
 from datahub.company.models import Advisor
 from datahub.core.exceptions import DataHubException
-from datahub.core.query_utils import get_full_name_expression
+from datahub.core.query_utils import PreferNullConcat
 from datahub.core.utils import join_truthy_strings
 from datahub.event.models import Event
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionDITParticipant
@@ -307,6 +308,9 @@ def _look_up_adviser(adviser_name, team):
     if not adviser_name:
         return None
 
+    # Note: An index has been created for this specific look-up (see note on the model).
+    # If the filter arguments or name annotation is changed, the index may need to be
+    # updated.
     get_kwargs = {
         'is_active': True,
         'name__iexact': adviser_name,
@@ -315,7 +319,9 @@ def _look_up_adviser(adviser_name, team):
     if team:
         get_kwargs['dit_team'] = team
 
-    queryset = Advisor.objects.annotate(name=get_full_name_expression())
+    queryset = Advisor.objects.annotate(
+        name=PreferNullConcat('first_name', Value(' '), 'last_name'),
+    )
 
     try:
         return queryset.get(**get_kwargs)
