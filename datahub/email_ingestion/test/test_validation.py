@@ -47,7 +47,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dkim=fail header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
                 'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates '
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
+                (
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk'
+                ),
             ]),
             False,
         ),
@@ -59,7 +62,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
                 'spf=fail (google.com: domain of bill.adama@digital.trade.gov.uk designates '
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
+                (
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk'
+                ),
             ]),
             False,
         ),
@@ -71,7 +77,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
                 'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates ',
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
-                'dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
+                (
+                    'dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk'
+                ),
             ]),
             False,
         ),
@@ -83,7 +92,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
                 'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates ',
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=foobar@digital.trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
+                (
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk'
+                ),
             ]),
             False,
         ),
