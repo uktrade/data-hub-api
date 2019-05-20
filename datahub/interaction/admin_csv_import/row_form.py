@@ -33,6 +33,9 @@ ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE = gettext_lazy(
 MULTIPLE_ADVISERS_FOUND_MESSAGE = gettext_lazy(
     'Multiple matching advisers were found.',
 )
+ADVISER_2_IS_THE_SAME_AS_ADVISER_1 = gettext_lazy(
+    'Adviser 2 cannot be the same person as adviser 1.',
+)
 
 
 def _validate_not_disabled(obj):
@@ -176,6 +179,7 @@ class InteractionCSVRowForm(forms.Form):
         # Look up values for adviser_1 and adviser_2 (adding errors if the look-up fails)
         self._populate_adviser(data, 'adviser_1', 'team_1')
         self._populate_adviser(data, 'adviser_2', 'team_2')
+        self._check_adviser_1_and_2_are_different(data)
 
         # If no subject was provided, set it to the name of the service
         if not subject and service:
@@ -262,6 +266,17 @@ class InteractionCSVRowForm(forms.Form):
             )
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
+
+    def _check_adviser_1_and_2_are_different(self, data):
+        adviser_1 = data.get('adviser_1')
+        adviser_2 = data.get('adviser_2')
+
+        if adviser_1 and adviser_1 == adviser_2:
+            err = ValidationError(
+                ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
+                code='adviser_2_is_the_same_as_adviser_1',
+            )
+            self.add_error('adviser_2', err)
 
     def cleaned_data_as_serializer_dict(self):
         """
