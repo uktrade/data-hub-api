@@ -462,8 +462,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'business_type',
             'employee_range',
             'turnover_range',
-            'headquarter_type',
-            'global_headquarters',
             'address',
             'registered_address',
         )
