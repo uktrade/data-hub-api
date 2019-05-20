@@ -8,16 +8,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
 @pytest.mark.parametrize(
     'email,authentication_results,expected_result',
     (
-        # Valid trade.gov.uk email
+        # Valid trade.gov.uk email - authentication exempt
         (
             'bill.adama@trade.gov.uk',
-            '\n'.join([
-                'mx.google.com;',
-                'dkim=pass header.i=@trade.gov.uk header.s=selector1 header.b=foobar;',
-                'spf=pass (google.com: domain of bill.adama@trade.gov.uk designates '
-                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=trade.gov.uk',
-            ]),
+            None,
             True,
         ),
         # Valid digital.trade.gov.uk email
@@ -47,49 +41,49 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
         ),
         # Invalid authentication results - dkim
         (
-            'bill.adama@trade.gov.uk',
+            'bill.adama@digital.trade.gov.uk',
             '\n'.join([
                 'mx.google.com;',
-                'dkim=fail header.i=@trade.gov.uk header.s=selector1 header.b=foobar;',
-                'spf=pass (google.com: domain of bill.adama@trade.gov.uk designates '
-                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=trade.gov.uk',
+                'dkim=fail header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates '
+                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
             ]),
             False,
         ),
         # Invalid authentication results - spf
         (
-            'bill.adama@trade.gov.uk',
+            'bill.adama@digital.trade.gov.uk',
             '\n'.join([
                 'mx.google.com;',
-                'dkim=pass header.i=@trade.gov.uk header.s=selector1 header.b=foobar;',
-                'spf=fail (google.com: domain of bill.adama@trade.gov.uk designates '
-                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=trade.gov.uk',
+                'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                'spf=fail (google.com: domain of bill.adama@digital.trade.gov.uk designates '
+                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
             ]),
             False,
         ),
         # Invalid authentication results - dmarc
         (
-            'bill.adama@trade.gov.uk',
+            'bill.adama@digital.trade.gov.uk',
             '\n'.join([
                 'mx.google.com;',
-                'dkim=pass header.i=@trade.gov.uk header.s=selector1 header.b=foobar;',
-                'spf=pass (google.com: domain of bill.adama@trade.gov.uk designates ',
-                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@trade.gov.uk;',
-                'dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=trade.gov.uk',
+                'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates ',
+                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                'dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
             ]),
             False,
         ),
         # Invalid authentication results - email mismatch
         (
-            'bill.adama@trade.gov.uk',
+            'bill.adama@digital.trade.gov.uk',
             '\n'.join([
                 'mx.google.com;',
-                'dkim=pass header.i=@trade.gov.uk header.s=selector1 header.b=foobar;',
-                'spf=pass (google.com: domain of bill.adama@trade.gov.uk designates ',
-                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=foobar@trade.gov.uk;',
-                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=trade.gov.uk',
+                'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates ',
+                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=foobar@digital.trade.gov.uk;',
+                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=digital.trade.gov.uk',
             ]),
             False,
         ),

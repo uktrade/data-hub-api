@@ -98,3 +98,6 @@ DOCUMENT_BUCKETS = {
         'aws_region': 'eu-west-2',
     }
 }
+
+DIT_EMAIL_DOMAINS = ["trade.gov.uk", "digital.trade.gov.uk"]
+DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT = ["trade.gov.uk"]
