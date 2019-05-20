@@ -1,10 +1,11 @@
-import os
 from datetime import date, datetime
+from pathlib import PurePath
 
+import factory
 import mailparser
 import pytest
-import pytz
 from django.core.exceptions import ValidationError
+from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.interaction.email_processors import CalendarInteractionEmailParser
@@ -25,10 +26,11 @@ def calendar_data_fixture():
         'marco.fucci@digital.trade.gov.uk',
         'ali.zaidi@digital.trade.gov.uk',
     ]
-    for adviser_email in adviser_emails:
-        fixture['advisers'].append(
-            AdviserFactory(contact_email=adviser_email, email=adviser_email),
-        )
+    fixture['advisers'] = AdviserFactory.create_batch(
+        len(adviser_emails),
+        email=factory.Iterator(adviser_emails),
+        contact_email=factory.SelfAttribute('email'),
+    )
     fixture['company_1'] = CompanyFactory(name='Company 1')
     fixture['company_2'] = CompanyFactory(name='Company 2')
     contacts = [
@@ -40,12 +42,13 @@ def calendar_data_fixture():
         first_name, last_name = name.split(' ')
         email_prefix = name.lower().replace(' ', '.')
         email = f'{email_prefix}@example.net'
-        fixture['contacts'].append(ContactFactory(
+        contact = ContactFactory(
             first_name=first_name,
             last_name=last_name,
             email=email,
             company=company,
-        ))
+        )
+        fixture['contacts'].append(contact)
     yield fixture
 
 
@@ -56,10 +59,7 @@ class TestCalendarInteractionEmailParser:
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
-        email_file_path = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)),
-            relative_email_file_path,
-        )
+        email_file_path = PurePath(__file__).parent / relative_email_file_path
         message = mailparser.parse_from_file(email_file_path)
         return CalendarInteractionEmailParser(message)
 
@@ -70,9 +70,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_online/sample.eml',
                 {
                     'subject': 'test meet',
-                    'start': datetime(2019, 3, 29, 12, 00, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=pytz.utc),
+                    'start': datetime(2019, 3, 29, 12, 00, tzinfo=utc),
+                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=utc),
+                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=utc),
                     'location': (
                         'SOMEWHERE Agency (10 Tunstall Studios, 34-44 Tunstall Road, '
                         '10/11 Tunstall Studios, London, England, United Kingdom)'
@@ -88,9 +88,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/gmail/sample.eml',
                 {
                     'subject': 'initial',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=pytz.utc),
+                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
+                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
+                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
                     'location': '',
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
@@ -100,9 +100,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/gmail/no_vcalendar.eml',
                 {
                     'subject': 'initial',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
-                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=pytz.utc),
+                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
+                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
+                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
                     'location': (
                         'Somewhere, Unit FF - 305 - شارع المركز المالي - دبي - '
                         'United Arab Emirates'
@@ -117,7 +117,7 @@ class TestCalendarInteractionEmailParser:
                     'subject': 'Test meeting iPhone 5',
                     'start': date(2019, 5, 19),
                     'end': date(2019, 5, 20),
-                    'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=pytz.utc),
+                    'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=utc),
                     'location': '',
                     'status': 'CONFIRMED',
                     'uid': (
@@ -130,9 +130,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_desktop/sample.eml',
                 {
                     'subject': 'Meeting test outlook desktop',
-                    'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=pytz.utc),
-                    'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=pytz.utc),
-                    'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=pytz.utc),
+                    'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=utc),
+                    'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=utc),
+                    'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=utc),
                     'location': 'Windsor House',
                     'status': 'CONFIRMED',
                     'uid': (
@@ -167,7 +167,7 @@ class TestCalendarInteractionEmailParser:
                     'contact_emails': ['bill.adama@example.net'],
                     'secondary_adviser_emails': [],
                     'company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 12, 0, tzinfo=pytz.utc),
+                    'date': datetime(2019, 3, 29, 12, 0, tzinfo=utc),
                     'location': (
                         'SOMEWHERE Agency (10 Tunstall Studios, 34-44 '
                         'Tunstall Road, 10/11 Tunstall Studios, London, '
@@ -189,7 +189,7 @@ class TestCalendarInteractionEmailParser:
                     ],
                     'secondary_adviser_emails': ['marco.fucci@digital.trade.gov.uk'],
                     'company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 16, 30, tzinfo=pytz.utc),
+                    'date': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
                     'location': '',
                     'subject': 'initial',
                 },

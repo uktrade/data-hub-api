@@ -16,6 +16,8 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
 
 logger = getLogger(__name__)
 
+ICALENDAR_CONTENT_TYPE = 'application/ics'
+
 
 def _get_all_recipients(message):
     """
@@ -23,12 +25,7 @@ def _get_all_recipients(message):
 
     :returns: a set of all recipient emails
     """
-    all_recipients = set()
-    for recipients in [message.to, message.cc]:
-        all_recipients = all_recipients.union(
-            {recipient[1].strip() for recipient in recipients},
-        )
-    return all_recipients
+    return {email.strip() for name, email in (*message.to, *message.cc)}
 
 
 def _get_company_from_contacts(contacts):
@@ -37,7 +34,7 @@ def _get_company_from_contacts(contacts):
     If these contacts are related to different companies, return the company
     with the highest number of contacts in our iterable.
     """
-    company_counts = Counter([contact.company for contact in contacts])
+    company_counts = Counter(contact.company for contact in contacts)
     top_company = company_counts.most_common()[0]
     return top_company
 
@@ -64,7 +61,7 @@ def _extract_calendar_string_from_attachments(message):
         the message's attachments
     """
     for attachment in message.attachments:
-        if attachment['mail_content_type'] == 'application/ics':
+        if attachment['mail_content_type'] == ICALENDAR_CONTENT_TYPE:
             encoded_cal_text = base64.b64decode(attachment['payload'])
             return encoded_cal_text.decode('utf-8', 'ignore')
     return None
@@ -92,9 +89,12 @@ class CalendarInteractionEmailParser:
         self.message = message
 
     def _extract_and_validate_sender_adviser(self):
+        try:
+            sender_email = self.message.from_[0][1]
+        except IndexError:
+            raise('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
-        sender_email = self.message.from_[0][1]
         sender_adviser, matching_status = find_active_adviser_by_email_address(sender_email)
         if not sender_adviser:
             if matching_status == MatchingStatus.multiple_matches:
@@ -114,6 +114,10 @@ class CalendarInteractionEmailParser:
         return contacts
 
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
+        """
+        Extract the secondary (non-sender) advisers for the calendar invite - that is,
+        any advisers that received the invite who did not send it.
+        """
         secondary_advisers = []
         for recipient_email in all_recipients:
             adviser, matching_status = find_active_adviser_by_email_address(recipient_email)
@@ -130,12 +134,9 @@ class CalendarInteractionEmailParser:
             raise error
         try:
             calendar = icalendar.Calendar.from_ical(calendar_string)
-        except Exception as exc:
+        except ValueError as exc:
             raise error from exc
-        calendar_event_components = []
-        for component in calendar.walk():
-            if component.name == 'VEVENT':
-                calendar_event_components.append(component)
+        calendar_event_components = [comp for comp in calendar.walk() if comp.name == 'VEVENT']
         if len(calendar_event_components) == 0:
             raise ValidationError('No calendar event was found in the calendar')
         if len(calendar_event_components) > 1:
@@ -146,14 +147,8 @@ class CalendarInteractionEmailParser:
         return calendar_event_components[0]
 
     def _extract_and_validate_calendar_event_metadata(self):
-        """
-        """
         event_component = self._extract_and_validate_calendar_event_component()
-        location = event_component.get('location')
-        if location:
-            location = str(location)
-        else:
-            location = ''
+        location = str(event_component.get('location') or '')
         return {
             'subject': str(event_component.get('summary')),
             'start': _get_utc_datetime(event_component.decoded('dtstart')),
