@@ -143,13 +143,17 @@ class TestCalendarInteractionEmailParser:
             ),
         ),
     )
-    def test_get_calendar_event_metadata(self, email_file, expected_event_details):
+    def test_extract_and_vailidate_calendar_event_metadata(
+        self,
+        email_file,
+        expected_event_details,
+    ):
         """
         Verify that the get_calendar_event_metadata method extracts the expected
         data from a given email message.
         """
         parser = self._get_parser_for_email_file(email_file)
-        calendar_event = parser._get_calendar_event_metadata()
+        calendar_event = parser._extract_and_validate_calendar_event_metadata()
         assert calendar_event == expected_event_details
 
     @pytest.mark.parametrize(
