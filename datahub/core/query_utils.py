@@ -169,21 +169,6 @@ def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
     )
 
 
-def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
-    """
-    Gets an SQL expression that returns a front-end URL for an object.
-
-    :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
-    :param pk_expression:   expression that resolves to the pk for the model
-    :param url_suffix:      Optional: string appended to the end of the url
-    """
-    return Concat(
-        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'),
-        pk_expression,
-        Value(url_suffix),
-    )
-
-
 def _full_name_concat(first_name_field, last_name_field, bracketed_field=None):
     parts = [
         NullIf(first_name_field, Value('')),
@@ -199,3 +184,18 @@ def _full_name_concat(first_name_field, last_name_field, bracketed_field=None):
         parts.append(bracketed_expression)
 
     return ConcatWS(Value(' '), *parts)
+
+
+def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
+    """
+    Gets an SQL expression that returns a front-end URL for an object.
+
+    :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
+    :param pk_expression:   expression that resolves to the pk for the model
+    :param url_suffix:      Optional: string appended to the end of the url
+    """
+    return Concat(
+        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'),
+        pk_expression,
+        Value(url_suffix),
+    )
