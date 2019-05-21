@@ -96,50 +96,6 @@ STATUS:CONFIRMED
 SUMMARY:initial
 TRANSP:OPAQUE
 END:VEVENT
-BEGIN:VEVENT
-DTSTART:20190329T163000Z
-DTEND:20190329T173000Z
-DTSTAMP:20190329T113633Z
-ORGANIZER;CN=3Dadviser1@trade.gov.uk:mailto:adviser1@digi=
-ta
- l.trade.gov.uk
-UID:5iggr1e2luglss6c789b0scvgr@google.com
-ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DACCEPTED;RSV=
-P=3DTRUE
- ;CN=3Dadviser1@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
-mith@
- digital.trade.gov.uk
-ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
-;RSVP=3D
- TRUE;CN=3Dbill.adama@example.net;X-NUM-GUESTS=3D0:mailto:brendan@bsmitty.co=
-.uk
-CREATED:20190329T113628Z
-DESCRIPTION:foooobar\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
- :~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of t=
-h
- e description.\n\nThis event has a video call.\nJoin: https://meet.google.=
-c
- om/tep-mywp-icw\n+1 443-671-4739 PIN: 601383231#\n\nView your event at htt=
-p
- s://www.google.com/calendar/event?action=3DVIEW&eid=3DNWlnZ3IxZTJsdWdsc3M2=
-Yzc4O
- WIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdp=
-dGF
- sLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&c=
-t
- z=3DEurope%2FLondon&hl=3Den_GB&es=3D1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:=
-~:~:~:~
- :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
-LAST-MODIFIED:20190329T113631Z
-LOCATION:Somewhere\, Unit FF - 305 - =D8=B4=D8=A7=D8=B1=D8=B9 =D8=A7=D9=84=
-=D9=85=D8=B1=D9=83=D8=B2 =D8=A7=D9=84=D9=85=D8=A7=D9=84=D9=8A - =D8=AF=D8=
-=A8=D9=8A - United Arab
-  Emirates
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:initial
-TRANSP:OPAQUE
-END:VEVENT
 END:VCALENDAR
 
 --0000000000002a997f05853a1559--

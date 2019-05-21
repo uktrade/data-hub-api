@@ -213,6 +213,7 @@ class TestCalendarInteractionEmailParser:
             assert contact.email in expected_interaction_data['contact_emails']
         for adviser in interaction_data['secondary_advisers']:
             assert adviser.email in expected_interaction_data['secondary_adviser_emails']
+        assert interaction_data['top_company'].name == expected_interaction_data['company_name']
         assert interaction_data['date'] == expected_interaction_data['date']
         assert interaction_data['location'] == expected_interaction_data['location']
         assert interaction_data['subject'] == expected_interaction_data['subject']

@@ -17,6 +17,9 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
 logger = getLogger(__name__)
 
 ICALENDAR_CONTENT_TYPE = 'application/ics'
+BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
+CALENDAR_STATUS_CONFIRMED = 'CONFIRMED'
+CALENDAR_COMPONENT_VEVENT = 'VEVENT'
 
 
 def _get_all_recipients(message):
@@ -28,14 +31,14 @@ def _get_all_recipients(message):
     return {email.strip() for name, email in (*message.to, *message.cc)}
 
 
-def _get_company_from_contacts(contacts):
+def _get_top_company_from_contacts(contacts):
     """
     Get the company from the given contacts.
     If these contacts are related to different companies, return the company
     with the highest number of contacts in our iterable.
     """
     company_counts = Counter(contact.company for contact in contacts)
-    top_company = company_counts.most_common()[0]
+    top_company = company_counts.most_common()[0][0]
     return top_company
 
 
@@ -47,7 +50,7 @@ def _extract_calendar_string_from_text(message):
     :returns: A string of the icalendar body or None if it could not be found in plain text
     """
     for text_part in message.text_plain:
-        if text_part.startswith('BEGIN:VCALENDAR'):
+        if text_part.startswith(BEGIN_VCALENDAR):
             return text_part
     return None
 
@@ -136,7 +139,10 @@ class CalendarInteractionEmailParser:
             calendar = icalendar.Calendar.from_ical(calendar_string)
         except ValueError as exc:
             raise error from exc
-        calendar_event_components = [comp for comp in calendar.walk() if comp.name == 'VEVENT']
+        calendar_event_components = [
+            comp for comp in calendar.walk()
+            if comp.name == CALENDAR_COMPONENT_VEVENT
+        ]
         if len(calendar_event_components) == 0:
             raise ValidationError('No calendar event was found in the calendar')
         if len(calendar_event_components) > 1:
@@ -149,7 +155,7 @@ class CalendarInteractionEmailParser:
     def _extract_and_validate_calendar_event_metadata(self):
         event_component = self._extract_and_validate_calendar_event_component()
         location = str(event_component.get('location') or '')
-        return {
+        calendar_event = {
             'subject': str(event_component.get('summary')),
             'start': _get_utc_datetime(event_component.decoded('dtstart')),
             'end': _get_utc_datetime(event_component.decoded('dtend')),
@@ -159,6 +165,12 @@ class CalendarInteractionEmailParser:
             'uid': str(event_component.get('uid')),
         }
 
+        meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
+        if not meeting_confirmed:
+            raise ValidationError(f'Calendar event was not status: {CALENDAR_STATUS_CONFIRMED}')
+
+        return calendar_event
+
     def extract_interaction_data_from_email(self):
         """
         Extract interaction data from the email message as a dictionary.
@@ -166,21 +178,20 @@ class CalendarInteractionEmailParser:
         This raises a ValidationError if the interaction data could not be fully extracted
         or is invalid according to business logic.
         """
-        interaction_data = {}
-        interaction_data['sender'] = self._extract_and_validate_sender_adviser()
-        all_recipients = _get_all_recipients(self.message)
-        interaction_data['contacts'] = self._extract_and_validate_contacts(all_recipients)
-        interaction_data['secondary_advisers'] = self._extract_secondary_advisers(
-            all_recipients,
-            interaction_data['sender'],
-        )
-        interaction_data['company'] = _get_company_from_contacts(interaction_data['contacts'])
         calendar_event = self._extract_and_validate_calendar_event_metadata()
-        interaction_data['date'] = calendar_event['start']
-        interaction_data['location'] = calendar_event['location']
-        interaction_data['meeting_details'] = calendar_event
-        interaction_data['subject'] = calendar_event['subject']
-        meeting_confirmed = calendar_event['status'] == 'CONFIRMED'
-        if not meeting_confirmed:
-            raise ValidationError('Calendar event was not status: CONFIRMED')
-        return interaction_data
+        all_recipients = _get_all_recipients(self.message)
+        sender = self._extract_and_validate_sender_adviser()
+        secondary_advisers = self._extract_secondary_advisers(all_recipients, sender)
+        contacts = self._extract_and_validate_contacts(all_recipients)
+        top_company = _get_top_company_from_contacts(contacts)
+
+        return {
+            'sender': sender,
+            'contacts': contacts,
+            'secondary_advisers': secondary_advisers,
+            'top_company': top_company,
+            'date': calendar_event['start'],
+            'location': calendar_event['location'],
+            'meeting_details': calendar_event,
+            'subject': calendar_event['subject'],
+        }
