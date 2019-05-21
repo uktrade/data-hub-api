@@ -10,11 +10,8 @@ from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import import file_form
-from datahub.interaction.admin_csv_import.file_form import (
-    _cache_keys_for_token,
-    InteractionCSVForm,
-    REVISION_COMMENT,
-)
+from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
+from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm, REVISION_COMMENT
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
     make_csv_file_from_dicts,
@@ -92,6 +89,7 @@ class TestInteractionCSVForm:
             {
                 'kind': 'invalid',
                 'date': 'invalid',
+
                 'adviser_1': 'invalid',
                 'contact_email': 'invalid',
                 'service': 'invalid',
@@ -249,7 +247,7 @@ class TestInteractionCSVForm:
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_to_cache(self, track_return_values):
         """Test that the form data can be saved to the cache."""
-        tracker = track_return_values(file_form, '_make_token')
+        tracker = track_return_values(file_form, 'token_urlsafe')
 
         file = make_csv_file_from_dicts(
             *make_matched_rows(1),
@@ -268,24 +266,26 @@ class TestInteractionCSVForm:
         assert len(tracker.return_values) == 1
         token = tracker.return_values[0]
 
-        data_key, name_key = _cache_keys_for_token(token)
+        contents_key = _cache_key_for_token(token, CacheKeyType.file_contents)
+        name_key = _cache_key_for_token(token, CacheKeyType.file_name)
 
         file.seek(0)
-        assert gzip.decompress(cache.get(data_key)) == file.read()
+        assert gzip.decompress(cache.get(contents_key)) == file.read()
         assert cache.get(name_key) == file.name
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_from_token_with_valid_token(self):
         """Test that a form can be restored from the cache."""
         token = 'test-token'
-        data_key, name_key = _cache_keys_for_token(token)
+        contents_key = _cache_key_for_token(token, CacheKeyType.file_contents)
+        name_key = _cache_key_for_token(token, CacheKeyType.file_name)
         file = make_csv_file_from_dicts(
             *make_matched_rows(1),
             filename='cache-test.csv',
         )
         compressed_data = gzip.compress(file.read())
 
-        cache.set(data_key, compressed_data)
+        cache.set(contents_key, compressed_data)
         cache.set(name_key, file.name)
 
         form = InteractionCSVForm.from_token(token)
@@ -301,9 +301,9 @@ class TestInteractionCSVForm:
         'cache_data',
         (
             # only the file contents
-            {_cache_keys_for_token('test-token')[0]: b'data'},
+            {_cache_key_for_token('test-token', CacheKeyType.file_contents): b'data'},
             # only the file name
-            {_cache_keys_for_token('test-token')[1]: 'name'},
+            {_cache_key_for_token('test-token', CacheKeyType.file_name): 'name'},
             # nothing
             {},
         ),

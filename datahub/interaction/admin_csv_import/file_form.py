@@ -1,21 +1,21 @@
-import gzip
 import hashlib
-from datetime import timedelta
 from secrets import token_urlsafe
 
 import reversion
 from django.conf import settings
-from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import filesizeformat
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.core.exceptions import DataHubException
+from datahub.interaction.admin_csv_import.cache_utils import (
+    load_file_contents_and_name,
+    save_file_contents_and_name,
+)
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
 
-FILE_CACHE_TIMEOUT_SECS = int(timedelta(minutes=30).total_seconds())
 REVISION_COMMENT = 'Imported from file via the admin site.'
 
 
@@ -95,18 +95,13 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         Can only be called on a validated form.
         """
+        token = token_urlsafe()
+
         csv_file = self.cleaned_data['csv_file']
         csv_file.seek(0)
-        data = csv_file.read()
-        compressed_data = gzip.compress(data)
+        contents = csv_file.read()
 
-        token = _make_token()
-        data_key, name_key = _cache_keys_for_token(token)
-        cache_keys_and_values = {
-            data_key: compressed_data,
-            name_key: csv_file.name,
-        }
-        cache.set_many(cache_keys_and_values, timeout=FILE_CACHE_TIMEOUT_SECS)
+        save_file_contents_and_name(token, contents, csv_file.name)
         return token
 
     @classmethod
@@ -116,16 +111,12 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         Returns None if serialised data for the token can't be found in the cache.
         """
-        data_key, name_key = _cache_keys_for_token(token)
-        cache_keys_and_values = cache.get_many((data_key, name_key))
-
-        any_cache_keys_missing = {data_key, name_key} - cache_keys_and_values.keys()
-        if any_cache_keys_missing:
+        file_contents_and_name = load_file_contents_and_name(token)
+        if not file_contents_and_name:
             return None
 
-        decompressed_data = gzip.decompress(cache_keys_and_values[data_key])
-        name = cache_keys_and_values[name_key]
-        csv_file = SimpleUploadedFile(name=name, content=decompressed_data)
+        contents, name = file_contents_and_name
+        csv_file = SimpleUploadedFile(name=name, content=contents)
 
         return cls(
             files={
@@ -149,15 +140,6 @@ class InteractionCSVForm(BaseCSVImportForm):
                     raise DataHubException('CSV row unexpectedly failed revalidation')
 
                 yield row_form
-
-
-def _make_token():
-    return token_urlsafe()
-
-
-def _cache_keys_for_token(token):
-    prefix = f'interaction-csv-import:{token}'
-    return f'{prefix}:data', f'{prefix}:name'
 
 
 def _sha256_for_file(file):
