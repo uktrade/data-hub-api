@@ -3,6 +3,7 @@ from typing import NamedTuple
 
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.db.transaction import atomic
 from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
@@ -12,10 +13,11 @@ from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
 )
 from datahub.company.models import Advisor
+from datahub.core.exceptions import DataHubException
 from datahub.core.query_utils import get_full_name_expression
 from datahub.core.utils import join_truthy_strings
 from datahub.event.models import Event
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.models import CommunicationChannel, Interaction, InteractionDITParticipant
 from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import Service, Team
 
@@ -147,10 +149,15 @@ class InteractionCSVRowForm(forms.Form):
 
     def is_valid_and_matched(self):
         """Return if the form is valid and the interaction has been matched to a contact."""
-        return (
-            self.is_valid()
-            and self.cleaned_data['contact_matching_status'] == ContactMatchingStatus.matched
-        )
+        return self.is_valid() and self.is_matched()
+
+    def is_matched(self):
+        """
+        Returns whether the interaction was matched to a contact.
+
+        Can only be called post-cleaning.
+        """
+        return self.cleaned_data['contact_matching_status'] == ContactMatchingStatus.matched
 
     def clean(self):
         """Validate and clean the data for this row."""
@@ -205,6 +212,35 @@ class InteractionCSVRowForm(forms.Form):
             for field, errors in normalised_errors.items():
                 self._add_serializer_error(field, errors)
 
+    @atomic
+    def save(self, user, source):
+        """Creates an interaction from the cleaned data."""
+        serializer_data = self.cleaned_data_as_serializer_dict()
+
+        contacts = serializer_data.pop('contacts')
+        dit_participants = serializer_data.pop('dit_participants')
+        # Remove `is_event` if it's present as it's a computed field and isn't saved
+        # on the model
+        serializer_data.pop('is_event', None)
+
+        interaction = Interaction(
+            **serializer_data,
+            created_by=user,
+            modified_by=user,
+            source=source,
+        )
+        interaction.save()
+
+        interaction.contacts.add(*contacts)
+
+        for dit_participant in dit_participants:
+            InteractionDITParticipant(
+                interaction=interaction,
+                **dit_participant,
+            ).save()
+
+        return interaction
+
     def _add_serializer_error(self, field, errors):
         mapped_field = self.SERIALIZER_FIELD_MAPPING.get(field, field)
 
@@ -232,6 +268,9 @@ class InteractionCSVRowForm(forms.Form):
         InteractionSerializer.
         """
         data = self.cleaned_data
+
+        if not self.is_matched():
+            raise DataHubException('Cannot create a serializer dict for an unmatched contact')
 
         subject = data.get('subject') or data['service'].name
         dit_participants = [
