@@ -5,7 +5,7 @@ from datahub.company.models import Advisor, Contact
 
 
 class MatchingStatus(IntEnum):
-    """Matching status (for when searching for a model by a lookup field)."""
+    """Matching status (for when searching for a model instance by a lookup field)."""
 
     matched = 1
     unmatched = 2
@@ -35,7 +35,7 @@ def find_active_contact_by_email_address(email) -> Tuple[Optional[Contact], Matc
 
 def find_active_adviser_by_email_address(email) -> Tuple[Optional[Contact], MatchingStatus]:
     """
-    Attempts to find an advisor by email address.
+    Attempts to find an adviser by email address.
 
     Used e.g. when importing interactions to match interactions to Advisors using an
     email address.
@@ -47,24 +47,34 @@ def find_active_adviser_by_email_address(email) -> Tuple[Optional[Contact], Matc
     - if there are multiple matches found using Advisor.contact_email, matching aborts
     - otherwise, if there is a unique match on Contact.contact_email, this is used
     """
-    advisor, matching_status = _find_active_adviser_using_field(email, 'email')
+    adviser, matching_status = _find_active_adviser_using_field(email, 'email')
     if matching_status == MatchingStatus.unmatched:
-        advisor, matching_status = _find_active_adviser_using_field(email, 'contact_email')
+        adviser, matching_status = _find_active_adviser_using_field(email, 'contact_email')
 
-    return advisor, matching_status
+    return adviser, matching_status
 
 
 def _find_active_contact_using_field(value, lookup_field):
-    return _find_model_using_field(Contact, value, lookup_field, extra_filters={'archived': False})
+    return _find_model_instance_using_field(
+        Contact,
+        value,
+        lookup_field,
+        extra_filters={'archived': False},
+    )
 
 
 def _find_active_adviser_using_field(value, lookup_field):
-    return _find_model_using_field(Advisor, value, lookup_field, extra_filters={'is_active': True})
+    return _find_model_instance_using_field(
+        Advisor,
+        value,
+        lookup_field,
+        extra_filters={'is_active': True},
+    )
 
 
-def _find_model_using_field(model_class, value, lookup_field, extra_filters=None):
+def _find_model_instance_using_field(model_class, value, lookup_field, extra_filters=None):
     """
-    Looks up a model by performing a case-insensitive search on a particular field.
+    Looks up a model instance by performing a case-insensitive search on a particular field.
 
     :param model_class: The model class to use for the lookup
     :param value: The value to search for

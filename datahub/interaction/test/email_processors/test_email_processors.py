@@ -225,6 +225,10 @@ class TestCalendarInteractionEmailParser:
                 ValidationError('Email not sent by DIT'),
             ),
             (
+                'email_samples/invalid/no_from_header.eml',
+                ValidationError('Email was malformed - missing "from" header'),
+            ),
+            (
                 'email_samples/invalid/email_not_sent_by_known_adviser.eml',
                 ValidationError('Email not sent by recognised DIT Adviser'),
             ),

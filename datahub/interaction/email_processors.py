@@ -3,8 +3,8 @@ from collections import Counter
 from logging import getLogger
 
 import icalendar
-import pytz
 from django.core.exceptions import ValidationError
+from django.utils.timezone import utc
 
 from datahub.company.contact_adviser_matching import (
     find_active_adviser_by_email_address,
@@ -69,7 +69,7 @@ def _extract_calendar_string_from_attachments(message):
 
 def _get_utc_datetime(localised_datetime):
     try:
-        return localised_datetime.astimezone(pytz.utc)
+        return localised_datetime.astimezone(utc)
     # When the calendar event is just a date
     except AttributeError:
         return localised_datetime
@@ -92,7 +92,7 @@ class CalendarInteractionEmailParser:
         try:
             sender_email = self.message.from_[0][1]
         except IndexError:
-            raise('Email was malformed - missing "from" header')
+            raise ValidationError('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
         sender_adviser, matching_status = find_active_adviser_by_email_address(sender_email)
