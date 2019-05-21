@@ -236,8 +236,14 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/invalid/email_contacts_unknown.eml',
                 ValidationError('No email recipients were recognised as Contacts'),
             ),
+            # Calendar entry does not start with "BEGIN:VCALENDAR"
             (
                 'email_samples/invalid/bad_calendar_event.eml',
+                ValidationError('No calendar event could be extracted'),
+            ),
+            # Calendar entry does not include an "END:VEVENT"
+            (
+                'email_samples/invalid/bad_calendar_event_2.eml',
                 ValidationError('No calendar event could be extracted'),
             ),
             (
