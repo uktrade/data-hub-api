@@ -1,4 +1,4 @@
-Delivered-To: brendan.smith@trade.gov.uk
+Delivered-To: adviser1@trade.gov.uk
 Received: by 2002:a1c:cc0b:0:0:0:0:0 with SMTP id h11csp1770156wmb;
         Fri, 29 Mar 2019 04:28:28 -0700 (PDT)
 X-Google-Smtp-Source: APXvYqyDWIZkABJrm9nTZMOuyqeYI/828C9ThsC4/NiUSv+ga0KG/T4XYoq4Ll8P8Hhxs69g6dsR
@@ -24,18 +24,18 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc
          RPNA==
 ARC-Authentication-Results: i=1; mx.google.com;
        dkim=pass header.i=@hotmail.com header.s=selector1 header.b=EyNwKraf;
-       spf=pass (google.com: domain of brendan.smith@trade.gov.uk designates 40.92.65.70 as permitted sender) smtp.mailfrom=brendan.smith@trade.gov.uk;
+       spf=pass (google.com: domain of adviser1@trade.gov.uk designates 40.92.65.70 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
        dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=hotmail.com
-Return-Path: <brendan.smith@trade.gov.uk>
+Return-Path: <adviser1@trade.gov.uk>
 Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-oln040092065070.outbound.protection.outlook.com. [40.92.65.70])
         by mx.google.com with ESMTPS id j37si1746886plb.236.2019.03.29.04.28.28
         for <bill.adama@example.net>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Fri, 29 Mar 2019 04:28:28 -0700 (PDT)
-Received-SPF: pass (google.com: domain of brendan.smith@trade.gov.uk designates 40.92.65.70 as permitted sender) client-ip=40.92.65.70;
+Received-SPF: pass (google.com: domain of adviser1@trade.gov.uk designates 40.92.65.70 as permitted sender) client-ip=40.92.65.70;
 Authentication-Results: mx.google.com;
        dkim=pass header.i=@trade.gov.uk header.s=selector1 header.b=EyNwKraf;
-       spf=pass (google.com: domain of hotmail.com designates 40.92.65.70 as permitted sender) smtp.mailfrom=brendan.smith@trade.gov.uk;
+       spf=pass (google.com: domain of hotmail.com designates 40.92.65.70 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
        dmarc=pass (p=NONE sp=NONE dis=NONE)
        header.from=trade.gov.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=trade.gov.uk;
@@ -57,7 +57,7 @@ Received: from DB6PR0101MB2261.eurprd01.prod.exchangelabs.com
  DB6PR0101MB2261.eurprd01.prod.exchangelabs.com
  ([fe80::985f:ba82:35f2:930d%6]) with mapi id 15.20.1750.014; Fri, 29 Mar 2019
  11:28:24 +0000
-From: Brendan Smith <brendan.smith@trade.gov.uk>
+From: Example Advisor <adviser1@trade.gov.uk>
 To: "bill.adama@example.net" <bill.adama@example.net>
 Subject: test meet
 Thread-Topic: test meet

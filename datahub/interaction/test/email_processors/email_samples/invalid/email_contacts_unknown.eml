@@ -12,9 +12,9 @@ Received: from CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM
 Authentication-Results: i=1; mx.google.com;
        dkim=pass header.i=@google.com header.s=20161025 header.b=OW9YZxC6;
        dkim=pass header.i=@trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b=sjezWYO1;
-       spf=pass (google.com: domain of brendan.smith@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=brendan.smith@trade.gov.uk;
+       spf=pass (google.com: domain of adviser1@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
        dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=trade.gov.uk
-From: brendan.smith@trade.gov.uk
+From: adviser1@trade.gov.uk
 To: unknown@example.net
 Subject: Meeting test outlook desktop
 Thread-Topic: Meeting test outlook desktop
@@ -56,13 +56,13 @@ BEGIN:VEVENT
 DTSTART:20190329T163000Z
 DTEND:20190329T173000Z
 DTSTAMP:20190329T113633Z
-ORGANIZER;CN=3Dbrendan.smith@trade.gov.uk:mailto:brendan.smith@digi=
+ORGANIZER;CN=3Dadviser1@trade.gov.uk:mailto:adviser1@digi=
 ta
  l.trade.gov.uk
 UID:5iggr1e2luglss6c789b0scvgr@google.com
 ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DACCEPTED;RSV=
 P=3DTRUE
- ;CN=3Dbrendan.smith@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
+ ;CN=3Dadviser1@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
 mith@
  digital.trade.gov.uk
 ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=

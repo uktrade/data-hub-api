@@ -16,7 +16,7 @@ Authentication-Results: i=1; mx.google.com;
        dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=trade.gov.uk
 From: unknown@trade.gov.uk
 To: bill.adama@example.net,saul.tigh@example.net,unknown@example.net
-CC: laura.roslin@example.net,saul.tigh@example.net,marco.fucci@digital.trade.gov.uk
+CC: laura.roslin@example.net,saul.tigh@example.net,adviser2@digital.trade.gov.uk
 Subject: Meeting test outlook desktop
 Thread-Topic: Meeting test outlook desktop
 Thread-Index: AdUJefcnIx0OrxKz10aFOJ7oasJYvg==
@@ -63,7 +63,7 @@ ta
 UID:5iggr1e2luglss6c789b0scvgr@google.com
 ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DACCEPTED;RSV=
 P=3DTRUE
- ;CN=3Dbrendan.smith@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
+ ;CN=3Dadviser1@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:brendan.s=
 mith@
  digital.trade.gov.uk
 ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=

@@ -22,9 +22,9 @@ def calendar_data_fixture():
         'advisers': [],
     }
     adviser_emails = [
-        'brendan.smith@trade.gov.uk',
-        'marco.fucci@digital.trade.gov.uk',
-        'ali.zaidi@digital.trade.gov.uk',
+        'adviser1@trade.gov.uk',
+        'adviser2@digital.trade.gov.uk',
+        'adviser3@digital.trade.gov.uk',
     ]
     fixture['advisers'] = AdviserFactory.create_batch(
         len(adviser_emails),
@@ -163,7 +163,7 @@ class TestCalendarInteractionEmailParser:
             (
                 'email_samples/valid/outlook_online/sample.eml',
                 {
-                    'adviser_email': 'brendan.smith@trade.gov.uk',
+                    'adviser_email': 'adviser1@trade.gov.uk',
                     'contact_emails': ['bill.adama@example.net'],
                     'secondary_adviser_emails': [],
                     'company_name': 'Company 1',
@@ -181,13 +181,13 @@ class TestCalendarInteractionEmailParser:
             (
                 'email_samples/valid/gmail/sample.eml',
                 {
-                    'adviser_email': 'brendan.smith@trade.gov.uk',
+                    'adviser_email': 'adviser1@trade.gov.uk',
                     'contact_emails': [
                         'bill.adama@example.net',
                         'saul.tigh@example.net',
                         'laura.roslin@example.net',
                     ],
-                    'secondary_adviser_emails': ['marco.fucci@digital.trade.gov.uk'],
+                    'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
                     'location': '',

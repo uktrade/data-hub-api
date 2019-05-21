@@ -24,19 +24,19 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc
 ARC-Authentication-Results: i=1; mx.google.com;
        dkim=pass header.i=@google.com header.s=20161025 header.b=OW9YZxC6;
        dkim=pass header.i=@trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b=sjezWYO1;
-       spf=pass (google.com: domain of brendan.smith@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=brendan.smith@trade.gov.uk;
+       spf=pass (google.com: domain of adviser1@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
        dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=trade.gov.uk
-Return-Path: <brendan.smith@trade.gov.uk>
+Return-Path: <adviser1@trade.gov.uk>
 Received: from mail-sor-f73.google.com (mail-sor-f73.google.com. [209.85.220.73])
         by mx.google.com with SMTPS id v18sor536794lfe.0.2019.03.29.04.36.33
         for <bill.adama@example.net>
         (Google Transport Security);
         Fri, 29 Mar 2019 04:36:33 -0700 (PDT)
-Received-SPF: pass (google.com: domain of brendan.smith@trade.gov.uk designates 209.85.220.73 as permitted sender) client-ip=209.85.220.73;
+Received-SPF: pass (google.com: domain of adviser1@trade.gov.uk designates 209.85.220.73 as permitted sender) client-ip=209.85.220.73;
 Authentication-Results: mx.google.com;
        dkim=pass header.i=@google.com header.s=20161025 header.b=OW9YZxC6;
        dkim=pass header.i=@trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b=sjezWYO1;
-       spf=pass (google.com: domain of brendan.smith@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=brendan.smith@trade.gov.uk;
+       spf=pass (google.com: domain of adviser1@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
        dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=trade.gov.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
@@ -76,14 +76,14 @@ X-Google-Smtp-Source: APXvYqzVKRNGdrCj8XXa/w+8skqF5hs/oJbP4x8AuVpW9u4eo9ypj4IvFZ
 MIME-Version: 1.0
 X-Received: by 2002:a19:6e0a:: with SMTP id j10mr1150585lfc.0.1553859393257;
  Fri, 29 Mar 2019 04:36:33 -0700 (PDT)
-Reply-To: brendan.smith@trade.gov.uk
+Reply-To: adviser1@trade.gov.uk
 Sender: Google Calendar <calendar-notification@google.com>
 Message-ID: <0000000000002a99a005853a155c@google.com>
 Date: Fri, 29 Mar 2019 11:36:33 +0000
 Subject: Invitation: initial @ Fri 29 Mar 2019 4:30pm - 5:30pm (GMT) (bill.adama@example.net)
-From: brendan.smith@trade.gov.uk
+From: adviser1@trade.gov.uk
 To: bill.adama@example.net,saul.tigh@example.net,unknown@example.net
-CC: laura.roslin@example.net,saul.tigh@example.net,marco.fucci@digital.trade.gov.uk
+CC: laura.roslin@example.net,saul.tigh@example.net,adviser2@digital.trade.gov.uk
 Content-Type: multipart/mixed; boundary="0000000000002a998305853a155b"
 
 --0000000000002a998305853a155b
@@ -107,7 +107,7 @@ Joining info: meet.google.com/tep-mywp-icw =20
 Or dial: +1 443-671-4739  PIN: 601383231#
 Calendar: bill.adama@example.net
 Who:
-     * brendan.smith@trade.gov.uk- organiser
+     * adviser1@trade.gov.uk- organiser
      * bill.adama@example.net
 
 Event details: =20
@@ -217,11 +217,11 @@ family:Courier New,monospace">&#x2022;</span></td><td style=3D"padding-righ=
 t:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222"><div><div st=
 yle=3D"margin:0 0 0.3em 0"><span itemprop=3D"attendee" itemscope itemtype=
 =3D"http://schema.org/Person"><span itemprop=3D"name" class=3D"notranslate"=
->brendan.smith@trade.gov.uk</span><meta itemprop=3D"email" content=
-=3D"brendan.smith@trade.gov.uk"/></span><span itemprop=3D"organizer=
+>adviser1@trade.gov.uk</span><meta itemprop=3D"email" content=
+=3D"adviser1@trade.gov.uk"/></span><span itemprop=3D"organizer=
 " itemscope itemtype=3D"http://schema.org/Person"><meta itemprop=3D"name" c=
-ontent=3D"brendan.smith@trade.gov.uk"/><meta itemprop=3D"email" con=
-tent=3D"brendan.smith@trade.gov.uk"/></span><span style=3D"font-siz=
+ontent=3D"adviser1@trade.gov.uk"/><meta itemprop=3D"email" con=
+tent=3D"adviser1@trade.gov.uk"/></span><span style=3D"font-siz=
 e:11px;color:#888">- organiser</span></div></div></td></tr><tr><td style=3D=
 "padding-right:10px;font-family:Arial,Sans-serif;font-size:13px;color:#222"=
 ><span style=3D"font-family:Courier New,monospace">&#x2022;</span></td><td =
