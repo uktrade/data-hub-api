@@ -14,6 +14,7 @@ from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import random_obj_for_queryset
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.row_form import (
+    ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
     CSVRowError,
@@ -163,6 +164,20 @@ class TestInteractionCSVRowForm:
                     ).name,
                 },
                 {'adviser_2': [ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE]},
+            ),
+            # adviser_2 same as adviser_1
+            (
+                {
+                    'adviser_1': lambda: AdviserFactory(
+                        first_name='Pluto',
+                        last_name='Doris',
+                        dit_team__name='Team Advantage',
+                    ).name,
+                    'team_1': 'Team Advantage',
+                    'adviser_2': 'Pluto Doris',
+                    'team_2': 'Team Advantage',
+                },
+                {'adviser_2': [ADVISER_2_IS_THE_SAME_AS_ADVISER_1]},
             ),
             # service doesn't exist
             (
