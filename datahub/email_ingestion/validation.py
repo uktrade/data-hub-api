@@ -34,7 +34,7 @@ def was_email_sent_by_dit(message):
     """
     try:
         from_email = message.from_[0][1]
-        from_domain = from_email.split('@')[1]
+        from_domain = from_email.rsplit('@', maxsplit=1)[1]
     except IndexError:
         return False
     from_domain_is_dit = any([
