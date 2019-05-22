@@ -139,8 +139,11 @@ class Team(BaseConstantModel):
     """
     Team.
 
-    Note: An index on `UPPER(name)` (with name `metadata_team_upper_name_ed973c5a`) exists for
-    use with iexact filtering. See the migrations for the definition.
+    Additional indexes created via migrations:
+
+        Name: metadata_team_upper_name_ed973c5a
+        Definition: UPPER(name)
+        Comments: For when filtering by name__iexact
     """
 
     TAGS = Choices(

@@ -1,3 +1,14 @@
+Data Hub API 12.3.0 (2019-05-22)
+================================
+
+
+
+API
+---
+
+- **Companies** ``PATCH /v4/company/<uuid:pk>``: ``headquarter_type`` and ``global_headquarters`` can now always be changed. They were previously read-only if a company had a non-empty ``duns_number`` set.
+
+
 Data Hub API 12.2.0 (2019-05-17)
 ================================
 

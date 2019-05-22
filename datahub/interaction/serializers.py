@@ -111,7 +111,19 @@ class InteractionDITParticipantSerializer(serializers.ModelSerializer):
 
 
 class InteractionSerializer(serializers.ModelSerializer):
-    """V3 interaction serialiser."""
+    """
+    Interaction serialiser.
+
+    Note that interactions can also be created and/or modified by:
+
+    - the standard admin site functionality
+    - the import interactions tool in the admin site
+
+    If you're making changes to interaction functionality you should consider if any changes
+    are required to the functionality listed above as well.
+
+    (Also note that the import interactions tool also uses the validators from this class.)
+    """
 
     default_error_messages = {
         'invalid_for_non_service_delivery': gettext_lazy(
