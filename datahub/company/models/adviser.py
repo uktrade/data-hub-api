@@ -53,6 +53,12 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     """Adviser model.
 
     Advisor is a legacy name mistakenly used, but hard to change now.
+
+    Additional indexes created via migrations:
+
+        Name: company_advisor_is_active_upper_name_e0ab1b4f
+        Definition: ("is_active", (UPPER("first_name" || ' ' || "last_name" )))
+        Comments: Used by the import interactions tool when looking up an active adviser by name
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

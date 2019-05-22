@@ -21,7 +21,19 @@ class ContactPermission(StrEnum):
 
 @reversion.register_base_model()
 class Contact(ArchivableModel, BaseModel):
-    """Contact from CDMS."""
+    """
+    Contact (a person at a company that DIT has had contact with).
+
+    Additional indexes created via migrations:
+
+        Name: company_contact_upper_email_244368
+        Definition: UPPER(email)
+        Comments: For when filtering by email__iexact
+
+        Name: company_contact_upper_email_alternative_eb17a977
+        Definition: UPPER(email_alternative)
+        Comments: For when filtering by email_alternative__iexact
+    """
 
     ADDRESS_VALIDATION_MAPPING = {
         'address_1': {'required': True},
@@ -50,9 +62,6 @@ class Contact(ArchivableModel, BaseModel):
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
-    # Note: An index on `UPPER(email)` (with name `company_contact_upper_email_244368`) exists
-    # for use with iexact filtering
-    # See the migrations for the definition
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -65,10 +74,6 @@ class Contact(ArchivableModel, BaseModel):
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    # Note: An index on `UPPER(email_alternative)` (with name
-    # `company_contact_upper_email_alternative_eb17a977`) exists for use with iexact
-    # filtering.
-    # See the migrations for the definition
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(

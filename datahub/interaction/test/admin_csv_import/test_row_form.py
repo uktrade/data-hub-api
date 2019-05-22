@@ -1,6 +1,7 @@
 from collections import Counter
 from collections.abc import Mapping
 from datetime import date, datetime
+from unittest.mock import Mock
 
 import pytest
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -9,9 +10,11 @@ from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
+from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import random_obj_for_queryset
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.row_form import (
+    ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
     CSVRowError,
@@ -161,6 +164,20 @@ class TestInteractionCSVRowForm:
                     ).name,
                 },
                 {'adviser_2': [ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE]},
+            ),
+            # adviser_2 same as adviser_1
+            (
+                {
+                    'adviser_1': lambda: AdviserFactory(
+                        first_name='Pluto',
+                        last_name='Doris',
+                        dit_team__name='Team Advantage',
+                    ).name,
+                    'team_1': 'Team Advantage',
+                    'adviser_2': 'Pluto Doris',
+                    'team_2': 'Team Advantage',
+                },
+                {'adviser_2': [ADVISER_2_IS_THE_SAME_AS_ADVISER_1]},
             ),
             # service doesn't exist
             (
@@ -775,6 +792,158 @@ class TestInteractionCSVRowForm:
             'subject': data['subject'],
             'was_policy_feedback_provided': False,
         }
+
+    def test_save_interaction(self):
+        """Test saving an interaction."""
+        user = AdviserFactory()
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+        source = {'test-source': 'test-value'}
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '02/03/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        interaction = form.save(user, source=source)
+        interaction.refresh_from_db()
+
+        assert interaction.kind == data['kind']
+        assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
+        assert interaction.communication_channel == communication_channel
+        assert interaction.service == service
+        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.subject == service.name
+        assert interaction.event is None
+        assert interaction.notes == ''
+        assert interaction.created_by == user
+        assert interaction.modified_by == user
+        assert interaction.source == source
+
+        assert list(interaction.contacts.all()) == [contact]
+        assert interaction.dit_participants.count() == 1
+
+        dit_participant = interaction.dit_participants.first()
+        assert dit_participant.adviser == adviser
+        assert dit_participant.team == adviser.dit_team
+
+    def test_save_service_delivery(self):
+        """Test saving a service delivery."""
+        user = AdviserFactory()
+        adviser_1 = AdviserFactory(first_name='Neptune', last_name='Doris')
+        adviser_2 = AdviserFactory(first_name='Pluto', last_name='Greene')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        event = EventFactory()
+        source = {'test-source': 'test-value'}
+
+        data = {
+            'kind': Interaction.KINDS.service_delivery,
+            'date': '02/03/2018',
+            'adviser_1': adviser_1.name,
+            'adviser_2': adviser_2.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'event_id': str(event.pk),
+            'subject': 'Test subject',
+            'notes': 'Some notes',
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        interaction = form.save(user, source=source)
+        interaction.refresh_from_db()
+
+        assert interaction.kind == data['kind']
+        assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
+        assert interaction.event == event
+        assert interaction.service == service
+        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.subject == data['subject']
+        assert interaction.event == event
+        assert interaction.notes == data['notes']
+        assert interaction.created_by == user
+        assert interaction.modified_by == user
+        assert interaction.source == source
+
+        assert list(interaction.contacts.all()) == [contact]
+        assert interaction.dit_participants.count() == 2
+
+        actual_advisers_and_teams = Counter(
+            (dit_participant.adviser, dit_participant.team)
+            for dit_participant in interaction.dit_participants.all()
+        )
+        expected_advisers_and_teams = Counter(
+            (
+                (adviser_1, adviser_1.dit_team),
+                (adviser_2, adviser_2.dit_team),
+            ),
+        )
+
+        assert actual_advisers_and_teams == expected_advisers_and_teams
+
+    def test_save_with_unmatched_contact_raises_error(self):
+        """Test that saving an interaction with an unmatched contact raises an error."""
+        user = AdviserFactory()
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        service = random_service()
+        communication_channel = random_communication_channel()
+        source = {'test-source': 'test-value'}
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '02/03/2018',
+            'adviser_1': adviser.name,
+            'contact_email': 'non-existent-contact@company.com',
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        assert not form.is_matched()
+
+        with pytest.raises(DataHubException):
+            form.save(user, source=source)
+
+    def test_save_rolls_back_on_error(self, monkeypatch):
+        """Test that save() rolls back if there's an error."""
+        monkeypatch.setattr(
+            'datahub.interaction.admin_csv_import.row_form.InteractionDITParticipant',
+            Mock(side_effect=ValueError),
+        )
+
+        user = AdviserFactory()
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+        source = {'test-source': 'test-value'}
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '02/03/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+
+        with pytest.raises(ValueError):
+            form.save(user, source=source)
+
+        assert not Interaction.objects.exists()
 
 
 def _resolve_data(data):
