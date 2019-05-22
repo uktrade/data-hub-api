@@ -4,7 +4,7 @@ import pytest
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from datahub.company.contact_adviser_matching import MatchingStatus
+from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import import file_form
 from datahub.interaction.admin_csv_import.file_form import (
@@ -63,9 +63,9 @@ class TestInteractionCSVForm:
         matching_counts, returned_matched_rows = form.get_matching_summary(max_returned_rows)
 
         assert matching_counts == {
-            MatchingStatus.matched: num_matching,
-            MatchingStatus.unmatched: num_unmatched,
-            MatchingStatus.multiple_matches: num_multiple_matches,
+            ContactMatchingStatus.matched: num_matching,
+            ContactMatchingStatus.unmatched: num_unmatched,
+            ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
 
         expected_num_returned_rows = min(num_matching, max_returned_rows)

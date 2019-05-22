@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import filesizeformat
 
-from datahub.company.contact_adviser_matching import MatchingStatus
+from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
@@ -43,10 +43,10 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         This is used as part of the preview page displayed once a file has been uploaded.
 
-        :returns: dict of counts by `MatchingStatus` and list of matched rows as
+        :returns: dict of counts by `ContactMatchingStatus` and list of matched rows as
             serializer dicts
         """
-        matching_counts = {status: 0 for status in MatchingStatus}
+        matching_counts = {status: 0 for status in ContactMatchingStatus}
         matched_rows = []
 
         with self.open_file_as_dict_reader() as dict_reader:
@@ -60,7 +60,7 @@ class InteractionCSVForm(BaseCSVImportForm):
                 contact_matching_status = form.cleaned_data['contact_matching_status']
                 matching_counts[contact_matching_status] += 1
 
-                is_row_matched = contact_matching_status == MatchingStatus.matched
+                is_row_matched = contact_matching_status == ContactMatchingStatus.matched
 
                 if is_row_matched and len(matched_rows) < max_rows:
                     matched_rows.append(form.cleaned_data_as_serializer_dict())

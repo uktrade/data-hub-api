@@ -6,11 +6,8 @@ import icalendar
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.company.contact_adviser_matching import (
-    find_active_adviser_by_email_address,
-    find_active_contact_by_email_address,
-    MatchingStatus,
-)
+from datahub.company.contact_matching import find_active_contact_by_email_address
+from datahub.company.models.adviser import Advisor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
 
 
@@ -98,13 +95,19 @@ class CalendarInteractionEmailParser:
             raise ValidationError('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
-        sender_adviser, matching_status = find_active_adviser_by_email_address(sender_email)
+        sender_adviser = self._get_adviser_from_email(sender_email)
         if not sender_adviser:
-            if matching_status == MatchingStatus.multiple_matches:
-                raise ValidationError('Sender email matched multiple DIT Advisers')
-            else:
-                raise ValidationError('Email not sent by recognised DIT Adviser')
+            raise ValidationError('Email not sent by recognised DIT Adviser')
         return sender_adviser
+
+    def _get_adviser_from_email(self, email):
+        for field in ['contact_email', 'email']:
+            criteria = {field: email}
+            try:
+                return Advisor.objects.get(**criteria)
+            except Advisor.DoesNotExist:
+                continue
+        return None
 
     def _extract_and_validate_contacts(self, all_recipients):
         contacts = []
@@ -123,8 +126,8 @@ class CalendarInteractionEmailParser:
         """
         secondary_advisers = []
         for recipient_email in all_recipients:
-            adviser, matching_status = find_active_adviser_by_email_address(recipient_email)
-            if adviser and adviser != sender_adviser:
+            adviser = self._get_adviser_from_email(recipient_email)
+            if adviser:
                 secondary_advisers.append(adviser)
         return secondary_advisers
 
