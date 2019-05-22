@@ -39,6 +39,29 @@ def _get_top_company_from_contacts(contacts):
     return top_company
 
 
+def _get_best_match_adviser_by_email(email):
+    """
+    Get the best-guess matching active adviser for a particular correspondence email
+    address.
+
+    This firstly attempts to get the oldest Advisor object with a matching
+    `contact_email`, it will then attempt to match on `email`.  We prefer
+    `contact_email` over `email` as this should most closely match the correspondence
+    email address - the context here is that we are dealing with the email
+    accounts that advisers use for setting up meetings/emailing companies.
+
+    :param email: string email address
+    :returns: an Advisor object or None, if a match could not be found
+    """
+    for field in ['contact_email', 'email']:
+        criteria = {field: email, 'is_active': True}
+        try:
+            return Advisor.objects.filter(**criteria).order_by('date_joined')[0]
+        except IndexError:
+            continue
+    return None
+
+
 def _extract_calendar_string_from_text(message):
     """
     Extract an icalendar string from the plain text of a message.
@@ -95,19 +118,10 @@ class CalendarInteractionEmailParser:
             raise ValidationError('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
             raise ValidationError('Email not sent by DIT')
-        sender_adviser = self._get_adviser_from_email(sender_email)
+        sender_adviser = _get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
             raise ValidationError('Email not sent by recognised DIT Adviser')
         return sender_adviser
-
-    def _get_adviser_from_email(self, email):
-        for field in ['contact_email', 'email']:
-            criteria = {field: email}
-            try:
-                return Advisor.objects.get(**criteria)
-            except Advisor.DoesNotExist:
-                continue
-        return None
 
     def _extract_and_validate_contacts(self, all_recipients):
         contacts = []
@@ -126,7 +140,7 @@ class CalendarInteractionEmailParser:
         """
         secondary_advisers = []
         for recipient_email in all_recipients:
-            adviser = self._get_adviser_from_email(recipient_email)
+            adviser = _get_best_match_adviser_by_email(recipient_email)
             if adviser:
                 secondary_advisers.append(adviser)
         return secondary_advisers

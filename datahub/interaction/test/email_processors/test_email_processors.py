@@ -24,13 +24,17 @@ def calendar_data_fixture():
     adviser_emails = [
         'adviser1@trade.gov.uk',
         'adviser2@digital.trade.gov.uk',
-        'adviser3@digital.trade.gov.uk',
     ]
     fixture['advisers'] = AdviserFactory.create_batch(
         len(adviser_emails),
         email=factory.Iterator(adviser_emails),
         contact_email=factory.SelfAttribute('email'),
     )
+    adviser_different_correspondence = AdviserFactory(
+        email='adviser3@digital.trade.gov.uk',
+        contact_email='correspondence3@digital.trade.gov.uk',
+    )
+    fixture['advisers'].append(adviser_different_correspondence)
     fixture['company_1'] = CompanyFactory(name='Company 1')
     fixture['company_2'] = CompanyFactory(name='Company 2')
     contacts = [
@@ -177,11 +181,12 @@ class TestCalendarInteractionEmailParser:
                 },
             ),
             # Test that interaction data can be extracted for a complicated case
-            # with many advisers, contacts and some unknown contacts
+            # with many advisers, contacts and some unknown contacts,
+            # sample uses sender adviser's contact_email which is different to their email
             (
                 'email_samples/valid/gmail/sample.eml',
                 {
-                    'adviser_email': 'adviser1@trade.gov.uk',
+                    'adviser_email': 'adviser3@digital.trade.gov.uk',
                     'contact_emails': [
                         'bill.adama@example.net',
                         'saul.tigh@example.net',
