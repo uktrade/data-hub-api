@@ -180,7 +180,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         """
         Review the metadata and calendar attachment (if present) of an email
         message to see if it fits the our criteria of a valid Data Hub meeting
-        request.  If it does, create an incomplete Interaction for it.
+        request.  If it does, create a draft Interaction for it.
 
         :param message: mailparser.MailParser object - the message to process
         """
@@ -207,8 +207,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         )
         if matching_interactions:
             return (False, 'Meeting already exists as an interaction')
-        # We've validated and marshalled everything we need to build an
-        # incomplete interaction
+        # We've validated and marshalled everything we need to build a draft interaction
         return self.save_serializer_as_interaction(serializer, interaction_data)
 
 

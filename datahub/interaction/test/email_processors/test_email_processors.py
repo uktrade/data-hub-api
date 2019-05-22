@@ -71,7 +71,8 @@ def calendar_data_fixture():
 @pytest.fixture()
 def base_interaction_data_fixture():
     """
-    Basic interaction data which a mock of CalendarInteractionEmailParser can return.
+    Basic interaction data spec which a can be used to build a return value
+    which a mock of CalendarInteractionEmailParser can return.
     """
     return {
         'sender': 'adviser1@trade.gov.uk',
@@ -92,6 +93,10 @@ class TestCalendarInteractionEmailProcessor:
     """
 
     def _get_email_parser_mock(self, interaction_data, monkeypatch):
+        """
+        Given a spec of interaction data and monkeypatch object, sets a mocked
+        return value for CalendarInteractionEmailParser.extract_interaction_data_from_email.
+        """
         email_parser_mock = mock.Mock()
         monkeypatch.setattr(
             (
@@ -203,6 +208,26 @@ class TestCalendarInteractionEmailProcessor:
         )
         assert all_interactions_by_sender.count() == 1
         assert all_interactions_by_sender[0].id == UUID(interaction_id)
+
+    def test_process_email_parser_validation_error(
+        self,
+        base_interaction_data_fixture,
+        calendar_data_fixture,
+        monkeypatch,
+    ):
+        """
+        Test that process_email returns an expected message when the parser
+        raises a ValidationError.
+        """
+        interaction_data = {**base_interaction_data_fixture}
+        mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
+        error_message = 'There was a problem with the meeting format'
+        mock_parser.side_effect = ValidationError(error_message)
+        processor = CalendarInteractionEmailProcessor()
+        # Create the calendar interaction initially
+        result, message = processor.process_email(mock.Mock())
+        assert result is False
+        assert message == error_message
 
     @pytest.mark.parametrize(
         'interaction_data_overrides,expected_message',

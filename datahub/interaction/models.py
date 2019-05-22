@@ -188,10 +188,6 @@ class Interaction(ArchivableModel, BaseModel):
         ('other', 'Something else'),
     )
 
-    SOURCE_TYPES = Choices(
-        ('meeting', 'Meeting'),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     theme = models.CharField(
         max_length=MAX_LENGTH,
