@@ -1,16 +1,21 @@
 import gzip
+import hashlib
 
 import pytest
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
+from reversion.models import Revision, Version
 
 from datahub.company.contact_matching import ContactMatchingStatus
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import import file_form
 from datahub.interaction.admin_csv_import.file_form import (
     _cache_keys_for_token,
     InteractionCSVForm,
+    REVISION_COMMENT,
 )
+from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
     make_csv_file_from_dicts,
     make_matched_rows,
@@ -104,6 +109,142 @@ class TestInteractionCSVForm:
 
         with pytest.raises(DataHubException):
             form.get_matching_summary(50)
+
+    @pytest.mark.parametrize('num_matching', (5, 10))
+    @pytest.mark.parametrize('num_unmatched', (0, 6))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    def test_save_returns_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that save() returns the expected counts."""
+        matched_rows = make_matched_rows(num_matching)
+        unmatched_rows = make_unmatched_rows(num_unmatched)
+        multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
+        user = AdviserFactory()
+
+        file = make_csv_file_from_dicts(
+            *matched_rows,
+            *unmatched_rows,
+            *multiple_matches_rows,
+        )
+        file_contents = file.getvalue()
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file_contents),
+            },
+        )
+
+        assert form.is_valid()
+        matching_counts = form.save(user)
+
+        assert matching_counts == {
+            ContactMatchingStatus.matched: num_matching,
+            ContactMatchingStatus.unmatched: num_unmatched,
+            ContactMatchingStatus.multiple_matches: num_multiple_matches,
+        }
+
+    @pytest.mark.parametrize('num_matching', (5, 10))
+    @pytest.mark.parametrize('num_unmatched', (0, 6))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    def test_save_creates_interactions(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that save() creates interactions."""
+        matched_rows = make_matched_rows(num_matching)
+        unmatched_rows = make_unmatched_rows(num_unmatched)
+        multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
+        user = AdviserFactory()
+
+        file = make_csv_file_from_dicts(
+            *matched_rows,
+            *unmatched_rows,
+            *multiple_matches_rows,
+        )
+        file_contents = file.getvalue()
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file_contents),
+            },
+        )
+
+        assert form.is_valid()
+        form.save(user)
+
+        created_interactions = list(Interaction.objects.all())
+        assert len(created_interactions) == num_matching
+
+        expected_contact_emails = {row['contact_email'] for row in matched_rows}
+        actual_contact_emails = {
+            interaction.contacts.first().email for interaction in created_interactions
+        }
+        # Make sure the test was correctly set up with unique contact emails
+        assert len(actual_contact_emails) == num_matching
+        # Check that the interactions created are the ones we expect
+        # Note: the full saving logic for a row is tested in the InteractionCSVRowForm tests
+        assert expected_contact_emails == actual_contact_emails
+
+        expected_source = {
+            'file': {
+                'name': file.name,
+                'size': len(file_contents),
+                'sha256': hashlib.sha256(file_contents).hexdigest(),
+            },
+        }
+        # `source` has been set (list used rather than a generator for useful failure messages)
+        assert all([
+            interaction.source == expected_source for interaction in created_interactions
+        ])
+
+    def test_save_creates_versions(self):
+        """Test that save() creates versions using django-reversion."""
+        num_matching = 5
+        matched_rows = make_matched_rows(num_matching)
+        user = AdviserFactory()
+
+        file = make_csv_file_from_dicts(*matched_rows)
+        file_contents = file.getvalue()
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file_contents),
+            },
+        )
+
+        assert form.is_valid()
+        form.save(user)
+
+        created_interactions = list(Interaction.objects.all())
+        assert len(created_interactions) == num_matching
+
+        # Single revision created
+        assert Revision.objects.count() == 1
+        assert Revision.objects.first().get_comment() == REVISION_COMMENT
+
+        # Versions were created (list used rather than a generator for useful failure messages)
+        assert all([
+            Version.objects.get_for_object(interaction).count() == 1
+            for interaction in created_interactions
+        ])
+
+    def test_save_rolls_back_on_error(self):
+        """Test that save() rolls back if one row can't be saved."""
+        user = AdviserFactory()
+
+        file = make_csv_file_from_dicts(
+            *make_matched_rows(5),
+            # an invalid row
+            {},
+        )
+        file_contents = file.getvalue()
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file_contents),
+            },
+        )
+
+        assert form.is_valid()
+        with pytest.raises(DataHubException):
+            form.save(user)
+
+        assert not Interaction.objects.count()
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_to_cache(self, track_return_values):
