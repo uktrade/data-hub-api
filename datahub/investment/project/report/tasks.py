@@ -14,7 +14,7 @@ def _get_report_key():
     return key
 
 
-@task(ignore_result=True)
+@task(acks_late=True)
 def generate_spi_report():
     """Celery task that generates SPI report."""
     with tempfile.TemporaryFile(mode='wb+') as file:
