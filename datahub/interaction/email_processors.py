@@ -35,7 +35,7 @@ def _get_top_company_from_contacts(contacts):
     with the highest number of contacts in our iterable.
     """
     company_counts = Counter(contact.company for contact in contacts)
-    top_company = company_counts.most_common()[0][0]
+    top_company, _ = company_counts.most_common(1)[0]
     return top_company
 
 
@@ -56,8 +56,8 @@ def _get_best_match_adviser_by_email(email):
     for field in ['contact_email', 'email']:
         criteria = {field: email, 'is_active': True}
         try:
-            return Advisor.objects.filter(**criteria).order_by('date_joined')[0]
-        except IndexError:
+            return Advisor.objects.filter(**criteria).earliest('date_joined')
+        except Advisor.DoesNotExist:
             continue
     return None
 
@@ -126,7 +126,7 @@ class CalendarInteractionEmailParser:
     def _extract_and_validate_contacts(self, all_recipients):
         contacts = []
         for recipient_email in all_recipients:
-            contact, matching_status = find_active_contact_by_email_address(recipient_email)
+            contact, _ = find_active_contact_by_email_address(recipient_email)
             if contact:
                 contacts.append(contact)
         if not contacts:
