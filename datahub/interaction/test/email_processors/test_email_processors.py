@@ -74,11 +74,11 @@ def base_interaction_data_fixture():
     Basic interaction data which a mock of CalendarInteractionEmailParser can return.
     """
     return {
-        'sender': 'brendan.smith@trade.gov.uk',
+        'sender': 'adviser1@trade.gov.uk',
         'contacts': ['bill.adama@example.net', 'saul.tigh@example.net'],
         'secondary_advisers': [],
         'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
-        'company': 'Company 1',
+        'top_company': 'Company 1',
         'location': 'Windsor House',
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',
@@ -108,7 +108,7 @@ class TestCalendarInteractionEmailProcessor:
             'sender': Advisor.objects.get(email=interaction_data['sender']),
             'contacts': contacts,
             'secondary_advisers': secondary_advisers,
-            'company': Company.objects.get(name=interaction_data['company']),
+            'top_company': Company.objects.get(name=interaction_data['top_company']),
             'date': interaction_data['date'],
             'location': interaction_data['location'],
             'meeting_details': interaction_data['meeting_details'],
@@ -124,8 +124,8 @@ class TestCalendarInteractionEmailProcessor:
             # Including secondary advisers
             {
                 'secondary_advisers': [
-                    'marco.fucci@digital.trade.gov.uk',
-                    'ali.zaidi@digital.trade.gov.uk',
+                    'adviser2@digital.trade.gov.uk',
+                    'adviser3@digital.trade.gov.uk',
                 ],
             },
             # Contacts from different companies
@@ -166,14 +166,13 @@ class TestCalendarInteractionEmailProcessor:
         interaction_contacts = interaction.contacts.all()
         email_contacts = email_parser_mock.return_value['contacts']
         for contact in email_contacts:
-            if contact.company.name == interaction_data['company']:
+            if contact.company.name == interaction_data['top_company']:
                 assert contact in interaction_contacts
-        assert interaction.company.name == interaction_data['company']
+        assert interaction.company.name == interaction_data['top_company']
         assert interaction.date == interaction_data['date']
         assert interaction.location == interaction_data['location']
         assert interaction.source == {
-            'type': Interaction.SOURCE_TYPES.meeting,
-            'id': interaction_data['meeting_details']['uid'],
+            'meeting': {'id': interaction_data['meeting_details']['uid']},
         }
         assert interaction.subject == interaction_data['subject']
         assert interaction.status == Interaction.STATUSES.draft

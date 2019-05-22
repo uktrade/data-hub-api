@@ -4,6 +4,7 @@ from logging import getLogger
 
 import icalendar
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.utils.timezone import utc
 from rest_framework.exceptions import ValidationError as RestValidationError
 
@@ -102,13 +103,33 @@ def _get_utc_datetime(localised_datetime):
         return localised_datetime
 
 
+def _flatten_serializer_errors_to_string(serializer_errors):
+    """
+    Flatten DRF Serializer validation errors to a string with one field per line.
+    """
+    error_parts = []
+    for field_name, details in serializer_errors.items():
+        details_string = ','.join([str(detail) for detail in details])
+        error_parts.append(f'{field_name}: {details_string}')
+    return '\n'.join(error_parts)
+
+
+def _reduce_contacts_to_single_company(contacts, company):
+    """
+    Given a list of contacts and a company, return all of the contacts who are
+    attributed to that company.
+    """
+    return [contact for contact in contacts if contact.company == company]
+
+
 class CalendarInteractionEmailProcessor(EmailProcessor):
     """
     An EmailProcessor which checks whether incoming email is a valid DIT/company
-    meeting and creates an incomplete Interaction model for it if so.
+    meeting, parses meeting information and creates a draft Interaction model
+    instance for it if the information is valid.
     """
 
-    def _transform(self, data):
+    def _transform_to_serializer_format(self, data):
         dit_participants = [
             {
                 'adviser': {'id': adviser.id},
@@ -119,7 +140,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         creation_data = {
             'contacts': [{'id': contact.id} for contact in data['contacts']],
-            'company': {'id': data['company'].id},
+            'company': {'id': data['top_company'].id},
             'date': data['date'],
             'dit_participants': dit_participants,
             'kind': Interaction.KINDS.interaction,
@@ -131,15 +152,6 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         return creation_data
 
-    def _reduce_contacts_to_single_company(self, interaction_data):
-        contacts = interaction_data['contacts']
-        company = interaction_data['company']
-        interaction_data['contacts'] = [
-            contact
-            for contact in contacts
-            if contact.company == company
-        ]
-
     def validate_with_serializer(self, data):
         """
         Transforms extracted data into a dict suitable for use with InteractionSerializer
@@ -147,10 +159,22 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         Returns the instantiated serializer.
         """
-        transformed_data = self._transform(data)
+        transformed_data = self._transform_to_serializer_format(data)
         serializer = InteractionSerializer(context={'is_bulk_import': True}, data=transformed_data)
         serializer.is_valid(raise_exception=True)
         return serializer
+
+    @transaction.atomic
+    def save_serializer_as_interaction(self, serializer, interaction_data):
+        """
+        Create the interaction model instance from the validated serializer.
+        """
+        interaction = serializer.save(
+            source={
+                'meeting': {'id': interaction_data['meeting_details']['uid']},
+            },
+        )
+        return (True, f'Successfully created interaction #{interaction.id}')
 
     def process_email(self, message):
         """
@@ -160,6 +184,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         :param message: mailparser.MailParser object - the message to process
         """
+        # Parse the email for interaction data
         email_parser = CalendarInteractionEmailParser(message)
         try:
             interaction_data = email_parser.extract_interaction_data_from_email(message)
@@ -167,31 +192,24 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             return (False, exc.message)
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
-        self._reduce_contacts_to_single_company(interaction_data)
+        sanitised_contacts = _reduce_contacts_to_single_company(
+            interaction_data['contacts'],
+            interaction_data['top_company'],
+        )
+        interaction_data['contacts'] = sanitised_contacts
         try:
             serializer = self.validate_with_serializer(interaction_data)
         except RestValidationError as exc:
-            error_parts = []
-            for field_name, details in exc.detail.items():
-                details_string = ','.join([str(detail) for detail in details])
-                error_parts.append(f'{field_name}: {details_string}')
-            return (False, '\n'.join(error_parts))
-        # For our initial iteration, we are ignoring meeting updates
+            return (False, _flatten_serializer_errors_to_string(exc.detail))
+        # For our initial iteration of this feature, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
-            source__id=interaction_data['meeting_details']['uid'],
-            source__type=Interaction.SOURCE_TYPES.meeting,
+            source__meeting__id=interaction_data['meeting_details']['uid'],
         )
         if matching_interactions:
             return (False, 'Meeting already exists as an interaction')
         # We've validated and marshalled everything we need to build an
         # incomplete interaction
-        interaction = serializer.save(
-            source={
-                'id': interaction_data['meeting_details']['uid'],
-                'type': Interaction.SOURCE_TYPES.meeting,
-            },
-        )
-        return (True, f'Successfully created interaction #{interaction.id}')
+        return self.save_serializer_as_interaction(serializer, interaction_data)
 
 
 class CalendarInteractionEmailParser:
