@@ -144,3 +144,20 @@ class TestAPIClient:
         assert response.status_code == 200
         assert response.request.headers['Accept'] == 'test-accept'
         assert response.request.timeout == 20
+
+    def test_can_specify_headers(self, requests_mock):
+        """Tests that headers can be specified when making a request."""
+        api_url = 'http://test/v1/'
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
+
+        api_client = APIClient(api_url)
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'test user agent',
+        }
+        response = api_client.request(
+            'GET',
+            'path/to/item',
+            headers=headers,
+        )
+        assert headers.items() <= response.request.headers.items()
