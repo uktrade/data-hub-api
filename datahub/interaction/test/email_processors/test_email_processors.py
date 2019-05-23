@@ -10,9 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.company.models.adviser import Advisor
-from datahub.company.models.company import Company
-from datahub.company.models.contact import Contact
+from datahub.company.models import Advisor, Company, Contact
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.interaction.email_processors import (
     CalendarInteractionEmailParser,
@@ -71,13 +69,13 @@ def calendar_data_fixture():
 @pytest.fixture()
 def base_interaction_data_fixture():
     """
-    Basic interaction data spec which a can be used to build a return value
+    Basic interaction data spec which can be used to build a return value
     which a mock of CalendarInteractionEmailParser can return.
     """
     return {
-        'sender': 'adviser1@trade.gov.uk',
-        'contacts': ['bill.adama@example.net', 'saul.tigh@example.net'],
-        'secondary_advisers': [],
+        'sender_email': 'adviser1@trade.gov.uk',
+        'contact_emails': ['bill.adama@example.net', 'saul.tigh@example.net'],
+        'secondary_adviser_emails': [],
         'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
         'top_company': 'Company 1',
         'location': 'Windsor House',
@@ -105,12 +103,12 @@ class TestCalendarInteractionEmailProcessor:
             ),
             email_parser_mock,
         )
-        contacts = list(Contact.objects.filter(email__in=interaction_data['contacts']))
+        contacts = list(Contact.objects.filter(email__in=interaction_data['contact_emails']))
         secondary_advisers = list(
-            Advisor.objects.filter(email__in=interaction_data['secondary_advisers']),
+            Advisor.objects.filter(email__in=interaction_data['secondary_adviser_emails']),
         )
         email_parser_mock.return_value = {
-            'sender': Advisor.objects.get(email=interaction_data['sender']),
+            'sender': Advisor.objects.get(email=interaction_data['sender_email']),
             'contacts': contacts,
             'secondary_advisers': secondary_advisers,
             'top_company': Company.objects.get(name=interaction_data['top_company']),
@@ -128,14 +126,14 @@ class TestCalendarInteractionEmailProcessor:
             {},
             # Including secondary advisers
             {
-                'secondary_advisers': [
+                'secondary_adviser_emails': [
                     'adviser2@digital.trade.gov.uk',
                     'adviser3@digital.trade.gov.uk',
                 ],
             },
             # Contacts from different companies
             {
-                'contacts': [
+                'contact_emails': [
                     'bill.adama@example.net',
                     'laura.roslin@example.net',
                 ],
@@ -150,23 +148,28 @@ class TestCalendarInteractionEmailProcessor:
         monkeypatch,
     ):
         """
-        Test that process_email saves a draft interaction can be saved successfully
-        when the calendar parser yields good data.
+        Test that process_email saves a draft interaction when the calendar
+        parser yields good data.
         """
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
         email_parser_mock = self._get_email_parser_mock(interaction_data, monkeypatch)
+        assert not Interaction.objects.count()
+
+        # Process the message and save a draft interaction
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock.Mock())
         assert result is True
-        interaction_id = message.split()[-1].strip('#')
-        interaction = Interaction.objects.get(id=interaction_id)
+        interaction = Interaction.objects.first()
+
         # Verify dit_participants holds all of the advisers for the interaction
-        expected_advisers = [interaction_data['sender']]
-        expected_advisers.extend(interaction_data['secondary_advisers'])
-        interaction_advisers = interaction.dit_participants.all()
-        for participant in interaction_advisers:
-            assert participant.adviser.email in expected_advisers
-        assert interaction_advisers.count() == len(expected_advisers)
+        expected_adviser_emails = [interaction_data['sender_email']]
+        expected_adviser_emails.extend(interaction_data['secondary_adviser_emails'])
+        interaction_adviser_emails = {
+            participant.adviser.email for participant
+            in interaction.dit_participants.all()
+        }
+        assert interaction_adviser_emails == set(expected_adviser_emails)
+
         # Verify contacts holds all of the expected contacts for the interaction
         interaction_contacts = interaction.contacts.all()
         email_contacts = email_parser_mock.return_value['contacts']
@@ -204,7 +207,7 @@ class TestCalendarInteractionEmailProcessor:
         assert duplicate_result is False
         assert duplicate_message == 'Meeting already exists as an interaction'
         all_interactions_by_sender = Interaction.objects.filter(
-            dit_participants__adviser=Advisor.objects.get(email=interaction_data['sender']),
+            dit_participants__adviser=Advisor.objects.get(email=interaction_data['sender_email']),
         )
         assert all_interactions_by_sender.count() == 1
         assert all_interactions_by_sender[0].id == UUID(interaction_id)
@@ -242,7 +245,7 @@ class TestCalendarInteractionEmailProcessor:
             # No contacts present
             (
                 {
-                    'contacts': [],
+                    'contact_emails': [],
                 },
                 'contacts: This list may not be empty.',
             ),

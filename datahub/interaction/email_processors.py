@@ -6,7 +6,7 @@ import icalendar
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.timezone import utc
-from rest_framework.exceptions import ValidationError as RestValidationError
+from rest_framework import serializers
 
 from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
@@ -190,6 +190,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction_data = email_parser.extract_interaction_data_from_email()
         except ValidationError as exc:
             return (False, exc.message)
+
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
         sanitised_contacts = _reduce_contacts_to_single_company(
@@ -199,15 +200,16 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         interaction_data['contacts'] = sanitised_contacts
         try:
             serializer = self.validate_with_serializer(interaction_data)
-        except RestValidationError as exc:
+        except serializers.ValidationError as exc:
             return (False, _flatten_serializer_errors_to_string(exc.detail))
+
         # For our initial iteration of this feature, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
             source__meeting__id=interaction_data['meeting_details']['uid'],
         )
-        if matching_interactions:
+        if matching_interactions.exists():
             return (False, 'Meeting already exists as an interaction')
-        # We've validated and marshalled everything we need to build a draft interaction
+
         return self.save_serializer_as_interaction(serializer, interaction_data)
 
 
