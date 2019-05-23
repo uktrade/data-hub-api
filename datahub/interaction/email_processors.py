@@ -114,7 +114,7 @@ def _flatten_serializer_errors_to_string(serializer_errors):
     return '\n'.join(error_parts)
 
 
-def _reduce_contacts_to_single_company(contacts, company):
+def _filter_contacts_to_single_company(contacts, company):
     """
     Given a list of contacts and a company, return all of the contacts who are
     attributed to that company.
@@ -129,7 +129,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
     instance for it if the information is valid.
     """
 
-    def _transform_to_serializer_format(self, data):
+    def _to_serializer_format(self, data):
         dit_participants = [
             {
                 'adviser': {'id': adviser.id},
@@ -159,7 +159,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         Returns the instantiated serializer.
         """
-        transformed_data = self._transform_to_serializer_format(data)
+        transformed_data = self._to_serializer_format(data)
         serializer = InteractionSerializer(context={'is_bulk_import': True}, data=transformed_data)
         serializer.is_valid(raise_exception=True)
         return serializer
@@ -169,6 +169,8 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         """
         Create the interaction model instance from the validated serializer.
         """
+        # Provide an overridden value for source - so that we save the meeting
+        # data properly
         interaction = serializer.save(
             source={
                 'meeting': {'id': interaction_data['meeting_details']['uid']},
@@ -193,7 +195,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
-        sanitised_contacts = _reduce_contacts_to_single_company(
+        sanitised_contacts = _filter_contacts_to_single_company(
             interaction_data['contacts'],
             interaction_data['top_company'],
         )
