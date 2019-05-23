@@ -47,7 +47,7 @@ class TestPathRateThrottle:
         """Test that the requests are throttled."""
         factory = APIRequestFactory()
 
-        for dummy in range(4):
+        for _ in range(4):
             request = factory.get('/some-path/')
             response = MockView.as_view()(request)
         assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
@@ -89,7 +89,7 @@ class TestPathRateThrottle:
         """
         factory = APIRequestFactory()
 
-        for dummy in range(4):
+        for _ in range(4):
             request = factory.get('/some-path/')
             response = MockView.as_view()(request)
         assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS

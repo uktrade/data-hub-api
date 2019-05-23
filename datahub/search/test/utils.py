@@ -44,7 +44,7 @@ def _create_mock_es_model(
         for obj in db_objects:
             yield {
                 '_index': index or write_index,
-                '_id': getattr(obj, 'id'),
+                '_id': obj.id,
                 '_type': 'test-type',
             }
 
