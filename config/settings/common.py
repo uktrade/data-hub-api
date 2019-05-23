@@ -501,6 +501,11 @@ _add_hawk_credentials(
     HawkScope.public_company,
 )
 
+# To read data from Activity Stream
+ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
+ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env('ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)
+ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY', default=None)
+
 DOCUMENT_BUCKETS = {
     'default': {
         'bucket': env('DEFAULT_BUCKET'),

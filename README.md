@@ -35,11 +35,11 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     * It will take time for the leeloo API container to come up - it will run
       migrations on both DBs, load initial data, sync elasticsearch etc. Watch
       along in the api container's logs.
-    * **NOTE:** 
-      If you are using a linux system, the  elasticsearch container may not 
-      come up successfully (`data-hub-leeloo_es_1`) - it might be perpetually 
+    * **NOTE:**
+      If you are using a linux system, the elasticsearch container may not
+      come up successfully (`data-hub-leeloo_es_1`) - it might be perpetually
       restarting.
-      If the logs for that container mention something like 
+      If the logs for that container mention something like
       `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
       you will need to run the following on your host machine:
 
@@ -47,7 +47,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
       sudo sysctl -w vm.max_map_count=262144
       ```
 
-      and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so 
+      and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so
       that this setting persists after restart):
 
       ```shell
@@ -56,7 +56,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
       For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
 
-4.  Optionally, you may want to run a local copy of the data hub frontend. 
+4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both leeloo and the frontend under one docker-compose
     project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#setting-up-with-docker-compose).
 
@@ -77,19 +77,19 @@ Dependencies:
     ```
 
 2.  Install Python 3.7.
-    
+
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
-    
+
 3.  Install system dependencies:
-    
+
     On Ubuntu:
-    
+
     ```shell
     sudo apt install build-essential libpq-dev python3.7-dev python3.7-venv
     ```
-    
+
     On macOS:
-    
+
     ```shell
     brew install libpq
     ```
@@ -166,8 +166,8 @@ Dependencies:
     celery worker -A config -l info -Q celery,long-running -B
     ```
 
-    Note that in production the long-running queue is run in a separate worker with the 
-    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks 
+    Note that in production the long-running queue is run in a separate worker with the
+    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks
     are running or pending execution.
 
 ## Local development
@@ -232,6 +232,9 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | ------------- | ------------- | ------------- |
 | `ACTIVITY_STREAM_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication. |
 | `ACTIVITY_STREAM_SECRET_ACCESS_KEY` | If `ACTIVITY_STREAM_ACCESS_KEY_ID` is set | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
+| `ACTIVITY_STREAM_OUTGOING_URL` | No | The URL used to read from activity stream |
+| `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY` | No | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
@@ -377,7 +380,7 @@ This downloads the latest data from Companies House, updates the Companies House
 
 ## Dependencies
 
-See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing, 
+See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing,
 adding and upgrading dependencies.
 
 ## Activity Stream
