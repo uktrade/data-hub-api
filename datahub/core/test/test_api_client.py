@@ -68,16 +68,32 @@ class TestAPIClient:
         assert response.request.headers['Accept'] == APIClient.DEFAULT_ACCEPT
         assert response.request.timeout is None
 
-    def test_raises_exception_on_unsuccessful_request(self, requests_mock):
-        """Tests that an exception is raised on an successful request."""
+    def test_raises_exception_on_unsuccessful_request_if_flag_is_true(self, requests_mock):
+        """
+        Tests that an exception is raised on an successful request
+        if the raise_for_status argument is True.
+        """
         api_url = 'http://test/v1/'
         requests_mock.get('http://test/v1/path/to/item', status_code=404)
 
-        api_client = APIClient(api_url)
+        api_client = APIClient(api_url, raise_for_status=True)
         with pytest.raises(HTTPError) as excinfo:
             api_client.request('GET', 'path/to/item')
 
         assert excinfo.value.response.status_code == 404
+
+    def test_doesnt_raise_exception_on_unsuccessful_request_if_flag_is_false(self, requests_mock):
+        """
+        Tests that no exception is raised on an successful request
+        if the raise_for_status argument is False.
+        """
+        api_url = 'http://test/v1/'
+        requests_mock.get('http://test/v1/path/to/item', status_code=404)
+
+        api_client = APIClient(api_url, raise_for_status=False)
+        response = api_client.request('GET', 'path/to/item')
+
+        assert response.status_code == 404
 
     def test_passes_through_arguments(self, requests_mock):
         """Tests that auth, accept and default_timeout are passed to the request."""
