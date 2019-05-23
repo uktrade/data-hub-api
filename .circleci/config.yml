@@ -21,6 +21,9 @@ job_defaults: &job_defaults
   environment:
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
+    ACTIVITY_STREAM_OUTGOING_URL: http://activity.stream/
+    ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID: some-outgoing-id
+    ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY: some-outgoing-secret
     DATABASE_URL: postgresql://postgres@localhost/datahub
     MI_DATABASE_URL: postgresql://postgres@mi-postgres/mi
     DEBUG: 'True'
