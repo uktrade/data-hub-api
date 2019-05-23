@@ -187,7 +187,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         # Parse the email for interaction data
         email_parser = CalendarInteractionEmailParser(message)
         try:
-            interaction_data = email_parser.extract_interaction_data_from_email(message)
+            interaction_data = email_parser.extract_interaction_data_from_email()
         except ValidationError as exc:
             return (False, exc.message)
         # Make the same-company check easy to remove later if we allow Interactions
