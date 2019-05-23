@@ -205,7 +205,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         # For our initial iteration of this feature, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
-            source__meeting__id=interaction_data['meeting_details']['uid'],
+            source__contains={'meeting': {'id': interaction_data['meeting_details']['uid']}},
         )
         if matching_interactions.exists():
             return (False, 'Meeting already exists as an interaction')
