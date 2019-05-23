@@ -81,7 +81,7 @@ class APIClient:
 
         timeout = kwargs.pop('timeout', self._default_timeout)
 
-        headers = {}
+        headers = kwargs.pop('headers', {})
         if self._accept:
             headers['Accept'] = self._accept
 
