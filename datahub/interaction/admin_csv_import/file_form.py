@@ -13,6 +13,7 @@ from datahub.interaction.admin_csv_import.cache_utils import (
     load_file_contents_and_name,
     save_file_contents_and_name,
 )
+from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
 
@@ -127,9 +128,15 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         This should only be called if the rows have previously been validated.
         """
+        duplicate_tracker = DuplicateTracker()
+
         with self.open_file_as_dict_reader() as dict_reader:
             for index, row in enumerate(dict_reader):
-                row_form = InteractionCSVRowForm(row_index=index, data=row)
+                row_form = InteractionCSVRowForm(
+                    row_index=index,
+                    data=row,
+                    duplicate_tracker=duplicate_tracker,
+                )
 
                 if not row_form.is_valid() and raise_error_if_invalid:
                     # We are not expecting this to happen. Raise an exception to alert us if

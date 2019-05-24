@@ -4,6 +4,7 @@ Logic for detecting probable duplicates when importing interactions.
 This includes:
 
 - duplicates of existing interactions in the database
+- duplicates of other interactions in the CSV file being imported
 
 Duplicate checking is done based on date, service and contact. These fields were chosen for
 simplicity, and because we are primarily dealing with overseas delivery partner interactions
@@ -48,6 +49,32 @@ def is_duplicate_of_existing_interaction(cleaned_data):
     return Interaction.objects.filter(**filter_kwargs).exists()
 
 
+class DuplicateTracker:
+    """
+    Used to detect rows that are duplicates of another row in an interactions CSV file
+    that is being imported.
+    """
+
+    def __init__(self):
+        """Initialise the instance."""
+        self.item_keys = set()
+
+    def add_item(self, cleaned_data):
+        """
+        Add the cleaned data of a InteractionCSVRowForm to the collection of rows seen so far.
+        """
+        key = _cleaned_data_to_key(cleaned_data)
+        if key:
+            self.item_keys.add(key)
+
+    def has_item(self, cleaned_data):
+        """
+        Check if a InteractionCSVRowForm is a duplicate of a previously-added row.
+        """
+        key = _cleaned_data_to_key(cleaned_data)
+        return key and key in self.item_keys
+
+
 def _cleaned_data_to_key(cleaned_data):
     """
     Return a tuple representing a unique key for the cleaned data of an InteractionCSVRowForm.
@@ -59,5 +86,5 @@ def _cleaned_data_to_key(cleaned_data):
     if all(key):
         return key
 
-    # Some of the fields did not pass validation
+    # Some of the fields are missing (this happens if they did not pass validation)
     return None
