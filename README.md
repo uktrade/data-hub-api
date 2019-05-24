@@ -67,7 +67,7 @@ Dependencies:
 -   Python 3.7.x
 -   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
--   Elasticsearch 6.4
+-   Elasticsearch 6.7
 
 1.  Clone the repository:
 
