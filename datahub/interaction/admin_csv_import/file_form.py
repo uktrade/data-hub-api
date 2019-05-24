@@ -30,15 +30,12 @@ class InteractionCSVForm(BaseCSVImportForm):
 
     def are_all_rows_valid(self):
         """Check if all of the rows in the CSV pass validation."""
-        with self.open_file_as_dict_reader() as dict_reader:
-            return all(InteractionCSVRowForm(data=row).is_valid() for row in dict_reader)
+        return all(row_form.is_valid() for row_form in self._get_row_form_iterator())
 
     def get_row_error_iterator(self):
         """Get a generator of CSVRowError instances."""
-        with self.open_file_as_dict_reader() as dict_reader:
-            for index, row in enumerate(dict_reader):
-                form = InteractionCSVRowForm(row_index=index, data=row)
-                yield from form.get_flat_error_list_iterator()
+        for row_form in self._get_row_form_iterator():
+            yield from row_form.get_flat_error_list_iterator()
 
     def get_matching_summary(self, max_rows):
         """
@@ -52,7 +49,7 @@ class InteractionCSVForm(BaseCSVImportForm):
         matching_counts = {status: 0 for status in ContactMatchingStatus}
         matched_rows = []
 
-        for row_form in self._get_validated_row_form_iterator():
+        for row_form in self._get_row_form_iterator(raise_error_if_invalid=True):
             contact_matching_status = row_form.cleaned_data['contact_matching_status']
             matching_counts[contact_matching_status] += 1
 
@@ -81,7 +78,7 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         matching_counts = {status: 0 for status in ContactMatchingStatus}
 
-        for row_form in self._get_validated_row_form_iterator():
+        for row_form in self._get_row_form_iterator(raise_error_if_invalid=True):
             if row_form.is_matched():
                 row_form.save(user, source)
 
@@ -124,7 +121,7 @@ class InteractionCSVForm(BaseCSVImportForm):
             },
         )
 
-    def _get_validated_row_form_iterator(self):
+    def _get_row_form_iterator(self, raise_error_if_invalid=False):
         """
         Get a generator over InteractionCSVRowForm instances.
 
@@ -134,7 +131,7 @@ class InteractionCSVForm(BaseCSVImportForm):
             for index, row in enumerate(dict_reader):
                 row_form = InteractionCSVRowForm(row_index=index, data=row)
 
-                if not row_form.is_valid():
+                if not row_form.is_valid() and raise_error_if_invalid:
                     # We are not expecting this to happen. Raise an exception to alert us if
                     # it does.
                     raise DataHubException('CSV row unexpectedly failed revalidation')

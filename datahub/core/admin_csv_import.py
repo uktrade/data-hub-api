@@ -71,10 +71,11 @@ class BaseCSVImportForm(forms.Form):
         csv_file.seek(0)
         stream = io.TextIOWrapper(csv_file, encoding=encoding)
 
-        yield stream
-
-        # Detach the file from TextIOWrapper; this stops it being automatically closed
-        stream.detach()
+        try:
+            yield stream
+        finally:
+            # Detach the file from TextIOWrapper; this stops it being automatically closed
+            stream.detach()
 
     @contextmanager
     def open_file_as_dict_reader(self):
