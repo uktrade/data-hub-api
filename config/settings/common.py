@@ -88,6 +88,7 @@ LOCAL_APPS = [
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.user_event_log',
+    'datahub.activity_feed',
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',

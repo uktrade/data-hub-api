@@ -3,6 +3,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from datahub.activity_feed import urls as activity_feed_urls
 from datahub.activity_stream import urls as activity_stream_urls
 from datahub.company import views as company_views
 from datahub.company.urls import ch_company as ch_company_urls
@@ -67,4 +68,5 @@ v4_urls = [
             namespace='large-investor-profile',
         ),
     ),
+    path('', include((activity_feed_urls, 'activity-feed'), namespace='activity-feed')),
 ]
