@@ -59,12 +59,20 @@ class APIClient:
     # Prefer JSON to other content types
     DEFAULT_ACCEPT = 'application/json;q=0.9,*/*;q=0.8'
 
-    def __init__(self, api_url, auth=None, accept=DEFAULT_ACCEPT, default_timeout=None):
+    def __init__(
+        self,
+        api_url,
+        auth=None,
+        accept=DEFAULT_ACCEPT,
+        default_timeout=None,
+        raise_for_status=True,
+    ):
         """Initialises the API client."""
         self._api_url = api_url
         self._auth = auth
         self._accept = accept
         self._default_timeout = default_timeout
+        self._raise_for_status = raise_for_status
 
     def request(self, method, path, **kwargs):
         """Makes an HTTP request."""
@@ -73,7 +81,7 @@ class APIClient:
 
         timeout = kwargs.pop('timeout', self._default_timeout)
 
-        headers = {}
+        headers = kwargs.pop('headers', {})
         if self._accept:
             headers['Accept'] = self._accept
 
@@ -86,5 +94,6 @@ class APIClient:
             **kwargs,
         )
         logger.info(f'Response received: {response.status_code} {method.upper()} {url}')
-        response.raise_for_status()
+        if self._raise_for_status:
+            response.raise_for_status()
         return response
