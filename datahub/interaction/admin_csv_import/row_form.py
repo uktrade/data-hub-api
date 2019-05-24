@@ -43,6 +43,10 @@ DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE = gettext_lazy(
     'This interaction appears to be a duplicate as there is an existing interaction with the '
     'same service, date and contact.',
 )
+DUPLICATE_OF_ANOTHER_ROW_MESSAGE = gettext_lazy(
+    'This interaction appears to be a duplicate as there is another row in this file with the '
+    'same service, date and contact.',
+)
 
 
 def _validate_not_disabled(obj):
@@ -140,10 +144,11 @@ class InteractionCSVRowForm(forms.Form):
     subject = forms.CharField(required=False)
     notes = forms.CharField(required=False)
 
-    def __init__(self, *args, row_index=None, **kwargs):
+    def __init__(self, *args, duplicate_tracker=None, row_index=None, **kwargs):
         """Initialise the form with an optional zero-based row index."""
         super().__init__(*args, **kwargs)
         self.row_index = row_index
+        self.duplicate_tracker = duplicate_tracker
 
     @classmethod
     def get_required_field_names(cls):
@@ -197,6 +202,7 @@ class InteractionCSVRowForm(forms.Form):
             data.get('contact_email'),
         )
 
+        self._validate_not_duplicate_of_prior_row(data)
         self._validate_not_duplicate_of_existing_interaction(data)
 
         return data
@@ -286,6 +292,16 @@ class InteractionCSVRowForm(forms.Form):
                 code='adviser_2_is_the_same_as_adviser_1',
             )
             self.add_error('adviser_2', err)
+
+    def _validate_not_duplicate_of_prior_row(self, data):
+        if not self.duplicate_tracker:
+            return
+
+        if self.duplicate_tracker.has_item(data):
+            self.add_error(None, DUPLICATE_OF_ANOTHER_ROW_MESSAGE)
+            return
+
+        self.duplicate_tracker.add_item(data)
 
     def _validate_not_duplicate_of_existing_interaction(self, data):
         if is_duplicate_of_existing_interaction(data):

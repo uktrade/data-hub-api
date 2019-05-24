@@ -13,11 +13,13 @@ from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import random_obj_for_queryset
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
+from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
 from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
     CSVRowError,
+    DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
     DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE,
     InteractionCSVRowForm,
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
@@ -441,6 +443,126 @@ class TestInteractionCSVRowForm:
         }
 
         form = InteractionCSVRowForm(data=data)
+        assert form.errors == expected_errors
+
+    @pytest.mark.parametrize(
+        'row_data,prior_rows,expected_errors',
+        (
+            pytest.param(
+                {
+                    'contact': lambda: ContactFactory(email='unique@company.com'),
+                    'service': random_service,
+                    'date': date(2018, 1, 1),
+                },
+                [],
+                {},
+                id='without any existing items',
+            ),
+            pytest.param(
+                {
+                    'contact': lambda: ContactFactory(email='unique@company.com'),
+                    'service': random_service,
+                    'date': date(2018, 1, 1),
+                },
+                [
+                    {
+                        'contact': lambda row_data: row_data['contact'],
+                        'service': lambda row_data: row_data['service'],
+                        'date': lambda row_data: row_data['date'],
+                    },
+                ],
+                {
+                    NON_FIELD_ERRORS: [DUPLICATE_OF_ANOTHER_ROW_MESSAGE],
+                },
+                id='with an existing duplicate',
+            ),
+            pytest.param(
+                {
+                    'contact': lambda: ContactFactory(email='unique@company.com'),
+                    'service': random_service,
+                    'date': date(2018, 1, 1),
+                },
+                [
+                    {
+                        'contact': lambda _: ContactFactory(email='different@company.com'),
+                        'service': lambda row_data: row_data['service'],
+                        'date': lambda row_data: row_data['date'],
+                    },
+                ],
+                {},
+                id='with contact different',
+            ),
+            pytest.param(
+                {
+                    'contact': lambda: ContactFactory(email='unique@company.com'),
+                    'service': random_service,
+                    'date': date(2018, 1, 1),
+                },
+                [
+                    {
+                        'contact': lambda row_data: row_data['contact'],
+                        'service': lambda _: ServiceFactory(),
+                        'date': lambda row_data: row_data['date'],
+                    },
+                ],
+                {},
+                id='with service different',
+            ),
+            pytest.param(
+                {
+                    'contact': lambda: ContactFactory(email='unique@company.com'),
+                    'service': random_service,
+                    'date': date(2018, 1, 1),
+                },
+                [
+                    {
+                        'contact': lambda row_data: row_data['contact'],
+                        'service': lambda row_data: row_data['service'],
+                        'date': lambda row_data: date(2019, 5, 5),
+                    },
+                ],
+                {},
+                id='with date different',
+            ),
+        ),
+    )
+    def test_fails_validation_if_is_duplicate_of_another_row(
+        self,
+        row_data,
+        prior_rows,
+        expected_errors,
+    ):
+        """
+        Test that an error is returned if the interaction is a duplicate of a row encountered
+        earlier in the file being imported.
+        """
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        communication_channel = random_communication_channel()
+
+        resolved_row_data = _resolve_data(row_data)
+        resolved_prior_rows = [
+            {
+                key: value(resolved_row_data)
+                for key, value in duplicate_item.items()
+            }
+            for duplicate_item in prior_rows
+        ]
+
+        duplicate_tracker = DuplicateTracker()
+        for resolved_duplicate_item in resolved_prior_rows:
+            duplicate_tracker.add_item(resolved_duplicate_item)
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'adviser_1': adviser.name,
+            'communication_channel': communication_channel.name,
+
+            'contact_email': resolved_row_data['contact'].email,
+            'service': resolved_row_data['service'].name,
+            'date': resolved_row_data['date'].strftime('%d/%m/%Y'),
+        }
+
+        form = InteractionCSVRowForm(data=data, duplicate_tracker=duplicate_tracker)
         assert form.errors == expected_errors
 
     @pytest.mark.parametrize(
