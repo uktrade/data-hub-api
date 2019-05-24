@@ -1,0 +1,14 @@
+{% load i18n %}
+<ul>
+  {% trans 'interaction created' as matched_singular_text %}
+  {% trans 'interactions created' as matched_plural_text %}
+  {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_matched singular_text=matched_singular_text plural_text=matched_plural_text only %}
+
+  {% trans 'record skipped as it could not be matched with an active contact' as unmatched_singular_text %}
+  {% trans 'records skipped as they could not be matched with an active contact' as unmatched_plural_text %}
+  {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_unmatched singular_text=unmatched_singular_text plural_text=unmatched_plural_text only %}
+
+  {% trans 'record skipped as it was matched with more than one active contact' as multiple_matches_singular_text %}
+  {% trans 'records skipped as they were matched with more than one active contact' as multiple_matches_plural_text %}
+  {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_multiple_matches singular_text=multiple_matches_singular_text plural_text=multiple_matches_plural_text only %}
+</ul>

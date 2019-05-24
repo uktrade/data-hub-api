@@ -111,8 +111,9 @@ class TestInteractionCSVForm:
     @pytest.mark.parametrize('num_matching', (5, 10))
     @pytest.mark.parametrize('num_unmatched', (0, 6))
     @pytest.mark.parametrize('num_multiple_matches', (0, 6))
-    def test_save_returns_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
-        """Test that save() returns the expected counts."""
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_save_stores_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that save() stores the expected counts in the cache."""
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
