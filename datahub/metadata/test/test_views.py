@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
+from datahub.interaction.models import ServiceAdditionalQuestion
 from datahub.metadata import urls
 from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
 from datahub.metadata.registry import registry
@@ -210,6 +211,7 @@ class TestServiceView:
             'name': service.name,
             'contexts': sorted(service.contexts),
             'disabled_on': disabled_on,
+            'interaction_questions': [],
         }
         assert len(services) == Service.objects.count()
 
@@ -243,6 +245,80 @@ class TestServiceView:
         services = response.json()
         assert len(services) == service_count_for_context
         assert all(set(service['contexts']) & set(contexts) for service in services)
+
+    def test_interaction_service_questions(self, api_client):
+        """Test that service questions and answers are being serialized."""
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+
+        service_additional_question = ServiceAdditionalQuestion.objects.first()
+        db_service = service_additional_question.answer_option.question.service
+
+        for service in services:
+            if service['id'] == str(db_service.id):
+                response_service = service
+                break
+
+        disabled_on = format_date_or_datetime(
+            db_service.disabled_on,
+        ) if db_service.disabled_on else None
+
+        response_service['contexts'] = sorted(response_service['contexts'])
+        response_service['interaction_questions'] = sorted(
+            response_service['interaction_questions'],
+            key=itemgetter('id'),
+        )
+        for interaction_question in response_service['interaction_questions']:
+            interaction_question['answer_options'] = sorted(
+                interaction_question['answer_options'],
+                key=itemgetter('id'),
+            )
+            for answer_option in interaction_question['answer_options']:
+                answer_option['additional_questions'] = sorted(
+                    answer_option['additional_questions'],
+                    key=itemgetter('id'),
+                )
+
+        assert response_service == {
+            'id': str(db_service.pk),
+            'name': db_service.name,
+            'contexts': sorted(db_service.contexts),
+            'disabled_on': disabled_on,
+            'interaction_questions': [
+                {
+                    'id': str(question.id),
+                    'name': question.name,
+                    'disabled_on': format_date_or_datetime(
+                        question.disabled_on,
+                    ) if question.disabled_on else None,
+                    'answer_options': [
+                        {
+                            'id': str(answer_option.id),
+                            'name': answer_option.name,
+                            'disabled_on': format_date_or_datetime(
+                                answer_option.disabled_on,
+                            ) if answer_option.disabled_on else None,
+                            'additional_questions': [
+                                {
+                                    'id': str(additional_question.id),
+                                    'name': additional_question.name,
+                                    'type': additional_question.type,
+                                    'is_required': additional_question.is_required,
+                                    'disabled_on': format_date_or_datetime(
+                                        additional_question.disabled_on,
+                                    ) if additional_question.disabled_on else None,
+                                } for additional_question
+                                in answer_option.additional_questions.order_by('id')
+                            ],
+                        } for answer_option in question.answer_options.order_by('id')
+                    ],
+                } for question in db_service.interaction_questions.order_by('id')
+            ],
+        }
+        assert len(services) == Service.objects.count()
 
 
 class TestSectorView:

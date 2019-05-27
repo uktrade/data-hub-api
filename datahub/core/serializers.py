@@ -4,13 +4,13 @@ from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ReadOnlyField, UUIDField
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country
-
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -99,10 +99,7 @@ class NestedRelatedField(serializers.RelatedField):
     def to_internal_value(self, data):
         """Converts a user-provided value to a model instance."""
         try:
-            if isinstance(data, str):
-                id_repr = data
-            else:
-                id_repr = data['id']
+            id_repr = data if isinstance(data, str) else data['id']
             data = self.pk_field.to_internal_value(id_repr)
             return self.get_queryset().get(pk=data)
         except ObjectDoesNotExist:
@@ -112,13 +109,26 @@ class NestedRelatedField(serializers.RelatedField):
         except (TypeError, ValueError):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
+    @staticmethod
+    def get_field_value(obj, field_name):
+        """Returns the field's value.
+
+        If the field is an instance of models.Manager, then it queries
+        all related objects.
+        """
+        value = getattr(obj, field_name)
+        if isinstance(value, models.Manager):
+            return value.all()
+
+        return value
+
     def to_representation(self, value):
         """Converts a model instance to a dict representation."""
         if not value:
             return value
 
         extra = {
-            field_name: field.to_representation(getattr(value, field_name))
+            field_name: field.to_representation(self.get_field_value(value, field_name))
             for field_name, field in self._fields
         }
         return {

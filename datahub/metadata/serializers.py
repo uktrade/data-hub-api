@@ -5,6 +5,7 @@ from rest_framework import serializers
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.metadata.models import Country, OverseasRegion, Service, TeamRole, UKRegion
 
+
 TeamWithGeographyField = partial(
     NestedRelatedField,
     'metadata.Team',
@@ -12,6 +13,52 @@ TeamWithGeographyField = partial(
         'name',
         ('uk_region', NestedRelatedField(UKRegion, read_only=True)),
         ('country', NestedRelatedField(Country, read_only=True)),
+    ),
+)
+
+
+ServiceAdditionalQuestionField = partial(
+    NestedRelatedField,
+    'interaction.ServiceAdditionalQuestion',
+    extra_fields=(
+        'name',
+        'disabled_on',
+        'type',
+        'is_required',
+    ),
+)
+
+
+ServiceAnswerOptionField = partial(
+    NestedRelatedField,
+    'interaction.ServiceAnswerOption',
+    extra_fields=(
+        'name',
+        'disabled_on',
+        (
+            'additional_questions',
+            ServiceAdditionalQuestionField(
+                many=True,
+                read_only=True,
+            ),
+        ),
+    ),
+)
+
+
+ServiceQuestionField = partial(
+    NestedRelatedField,
+    'interaction.ServiceQuestion',
+    extra_fields=(
+        'name',
+        'disabled_on',
+        (
+            'answer_options',
+            ServiceAnswerOptionField(
+                many=True,
+                read_only=True,
+            ),
+        ),
     ),
 )
 
@@ -32,6 +79,7 @@ class ServiceSerializer(ConstantModelSerializer):
     """Service serializer."""
 
     contexts = serializers.MultipleChoiceField(choices=Service.CONTEXTS, read_only=True)
+    interaction_questions = ServiceQuestionField(read_only=True, many=True)
 
 
 class TeamSerializer(ConstantModelSerializer):
