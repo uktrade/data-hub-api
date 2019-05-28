@@ -1,22 +1,13 @@
 import base64
 from collections import Counter
-from logging import getLogger
 
 import icalendar
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.utils.timezone import utc
-from rest_framework import serializers
 
 from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
-from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
-from datahub.interaction.models import Interaction
-from datahub.interaction.serializers import InteractionSerializer
-
-
-logger = getLogger(__name__)
 
 ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
@@ -101,119 +92,6 @@ def _get_utc_datetime(localised_datetime):
     # When the calendar event is just a date
     except AttributeError:
         return localised_datetime
-
-
-def _flatten_serializer_errors_to_string(serializer_errors):
-    """
-    Flatten DRF Serializer validation errors to a string with one field per line.
-    """
-    error_parts = []
-    for field_name, details in serializer_errors.items():
-        details_string = ','.join([str(detail) for detail in details])
-        error_parts.append(f'{field_name}: {details_string}')
-    return '\n'.join(error_parts)
-
-
-def _filter_contacts_to_single_company(contacts, company):
-    """
-    Given a list of contacts and a company, return all of the contacts who are
-    attributed to that company.
-    """
-    return [contact for contact in contacts if contact.company == company]
-
-
-class CalendarInteractionEmailProcessor(EmailProcessor):
-    """
-    An EmailProcessor which checks whether incoming email is a valid DIT/company
-    meeting, parses meeting information and creates a draft Interaction model
-    instance for it if the information is valid.
-    """
-
-    def _to_serializer_format(self, data):
-        dit_participants = [
-            {
-                'adviser': {'id': adviser.id},
-                'team': adviser.dit_team,
-            }
-            for adviser in (data['sender'], *data['secondary_advisers'])
-        ]
-
-        creation_data = {
-            'contacts': [{'id': contact.id} for contact in data['contacts']],
-            'company': {'id': data['top_company'].id},
-            'date': data['date'],
-            'dit_participants': dit_participants,
-            'kind': Interaction.KINDS.interaction,
-            'status': Interaction.STATUSES.draft,
-            'subject': data['subject'],
-            'location': data['location'],
-            'was_policy_feedback_provided': False,
-        }
-
-        return creation_data
-
-    def validate_with_serializer(self, data):
-        """
-        Transforms extracted data into a dict suitable for use with InteractionSerializer
-        and then runs data through this serializer for validation.
-
-        Returns the instantiated serializer.
-        """
-        transformed_data = self._to_serializer_format(data)
-        serializer = InteractionSerializer(context={'is_bulk_import': True}, data=transformed_data)
-        serializer.is_valid(raise_exception=True)
-        return serializer
-
-    @transaction.atomic
-    def save_serializer_as_interaction(self, serializer, interaction_data):
-        """
-        Create the interaction model instance from the validated serializer.
-        """
-        # Provide an overridden value for source - so that we save the meeting
-        # data properly
-        interaction = serializer.save(
-            source={
-                'meeting': {'id': interaction_data['meeting_details']['uid']},
-            },
-        )
-        return interaction
-
-    def process_email(self, message):
-        """
-        Review the metadata and calendar attachment (if present) of an email
-        message to see if it fits the our criteria of a valid Data Hub meeting
-        request.  If it does, create a draft Interaction for it.
-
-        :param message: mailparser.MailParser object - the message to process
-        """
-        # Parse the email for interaction data
-        email_parser = CalendarInteractionEmailParser(message)
-        try:
-            interaction_data = email_parser.extract_interaction_data_from_email()
-        except ValidationError as exc:
-            return (False, exc.message)
-
-        # Make the same-company check easy to remove later if we allow Interactions
-        # to have contacts from more than one company
-        sanitised_contacts = _filter_contacts_to_single_company(
-            interaction_data['contacts'],
-            interaction_data['top_company'],
-        )
-        interaction_data['contacts'] = sanitised_contacts
-        try:
-            serializer = self.validate_with_serializer(interaction_data)
-        except serializers.ValidationError as exc:
-            return (False, _flatten_serializer_errors_to_string(exc.detail))
-
-        # For our initial iteration of this feature, we are ignoring meeting updates
-        matching_interactions = Interaction.objects.filter(
-            source__contains={'meeting': {'id': interaction_data['meeting_details']['uid']}},
-        )
-        if matching_interactions.exists():
-            return (False, 'Meeting already exists as an interaction')
-
-        interaction = self.save_serializer_as_interaction(serializer, interaction_data)
-        return (True, f'Successfully created interaction #{interaction.id}')
 
 
 class CalendarInteractionEmailParser:
