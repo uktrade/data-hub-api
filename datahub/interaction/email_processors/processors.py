@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
@@ -8,9 +6,6 @@ from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializer
-
-
-logger = getLogger(__name__)
 
 
 def _flatten_serializer_errors_to_string(serializer_errors):
