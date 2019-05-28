@@ -176,7 +176,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
                 'meeting': {'id': interaction_data['meeting_details']['uid']},
             },
         )
-        return (True, f'Successfully created interaction #{interaction.id}')
+        return interaction
 
     def process_email(self, message):
         """
@@ -212,7 +212,8 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         if matching_interactions.exists():
             return (False, 'Meeting already exists as an interaction')
 
-        return self.save_serializer_as_interaction(serializer, interaction_data)
+        interaction = self.save_serializer_as_interaction(serializer, interaction_data)
+        return (True, f'Successfully created interaction #{interaction.id}')
 
 
 class CalendarInteractionEmailParser:
