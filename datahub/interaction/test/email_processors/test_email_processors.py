@@ -77,7 +77,7 @@ def base_interaction_data_fixture():
         'contact_emails': ['bill.adama@example.net', 'saul.tigh@example.net'],
         'secondary_adviser_emails': [],
         'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
-        'top_company': 'Company 1',
+        'top_company_name': 'Company 1',
         'location': 'Windsor House',
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',
@@ -111,7 +111,7 @@ class TestCalendarInteractionEmailProcessor:
             'sender': Advisor.objects.get(email=interaction_data['sender_email']),
             'contacts': contacts,
             'secondary_advisers': secondary_advisers,
-            'top_company': Company.objects.get(name=interaction_data['top_company']),
+            'top_company': Company.objects.get(name=interaction_data['top_company_name']),
             'date': interaction_data['date'],
             'location': interaction_data['location'],
             'meeting_details': interaction_data['meeting_details'],
@@ -151,7 +151,10 @@ class TestCalendarInteractionEmailProcessor:
         Test that process_email saves a draft interaction when the calendar
         parser yields good data.
         """
-        interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
+        interaction_data = {
+            **base_interaction_data_fixture,
+            **interaction_data_overrides,
+        }
         email_parser_mock = self._get_email_parser_mock(interaction_data, monkeypatch)
         assert not Interaction.objects.count()
 
@@ -160,23 +163,26 @@ class TestCalendarInteractionEmailProcessor:
         result, message = processor.process_email(mock.Mock())
         assert result is True
         interaction = Interaction.objects.first()
+        assert message == f'Successfully created interaction #{interaction.id}'
 
         # Verify dit_participants holds all of the advisers for the interaction
-        expected_adviser_emails = [interaction_data['sender_email']]
-        expected_adviser_emails.extend(interaction_data['secondary_adviser_emails'])
+        expected_adviser_emails = {
+            interaction_data['sender_email'],
+            *interaction_data['secondary_adviser_emails'],
+        }
         interaction_adviser_emails = {
             participant.adviser.email for participant
             in interaction.dit_participants.all()
         }
-        assert interaction_adviser_emails == set(expected_adviser_emails)
+        assert interaction_adviser_emails == expected_adviser_emails
 
         # Verify contacts holds all of the expected contacts for the interaction
         interaction_contacts = interaction.contacts.all()
         email_contacts = email_parser_mock.return_value['contacts']
         for contact in email_contacts:
-            if contact.company.name == interaction_data['top_company']:
+            if contact.company.name == interaction_data['top_company_name']:
                 assert contact in interaction_contacts
-        assert interaction.company.name == interaction_data['top_company']
+        assert interaction.company.name == interaction_data['top_company_name']
         assert interaction.date == interaction_data['date']
         assert interaction.location == interaction_data['location']
         assert interaction.source == {
@@ -386,7 +392,7 @@ class TestCalendarInteractionEmailParser:
                     'adviser_email': 'adviser1@trade.gov.uk',
                     'contact_emails': ['bill.adama@example.net'],
                     'secondary_adviser_emails': [],
-                    'company_name': 'Company 1',
+                    'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 12, 0, tzinfo=utc),
                     'location': (
                         'SOMEWHERE Agency (10 Tunstall Studios, 34-44 '
@@ -409,7 +415,7 @@ class TestCalendarInteractionEmailParser:
                         'laura.roslin@example.net',
                     ],
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
-                    'company_name': 'Company 1',
+                    'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
                     'location': '',
                     'subject': 'initial',
@@ -434,7 +440,9 @@ class TestCalendarInteractionEmailParser:
             assert contact.email in expected_interaction_data['contact_emails']
         for adviser in interaction_data['secondary_advisers']:
             assert adviser.email in expected_interaction_data['secondary_adviser_emails']
-        assert interaction_data['top_company'].name == expected_interaction_data['company_name']
+        assert (
+            interaction_data['top_company'].name == expected_interaction_data['top_company_name']
+        )
         assert interaction_data['date'] == expected_interaction_data['date']
         assert interaction_data['location'] == expected_interaction_data['location']
         assert interaction_data['subject'] == expected_interaction_data['subject']
