@@ -325,6 +325,8 @@ class Interaction(ArchivableModel, BaseModel):
     class Meta:
         indexes = [
             models.Index(fields=['-date', '-created_on']),
+            # For activity-stream
+            models.Index(fields=['modified_on', 'id']),
         ]
         permissions = (
             (
