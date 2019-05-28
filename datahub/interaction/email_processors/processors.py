@@ -43,7 +43,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             for adviser in (data['sender'], *data['secondary_advisers'])
         ]
 
-        creation_data = {
+        data_for_serializer = {
             'contacts': [{'id': contact.id} for contact in data['contacts']],
             'company': {'id': data['top_company'].id},
             'date': data['date'],
@@ -55,7 +55,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             'was_policy_feedback_provided': False,
         }
 
-        return creation_data
+        return data_for_serializer
 
     def validate_with_serializer(self, data):
         """
