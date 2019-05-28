@@ -795,7 +795,7 @@ class TestInteractionCSVRowForm:
 
     def test_save_interaction(self):
         """Test saving an interaction."""
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         contact = ContactFactory(email='unique@company.com')
         service = random_service()
@@ -837,7 +837,7 @@ class TestInteractionCSVRowForm:
 
     def test_save_service_delivery(self):
         """Test saving a service delivery."""
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
         adviser_1 = AdviserFactory(first_name='Neptune', last_name='Doris')
         adviser_2 = AdviserFactory(first_name='Pluto', last_name='Greene')
         contact = ContactFactory(email='unique@company.com')
@@ -892,7 +892,7 @@ class TestInteractionCSVRowForm:
 
     def test_save_with_unmatched_contact_raises_error(self):
         """Test that saving an interaction with an unmatched contact raises an error."""
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         service = random_service()
         communication_channel = random_communication_channel()
@@ -921,7 +921,7 @@ class TestInteractionCSVRowForm:
             Mock(side_effect=ValueError),
         )
 
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         contact = ContactFactory(email='unique@company.com')
         service = random_service()
