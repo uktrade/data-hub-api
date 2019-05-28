@@ -1,6 +1,5 @@
 import base64
 from collections import Counter
-from logging import getLogger
 
 import icalendar
 from django.core.exceptions import ValidationError
@@ -9,9 +8,6 @@ from django.utils.timezone import utc
 from datahub.company.contact_matching import find_active_contact_by_email_address
 from datahub.company.models.adviser import Advisor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
-
-
-logger = getLogger(__name__)
 
 ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
