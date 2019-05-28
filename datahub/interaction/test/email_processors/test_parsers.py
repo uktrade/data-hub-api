@@ -6,7 +6,10 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.parsers import (
+    CalendarInteractionEmailParser,
+    EmailNotSentByDITException,
+)
 
 
 @pytest.mark.django_db
@@ -183,7 +186,15 @@ class TestCalendarInteractionEmailParser:
         (
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
-                ValidationError('Email not sent by DIT'),
+                # TODO: Swap this expected error out for a ValidationError when
+                # we are past the pilot stage for email ingestion
+                EmailNotSentByDITException(
+                    'Email with ID "<CWXP123MB2008236F14A5E2A22B2B65FFC90F0@CWXP123MB2008.'
+                    'GBRP123.PROD.OUTLOOK.COM>" and sender domain "unknown.net" was not recognised'
+                    ' as being sent by an authenticated DIT domain. Either the domain was '
+                    'unrecognised, or it did not pass our requirements for Authentication-Results.'
+                    ' Further investigation is needed during the pilot for email ingestion.',
+                ),
             ),
             (
                 'email_samples/invalid/no_from_header.eml',
@@ -241,4 +252,4 @@ class TestCalendarInteractionEmailParser:
         parser = self._get_parser_for_email_file(email_file)
         with pytest.raises(expected_error.__class__) as exc:
             parser.extract_interaction_data_from_email()
-        assert exc.value.message == expected_error.message
+        assert exc.value.args[0] == expected_error.args[0]
