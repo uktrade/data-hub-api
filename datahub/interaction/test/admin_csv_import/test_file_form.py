@@ -117,7 +117,7 @@ class TestInteractionCSVForm:
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
 
         file = make_csv_file_from_dicts(
             *matched_rows,
@@ -149,7 +149,7 @@ class TestInteractionCSVForm:
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
 
         file = make_csv_file_from_dicts(
             *matched_rows,
@@ -196,7 +196,7 @@ class TestInteractionCSVForm:
         """Test that save() creates versions using django-reversion."""
         num_matching = 5
         matched_rows = make_matched_rows(num_matching)
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
 
         file = make_csv_file_from_dicts(*matched_rows)
         file_contents = file.getvalue()
@@ -225,7 +225,7 @@ class TestInteractionCSVForm:
 
     def test_save_rolls_back_on_error(self):
         """Test that save() rolls back if one row can't be saved."""
-        user = AdviserFactory()
+        user = AdviserFactory(first_name='Admin', last_name='User')
 
         file = make_csv_file_from_dicts(
             *make_matched_rows(5),
