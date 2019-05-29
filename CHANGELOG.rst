@@ -1,3 +1,71 @@
+Data Hub API 13.0.0 (2019-05-29)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The ability to save loaded interactions was added to the import interactions admin site tool. The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it’s incomplete.
+
+Bug fixes
+---------
+
+- **Investment** A fix was applied to the SPI report generation task so that it restarts if it's interrupted.
+
+API
+---
+
+- New endpoint added ``GET /v4/activity-feed`` which acts as a proxy for Activity Stream and allows a Data Hub frontend client to read from it.
+- It is now possible to get a list of interactions in activity-stream `format.
+  <https://www.w3.org/TR/activitystreams-core/>`_
+
+  The URL for this is:
+
+  | ``/v3/activity-stream/interactions``
+
+Database schema
+---------------
+
+- **Interactions** The database table ``interaction_serviceadditionalquestion`` has been added with the following columns:
+
+  - ``id uuid not null``
+
+  - ``disabled_on timestamp with time zone``
+
+  - ``name text not null``
+
+  - ``is_required boolean not null``
+
+  - ``type character varying(255) not null``
+
+  - ``order double precision not null``
+
+  - ``answer_option_id uuid not null``
+- **Interactions** The database table ``interaction_serviceansweroption`` has been added with the following columns:
+
+  - ``id uuid not null``
+
+  - ``disabled_on timestamp with time zone``
+
+  - ``name text not null``
+
+  - ``order double precision not null``
+
+  - ``question_id uuid not null``
+- **Interactions** The database table ``interaction_servicequestion`` has been added with the following columns:
+
+  - ``id uuid not null``
+
+  - ``disabled_on timestamp with time zone``
+
+  - ``name text not null``
+
+  - ``order double precision not null``
+
+  - ``service_id uuid not null``
+
+
 Data Hub API 12.3.0 (2019-05-22)
 ================================
 
