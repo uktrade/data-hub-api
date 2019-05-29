@@ -21,6 +21,9 @@ job_defaults: &job_defaults
   environment:
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
+    ACTIVITY_STREAM_OUTGOING_URL: http://activity.stream/
+    ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID: some-outgoing-id
+    ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY: some-outgoing-secret
     DATABASE_URL: postgresql://postgres@localhost/datahub
     MI_DATABASE_URL: postgresql://postgres@mi-postgres/mi
     DEBUG: 'True'
@@ -101,7 +104,6 @@ jobs:
 workflows:
   version: 2
 
-  # Current standard environment
   Default build:
     jobs:
       - build:
@@ -109,14 +111,4 @@ workflows:
           python_image: python:3.7
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
-
-  # Environment that we are migrating to
-  Next environment (Elasticsearch 6.6):
-    jobs:
-      - build:
-          publish_coverage: false
-          python_image: python:3.7
-          postgres_image: postgres:10
-          mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1

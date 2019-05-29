@@ -11,15 +11,7 @@
 
   <p>{% trans 'No interactions have been imported as none of the loaded interactions could be matched to active contacts.' %}</p>
 
-  <ul>
-    {% trans 'record was skipped as it could not be matched with an active contact' as unmatched_singular_text %}
-    {% trans 'records were skipped as they could not be matched with an active contact' as unmatched_plural_text %}
-    {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_unmatched singular_text=unmatched_singular_text plural_text=unmatched_plural_text only %}
-
-    {% trans 'record was skipped as it was matched with more than one active contact' as multiple_matches_singular_text %}
-    {% trans 'records were skipped as they were matched with more than one active contact' as multiple_matches_plural_text %}
-    {% include 'admin/interaction/interaction/fragment_import_count_line.html' with count=num_multiple_matches singular_text=multiple_matches_singular_text plural_text=multiple_matches_plural_text only %}
-  </ul>
+  {% include 'admin/interaction/interaction/fragment_post_import_counts.html' with num_matched=0 num_unmatched=num_unmatched num_multiple_matches=num_multiple_matches only %}
 
   <p>
     <a href="{% url opts|admin_urlname:'changelist' %}">

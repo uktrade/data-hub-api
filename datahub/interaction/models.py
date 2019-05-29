@@ -126,6 +126,47 @@ class InteractionDITParticipant(models.Model):
         unique_together = (('interaction', 'adviser'),)
 
 
+class ServiceQuestion(BaseOrderedConstantModel):
+    """Service question model."""
+
+    service = models.ForeignKey(
+        'metadata.Service',
+        related_name='interaction_questions',
+        on_delete=models.PROTECT,
+    )
+
+
+class ServiceAnswerOption(BaseOrderedConstantModel):
+    """Service answer option model."""
+
+    question = models.ForeignKey(
+        'interaction.ServiceQuestion',
+        related_name='answer_options',
+        on_delete=models.CASCADE,
+    )
+
+
+class ServiceAdditionalQuestion(BaseOrderedConstantModel):
+    """Service additional question model."""
+
+    TYPES = Choices(
+        ('text', 'Text'),
+        ('money', 'Money'),
+    )
+    type = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=TYPES,
+    )
+
+    is_required = models.BooleanField(default=False)
+
+    answer_option = models.ForeignKey(
+        'interaction.ServiceAnswerOption',
+        related_name='additional_questions',
+        on_delete=models.CASCADE,
+    )
+
+
 @reversion.register_base_model()
 class Interaction(ArchivableModel, BaseModel):
     """Interaction."""
@@ -160,9 +201,20 @@ class Interaction(ArchivableModel, BaseModel):
         choices=STATUSES,
         default=STATUSES.complete,
     )
-    # If source is set, it provides details of an external source that this
-    # interaction represents.  e.g. a calendar event
-    # {'id': 'abc123', 'type': 'calendar'}
+    # Set if the interaction was imported from an external source
+    # (e.g. an .ics (iCalendar) file or a CSV file).
+    #
+    # Examples
+    #
+    # Imported from a CSV file via the import interactions tool in the admin site:
+    #
+    # {
+    #     "file": {
+    #         "name": "<file name>",
+    #         "size": <file size in bytes>,
+    #         "sha256": "<SHA-256 hash>"
+    #     }
+    # }
     source = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
@@ -273,6 +325,8 @@ class Interaction(ArchivableModel, BaseModel):
     class Meta:
         indexes = [
             models.Index(fields=['-date', '-created_on']),
+            # For activity-stream
+            models.Index(fields=['modified_on', 'id']),
         ]
         permissions = (
             (

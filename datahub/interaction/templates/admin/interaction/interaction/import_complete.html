@@ -1,0 +1,22 @@
+{% extends 'admin/interaction/interaction/base_import.html' %}
+{% load admin_urls i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'interaction/admin/css/import-preview.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h2>
+    {% trans 'Import complete' %}
+  </h2>
+
+  {% include 'admin/interaction/interaction/fragment_post_import_counts.html' with num_matched=num_matched num_unmatched=num_unmatched num_multiple_matches=num_multiple_matches only %}
+
+  <p>
+    <a href="{% url opts|admin_urlname:'changelist' %}">
+      {% trans 'Return to the interaction list' %}
+    </a>
+  </p>
+
+{% endblock %}
