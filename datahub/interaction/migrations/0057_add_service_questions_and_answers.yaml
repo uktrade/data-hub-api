@@ -1,4 +1,3 @@
-# Service
 - model: metadata.service
   pk: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
   fields:
@@ -11,9 +10,6 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 054b29fe-c14b-463d-8177-c378d3a819aa
   fields:
@@ -26,8 +22,6 @@
     disabled_on:
     name: Was this of significant assistance?
     service_id: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
-
-# Answer options - who was the company introduced to?
 - model: interaction.serviceansweroption
   pk: a0fabd27-587b-49d1-9e56-eb789b66b7cd
   fields:
@@ -64,8 +58,6 @@
     disabled_on:
     name: UK Export Finance (UKEF)
     question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
-
-# Answer options - was this of significant assistance?
 - model: interaction.serviceansweroption
   pk: d8e6eb69-a09a-4767-9f7e-59d952cc4e60
   fields:
@@ -79,8 +71,6 @@
     name: No
     question_id: 335f31fd-8d43-4061-9648-a68d00834a0e
 
-####################################################################################
-# Service
 - model: metadata.service
   pk: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
   fields:
@@ -93,9 +83,6 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 26c08878-8dd1-4abf-bc59-84918086bf29
   fields:
@@ -108,8 +95,6 @@
     disabled_on:
     name: Was this of significant assistance?
     service_id: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
-
-# Answer options - who was the company introduced to?
 - model: interaction.serviceansweroption
   pk: 0529377a-57f1-4b27-baa0-4b9d9bbba8cd
   fields:
@@ -146,8 +131,6 @@
     disabled_on:
     name: UK Export Finance (UKEF)
     question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
-
-# Answer options - was this of significant assistance?
 - model: interaction.serviceansweroption
   pk: 59eb7ae0-ea31-4d35-a961-ccb21004f1dc
   fields:
@@ -161,9 +144,6 @@
     name: No
     question_id: 86f0e43e-3995-4a7c-9fe6-6f11d94ae475
 
-####################################################################################
-# Service - Global Growth Service
-
 - model: metadata.service
   pk: 03339685-d86e-48c3-bf4a-05a51821f6ca
   fields:
@@ -176,17 +156,12 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 7360689f-3a9b-4139-b888-265ae1149bff
   fields:
     disabled_on:
     name: Status
     service_id: 03339685-d86e-48c3-bf4a-05a51821f6ca
-
-# Answer options - Which stage of the Global Growth Service?
 - model: interaction.serviceansweroption
   pk: 13f7cdf4-4e5d-48a1-8c93-ab9d64b463a8
   fields:
@@ -211,20 +186,12 @@
     disabled_on:
     name: Signed Export Growth Plan Received from company
     question_id: 7360689f-3a9b-4139-b888-265ae1149bff
-
-####################################################################################
-# Service - Tradeshow Access Programme (TAP)
-# Service already exists
-# Questions
-
 - model: interaction.servicequestion
   pk: 13bdafaf-5a1f-4a8f-b622-46a29b413510
   fields:
     disabled_on:
     name: Status
     service_id: 380bba2b-3499-e211-a939-e4115bead28a
-
-# Answer options - Status?
 - model: interaction.serviceansweroption
   pk: cb960999-be0b-499e-aa99-842fbf4f581b
   fields:
@@ -261,9 +228,6 @@
     disabled_on:
     name: On-hold
     question_id: 13bdafaf-5a1f-4a8f-b622-46a29b413510
-
-# Additional questions
-# Current
 - model: interaction.serviceadditionalquestion
   pk: 295a69ac-d3ba-41cc-a779-aca2c408efc3
   fields:
@@ -272,8 +236,6 @@
     type: money
     is_required: false
     answer_option_id: 18cd5ca5-26d3-4ae0-abcf-269d513e5098
-
-# Completed
 - model: interaction.serviceadditionalquestion
   pk: f3fd9c77-c8ab-4806-b769-847cc57346a1
   fields:
@@ -290,8 +252,6 @@
     type: money
     is_required: false
     answer_option_id: c091120c-d68b-45c1-9b39-bc58693b4a64
-
-# Offered
 - model: interaction.serviceadditionalquestion
   pk: 1190e304-1f10-47ff-a59c-f8225924e467
   fields:
@@ -300,8 +260,6 @@
     type: money
     is_required: false
     answer_option_id: 59909007-c7e3-4794-8851-9f247f35b996
-
-# Withdrawn
 - model: interaction.serviceadditionalquestion
   pk: a4d00fd1-75ee-4e80-b2b6-8babfb6d655f
   fields:
@@ -310,8 +268,6 @@
     type: money
     is_required: false
     answer_option_id: 5659c5e9-2210-48c2-9d73-90934e132ca5
-
-# On-hold
 - model: interaction.serviceadditionalquestion
   pk: a4d00fd1-75ee-4e80-b2b6-8babfb6d655f
   fields:
@@ -320,9 +276,6 @@
     type: money
     is_required: false
     answer_option_id: 295a69ac-d3ba-41cc-a779-aca2c408efc3
-
-####################################################################################
-# Service - European Regional Development Fund (ERDF)
 
 - model: metadata.service
   pk: 87020ffd-1139-44f4-a497-6ff16f744c35
@@ -336,17 +289,12 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 1e672308-cb23-420d-8c77-1cda7dae4006
   fields:
     disabled_on:
     name: Status
     service_id: 87020ffd-1139-44f4-a497-6ff16f744c35
-
-# Answer options - Status?
 - model: interaction.serviceansweroption
   pk: d5e291aa-8a32-457c-8d6a-22b449af1f06
   fields:
@@ -383,8 +331,6 @@
     disabled_on:
     name: Withdrawn
     question_id: 1e672308-cb23-420d-8c77-1cda7dae4006
-
-# Grant Offered
 - model: interaction.serviceadditionalquestion
   pk: 192422c1-c159-47f1-8487-d4ac8f74192b
   fields:
@@ -393,8 +339,6 @@
     type: money
     is_required: false
     answer_option_id: 01bc4ce9-3c43-427e-a10a-17a9e667baa2
-
-# Grant paid
 - model: interaction.serviceadditionalquestion
   pk: f6836467-1f35-4534-8ea9-7f250ad96c30
   fields:
@@ -411,8 +355,6 @@
     type: money
     is_required: false
     answer_option_id: 1bef0162-299f-471a-ab6c-10b7fa2f3673
-
-# Final Sign-Off Form Completed
 - model: interaction.serviceadditionalquestion
   pk: 3cd045d6-98bc-487a-a2d7-4e795704938c
   fields:
@@ -429,8 +371,6 @@
     type: money
     is_required: false
     answer_option_id: 54239882-a260-49b3-8ebc-bd821a8b89d1
-
-# Withdrawn
 - model: interaction.serviceadditionalquestion
   pk: a3e5dfc5-39ea-44de-b39c-74292c55fe4e
   fields:
@@ -439,9 +379,6 @@
     type: money
     is_required: false
     answer_option_id: 70dbc063-9e21-4a3a-b486-f702530cb3de
-
-####################################################################################
-# Service - Trade Development Fund (TDF)
 
 - model: metadata.service
   pk: 2bf0b7aa-18dd-4190-b6d9-4a7cae24ce6e
@@ -455,17 +392,12 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 198ff01d-7441-4dd2-aac6-a7f036d2d030
   fields:
     disabled_on:
     name: Status
     service_id: 2bf0b7aa-18dd-4190-b6d9-4a7cae24ce6e
-
-# Answer options - Status?
 - model: interaction.serviceansweroption
   pk: a9b586bd-4014-4d15-9f5c-9a80c43e768d
   fields:
@@ -496,8 +428,6 @@
     disabled_on:
     name: On-hold
     question_id: 198ff01d-7441-4dd2-aac6-a7f036d2d030
-
-# Current
 - model: interaction.serviceadditionalquestion
   pk: a8668439-0a95-4490-ad58-f91a87317b12
   fields:
@@ -506,8 +436,6 @@
     type: money
     is_required: false
     answer_option_id: a9b586bd-4014-4d15-9f5c-9a80c43e768d
-
-# Completed
 - model: interaction.serviceadditionalquestion
   pk: 38de9f37-f6cf-4d74-a269-a4d4fdbd387d
   fields:
@@ -524,8 +452,6 @@
     type: money
     is_required: false
     answer_option_id: 14279e43-4ffb-4be0-859a-a2e1988ca528
-
-# Offered
 - model: interaction.serviceadditionalquestion
   pk: f876c41c-dfe1-460b-97d3-6184f9d41c6c
   fields:
@@ -534,8 +460,6 @@
     type: money
     is_required: false
     answer_option_id: edeb300e-ceb6-4d5c-9b8f-f4a9e4ad7720
-
-# Withdrawn
 - model: interaction.serviceadditionalquestion
   pk: c51f38ff-f10f-4e07-b05b-9bc7f9520789
   fields:
@@ -544,8 +468,6 @@
     type: money
     is_required: false
     answer_option_id: 375d9011-4d28-486e-a7ba-f8f642847315
-
-# On-hold
 - model: interaction.serviceadditionalquestion
   pk: bbd5d4c5-872d-4bc9-bd73-ae90c27db89e
   fields:
@@ -554,9 +476,6 @@
     type: money
     is_required: false
     answer_option_id: 96fb720f-05f8-4be4-8969-2131f49ba984
-
-####################################################################################
-# Service - OBN Services
 
 - model: metadata.service
   pk: 83f59603-bea8-4529-b73e-b91a9c5d0e9e
@@ -571,9 +490,6 @@
     - other_interaction
     - other_service_delivery
 
-####################################################################################
-# Service - Providing Export Advice & Information
-
 - model: metadata.service
   pk: 76d912d6-e9da-4963-80ae-d07f8f6feed7
   fields:
@@ -586,9 +502,6 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: a5e1124e-e303-4774-bac5-5a3a519273e4
   fields:
@@ -601,8 +514,6 @@
     disabled_on:
     name: Was this of significant assistance?
     service_id: 76d912d6-e9da-4963-80ae-d07f8f6feed7
-
-# Answer options - What did you give advice about?
 - model: interaction.serviceansweroption
   pk: eee5607c-db40-41f4-ba30-454302907f20
   fields:
@@ -645,8 +556,6 @@
     disabled_on:
     name: General
     question_id: a5e1124e-e303-4774-bac5-5a3a519273e4
-
-# Answer options - was this of significant assistance?
 - model: interaction.serviceansweroption
   pk: ab5755e9-8a1d-4bf5-bc9c-d604c8d27691
   fields:
@@ -660,9 +569,6 @@
     name: No
     question_id: 07419b81-5e9d-4d67-aae6-79af463e1df6
 
-####################################################################################
-# Service - Providing Investment Advice & Information
-
 - model: metadata.service
   pk: ef3218c1-bed6-4ad8-b8d5-8af2430d32ff
   fields:
@@ -675,9 +581,6 @@
     - investment_project_interaction
     - other_interaction
     - other_service_delivery
-
-# Questions
-
 - model: interaction.servicequestion
   pk: 3c69f671-0888-475c-97e5-bc55461db35e
   fields:
@@ -690,8 +593,6 @@
     disabled_on:
     name: Was this of significant assistance?
     service_id: ef3218c1-bed6-4ad8-b8d5-8af2430d32ff
-
-# Answer options - What did you give advice about?
 - model: interaction.serviceansweroption
   pk: d7293a68-05a6-461b-911c-2f07b4306c1e
   fields:
@@ -734,8 +635,6 @@
     disabled_on:
     name: General
     question_id: 3c69f671-0888-475c-97e5-bc55461db35e
-
-# Answer options - was this of significant assistance?
 - model: interaction.serviceansweroption
   pk: 4cab6210-c38f-4b3b-935d-f8cad14202f2
   fields:
