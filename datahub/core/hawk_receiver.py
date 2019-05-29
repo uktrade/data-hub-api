@@ -72,7 +72,7 @@ class HawkAuthentication(BaseAuthentication):
         if remote_address not in settings.HAWK_RECEIVER_IP_WHITELIST:
             logger.warning(
                 'Failed authentication: the X-Forwarded-For header was not '
-                'produced by a whitelisted IP',
+                f'produced by a whitelisted IP - found {remote_address}',
             )
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
