@@ -1,19 +1,22 @@
-import gzip
-from datetime import timedelta
+import hashlib
 from secrets import token_urlsafe
 
+import reversion
 from django.conf import settings
-from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import filesizeformat
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
 from datahub.core.exceptions import DataHubException
+from datahub.interaction.admin_csv_import.cache_utils import (
+    load_file_contents_and_name,
+    save_file_contents_and_name,
+)
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
 
-FILE_CACHE_TIMEOUT_SECS = int(timedelta(minutes=30).total_seconds())
+REVISION_COMMENT = 'Imported from file via the admin site.'
 
 
 class InteractionCSVForm(BaseCSVImportForm):
@@ -49,23 +52,42 @@ class InteractionCSVForm(BaseCSVImportForm):
         matching_counts = {status: 0 for status in ContactMatchingStatus}
         matched_rows = []
 
-        with self.open_file_as_dict_reader() as dict_reader:
-            for index, row in enumerate(dict_reader):
-                form = InteractionCSVRowForm(row_index=index, data=row)
+        for row_form in self._get_validated_row_form_iterator():
+            contact_matching_status = row_form.cleaned_data['contact_matching_status']
+            matching_counts[contact_matching_status] += 1
 
-                if not form.is_valid():
-                    # This should not happen. Just raise an exception to alert us if it does.
-                    raise DataHubException('CSV row unexpectedly failed revalidation')
+            is_row_matched = contact_matching_status == ContactMatchingStatus.matched
 
-                contact_matching_status = form.cleaned_data['contact_matching_status']
-                matching_counts[contact_matching_status] += 1
-
-                is_row_matched = contact_matching_status == ContactMatchingStatus.matched
-
-                if is_row_matched and len(matched_rows) < max_rows:
-                    matched_rows.append(form.cleaned_data_as_serializer_dict())
+            if is_row_matched and len(matched_rows) < max_rows:
+                matched_rows.append(row_form.cleaned_data_as_serializer_dict())
 
         return matching_counts, matched_rows
+
+    @reversion.create_revision()
+    def save(self, user):
+        """Saves all loaded rows matched with contacts."""
+        reversion.set_comment(REVISION_COMMENT)
+
+        csv_file = self.cleaned_data['csv_file']
+        sha256 = _sha256_for_file(csv_file)
+
+        source = {
+            'file': {
+                'name': csv_file.name,
+                'size': csv_file.size,
+                'sha256': sha256.hexdigest(),
+            },
+        }
+
+        matching_counts = {status: 0 for status in ContactMatchingStatus}
+
+        for row_form in self._get_validated_row_form_iterator():
+            if row_form.is_matched():
+                row_form.save(user, source)
+
+            matching_counts[row_form.cleaned_data['contact_matching_status']] += 1
+
+        return matching_counts
 
     def save_to_cache(self):
         """
@@ -73,18 +95,13 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         Can only be called on a validated form.
         """
+        token = token_urlsafe()
+
         csv_file = self.cleaned_data['csv_file']
         csv_file.seek(0)
-        data = csv_file.read()
-        compressed_data = gzip.compress(data)
+        contents = csv_file.read()
 
-        token = _make_token()
-        data_key, name_key = _cache_keys_for_token(token)
-        cache_keys_and_values = {
-            data_key: compressed_data,
-            name_key: csv_file.name,
-        }
-        cache.set_many(cache_keys_and_values, timeout=FILE_CACHE_TIMEOUT_SECS)
+        save_file_contents_and_name(token, contents, csv_file.name)
         return token
 
     @classmethod
@@ -94,16 +111,12 @@ class InteractionCSVForm(BaseCSVImportForm):
 
         Returns None if serialised data for the token can't be found in the cache.
         """
-        data_key, name_key = _cache_keys_for_token(token)
-        cache_keys_and_values = cache.get_many((data_key, name_key))
-
-        any_cache_keys_missing = {data_key, name_key} - cache_keys_and_values.keys()
-        if any_cache_keys_missing:
+        file_contents_and_name = load_file_contents_and_name(token)
+        if not file_contents_and_name:
             return None
 
-        decompressed_data = gzip.decompress(cache_keys_and_values[data_key])
-        name = cache_keys_and_values[name_key]
-        csv_file = SimpleUploadedFile(name=name, content=decompressed_data)
+        contents, name = file_contents_and_name
+        csv_file = SimpleUploadedFile(name=name, content=contents)
 
         return cls(
             files={
@@ -111,11 +124,29 @@ class InteractionCSVForm(BaseCSVImportForm):
             },
         )
 
+    def _get_validated_row_form_iterator(self):
+        """
+        Get a generator over InteractionCSVRowForm instances.
 
-def _make_token():
-    return token_urlsafe()
+        This should only be called if the rows have previously been validated.
+        """
+        with self.open_file_as_dict_reader() as dict_reader:
+            for index, row in enumerate(dict_reader):
+                row_form = InteractionCSVRowForm(row_index=index, data=row)
+
+                if not row_form.is_valid():
+                    # We are not expecting this to happen. Raise an exception to alert us if
+                    # it does.
+                    raise DataHubException('CSV row unexpectedly failed revalidation')
+
+                yield row_form
 
 
-def _cache_keys_for_token(token):
-    prefix = f'interaction-csv-import:{token}'
-    return f'{prefix}:data', f'{prefix}:name'
+def _sha256_for_file(file):
+    file.seek(0)
+
+    sha256 = hashlib.sha256()
+    for line in file:
+        sha256.update(line)
+
+    return sha256

@@ -118,11 +118,14 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     - the standard admin site functionality
     - the import interactions tool in the admin site
+    - the calendar meeting invite processing tool
 
     If you're making changes to interaction functionality you should consider if any changes
     are required to the functionality listed above as well.
 
-    (Also note that the import interactions tool also uses the validators from this class.)
+    Also note that the import interactions tool also uses the validators from this class,
+    the calendar meeting invite processing tool uses the serializer as a whole to
+    create interactions.
     """
 
     default_error_messages = {

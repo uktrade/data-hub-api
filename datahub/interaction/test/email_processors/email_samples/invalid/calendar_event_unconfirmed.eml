@@ -1,0 +1,102 @@
+Received: from CWXP123MB2325.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:61::24)
+ by LO2P123MB2253.GBRP123.PROD.OUTLOOK.COM with HTTPS via
+ LO2P265CA0036.GBRP265.PROD.OUTLOOK.COM; Mon, 13 May 2019 10:52:33 +0000
+Received: from CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM (20.179.108.206) by
+ CWXP123MB2325.GBRP123.PROD.OUTLOOK.COM (20.179.110.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1878.22; Mon, 13 May 2019 10:52:32 +0000
+Received: from CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::e80b:904e:8652:a808]) by CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::e80b:904e:8652:a808%7]) with mapi id 15.20.1878.024; Mon, 13 May 2019
+ 10:52:32 +0000
+Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@google.com header.s=20161025 header.b=OW9YZxC6;
+       dkim=pass header.i=@trade-gov-uk.20150623.gappssmtp.com header.s=20150623 header.b=sjezWYO1;
+       spf=pass (google.com: domain of adviser1@trade.gov.uk designates 209.85.220.73 as permitted sender) smtp.mailfrom=adviser1@trade.gov.uk;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=trade.gov.uk
+From: adviser1@trade.gov.uk
+To: bill.adama@example.net,saul.tigh@example.net,unknown@example.net
+CC: laura.roslin@example.net,saul.tigh@example.net,adviser2@digital.trade.gov.uk
+Subject: Meeting test outlook desktop
+Thread-Topic: Meeting test outlook desktop
+Thread-Index: AdUJefcnIx0OrxKz10aFOJ7oasJYvg==
+Date: Mon, 13 May 2019 11:52:32 +0100
+Message-ID:
+	<CWXP123MB2008236F14A5E2A22B2B65FFC90F0@CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: CWXP123MB2008.GBRP123.PROD.OUTLOOK.COM
+X-MS-Has-Attach:
+X-MS-Exchange-Organization-Network-Message-Id:
+	e266fdc6-aff8-4abb-0d59-08d6d79119de
+X-MS-Exchange-Organization-SCL: -1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-publictraffictype: Email
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;ex:0;auth:0;dest:I;ENG:(750119)(520011016)(706158)(944506303)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	rRWtr5Ko14Am6x2Tz5w/Jgseetq8LzLOWGYGYr1OTUpNmgw2OlNBZk7V+R7C2SWLxFoRninoVzDwdw/saq0T1qg3Hq9jNdG5JRjaP8nMV6spEcEGRMjo8JKztVkZ8mnELPrQDyluX46idKawQHE/f6RsFyQUyCqgZVN6wTBJc03n9UidrT/WMQT7Wtz69tYIlsHJ//iM2dfhgdkOmG0maKPdcnklKKx3/9Xit3zQJmHZs37OxhG3peVdFi0DrFCOkuJ5IDJpzdCI5vX4SBYen/EcAykDGmK0ApGOh/ez73kCrfdHbRxR0Y43KKNNvABG
+Content-Type: multipart/mixed; boundary="0000000000002a998305853a155b"
+
+--0000000000002a998305853a155b
+Content-Type: multipart/alternative; boundary="0000000000002a997f05853a1559"
+
+--0000000000002a997f05853a1559
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: quoted-printable
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20190329T163000Z
+DTEND:20190329T173000Z
+DTSTAMP:20190329T113633Z
+ORGANIZER;CN=3Dadviser1@trade.gov.uk:mailto:adviser1@digi=
+ta
+ l.trade.gov.uk
+UID:5iggr1e2luglss6c789b0scvgr@google.com
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DACCEPTED;RSV=
+P=3DTRUE
+ ;CN=3Dadviser1@trade.gov.uk;X-NUM-GUESTS=3D0:mailto:adviser1=
+@
+ digital.trade.gov.uk
+ATTENDEE;CUTYPE=3DINDIVIDUAL;ROLE=3DREQ-PARTICIPANT;PARTSTAT=3DNEEDS-ACTION=
+;RSVP=3D
+ TRUE;CN=3Dbill.adama@example.net;X-NUM-GUESTS=3D0:mailto:brendan@bsmitty.co=
+.uk
+CREATED:20190329T113628Z
+DESCRIPTION:foooobar\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of t=
+h
+ e description.\n\nThis event has a video call.\nJoin: https://meet.google.=
+c
+ om/tep-mywp-icw\n+1 443-671-4739 PIN: 601383231#\n\nView your event at htt=
+p
+ s://www.google.com/calendar/event?action=3DVIEW&eid=3DNWlnZ3IxZTJsdWdsc3M2=
+Yzc4O
+ WIwc2N2Z3IgYnJlbmRhbkBic21pdHR5LmNvLnVr&tok=3DMzQjYnJlbmRhbi5zbWl0aEBkaWdp=
+dGF
+ sLnRyYWRlLmdvdi51azBmYWI0ODM4ZWE3NGNiYzM2MjVmOTk4NzRlODk1Y2ViOTQ1Y2E0NmI&c=
+t
+ z=3DEurope%2FLondon&hl=3Den_GB&es=3D1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:=
+~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20190329T113631Z
+LOCATION:Somewhere\, Unit FF - 305 - =D8=B4=D8=A7=D8=B1=D8=B9 =D8=A7=D9=84=
+=D9=85=D8=B1=D9=83=D8=B2 =D8=A7=D9=84=D9=85=D8=A7=D9=84=D9=8A - =D8=AF=D8=
+=A8=D9=8A - United Arab
+  Emirates
+SEQUENCE:0
+STATUS:UNCONFIRMED
+SUMMARY:initial
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--0000000000002a997f05853a1559--

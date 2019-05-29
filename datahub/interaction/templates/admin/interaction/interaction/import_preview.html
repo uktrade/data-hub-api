@@ -25,7 +25,7 @@
   </ul>
 
   <p>
-    {% trans 'Review the interactions that will be imported below and click Import to complete the process.' %}
+    {% trans 'Review the interactions that will be imported below and click the import button to complete the process.' %}
   </p>
 
   <table>
@@ -83,13 +83,25 @@
 
   </table>
 
-  <p>
-  </p>
+  <p></p>
 
-  <p>
-    <a href="{% url opts|admin_urlname:'changelist' %}">
-      {% trans 'Cancel and return to the interaction list' %}
-    </a>
-  </p>
+  {% blocktrans count count=num_matched asvar import %}Import {{ count }} row{% plural %}Import {{ count }} rows{% endblocktrans %}
+
+  <form action="{% url opts|admin_urlname:'import-save' token=token %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div>
+      <input type="submit" value="{{ import }}">
+    </div>
+
+    <p></p>
+
+    <div>
+      <a href="{% url opts|admin_urlname:'import' %}">
+        {% trans 'Cancel and select another file' %}
+      </a>
+    </div>
+
+  </form>
 
 {% endblock %}

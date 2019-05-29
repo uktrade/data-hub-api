@@ -1,22 +1,32 @@
+import gzip
 import io
 
 import pytest
 from django.conf import settings
 from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
+from django.core.cache import cache
 from django.test import Client
 from django.urls import reverse
 from rest_framework import status
 
+from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
+from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.admin_csv_import.views import INTERACTION_IMPORTER_FEATURE_FLAG_NAME
+from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
+from datahub.interaction.admin_csv_import.views import (
+    INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
+    INVALID_TOKEN_MESSAGE,
+)
 from datahub.interaction.models import Interaction, InteractionPermission
 from datahub.interaction.test.admin_csv_import.utils import (
     make_csv_file,
     make_csv_file_from_dicts,
     make_matched_rows,
+    make_multiple_matches_rows,
+    make_unmatched_rows,
     random_communication_channel,
     random_service,
 )
@@ -34,6 +44,8 @@ import_interactions_url = reverse(
 interaction_change_list_url = reverse(
     admin_urlname(Interaction._meta, 'changelist'),
 )
+import_save_urlname = admin_urlname(Interaction._meta, 'import-save')
+import_complete_urlname = admin_urlname(Interaction._meta, 'import-complete')
 
 
 class TestInteractionAdminChangeList(AdminTestMixin):
@@ -83,6 +95,8 @@ class TestInteractionAdminChangeList(AdminTestMixin):
     (
         ('get', import_interactions_url),
         ('post', import_interactions_url),
+        ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
+        ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
     ),
 )
 class TestAccessRestrictions(AdminTestMixin):
@@ -135,6 +149,8 @@ class TestAccessRestrictions(AdminTestMixin):
     (
         ('get', import_interactions_url),
         ('post', import_interactions_url),
+        ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
+        ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
     ),
 )
 class Test404IfFeatureFlagDisabled(AdminTestMixin):
@@ -339,3 +355,201 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.context['num_multiple_matches'] == 0
         assert len(response.context['matched_rows']) == min(max_preview_rows, num_input_rows)
         assert response.context['num_matched_omitted'] == expected_num_omitted_rows
+
+
+@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+class TestImportInteractionsSaveView(AdminTestMixin):
+    """Tests for the import interaction save view."""
+
+    def test_redirects_and_displays_error_if_token_invalid(self):
+        """
+        Test that the user is redirected to the change list and an error is displayed if the
+        token is invalid.
+        """
+        url = reverse(
+            import_save_urlname,
+            kwargs={'token': 'invalid-token'},
+        )
+        response = self.client.post(url, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.redirect_chain == [
+            (interaction_change_list_url, status.HTTP_302_FOUND),
+        ]
+
+        messages = list(response.context['messages'])
+        assert len(messages) == 1
+        assert messages[0].level == django_messages.ERROR
+        assert messages[0].message == INVALID_TOKEN_MESSAGE
+
+    def test_raises_error_if_file_in_cache_is_invalid(self):
+        """
+        Test that if the file in the cache fails InteractionCSVForm re-validation,
+        a DataHubException is raised.
+
+        (This should not happen in normal circumstances.)
+        """
+        token = 'test-token'
+        compressed_conents = gzip.compress(b'invalid')
+        contents_key = _cache_key_for_token(token, CacheKeyType.file_contents)
+        name_key = _cache_key_for_token(token, CacheKeyType.file_name)
+
+        cache.set(contents_key, compressed_conents)
+        cache.set(name_key, 'test.csv')
+
+        url = reverse(
+            import_save_urlname,
+            kwargs={'token': token},
+        )
+        with pytest.raises(DataHubException):
+            self.client.post(url)
+
+    @pytest.mark.parametrize('num_matching', (5, 10))
+    @pytest.mark.parametrize('num_unmatched', (0, 6))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    def test_creates_interactions(self, num_matching, num_unmatched, num_multiple_matches):
+        """
+        Test that interactions are created if a valid token is provided, and that the
+        user is redirected to the import complete page.
+
+        Note: The full saving logic is tested in the InteractionCSVForm tests.
+        """
+        token = 'test-token'
+        matching_rows = _create_file_in_cache(
+            token,
+            num_matching,
+            num_unmatched,
+            num_multiple_matches,
+        )
+
+        url = reverse(
+            import_save_urlname,
+            kwargs={'token': token},
+        )
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        expected_redirect_url = reverse(
+            import_complete_urlname,
+            kwargs={'token': token},
+        )
+        assert response.url == expected_redirect_url
+
+        created_interactions = list(Interaction.objects.all())
+        assert len(created_interactions) == num_matching
+
+        expected_contact_emails = {row['contact_email'] for row in matching_rows}
+        actual_contact_emails = {
+            interaction.contacts.first().email for interaction in created_interactions
+        }
+        # Make sure the test was correctly set up with unique contact emails
+        assert len(actual_contact_emails) == num_matching
+        # Check that the interactions created are the ones we expect
+        # Note: the full saving logic for a row is tested in the InteractionCSVRowForm tests
+        assert expected_contact_emails == actual_contact_emails
+
+        # Check that created_by is set correctly
+        assert all([
+            interaction.created_by == self.user for interaction in created_interactions
+        ])
+
+    @pytest.mark.parametrize('num_matching', (5, 10))
+    @pytest.mark.parametrize('num_unmatched', (0, 6))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    def test_saves_results(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that counts by matching status are saved in the cache."""
+        token = 'test-token'
+        _create_file_in_cache(token, num_matching, num_unmatched, num_multiple_matches)
+
+        url = reverse(
+            import_save_urlname,
+            kwargs={'token': token},
+        )
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_302_FOUND
+
+        expected_redirect_url = reverse(
+            import_complete_urlname,
+            kwargs={'token': token},
+        )
+        assert response.url == expected_redirect_url
+
+        cache_key = _cache_key_for_token(token, CacheKeyType.result_counts_by_status)
+        matching_counts = cache.get(cache_key)
+        assert matching_counts == {
+            ContactMatchingStatus.matched: num_matching,
+            ContactMatchingStatus.unmatched: num_unmatched,
+            ContactMatchingStatus.multiple_matches: num_multiple_matches,
+        }
+
+
+@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+class TestImportInteractionsCompleteView(AdminTestMixin):
+    """Tests for the import complete view."""
+
+    def test_redirects_and_displays_error_if_token_invalid(self):
+        """
+        Test that the user is redirected to the change list and an error is displayed if the
+        token is invalid.
+        """
+        url = reverse(
+            import_complete_urlname,
+            kwargs={'token': 'invalid-token'},
+        )
+        response = self.client.post(url, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.redirect_chain == [
+            (interaction_change_list_url, status.HTTP_302_FOUND),
+        ]
+
+        messages = list(response.context['messages'])
+        assert len(messages) == 1
+        assert messages[0].level == django_messages.ERROR
+        assert messages[0].message == INVALID_TOKEN_MESSAGE
+
+    @pytest.mark.parametrize('num_matching', (1, 2))
+    @pytest.mark.parametrize('num_unmatched', (0, 1, 3))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 1, 4))
+    def test_displays_counts_by_status(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that counts are displayed for each matching status."""
+        token = 'test-token'
+        cache_key = _cache_key_for_token(token, CacheKeyType.result_counts_by_status)
+        cache_value = {
+            ContactMatchingStatus.matched: num_matching,
+            ContactMatchingStatus.unmatched: num_unmatched,
+            ContactMatchingStatus.multiple_matches: num_multiple_matches,
+        }
+        cache.set(cache_key, cache_value)
+
+        url = reverse(
+            import_complete_urlname,
+            kwargs={'token': token},
+        )
+        response = self.client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.context['num_matched'] == num_matching
+        assert response.context['num_unmatched'] == num_unmatched
+        assert response.context['num_multiple_matches'] == num_multiple_matches
+
+
+def _create_file_in_cache(token, num_matching, num_unmatched, num_multiple_matches):
+    matched_rows = make_matched_rows(num_matching)
+    unmatched_rows = make_unmatched_rows(num_unmatched)
+    multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
+
+    file = make_csv_file_from_dicts(
+        *matched_rows,
+        *unmatched_rows,
+        *multiple_matches_rows,
+        filename='cache-test.csv',
+    )
+    with file:
+        compressed_contents = gzip.compress(file.read())
+    contents_key = _cache_key_for_token(token, CacheKeyType.file_contents)
+    name_key = _cache_key_for_token(token, CacheKeyType.file_name)
+
+    cache.set(contents_key, compressed_contents)
+    cache.set(name_key, file.name)
+
+    return matched_rows

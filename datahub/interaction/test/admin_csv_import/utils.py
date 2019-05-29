@@ -59,7 +59,10 @@ def make_csv_file_from_dicts(*rows, fieldnames=None, encoding='utf-8-sig', filen
 
 def make_matched_rows(num_records):
     """Make multiple interaction CSV rows that should pass contact matching."""
-    adviser = AdviserFactory()
+    adviser = AdviserFactory(
+        first_name='Adviser for',
+        last_name='Matched interaction',
+    )
     service = random_service()
     communication_channel = random_communication_channel()
     contacts = ContactFactory.create_batch(
@@ -82,7 +85,10 @@ def make_matched_rows(num_records):
 
 def make_multiple_matches_rows(num_records):
     """Make multiple interaction CSV rows that should have multiple contact matches."""
-    adviser = AdviserFactory()
+    adviser = AdviserFactory(
+        first_name='Adviser for',
+        last_name='Multi-matched interaction',
+    )
     service = random_service()
     communication_channel = random_communication_channel()
 
@@ -104,7 +110,10 @@ def make_multiple_matches_rows(num_records):
 
 def make_unmatched_rows(num_records):
     """Make multiple interaction CSV rows that should have no contact matches."""
-    adviser = AdviserFactory()
+    adviser = AdviserFactory(
+        first_name='Adviser for',
+        last_name='Unmatched interaction',
+    )
     service = random_service()
     communication_channel = random_communication_channel()
 
