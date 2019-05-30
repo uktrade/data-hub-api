@@ -3,6 +3,7 @@ import hashlib
 
 import pytest
 from django.core.cache import cache
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from reversion.models import Revision, Version
 
@@ -12,6 +13,10 @@ from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import import file_form
 from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
 from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm, REVISION_COMMENT
+from datahub.interaction.admin_csv_import.row_form import (
+    CSVRowError,
+    DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
+)
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
     make_csv_file_from_dicts,
@@ -24,6 +29,31 @@ from datahub.interaction.test.admin_csv_import.utils import (
 @pytest.mark.django_db
 class TestInteractionCSVForm:
     """Tests for InteractionCSVForm."""
+
+    def test_get_row_errors_with_duplicate_rows(self):
+        """Test that duplicate rows are tracked and errors returned when encountered."""
+        matched_rows = make_matched_rows(5)
+
+        file = make_csv_file_from_dicts(
+            # Duplicate the first row
+            matched_rows[0],
+            *matched_rows,
+            *make_unmatched_rows(5),
+            *make_multiple_matches_rows(5),
+        )
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file.getvalue()),
+            },
+        )
+
+        assert form.is_valid()
+
+        row_errors = list(form.get_row_error_iterator())
+        assert row_errors == [
+            CSVRowError(1, NON_FIELD_ERRORS, '', DUPLICATE_OF_ANOTHER_ROW_MESSAGE),
+        ]
 
     @pytest.mark.parametrize(
         'num_matching,num_unmatched,num_multiple_matches,max_returned_rows',
