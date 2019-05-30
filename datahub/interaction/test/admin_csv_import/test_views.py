@@ -172,6 +172,37 @@ class Test404IfFeatureFlagDisabled(AdminTestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.parametrize(
+    'http_method,url',
+    (
+        ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
+        ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
+    ),
+)
+@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+class TestInvalidTokenRedirectView(AdminTestMixin):
+    """Tests for handling of invalid tokens in views that require a token."""
+
+    def test_redirects_and_displays_error_if_token_invalid(self, http_method, url):
+        """
+        Test that the user is redirected to the change list and an error is displayed if the
+        token is invalid.
+        """
+        # Note: Client.generic() doesn't support follow=True
+        request_func = getattr(self.client, http_method)
+        response = request_func(url, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.redirect_chain == [
+            (interaction_change_list_url, status.HTTP_302_FOUND),
+        ]
+
+        messages = list(response.context['messages'])
+        assert len(messages) == 1
+        assert messages[0].level == django_messages.ERROR
+        assert messages[0].message == INVALID_TOKEN_MESSAGE
+
+
 @pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
 class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
@@ -361,27 +392,6 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 class TestImportInteractionsSaveView(AdminTestMixin):
     """Tests for the import interaction save view."""
 
-    def test_redirects_and_displays_error_if_token_invalid(self):
-        """
-        Test that the user is redirected to the change list and an error is displayed if the
-        token is invalid.
-        """
-        url = reverse(
-            import_save_urlname,
-            kwargs={'token': 'invalid-token'},
-        )
-        response = self.client.post(url, follow=True)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.redirect_chain == [
-            (interaction_change_list_url, status.HTTP_302_FOUND),
-        ]
-
-        messages = list(response.context['messages'])
-        assert len(messages) == 1
-        assert messages[0].level == django_messages.ERROR
-        assert messages[0].message == INVALID_TOKEN_MESSAGE
-
     def test_raises_error_if_file_in_cache_is_invalid(self):
         """
         Test that if the file in the cache fails InteractionCSVForm re-validation,
@@ -485,27 +495,6 @@ class TestImportInteractionsSaveView(AdminTestMixin):
 @pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
 class TestImportInteractionsCompleteView(AdminTestMixin):
     """Tests for the import complete view."""
-
-    def test_redirects_and_displays_error_if_token_invalid(self):
-        """
-        Test that the user is redirected to the change list and an error is displayed if the
-        token is invalid.
-        """
-        url = reverse(
-            import_complete_urlname,
-            kwargs={'token': 'invalid-token'},
-        )
-        response = self.client.post(url, follow=True)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.redirect_chain == [
-            (interaction_change_list_url, status.HTTP_302_FOUND),
-        ]
-
-        messages = list(response.context['messages'])
-        assert len(messages) == 1
-        assert messages[0].level == django_messages.ERROR
-        assert messages[0].message == INVALID_TOKEN_MESSAGE
 
     @pytest.mark.parametrize('num_matching', (1, 2))
     @pytest.mark.parametrize('num_unmatched', (0, 1, 3))
