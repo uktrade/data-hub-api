@@ -1,1 +1,1 @@
-Added a GIN index for ``source`` on the ``interaction_interaction`` table.
+A GIN index for ``source`` was added to the ``interaction_interaction`` table.
