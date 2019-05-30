@@ -18,7 +18,8 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
 from datahub.interaction.admin_csv_import.views import (
     INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
-    INVALID_TOKEN_MESSAGE,
+    INVALID_TOKEN_MESSAGE_DURING_SAVE,
+    INVALID_TOKEN_MESSAGE_POST_SAVE,
 )
 from datahub.interaction.models import Interaction, InteractionPermission
 from datahub.interaction.test.admin_csv_import.utils import (
@@ -173,17 +174,30 @@ class Test404IfFeatureFlagDisabled(AdminTestMixin):
 
 
 @pytest.mark.parametrize(
-    'http_method,url',
+    'http_method,url,expected_message',
     (
-        ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
-        ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
+        (
+            'post',
+            reverse(import_save_urlname, kwargs={'token': 'test-token'}),
+            INVALID_TOKEN_MESSAGE_DURING_SAVE,
+        ),
+        (
+            'get',
+            reverse(import_complete_urlname, kwargs={'token': 'test-token'}),
+            INVALID_TOKEN_MESSAGE_POST_SAVE,
+        ),
     ),
 )
 @pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
 class TestInvalidTokenRedirectView(AdminTestMixin):
     """Tests for handling of invalid tokens in views that require a token."""
 
-    def test_redirects_and_displays_error_if_token_invalid(self, http_method, url):
+    def test_redirects_and_displays_error_if_token_invalid(
+        self,
+        http_method,
+        url,
+        expected_message,
+    ):
         """
         Test that the user is redirected to the change list and an error is displayed if the
         token is invalid.
@@ -200,7 +214,7 @@ class TestInvalidTokenRedirectView(AdminTestMixin):
         messages = list(response.context['messages'])
         assert len(messages) == 1
         assert messages[0].level == django_messages.ERROR
-        assert messages[0].message == INVALID_TOKEN_MESSAGE
+        assert messages[0].message == expected_message
 
 
 @pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
