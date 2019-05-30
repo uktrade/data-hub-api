@@ -360,7 +360,7 @@ class AddressSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         # populate fields' source
-        for field_name, field in self.fields.items():
+        for field in self.fields.values():
             field.source = field.source.format(source_prefix=address_source_prefix)
             field.source_attrs = field.source.split('.')
 

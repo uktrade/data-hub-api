@@ -125,7 +125,7 @@ class TestOrderGenerateReference:
         mock_get_random_string.side_effect = ['ABC', '123'] * max_retries
 
         with pytest.raises(RuntimeError):
-            for index in range(max_retries):
+            for _ in range(max_retries):
                 OrderWithRandomPublicTokenFactory()
 
 
@@ -175,7 +175,7 @@ class TestOrderGeneratePublicToken:
         mock_secrets.token_urlsafe.side_effect = ['9999'] * max_retries
 
         with pytest.raises(RuntimeError):
-            for index in range(max_retries):
+            for _ in range(max_retries):
                 OrderWithRandomReferenceFactory()
 
 

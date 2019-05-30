@@ -510,7 +510,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         )
 
         # the 4th time it should error
-        for dummy in range(3):
+        for _ in range(3):
             response = client.post(url)
             assert response.status_code == status.HTTP_201_CREATED
 
