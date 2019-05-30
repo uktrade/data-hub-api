@@ -1,5 +1,7 @@
+import csv
 import gzip
 import io
+from cgi import parse_header
 
 import pytest
 from django.conf import settings
@@ -8,6 +10,7 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.cache import cache
 from django.test import Client
 from django.urls import reverse
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.company.contact_matching import ContactMatchingStatus
@@ -15,7 +18,11 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
+from datahub.interaction.admin_csv_import.cache_utils import (
+    _cache_key_for_token,
+    CacheKeyType,
+    load_unmatched_rows_csv_contents,
+)
 from datahub.interaction.admin_csv_import.views import (
     INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
     INVALID_TOKEN_MESSAGE_DURING_SAVE,
@@ -47,6 +54,7 @@ interaction_change_list_url = reverse(
 )
 import_save_urlname = admin_urlname(Interaction._meta, 'import-save')
 import_complete_urlname = admin_urlname(Interaction._meta, 'import-complete')
+import_download_unmatched_urlname = admin_urlname(Interaction._meta, 'import-download-unmatched')
 
 
 class TestInteractionAdminChangeList(AdminTestMixin):
@@ -98,6 +106,7 @@ class TestInteractionAdminChangeList(AdminTestMixin):
         ('post', import_interactions_url),
         ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
         ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
+        ('get', reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'})),
     ),
 )
 class TestAccessRestrictions(AdminTestMixin):
@@ -152,6 +161,7 @@ class TestAccessRestrictions(AdminTestMixin):
         ('post', import_interactions_url),
         ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
         ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
+        ('get', reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'})),
     ),
 )
 class Test404IfFeatureFlagDisabled(AdminTestMixin):
@@ -184,6 +194,11 @@ class Test404IfFeatureFlagDisabled(AdminTestMixin):
         (
             'get',
             reverse(import_complete_urlname, kwargs={'token': 'test-token'}),
+            INVALID_TOKEN_MESSAGE_POST_SAVE,
+        ),
+        (
+            'get',
+            reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'}),
             INVALID_TOKEN_MESSAGE_POST_SAVE,
         ),
     ),
@@ -505,6 +520,34 @@ class TestImportInteractionsSaveView(AdminTestMixin):
             ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
 
+    @pytest.mark.parametrize(
+        'num_unmatched,num_multiple_matches',
+        (
+            (0, 6),
+            (6, 0),
+        ),
+    )
+    def test_stores_unmatched_rows(self, num_unmatched, num_multiple_matches):
+        """Test that unmatched rows are saved in the cache."""
+        token = 'test-token'
+        _create_file_in_cache(token, 1, num_unmatched, num_multiple_matches)
+
+        url = reverse(import_save_urlname, kwargs={'token': token})
+        response = self.client.post(url)
+        assert response.status_code == status.HTTP_302_FOUND
+
+        expected_redirect_url = reverse(import_complete_urlname, kwargs={'token': token})
+        assert response.url == expected_redirect_url
+
+        unmatched_rows_csv_contents = load_unmatched_rows_csv_contents(token)
+        assert unmatched_rows_csv_contents
+
+        with io.BytesIO(unmatched_rows_csv_contents) as stream:
+            reader = csv.reader(io.TextIOWrapper(stream, encoding='utf-8-sig'))
+            # The content is checked in tests for UnmatchedRowCollector and InteractionCSVForm
+            # Add one for the header
+            assert len(list(reader)) == num_unmatched + num_multiple_matches + 1
+
 
 @pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
 class TestImportInteractionsCompleteView(AdminTestMixin):
@@ -534,6 +577,36 @@ class TestImportInteractionsCompleteView(AdminTestMixin):
         assert response.context['num_matched'] == num_matching
         assert response.context['num_unmatched'] == num_unmatched
         assert response.context['num_multiple_matches'] == num_multiple_matches
+
+
+@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+class TestImportInteractionsDownloadUnmatchedView(AdminTestMixin):
+    """Tests for the download unmatched rows view."""
+
+    @pytest.mark.parametrize('num_matching', (1, 2))
+    @pytest.mark.parametrize('num_unmatched', (0, 1, 3))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 1, 4))
+    @freeze_time('2019-05-10 12:13:14')
+    def test_can_download_unmatched_rows(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that unmatched rows can be downloaded."""
+        token = 'test-token'
+        file_contents = 'unmatched-rows'.encode('utf-8-sig')
+        cache_key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+        cache.set(cache_key, gzip.compress(file_contents))
+
+        url = reverse(
+            import_download_unmatched_urlname,
+            kwargs={'token': token},
+        )
+        response = self.client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response['Content-Type']) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response['Content-Disposition']) == (
+            'attachment',
+            {'filename': 'Unmatched interactions - 2019-05-10-12-13-14.csv'},
+        )
+        assert response.getvalue() == file_contents
 
 
 def _create_file_in_cache(token, num_matching, num_unmatched, num_multiple_matches):
