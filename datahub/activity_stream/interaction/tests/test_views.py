@@ -16,6 +16,7 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
+from datahub.metadata.test.factories import TeamFactory
 
 
 def _url(name):
@@ -554,3 +555,32 @@ def test_cursor_pagination(api_client, monkeypatch):
     data = response.json()
     assert len(data['orderedItems']) == page_size
     assert data['next'] == next_page_url
+
+
+@pytest.mark.django_db
+def test_null_adviser(api_client):
+    """
+    Test that we can handle dit_participant.adviser being None
+    """
+    interaction = CompanyInteractionFactory(dit_participants=[])
+    InteractionDITParticipantFactory(
+        interaction=interaction,
+        adviser=None,
+        team=TeamFactory(),
+    )
+    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_null_team(api_client):
+    """
+    Test that we can handle dit_participant.team being None
+    """
+    interaction = EventServiceDeliveryFactory(dit_participants=[])
+    InteractionDITParticipantFactory(
+        interaction=interaction,
+        team=None,
+    )
+    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    assert response.status_code == status.HTTP_200_OK
