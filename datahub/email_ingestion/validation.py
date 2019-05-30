@@ -1,25 +1,26 @@
+from authres import AuthenticationResultsHeader
 from django.conf import settings
 
 
-def _verify_authentication(message, from_email):
-    authentication_lines = [
-        line.strip() for line in message.authentication_results.split('\n')
-    ]
-    auth_results = {
-        'dkim': False,
-        'spf': False,
-        'dmarc': False,
-    }
-    for line in authentication_lines:
-        if line.startswith('dkim'):
-            auth_results['dkim'] = line.startswith('dkim=pass')
-        if line.startswith('spf'):
-            spf_valid = (
-                line.startswith('spf=pass') and line.endswith(f'smtp.mailfrom={from_email};')
-            )
-            auth_results['spf'] = spf_valid
-        if line.startswith('dmarc'):
-            auth_results['dmarc'] = line.startswith('dmarc=pass')
+def _verify_authentication(message, auth_methods=None):
+    """
+    Verify the Authentication-Results header of a MailParser object.
+
+    :param message: mailparse.MailParser object - the message to check
+    :param auth_methods: Optional - An iterable of email authentication methods
+        to check.  Defaults to ('dkim', 'spf', 'dmarc').
+
+    :returns: A boolean for whether or not the Authentication-Results header
+        was verified.
+    """
+    if not auth_methods:
+        auth_methods = ('dkim', 'spf', 'dmarc')
+    header_contents = ' '.join(message.authentication_results.split('\n'))
+    auth_parser = AuthenticationResultsHeader.parse(f'Authentication-Results: {header_contents}')
+    auth_results = {auth_method: False for auth_method in auth_methods}
+    for auth_mechanism in auth_parser.results:
+        if auth_mechanism.method in auth_results.keys():
+            auth_results[auth_mechanism.method] = auth_mechanism.result == 'pass'
     all_auth_pass = all(auth_results.values())
     return all_auth_pass
 
@@ -49,5 +50,5 @@ def was_email_sent_by_dit(message):
     ])
     if from_domain_is_authentication_exempt:
         return True
-    authentication_pass = _verify_authentication(message, from_email)
+    authentication_pass = _verify_authentication(message)
     return authentication_pass
