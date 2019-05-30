@@ -27,9 +27,12 @@ MAX_ERRORS_TO_DISPLAY = 50
 MAX_PREVIEW_ROWS_TO_DISPLAY = 100
 PAGE_TITLE = gettext_lazy('Import interactions')
 
-INVALID_TOKEN_MESSAGE = gettext_lazy(
+INVALID_TOKEN_MESSAGE_DURING_SAVE = gettext_lazy(
     'The CSV file referenced is no longer available and may have expired. Please upload '
     'the file again.',
+)
+INVALID_TOKEN_MESSAGE_POST_SAVE = gettext_lazy(
+    'Sorry, we could not find the results for that import operation. They may have expired.',
 )
 
 
@@ -100,7 +103,7 @@ class InteractionCSVImportAdmin:
         form = InteractionCSVForm.from_token(token)
 
         if not form:
-            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE, ERROR)
+            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE_DURING_SAVE, ERROR)
             return _redirect_response('changelist')
 
         if not form.is_valid():
@@ -123,7 +126,7 @@ class InteractionCSVImportAdmin:
         counts_by_status = load_result_counts_by_status(token)
 
         if not counts_by_status:
-            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE, ERROR)
+            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE_POST_SAVE, ERROR)
             return _redirect_response('changelist')
 
         return self._complete_response(request, counts_by_status)
