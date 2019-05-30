@@ -565,7 +565,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
                 del validated_data_dict[assignee_adviser_id]
 
         # ADD
-        for assignee_adviser_id, data in validated_data_dict.items():
+        for data in validated_data_dict.values():
             data = {
                 **data,
                 'order': order,

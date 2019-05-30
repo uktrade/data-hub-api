@@ -96,7 +96,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         try:
             interaction_data = email_parser.extract_interaction_data_from_email()
         except ValidationError as exc:
-            return (False, exc.message)
+            return (False, exc.message)  # noqa: B306
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company

@@ -27,7 +27,7 @@ def test_csv_iterator_with_error():
     row = None
 
     with pytest.raises(ValueError):
-        for row in csv_iterator(_rows(), {'id': 'id'}):
+        for row in csv_iterator(_rows(), {'id': 'id'}):  # noqa: B007
             pass
 
     assert row == INCOMPLETE_CSV_MESSAGE
