@@ -1,4 +1,4 @@
-Activated a feature for ingesting meeting invite emails sent to a shared mailbox as draft
+A feature was activated for ingesting meeting invite emails sent to a shared mailbox as draft
 interactions. This enables DIT advisers to create interactions more easily.
 
 This is the first instance of a Data Hub app using the framework provided by the
