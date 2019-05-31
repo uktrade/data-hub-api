@@ -158,7 +158,7 @@ class CalendarInteractionEmailParser:
         secondary_advisers = []
         for recipient_email in all_recipients:
             adviser = _get_best_match_adviser_by_email(recipient_email)
-            if adviser:
+            if adviser and adviser != sender_adviser:
                 secondary_advisers.append(adviser)
         return secondary_advisers
 

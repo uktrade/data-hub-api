@@ -170,10 +170,13 @@ class TestCalendarInteractionEmailParser:
         parser = self._get_parser_for_email_file(email_file)
         interaction_data = parser.extract_interaction_data_from_email()
         assert interaction_data['sender'].email == expected_interaction_data['adviser_email']
-        for contact in interaction_data['contacts']:
-            assert contact.email in expected_interaction_data['contact_emails']
-        for adviser in interaction_data['secondary_advisers']:
-            assert adviser.email in expected_interaction_data['secondary_adviser_emails']
+        contact_emails = {contact.email for contact in interaction_data['contacts']}
+        assert contact_emails == set(expected_interaction_data['contact_emails'])
+        secondary_adviser_emails = {
+            adviser.email for adviser in interaction_data['secondary_advisers']
+        }
+        expected_secondary_adviser_emails = expected_interaction_data['secondary_adviser_emails']
+        assert secondary_adviser_emails == set(expected_secondary_adviser_emails)
         assert (
             interaction_data['top_company'].name == expected_interaction_data['top_company_name']
         )
