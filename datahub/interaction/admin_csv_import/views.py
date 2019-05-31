@@ -1,23 +1,30 @@
+import io
+from datetime import timedelta
 from itertools import islice
 
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth.decorators import permission_required
 from django.contrib.messages import ERROR
-from django.http import HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_POST
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin import max_upload_size
+from datahub.core.csv import CSV_CONTENT_TYPE
 from datahub.core.exceptions import DataHubException
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.admin_csv_import.cache_utils import (
+    CACHE_VALUE_TIMEOUT,
     load_result_counts_by_status,
+    load_unmatched_rows_csv_contents,
     save_result_counts_by_status,
+    save_unmatched_rows_csv_contents,
 )
 from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm
 from datahub.interaction.models import Interaction, InteractionPermission
@@ -27,9 +34,12 @@ MAX_ERRORS_TO_DISPLAY = 50
 MAX_PREVIEW_ROWS_TO_DISPLAY = 100
 PAGE_TITLE = gettext_lazy('Import interactions')
 
-INVALID_TOKEN_MESSAGE = gettext_lazy(
+INVALID_TOKEN_MESSAGE_DURING_SAVE = gettext_lazy(
     'The CSV file referenced is no longer available and may have expired. Please upload '
     'the file again.',
+)
+INVALID_TOKEN_MESSAGE_POST_SAVE = gettext_lazy(
+    'Sorry, we could not find the results for that import operation. They may have expired.',
 )
 
 
@@ -73,6 +83,11 @@ class InteractionCSVImportAdmin:
                 admin_site.admin_view(self.complete),
                 name=f'{model_meta.app_label}_{model_meta.model_name}_import-complete',
             ),
+            path(
+                'import/<token>/download-unmatched',
+                admin_site.admin_view(self.download_unmatched),
+                name=f'{model_meta.app_label}_{model_meta.model_name}_import-download-unmatched',
+            ),
         ]
 
     @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
@@ -100,15 +115,19 @@ class InteractionCSVImportAdmin:
         form = InteractionCSVForm.from_token(token)
 
         if not form:
-            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE, ERROR)
+            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE_DURING_SAVE, ERROR)
             return _redirect_response('changelist')
 
         if not form.is_valid():
             # This should not happen, so we simply raise an error to alert us if it does
             raise DataHubException('Unexpected form re-validation failure')
 
-        matching_counts = form.save(request.user)
+        matching_counts, unmatched_row_collector = form.save(request.user)
         save_result_counts_by_status(token, matching_counts)
+
+        unmatched_rows_csv_contents = unmatched_row_collector.to_raw_csv()
+        if unmatched_rows_csv_contents:
+            save_unmatched_rows_csv_contents(token, unmatched_rows_csv_contents)
 
         # Redirect to another page to display a confirmation message on success (following the
         # standard Django pattern to limit the possibility of a form resubmission on page
@@ -123,10 +142,30 @@ class InteractionCSVImportAdmin:
         counts_by_status = load_result_counts_by_status(token)
 
         if not counts_by_status:
-            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE, ERROR)
+            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE_POST_SAVE, ERROR)
             return _redirect_response('changelist')
 
-        return self._complete_response(request, counts_by_status)
+        return self._complete_response(request, token, counts_by_status)
+
+    @interaction_change_all_permission_required
+    @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
+    def download_unmatched(self, request, token=None, *args, **kwargs):
+        """Download unmatched rows as a CSV file following a successful import operation."""
+        unmatched_rows_csv_contents = load_unmatched_rows_csv_contents(token)
+
+        if not unmatched_rows_csv_contents:
+            self.model_admin.message_user(request, INVALID_TOKEN_MESSAGE_POST_SAVE, ERROR)
+            return _redirect_response('changelist')
+
+        timestamp = now().strftime('%Y-%m-%d-%H-%M-%S')
+        filename = f'Unmatched interactions - {timestamp}.csv'
+
+        return FileResponse(
+            io.BytesIO(unmatched_rows_csv_contents),
+            as_attachment=True,
+            content_type=CSV_CONTENT_TYPE,
+            filename=filename,
+        )
 
     def _select_file_form_response(self, request, form):
         return self._template_response(
@@ -168,11 +207,13 @@ class InteractionCSVImportAdmin:
             token=token,
         )
 
-    def _complete_response(self, request, counts_by_status):
+    def _complete_response(self, request, token, counts_by_status):
         return self._template_response(
             request,
             f'admin/interaction/interaction/import_complete.html',
             PAGE_TITLE,
+            token=token,
+            download_timeout_mins=CACHE_VALUE_TIMEOUT // timedelta(minutes=1),
             num_matched=counts_by_status[ContactMatchingStatus.matched],
             num_unmatched=counts_by_status[ContactMatchingStatus.unmatched],
             num_multiple_matches=counts_by_status[ContactMatchingStatus.multiple_matches],

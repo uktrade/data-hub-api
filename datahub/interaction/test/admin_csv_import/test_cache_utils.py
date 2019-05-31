@@ -1,13 +1,18 @@
 import gzip
+from datetime import datetime, timedelta
 
 import pytest
 from django.core.cache import cache
+from freezegun import freeze_time
 
 from datahub.interaction.admin_csv_import.cache_utils import (
     _cache_key_for_token,
+    CACHE_VALUE_TIMEOUT,
     CacheKeyType,
     load_file_contents_and_name,
+    load_unmatched_rows_csv_contents,
     save_file_contents_and_name,
+    save_unmatched_rows_csv_contents,
 )
 
 
@@ -69,6 +74,51 @@ class TestSaveFileContentsAndName:
 
         saved_contents = gzip.decompress(cache.get(contents_key))
         assert saved_contents == contents
+
+
+@pytest.mark.usefixtures('local_memory_cache')
+class TestLoadUnmatchedRowsCSVContents:
+    """Tests for load_unmatched_rows_csv_contents()."""
+
+    def test_loads_unmatched_rows(self):
+        """Test that the file is loaded from the cache."""
+        contents = b'file-contents'
+        token = 'test-token'
+
+        key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+        cache.set(key, gzip.compress(contents))
+
+        assert load_unmatched_rows_csv_contents(token) == contents
+
+
+@pytest.mark.usefixtures('local_memory_cache')
+class TestSaveUnmatchedRowsCSVContents:
+    """Tests for save_unmatched_rows_csv_contents()."""
+
+    def test_saves_unmatched_rows(self):
+        """Test that the file is saved to the cache."""
+        contents = b'file-contents'
+        token = 'test-token'
+
+        save_unmatched_rows_csv_contents(token, contents)
+
+        key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+        saved_contents = gzip.decompress(cache.get(key))
+        assert saved_contents == contents
+
+    def test_key_expires(self):
+        """Test that the key expires after the expiry period."""
+        contents = b'file-contents'
+        token = 'test-token'
+        base_datetime = datetime(2019, 2, 3)
+
+        with freeze_time(base_datetime):
+            save_unmatched_rows_csv_contents(token, contents)
+
+        key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+
+        with freeze_time(base_datetime + CACHE_VALUE_TIMEOUT + timedelta(minutes=1)):
+            assert cache.get(key) is None
 
 
 class TestCacheKeyForToken:
