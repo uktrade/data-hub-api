@@ -31,6 +31,7 @@
   <table>
     <thead>
       <tr>
+        <th>{% trans 'Theme' %}</th>
         <th>{% trans 'Kind' %}</th>
         <th>{% trans 'Date' %}</th>
         <th>{% trans 'Advisers' %}</th>
@@ -45,6 +46,7 @@
     </thead>
   {% for row in matched_rows %}
     <tr class="{% cycle 'row1' 'row2' %}">
+      <td>{{ row.theme }}</td>
       <td>{{ row.kind }}</td>
       <td>{{ row.date }}</td>
       <td>
