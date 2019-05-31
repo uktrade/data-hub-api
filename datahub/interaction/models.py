@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from model_utils import Choices
@@ -327,6 +328,8 @@ class Interaction(ArchivableModel, BaseModel):
             models.Index(fields=['-date', '-created_on']),
             # For activity-stream
             models.Index(fields=['modified_on', 'id']),
+            # For meeting update lookups
+            GinIndex(fields=['source']),
         ]
         permissions = (
             (
