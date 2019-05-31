@@ -320,12 +320,6 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'name': interaction.service.name,
             },
             'subject': interaction.subject,
-            'dit_adviser': {
-                'id': str(interaction.dit_adviser.pk),
-                'first_name': interaction.dit_adviser.first_name,
-                'name': interaction.dit_adviser.name,
-                'last_name': interaction.dit_adviser.last_name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -342,10 +336,6 @@ class TestInteractionEntitySearchView(APITestMixin):
                 for dit_participant in interaction.dit_participants.order_by('adviser__pk')
             ],
             'notes': interaction.notes,
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
-            },
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,
@@ -1051,12 +1041,6 @@ class TestInteractionBasicSearch(APITestMixin):
                 'name': interaction.service.name,
             },
             'subject': interaction.subject,
-            'dit_adviser': {
-                'id': str(interaction.dit_adviser.pk),
-                'first_name': interaction.dit_adviser.first_name,
-                'name': interaction.dit_adviser.name,
-                'last_name': interaction.dit_adviser.last_name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -1073,10 +1057,6 @@ class TestInteractionBasicSearch(APITestMixin):
                 for dit_participant in interaction.dit_participants.order_by('adviser__pk')
             ],
             'notes': interaction.notes,
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
-            },
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name,
