@@ -1,0 +1,1 @@
+``GET /v3/search``, ``POST /v3/search/interaction``: The deprecated ``dit_adviser`` and ``dit_team`` interaction fields were removed from interaction objects in responses. Please use ``dit_participants`` instead.
