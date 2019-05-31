@@ -75,8 +75,8 @@ class TestCSVRowError:
 
 
 @pytest.mark.django_db
-class TestInteractionCSVRowForm:
-    """Tests for InteractionCSVRowForm."""
+class TestInteractionCSVRowFormValidation:
+    """Tests for validation in InteractionCSVRowForm."""
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -565,6 +565,15 @@ class TestInteractionCSVRowForm:
         form = InteractionCSVRowForm(data=data, duplicate_tracker=duplicate_tracker)
         assert form.errors == expected_errors
 
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormCleaning:
+    """
+    Tests for field cleaning in InteractionCSVRowForm.
+
+    This includes looking up model objects and the transformation of values (but not validation).
+    """
+
     @pytest.mark.parametrize(
         'field,input_value,expected_value',
         (
@@ -862,6 +871,11 @@ class TestInteractionCSVRowForm:
         else:
             assert not contact
 
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormGetFlatErrorListIterator:
+    """Tests for InteractionCSVRowForm.get_flat_error_list_iterator()."""
+
     def test_get_flat_error_list_iterator(self):
         """Test that get_flat_error_list_iterator() returns a flat list of errors."""
         data = {
@@ -908,6 +922,14 @@ class TestInteractionCSVRowForm:
             ),
         ]
         assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
+
+
+class TestInteractionCSVRowFormSerializerUsage:
+    """
+    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
+
+    (This excludes validation of specific fields which is part of the validation tests above.)
+    """
 
     def test_serializer_error_for_invalid_form(self, monkeypatch):
         """
@@ -965,6 +987,11 @@ class TestInteractionCSVRowForm:
             'adviser_2': ['adviser test error'],
             NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
         }
+
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
+    """Tests for InteractionCSVRowForm.cleaned_data_as_serializer_dict()."""
 
     def test_cleaned_data_as_serializer_dict_for_interaction(self):
         """Test that cleaned_data_as_serializer_dict() transforms an interaction."""
@@ -1044,6 +1071,11 @@ class TestInteractionCSVRowForm:
             'subject': data['subject'],
             'was_policy_feedback_provided': False,
         }
+
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormSaving:
+    """Tests for InteractionCSVRowForm.save()."""
 
     def test_save_interaction(self):
         """Test saving an interaction."""
