@@ -15,7 +15,7 @@ def _verify_authentication(message, auth_methods=None):
     """
     if not auth_methods:
         auth_methods = ('dkim', 'spf', 'dmarc')
-    header_contents = ' '.join(message.authentication_results.split('\n'))
+    header_contents = ' '.join(message.authentication_results.splitlines())
     auth_parser = AuthenticationResultsHeader.parse(f'Authentication-Results: {header_contents}')
     auth_results = {auth_method: False for auth_method in auth_methods}
     for auth_mechanism in auth_parser.results:
