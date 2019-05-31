@@ -99,7 +99,7 @@ class EmailNotSentByDITException(Exception):
     Exception for flagging that an email could not be verified as sent by a DIT
     adviser.
 
-    TODO: Remove this exception and it's uses once we are past calendar invite
+    TODO: Remove this exception and its uses once we are past calendar invite
     ingestion pilot stage.
     """
 

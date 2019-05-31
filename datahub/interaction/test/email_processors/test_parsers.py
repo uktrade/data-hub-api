@@ -250,6 +250,6 @@ class TestCalendarInteractionEmailParser:
         raises ValidationErrors as expected in a number of situations.
         """
         parser = self._get_parser_for_email_file(email_file)
-        with pytest.raises(expected_error.__class__) as exc:
+        with pytest.raises(expected_error.__class__) as excinfo:
             parser.extract_interaction_data_from_email()
-        assert exc.value.args[0] == expected_error.args[0]
+        assert excinfo.value.args[0] == expected_error.args[0]
