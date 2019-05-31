@@ -248,7 +248,6 @@ class MailboxHandler:
         Initialise the MailboxHandler object.
         """
         self.mailboxes = {}
-        self.initialise_mailboxes()
 
     def initialise_mailboxes(self):
         """

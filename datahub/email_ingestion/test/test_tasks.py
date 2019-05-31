@@ -28,9 +28,11 @@ class TestIngestEmails:
             process_new_mail_patch,
         )
         # Refresh the mailbox_handler singleton as we have overidden the MAILBOXES setting
+        mailbox_handler = MailboxHandler()
+        mailbox_handler.initialise_mailboxes()
         monkeypatch.setattr(
             'datahub.email_ingestion.tasks.mailbox_handler',
-            MailboxHandler(),
+            mailbox_handler,
         )
         ingest_emails()
         assert process_new_mail_patch.call_count == 2

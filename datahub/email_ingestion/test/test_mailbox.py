@@ -419,6 +419,7 @@ class TestMailboxHandler:
         # Mock import_string to avoid import errors for processor_class path strings
         import_string_mock = mock_import_string(monkeypatch)
         mailbox_handler = MailboxHandler()
+        mailbox_handler.initialise_mailboxes()
         for mailbox_name, mailbox_config in MAILBOXES_SETTING.items():
             instantiated_mailbox = mailbox_handler.get_mailbox(mailbox_name)
             # ensure that the Mailbox object has the expected attributes
@@ -440,7 +441,8 @@ class TestMailboxHandler:
         when badly configured.
         """
         with pytest.raises(ImproperlyConfigured):
-            MailboxHandler()
+            mailbox_handler = MailboxHandler()
+            mailbox_handler.initialise_mailboxes()
 
     @override_settings(MAILBOXES={})
     def test_handler_initialisation_no_mailboxes(self):
@@ -449,4 +451,5 @@ class TestMailboxHandler:
         there are no mailboxes in the application settings.
         """
         mailbox_handler = MailboxHandler()
+        mailbox_handler.initialise_mailboxes()
         assert mailbox_handler.get_all_mailboxes() == []
