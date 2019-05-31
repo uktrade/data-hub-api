@@ -567,6 +567,72 @@ class TestInteractionCSVRowFormValidation:
 
 
 @pytest.mark.django_db
+class TestInteractionCSVRowFormSerializerUsage:
+    """
+    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
+
+    (This excludes validation of specific fields which is part of the validation tests above.)
+    """
+
+    def test_serializer_error_for_invalid_form(self, monkeypatch):
+        """
+        Test that an unmapped error from the serializer validators is not added to
+        NON_FIELD_ERRORS if the form was otherwise invalid.
+        """
+        def validator(_):
+            raise serializers.ValidationError(
+                {'non_existent_field': 'test error'},
+            )
+
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
+
+        data = {'kind': 'invalid'}
+        form = InteractionCSVRowForm(data=data)
+
+        assert NON_FIELD_ERRORS not in form.errors
+
+    def test_serializer_errors_for_valid_form(self, monkeypatch):
+        """Test that errors from the serializer validators are added to the form."""
+        def validator(_):
+            raise serializers.ValidationError(
+                {
+                    # This rule should be mapped to NON_FIELD_ERRORS
+                    'non_existent_field': 'unmapped test error',
+                    # This rule should be mapped to adviser_2
+                    'adviser_2': 'adviser test error',
+                },
+            )
+
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
+
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+
+        data = {
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+
+        form = InteractionCSVRowForm(data=data)
+        assert form.errors == {
+            'adviser_2': ['adviser test error'],
+            NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
+        }
+
+
+@pytest.mark.django_db
 class TestInteractionCSVRowFormCleaning:
     """
     Tests for field cleaning in InteractionCSVRowForm.
@@ -922,71 +988,6 @@ class TestInteractionCSVRowFormGetFlatErrorListIterator:
             ),
         ]
         assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
-
-
-class TestInteractionCSVRowFormSerializerUsage:
-    """
-    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
-
-    (This excludes validation of specific fields which is part of the validation tests above.)
-    """
-
-    def test_serializer_error_for_invalid_form(self, monkeypatch):
-        """
-        Test that an unmapped error from the serializer validators is not added to
-        NON_FIELD_ERRORS if the form was otherwise invalid.
-        """
-        def validator(_):
-            raise serializers.ValidationError(
-                {'non_existent_field': 'test error'},
-            )
-
-        monkeypatch.setattr(
-            'datahub.interaction.serializers.InteractionSerializer.validators',
-            [validator],
-        )
-
-        data = {'kind': 'invalid'}
-        form = InteractionCSVRowForm(data=data)
-
-        assert NON_FIELD_ERRORS not in form.errors
-
-    def test_serializer_errors_for_valid_form(self, monkeypatch):
-        """Test that errors from the serializer validators are added to the form."""
-        def validator(_):
-            raise serializers.ValidationError(
-                {
-                    # This rule should be mapped to NON_FIELD_ERRORS
-                    'non_existent_field': 'unmapped test error',
-                    # This rule should be mapped to adviser_2
-                    'adviser_2': 'adviser test error',
-                },
-            )
-
-        monkeypatch.setattr(
-            'datahub.interaction.serializers.InteractionSerializer.validators',
-            [validator],
-        )
-
-        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        contact = ContactFactory(email='unique@company.com')
-        service = random_service()
-        communication_channel = random_communication_channel()
-
-        data = {
-            'kind': Interaction.KINDS.interaction,
-            'date': '01/01/2018',
-            'adviser_1': adviser.name,
-            'contact_email': contact.email,
-            'service': service.name,
-            'communication_channel': communication_channel.name,
-        }
-
-        form = InteractionCSVRowForm(data=data)
-        assert form.errors == {
-            'adviser_2': ['adviser test error'],
-            NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
-        }
 
 
 @pytest.mark.django_db
