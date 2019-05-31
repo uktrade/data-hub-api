@@ -16,7 +16,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin,
@@ -505,83 +505,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             (not result['created_on'] is None) == created_on_exists
             for result in results
         )
-
-    def test_filter_by_dit_adviser_id(self, setup_es):
-        """Tests filtering interaction by dit adviser id."""
-        advisers = AdviserFactory.create_batch(10)
-        CompanyInteractionFactory.create_batch(
-            len(advisers),
-            dit_adviser=factory.Iterator(advisers),
-        )
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:interaction')
-        request_data = {
-            'dit_adviser': advisers[5].id,
-        }
-        response = self.api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] == 1
-
-        results = response_data['results']
-
-        assert results[0]['dit_adviser']['id'] == str(advisers[5].id)
-        assert results[0]['dit_adviser']['name'] == advisers[5].name
-
-    def test_filter_by_dit_adviser_name(self, setup_es):
-        """Tests filtering interaction by dit adviser name."""
-        advisers = AdviserFactory.create_batch(10)
-        CompanyInteractionFactory.create_batch(
-            len(advisers),
-            dit_adviser=factory.Iterator(advisers),
-        )
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:interaction')
-        request_data = {
-            'dit_adviser_name': advisers[5].name,
-        }
-        response = self.api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] > 0
-
-        results = response_data['results']
-        # multiple records can match our filter, let's make sure at least one is exact match
-        assert any(result['dit_adviser']['id'] == str(advisers[5].id) for result in results)
-        assert any(result['dit_adviser']['name'] == advisers[5].name for result in results)
-
-    def test_filter_by_dit_team(self, setup_es):
-        """Tests filtering interaction by dit team."""
-        CompanyInteractionFactory.create_batch(5, dit_team_id=constants.Team.crm.value.id)
-        dit_team_id = constants.Team.td_events_healthcare.value.id
-        CompanyInteractionFactory.create_batch(5, dit_team_id=dit_team_id)
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:interaction')
-        request_data = {
-            'dit_team': dit_team_id,
-        }
-        response = self.api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-
-        assert response_data['count'] == 5
-
-        results = response_data['results']
-        assert {result['dit_team']['id'] for result in results} == {str(dit_team_id)}
 
     @pytest.mark.parametrize('dit_participant_field', ('adviser', 'team'))
     def test_filter_by_dit_participant(self, setup_es, dit_participant_field):
