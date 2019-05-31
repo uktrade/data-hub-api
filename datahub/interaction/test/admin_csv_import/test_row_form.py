@@ -91,6 +91,16 @@ class TestInteractionCSVRowFormValidation:
                 {'kind': 'invalid'},
                 {'kind': ['Select a valid choice. invalid is not one of the available choices.']},
             ),
+            # theme blank
+            (
+                {'theme': ''},
+                {'theme': ['This field is required.']},
+            ),
+            # theme invalid
+            (
+                {'theme': 'invalid'},
+                {'theme': ['Select a valid choice. invalid is not one of the available choices.']},
+            ),
             # date blank
             (
                 {'date': ''},
@@ -306,6 +316,7 @@ class TestInteractionCSVRowFormValidation:
         communication_channel = random_communication_channel()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -433,6 +444,7 @@ class TestInteractionCSVRowFormValidation:
             )
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
@@ -553,6 +565,7 @@ class TestInteractionCSVRowFormValidation:
             duplicate_tracker.add_item(resolved_duplicate_item)
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
@@ -617,6 +630,7 @@ class TestInteractionCSVRowFormSerializerUsage:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -682,6 +696,7 @@ class TestInteractionCSVRowFormCleaning:
         communication_channel = random_communication_channel()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -764,6 +779,7 @@ class TestInteractionCSVRowFormCleaning:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -803,6 +819,7 @@ class TestInteractionCSVRowFormCleaning:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -849,6 +866,7 @@ class TestInteractionCSVRowFormCleaning:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'service_delivery',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -873,6 +891,7 @@ class TestInteractionCSVRowFormCleaning:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -914,6 +933,7 @@ class TestInteractionCSVRowFormCleaning:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -945,6 +965,7 @@ class TestInteractionCSVRowFormGetFlatErrorListIterator:
     def test_get_flat_error_list_iterator(self):
         """Test that get_flat_error_list_iterator() returns a flat list of errors."""
         data = {
+            'theme': 'invalid',
             'kind': 'invalid',
             'date': 'invalid',
             'adviser_1': '',
@@ -959,6 +980,12 @@ class TestInteractionCSVRowFormGetFlatErrorListIterator:
             CSVRowError(
                 5,
                 'kind',
+                'invalid',
+                'Select a valid choice. invalid is not one of the available choices.',
+            ),
+            CSVRowError(
+                5,
+                'theme',
                 'invalid',
                 'Select a valid choice. invalid is not one of the available choices.',
             ),
@@ -1002,6 +1029,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -1029,6 +1057,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'service': service,
             'status': Interaction.STATUSES.complete,
             'subject': service.name,
+            'theme': data['theme'],
             'was_policy_feedback_provided': False,
         }
 
@@ -1040,6 +1069,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         event = EventFactory()
 
         data = {
+            'theme': Interaction.THEMES.other,
             'kind': Interaction.KINDS.service_delivery,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -1070,6 +1100,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'service': service,
             'status': Interaction.STATUSES.complete,
             'subject': data['subject'],
+            'theme': data['theme'],
             'was_policy_feedback_provided': False,
         }
 
@@ -1088,6 +1119,7 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
@@ -1101,6 +1133,7 @@ class TestInteractionCSVRowFormSaving:
         interaction = form.save(user, source=source)
         interaction.refresh_from_db()
 
+        assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.communication_channel == communication_channel
@@ -1131,6 +1164,7 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.service_delivery,
             'date': '02/03/2018',
             'adviser_1': adviser_1.name,
@@ -1147,6 +1181,7 @@ class TestInteractionCSVRowFormSaving:
         interaction = form.save(user, source=source)
         interaction.refresh_from_db()
 
+        assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.event == event
@@ -1184,6 +1219,7 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
@@ -1214,6 +1250,7 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,

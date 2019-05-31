@@ -267,7 +267,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert 'csv_file' in form.errors
         assert form.errors['csv_file'] == [
             'This file is missing the following required columns: '
-            'adviser_1, contact_email, date, kind, service.',
+            'adviser_1, contact_email, date, kind, service, theme.',
         ]
 
     def test_rejects_large_files(self):
@@ -299,7 +299,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         'max_errors,should_be_truncated',
         (
             (5, True),
-            (10, False),
+            (12, False),
         ),
     )
     def test_displays_errors_for_file_with_invalid_rows(
@@ -314,11 +314,11 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             max_errors,
         )
 
-        # This file should have 10 errors
+        # This file should have 12 errors
         file = make_csv_file(
-            ('kind', 'date', 'adviser_1', 'contact_email', 'service'),
-            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
-            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
+            ('theme', 'kind', 'date', 'adviser_1', 'contact_email', 'service'),
+            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
+            ('invalid', 'invalid', 'invalid', 'invalid', 'invalid', 'invalid'),
         )
 
         response = self.client.post(
@@ -329,7 +329,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.context['errors']) == min(10, max_errors)
+        assert len(response.context['errors']) == min(12, max_errors)
         assert response.context['are_errors_truncated'] == should_be_truncated
 
     def test_displays_no_matches_message_if_no_matches(self):
@@ -342,6 +342,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         communication_channel = random_communication_channel()
         file = make_csv_file(
             (
+                'theme',
                 'kind',
                 'date',
                 'adviser_1',
@@ -350,6 +351,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
                 'communication_channel',
             ),
             (
+                Interaction.THEMES.export,
                 'interaction',
                 '01/01/2018',
                 adviser.name,

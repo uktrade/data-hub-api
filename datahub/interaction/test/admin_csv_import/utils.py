@@ -7,7 +7,7 @@ import factory
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.test_utils import random_obj_for_queryset
-from datahub.interaction.models import CommunicationChannel
+from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.metadata.models import Service
 
 
@@ -72,6 +72,7 @@ def make_matched_rows(num_records):
 
     return [
         {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -97,6 +98,7 @@ def make_multiple_matches_rows(num_records):
 
     return [
         {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -119,6 +121,7 @@ def make_unmatched_rows(num_records):
 
     return [
         {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
