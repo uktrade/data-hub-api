@@ -110,12 +110,8 @@ class NestedRelatedField(serializers.RelatedField):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
     @staticmethod
-    def get_field_value(obj, field_name):
-        """Returns the field's value.
-
-        If the field is an instance of models.Manager, then it queries
-        all related objects.
-        """
+    def get_field(obj, field_name):
+        """Returns a value of the field or related objects."""
         value = getattr(obj, field_name)
         if isinstance(value, models.Manager):
             return value.all()
@@ -128,7 +124,7 @@ class NestedRelatedField(serializers.RelatedField):
             return value
 
         extra = {
-            field_name: field.to_representation(self.get_field_value(value, field_name))
+            field_name: field.to_representation(self.get_field(value, field_name))
             for field_name, field in self._fields
         }
         return {
