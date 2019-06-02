@@ -267,20 +267,6 @@ class TestServiceView:
         ) if db_service.disabled_on else None
 
         response_service['contexts'] = sorted(response_service['contexts'])
-        response_service['interaction_questions'] = sorted(
-            response_service['interaction_questions'],
-            key=itemgetter('id'),
-        )
-        for interaction_question in response_service['interaction_questions']:
-            interaction_question['answer_options'] = sorted(
-                interaction_question['answer_options'],
-                key=itemgetter('id'),
-            )
-            for answer_option in interaction_question['answer_options']:
-                answer_option['additional_questions'] = sorted(
-                    answer_option['additional_questions'],
-                    key=itemgetter('id'),
-                )
 
         assert response_service == {
             'id': str(db_service.pk),
@@ -311,14 +297,13 @@ class TestServiceView:
                                         additional_question.disabled_on,
                                     ) if additional_question.disabled_on else None,
                                 } for additional_question
-                                in answer_option.additional_questions.order_by('id')
+                                in answer_option.additional_questions.all()
                             ],
-                        } for answer_option in question.answer_options.order_by('id')
+                        } for answer_option in question.answer_options.all()
                     ],
-                } for question in db_service.interaction_questions.order_by('id')
+                } for question in db_service.interaction_questions.all()
             ],
         }
-        assert len(services) == Service.objects.count()
 
 
 class TestSectorView:
