@@ -389,7 +389,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': 10.0, # Every 10 seconds
+            'schedule': 30.0, # Every 30 seconds
         }
 
     CELERY_WORKER_LOG_FORMAT = (
