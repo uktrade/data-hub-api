@@ -10,17 +10,21 @@ def calendar_data_fixture():
     Create advisers, contacts and companies so that our email samples can be
     attributed to some DB entities.
     """
-    adviser_emails = [
-        'adviser1@trade.gov.uk',
-        'adviser2@digital.trade.gov.uk',
+    advisers = [
+        ('adviser1@trade.gov.uk', 'Adviser', '1'),
+        ('adviser2@digital.trade.gov.uk', 'Adviser', '2'),
     ]
     AdviserFactory.create_batch(
-        len(adviser_emails),
-        email=factory.Iterator(adviser_emails),
+        len(advisers),
+        email=factory.Iterator(advisers, getter=lambda a: a[0]),
+        first_name=factory.Iterator(advisers, getter=lambda a: a[1]),
+        last_name=factory.Iterator(advisers, getter=lambda a: a[2]),
         contact_email=factory.SelfAttribute('email'),
     )
     AdviserFactory(
         email='adviser3@digital.trade.gov.uk',
+        first_name='Adviser',
+        last_name='3',
         contact_email='correspondence3@digital.trade.gov.uk',
     )
     company_1 = CompanyFactory(name='Company 1')
