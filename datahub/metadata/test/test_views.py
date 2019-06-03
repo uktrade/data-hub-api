@@ -262,17 +262,13 @@ class TestServiceView:
                 response_service = service
                 break
 
-        disabled_on = format_date_or_datetime(
-            db_service.disabled_on,
-        ) if db_service.disabled_on else None
-
         response_service['contexts'] = sorted(response_service['contexts'])
 
         assert response_service == {
             'id': str(db_service.pk),
             'name': db_service.name,
             'contexts': sorted(db_service.contexts),
-            'disabled_on': disabled_on,
+            'disabled_on': _format_datetime_field_if_exists(db_service, 'disabled_on'),
             'interaction_questions': [
                 {
                     'id': str(question.id),
@@ -284,18 +280,20 @@ class TestServiceView:
                         {
                             'id': str(answer_option.id),
                             'name': answer_option.name,
-                            'disabled_on': format_date_or_datetime(
-                                answer_option.disabled_on,
-                            ) if answer_option.disabled_on else None,
+                            'disabled_on': _format_datetime_field_if_exists(
+                                answer_option,
+                                'disabled_on',
+                            ),
                             'additional_questions': [
                                 {
                                     'id': str(additional_question.id),
                                     'name': additional_question.name,
                                     'type': additional_question.type,
                                     'is_required': additional_question.is_required,
-                                    'disabled_on': format_date_or_datetime(
-                                        additional_question.disabled_on,
-                                    ) if additional_question.disabled_on else None,
+                                    'disabled_on': _format_datetime_field_if_exists(
+                                        additional_question,
+                                        'disabled_on',
+                                    ),
                                 } for additional_question
                                 in answer_option.additional_questions.all()
                             ],
@@ -374,3 +372,10 @@ class TestInvestmentProjectStageView:
         assert set(first_project_stage.keys()) == set(expected_items)
         assert first_project_stage['name'] == 'Prospect'
         assert not first_project_stage['exclude_from_investment_flow']
+
+
+def _format_datetime_field_if_exists(obj, field_name):
+    value = getattr(obj, field_name)
+    if value is None:
+        return None
+    return format_date_or_datetime(value)
