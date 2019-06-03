@@ -423,7 +423,7 @@ class TestMailboxHandler:
         for mailbox_name, mailbox_config in MAILBOXES_SETTING.items():
             instantiated_mailbox = mailbox_handler.get_mailbox(mailbox_name)
             # ensure that the Mailbox object has the expected attributes
-            assert instantiated_mailbox.email == mailbox_config['email']
+            assert instantiated_mailbox.username == mailbox_config['username']
             assert instantiated_mailbox.password == mailbox_config['password']
             assert instantiated_mailbox.imap_domain == mailbox_config['imap_domain']
             # ensure that the processor class paths were imported
