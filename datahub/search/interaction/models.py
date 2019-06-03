@@ -51,11 +51,7 @@ class Interaction(BaseESModel):
     contacts = _contact_field()
     created_on = Date()
     date = Date()
-    # TODO: dit_adviser is deprecated. Remove after deprecation period.
-    dit_adviser = fields.contact_or_adviser_field()
     dit_participants = Object(_DITParticipant)
-    # TODO: dit_team is deprecated. Remove after deprecation period.
-    dit_team = fields.id_name_partial_field()
     event = fields.id_name_partial_field()
     investment_project = fields.id_name_field()
     investment_project_sector = fields.sector_field()
@@ -79,9 +75,7 @@ class Interaction(BaseESModel):
         'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
         'contacts': dict_utils.contact_or_adviser_list_of_dicts,
-        'dit_adviser': dict_utils.contact_or_adviser_dict,
         'dit_participants': _dit_participant_list,
-        'dit_team': dict_utils.id_name_dict,
         'event': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
         'policy_areas': dict_utils.id_name_list_of_dicts,
