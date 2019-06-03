@@ -2,11 +2,9 @@ from logging import getLogger
 
 from celery import shared_task
 from django.apps import apps
-from django.db.models import Exists, NOT_PROVIDED, OuterRef, Q, Subquery
+from django.db.models import Exists, NOT_PROVIDED, OuterRef, Subquery
 from django.db.transaction import atomic
 from django_pglocks import advisory_lock
-
-from datahub.interaction.models import Interaction, InteractionDITParticipant
 
 logger = getLogger(__name__)
 
@@ -122,48 +120,6 @@ def copy_foreign_key_to_m2m_field(
     )
 
 
-@shared_task(acks_late=True)
-def populate_interaction_dit_participant(batch_size=5000):
-    """
-    Task that creates InteractionDITParticipant instances for interactions that do not already
-    have one.
-
-    Interactions that have neither a dit_adviser nor a dit_team are skipped.
-
-    Usage example:
-
-        populate_interaction_dit_participant.apply_async()
-
-    """
-    lock_name = 'leeloo-populate_interaction_dit_participant'
-
-    with advisory_lock(lock_name, wait=False) as lock_held:
-        if not lock_held:
-            logger.warning(
-                f'Another populate_interaction_dit_participant task is in '
-                f'progress. Aborting...',
-            )
-            return
-
-        num_processed = _populate_interaction_dit_participant(
-            batch_size=batch_size,
-        )
-
-    # If there are definitely no more rows needing processing, return
-    if num_processed < batch_size:
-        return
-
-    # Schedule another task to update another batch of rows.
-    #
-    # This must be outside of the atomic block, otherwise it will probably run before the
-    # current changes have been committed.
-    #
-    # (Similarly, the lock should also be released before the next task is scheduled.)
-    populate_interaction_dit_participant.apply_async(
-        kwargs={'batch_size': batch_size},
-    )
-
-
 @atomic
 def _copy_foreign_key_to_m2m_field(
     model_label,
@@ -215,48 +171,6 @@ def _copy_foreign_key_to_m2m_field(
 
     logger.info(
         f'{num_created} {model_label}.{target_m2m_field_name} many-to-many objects created',
-    )
-
-    return len(objects_to_create)
-
-
-@atomic
-def _populate_interaction_dit_participant(batch_size=5000):
-    """
-    The main logic for the populate_interaction_dit_participant task.
-
-    This processes a single batch of objects in a transaction.
-    """
-    # Select a batch of rows. The rows are locked to avoid race conditions.
-    batch_queryset = Interaction.objects.select_for_update().annotate(
-        has_m2m_values=Exists(
-            InteractionDITParticipant.objects.filter(
-                interaction_id=OuterRef('pk'),
-            ),
-        ),
-    ).filter(
-        Q(dit_adviser__isnull=False) | Q(dit_team__isnull=False),
-        has_m2m_values=False,
-    ).values(
-        'pk',
-        'dit_adviser_id',
-        'dit_team_id',
-    )[:batch_size]
-
-    objects_to_create = [
-        InteractionDITParticipant(
-            interaction_id=row['pk'],
-            adviser_id=row['dit_adviser_id'],
-            team_id=row['dit_team_id'],
-        ) for row in batch_queryset
-    ]
-
-    # Create many-to-many objects for the batch
-    created_objects = InteractionDITParticipant.objects.bulk_create(objects_to_create)
-    num_created = len(created_objects)
-
-    logger.info(
-        f'{num_created} InteractionDITParticipant many-to-many objects created',
     )
 
     return len(objects_to_create)
