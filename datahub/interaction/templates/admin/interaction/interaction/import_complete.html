@@ -13,6 +13,15 @@
 
   {% include 'admin/interaction/interaction/fragment_post_import_counts.html' with num_matched=num_matched num_unmatched=num_unmatched num_multiple_matches=num_multiple_matches only %}
 
+  {% if num_unmatched or num_multiple_matches %}
+    <p>
+      {% url opts|admin_urlname:'import-download-unmatched' token=token as unmatched_download_url %}
+      {% blocktrans %}
+        <a href="{{ unmatched_download_url }}">Download unmatched interactions</a> (link valid for {{ download_timeout_mins }} minutes after importing)
+      {% endblocktrans %}
+    </p>
+  {% endif %}
+
   <p>
     <a href="{% url opts|admin_urlname:'changelist' %}">
       {% trans 'Return to the interaction list' %}

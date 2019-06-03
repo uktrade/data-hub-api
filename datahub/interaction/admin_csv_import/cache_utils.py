@@ -5,7 +5,8 @@ from django.core.cache import cache
 
 from datahub.core.utils import StrEnum
 
-CACHE_VALUE_TIMEOUT_SECS = int(timedelta(minutes=30).total_seconds())
+CACHE_VALUE_TIMEOUT = timedelta(minutes=30)
+CACHE_VALUE_TIMEOUT_SECS = int(CACHE_VALUE_TIMEOUT.total_seconds())
 
 
 class CacheKeyType(StrEnum):
@@ -14,6 +15,7 @@ class CacheKeyType(StrEnum):
     file_name = 'file-name'
     file_contents = 'file-contents'
     result_counts_by_status = 'result_counts_by_status'
+    unmatched_rows = 'unmatched-rows'
 
 
 def load_file_contents_and_name(token):
@@ -59,6 +61,24 @@ def save_result_counts_by_status(token, counts_by_status):
     """Saves counts by matching status to the cache for a completed import operation."""
     result_counts_cache_key = _cache_key_for_token(token, CacheKeyType.result_counts_by_status)
     cache.set(result_counts_cache_key, counts_by_status, CACHE_VALUE_TIMEOUT_SECS)
+
+
+def load_unmatched_rows_csv_contents(token):
+    """Load a CSV file (from the cache) of rows that could not be matched to contacts."""
+    key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+    compressed_contents = cache.get(key)
+
+    if compressed_contents is None:
+        return None
+
+    return gzip.decompress(compressed_contents)
+
+
+def save_unmatched_rows_csv_contents(token, contents):
+    """Save a CSV file (to the cache) of rows that could not be matched to contacts."""
+    compressed_contents = gzip.compress(contents)
+    key = _cache_key_for_token(token, CacheKeyType.unmatched_rows)
+    cache.set(key, compressed_contents, timeout=CACHE_VALUE_TIMEOUT_SECS)
 
 
 def _cache_key_for_token(token, type_: CacheKeyType):

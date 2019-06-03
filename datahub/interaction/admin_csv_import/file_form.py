@@ -1,4 +1,7 @@
+import csv
 import hashlib
+import io
+from codecs import BOM_UTF8
 from secrets import token_urlsafe
 
 import reversion
@@ -13,10 +16,45 @@ from datahub.interaction.admin_csv_import.cache_utils import (
     load_file_contents_and_name,
     save_file_contents_and_name,
 )
+from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
 
 REVISION_COMMENT = 'Imported from file via the admin site.'
+
+
+class UnmatchedRowCollector:
+    """Holds unmatched rows following an import operation."""
+
+    def __init__(self):
+        """Initialise the instance with an empty list of rows."""
+        self.rows = []
+
+    def append_row(self, row_form):
+        """Add an unmatched row."""
+        self.rows.append(row_form.data)
+
+    def to_raw_csv(self):
+        """
+        Generate a CSV file from collected unmatched rows.
+
+        The CSV file is in the same format as the input file (so that it can be re-uploaded
+        at a later date if required).
+        """
+        if not self.rows:
+            return None
+
+        byte_stream = io.BytesIO()
+        byte_stream.write(BOM_UTF8)
+
+        with byte_stream:
+            text_stream = io.TextIOWrapper(byte_stream, encoding='utf-8', write_through=True)
+            # Use the keys of the first row for the fieldnames argument (all rows should have
+            # the same keys)
+            writer = csv.DictWriter(text_stream, self.rows[0].keys())
+            writer.writeheader()
+            writer.writerows(self.rows)
+            return byte_stream.getvalue()
 
 
 class InteractionCSVForm(BaseCSVImportForm):
@@ -30,15 +68,12 @@ class InteractionCSVForm(BaseCSVImportForm):
 
     def are_all_rows_valid(self):
         """Check if all of the rows in the CSV pass validation."""
-        with self.open_file_as_dict_reader() as dict_reader:
-            return all(InteractionCSVRowForm(data=row).is_valid() for row in dict_reader)
+        return all(row_form.is_valid() for row_form in self._get_row_form_iterator())
 
     def get_row_error_iterator(self):
         """Get a generator of CSVRowError instances."""
-        with self.open_file_as_dict_reader() as dict_reader:
-            for index, row in enumerate(dict_reader):
-                form = InteractionCSVRowForm(row_index=index, data=row)
-                yield from form.get_flat_error_list_iterator()
+        for row_form in self._get_row_form_iterator():
+            yield from row_form.get_flat_error_list_iterator()
 
     def get_matching_summary(self, max_rows):
         """
@@ -52,7 +87,7 @@ class InteractionCSVForm(BaseCSVImportForm):
         matching_counts = {status: 0 for status in ContactMatchingStatus}
         matched_rows = []
 
-        for row_form in self._get_validated_row_form_iterator():
+        for row_form in self._get_row_form_iterator(raise_error_if_invalid=True):
             contact_matching_status = row_form.cleaned_data['contact_matching_status']
             matching_counts[contact_matching_status] += 1
 
@@ -80,14 +115,17 @@ class InteractionCSVForm(BaseCSVImportForm):
         }
 
         matching_counts = {status: 0 for status in ContactMatchingStatus}
+        unmatched_row_collector = UnmatchedRowCollector()
 
-        for row_form in self._get_validated_row_form_iterator():
+        for row_form in self._get_row_form_iterator(raise_error_if_invalid=True):
             if row_form.is_matched():
                 row_form.save(user, source)
+            else:
+                unmatched_row_collector.append_row(row_form)
 
             matching_counts[row_form.cleaned_data['contact_matching_status']] += 1
 
-        return matching_counts
+        return matching_counts, unmatched_row_collector
 
     def save_to_cache(self):
         """
@@ -124,17 +162,23 @@ class InteractionCSVForm(BaseCSVImportForm):
             },
         )
 
-    def _get_validated_row_form_iterator(self):
+    def _get_row_form_iterator(self, raise_error_if_invalid=False):
         """
         Get a generator over InteractionCSVRowForm instances.
 
         This should only be called if the rows have previously been validated.
         """
+        duplicate_tracker = DuplicateTracker()
+
         with self.open_file_as_dict_reader() as dict_reader:
             for index, row in enumerate(dict_reader):
-                row_form = InteractionCSVRowForm(row_index=index, data=row)
+                row_form = InteractionCSVRowForm(
+                    row_index=index,
+                    data=row,
+                    duplicate_tracker=duplicate_tracker,
+                )
 
-                if not row_form.is_valid():
+                if not row_form.is_valid() and raise_error_if_invalid:
                     # We are not expecting this to happen. Raise an exception to alert us if
                     # it does.
                     raise DataHubException('CSV row unexpectedly failed revalidation')

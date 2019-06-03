@@ -79,7 +79,7 @@ def test_with_all_models(caplog):
     caplog.set_level('INFO')
 
     objs = []
-    for model_label, model_factory in MAPPINGS.items():
+    for model_factory in MAPPINGS.values():
         with reversion.create_revision():
             obj, _ = model_factory.create_batch(2)  # keep only one
             objs.append(obj)
@@ -143,7 +143,7 @@ def test_delete_revisions_without_versions(caplog):
 def test_rollback_in_case_or_error(monkeypatch):
     """Test that if there's an exception in the logic, all the changes are rolled back."""
     objs = []
-    for model_label, model_factory in MAPPINGS.items():
+    for model_factory in MAPPINGS.values():
         with reversion.create_revision():
             objs.append(model_factory())
 

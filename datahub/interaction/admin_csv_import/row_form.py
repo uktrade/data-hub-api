@@ -18,6 +18,9 @@ from datahub.core.exceptions import DataHubException
 from datahub.core.query_utils import PreferNullConcat
 from datahub.core.utils import join_truthy_strings
 from datahub.event.models import Event
+from datahub.interaction.admin_csv_import.duplicate_checking import (
+    is_duplicate_of_existing_interaction,
+)
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionDITParticipant
 from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import Service, Team
@@ -35,6 +38,14 @@ MULTIPLE_ADVISERS_FOUND_MESSAGE = gettext_lazy(
 )
 ADVISER_2_IS_THE_SAME_AS_ADVISER_1 = gettext_lazy(
     'Adviser 2 cannot be the same person as adviser 1.',
+)
+DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE = gettext_lazy(
+    'This interaction appears to be a duplicate as there is an existing interaction with the '
+    'same service, date and contact.',
+)
+DUPLICATE_OF_ANOTHER_ROW_MESSAGE = gettext_lazy(
+    'This interaction appears to be a duplicate as there is another row in this file with the '
+    'same service, date and contact.',
 )
 
 
@@ -133,10 +144,11 @@ class InteractionCSVRowForm(forms.Form):
     subject = forms.CharField(required=False)
     notes = forms.CharField(required=False)
 
-    def __init__(self, *args, row_index=None, **kwargs):
+    def __init__(self, *args, duplicate_tracker=None, row_index=None, **kwargs):
         """Initialise the form with an optional zero-based row index."""
         super().__init__(*args, **kwargs)
         self.row_index = row_index
+        self.duplicate_tracker = duplicate_tracker
 
     @classmethod
     def get_required_field_names(cls):
@@ -189,6 +201,9 @@ class InteractionCSVRowForm(forms.Form):
         data['contact'], data['contact_matching_status'] = find_active_contact_by_email_address(
             data.get('contact_email'),
         )
+
+        self._validate_not_duplicate_of_prior_row(data)
+        self._validate_not_duplicate_of_existing_interaction(data)
 
         return data
 
@@ -277,6 +292,20 @@ class InteractionCSVRowForm(forms.Form):
                 code='adviser_2_is_the_same_as_adviser_1',
             )
             self.add_error('adviser_2', err)
+
+    def _validate_not_duplicate_of_prior_row(self, data):
+        if not self.duplicate_tracker:
+            return
+
+        if self.duplicate_tracker.has_item(data):
+            self.add_error(None, DUPLICATE_OF_ANOTHER_ROW_MESSAGE)
+            return
+
+        self.duplicate_tracker.add_item(data)
+
+    def _validate_not_duplicate_of_existing_interaction(self, data):
+        if is_duplicate_of_existing_interaction(data):
+            self.add_error(None, DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE)
 
     def cleaned_data_as_serializer_dict(self):
         """

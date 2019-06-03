@@ -94,6 +94,16 @@ def _get_utc_datetime(localised_datetime):
         return localised_datetime
 
 
+class EmailNotSentByDITException(Exception):
+    """
+    Exception for flagging that an email could not be verified as sent by a DIT
+    adviser.
+
+    TODO: Remove this exception and its uses once we are past calendar invite
+    ingestion pilot stage.
+    """
+
+
 class CalendarInteractionEmailParser:
     """
     Parses and extracts calendar interaction information from a MailParser email
@@ -113,7 +123,18 @@ class CalendarInteractionEmailParser:
         except IndexError:
             raise ValidationError('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
-            raise ValidationError('Email not sent by DIT')
+            sender_domain = sender_email.rsplit('@', maxsplit=1)[1]
+            message_id = self.message.message_id
+            # TODO: This raises a EmailNotSentByDITException for debugging purposes.
+            # change this back to a ValidationError when we are past the pilot stage for
+            # calendar invite ingestion
+            raise EmailNotSentByDITException(
+                f'Email with ID "{message_id}" and sender domain "{sender_domain}" '
+                'was not recognised as being sent by an authenticated DIT domain. '
+                'Either the domain was unrecognised, or it did not pass our requirements for '
+                'Authentication-Results. Further investigation is needed during the pilot for '
+                'email ingestion.',
+            )
         sender_adviser = _get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
             raise ValidationError('Email not sent by recognised DIT Adviser')

@@ -1,3 +1,23 @@
+Data Hub API 13.1.0 (2019-06-03)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The ability to download records that could not be matched to contacts was added to the import interactions admin site tool. The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it’s incomplete.
+- **Interactions** The import interactions admin site tool now rejects files that contain duplicate items. The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it’s incomplete.
+- **Interactions** The search CSV export was updated to handle interactions with multiple advisers. The previous Adviser and Service provider columns have been merged into a single Advisers column. This column contains the names of all the advisers for each interaction separated by commas. The team of each adviser is in brackets after each name.
+
+  For existing interactions, existing teams associated with each interaction have been preserved. For new interactions, the team included is the team each adviser was in when they were added to the interaction.
+
+Database schema
+---------------
+
+- **Interactions** A GIN index for ``source`` was added to the ``interaction_interaction`` table.
+
+
 Data Hub API 13.0.0 (2019-05-29)
 ================================
 
