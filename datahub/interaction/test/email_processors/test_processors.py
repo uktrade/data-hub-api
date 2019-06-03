@@ -68,29 +68,39 @@ class TestCalendarInteractionEmailProcessor:
         return email_parser_mock
 
     @pytest.mark.parametrize(
-        'interaction_data_overrides',
+        'interaction_data_overrides,expected_subject',
         (
             # Simple case; just the base interaction data
-            {},
+            (
+                {},
+                'Meeting between Adviser 1, Bill Adama and Saul Tigh',
+            ),
             # Including secondary advisers
-            {
-                'secondary_adviser_emails': [
-                    'adviser2@digital.trade.gov.uk',
-                    'adviser3@digital.trade.gov.uk',
-                ],
-            },
+            (
+                {
+                    'secondary_adviser_emails': [
+                        'adviser2@digital.trade.gov.uk',
+                        'adviser3@digital.trade.gov.uk',
+                    ],
+                },
+                'Meeting between Adviser 1, Adviser 2, Adviser 3, Bill Adama and Saul Tigh',
+            ),
             # Contacts from different companies
-            {
-                'contact_emails': [
-                    'bill.adama@example.net',
-                    'laura.roslin@example.net',
-                ],
-            },
+            (
+                {
+                    'contact_emails': [
+                        'bill.adama@example.net',
+                        'laura.roslin@example.net',
+                    ],
+                },
+                'Meeting between Adviser 1 and Bill Adama',
+            ),
         ),
     )
     def test_process_email_successful(
         self,
         interaction_data_overrides,
+        expected_subject,
         calendar_data_fixture,
         base_interaction_data_fixture,
         monkeypatch,
@@ -136,7 +146,7 @@ class TestCalendarInteractionEmailProcessor:
         assert interaction.source == {
             'meeting': {'id': interaction_data['meeting_details']['uid']},
         }
-        assert interaction.subject == interaction_data['subject']
+        assert interaction.subject == expected_subject
         assert interaction.status == Interaction.STATUSES.draft
 
     def test_process_email_meeting_exists(

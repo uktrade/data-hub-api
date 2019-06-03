@@ -27,6 +27,31 @@ def _filter_contacts_to_single_company(contacts, company):
     return [contact for contact in contacts if contact.company == company]
 
 
+def _get_meeting_subject(sender, contacts, secondary_advisers):
+    """
+    Construct and return a meeting subject given a sender, contacts and secondary
+    advisers (if present).
+    """
+    adviser_names = [
+        adviser.name
+        for adviser in (sender, *secondary_advisers)
+        if adviser.name
+    ]
+    if not adviser_names:
+        adviser_names = ['DIT']
+    contact_names = [contact.name for contact in contacts if contact.name]
+    if not contact_names:
+        try:
+            contact_names = [contacts[0].company.name]
+        except IndexError:
+            # This is not going to be a valid interaction, but this helper function
+            # should not raise an exception
+            contact_names = ['A company']
+    all_names = (*adviser_names, *contact_names)
+    comma_names = ', '.join(all_names[:-1])
+    return f'Meeting between {comma_names} and {all_names[-1]}'
+
+
 class CalendarInteractionEmailProcessor(EmailProcessor):
     """
     An EmailProcessor which checks whether incoming email is a valid DIT/company
@@ -105,6 +130,15 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction_data['top_company'],
         )
         interaction_data['contacts'] = sanitised_contacts
+
+        # Replace the meeting invite subject with one which details the people attending
+        interaction_data['subject'] = _get_meeting_subject(
+            interaction_data['sender'],
+            interaction_data['contacts'],
+            interaction_data['secondary_advisers'],
+        )
+
+        # Get a serializer for the interaction data
         try:
             serializer = self.validate_with_serializer(interaction_data)
         except serializers.ValidationError as exc:
