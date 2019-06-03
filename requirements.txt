@@ -55,7 +55,7 @@ flake8-print==3.1.0
 flake8-quotes==2.0.1
 flake8-string-format==0.2.3
 flake8==3.7.7
-freezegun==0.3.11
+freezegun==0.3.12
 future==0.17.1            # via notifications-python-client
 gevent==1.4.0
 greenlet==0.4.15          # via gevent
