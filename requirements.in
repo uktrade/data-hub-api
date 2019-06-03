@@ -3,7 +3,7 @@ lxml==4.3.3
 cssselect==1.0.3
 
 # Django and django related
-Django==2.2.1
+Django==2.2.2
 djangorestframework==3.9.4
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
