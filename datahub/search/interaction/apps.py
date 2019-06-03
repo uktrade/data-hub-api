@@ -21,8 +21,6 @@ class InteractionSearchApp(SearchApp):
         'company__sector',
         'company__sector__parent',
         'company__sector__parent__parent',
-        'dit_adviser',
-        'dit_team',
         'communication_channel',
         'investment_project',
         'investment_project__sector',
