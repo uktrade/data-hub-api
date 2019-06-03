@@ -3,7 +3,32 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.activity_feed.views import ActivityFeedView
+from datahub.core.test_utils import APITestMixin, create_test_user
+
+
+def pytest_generate_tests(metafunc):
+    """
+    Parametrizes the tests that use the `insufficient_activity_permissions` fixture
+    by creating lists with all required permissions except one.
+    """
+    if 'insufficient_activity_permissions' in metafunc.fixturenames:
+        perms = ActivityFeedView.ACTIVITY_MODELS_PERMISSIONS_REQUIRED
+        insufficient_activity_permissions = [
+            pytest.param(
+                [
+                    perm
+                    for perm in perms
+                    if perm != perm_to_exclude
+                ],
+                id=f'without {perm_to_exclude}',
+            )
+            for perm_to_exclude in perms
+        ]
+        metafunc.parametrize(
+            'insufficient_activity_permissions',
+            insufficient_activity_permissions,
+        )
 
 
 class TestActivityFeedView(APITestMixin):
@@ -76,3 +101,35 @@ class TestActivityFeedView(APITestMixin):
         )
 
         assert response.status_code == expected_status_code
+
+    def test_returns_empty_list_without_all_required_perms(
+        self,
+        insufficient_activity_permissions,
+    ):
+        """
+        Test that an empty list is returned if the authenticated user doesn't have permission
+        to view all activity models.
+        """
+        requester = create_test_user(
+            permission_codenames=(
+                perm.rsplit('.', maxsplit=1)[1]  # get only the codename
+                for perm in insufficient_activity_permissions
+            ),
+        )
+
+        url = reverse('api-v4:activity-feed:index')
+        api_client = self.create_api_client(user=requester)
+        response = api_client.generic(
+            'GET',
+            url,
+            data={},
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'hits': {
+                'total': 0,
+                'hits': [],
+            },
+        }
