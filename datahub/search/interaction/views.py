@@ -1,4 +1,5 @@
 from datahub.core.query_utils import (
+    get_bracketed_concat_expression,
     get_choices_as_case_expression,
     get_front_end_url_expression,
     get_full_name_expression,
@@ -95,7 +96,14 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
                 bracketed_field_name='job_title',
             ),
         ),
-        dit_adviser_name=get_full_name_expression('dit_adviser'),
+        adviser_names=get_string_agg_subquery(
+            DBInteraction,
+            get_bracketed_concat_expression(
+                'dit_participants__adviser__first_name',
+                'dit_participants__adviser__last_name',
+                expression_to_bracket='dit_participants__team__name',
+            ),
+        ),
         link=get_front_end_url_expression('interaction', 'pk'),
         kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
         policy_issue_type_names=get_string_agg_subquery(
@@ -121,8 +129,7 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         'company__uk_region__name': 'Company UK region',
         'company_sector_name': 'Company sector',
         'contact_names': 'Contacts',
-        'dit_adviser_name': 'Adviser',
-        'dit_team__name': 'Service provider',
+        'adviser_names': 'Advisers',
         'event__name': 'Event',
         'communication_channel__name': 'Communication channel',
         'service_delivery_status__name': 'Service delivery status',

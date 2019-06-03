@@ -54,14 +54,18 @@ class InteractionActivitySerializer(serializers.ModelSerializer):
 
     def _get_dit_participants(self, participants):
         return [
-            {
-                'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
-                'type': ['Person', 'dit:Adviser'],
-                'dit:emailAddress': participant.adviser.contact_email or participant.adviser.email,
-                'name': participant.adviser.name,
-            }
+            self._get_adviser(participant.adviser)
             for participant in participants.all()
+            if participant.adviser is not None
         ]
+
+    def _get_adviser(self, adviser):
+        return {} if adviser is None else {
+            'id': f'dit:DataHubAdviser:{adviser.pk}',
+            'type': ['Person', 'dit:Adviser'],
+            'dit:emailAddress': adviser.contact_email or adviser.email,
+            'name': adviser.name,
+        }
 
     def _get_team(self, team):
         return {} if team is None else {

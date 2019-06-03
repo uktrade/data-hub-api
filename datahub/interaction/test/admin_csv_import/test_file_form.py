@@ -1,8 +1,11 @@
+import csv
 import gzip
 import hashlib
+import io
 
 import pytest
 from django.core.cache import cache
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from reversion.models import Revision, Version
 
@@ -11,7 +14,15 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubException
 from datahub.interaction.admin_csv_import import file_form
 from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
-from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm, REVISION_COMMENT
+from datahub.interaction.admin_csv_import.file_form import (
+    InteractionCSVForm,
+    REVISION_COMMENT,
+    UnmatchedRowCollector,
+)
+from datahub.interaction.admin_csv_import.row_form import (
+    CSVRowError,
+    DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
+)
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
     make_csv_file_from_dicts,
@@ -22,8 +33,87 @@ from datahub.interaction.test.admin_csv_import.utils import (
 
 
 @pytest.mark.django_db
+class TestUnmatchedRowCollector:
+    """Tests for UnmatchedRowCollector."""
+
+    def test_to_csv(self):
+        """Test CSV file generation."""
+        collector = UnmatchedRowCollector()
+        input_rows = make_unmatched_rows(2)
+
+        for input_row in input_rows:
+            collector.append_row(InteractionCSVForm(data=input_row))
+
+        csv_contents = collector.to_raw_csv()
+        with io.BytesIO(csv_contents) as stream:
+            reader = csv.reader(io.TextIOWrapper(stream, encoding='utf-8-sig'))
+            csv_rows = list(reader)
+
+        assert csv_rows == [
+            [
+                'kind',
+                'date',
+                'adviser_1',
+                'contact_email',
+                'service',
+                'communication_channel',
+            ],
+            [
+                input_rows[0]['kind'],
+                input_rows[0]['date'],
+                input_rows[0]['adviser_1'],
+                input_rows[0]['contact_email'],
+                input_rows[0]['service'],
+                input_rows[0]['communication_channel'],
+            ],
+            [
+                input_rows[1]['kind'],
+                input_rows[1]['date'],
+                input_rows[1]['adviser_1'],
+                input_rows[1]['contact_email'],
+                input_rows[1]['service'],
+                input_rows[1]['communication_channel'],
+            ],
+        ]
+
+        # Check that the file re-validates (so it can be re-uploaded)
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile('test.csv', csv_contents),
+            },
+        )
+        assert form.is_valid()
+        assert form.are_all_rows_valid()
+
+
+@pytest.mark.django_db
 class TestInteractionCSVForm:
     """Tests for InteractionCSVForm."""
+
+    def test_get_row_errors_with_duplicate_rows(self):
+        """Test that duplicate rows are tracked and errors returned when encountered."""
+        matched_rows = make_matched_rows(5)
+
+        file = make_csv_file_from_dicts(
+            # Duplicate the first row
+            matched_rows[0],
+            *matched_rows,
+            *make_unmatched_rows(5),
+            *make_multiple_matches_rows(5),
+        )
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file.getvalue()),
+            },
+        )
+
+        assert form.is_valid()
+
+        row_errors = list(form.get_row_error_iterator())
+        assert row_errors == [
+            CSVRowError(1, NON_FIELD_ERRORS, '', DUPLICATE_OF_ANOTHER_ROW_MESSAGE),
+        ]
 
     @pytest.mark.parametrize(
         'num_matching,num_unmatched,num_multiple_matches,max_returned_rows',
@@ -112,8 +202,8 @@ class TestInteractionCSVForm:
     @pytest.mark.parametrize('num_unmatched', (0, 6))
     @pytest.mark.parametrize('num_multiple_matches', (0, 6))
     @pytest.mark.usefixtures('local_memory_cache')
-    def test_save_stores_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
-        """Test that save() stores the expected counts in the cache."""
+    def test_save_returns_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that save() returns the expected counts for each matching status."""
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
@@ -133,13 +223,45 @@ class TestInteractionCSVForm:
         )
 
         assert form.is_valid()
-        matching_counts = form.save(user)
+        matching_counts, _ = form.save(user)
 
         assert matching_counts == {
             ContactMatchingStatus.matched: num_matching,
             ContactMatchingStatus.unmatched: num_unmatched,
             ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
+
+    @pytest.mark.parametrize('num_matching', (5, 10))
+    @pytest.mark.parametrize('num_unmatched', (0, 6))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_save_returns_unmatched_rows(self, num_matching, num_unmatched, num_multiple_matches):
+        """Test that save() returns an UnmatchedRowCollector with the expected rows."""
+        matched_rows = make_matched_rows(num_matching)
+        unmatched_rows = make_unmatched_rows(num_unmatched)
+        multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
+        user = AdviserFactory(first_name='Admin', last_name='User')
+
+        file = make_csv_file_from_dicts(
+            *matched_rows,
+            *unmatched_rows,
+            *multiple_matches_rows,
+        )
+        file_contents = file.getvalue()
+
+        form = InteractionCSVForm(
+            files={
+                'csv_file': SimpleUploadedFile(file.name, file_contents),
+            },
+        )
+
+        assert form.is_valid()
+        _, unmatched_row_collector = form.save(user)
+
+        assert unmatched_row_collector.rows == [
+            *unmatched_rows,
+            *multiple_matches_rows,
+        ]
 
     @pytest.mark.parametrize('num_matching', (5, 10))
     @pytest.mark.parametrize('num_unmatched', (0, 6))
