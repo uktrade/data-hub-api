@@ -75,8 +75,8 @@ class TestCSVRowError:
 
 
 @pytest.mark.django_db
-class TestInteractionCSVRowForm:
-    """Tests for InteractionCSVRowForm."""
+class TestInteractionCSVRowFormValidation:
+    """Tests for validation in InteractionCSVRowForm."""
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -90,6 +90,16 @@ class TestInteractionCSVRowForm:
             (
                 {'kind': 'invalid'},
                 {'kind': ['Select a valid choice. invalid is not one of the available choices.']},
+            ),
+            # theme blank
+            (
+                {'theme': ''},
+                {'theme': ['This field is required.']},
+            ),
+            # theme invalid
+            (
+                {'theme': 'invalid'},
+                {'theme': ['Select a valid choice. invalid is not one of the available choices.']},
             ),
             # date blank
             (
@@ -306,6 +316,7 @@ class TestInteractionCSVRowForm:
         communication_channel = random_communication_channel()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -433,6 +444,7 @@ class TestInteractionCSVRowForm:
             )
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
@@ -553,6 +565,7 @@ class TestInteractionCSVRowForm:
             duplicate_tracker.add_item(resolved_duplicate_item)
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
@@ -564,6 +577,82 @@ class TestInteractionCSVRowForm:
 
         form = InteractionCSVRowForm(data=data, duplicate_tracker=duplicate_tracker)
         assert form.errors == expected_errors
+
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormSerializerUsage:
+    """
+    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
+
+    (This excludes validation of specific fields which is part of the validation tests above.)
+    """
+
+    def test_serializer_error_for_invalid_form(self, monkeypatch):
+        """
+        Test that an unmapped error from the serializer validators is not added to
+        NON_FIELD_ERRORS if the form was otherwise invalid.
+        """
+        def validator(_):
+            raise serializers.ValidationError(
+                {'non_existent_field': 'test error'},
+            )
+
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
+
+        data = {'kind': 'invalid'}
+        form = InteractionCSVRowForm(data=data)
+
+        assert NON_FIELD_ERRORS not in form.errors
+
+    def test_serializer_errors_for_valid_form(self, monkeypatch):
+        """Test that errors from the serializer validators are added to the form."""
+        def validator(_):
+            raise serializers.ValidationError(
+                {
+                    # This rule should be mapped to NON_FIELD_ERRORS
+                    'non_existent_field': 'unmapped test error',
+                    # This rule should be mapped to adviser_2
+                    'adviser_2': 'adviser test error',
+                },
+            )
+
+        monkeypatch.setattr(
+            'datahub.interaction.serializers.InteractionSerializer.validators',
+            [validator],
+        )
+
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+
+        data = {
+            'theme': Interaction.THEMES.export,
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+
+        form = InteractionCSVRowForm(data=data)
+        assert form.errors == {
+            'adviser_2': ['adviser test error'],
+            NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
+        }
+
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormCleaning:
+    """
+    Tests for field cleaning in InteractionCSVRowForm.
+
+    This includes looking up model objects and the transformation of values (but not validation).
+    """
 
     @pytest.mark.parametrize(
         'field,input_value,expected_value',
@@ -607,6 +696,7 @@ class TestInteractionCSVRowForm:
         communication_channel = random_communication_channel()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -689,6 +779,7 @@ class TestInteractionCSVRowForm:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -728,6 +819,7 @@ class TestInteractionCSVRowForm:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -774,6 +866,7 @@ class TestInteractionCSVRowForm:
         obj = object_creator()
 
         resolved_data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'service_delivery',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -798,6 +891,7 @@ class TestInteractionCSVRowForm:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -839,6 +933,7 @@ class TestInteractionCSVRowForm:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': 'interaction',
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -862,9 +957,15 @@ class TestInteractionCSVRowForm:
         else:
             assert not contact
 
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormGetFlatErrorListIterator:
+    """Tests for InteractionCSVRowForm.get_flat_error_list_iterator()."""
+
     def test_get_flat_error_list_iterator(self):
         """Test that get_flat_error_list_iterator() returns a flat list of errors."""
         data = {
+            'theme': 'invalid',
             'kind': 'invalid',
             'date': 'invalid',
             'adviser_1': '',
@@ -879,6 +980,12 @@ class TestInteractionCSVRowForm:
             CSVRowError(
                 5,
                 'kind',
+                'invalid',
+                'Select a valid choice. invalid is not one of the available choices.',
+            ),
+            CSVRowError(
+                5,
+                'theme',
                 'invalid',
                 'Select a valid choice. invalid is not one of the available choices.',
             ),
@@ -909,62 +1016,10 @@ class TestInteractionCSVRowForm:
         ]
         assert Counter(form.get_flat_error_list_iterator()) == Counter(expected_errors)
 
-    def test_serializer_error_for_invalid_form(self, monkeypatch):
-        """
-        Test that an unmapped error from the serializer validators is not added to
-        NON_FIELD_ERRORS if the form was otherwise invalid.
-        """
-        def validator(_):
-            raise serializers.ValidationError(
-                {'non_existent_field': 'test error'},
-            )
 
-        monkeypatch.setattr(
-            'datahub.interaction.serializers.InteractionSerializer.validators',
-            [validator],
-        )
-
-        data = {'kind': 'invalid'}
-        form = InteractionCSVRowForm(data=data)
-
-        assert NON_FIELD_ERRORS not in form.errors
-
-    def test_serializer_errors_for_valid_form(self, monkeypatch):
-        """Test that errors from the serializer validators are added to the form."""
-        def validator(_):
-            raise serializers.ValidationError(
-                {
-                    # This rule should be mapped to NON_FIELD_ERRORS
-                    'non_existent_field': 'unmapped test error',
-                    # This rule should be mapped to adviser_2
-                    'adviser_2': 'adviser test error',
-                },
-            )
-
-        monkeypatch.setattr(
-            'datahub.interaction.serializers.InteractionSerializer.validators',
-            [validator],
-        )
-
-        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        contact = ContactFactory(email='unique@company.com')
-        service = random_service()
-        communication_channel = random_communication_channel()
-
-        data = {
-            'kind': Interaction.KINDS.interaction,
-            'date': '01/01/2018',
-            'adviser_1': adviser.name,
-            'contact_email': contact.email,
-            'service': service.name,
-            'communication_channel': communication_channel.name,
-        }
-
-        form = InteractionCSVRowForm(data=data)
-        assert form.errors == {
-            'adviser_2': ['adviser test error'],
-            NON_FIELD_ERRORS: ['non_existent_field: unmapped test error'],
-        }
+@pytest.mark.django_db
+class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
+    """Tests for InteractionCSVRowForm.cleaned_data_as_serializer_dict()."""
 
     def test_cleaned_data_as_serializer_dict_for_interaction(self):
         """Test that cleaned_data_as_serializer_dict() transforms an interaction."""
@@ -974,6 +1029,7 @@ class TestInteractionCSVRowForm:
         communication_channel = random_communication_channel()
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -1001,6 +1057,7 @@ class TestInteractionCSVRowForm:
             'service': service,
             'status': Interaction.STATUSES.complete,
             'subject': service.name,
+            'theme': data['theme'],
             'was_policy_feedback_provided': False,
         }
 
@@ -1012,6 +1069,7 @@ class TestInteractionCSVRowForm:
         event = EventFactory()
 
         data = {
+            'theme': Interaction.THEMES.other,
             'kind': Interaction.KINDS.service_delivery,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -1042,8 +1100,14 @@ class TestInteractionCSVRowForm:
             'service': service,
             'status': Interaction.STATUSES.complete,
             'subject': data['subject'],
+            'theme': data['theme'],
             'was_policy_feedback_provided': False,
         }
+
+
+@pytest.mark.django_db
+class TestInteractionCSVRowFormSaving:
+    """Tests for InteractionCSVRowForm.save()."""
 
     def test_save_interaction(self):
         """Test saving an interaction."""
@@ -1055,6 +1119,7 @@ class TestInteractionCSVRowForm:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
@@ -1068,6 +1133,7 @@ class TestInteractionCSVRowForm:
         interaction = form.save(user, source=source)
         interaction.refresh_from_db()
 
+        assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.communication_channel == communication_channel
@@ -1098,6 +1164,7 @@ class TestInteractionCSVRowForm:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.service_delivery,
             'date': '02/03/2018',
             'adviser_1': adviser_1.name,
@@ -1114,6 +1181,7 @@ class TestInteractionCSVRowForm:
         interaction = form.save(user, source=source)
         interaction.refresh_from_db()
 
+        assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.event == event
@@ -1151,6 +1219,7 @@ class TestInteractionCSVRowForm:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
@@ -1181,6 +1250,7 @@ class TestInteractionCSVRowForm:
         source = {'test-source': 'test-value'}
 
         data = {
+            'theme': Interaction.THEMES.export,
             'kind': Interaction.KINDS.interaction,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
