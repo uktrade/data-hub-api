@@ -46,7 +46,7 @@ def _get_meeting_subject(sender, contacts, secondary_advisers):
         except IndexError:
             # This is not going to be a valid interaction, but this helper function
             # should not raise an exception
-            contact_names = ['A company']
+            contact_names = ['a company']
     all_names = (*adviser_names, *contact_names)
     comma_names = ', '.join(all_names[:-1])
     return f'Meeting between {comma_names} and {all_names[-1]}'
