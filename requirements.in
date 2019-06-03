@@ -45,7 +45,7 @@ elasticsearch-dsl==6.3.1
 # Celery
 celery[redis]==4.3
 billiard==3.6.0.0
-kombu==4.5.0
+kombu==4.6.0
 
 # Testing and dev
 pytest==4.5.0
