@@ -51,6 +51,7 @@ class TestUnmatchedRowCollector:
 
         assert csv_rows == [
             [
+                'theme',
                 'kind',
                 'date',
                 'adviser_1',
@@ -59,6 +60,7 @@ class TestUnmatchedRowCollector:
                 'communication_channel',
             ],
             [
+                input_rows[0]['theme'],
                 input_rows[0]['kind'],
                 input_rows[0]['date'],
                 input_rows[0]['adviser_1'],
@@ -67,6 +69,7 @@ class TestUnmatchedRowCollector:
                 input_rows[0]['communication_channel'],
             ],
             [
+                input_rows[1]['theme'],
                 input_rows[1]['kind'],
                 input_rows[1]['date'],
                 input_rows[1]['adviser_1'],
@@ -177,6 +180,7 @@ class TestInteractionCSVForm:
         """
         file = make_csv_file_from_dicts(
             {
+                'theme': 'invalid',
                 'kind': 'invalid',
                 'date': 'invalid',
 

@@ -99,6 +99,7 @@ class InteractionCSVRowForm(forms.Form):
         'event': 'event_id',
     }
 
+    theme = forms.ChoiceField(choices=Interaction.THEMES)
     kind = forms.ChoiceField(choices=Interaction.KINDS)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     # Used to attempt to find a matching contact (and company) for the interaction
@@ -339,6 +340,7 @@ class InteractionCSVRowForm(forms.Form):
             'service': data['service'],
             'status': Interaction.STATUSES.complete,
             'subject': subject,
+            'theme': data['theme'],
             'was_policy_feedback_provided': False,
         }
 
