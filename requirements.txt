@@ -9,7 +9,6 @@ apipkg==1.5               # via execnet
 argh==0.26.2              # via watchdog
 atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via flake8-bugbear, pytest
-authres==1.1.1
 backcall==0.1.0           # via ipython
 billiard==3.6.0.0
 boto3==1.9.159

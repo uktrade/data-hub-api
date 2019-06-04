@@ -3,6 +3,8 @@ from celery.utils.log import get_task_logger
 from django_pglocks import advisory_lock
 
 from datahub.email_ingestion import mailbox_handler
+from datahub.feature_flag.utils import is_feature_flag_active
+from datahub.interaction import INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME
 
 logger = get_task_logger(__name__)
 
@@ -13,6 +15,14 @@ def ingest_emails():
     Ingest and process new emails for all mailboxes in the application - i.e.
     those in the MAILBOXES django setting.
     """
+    # TODO: remove feature flag check once we are happy with meeting invite
+    # email processing
+    if not is_feature_flag_active(INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME):
+        logger.info(
+            f'Feature flag "{INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME}" is not active, '
+            'exiting.',
+        )
+        return
     # Acquire a processing lock for the duration of the current DB session -
     # this will ensure that multiple ingestion workers do not run at the same
     # time and therefore prevent the chance of messages being processed more
