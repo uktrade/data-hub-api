@@ -101,3 +101,7 @@ DOCUMENT_BUCKETS = {
 
 DIT_EMAIL_DOMAINS = ['trade.gov.uk', 'digital.trade.gov.uk']
 DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT = ['trade.gov.uk']
+
+ACTIVITY_STREAM_OUTGOING_URL = 'http://activity.stream/'
+ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = 'some-outgoing-id'
+ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = 'some-outgoing-secret'
