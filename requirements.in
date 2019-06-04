@@ -32,7 +32,6 @@ notifications-python-client==5.3.0
 # Email
 mail-parser==3.9.3
 icalendar==4.0.3
-authres==1.1.1
 
 # REDIS
 django-redis==4.10.0

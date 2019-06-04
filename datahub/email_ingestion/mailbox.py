@@ -53,7 +53,7 @@ class Mailbox:
 
     def __init__(
         self,
-        email,
+        username,
         password,
         imap_domain,
         mail_processor_classes,
@@ -62,14 +62,14 @@ class Mailbox:
         """
         Initialise a Mailbox object.
 
-        :param email: string - the email address of the inbox
+        :param username: string - the username of the inbox
         :param password: string - the password for the inbox
         :param imap_domain: string - the domain of the imap server to connect to
         :param mail_processor_classes: iterable - EmailProcessor classes which
             should be used to process incoming mail to this mailbox
         :param imap_port: optional int - the port to use when connecting with imap
         """
-        self.email = email
+        self.username = username
         self.password = password
         self.imap_domain = imap_domain
         if imap_port:
@@ -88,7 +88,7 @@ class Mailbox:
         :yields: An active imaplib server connection object.
         """
         connection = imaplib.IMAP4_SSL(self.imap_domain, self.imap_port)
-        connection.login(self.email, self.password)
+        connection.login(self.username, self.password)
         connection.select()
         try:
             yield connection
@@ -192,7 +192,7 @@ class Mailbox:
                     # If we have some problem parsing the email, it's likely
                     # to be spam/malicious so skip it
                     error_message = (
-                        f'Mailbox "{self.email}" failed to parse message'
+                        f'Mailbox "{self.username}" failed to parse message'
                     )
                     logger.exception(error_message)
                     # Just set the message to None so that we still mark it as
@@ -202,7 +202,7 @@ class Mailbox:
                     # We should fail and exit immediately in this case, as it's
                     # probable that another process is processing the inbox
                     error_message = (
-                        f'Mailbox "{self.email}" could not retrieve message {uid} successfully'
+                        f'Mailbox "{self.username}" could not retrieve message {uid} successfully'
                     )
                     logger.exception(error_message)
                     return
@@ -248,14 +248,13 @@ class MailboxHandler:
         Initialise the MailboxHandler object.
         """
         self.mailboxes = {}
-        self.initialise_mailboxes()
 
     def initialise_mailboxes(self):
         """
         Initialise all of the mailboxes detailed in the MAILBOXES django setting.
         """
         for mailbox_name, config in settings.MAILBOXES.items():
-            properly_configured = config.keys() >= {'email', 'password', 'imap_domain'}
+            properly_configured = config.keys() >= {'username', 'password', 'imap_domain'}
             if not properly_configured:
                 message = f'Mailbox "{mailbox_name}" was not configured properly in settings'
                 raise ImproperlyConfigured(message)
@@ -265,7 +264,7 @@ class MailboxHandler:
                 processor_class = import_string(processor_class_path)
                 processor_classes.append(processor_class)
             mailbox = Mailbox(
-                config['email'],
+                config['username'],
                 config['password'],
                 config['imap_domain'],
                 processor_classes,
