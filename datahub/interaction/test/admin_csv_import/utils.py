@@ -20,8 +20,14 @@ def random_communication_channel(disabled=False):
 
 def random_service(disabled=False):
     """Get a random service."""
+    # TODO: services that require interaction questions need to be excluded until the support
+    # is fully implemented otherwise some tests, which don't provide answers when required, will
+    # fail
     return random_obj_for_queryset(
-        Service.objects.filter(disabled_on__isnull=not disabled),
+        Service.objects.filter(
+            disabled_on__isnull=not disabled,
+            interaction_questions__isnull=True,
+        ),
     )
 
 

@@ -30,6 +30,7 @@ from datahub.interaction.models import (
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
 from datahub.interaction.validators import (
     ContactsBelongToCompanyValidator,
+    ServiceAnswersValidator,
     StatusChangeValidator,
 )
 from datahub.investment.project.serializers import NestedInvestmentProjectField
@@ -194,6 +195,7 @@ class InteractionSerializer(serializers.ModelSerializer):
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service, required=False, allow_null=True)
+    service_answers = serializers.JSONField(required=False)
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
@@ -283,7 +285,6 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     def _create_or_update(self, validated_data, instance=None, is_update=False):
         dit_participants = validated_data.pop('dit_participants', None)
-
         if is_update:
             interaction = super().update(instance, validated_data)
         else:
@@ -383,6 +384,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'investment_project',
             'net_company_receipt',
             'service',
+            'service_answers',
             'service_delivery_status',
             'subject',
             'theme',
@@ -411,6 +413,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             HasAssociatedInvestmentProjectValidator(),
             ContactsBelongToCompanyValidator(),
             StatusChangeValidator(),
+            ServiceAnswersValidator(),
             RulesBasedValidator(
                 # If dit_adviser and dit_team are *omitted* (note that they already have
                 # allow_null=False) we assume that dit_participants is being used, and return an

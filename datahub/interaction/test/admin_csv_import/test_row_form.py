@@ -11,7 +11,6 @@ from rest_framework import serializers
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
-from datahub.core.test_utils import random_obj_for_queryset
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
@@ -28,9 +27,7 @@ from datahub.interaction.test.admin_csv_import.utils import (
     random_service,
 )
 from datahub.interaction.test.factories import CommunicationChannelFactory
-from datahub.metadata.models import Service
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
-
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
     {
@@ -581,9 +578,8 @@ class TestInteractionCSVRowForm:
             ContactFactory(**factory_kwargs)
 
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
-        service = random_obj_for_queryset(
-            Service.objects.filter(disabled_on__isnull=True),
-        )
+        service = random_service(disabled=False)
+
         communication_channel = random_communication_channel()
 
         data = {

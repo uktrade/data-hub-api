@@ -159,6 +159,7 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
             },
+            'service_answers': None,
             'investment_project': None,
             'archived_documents_url_path': '',
             'created_by': {
