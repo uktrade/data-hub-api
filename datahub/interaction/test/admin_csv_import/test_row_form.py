@@ -317,7 +317,7 @@ class TestInteractionCSVRowFormValidation:
 
         resolved_data = {
             'theme': Interaction.THEMES.export,
-            'kind': 'interaction',
+            'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -697,7 +697,7 @@ class TestInteractionCSVRowFormCleaning:
 
         resolved_data = {
             'theme': Interaction.THEMES.export,
-            'kind': 'interaction',
+            'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
@@ -820,7 +820,7 @@ class TestInteractionCSVRowFormCleaning:
 
         resolved_data = {
             'theme': Interaction.THEMES.export,
-            'kind': 'interaction',
+            'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -867,7 +867,7 @@ class TestInteractionCSVRowFormCleaning:
 
         resolved_data = {
             'theme': Interaction.THEMES.export,
-            'kind': 'service_delivery',
+            'kind': Interaction.KINDS.service_delivery,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -934,7 +934,7 @@ class TestInteractionCSVRowFormCleaning:
 
         data = {
             'theme': Interaction.THEMES.export,
-            'kind': 'interaction',
+            'kind': Interaction.KINDS.interaction,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'service': service.name,
