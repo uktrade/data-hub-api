@@ -1,5 +1,7 @@
 from django.conf import settings
 
+DEFAULT_AUTH_METHODS = (('spf', 'pass'), ('dmarc', 'bestguesspass'), ('compauth', 'pass'))
+
 
 def _verify_authentication(message, auth_methods=None):
     """
@@ -14,7 +16,7 @@ def _verify_authentication(message, auth_methods=None):
         was verified.
     """
     if not auth_methods:
-        auth_methods = (('dkim', 'pass'), ('spf', 'pass'), ('dmarc', 'pass'))
+        auth_methods = [*DEFAULT_AUTH_METHODS]
     header_contents = ' '.join(message.authentication_results.splitlines())
     auth_results = {auth_method: False for auth_method, _ in auth_methods}
 
@@ -41,7 +43,7 @@ def was_email_sent_by_dit(message):
 
     :param message: mailparse.MailParser object - the message to check
 
-    :returns: True if the email was sent by DIT, False otherwise.
+    :returns: True if the email passed our minimal level of email authentication checks.
     """
     try:
         from_email = message.from_[0][1]
@@ -52,8 +54,11 @@ def was_email_sent_by_dit(message):
     try:
         domain_auth_methods = settings.DIT_EMAIL_DOMAINS[from_domain]
     except KeyError:
-        # The domain is not in our known dictionary of DIT email domains
-        return False
+        # TODO: Once we are past the pilot period this should return False.
+        #  For now, we are relaxed about the authentication methods
+        #  and allowed incoming DIT domains as this information is very hard to
+        #  source exhaustively.
+        domain_auth_methods = [*DEFAULT_AUTH_METHODS]
 
     from_domain_is_authentication_exempt = domain_auth_methods == ['exempt']
     if from_domain_is_authentication_exempt:
