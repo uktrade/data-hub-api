@@ -257,10 +257,9 @@ class TestServiceView:
         service_additional_question = ServiceAdditionalQuestion.objects.first()
         db_service = service_additional_question.answer_option.question.service
 
-        for service in services:
-            if service['id'] == str(db_service.id):
-                response_service = service
-                break
+        response_service = next(
+            (service for service in services if service['id'] == str(db_service.id)),
+        )
 
         response_service['contexts'] = sorted(response_service['contexts'])
 
