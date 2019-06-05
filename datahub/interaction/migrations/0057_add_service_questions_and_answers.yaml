@@ -35,7 +35,7 @@
   pk: 2ecdad3d-642a-454c-9bd9-8089b448c319
   fields:
     disabled_on:
-    name: Business Partners (e.g. distributers or manufacturers)
+    name: Business Partners (e.g. distributors or manufacturers)
     question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
     order: 200.0
 - model: interaction.serviceansweroption
@@ -118,7 +118,7 @@
   pk: faa5a5c7-5703-46d8-a35c-c92a87850655
   fields:
     disabled_on:
-    name: Business Partners (e.g. distributers or manufacturers)
+    name: Business Partners (e.g. distributors or manufacturers)
     question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
     order: 200.0
 - model: interaction.serviceansweroption
