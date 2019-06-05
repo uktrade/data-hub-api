@@ -102,6 +102,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified',
         'dit_adviser',
         'dit_team',
+        'pretty_service_answers',
         'pretty_source',
     )
     list_select_related = (
@@ -114,6 +115,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
+        'service_answers',
         'source',
     )
 
@@ -140,6 +142,12 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         return format_json_as_html(obj.source)
 
     pretty_source.short_description = 'source'
+
+    def pretty_service_answers(self, obj):
+        """Return the service_answers field formatted with indentation."""
+        return format_json_as_html(obj.service_answers)
+
+    pretty_service_answers.short_description = 'service answers'
 
     def get_urls(self):
         """Gets the URLs for this model's admin views."""

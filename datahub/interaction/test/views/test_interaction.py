@@ -178,6 +178,7 @@ class TestAddInteraction(APITestMixin):
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
             },
+            'service_answers': None,
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
             'created_by': {
@@ -705,6 +706,7 @@ class TestGetInteraction(APITestMixin):
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
             },
+            'service_answers': None,
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
@@ -812,6 +814,7 @@ class TestGetInteraction(APITestMixin):
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
             },
+            'service_answers': None,
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
