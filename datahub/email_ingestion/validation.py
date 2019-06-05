@@ -6,19 +6,31 @@ def _verify_authentication(message, auth_methods=None):
     Verify the Authentication-Results header of a MailParser object.
 
     :param message: mailparse.MailParser object - the message to check
-    :param auth_methods: Optional - An iterable of email authentication methods
-        to check.  Defaults to ('dkim', 'spf', 'dmarc').
+    :param auth_methods: Optional - An iterable of pairs of email authentication methods
+        to and their minimum results to check.
+        Defaults to (('dkim', 'pass'), ('spf', 'pass'), ('dmarc', 'pass')).
 
     :returns: A boolean for whether or not the Authentication-Results header
         was verified.
     """
     if not auth_methods:
-        auth_methods = ('dkim', 'spf', 'dmarc')
+        auth_methods = (('dkim', 'pass'), ('spf', 'pass'), ('dmarc', 'pass'))
     header_contents = ' '.join(message.authentication_results.splitlines())
-    auth_results = {auth_method: False for auth_method in auth_methods}
-    for auth_method in auth_methods:
-        if f'{auth_method}=pass' in header_contents:
+    auth_results = {auth_method: False for auth_method, _ in auth_methods}
+
+    for auth_method, minimum_result in auth_methods:
+        expected_auth_pairs = [f'{auth_method}={minimum_result}']
+        if minimum_result == 'bestguesspass':
+            expected_auth_pairs.append(f'{auth_method}=pass')
+
+        expected_auth_pair_present = any(
+            expected_auth_pair in header_contents
+            for expected_auth_pair in expected_auth_pairs
+        )
+
+        if expected_auth_pair_present:
             auth_results[auth_method] = True
+
     all_auth_pass = all(auth_results.values())
     return all_auth_pass
 
@@ -36,17 +48,15 @@ def was_email_sent_by_dit(message):
         from_domain = from_email.rsplit('@', maxsplit=1)[1]
     except IndexError:
         return False
-    from_domain_is_dit = any([
-        domain for domain in settings.DIT_EMAIL_DOMAINS
-        if from_domain == domain
-    ])
-    if not from_domain_is_dit:
+
+    try:
+        domain_auth_methods = settings.DIT_EMAIL_DOMAINS[from_domain]
+    except KeyError:
+        # The domain is not in our known dictionary of DIT email domains
         return False
-    from_domain_is_authentication_exempt = any([
-        domain for domain in settings.DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT
-        if from_domain == domain
-    ])
+
+    from_domain_is_authentication_exempt = domain_auth_methods == ['exempt']
     if from_domain_is_authentication_exempt:
         return True
-    authentication_pass = _verify_authentication(message)
+    authentication_pass = _verify_authentication(message, domain_auth_methods)
     return authentication_pass
