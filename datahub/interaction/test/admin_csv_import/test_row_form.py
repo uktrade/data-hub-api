@@ -81,53 +81,52 @@ class TestInteractionCSVRowFormValidation:
     @pytest.mark.parametrize(
         'data,errors',
         (
-            # kind blank
-            (
+            pytest.param(
                 {'kind': ''},
                 {'kind': ['This field is required.']},
+                id='kind blank',
             ),
-            # kind invalid
-            (
+            pytest.param(
                 {'kind': 'invalid'},
                 {'kind': ['Select a valid choice. invalid is not one of the available choices.']},
+                id='kind invalid',
             ),
-            # theme blank
-            (
+            pytest.param(
                 {'theme': ''},
                 {'theme': ['This field is required.']},
+                id='theme blank',
             ),
-            # theme invalid
-            (
+            pytest.param(
                 {'theme': 'invalid'},
                 {'theme': ['Select a valid choice. invalid is not one of the available choices.']},
+                id='theme invalid',
             ),
-            # date blank
-            (
+            pytest.param(
                 {'date': ''},
                 {'date': ['This field is required.']},
+                id='date blank',
             ),
-            # invalid date
-            (
+            pytest.param(
                 {'date': '08/31/2020'},
                 {'date': ['Enter a valid date.']},
+                id='invalid date',
             ),
-            # invalid contact_email
-            (
+            pytest.param(
                 {'contact_email': 'invalid'},
                 {'contact_email': ['Enter a valid email address.']},
+                id='invalid contact_email',
             ),
-            # blank adviser_1
-            (
+            pytest.param(
                 {'adviser_1': ''},
                 {'adviser_1': ['This field is required.']},
+                id='blank adviser_1',
             ),
-            # adviser_1 doesn't exist
-            (
+            pytest.param(
                 {'adviser_1': 'Non-existent adviser'},
                 {'adviser_1': [ADVISER_NOT_FOUND_MESSAGE]},
+                id="adviser_1 doesn't exist",
             ),
-            # multiple matching values for adviser_1
-            (
+            pytest.param(
                 {
                     'adviser_1': lambda: AdviserFactory.create_batch(
                         2,
@@ -136,9 +135,9 @@ class TestInteractionCSVRowFormValidation:
                     )[0].name,
                 },
                 {'adviser_1': [MULTIPLE_ADVISERS_FOUND_MESSAGE]},
+                id='multiple matching values for adviser_1',
             ),
-            # adviser_1 and team_1 mismatch
-            (
+            pytest.param(
                 {
                     'adviser_1': lambda: AdviserFactory(
                         first_name='Pluto',
@@ -150,14 +149,14 @@ class TestInteractionCSVRowFormValidation:
                     ).name,
                 },
                 {'adviser_1': [ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE]},
+                id='adviser_1 and team_1 mismatch',
             ),
-            # adviser_2 doesn't exist
-            (
+            pytest.param(
                 {'adviser_2': 'Non-existent adviser'},
                 {'adviser_2': [ADVISER_NOT_FOUND_MESSAGE]},
+                id="adviser_2 doesn't exist",
             ),
-            # multiple matching values for adviser_2
-            (
+            pytest.param(
                 {
                     'adviser_2': lambda: AdviserFactory.create_batch(
                         2,
@@ -166,9 +165,9 @@ class TestInteractionCSVRowFormValidation:
                     )[0].name,
                 },
                 {'adviser_2': [MULTIPLE_ADVISERS_FOUND_MESSAGE]},
+                id='multiple matching values for adviser_2',
             ),
-            # adviser_2 and team_2 mismatch
-            (
+            pytest.param(
                 {
                     'adviser_2': lambda: AdviserFactory(
                         first_name='Pluto',
@@ -180,9 +179,9 @@ class TestInteractionCSVRowFormValidation:
                     ).name,
                 },
                 {'adviser_2': [ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE]},
+                id='adviser_2 and team_2 mismatch',
             ),
-            # adviser_2 same as adviser_1
-            (
+            pytest.param(
                 {
                     'adviser_1': lambda: AdviserFactory(
                         first_name='Pluto',
@@ -194,45 +193,45 @@ class TestInteractionCSVRowFormValidation:
                     'team_2': 'Team Advantage',
                 },
                 {'adviser_2': [ADVISER_2_IS_THE_SAME_AS_ADVISER_1]},
+                id='adviser_2 same as adviser_1',
             ),
-            # service doesn't exist
-            (
+            pytest.param(
                 {'service': 'Non-existent service'},
                 {
                     'service': [
                         'Select a valid choice. That choice is not one of the available choices.',
                     ],
                 },
+                id="service doesn't exist",
             ),
-            # service is disabled
-            (
+            pytest.param(
                 {
                     'service': lambda: random_service(disabled=True).name,
                 },
                 {
                     'service': [OBJECT_DISABLED_MESSAGE],
                 },
+                id='service is disabled',
             ),
-            # Multiple matching services
-            (
+            pytest.param(
                 {
                     'service': lambda: ServiceFactory.create_batch(2, name='Duplicate')[0].name,
                 },
                 {
                     'service': ['There is more than one matching service.'],
                 },
+                id='multiple matching services',
             ),
-            # communication_channel doesn't exist
-            (
+            pytest.param(
                 {'communication_channel': 'Non-existent communication channel'},
                 {
                     'communication_channel': [
                         'Select a valid choice. That choice is not one of the available choices.',
                     ],
                 },
+                id="communication_channel doesn't exist",
             ),
-            # Multiple matching communication channels
-            (
+            pytest.param(
                 {
                     'communication_channel': lambda: CommunicationChannelFactory.create_batch(
                         2,
@@ -244,9 +243,9 @@ class TestInteractionCSVRowFormValidation:
                         'There is more than one matching communication channel.',
                     ],
                 },
+                id='multiple matching communication channels',
             ),
-            # communication_channel is disabled
-            (
+            pytest.param(
                 {
                     'communication_channel': lambda: random_communication_channel(
                         disabled=True,
@@ -255,10 +254,10 @@ class TestInteractionCSVRowFormValidation:
                 {
                     'communication_channel': [OBJECT_DISABLED_MESSAGE],
                 },
+                id='communication_channel is disabled',
             ),
-            # communication_channel required for interactions
-            # Note: This error comes from the serialiser validation rules
-            (
+            # This error comes from the serialiser validation rules
+            pytest.param(
                 {
                     'communication_channel': '',
                     'kind': Interaction.KINDS.interaction,
@@ -266,27 +265,27 @@ class TestInteractionCSVRowFormValidation:
                 {
                     'communication_channel': ['This field is required.'],
                 },
+                id='communication_channel required for interactions',
             ),
-            # event_id invalid
-            (
+            pytest.param(
                 {'event_id': 'non_existent_event_id'},
                 {
                     'event_id': [
                         "'non_existent_event_id' is not a valid UUID.",
                     ],
                 },
+                id='event_id invalid',
             ),
-            # event_id is for a disabled event
-            (
+            pytest.param(
                 {
                     'event_id': lambda: str(DisabledEventFactory().pk),
                 },
                 {
                     'event_id': [OBJECT_DISABLED_MESSAGE],
                 },
+                id='event_id is for a disabled event',
             ),
-            # event_id non-existent
-            (
+            pytest.param(
                 {'event_id': '00000000-0000-0000-0000-000000000000'},
                 {
                     'event_id': [
@@ -294,10 +293,10 @@ class TestInteractionCSVRowFormValidation:
                         'choices.',
                     ],
                 },
+                id='event_id non-existent',
             ),
-            # cannot specify event_id for an interaction
-            # Note: This error comes from the serialiser validation rules
-            (
+            # This error comes from the serialiser validation rules
+            pytest.param(
                 {
                     'kind': Interaction.KINDS.interaction,
                     'event_id': lambda: str(EventFactory().pk),
@@ -305,6 +304,7 @@ class TestInteractionCSVRowFormValidation:
                 {
                     'event_id': ['This field is only valid for service deliveries.'],
                 },
+                id='cannot specify event_id for an interaction',
             ),
         ),
     )
@@ -657,35 +657,35 @@ class TestInteractionCSVRowFormCleaning:
     @pytest.mark.parametrize(
         'field,input_value,expected_value',
         (
-            # UK date format without leading zeroes
-            (
+            pytest.param(
                 'date',
                 '1/2/2013',
                 date(2013, 2, 1),
+                id='UK date format without leading zeroes',
             ),
-            # UK date format with leading zeroes
-            (
+            pytest.param(
                 'date',
                 '03/04/2015',
                 date(2015, 4, 3),
+                id='UK date format with leading zeroes',
             ),
-            # ISO date format
-            (
+            pytest.param(
                 'date',
                 '2016-05-04',
                 date(2016, 5, 4),
+                id='ISO date format',
             ),
-            # Subject
-            (
+            pytest.param(
                 'subject',
                 'A subject',
                 'A subject',
+                id='subject',
             ),
-            # Notes (trailing blank lines are stripped)
-            (
+            pytest.param(
                 'notes',
                 'Notes with\nmultiple lines\n',
                 'Notes with\nmultiple lines',
+                id='notes (trailing blank lines are stripped)',
             ),
         ),
     )
@@ -718,53 +718,53 @@ class TestInteractionCSVRowFormCleaning:
     @pytest.mark.parametrize(
         'field,object_creator,input_transformer',
         (
-            # adviser_1 look-up (same case)
-            (
+            pytest.param(
                 'adviser_1',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
                 ),
                 lambda obj: obj.name,
+                id='adviser_1 look-up (same case)',
             ),
-            # adviser_1 look-up (case-insensitive)
-            (
+            pytest.param(
                 'adviser_1',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
                 ),
                 lambda obj: obj.name.upper(),
+                id='adviser_1 look-up (case-insensitive)',
             ),
-            # adviser_2 look-up (same case)
-            (
+            pytest.param(
                 'adviser_1',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
                 ),
                 lambda obj: obj.name,
+                id='adviser_2 look-up (same case)',
             ),
-            # adviser_2 look-up (case-insensitive)
-            (
+            pytest.param(
                 'adviser_1',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
                 ),
                 lambda obj: obj.name.upper(),
+                id='adviser_2 look-up (case-insensitive)',
             ),
-            # service look-up (same case)
-            (
+            pytest.param(
                 'service',
                 lambda: ServiceFactory(name='UNIQUE EXPORT DEAL'),
                 lambda obj: obj.name,
+                id='service look-up (same case)',
             ),
-            # service look-up (case-insensitive)
-            (
+            pytest.param(
                 'service',
                 lambda: ServiceFactory(name='UNIQUE EXPORT DEAL'),
                 lambda obj: obj.name.lower(),
+                id='service look-up (case-insensitive)',
             ),
         ),
     )
@@ -797,17 +797,17 @@ class TestInteractionCSVRowFormCleaning:
     @pytest.mark.parametrize(
         'field,object_creator,input_transformer',
         (
-            # communication channel look-up (same case)
-            (
+            pytest.param(
                 'communication_channel',
                 lambda: random_communication_channel(),
                 lambda obj: obj.name,
+                id='communication channel look-up (same case)',
             ),
-            # communication channel look-up (case-insensitive)
-            (
+            pytest.param(
                 'communication_channel',
                 lambda: random_communication_channel(),
                 lambda obj: obj.name.upper(),
+                id='communication channel look-up (case-insensitive)',
             ),
         ),
     )
@@ -836,19 +836,19 @@ class TestInteractionCSVRowFormCleaning:
     @pytest.mark.parametrize(
         'field,object_creator,input_transformer,expected_value_transformer',
         (
-            # communication channel should be ignored
-            (
+            pytest.param(
                 'communication_channel',
                 lambda: random_communication_channel(),
                 lambda obj: obj.name,
                 lambda obj: None,
+                id='communication channel should be ignored',
             ),
-            # event look-up
-            (
+            pytest.param(
                 'event_id',
                 lambda: EventFactory(),
                 lambda obj: str(obj.pk),
                 lambda obj: obj,
+                id='event look-up',
             ),
         ),
     )
