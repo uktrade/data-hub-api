@@ -1,9 +1,8 @@
-from rest_framework import serializers
-
+from datahub.activity_stream.serializers import ActivitySerializer
 from datahub.interaction.models import Interaction
 
 
-class InteractionActivitySerializer(serializers.ModelSerializer):
+class InteractionActivitySerializer(ActivitySerializer):
     """Interaction serialiser for activity stream."""
 
     KINDS_JSON = {
@@ -43,15 +42,6 @@ class InteractionActivitySerializer(serializers.ModelSerializer):
             context = {}
         return context
 
-    def _get_company(self, company):
-        return {} if company is None else {
-            'id': f'dit:DataHubCompany:{company.pk}',
-            'dit:dunsNumber': company.duns_number,
-            'dit:companiesHouseNumber': company.company_number,
-            'type': ['Organization', 'dit:Company'],
-            'name': company.name,
-        }
-
     def _get_dit_participants(self, participants):
         return [
             self._get_adviser(participant.adviser)
@@ -59,31 +49,12 @@ class InteractionActivitySerializer(serializers.ModelSerializer):
             if participant.adviser is not None
         ]
 
-    def _get_adviser(self, adviser):
-        return {} if adviser is None else {
-            'id': f'dit:DataHubAdviser:{adviser.pk}',
-            'type': ['Person', 'dit:Adviser'],
-            'dit:emailAddress': adviser.contact_email or adviser.email,
-            'name': adviser.name,
-        }
-
     def _get_team(self, team):
         return {} if team is None else {
             'id': f'dit:DataHubTeam:{team.pk}',
             'type': ['Group', 'dit:Team'],
             'name': team.name,
         }
-
-    def _get_contacts(self, contacts):
-        return [
-            {
-                'id': f'dit:DataHubContact:{contact.pk}',
-                'type': ['Person', 'dit:Contact'],
-                'dit:emailAddress': contact.email,
-                'name': contact.name,
-            }
-            for contact in contacts.all()
-        ]
 
     def to_representation(self, instance):
         """
@@ -95,7 +66,7 @@ class InteractionActivitySerializer(serializers.ModelSerializer):
             'id': f'{interaction_id}:Announce',
             'type': 'Announce',
             'published': instance.created_on,
-            'generator': {'name': 'dit:dataHub', 'type': 'Application'},
+            'generator': self._get_generator(),
             'object': {
                 'id': interaction_id,
                 'type': ['dit:Event', f'dit:{self.KINDS_JSON[instance.kind]}'],
