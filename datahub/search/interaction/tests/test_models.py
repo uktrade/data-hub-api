@@ -63,12 +63,6 @@ def test_interaction_to_dict(setup_es, factory_cls):
             'name': interaction.service.name,
         },
         'subject': interaction.subject,
-        'dit_adviser': {
-            'id': str(interaction.dit_adviser.pk),
-            'first_name': interaction.dit_adviser.first_name,
-            'name': interaction.dit_adviser.name,
-            'last_name': interaction.dit_adviser.last_name,
-        },
         'dit_participants': [
             {
                 'adviser': {
@@ -85,10 +79,6 @@ def test_interaction_to_dict(setup_es, factory_cls):
             for dit_participant in interaction.dit_participants.order_by('adviser__pk')
         ],
         'notes': interaction.notes,
-        'dit_team': {
-            'id': str(interaction.dit_team.pk),
-            'name': interaction.dit_team.name,
-        },
         'communication_channel': {
             'id': str(interaction.communication_channel.pk),
             'name': interaction.communication_channel.name,
@@ -165,12 +155,6 @@ def test_service_delivery_to_dict(setup_es):
             'name': interaction.service.name,
         },
         'subject': interaction.subject,
-        'dit_adviser': {
-            'id': str(interaction.dit_adviser.pk),
-            'first_name': interaction.dit_adviser.first_name,
-            'name': interaction.dit_adviser.name,
-            'last_name': interaction.dit_adviser.last_name,
-        },
         'dit_participants': [
             {
                 'adviser': {
@@ -187,10 +171,6 @@ def test_service_delivery_to_dict(setup_es):
             for dit_participant in interaction.dit_participants.order_by('adviser__pk')
         ],
         'notes': interaction.notes,
-        'dit_team': {
-            'id': str(interaction.dit_team.pk),
-            'name': interaction.dit_team.name,
-        },
         'communication_channel': None,
         'investment_project': None,
         'investment_project_sector': None,

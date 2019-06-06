@@ -1,0 +1,1 @@
+INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME = 'interaction-email-ingestion'

@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Service, Team
+from datahub.core.constants import Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
@@ -85,7 +85,7 @@ class TestAddInteraction(APITestMixin):
     )
     def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
-        adviser = create_test_user(permission_codenames=permissions)
+        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -96,11 +96,12 @@ class TestAddInteraction(APITestMixin):
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
-            'dit_adviser': adviser.pk,
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
             'company': company.pk,
             'contacts': [contact.pk],
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id,
             'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
@@ -147,14 +148,14 @@ class TestAddInteraction(APITestMixin):
                         'name': adviser.name,
                     },
                     'team': {
-                        'id': str(Team.healthcare_uk.value.id),
-                        'name': Team.healthcare_uk.value.name,
+                        'id': str(adviser.dit_team.pk),
+                        'name': adviser.dit_team.name,
                     },
                 },
             ],
             'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
+                'id': str(adviser.dit_team.pk),
+                'name': adviser.dit_team.name,
             },
             'notes': request_data.get('notes', ''),
             'company': {
@@ -207,6 +208,7 @@ class TestAddInteraction(APITestMixin):
                 {
                     'contacts': ['This field is required.'],
                     'date': ['This field is required.'],
+                    'dit_participants': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
@@ -222,8 +224,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
-                    'dit_team': Team.healthcare_uk.value.id,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                 },
@@ -240,9 +243,10 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'was_policy_feedback_provided': False,
                 },
                 {
@@ -258,9 +262,10 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'was_policy_feedback_provided': True,
@@ -280,9 +285,10 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'was_policy_feedback_provided': True,
@@ -306,9 +312,10 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
 
@@ -357,14 +364,12 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     # fields where None is not allowed
-                    'dit_adviser': None,
-                    'dit_team': None,
+                    'dit_participants': None,
                     'was_policy_feedback_provided': None,
                     'policy_feedback_notes': None,
                 },
                 {
-                    'dit_adviser': ['This field may not be null.'],
-                    'dit_team': ['This field may not be null.'],
+                    'dit_participants': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
                 },
@@ -378,9 +383,10 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
@@ -400,9 +406,10 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
@@ -412,24 +419,6 @@ class TestAddInteraction(APITestMixin):
                 {
                     'is_event': ['This field is only valid for service deliveries.'],
                     'event': ['This field is only valid for service deliveries.'],
-                },
-            ),
-
-            # dit_participants cannot be None
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_participants': None,
-                },
-                {
-                    'dit_participants': ['This field may not be null.'],
                 },
             ),
 
@@ -461,6 +450,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
                     'was_policy_feedback_provided': False,
                     'status': 'foobar',
@@ -476,6 +468,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
                     'was_policy_feedback_provided': False,
                     'status': None,
@@ -519,11 +514,12 @@ class TestAddInteraction(APITestMixin):
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
-                'dit_adviser': requester.pk,
+                'dit_participants': [
+                    {'adviser': requester.pk},
+                ],
                 'notes': 'hello',
                 'investment_project': project.pk,
                 'service': Service.trade_enquiry.value.id,
-                'dit_team': Team.healthcare_uk.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -557,11 +553,12 @@ class TestAddInteraction(APITestMixin):
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
-                'dit_adviser': requester.pk,
+                'dit_participants': [
+                    {'adviser': requester.pk},
+                ],
                 'notes': 'hello',
                 'investment_project': project.pk,
                 'service': Service.trade_enquiry.value.id,
-                'dit_team': Team.healthcare_uk.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -590,10 +587,11 @@ class TestAddInteraction(APITestMixin):
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
-                'dit_adviser': requester.pk,
+                'dit_participants': [
+                    {'adviser': requester.pk},
+                ],
                 'notes': 'hello',
                 'service': Service.trade_enquiry.value.id,
-                'dit_team': Team.healthcare_uk.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -628,6 +626,7 @@ class TestGetInteraction(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['contacts'].sort(key=itemgetter('id'))
+        response_data['dit_participants'].sort(key=lambda item: item['adviser']['id'])
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
@@ -666,16 +665,17 @@ class TestGetInteraction(APITestMixin):
             'dit_participants': [
                 {
                     'adviser': {
-                        'id': str(interaction.dit_adviser.pk),
-                        'first_name': interaction.dit_adviser.first_name,
-                        'last_name': interaction.dit_adviser.last_name,
-                        'name': interaction.dit_adviser.name,
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'last_name': dit_participant.adviser.last_name,
+                        'name': dit_participant.adviser.name,
                     },
                     'team': {
-                        'id': str(interaction.dit_team.pk),
-                        'name': interaction.dit_team.name,
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
                     },
-                },
+                }
+                for dit_participant in interaction.dit_participants.order_by('pk')
             ],
             'dit_team': {
                 'id': str(interaction.dit_team.pk),
