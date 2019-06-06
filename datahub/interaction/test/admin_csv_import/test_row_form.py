@@ -73,6 +73,18 @@ class TestCSVRowError:
         csv_row_error = CSVRowError(1, field, '', '')
         assert csv_row_error.display_field == expected_display_field
 
+    @pytest.mark.parametrize(
+        'source_row,expected_display_source_row',
+        (
+            (0, 2),
+            (1, 3),
+        ),
+    )
+    def test_display_source_row(self, source_row, expected_display_source_row):
+        """Test the display_source_row property."""
+        csv_row_error = CSVRowError(source_row, 'some_field', '', '')
+        assert csv_row_error.display_source_row == expected_display_source_row
+
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormValidation:
