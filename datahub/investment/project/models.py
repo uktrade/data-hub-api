@@ -528,6 +528,10 @@ class InvestmentProject(
             'delete',
             'view_all',
         )
+        indexes = [
+            # For activity stream
+            models.Index(fields=('created_on', 'id')),
+        ]
 
     def get_associated_advisers(self):
         """Get the advisers associated with the project."""
