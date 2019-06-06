@@ -2,18 +2,16 @@ from datetime import date, datetime
 from functools import partial, reduce
 from operator import attrgetter
 from random import sample
-from uuid import UUID
 
 import pytest
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.settings import api_settings
 from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Service, Team
+from datahub.core.constants import Service
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
@@ -56,12 +54,13 @@ class TestAddInteraction(APITestMixin):
                 'id': contact.pk,
             }],
             'date': '2017-04-18',
-            'dit_adviser': {
-                'id': adviser.pk,
-            },
-            'dit_team': {
-                'id': adviser.dit_team.pk,
-            },
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': adviser.pk,
+                    },
+                },
+            ],
             'service': {
                 'id': random_obj_for_model(ServiceModel).pk,
             },
@@ -118,92 +117,6 @@ class TestAddInteraction(APITestMixin):
                     'theme': ['"not_valid" is not a valid choice.'],
                 },
             ),
-
-            # cannot provide dit_adviser + dit_team and dit_participants
-            # TODO: Remove once dit_adviser and dit_team removed from API.
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_adviser': AdviserFactory,
-                    'dit_participants': [
-                        {'adviser': AdviserFactory},
-                    ],
-                    'dit_team': Team.healthcare_uk.value.id,
-                },
-                {
-                    api_settings.NON_FIELD_ERRORS_KEY: [
-                        'If dit_participants is provided, dit_adviser and dit_team must be '
-                        'omitted.',
-                    ],
-                },
-            ),
-
-            # If all of dit_adviser, dit_team and dit_participants are omitted, an error should
-            # be returned for dit_participants.
-            # (This should not happen in production as the front end should be specifying None or
-            # an empty list rather than omitting the keys.)
-            # TODO: Update once dit_adviser and dit_team removed from API.
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-                },
-                {
-                    'dit_participants': ['This field is required.'],
-                },
-            ),
-
-            # If dit_adviser is provided but dit_team isn't, an error should be returned for
-            # dit_team.
-            # (This should not happen in production as the front end should be specifying None or
-            # an empty list rather than omitting the keys.)
-            # TODO: Remove once dit_adviser and dit_team removed from API.
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_adviser': AdviserFactory,
-                },
-                {
-                    'dit_team': ['This field is required.'],
-                },
-            ),
-
-            # If dit_team is provided but dit_adviser isn't, an error should be returned for
-            # dit_adviser.
-            # (This should not happen in production as the front end should be specifying None or
-            # an empty list rather than omitting the keys.)
-            # TODO: Remove once dit_adviser and dit_team removed from API.
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_team': TeamFactory,
-                },
-                {
-                    'dit_adviser': ['This field is required.'],
-                },
-            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -234,9 +147,9 @@ class TestAddInteraction(APITestMixin):
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
-            'dit_adviser': {
-                'id': self.user.pk,
-            },
+            'dit_participants': [
+                {'adviser': self.user.pk},
+            ],
             'company': {
                 'id': company.pk,
             },
@@ -245,9 +158,6 @@ class TestAddInteraction(APITestMixin):
             } for contact in contacts],
             'service': {
                 'id': random_obj_for_model(ServiceModel).pk,
-            },
-            'dit_team': {
-                'id': self.user.dit_team.pk,
             },
             'was_policy_feedback_provided': False,
         }
@@ -258,54 +168,6 @@ class TestAddInteraction(APITestMixin):
         assert response.json() == {
             'non_field_errors': ['The interaction contacts must belong to the specified company.'],
         }
-
-    def test_adviser_and_team_copied_to_participants(self):
-        """
-        Test that a DIT participant is created using the values provided in the dit_adviser and
-        dit_team fields.
-
-        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
-         dit_team fields.
-        """
-        contact = ContactFactory()
-        communication_channel = random_obj_for_model(CommunicationChannel)
-        dit_adviser = AdviserFactory()
-        dit_team = TeamFactory()
-
-        url = reverse('api-v3:interaction:collection')
-        request_data = {
-            'kind': Interaction.KINDS.interaction,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': {
-                'id': dit_adviser.pk,
-            },
-            'company': {
-                'id': contact.company.pk,
-            },
-            'contacts': [{
-                'id': contact.pk,
-            }],
-            'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
-            },
-            'dit_team': {
-                'id': dit_team.pk,
-            },
-            'was_policy_feedback_provided': False,
-        }
-
-        api_client = self.create_api_client()
-        response = api_client.post(url, request_data)
-        assert response.status_code == status.HTTP_201_CREATED
-
-        interaction = Interaction.objects.get(pk=response.json()['id'])
-        assert interaction.dit_participants.count() == 1
-
-        dit_participant = interaction.dit_participants.first()
-        assert dit_participant.adviser == dit_adviser
-        assert dit_participant.team == dit_team
 
     def test_participant_copied_to_adviser_and_team(self):
         """
@@ -510,6 +372,8 @@ class TestUpdateInteraction(APITestMixin):
                 'archived_by': 123,
                 'archived_on': date.today(),
                 'archived_reason': 'test',
+                'dit_adviser': None,
+                'dit_team': None,
             },
         )
 
@@ -519,6 +383,8 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['archived_by'] is None
         assert response.data['archived_on'] is None
         assert response.data['archived_reason'] is None
+        assert response.data['dit_adviser']['id'] == str(interaction.dit_adviser.pk)
+        assert response.data['dit_team']['id'] == str(interaction.dit_team.pk)
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -630,82 +496,6 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['notes'] == data['notes']
-
-    def test_creates_participant_when_updating_adviser_or_team(self):
-        """
-        If an interaction does not have an existing DIT participant, test that a DIT participant
-        is created using the details in the dit_adviser and dit_team fields.
-        (This is for backwards compatibility.)
-
-        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
-         dit_team fields.
-        """
-        interaction = CompanyInteractionFactory(dit_participants=[])
-        new_dit_adviser = AdviserFactory()
-        new_dit_team = TeamFactory()
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        data = {
-            'dit_adviser': {
-                'id': new_dit_adviser.pk,
-            },
-            'dit_team': {
-                'id': new_dit_team.pk,
-            },
-        }
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_200_OK
-        interaction.refresh_from_db()
-        assert interaction.dit_participants.count() == 1
-
-        dit_participant = interaction.dit_participants.first()
-        assert dit_participant.adviser == new_dit_adviser
-        assert dit_participant.team == new_dit_team
-
-    @pytest.mark.parametrize(
-        'request_data',
-        (
-            {
-                'dit_adviser': AdviserFactory,
-            },
-            {
-                'dit_team': TeamFactory,
-            },
-            {
-                'dit_adviser': AdviserFactory,
-                'dit_team': TeamFactory,
-            },
-        ),
-    )
-    def test_updates_participant_when_updating_adviser_or_team(self, request_data):
-        """
-        If an interaction has an existing DIT participant, test that it is updated using the
-        details in the dit_adviser and dit_team fields. (This is for backwards compatibility.)
-
-        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
-         dit_team fields.
-        """
-        interaction = CompanyInteractionFactory()
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        resolved_data = resolve_data(request_data)
-        response = self.api_client.patch(url, data=resolved_data)
-
-        assert response.status_code == status.HTTP_200_OK
-        interaction.refresh_from_db()
-        assert interaction.dit_participants.count() == 1
-
-        dit_participant = interaction.dit_participants.first()
-
-        if 'dit_adviser' in resolved_data:
-            assert interaction.dit_adviser.pk == UUID(resolved_data['dit_adviser']['id'])
-
-        if 'dit_team' in resolved_data:
-            assert interaction.dit_team.pk == UUID(resolved_data['dit_team']['id'])
-
-        assert dit_participant.adviser == interaction.dit_adviser
-        assert dit_participant.team == interaction.dit_team
 
     def test_updates_adviser_and_team_when_updating_participants(self):
         """
@@ -1173,12 +963,13 @@ class TestInteractionVersioning(APITestMixin):
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
-                'dit_adviser': AdviserFactory().pk,
+                'dit_participants': [
+                    {'adviser': AdviserFactory().pk},
+                ],
                 'notes': 'hello',
                 'company': company.pk,
                 'contacts': [contact.pk],
                 'service': Service.trade_enquiry.value.id,
-                'dit_team': Team.healthcare_uk.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
