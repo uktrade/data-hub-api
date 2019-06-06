@@ -22,11 +22,9 @@ from datahub.interaction.admin_csv_import.row_form import (
     OBJECT_DISABLED_MESSAGE,
 )
 from datahub.interaction.models import Interaction
-from datahub.interaction.test.admin_csv_import.utils import (
-    random_communication_channel,
-    random_service,
-)
+from datahub.interaction.test.admin_csv_import.utils import random_communication_channel
 from datahub.interaction.test.factories import CommunicationChannelFactory
+from datahub.interaction.test.utils import random_service
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [

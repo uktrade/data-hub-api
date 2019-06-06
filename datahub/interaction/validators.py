@@ -8,6 +8,7 @@ from datahub.interaction.models import (
     Interaction,
     ServiceAdditionalQuestion,
     ServiceAnswerOption,
+    ServiceQuestion,
 )
 
 
@@ -15,6 +16,7 @@ class ServiceAnswersValidator:
     """Validates service answers."""
 
     required_message = 'This field is required.'
+    question_does_not_exist = 'Question does not exist.'
     question_does_not_relate_message = 'This question does not relate to selected service.'
     answer_invalid_format_message = 'Answers have invalid format.'
     answer_not_required_message = 'Answers not required for given service value.'
@@ -33,31 +35,101 @@ class ServiceAnswersValidator:
         """Saves a reference to the model object."""
         self.instance = serializer.instance
 
-    def __call__(self, data):
-        """Performs validation."""
-        data_combiner = DataCombiner(self.instance, data)
-        service = data_combiner.get_value('service')
-
+    def _get_service_answers(self, service, data_combiner):
+        """Return service answers if valid."""
         # check format of service answers
         service_answers = data_combiner.get_value('service_answers')
+
         if service_answers and not isinstance(service_answers, dict):
             raise ValidationError({
                 'service_answers': self.answer_invalid_format_message,
             })
 
         # check if service answers shouldn't be provided
-        has_service_answers = service_answers and len(service_answers.keys()) > 0
+        has_service_answers = bool(service_answers)
         if service is None or service.interaction_questions.count() == 0:
             if has_service_answers:
                 raise ValidationError({
                     'service_answers': self.answer_not_required_message,
                 })
-            return
+            return None
 
         if service.interaction_questions.count() > 0 and not has_service_answers:
             raise ValidationError({
                 'service_answers': self.required_message,
             })
+
+        return service_answers
+
+    def _validate_answer_options(self, db_service_question, answer_options, errors):
+        """Validate answer options."""
+        if len(answer_options.keys()) > 1:
+            errors[db_service_question.id] = [self.only_one_answer_per_question_message]
+            return errors
+
+        for answer_option_id, additional_questions in answer_options.items():
+            db_answer_option = self._get_answer_option(answer_option_id)
+            if db_answer_option is None:
+                errors[answer_option_id] = [self.answer_does_not_exist_message]
+                break
+
+            errors = self._validate_additional_questions(
+                db_answer_option,
+                additional_questions,
+                errors,
+            )
+
+        return errors
+
+    def _validate_additional_questions(self, db_answer_option, additional_questions, errors):
+        """Validate additional questions."""
+        required_additional_questions = [
+            str(additional_question_id) for additional_question_id in
+            db_answer_option.additional_questions.filter(is_required=True)
+        ]
+
+        for additional_question_id, value in additional_questions.items():
+            db_additional_question = self._get_additional_question(
+                additional_question_id,
+            )
+            if db_additional_question is None:
+                errors[additional_question_id] = [
+                    self.additional_question_does_not_exist_message,
+                ]
+                break
+
+            if additional_question_id in required_additional_questions:
+                required_additional_questions.remove(additional_question_id)
+
+            if db_additional_question.answer_option_id != db_answer_option.id:
+                errors[additional_question_id] = [
+                    self.additional_question_does_not_belong_to_answer_message,
+                ]
+                break
+
+            # check if value is valid for given type
+            if db_additional_question.type == 'money' and value != '':
+                try:
+                    int(value)
+                except ValueError:
+                    errors[additional_question_id] = [
+                        self.additional_question_value_is_not_a_number,
+                    ]
+
+        for required_additional_question_id in required_additional_questions:
+            errors[required_additional_question_id] = [self.required_message]
+
+        return errors
+
+    def __call__(self, data):
+        """Performs validation."""
+        data_combiner = DataCombiner(self.instance, data)
+        service = data_combiner.get_value('service')
+
+        # check format of service answers
+        service_answers = self._get_service_answers(service, data_combiner)
+        if service_answers is None:
+            return
 
         # check if all required answers are provided
         required_question_ids = [
@@ -68,64 +140,29 @@ class ServiceAnswersValidator:
         errors = defaultdict(list)
 
         for service_question_id, answer_options in service_answers.items():
+            db_service_question = self._get_question(service_question_id)
+            if db_service_question is None:
+                errors[service_question_id] = [self.question_does_not_exist]
+                break
+
             try:
                 required_question_ids.remove(service_question_id)
             except ValueError:
                 errors[service_question_id] = [self.question_does_not_relate_message]
                 break
 
-            # check each answer option for additional questions, ensure only one answer
-            if len(answer_options.keys()) > 1:
-                errors[service_question_id] = [self.only_one_answer_per_question_message]
-                break
-
-            for answer_option_id, additional_questions in answer_options.items():
-                db_answer_option = self._get_answer_option(answer_option_id)
-                if db_answer_option is None:
-                    errors[answer_option_id] = [self.answer_does_not_exist_message]
-                    break
-
-                required_additional_questions = [
-                    str(additional_question_id) for additional_question_id in
-                    db_answer_option.additional_questions.filter(is_required=True)
-                ]
-
-                for additional_question_id, value in additional_questions.items():
-                    db_additional_question = self._get_additional_question(
-                        additional_question_id,
-                    )
-                    if db_additional_question is None:
-                        errors[additional_question_id] = [
-                            self.additional_question_does_not_exist_message,
-                        ]
-                        break
-
-                    if additional_question_id in required_additional_questions:
-                        required_additional_questions.remove(additional_question_id)
-
-                    if str(db_additional_question.answer_option_id) != answer_option_id:
-                        errors[additional_question_id] = [
-                            self.additional_question_does_not_belong_to_answer_message,
-                        ]
-                        break
-
-                    # check if value is valid for given type
-                    if db_additional_question.type == 'money' and value != '':
-                        try:
-                            int(value)
-                        except ValueError:
-                            errors[additional_question_id] = [
-                                self.additional_question_value_is_not_a_number,
-                            ]
-
-                for required_additional_question_id in required_additional_questions:
-                    errors[required_additional_question_id] = [self.required_message]
+            errors = self._validate_answer_options(db_service_question, answer_options, errors)
 
         for required_question_id in required_question_ids:
             errors[required_question_id] = [self.required_message]
 
         if errors:
             raise ValidationError(errors)
+
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def _get_question(service_question_id):
+        return ServiceQuestion.objects.filter(id=service_question_id).first()
 
     @staticmethod
     @lru_cache(maxsize=None)

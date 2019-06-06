@@ -89,7 +89,6 @@ class TestAddInteraction(APITestMixin):
 
         api_client = self.create_api_client(user=adviser)
         response = api_client.post(url, request_data)
-
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
 

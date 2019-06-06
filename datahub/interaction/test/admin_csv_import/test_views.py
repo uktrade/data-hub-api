@@ -28,8 +28,8 @@ from datahub.interaction.test.admin_csv_import.utils import (
     make_multiple_matches_rows,
     make_unmatched_rows,
     random_communication_channel,
-    random_service,
 )
+from datahub.interaction.test.utils import random_service
 
 
 @pytest.fixture()
