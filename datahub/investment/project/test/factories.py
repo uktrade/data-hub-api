@@ -100,7 +100,7 @@ class AssignPMInvestmentProjectFactory(InvestmentProjectFactory):
 
     stage_id = InvestmentProjectStage.assign_pm.value.id
     client_cannot_provide_total_investment = False
-    total_investment = 100
+    total_investment = Decimal('100.0')
     number_new_jobs = 0
     client_considering_other_countries = False
     client_requirements = factory.Faker('text')
@@ -130,7 +130,7 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
 
     stage_id = InvestmentProjectStage.verify_win.value.id
     client_cannot_provide_foreign_investment = False
-    foreign_equity_investment = 100
+    foreign_equity_investment = Decimal('100.0')
     government_assistance = False
     number_safeguarded_jobs = 0
     r_and_d_budget = True
