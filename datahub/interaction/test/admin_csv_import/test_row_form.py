@@ -114,6 +114,16 @@ class TestInteractionCSVRowFormValidation:
                 id='theme invalid',
             ),
             pytest.param(
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'theme': Interaction.THEMES.investment,
+                },
+                {
+                    'kind': ["This value can't be selected for investment interactions."],
+                },
+                id='investment service delivery',
+            ),
+            pytest.param(
                 {'date': ''},
                 {'date': ['This field is required.']},
                 id='date blank',

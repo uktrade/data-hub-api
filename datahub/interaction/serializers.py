@@ -127,6 +127,9 @@ class InteractionSerializer(serializers.ModelSerializer):
     """
 
     default_error_messages = {
+        'invalid_for_investment': gettext_lazy(
+            "This value can't be selected for investment interactions.",
+        ),
         'invalid_for_non_service_delivery': gettext_lazy(
             'This field is only valid for service deliveries.',
         ),
@@ -387,6 +390,11 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'required',
                     OperatorRule('service', bool),
                     when=EqualsRule('status', Interaction.STATUSES.complete),
+                ),
+                ValidationRule(
+                    'invalid_for_investment',
+                    EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=EqualsRule('theme', Interaction.THEMES.investment),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
