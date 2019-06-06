@@ -18,7 +18,7 @@
     </thead>
   {% for error in errors %}
     <tr>
-      <td>{{ error.source_row|add:1 }}</td>
+      <td>{{ error.display_source_row }}</td>
       <td>{{ error.display_field }}</td>
       <td>{{ error.value }}</td>
       <td>{{ error.error }}</td>
