@@ -1,11 +1,10 @@
-import mohawk
 import pytest
-from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
-from rest_framework.reverse import reverse
 
 from datahub.activity_stream.interaction.serializers import InteractionActivitySerializer
+from datahub.activity_stream.tests import hawk
+from datahub.activity_stream.tests.utils import get_url
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import (
@@ -19,143 +18,6 @@ from datahub.interaction.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 
 
-def _url(name):
-    return 'http://testserver' + reverse(name)
-
-
-def _auth_sender(
-    url,
-    key_id='some-id',
-    secret_key='some-secret',
-    method='GET',
-    content='',
-    content_type='',
-):
-    credentials = {
-        'id': key_id,
-        'key': secret_key,
-        'algorithm': 'sha256',
-    }
-    return mohawk.Sender(
-        credentials,
-        url,
-        method,
-        content=content,
-        content_type=content_type,
-    )
-
-
-def _hawk_get(client, url):
-    return client.get(
-        url,
-        content_type='',
-        HTTP_AUTHORIZATION=_auth_sender(url).request_header,
-        HTTP_X_FORWARDED_FOR='3.3.3.3, 1.2.3.4, 123.123.123.123',
-    )
-
-
-@pytest.mark.parametrize(
-    'get_kwargs,expected_json',
-    (
-        (
-            # If the Authorization header isn't passed
-            {
-                'content_type': '',
-                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
-            },
-            {'detail': 'Authentication credentials were not provided.'},
-        ),
-        (
-            # If the wrong credentials are used
-            {
-                'content_type': '',
-                'HTTP_AUTHORIZATION': _auth_sender(
-                    _url('api-v3:activity-stream:interactions'),
-                    key_id='incorrect',
-                    secret_key='incorrect',
-                ).request_header,
-                'HTTP_X_FORWARDED_FOR': '1.2.3.4, 123.123.123.123',
-            },
-            {'detail': 'Incorrect authentication credentials.'},
-        ),
-    ),
-)
-@pytest.mark.django_db
-def test_401_returned(api_client, get_kwargs, expected_json):
-    """If the request isn't Hawk-authenticated, then a 401 is returned."""
-    response = api_client.get(
-        _url('api-v3:activity-stream:interactions'),
-        **get_kwargs,
-    )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == expected_json
-
-
-@pytest.mark.django_db
-def test_403_returned(api_client):
-    """
-    Test that a 403 is returned if the request is Hawk authenticated but the client doesn't have
-    the required scope.
-    """
-    sender = _auth_sender(
-        _url('api-v3:activity-stream:interactions'),
-        key_id='test-id-without-scope',
-        secret_key='test-key-without-scope',
-    )
-    response = api_client.get(
-        _url('api-v3:activity-stream:interactions'),
-        content_type='',
-        HTTP_AUTHORIZATION=sender.request_header,
-        HTTP_X_FORWARDED_FOR='3.3.3.3, 1.2.3.4, 123.123.123.123',
-    )
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.json() == {
-        'detail': 'You do not have permission to perform this action.',
-    }
-
-
-@pytest.mark.django_db
-def test_succeeds_with_valid_credentials(api_client):
-    """If the Authorization and X-Forwarded-For headers are correct, then
-    the correct, and authentic, data is returned
-    """
-    sender = _auth_sender(_url('api-v3:activity-stream:interactions'))
-    response = api_client.get(
-        _url('api-v3:activity-stream:interactions'),
-        content_type='',
-        HTTP_AUTHORIZATION=sender.request_header,
-        HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-    )
-    assert response.status_code == status.HTTP_200_OK
-
-    # Just asserting that accept_response doesn't raise is a bit weak,
-    # so we also assert that it raises if the header, content, or
-    # content_type are incorrect
-    sender.accept_response(
-        response_header=response['Server-Authorization'],
-        content=response.content,
-        content_type=response['Content-Type'],
-    )
-    with pytest.raises(mohawk.exc.MacMismatch):
-        sender.accept_response(
-            response_header='Hawk mac="incorrect", hash="incorrect"',
-            content=response.content,
-            content_type=response['Content-Type'],
-        )
-    with pytest.raises(mohawk.exc.MisComputedContentHash):
-        sender.accept_response(
-            response_header=response['Server-Authorization'],
-            content='incorrect',
-            content_type=response['Content-Type'],
-        )
-    with pytest.raises(mohawk.exc.MisComputedContentHash):
-        sender.accept_response(
-            response_header=response['Server-Authorization'],
-            content=response.content,
-            content_type='incorrect',
-        )
-
-
 @pytest.mark.django_db
 def test_interaction_activity(api_client):
     """
@@ -163,15 +25,15 @@ def test_interaction_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     interaction = CompanyInteractionFactory()
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interactions',
-        'partOf': 'http://testserver/v3/activity-stream/interactions',
+        'id': 'http://testserver/v3/activity-stream/interaction',
+        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'previous': None,
         'next': None,
         'orderedItems': [
@@ -232,15 +94,15 @@ def test_interaction_investment_project_activity(api_client):
     """
     interaction = InvestmentProjectInteractionFactory()
     project = interaction.investment_project
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interactions',
-        'partOf': 'http://testserver/v3/activity-stream/interactions',
+        'id': 'http://testserver/v3/activity-stream/interaction',
+        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'previous': None,
         'next': None,
         'orderedItems': [
@@ -308,15 +170,15 @@ def test_service_delivery_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     interaction = ServiceDeliveryFactory()
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interactions',
-        'partOf': 'http://testserver/v3/activity-stream/interactions',
+        'id': 'http://testserver/v3/activity-stream/interaction',
+        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'previous': None,
         'next': None,
         'orderedItems': [
@@ -376,15 +238,15 @@ def test_service_delivery_event_activity(api_client):
     """
     interaction = EventServiceDeliveryFactory()
     event = interaction.event
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interactions',
-        'partOf': 'http://testserver/v3/activity-stream/interactions',
+        'id': 'http://testserver/v3/activity-stream/interaction',
+        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'previous': None,
         'next': None,
         'orderedItems': [
@@ -472,7 +334,7 @@ def test_interaction_ordering(api_client):
     with freeze_time():
         interactions += CompanyInteractionFactory.create_batch(2)
     interactions += CompanyInteractionFactory.create_batch(8)
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     sorted_interaction_ids = [
@@ -493,7 +355,7 @@ def test_contacts_ordering(api_client):
     """
     contacts = ContactFactory.create_batch(5)
     CompanyInteractionFactory(contacts=contacts)
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     sorted_contact_ids = [
@@ -516,7 +378,7 @@ def test_dit_participant_ordering(api_client):
     """
     interaction = CompanyInteractionFactory(dit_participants=[])
     InteractionDITParticipantFactory.create_batch(5, interaction=interaction)
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
     sorted_participant_ids = [
@@ -533,31 +395,6 @@ def test_dit_participant_ordering(api_client):
 
 
 @pytest.mark.django_db
-def test_cursor_pagination(api_client, monkeypatch):
-    """
-    Test if pagination behaves as expected
-    """
-    page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
-    interactions = CompanyInteractionFactory.create_batch(page_size + 1)
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
-
-    data = response.json()
-    next_page_url = data['next']
-    assert len(data['orderedItems']) == page_size
-
-    response = _hawk_get(api_client, next_page_url)
-    data = response.json()
-    previous_page_url = data['previous']
-    assert len(data['orderedItems']) == len(interactions) - page_size
-
-    response = _hawk_get(api_client, previous_page_url)
-    data = response.json()
-    assert len(data['orderedItems']) == page_size
-    assert data['next'] == next_page_url
-
-
-@pytest.mark.django_db
 def test_null_adviser(api_client):
     """
     Test that we can handle dit_participant.adviser being None
@@ -568,7 +405,7 @@ def test_null_adviser(api_client):
         adviser=None,
         team=TeamFactory(),
     )
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
 
@@ -582,5 +419,5 @@ def test_null_team(api_client):
         interaction=interaction,
         team=None,
     )
-    response = _hawk_get(api_client, _url('api-v3:activity-stream:interactions'))
+    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
