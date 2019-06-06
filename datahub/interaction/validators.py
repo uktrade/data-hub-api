@@ -64,7 +64,7 @@ class ServiceAnswersValidator:
     def _validate_answer_options(self, db_service_question, answer_options, errors):
         """Validate answer options."""
         if len(answer_options.keys()) > 1:
-            errors[db_service_question.id] = [self.only_one_answer_per_question_message]
+            errors[str(db_service_question.id)] = [self.only_one_answer_per_question_message]
             return errors
 
         for answer_option_id, additional_questions in answer_options.items():

@@ -178,6 +178,11 @@ class ServiceAnswerOption(Enum):
         'd7293a68-05a6-461b-911c-2f07b4306c1e',
     )
 
+    piai_dit_or_government_services = Constant(
+        'DIT or Government Services',
+        'e5f83d7f-f696-4069-b649-a3e295b41046',
+    )
+
     # providing_investment_advice_and_information
     piai_yes = Constant(
         'Yes',
