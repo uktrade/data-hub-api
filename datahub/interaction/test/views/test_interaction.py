@@ -47,9 +47,13 @@ class TestAddInteraction(APITestMixin):
             # company interaction
             {
             },
-            # company interaction with theme
+            # company interaction with export theme
             {
                 'theme': Interaction.THEMES.export,
+            },
+            # company interaction with investment theme
+            {
+                'theme': Interaction.THEMES.investment,
             },
             # company interaction with blank notes
             {
