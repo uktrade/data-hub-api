@@ -103,7 +103,7 @@ class InteractionCSVImportAdmin:
             return self._select_file_form_response(request, form)
 
         if not form.are_all_rows_valid():
-            return self._error_list_response(request, form.get_row_error_iterator())
+            return self._error_list_response(request, form)
 
         return self._preview_response(request, form)
 
@@ -175,16 +175,17 @@ class InteractionCSVImportAdmin:
             form=form,
         )
 
-    def _error_list_response(self, request, errors):
+    def _error_list_response(self, request, form):
+        errors = form.get_row_error_iterator()
         limited_errors = list(islice(errors, MAX_ERRORS_TO_DISPLAY))
-        are_errors_truncated = bool(next(errors, None))
+        num_errors_omitted = sum(1 for _ in errors)
 
         return self._template_response(
             request,
             'admin/interaction/interaction/import_row_errors.html',
             PAGE_TITLE,
             errors=limited_errors,
-            are_errors_truncated=are_errors_truncated,
+            num_errors_omitted=num_errors_omitted,
             max_errors=MAX_ERRORS_TO_DISPLAY,
         )
 

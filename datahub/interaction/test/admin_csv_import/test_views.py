@@ -296,16 +296,16 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
     @pytest.mark.parametrize(
-        'max_errors,should_be_truncated',
+        'max_errors,expected_num_errors_omitted',
         (
-            (5, True),
-            (12, False),
+            (5, 7),
+            (12, 0),
         ),
     )
     def test_displays_errors_for_file_with_invalid_rows(
         self,
         max_errors,
-        should_be_truncated,
+        expected_num_errors_omitted,
         monkeypatch,
     ):
         """Test that errors are displayed for a file with invalid rows."""
@@ -330,7 +330,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.context['errors']) == min(12, max_errors)
-        assert response.context['are_errors_truncated'] == should_be_truncated
+        assert response.context['num_errors_omitted'] == expected_num_errors_omitted
 
     def test_displays_no_matches_message_if_no_matches(self):
         """
