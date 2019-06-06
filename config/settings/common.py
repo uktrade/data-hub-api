@@ -549,7 +549,7 @@ MAILBOXES = {
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [
     environ_name 
-    for environ_name in os.environ.keys()
+    for environ_name in env.ENVIRON.keys()
     if environ_name.startswith('DIT_EMAIL_DOMAIN_')
 ]
 
