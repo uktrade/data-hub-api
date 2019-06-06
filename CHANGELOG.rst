@@ -1,3 +1,42 @@
+Data Hub API 13.2.0 (2019-06-06)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``POST /v3/interaction, PATCH /v3/interaction/<id>``: The deprecated ``dit_adviser`` and ``dit_team`` fields
+  were made read-only in preparation for their removal. Please use ``dit_participants`` instead.
+- **Interactions** ``POST /v3/search/interaction``: The deprecated ``dit_adviser`` filter was removed. Please use the ``dit_participants__adviser`` filter instead.
+- **Interactions** ``POST /v3/search/interaction``: The deprecated ``dit_adviser_name`` filter was removed. There is no replacement for this filter.
+- **Interactions** ``GET /v3/search``, ``POST /v3/search/interaction``: The deprecated ``dit_adviser`` and ``dit_team`` interaction fields were removed from interaction objects in responses. Please use ``dit_participants`` instead.
+- **Interactions** ``POST /v3/search/interaction``: The deprecated ``dit_team`` filter was removed. Please use the ``dit_participants__team`` filter instead.
+
+Features
+--------
+
+- **Interactions** The theme field was added to the import interactions admin site tool. The tool is currently behind the ``admin-interaction-csv-importer`` feature flag as it’s incomplete.
+- **Interactions** A feature was activated for ingesting meeting invite emails sent to a shared mailbox as draft
+  interactions. This enables DIT advisers to create interactions more easily.
+
+  This is the first instance of a Data Hub app using the framework provided by the
+  ``datahub.email_ingestion`` app.  There will be subsequent iterations on the 
+  ``CalendarInteractionEmailProcessor`` class to improve the user experience - most
+  notably sending notifications of bounce/receipt to advisers.
+
+API
+---
+
+- ``GET /v4/activity-feed`` now returns an empty list if the authenticated user doesn't have permissions to view all interactions, investment projects or OMIS orders.
+- It is now possible to get a list of investment projects created in activity-stream `format.
+  <https://www.w3.org/TR/activitystreams-core/>`_ 
+
+  The URL for this is:
+
+  | /v3/activity-stream/investment/project-added
+
+
 Data Hub API 13.1.0 (2019-06-03)
 ================================
 
