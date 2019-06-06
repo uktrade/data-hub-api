@@ -352,7 +352,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             ),
             (
                 Interaction.THEMES.export,
-                'interaction',
+                Interaction.KINDS.interaction,
                 '01/01/2018',
                 adviser.name,
                 'person@company.uk',
