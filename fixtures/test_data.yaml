@@ -501,6 +501,25 @@
     modified_on: '2018-06-05T00:00:00Z'
     archived_documents_url_path: '/documents/123'
 
+- model: company.contact
+  pk: 1430e18a-52ac-4185-b71d-b2be5a771fd0
+  fields:
+    first_name: Fred
+    last_name: Peterson
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    primary: false
+    telephone_countrycode: +44
+    telephone_number: 78801234322
+    email: fred.peterson@example.com
+    address_1: 123 Fake Street
+    address_town: Fake Town
+    address_postcode: BN2 9QB
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    accepts_dit_email_marketing: false
+    notes: This is a dummy contact for testing
+    created_on: '2018-02-28T15:00:00Z'
+    modified_on: '2018-06-05T00:00:00Z'
+
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:

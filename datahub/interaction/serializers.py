@@ -4,14 +4,12 @@ from operator import not_
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
-from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
-    AllIsBlankRule,
     AndRule,
     EqualsRule,
     OperatorRule,
@@ -150,9 +148,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         'too_many_contacts_for_event_service_delivery': gettext_lazy(
             'Only one contact can be provided for event service deliveries.',
         ),
-        'one_participant_field': gettext_lazy(
-            'If dit_participants is provided, dit_adviser and dit_team must be omitted.',
-        ),
         'cannot_unset_theme': gettext_lazy(
             "A theme can't be removed once set.",
         ),
@@ -175,17 +170,15 @@ class InteractionSerializer(serializers.ModelSerializer):
     # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
-    dit_adviser = NestedAdviserField(required=False)
-    # TODO: Remove required=False once dit_adviser and dit_team have been removed
+    dit_adviser = NestedAdviserField(read_only=True)
     dit_participants = InteractionDITParticipantSerializer(
         many=True,
         allow_empty=False,
-        required=False,
     )
     # dit_team has been replaced by dit_participants but is retained for temporary backwards
     # compatibility
     # TODO: Remove following deprecation period
-    dit_team = NestedRelatedField(Team, required=False)
+    dit_team = NestedRelatedField(Team, read_only=True)
     communication_channel = NestedRelatedField(
         CommunicationChannel, required=False, allow_null=True,
     )
@@ -222,17 +215,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         """
         self._validate_theme(data)
 
-        has_dit_adviser_or_dit_team = {'dit_adviser', 'dit_team'} & data.keys()
-        has_dit_participants = 'dit_participants' in data
-
-        if has_dit_adviser_or_dit_team and has_dit_participants:
-            error = {
-                api_settings.NON_FIELD_ERRORS_KEY: [
-                    self.error_messages['one_participant_field'],
-                ],
-            }
-            raise serializers.ValidationError(error, code='one_participant_field')
-
         if 'is_event' in data:
             del data['is_event']
 
@@ -259,7 +241,12 @@ class InteractionSerializer(serializers.ModelSerializer):
 
         Overridden to handle updating of dit_participants.
         """
-        return self._create_or_update(validated_data)
+        dit_participants = validated_data.pop('dit_participants')
+
+        interaction = super().create(validated_data)
+        self._save_dit_participants(interaction, dit_participants)
+
+        return interaction
 
     @atomic
     def update(self, instance, validated_data):
@@ -268,7 +255,14 @@ class InteractionSerializer(serializers.ModelSerializer):
 
         Overridden to handle updating of dit_participants.
         """
-        return self._create_or_update(validated_data, instance=instance, is_update=True)
+        dit_participants = validated_data.pop('dit_participants', None)
+        interaction = super().update(instance, validated_data)
+
+        # For PATCH requests, dit_participants may not be being updated
+        if dit_participants is not None:
+            self._save_dit_participants(interaction, dit_participants)
+
+        return interaction
 
     def _validate_theme(self, data):
         """Make sure that a theme is not unset once it has been set for an interaction."""
@@ -280,37 +274,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ],
             }
             raise serializers.ValidationError(error, code='cannot_unset_theme')
-
-    def _create_or_update(self, validated_data, instance=None, is_update=False):
-        dit_participants = validated_data.pop('dit_participants', None)
-
-        if is_update:
-            interaction = super().update(instance, validated_data)
-        else:
-            interaction = super().create(validated_data)
-
-        # If dit_participants has not been provided, create, update and remove participants using
-        # the provided dit_adviser and dit_team values
-        # TODO: Remove the 'if dit_participants is None' part once dit_adviser and dit_team have
-        #  been removed from the API.
-        if dit_participants is None:
-            InteractionDITParticipant.objects.update_or_create(
-                interaction=interaction,
-                adviser=interaction.dit_adviser,
-                defaults={
-                    'team': interaction.dit_team,
-                },
-            )
-
-            InteractionDITParticipant.objects.filter(
-                interaction=interaction,
-            ).exclude(
-                adviser=interaction.dit_adviser,
-            ).delete()
-        else:
-            self._save_dit_participants(interaction, dit_participants)
-
-        return interaction
 
     def _save_dit_participants(self, interaction, validated_dit_participants):
         """
@@ -412,35 +375,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             ContactsBelongToCompanyValidator(),
             StatusChangeValidator(),
             RulesBasedValidator(
-                # If dit_adviser and dit_team are *omitted* (note that they already have
-                # allow_null=False) we assume that dit_participants is being used, and return an
-                # error if it is empty.
-                # TODO: Remove once dit_adviser and dit_team have been removed.
-                ValidationRule(
-                    'required',
-                    OperatorRule('dit_participants', bool),
-                    when=AllIsBlankRule('dit_adviser', 'dit_team'),
-                ),
-                # If dit_adviser has been provided, double-check that dit_team is also set.
-                # TODO: Remove once dit_adviser and dit_team have been removed.
-                ValidationRule(
-                    'required',
-                    OperatorRule('dit_adviser', bool),
-                    when=AndRule(
-                        OperatorRule('dit_team', bool),
-                        OperatorRule('dit_participants', not_),
-                    ),
-                ),
-                # If dit_team has been provided, double-check that dit_adviser is also set.
-                # TODO: Remove once dit_adviser and dit_team have been removed.
-                ValidationRule(
-                    'required',
-                    OperatorRule('dit_team', bool),
-                    when=AndRule(
-                        OperatorRule('dit_adviser', bool),
-                        OperatorRule('dit_participants', not_),
-                    ),
-                ),
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),

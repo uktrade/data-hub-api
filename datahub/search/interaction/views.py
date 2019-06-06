@@ -28,11 +28,8 @@ class SearchInteractionAPIViewMixin:
         'company',
         'company_name',
         'created_on_exists',
-        'dit_adviser',
-        'dit_adviser_name',
         'dit_participants__adviser',
         'dit_participants__team',
-        'dit_team',
         'date_after',
         'date_before',
         'communication_channel',
@@ -46,8 +43,6 @@ class SearchInteractionAPIViewMixin:
 
     REMAP_FIELDS = {
         'company': 'company.id',
-        'dit_adviser': 'dit_adviser.id',
-        'dit_team': 'dit_team.id',
         'dit_participants__adviser': 'dit_participants.adviser.id',
         'dit_participants__team': 'dit_participants.team.id',
         'communication_channel': 'communication_channel.id',
@@ -63,10 +58,6 @@ class SearchInteractionAPIViewMixin:
             'company.name.trigram',
             'company.trading_names',  # to find 2-letter words
             'company.trading_names.trigram',
-        ],
-        'dit_adviser_name': [
-            'dit_adviser.name',
-            'dit_adviser.name.trigram',
         ],
         'sector_descends': [
             'company_sector.id',

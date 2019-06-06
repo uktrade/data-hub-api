@@ -8,7 +8,7 @@ from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Service, Team
+from datahub.core.constants import Service
 from datahub.core.test_utils import APITestMixin, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
@@ -86,11 +86,12 @@ class TestAddServiceDelivery(APITestMixin):
             'kind': Interaction.KINDS.service_delivery,
             'subject': 'whatever',
             'date': date.today().isoformat(),
-            'dit_adviser': adviser.pk,
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
             'company': company.pk,
             'contacts': [contact.pk],
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id,
             'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
@@ -133,14 +134,14 @@ class TestAddServiceDelivery(APITestMixin):
                         'name': adviser.name,
                     },
                     'team': {
-                        'id': str(Team.healthcare_uk.value.id),
-                        'name': Team.healthcare_uk.value.name,
+                        'id': str(adviser.dit_team.pk),
+                        'name': adviser.dit_team.name,
                     },
                 },
             ],
             'dit_team': {
-                'id': str(Team.healthcare_uk.value.id),
-                'name': Team.healthcare_uk.value.name,
+                'id': str(adviser.dit_team.pk),
+                'name': adviser.dit_team.name,
             },
             'notes': request_data.get('notes', ''),
             'company': {
@@ -193,6 +194,7 @@ class TestAddServiceDelivery(APITestMixin):
                 {
                     'contacts': ['This field is required.'],
                     'date': ['This field is required.'],
+                    'dit_participants': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
@@ -207,8 +209,9 @@ class TestAddServiceDelivery(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
-                    'dit_team': Team.healthcare_uk.value.id,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'was_policy_feedback_provided': False,
                 },
                 {
@@ -226,9 +229,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -253,9 +257,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -283,9 +288,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -326,9 +332,8 @@ class TestAddServiceDelivery(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': None,
+                    'dit_participants': None,
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': None,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -342,8 +347,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'policy_feedback_notes': None,
                 },
                 {
-                    'dit_adviser': ['This field may not be null.'],
-                    'dit_team': ['This field may not be null.'],
+                    'dit_participants': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
                 },
@@ -358,9 +362,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -385,9 +390,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -410,9 +416,10 @@ class TestAddServiceDelivery(APITestMixin):
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,
-                    'dit_adviser': AdviserFactory,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
                     'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -427,24 +434,6 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'contacts': ['Only one contact can be provided for event service deliveries.'],
-                },
-            ),
-
-            # dit_participants cannot be None
-            (
-                {
-                    'kind': Interaction.KINDS.service_delivery,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
-                    'was_policy_feedback_provided': False,
-
-                    'dit_participants': None,
-                },
-                {
-                    'dit_participants': ['This field may not be null.'],
                 },
             ),
 

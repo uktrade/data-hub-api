@@ -3,7 +3,7 @@ from unittest import mock
 
 MAILBOXES_SETTING = {
     'mybox1': {
-        'email': 'mybox1@example.net',
+        'username': 'mybox1@example.net',
         'password': 'foobarbaz1',
         'imap_domain': 'imap.example.net',
         'processor_classes': [
@@ -12,7 +12,7 @@ MAILBOXES_SETTING = {
         ],
     },
     'mybox2': {
-        'email': 'mybox2@example.net',
+        'username': 'mybox2@example.net',
         'password': 'foobarbaz2',
         'imap_domain': 'imap.example.net',
         'processor_classes': [
@@ -25,7 +25,7 @@ MAILBOXES_SETTING = {
 # Mailbox missing password configuration
 BAD_MAILBOXES_SETTING = {
     'mybox1': {
-        'email': 'mybox1@example.net',
+        'username': 'mybox1@example.net',
         'imap_domain': 'imap.example.net',
         'processor_classes': [
             'datahub.email_ingestion.processor_1.Processor',
