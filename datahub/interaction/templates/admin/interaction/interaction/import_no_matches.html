@@ -14,8 +14,8 @@
   {% include 'admin/interaction/interaction/fragment_post_import_counts.html' with num_matched=0 num_unmatched=num_unmatched num_multiple_matches=num_multiple_matches only %}
 
   <p>
-    <a href="{% url opts|admin_urlname:'changelist' %}">
-      {% trans 'Return to the interaction list' %}
+    <a href="{% url opts|admin_urlname:'import' %}">
+      {% trans 'Select another file' %}
     </a>
   </p>
 
