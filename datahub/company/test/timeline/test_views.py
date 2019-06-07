@@ -128,7 +128,7 @@ class TestCompanyTimelineViews(APITestMixin):
         """Test the behaviour when an error is returned from the upstream service."""
         error_reference = 'error-ref-1'
         monkeypatch.setattr(
-            'raven.contrib.django.models.client.captureException',
+            'sentry_sdk.capture_exception',
             Mock(return_value=error_reference),
         )
         stubbed_url = urljoin(
@@ -161,7 +161,7 @@ class TestCompanyTimelineViews(APITestMixin):
         """
         error_reference = 'error-ref-1'
         monkeypatch.setattr(
-            'raven.contrib.django.models.client.captureException',
+            'sentry_sdk.capture_exception',
             Mock(return_value=error_reference),
         )
 

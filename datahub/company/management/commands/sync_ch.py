@@ -9,12 +9,12 @@ from logging import getLogger
 from urllib.parse import urlparse
 
 import requests
+import sentry_sdk
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection, reset_queries, transaction
 from lxml import etree
-from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.ch_constants import (
     COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING,
@@ -119,7 +119,7 @@ def is_relevant_company_type(row):
                    f'encountered. Update the company category to business type mapping to '
                    f'indicate if it should be loaded.')
         logger.warning(message)
-        client.captureMessage(message)
+        sentry_sdk.capture_message(message)
     return bool(COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.get(lower_company_category))
 
 
@@ -198,8 +198,8 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
 
 def process_row(row):
     """Processes a CH row, yielding a transformed row if the row should be loaded"""
-    with client.context:
-        client.context.merge({'record': row})
+    with sentry_sdk.push_scope() as scope:
+        scope.set_extra('record', row)
 
         if is_relevant_company_type(row):
             yield transform_ch_row(row)

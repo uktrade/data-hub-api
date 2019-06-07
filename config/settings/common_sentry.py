@@ -1,7 +1,8 @@
-from config.settings.common import *
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
-MIDDLEWARE.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')
-INSTALLED_APPS.append('raven.contrib.django.raven_compat')
+from config.settings.common import *
 
 # Logging
 LOGGING = {
@@ -9,7 +10,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'root': {
         'level': 'INFO',
-        'handlers': ['sentry', 'console'],
+        'handlers': ['console'],
     },
     'formatters': {
         'verbose': {
@@ -17,10 +18,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'sentry': {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler'
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -33,21 +30,15 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
         },
-        'raven': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
     },
 }
 
-RAVEN_CONFIG = {
-    'dsn': env('DJANGO_SENTRY_DSN'),
-    'include_paths': ['datahub'],
-    'environment': env('SENTRY_ENVIRONMENT'),
-}
+sentry_sdk.init(
+    dsn=env('DJANGO_SENTRY_DSN'),
+    environment=env('SENTRY_ENVIRONMENT'),
+    integrations=[
+        CeleryIntegration(),
+        DjangoIntegration(),
+    ],
+    in_app_include=['datahub'],
+)
