@@ -11,11 +11,7 @@ from datahub.core.admin import (
     custom_view_permission,
 )
 from datahub.core.utils import join_truthy_strings
-from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.interaction.admin_csv_import.views import (
-    INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
-    InteractionCSVImportAdmin,
-)
+from datahub.interaction.admin_csv_import.views import InteractionCSVImportAdmin
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -146,21 +142,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         return format_html('<pre>{0}</pre>', json.dumps(obj.source, indent=2))
 
     pretty_source.short_description = 'source'
-
-    def changelist_view(self, request, extra_context=None):
-        """
-        Change list view with additional data added to the context.
-
-        Based on this example in the Django docs:
-        https://docs.djangoproject.com/en/2.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.history_view
-        """
-        csv_import_feature_flag = is_feature_flag_active(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
-        extra_context = {
-            **(extra_context or {}),
-            'csv_import_feature_flag': csv_import_feature_flag,
-        }
-
-        return super().changelist_view(request, extra_context=extra_context)
 
     def get_urls(self):
         """Gets the URLs for this model's admin views."""
