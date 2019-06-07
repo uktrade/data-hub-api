@@ -24,10 +24,11 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
                 'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                 'header.from=digital.trade.gov.uk',
+                'compauth=pass (reason=109)',
             ]),
             True,
         ),
-        # Invalid domain
+        # Invalid domain - passes during trial period
         (
             'bill.adama@gmail.com',
             '\n'.join([
@@ -36,8 +37,10 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'spf=pass (google.com: domain of bill.adama@gmail.com designates '
                 'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@gmail.com;',
                 'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=gmail.com',
+                'compauth=pass (reason=109)',
             ]),
-            False,
+            # TODO: Change this to False after trial period, when we tighten sender verification
+            True,
         ),
         # Invalid authentication results - dkim
         (
@@ -51,6 +54,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                     'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                     'header.from=digital.trade.gov.uk'
                 ),
+                'compauth=pass (reason=109)',
             ]),
             False,
         ),
@@ -66,6 +70,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                     'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                     'header.from=digital.trade.gov.uk'
                 ),
+                'compauth=pass (reason=109)',
             ]),
             False,
         ),
@@ -81,6 +86,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                     'dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                     'header.from=digital.trade.gov.uk'
                 ),
+                'compauth=pass (reason=109)',
             ]),
             False,
         ),
@@ -94,6 +100,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                     'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                     'header.from=digital.trade.gov.uk'
                 ),
+                'compauth=pass (reason=109)',
             ]),
             False,
         ),
@@ -108,8 +115,23 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
                 'header.from=digital.trade.gov.uk;',
                 'sender-id=fail header.from=example.com',
+                'compauth=pass (reason=109)',
             ]),
             True,
+        ),
+        # Domain with no auth methods set, uses default methods and fails
+        (
+            'bill.adama@other.trade.gov.uk',
+            '\n'.join([
+                'mx.google.com;',
+                'dkim=fail header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                'spf=fail (google.com: domain of bill.adama@digital.trade.gov.uk designates '
+                'XX.XXX.XX.XX as permitted sender) smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                'header.from=digital.trade.gov.uk;',
+                'compauth=pass (reason=109)',
+            ]),
+            False,
         ),
     ),
 )
