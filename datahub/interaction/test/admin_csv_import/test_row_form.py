@@ -659,11 +659,11 @@ class TestInteractionCSVRowFormSerializerUsage:
 
 
 @pytest.mark.django_db
-class TestInteractionCSVRowFormCleaning:
+class TestInteractionCSVRowFormSuccessfulCleaning:
     """
-    Tests for field cleaning in InteractionCSVRowForm.
+    Tests for successful field cleaning in InteractionCSVRowForm.
 
-    This includes looking up model objects and the transformation of values (but not validation).
+    This includes looking up model objects and the transformation of values.
     """
 
     @pytest.mark.parametrize(
@@ -701,7 +701,7 @@ class TestInteractionCSVRowFormCleaning:
             ),
         ),
     )
-    def test_simple_value_cleaning(self, field, input_value, expected_value):
+    def test_common_non_relations(self, field, input_value, expected_value):
         """Test the conversion and cleaning of various non-relationship fields."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         service = random_service()
@@ -749,7 +749,7 @@ class TestInteractionCSVRowFormCleaning:
                 id='adviser_1 look-up (case-insensitive)',
             ),
             pytest.param(
-                'adviser_1',
+                'adviser_2',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
@@ -758,7 +758,7 @@ class TestInteractionCSVRowFormCleaning:
                 id='adviser_2 look-up (same case)',
             ),
             pytest.param(
-                'adviser_1',
+                'adviser_2',
                 lambda: AdviserFactory(
                     first_name='Pluto',
                     last_name='Doris',
@@ -861,6 +861,13 @@ class TestInteractionCSVRowFormCleaning:
                 lambda obj: str(obj.pk),
                 lambda obj: obj,
                 id='event look-up',
+            ),
+            pytest.param(
+                'event_id',
+                lambda: None,
+                lambda _: '',
+                lambda _: None,
+                id='event can be omitted',
             ),
         ),
     )
