@@ -18,7 +18,6 @@ from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin import max_upload_size
 from datahub.core.csv import CSV_CONTENT_TYPE
 from datahub.core.exceptions import DataHubException
-from datahub.feature_flag.utils import feature_flagged_view
 from datahub.interaction.admin_csv_import.cache_utils import (
     CACHE_VALUE_TIMEOUT,
     load_result_counts_by_status,
@@ -29,7 +28,6 @@ from datahub.interaction.admin_csv_import.cache_utils import (
 from datahub.interaction.admin_csv_import.file_form import InteractionCSVForm
 from datahub.interaction.models import Interaction, InteractionPermission
 
-INTERACTION_IMPORTER_FEATURE_FLAG_NAME = 'admin-interaction-csv-importer'
 MAX_ERRORS_TO_DISPLAY = 50
 MAX_PREVIEW_ROWS_TO_DISPLAY = 100
 PAGE_TITLE = gettext_lazy('Import interactions')
@@ -52,11 +50,7 @@ interaction_change_all_permission_required = method_decorator(
 
 
 class InteractionCSVImportAdmin:
-    """
-    Views related to importing interactions from a CSV file.
-
-    The implementation is not yet complete; hence, views are behind a feature flag.
-    """
+    """Views related to importing interactions from a CSV file."""
 
     def __init__(self, model_admin):
         """Initialises the instance with a reference to an InteractionAdmin instance."""
@@ -90,7 +84,6 @@ class InteractionCSVImportAdmin:
             ),
         ]
 
-    @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
     @interaction_change_all_permission_required
     @method_decorator(max_upload_size(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE))
     def select_file(self, request, *args, **kwargs):
@@ -108,7 +101,6 @@ class InteractionCSVImportAdmin:
         return self._preview_response(request, form)
 
     @interaction_change_all_permission_required
-    @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
     @method_decorator(require_POST)
     def save(self, request, token=None, *args, **kwargs):
         """Create interactions from a CSV file that was loaded in the select_file view."""
@@ -136,7 +128,6 @@ class InteractionCSVImportAdmin:
         return _redirect_response('import-complete', token=token)
 
     @interaction_change_all_permission_required
-    @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
     def complete(self, request, token=None, *args, **kwargs):
         """Display a confirmation page following a successful import operation."""
         counts_by_status = load_result_counts_by_status(token)
@@ -148,7 +139,6 @@ class InteractionCSVImportAdmin:
         return self._complete_response(request, token, counts_by_status)
 
     @interaction_change_all_permission_required
-    @feature_flagged_view(INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
     def download_unmatched(self, request, token=None, *args, **kwargs):
         """Download unmatched rows as a CSV file following a successful import operation."""
         unmatched_rows_csv_contents = load_unmatched_rows_csv_contents(token)
