@@ -6,12 +6,16 @@ from datahub.activity_stream.tests import hawk
 from datahub.activity_stream.tests.utils import get_url
 
 
+ACTIVITY_STREAM_URLS = (
+    'api-v3:activity-stream:interactions',
+    'api-v3:activity-stream:investment-project-added',
+    'api-v3:activity-stream:omis-order-added',
+)
+
+
 @pytest.mark.parametrize(
     'endpoint',
-    (
-        'api-v3:activity-stream:interactions',
-        'api-v3:activity-stream:investment-project-added',
-    ),
+    ACTIVITY_STREAM_URLS,
 )
 @pytest.mark.django_db
 def test_401_noauth(api_client, endpoint):
@@ -30,10 +34,7 @@ def test_401_noauth(api_client, endpoint):
 
 @pytest.mark.parametrize(
     'endpoint',
-    (
-        'api-v3:activity-stream:interactions',
-        'api-v3:activity-stream:investment-project-added',
-    ),
+    ACTIVITY_STREAM_URLS,
 )
 @pytest.mark.django_db
 def test_401_wrong_creds(api_client, endpoint):
@@ -56,10 +57,7 @@ def test_401_wrong_creds(api_client, endpoint):
 
 @pytest.mark.parametrize(
     'endpoint',
-    (
-        'api-v3:activity-stream:interactions',
-        'api-v3:activity-stream:investment-project-added',
-    ),
+    ACTIVITY_STREAM_URLS,
 )
 @pytest.mark.django_db
 def test_403_returned(api_client, endpoint):
@@ -87,10 +85,7 @@ def test_403_returned(api_client, endpoint):
 
 @pytest.mark.parametrize(
     'endpoint',
-    (
-        'api-v3:activity-stream:interactions',
-        'api-v3:activity-stream:investment-project-added',
-    ),
+    ACTIVITY_STREAM_URLS,
 )
 @pytest.mark.django_db
 def test_succeeds_with_valid_credentials(api_client, endpoint):
