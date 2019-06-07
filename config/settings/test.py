@@ -99,8 +99,11 @@ DOCUMENT_BUCKETS = {
     }
 }
 
-DIT_EMAIL_DOMAINS = ['trade.gov.uk', 'digital.trade.gov.uk']
-DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT = ['trade.gov.uk']
+DIT_EMAIL_DOMAINS = {
+    'trade.gov.uk': ['exempt'],
+    'digital.trade.gov.uk': [['spf', 'pass'], ['dmarc', 'bestguesspass'], ['dkim', 'pass']],
+    'other.trade.gov.uk': [],
+}
 
 ACTIVITY_STREAM_OUTGOING_URL = 'http://activity.stream/'
 ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = 'some-outgoing-id'
