@@ -46,9 +46,13 @@ def was_email_sent_by_dit(message):
     :returns: True if the email passed our minimal level of email authentication checks.
     """
     try:
-        from_email = message.from_[0][1]
+        from_email = message.from_[0][1].strip()
         from_domain = from_email.rsplit('@', maxsplit=1)[1]
     except IndexError:
+        return False
+
+    # TODO: Remove this logic once we are past the pilo5 period for email ingestion
+    if from_email not in settings.DIT_EMAIL_INGEST_WHITELIST:
         return False
 
     try:
