@@ -9,9 +9,6 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import (
     Service as ServiceConstant,
-    ServiceAdditionalQuestion as ServiceAdditionalQuestionConstant,
-    ServiceAnswerOption as ServiceAnswerOptionConstant,
-    ServiceQuestion as ServiceQuestionConstant,
     Team as TeamConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
@@ -26,6 +23,11 @@ from datahub.interaction.test.factories import (
 from datahub.interaction.test.permissions import (
     NON_RESTRICTED_ADD_PERMISSIONS,
     NON_RESTRICTED_VIEW_PERMISSIONS,
+)
+from datahub.interaction.test.views.constants import (
+    ServiceAdditionalQuestion as ServiceAdditionalQuestionConstant,
+    ServiceAnswerOption as ServiceAnswerOptionConstant,
+    ServiceQuestion as ServiceQuestionConstant,
 )
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.metadata.models import Service
