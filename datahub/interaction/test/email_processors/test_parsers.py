@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import PurePath
 
 import mailparser
@@ -68,12 +68,13 @@ class TestCalendarInteractionEmailParser:
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
             ),
+            # Sample email only specifies the day for start/end instead of date/time
             (
                 'email_samples/valid/outlook_iphone/sample.eml',
                 {
                     'subject': 'Test meeting iPhone 5',
-                    'start': date(2019, 5, 19),
-                    'end': date(2019, 5, 20),
+                    'start': datetime(2019, 5, 19, tzinfo=utc),
+                    'end': datetime(2019, 5, 20, tzinfo=utc),
                     'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=utc),
                     'location': '',
                     'status': 'CONFIRMED',

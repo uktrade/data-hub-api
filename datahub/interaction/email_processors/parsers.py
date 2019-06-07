@@ -1,4 +1,5 @@
 import base64
+import datetime
 from collections import Counter
 
 import icalendar
@@ -86,12 +87,21 @@ def _extract_calendar_string_from_attachments(message):
     return None
 
 
-def _get_utc_datetime(localised_datetime):
-    try:
-        return localised_datetime.astimezone(utc)
-    # When the calendar event is just a date
-    except AttributeError:
-        return localised_datetime
+def _convert_calendar_time_to_utc_datetime(calendar_time):
+    """
+    Takes a scheduled calendar time (could be a datetime.date or datetime.datetime)
+    and transposes it to a UTC datetime.
+    """
+    # If calendar_time is a datetime.date, make it a datetime
+    if not isinstance(calendar_time, datetime.datetime):
+        calendar_time = datetime.datetime(
+            day=calendar_time.day,
+            month=calendar_time.month,
+            year=calendar_time.year,
+        )
+    # If calendar_time does not have a timezone, this will assume calendar_time
+    # is the default timezone for this django project
+    return calendar_time.astimezone(utc)
 
 
 class CalendarInteractionEmailParser:
@@ -170,9 +180,9 @@ class CalendarInteractionEmailParser:
         location = str(event_component.get('location') or '')
         calendar_event = {
             'subject': str(event_component.get('summary')),
-            'start': _get_utc_datetime(event_component.decoded('dtstart')),
-            'end': _get_utc_datetime(event_component.decoded('dtend')),
-            'sent': _get_utc_datetime(event_component.decoded('dtstamp')),
+            'start': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstart')),
+            'end': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtend')),
+            'sent': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstamp')),
             'location': location,
             'status': str(event_component.get('status')),
             'uid': str(event_component.get('uid')),

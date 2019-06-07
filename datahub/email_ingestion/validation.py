@@ -51,7 +51,7 @@ def was_email_sent_by_dit(message):
     except IndexError:
         return False
 
-    # TODO: Remove this logic once we are past the pilo5 period for email ingestion
+    # TODO: Remove this logic once we are past the pilot period for email ingestion
     if from_email not in settings.DIT_EMAIL_INGEST_WHITELIST:
         return False
 
