@@ -21,17 +21,23 @@ class ActivitySerializer(serializers.Serializer):
             'name': company.name,
         }
 
+    def _get_contact(self, contact):
+        """
+        Get a serialized representation of a contact.
+        """
+        return {
+            'id': f'dit:DataHubContact:{contact.pk}',
+            'type': ['Person', 'dit:Contact'],
+            'dit:emailAddress': contact.email,
+            'name': contact.name,
+        }
+
     def _get_contacts(self, contacts):
         """
         Get a serialized representation of a list of Contacts.
         """
         return [
-            {
-                'id': f'dit:DataHubContact:{contact.pk}',
-                'type': ['Person', 'dit:Contact'],
-                'dit:emailAddress': contact.email,
-                'name': contact.name,
-            }
+            self._get_contact(contact)
             for contact in contacts.order_by('pk')
         ]
 
