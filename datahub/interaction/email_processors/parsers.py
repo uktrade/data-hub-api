@@ -1,4 +1,5 @@
 import base64
+import datetime
 from collections import Counter
 
 import icalendar
@@ -86,22 +87,21 @@ def _extract_calendar_string_from_attachments(message):
     return None
 
 
-def _get_utc_datetime(localised_datetime):
-    try:
-        return localised_datetime.astimezone(utc)
-    # When the calendar event is just a date
-    except AttributeError:
-        return localised_datetime
-
-
-class EmailNotSentByDITException(Exception):
+def _convert_calendar_time_to_utc_datetime(calendar_time):
     """
-    Exception for flagging that an email could not be verified as sent by a DIT
-    adviser.
-
-    TODO: Remove this exception and its uses once we are past calendar invite
-    ingestion pilot stage.
+    Takes a scheduled calendar time (could be a datetime.date or datetime.datetime)
+    and transposes it to a UTC datetime.
     """
+    # If calendar_time is a datetime.date, make it a datetime
+    if not isinstance(calendar_time, datetime.datetime):
+        calendar_time = datetime.datetime(
+            day=calendar_time.day,
+            month=calendar_time.month,
+            year=calendar_time.year,
+        )
+    # If calendar_time does not have a timezone, this will assume calendar_time
+    # is the default timezone for this django project
+    return calendar_time.astimezone(utc)
 
 
 class CalendarInteractionEmailParser:
@@ -123,18 +123,7 @@ class CalendarInteractionEmailParser:
         except IndexError:
             raise ValidationError('Email was malformed - missing "from" header')
         if not was_email_sent_by_dit(self.message):
-            sender_domain = sender_email.rsplit('@', maxsplit=1)[1]
-            message_id = self.message.message_id
-            # TODO: This raises a EmailNotSentByDITException for debugging purposes.
-            # change this back to a ValidationError when we are past the pilot stage for
-            # calendar invite ingestion
-            raise EmailNotSentByDITException(
-                f'Email with ID "{message_id}" and sender domain "{sender_domain}" '
-                'was not recognised as being sent by an authenticated DIT domain. '
-                'Either the domain was unrecognised, or it did not pass our requirements for '
-                'Authentication-Results. Further investigation is needed during the pilot for '
-                'email ingestion.',
-            )
+            raise ValidationError('Email not sent by DIT')
         sender_adviser = _get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
             raise ValidationError('Email not sent by recognised DIT Adviser')
@@ -191,9 +180,9 @@ class CalendarInteractionEmailParser:
         location = str(event_component.get('location') or '')
         calendar_event = {
             'subject': str(event_component.get('summary')),
-            'start': _get_utc_datetime(event_component.decoded('dtstart')),
-            'end': _get_utc_datetime(event_component.decoded('dtend')),
-            'sent': _get_utc_datetime(event_component.decoded('dtstamp')),
+            'start': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstart')),
+            'end': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtend')),
+            'sent': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstamp')),
             'location': location,
             'status': str(event_component.get('status')),
             'uid': str(event_component.get('uid')),
