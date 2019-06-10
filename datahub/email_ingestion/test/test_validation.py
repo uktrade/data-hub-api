@@ -28,7 +28,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             ]),
             True,
         ),
-        # Invalid domain - passes during trial period
+        # Invalid domain - not on DIT adviser whitelist
         (
             'bill.adama@gmail.com',
             '\n'.join([
@@ -39,8 +39,8 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=gmail.com',
                 'compauth=pass (reason=109)',
             ]),
-            # TODO: Change this to False after trial period, when we tighten sender verification
-            True,
+            # TODO: Will need review as we adjust domain verification during trial
+            False,
         ),
         # Invalid authentication results - dkim
         (
