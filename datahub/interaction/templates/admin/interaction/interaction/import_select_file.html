@@ -1,6 +1,11 @@
 {% extends "admin/interaction/interaction/base_import.html" %}
 {% load i18n admin_urls static %}
 
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static 'core/admin/js/prevent-multiple-submit.js' %}"></script>
+{% endblock %}
+
 {% block content %}
   <p>{% trans 'Select a CSV file to import interactions into Data Hub. The CSV file should contain the following columns (in any order):' %}</p>
 
@@ -111,7 +116,7 @@
     {% endfor %}
 
     <div>
-      <input type="submit" value="{% trans 'Submit' %}">
+      <input type="submit" value="{% trans 'Submit' %}" data-prevent-multiple-submit>
     </div>
   </form>
 {% endblock %}
