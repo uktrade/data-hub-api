@@ -390,9 +390,9 @@ adding and upgrading dependencies.
 
 ## Activity Stream
 
-The `/v3/activity-stream/` endpoint is protected by two mechanisms:
+The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
-* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `ACTIVITY_STREAM_IP_WHITELIST`.
+* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `HAWK_RECEIVER_IP_WHITELIST`.
 
 * Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 
