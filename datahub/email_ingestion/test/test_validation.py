@@ -14,9 +14,9 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             None,
             True,
         ),
-        # Valid digital.trade.gov.uk email
+        # Valid digital.trade.gov.uk email, ensure whitelist is case insensitive
         (
-            'bill.adama@digital.trade.gov.uk',
+            'bill.Adama@digital.trade.gov.uk',
             '\n'.join([
                 'mx.google.com;',
                 'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
