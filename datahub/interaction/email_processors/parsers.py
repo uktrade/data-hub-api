@@ -41,8 +41,8 @@ def _get_best_match_adviser_by_email(email):
     Get the best-guess matching active adviser for a particular correspondence email
     address.
 
-    This firstly attempts to get the oldest Advisor object with a matching
-    `contact_email`, it will then attempt to match on `email`.  We prefer
+    This firstly attempts to get the oldest Advisor object with a (case insensitive) matching
+    `contact_email`, it will then attempt to match on (case insensitive) `email`.  We prefer
     `contact_email` over `email` as this should most closely match the correspondence
     email address - the context here is that we are dealing with the email
     accounts that advisers use for setting up meetings/emailing companies.
@@ -51,7 +51,7 @@ def _get_best_match_adviser_by_email(email):
     :returns: an Advisor object or None, if a match could not be found
     """
     for field in ['contact_email', 'email']:
-        criteria = {field: email, 'is_active': True}
+        criteria = {f'{field}__iexact': email, 'is_active': True}
         try:
             return Advisor.objects.filter(**criteria).earliest('date_joined')
         except Advisor.DoesNotExist:
