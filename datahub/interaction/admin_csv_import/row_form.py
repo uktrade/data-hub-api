@@ -67,6 +67,21 @@ class CSVRowError(NamedTuple):
         """Returns the field name suitable for displaying to the user."""
         return '' if self.field == NON_FIELD_ERRORS else self.field
 
+    @property
+    def display_source_row(self):
+        """
+        Returns the source row number for displaying to the user.
+
+        This adds 2 to source_row:
+
+        - 1 is added for the header (column titles)
+        - 1 is added to make it one-based (rather than zero-based)
+
+        These make the displayed row numbers align with the row numbers as displayed
+        in a spreadsheet editor.
+        """
+        return self.source_row + 2
+
 
 class NoDuplicatesModelChoiceField(forms.ModelChoiceField):
     """ModelChoiceField subclass that handles MultipleObjectsReturned exceptions."""

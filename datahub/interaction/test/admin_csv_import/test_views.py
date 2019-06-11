@@ -17,14 +17,12 @@ from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.admin_csv_import.cache_utils import (
     _cache_key_for_token,
     CacheKeyType,
     load_unmatched_rows_csv_contents,
 )
 from datahub.interaction.admin_csv_import.views import (
-    INTERACTION_IMPORTER_FEATURE_FLAG_NAME,
     INVALID_TOKEN_MESSAGE_DURING_SAVE,
     INVALID_TOKEN_MESSAGE_POST_SAVE,
 )
@@ -38,12 +36,6 @@ from datahub.interaction.test.admin_csv_import.utils import (
     random_communication_channel,
     random_service,
 )
-
-
-@pytest.fixture()
-def interaction_importer_feature_flag():
-    """Creates the import interactions tool feature flag."""
-    yield FeatureFlagFactory(code=INTERACTION_IMPORTER_FEATURE_FLAG_NAME)
 
 
 import_interactions_url = reverse(
@@ -60,7 +52,6 @@ import_download_unmatched_urlname = admin_urlname(Interaction._meta, 'import-dow
 class TestInteractionAdminChangeList(AdminTestMixin):
     """Tests for the contact admin change list."""
 
-    @pytest.mark.usefixtures('interaction_importer_feature_flag')
     def test_load_import_link_exists(self):
         """
         Test that there is a link to import interactions on the interaction change list page.
@@ -88,17 +79,7 @@ class TestInteractionAdminChangeList(AdminTestMixin):
         assert f'Select {Interaction._meta.verbose_name} to view' in response.rendered_content
         assert import_interactions_url not in response.rendered_content
 
-    def test_import_link_does_not_exist_if_feature_flag_inactive(self):
-        """
-        Test that there is not a link to import interactions if the feature flag is inactive.
-        """
-        response = self.client.get(interaction_change_list_url)
-        assert response.status_code == status.HTTP_200_OK
 
-        assert import_interactions_url not in response.rendered_content
-
-
-@pytest.mark.usefixtures('interaction_importer_feature_flag')
 @pytest.mark.parametrize(
     'http_method,url',
     (
@@ -155,35 +136,6 @@ class TestAccessRestrictions(AdminTestMixin):
 
 
 @pytest.mark.parametrize(
-    'http_method,url',
-    (
-        ('get', import_interactions_url),
-        ('post', import_interactions_url),
-        ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
-        ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
-        ('get', reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'})),
-    ),
-)
-class Test404IfFeatureFlagDisabled(AdminTestMixin):
-    """
-    Tests that import interaction-related views return a 404 if the feature flag is not
-    active.
-
-    (The feature flag not being active is implicit by it not being created,)
-    """
-
-    def test_returns_404_if_feature_flag_inactive(self, http_method, url):
-        """Test that the a 404 is returned if the feature flag is inactive."""
-        response = self.client.generic(
-            http_method,
-            url,
-            data={},
-        )
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-
-@pytest.mark.parametrize(
     'http_method,url,expected_message',
     (
         (
@@ -203,7 +155,7 @@ class Test404IfFeatureFlagDisabled(AdminTestMixin):
         ),
     ),
 )
-@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+@pytest.mark.usefixtures('local_memory_cache')
 class TestInvalidTokenRedirectView(AdminTestMixin):
     """Tests for handling of invalid tokens in views that require a token."""
 
@@ -232,14 +184,13 @@ class TestInvalidTokenRedirectView(AdminTestMixin):
         assert messages[0].message == expected_message
 
 
-@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+@pytest.mark.usefixtures('local_memory_cache')
 class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
 
     def test_displays_page_if_with_correct_permissions(self):
         """
-        Test that the view returns displays the form if the feature flag is active
-        and the user has the correct permissions.
+        Test that the view returns displays the form if the user has the correct permissions.
         """
         response = self.client.get(import_interactions_url)
 
@@ -296,16 +247,16 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
     @pytest.mark.parametrize(
-        'max_errors,should_be_truncated',
+        'max_errors,expected_num_errors_omitted',
         (
-            (5, True),
-            (12, False),
+            (5, 7),
+            (12, 0),
         ),
     )
     def test_displays_errors_for_file_with_invalid_rows(
         self,
         max_errors,
-        should_be_truncated,
+        expected_num_errors_omitted,
         monkeypatch,
     ):
         """Test that errors are displayed for a file with invalid rows."""
@@ -330,7 +281,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.context['errors']) == min(12, max_errors)
-        assert response.context['are_errors_truncated'] == should_be_truncated
+        assert response.context['num_errors_omitted'] == expected_num_errors_omitted
 
     def test_displays_no_matches_message_if_no_matches(self):
         """
@@ -352,7 +303,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             ),
             (
                 Interaction.THEMES.export,
-                'interaction',
+                Interaction.KINDS.interaction,
                 '01/01/2018',
                 adviser.name,
                 'person@company.uk',
@@ -419,7 +370,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.context['num_matched_omitted'] == expected_num_omitted_rows
 
 
-@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+@pytest.mark.usefixtures('local_memory_cache')
 class TestImportInteractionsSaveView(AdminTestMixin):
     """Tests for the import interaction save view."""
 
@@ -551,7 +502,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
             assert len(list(reader)) == num_unmatched + num_multiple_matches + 1
 
 
-@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+@pytest.mark.usefixtures('local_memory_cache')
 class TestImportInteractionsCompleteView(AdminTestMixin):
     """Tests for the import complete view."""
 
@@ -581,7 +532,7 @@ class TestImportInteractionsCompleteView(AdminTestMixin):
         assert response.context['num_multiple_matches'] == num_multiple_matches
 
 
-@pytest.mark.usefixtures('interaction_importer_feature_flag', 'local_memory_cache')
+@pytest.mark.usefixtures('local_memory_cache')
 class TestImportInteractionsDownloadUnmatchedView(AdminTestMixin):
     """Tests for the download unmatched rows view."""
 

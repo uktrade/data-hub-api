@@ -546,5 +546,25 @@ MAILBOXES = {
     },
 }
 
-DIT_EMAIL_DOMAINS = env.list('DIT_EMAIL_DOMAINS', default=[])
-DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT = env.list('DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT', default=[])
+# TODO: Remove this setting once we are past the pilot period for email ingestion
+DIT_EMAIL_INGEST_WHITELIST = env.list('DIT_EMAIL_INGEST_WHITELIST', default=[])
+DIT_EMAIL_DOMAINS = {}
+domain_environ_names = [
+    environ_name 
+    for environ_name in env.ENVIRON.keys()
+    if environ_name.startswith('DIT_EMAIL_DOMAIN_')
+]
+
+# Go through all DIT_EMAIL_DOMAIN_* environment variables and extract
+# dictionary with key email domain and value consisting of 
+# authentication method/minimum pass result pairs e.g.
+# example.com=dmarc:pass|spf:pass|dkim:pass becomes
+# {'example.com': [['dmarc', 'pass'], ['spf', 'pass'], ['dkim', 'pass']]}
+for environ_name in domain_environ_names:
+    domain_details = env.dict(environ_name)
+    DIT_EMAIL_DOMAINS.update(
+        {
+            domain: [method.split(':') for method in auth.split('|')]
+            for domain, auth in domain_details.items()
+        }
+    )

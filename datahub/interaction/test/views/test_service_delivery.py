@@ -353,6 +353,33 @@ class TestAddServiceDelivery(APITestMixin):
                 },
             ),
 
+            # theme=investment not allowed
+            (
+                {
+                    'kind': Interaction.KINDS.service_delivery,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.trade_enquiry.value.id,
+                    'service_delivery_status': partial(
+                        random_obj_for_model, ServiceDeliveryStatus,
+                    ),
+                    'grant_amount_offered': '1111.11',
+                    'net_company_receipt': '8888.11',
+                    'was_policy_feedback_provided': False,
+                    'is_event': False,
+
+                    'theme': Interaction.THEMES.investment,
+                },
+                {
+                    'kind': ["This value can't be selected for investment interactions."],
+                },
+            ),
+
             # event field not allowed for non-event service delivery
             (
                 {

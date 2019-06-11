@@ -99,8 +99,22 @@ DOCUMENT_BUCKETS = {
     }
 }
 
-DIT_EMAIL_DOMAINS = ['trade.gov.uk', 'digital.trade.gov.uk']
-DIT_EMAIL_DOMAINS_AUTHENTICATION_EXEMPT = ['trade.gov.uk']
+# TODO: Remove this setting once we are past the pilot period for email ingestion
+DIT_EMAIL_INGEST_WHITELIST = [
+    'bill.adama@digital.trade.gov.uk',
+    'bill.adama@other.trade.gov.uk',
+    'bill.adama@trade.gov.uk',
+    'adviser1@trade.gov.uk',
+    'adviser2@digital.trade.gov.uk',
+    'adviser3@digital.trade.gov.uk',
+    'correspondence3@digital.trade.gov.uk',
+    'unknown@trade.gov.uk',
+]
+DIT_EMAIL_DOMAINS = {
+    'trade.gov.uk': [['exempt']],
+    'digital.trade.gov.uk': [['spf', 'pass'], ['dmarc', 'bestguesspass'], ['dkim', 'pass']],
+    'other.trade.gov.uk': [],
+}
 
 ACTIVITY_STREAM_OUTGOING_URL = 'http://activity.stream/'
 ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = 'some-outgoing-id'

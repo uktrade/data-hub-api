@@ -299,6 +299,10 @@ class Order(BaseModel):
         permissions = (
             ('export_order', 'Can export order'),
         )
+        indexes = [
+            # For activity stream
+            models.Index(fields=('created_on', 'id')),
+        ]
 
     def __str__(self):
         """Human-readable representation"""

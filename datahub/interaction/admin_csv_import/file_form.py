@@ -8,6 +8,7 @@ import reversion
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.defaultfilters import filesizeformat
+from django.utils.translation import gettext_lazy
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
@@ -60,9 +61,12 @@ class UnmatchedRowCollector:
 class InteractionCSVForm(BaseCSVImportForm):
     """Form used for loading a CSV file to import interactions."""
 
-    csv_file_field_label = 'Interaction list (CSV file)'
-    csv_file_field_help_text = (
-        f'Maximum file size: {filesizeformat(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE)}'
+    csv_file_field_label = gettext_lazy('Interaction list (CSV file)')
+    csv_file_field_help_text = gettext_lazy(
+        'Maximum file size: {max_file_size}. Use the CSV (UTF-8) format when using Microsoft '
+        'Excel.',
+    ).format(
+        max_file_size=filesizeformat(settings.INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE),
     )
     required_columns = InteractionCSVRowForm.get_required_field_names()
 
