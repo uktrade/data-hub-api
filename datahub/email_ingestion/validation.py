@@ -52,7 +52,7 @@ def was_email_sent_by_dit(message):
         return False
 
     # TODO: Remove this logic once we are past the pilot period for email ingestion
-    if from_email not in settings.DIT_EMAIL_INGEST_WHITELIST:
+    if from_email.lower() not in settings.DIT_EMAIL_INGEST_WHITELIST:
         return False
 
     try:
@@ -64,7 +64,7 @@ def was_email_sent_by_dit(message):
         #  source exhaustively.
         domain_auth_methods = [*DEFAULT_AUTH_METHODS]
 
-    from_domain_is_authentication_exempt = domain_auth_methods == ['exempt']
+    from_domain_is_authentication_exempt = domain_auth_methods == [['exempt']]
     if from_domain_is_authentication_exempt:
         return True
     authentication_pass = _verify_authentication(message, domain_auth_methods)
