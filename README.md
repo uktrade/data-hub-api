@@ -303,6 +303,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
 | `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
+| `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 
 
 ## Management commands
@@ -389,9 +390,9 @@ adding and upgrading dependencies.
 
 ## Activity Stream
 
-The `/v3/activity-stream/` endpoint is protected by two mechanisms:
+The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
-* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `ACTIVITY_STREAM_IP_WHITELIST`.
+* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `HAWK_RECEIVER_IP_WHITELIST`.
 
 * Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 

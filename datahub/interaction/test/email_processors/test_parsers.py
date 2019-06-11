@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import PurePath
 
 import mailparser
@@ -6,10 +6,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.interaction.email_processors.parsers import (
-    CalendarInteractionEmailParser,
-    EmailNotSentByDITException,
-)
+from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
 
 
 @pytest.mark.django_db
@@ -71,12 +68,13 @@ class TestCalendarInteractionEmailParser:
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
             ),
+            # Sample email only specifies the day for start/end instead of date/time
             (
                 'email_samples/valid/outlook_iphone/sample.eml',
                 {
                     'subject': 'Test meeting iPhone 5',
-                    'start': date(2019, 5, 19),
-                    'end': date(2019, 5, 20),
+                    'start': datetime(2019, 5, 19, tzinfo=utc),
+                    'end': datetime(2019, 5, 20, tzinfo=utc),
                     'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=utc),
                     'location': '',
                     'status': 'CONFIRMED',
@@ -189,15 +187,7 @@ class TestCalendarInteractionEmailParser:
         (
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
-                # TODO: Swap this expected error out for a ValidationError when
-                # we are past the pilot stage for email ingestion
-                EmailNotSentByDITException(
-                    'Email with ID "<CWXP123MB2008236F14A5E2A22B2B65FFC90F0@CWXP123MB2008.'
-                    'GBRP123.PROD.OUTLOOK.COM>" and sender domain "unknown.net" was not recognised'
-                    ' as being sent by an authenticated DIT domain. Either the domain was '
-                    'unrecognised, or it did not pass our requirements for Authentication-Results.'
-                    ' Further investigation is needed during the pilot for email ingestion.',
-                ),
+                ValidationError('Email not sent by DIT'),
             ),
             (
                 'email_samples/invalid/no_from_header.eml',

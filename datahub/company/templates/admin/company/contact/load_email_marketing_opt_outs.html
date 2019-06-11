@@ -2,8 +2,9 @@
 {% load i18n admin_urls static %}
 
 {% block extrahead %}
-    {{ block.super }}
-    {{ media }}
+  {{ block.super }}
+  {{ media }}
+  <script src="{% static 'core/admin/js/prevent-multiple-submit.js' %}"></script>
 {% endblock %}
 
 {% block extrastyle %}
@@ -43,7 +44,7 @@
     {% endfor %}
 
     <div>
-      <input type="submit" value="{% trans 'Submit' %}">
+      <input type="submit" value="{% trans 'Submit' %}" data-prevent-multiple-submit>
     </div>
   </form>
 {% endblock %}

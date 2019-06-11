@@ -6,6 +6,7 @@ from datahub.activity_stream.tests import hawk
 from datahub.activity_stream.tests.utils import get_url
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.omis.order.test.factories import OrderFactory
 
 
 @pytest.mark.parametrize(
@@ -13,6 +14,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
     (
         (CompanyInteractionFactory, 'api-v3:activity-stream:interactions'),
         (InvestmentProjectFactory, 'api-v3:activity-stream:investment-project-added'),
+        (OrderFactory, 'api-v3:activity-stream:omis-order-added'),
     ),
 )
 @pytest.mark.django_db

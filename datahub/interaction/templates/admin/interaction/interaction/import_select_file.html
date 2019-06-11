@@ -1,6 +1,11 @@
 {% extends "admin/interaction/interaction/base_import.html" %}
 {% load i18n admin_urls static %}
 
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static 'core/admin/js/prevent-multiple-submit.js' %}"></script>
+{% endblock %}
+
 {% block content %}
   <p>{% trans 'Select a CSV file to import interactions into Data Hub. The CSV file should contain the following columns (in any order):' %}</p>
 
@@ -8,11 +13,13 @@
   {% trans "No" as no %}
 
   <table>
-    <tr>
-      <th>{% trans 'Column name' %}</th>
-      <th>{% trans 'Required' %}</th>
-      <th>{% trans 'Description' %}</th>
-    </tr>
+    <thead>
+      <tr>
+        <th>{% trans 'Column name' %}</th>
+        <th>{% trans 'Required' %}</th>
+        <th>{% trans 'Description' %}</th>
+      </tr>
+    </thead>
     <tr>
       <td><code>{% trans 'theme' %}</code></td>
       <td>{{ yes }}</td>
@@ -85,11 +92,11 @@
   <p>
     {% blocktrans %}
       Interactions are matched to a contact by looking for a unique match on all contacts' primary email addresses.
-      If no match is found, alternative email addresses are then checked.
+      If no match is found, alternative email addresses are then checked. (If multiple matches are found at either of those two stages, the interaction will be skipped.)
     {% endblocktrans %}
   </p>
   <p>
-    {% trans 'The interaction will not be loaded if multiple matches are found at either stage of matching.' %}
+    {% trans 'Interaction will also be duplicate-checked using the service, contact and date fields. If duplicates are detected, the load will be blocked.' %}
   </p>
   <p>
     {% trans 'You will have a chance to review the records that will be loaded on the next page.' %}
@@ -109,7 +116,7 @@
     {% endfor %}
 
     <div>
-      <input type="submit" value="{% trans 'Submit' %}">
+      <input type="submit" value="{% trans 'Submit' %}" data-prevent-multiple-submit>
     </div>
   </form>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "admin/change_list_object_tools.html" %}
 
 {% block object-tools-items %}
-  {% if has_change_permission and csv_import_feature_flag %}
+  {% if has_change_permission %}
     <li>
       <a href="{% url 'admin:interaction_interaction_import' %}">
         Import interactions

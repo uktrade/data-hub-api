@@ -1,6 +1,11 @@
 {% extends 'admin/interaction/interaction/base_import.html' %}
 {% load admin_urls static i18n %}
 
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static 'core/admin/js/prevent-multiple-submit.js' %}"></script>
+{% endblock %}
+
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'interaction/admin/css/import-preview.css' %}">
@@ -93,7 +98,7 @@
     {% csrf_token %}
 
     <div>
-      <input type="submit" value="{{ import }}">
+      <input type="submit" value="{{ import }}" data-prevent-multiple-submit>
     </div>
 
     <p></p>
