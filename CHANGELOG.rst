@@ -1,3 +1,25 @@
+Data Hub API 13.3.0 (2019-06-11)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The admin site import interactions tool is no longer behind a feature flag.
+
+API
+---
+
+- **Interactions** ``POST /v3/interaction, PATCH /v3/interaction/<id>``: The API now correctly returns an error if ``service_delivery`` is specified for ``kind`` when ``theme`` is ``investment``.
+- It is now possible to get a list of OMIS orders added in activity-stream `format.
+  <https://www.w3.org/TR/activitystreams-core/>`_ 
+
+  The URL for this is:
+
+  | /v3/activity-stream/omis/order-added
+
+
 Data Hub API 13.2.0 (2019-06-06)
 ================================
 
