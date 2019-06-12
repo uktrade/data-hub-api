@@ -1,0 +1,1 @@
+A ``metadata_service.requires_service_answers_flow_feature_flag`` column was added with type ``boolean``. This is used to hide certain services behind a feature flag while related functionality is being built.
