@@ -1,3 +1,7 @@
+from django.db.models import Q
+
+from datahub.feature_flag.utils import build_is_feature_flag_active_subquery
+from datahub.interaction.constants import SERVICE_ANSWERS_FEATURE_FLAG
 from datahub.metadata import models
 from datahub.metadata.filters import ServiceFilterSet
 from datahub.metadata.registry import registry
@@ -41,10 +45,24 @@ registry.register(
     ),
     serializer=SectorSerializer,
 )
+
+# Custom service query set that does not return services with
+# requires_service_answers_flow_feature_flag=True unless the SERVICE_ANSWERS_FEATURE_FLAG
+# feature flag is active
+service_queryset = models.Service.objects.annotate(
+    service_answers_feature_flag_is_active=build_is_feature_flag_active_subquery(
+        SERVICE_ANSWERS_FEATURE_FLAG,
+    ),
+).filter(
+    Q(requires_service_answers_flow_feature_flag=False)
+    | Q(service_answers_feature_flag_is_active=True),
+)
+
 registry.register(
     filterset_class=ServiceFilterSet,
     metadata_id='service',
     model=models.Service,
+    queryset=service_queryset,
     serializer=ServiceSerializer,
 )
 registry.register(metadata_id='team-role', model=models.TeamRole)

@@ -16,7 +16,19 @@ def is_feature_flag_active(code):
 
 
 def build_is_feature_flag_active_subquery(code):
-    """Return a subquery that checks if a feature flag is active."""
+    """
+    Return a subquery that checks if a feature flag is active.
+
+    This can be used e.g. to use a feature flag as part of a filter on a query set.
+
+    For example:
+
+        models.Service.objects.annotate(
+            feature_flag_active=build_is_feature_flag_active_subquery(FEATURE_FLAG),
+        ).filter(
+            Q(requires_service_answers_flow_feature_flag=False) | Q(feature_flag_active=True),
+        )
+    """
     return Exists(
         FeatureFlag.objects.filter(code=code, is_active=True),
     )
