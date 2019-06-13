@@ -1,6 +1,6 @@
+import sentry_sdk
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from raven.contrib.django.models import client
 from requests import HTTPError
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
@@ -60,7 +60,7 @@ class DataScienceCompanyAPIClient:
             response = self._api_client.request('get', path, **kwargs)
         except HTTPError as exc:
             if exc.response.status_code != status.HTTP_404_NOT_FOUND:
-                event_id = client.captureException()
+                event_id = sentry_sdk.capture_exception()
                 raise APIException(
                     f'Error communicating with the company timeline API. Error '
                     f'reference: {event_id}.',
@@ -75,7 +75,7 @@ def _transform_events_response(data):
     try:
         serializer.is_valid(raise_exception=True)
     except ValidationError as exc:
-        event_id = client.captureException()
+        event_id = sentry_sdk.capture_exception()
         raise APIException(
             f'Unexpected response data format received from the company '
             f'timeline API. Error reference: {event_id}.',
