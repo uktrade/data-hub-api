@@ -8,6 +8,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.interaction.constants import SERVICE_ANSWERS_FEATURE_FLAG
 from datahub.metadata import urls
 from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
 from datahub.metadata.registry import registry
@@ -15,6 +17,12 @@ from datahub.metadata.test.factories import ServiceFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture()
+def service_answers_feature_flag():
+    """Creates the interaction service answers feature flag."""
+    yield FeatureFlagFactory(code=SERVICE_ANSWERS_FEATURE_FLAG)
 
 
 def pytest_generate_tests(metafunc):
@@ -190,6 +198,7 @@ def test_team_view(api_client):
 class TestServiceView:
     """Tests for the /metadata/service/ view."""
 
+    @pytest.mark.usefixtures('service_answers_feature_flag')
     def test_list(self, api_client):
         """
         Test listing services.
@@ -221,6 +230,7 @@ class TestServiceView:
             [Service.CONTEXTS.export_interaction, Service.CONTEXTS.export_service_delivery],
         ),
     )
+    @pytest.mark.usefixtures('service_answers_feature_flag')
     def test_list_filter_by_has_any(self, api_client, contexts):
         """Test listing services, filtered by context."""
         test_data_contexts = (
@@ -243,6 +253,37 @@ class TestServiceView:
         services = response.json()
         assert len(services) == service_count_for_context
         assert all(set(service['contexts']) & set(contexts) for service in services)
+
+    @pytest.mark.usefixtures('service_answers_feature_flag')
+    def test_feature_flagged_services_included_if_feature_flag_active(self, api_client):
+        """
+        Test that feature flag services are included if the SERVICE_ANSWERS_FEATURE_FLAG
+        feature flag is active.
+        """
+        service = ServiceFactory(requires_service_answers_flow_feature_flag=True)
+
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+
+        assert str(service.pk) in [service['id'] for service in services if service['id']]
+
+    def test_feature_flagged_services_excluded_if_feature_flag_inactive(self, api_client):
+        """
+        Test that feature flag services are excluded if the SERVICE_ANSWERS_FEATURE_FLAG
+        feature flag is inactive.
+        """
+        service = ServiceFactory(requires_service_answers_flow_feature_flag=True)
+
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+
+        assert str(service.pk) not in [service['id'] for service in services if service['id']]
 
 
 class TestSectorView:
