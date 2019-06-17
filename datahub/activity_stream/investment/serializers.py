@@ -51,4 +51,7 @@ class IProjectCreatedSerializer(ActivitySerializer):
         if instance.number_new_jobs is not None:
             project['object']['dit:numberNewJobs'] = instance.number_new_jobs
 
+        if instance.gross_value_added is not None:
+            project['object']['dit:grossValueAdded'] = instance.gross_value_added
+
         return project

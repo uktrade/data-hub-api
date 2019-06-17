@@ -1,3 +1,30 @@
+Data Hub API 13.4.0 (2019-06-14)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The services in production were replicated to all other environments in preparation for forthcoming changes to interactions and services.
+
+Bug fixes
+---------
+
+- **OMIS** When a company or a contact name changes, related OMIS orders are now synced to ElasticSearch.
+
+Internal changes
+----------------
+
+- **Interactions** A feature flag with code ``interaction_service_answers_flow`` was added to control whether services with service questions and answer options are returned by the API.
+- The deprecated Raven Sentry client was replaced with the Sentry SDK.
+
+Database schema
+---------------
+
+- **Interactions** A ``metadata_service.requires_service_answers_flow_feature_flag`` column was added with type ``boolean``. This is used to hide certain services behind a feature flag while related functionality is being built.
+
+
 Data Hub API 13.3.0 (2019-06-11)
 ================================
 

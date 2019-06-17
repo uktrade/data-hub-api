@@ -136,7 +136,8 @@ class TestCalendarInteractionEmailParser:
             ),
             # Test that interaction data can be extracted for a complicated case
             # with many advisers, contacts and some unknown contacts,
-            # sample uses sender adviser's contact_email which is different to their email
+            # sample uses sender adviser's contact_email which is different to their email,
+            # email's From field has different case to the saved Adviser's contact_email field
             (
                 'email_samples/valid/gmail/sample.eml',
                 {

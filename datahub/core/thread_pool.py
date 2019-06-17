@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
+import sentry_sdk
 from django.db import close_old_connections
-from raven.contrib.django.models import client
 
 from datahub.core.utils import logger
 
@@ -42,7 +42,7 @@ def _make_thread_pool_task(fn, *args, **kwargs):
         except Exception:
             msg = f'Error running thread pool task {fn.__name__}'
             logger.exception(msg)
-            client.captureException(msg)
+            sentry_sdk.capture_exception()
             raise
         finally:
             close_old_connections()
