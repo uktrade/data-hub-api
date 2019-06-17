@@ -73,6 +73,7 @@ def test_interaction_activity(api_client):
                             {
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
+                                'url': contact.get_absolute_url(),
                                 'dit:emailAddress': contact.email,
                                 'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
@@ -143,6 +144,7 @@ def test_interaction_investment_project_activity(api_client):
                             {
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
+                                'url': contact.get_absolute_url(),
                                 'dit:emailAddress': contact.email,
                                 'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
@@ -219,6 +221,7 @@ def test_service_delivery_activity(api_client):
                             {
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
+                                'url': contact.get_absolute_url(),
                                 'dit:emailAddress': contact.email,
                                 'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
@@ -288,6 +291,7 @@ def test_service_delivery_event_activity(api_client):
                             {
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
+                                'url': contact.get_absolute_url(),
                                 'dit:emailAddress': contact.email,
                                 'dit:jobTitle': contact.job_title,
                                 'name': contact.name,

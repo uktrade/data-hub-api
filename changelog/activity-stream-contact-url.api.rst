@@ -1,0 +1,1 @@
+The activity-stream payload will now contain ``url`` for all ``dit:DataHubContact``.
