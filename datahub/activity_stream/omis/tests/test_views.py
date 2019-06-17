@@ -55,6 +55,7 @@ def test_omis_order_added_activity(api_client, order_overrides):
                         {
                             'id': f'dit:DataHubContact:{order.contact.pk}',
                             'type': ['Person', 'dit:Contact'],
+                            'url': order.contact.get_absolute_url(),
                             'dit:emailAddress': order.contact.email,
                             'dit:jobTitle': order.contact.job_title,
                             'name': order.contact.name,
