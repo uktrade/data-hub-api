@@ -10,6 +10,8 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.constants import SERVICE_ANSWERS_FEATURE_FLAG
+from datahub.interaction.models import ServiceAnswerOption
+from datahub.interaction.test.factories import ServiceAnswerOptionFactory
 from datahub.metadata import urls
 from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
 from datahub.metadata.registry import registry
@@ -219,6 +221,7 @@ class TestServiceView:
             'name': service.name,
             'contexts': sorted(service.contexts),
             'disabled_on': disabled_on,
+            'interaction_questions': [],
         }
         assert len(services) == Service.objects.count()
 
@@ -284,6 +287,79 @@ class TestServiceView:
         services = response.json()
 
         assert str(service.pk) not in [service['id'] for service in services if service['id']]
+
+    @pytest.mark.usefixtures('service_answers_feature_flag')
+    def test_interaction_service_questions(self, api_client):
+        """Test that service questions and answers are being serialized."""
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+
+        service_answer_option = ServiceAnswerOption.objects.first()
+        db_service = service_answer_option.question.service
+
+        response_service = next(
+            (service for service in services if service['id'] == str(db_service.id)),
+        )
+
+        response_service['contexts'] = sorted(response_service['contexts'])
+
+        assert response_service == {
+            'id': str(db_service.pk),
+            'name': db_service.name,
+            'contexts': sorted(db_service.contexts),
+            'disabled_on': _format_datetime_field_if_exists(db_service, 'disabled_on'),
+            'interaction_questions': [
+                {
+                    'id': str(question.id),
+                    'name': question.name,
+                    'disabled_on': format_date_or_datetime(
+                        question.disabled_on,
+                    ) if question.disabled_on else None,
+                    'answer_options': [
+                        {
+                            'id': str(answer_option.id),
+                            'name': answer_option.name,
+                            'disabled_on': _format_datetime_field_if_exists(
+                                answer_option,
+                                'disabled_on',
+                            ),
+                        } for answer_option in question.answer_options.all()
+                    ],
+                } for question in db_service.interaction_questions.all()
+            ],
+        }
+
+    def test_interaction_service_questions_excluded_if_feature_flag_inactive(self, api_client):
+        """
+        Test that service questions and answers are not included in the response if the
+        feature flag is inactive.
+        """
+        service_answer_option = ServiceAnswerOptionFactory(
+            question__service__requires_service_answers_flow_feature_flag=False,
+        )
+        service_obj = service_answer_option.question.service
+
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_services = response.json()
+        response_service = next(
+            service for service in response_services if service['id'] == str(service_obj.id)
+        )
+
+        response_service['contexts'] = sorted(response_service['contexts'])
+
+        assert response_service == {
+            'id': str(service_obj.pk),
+            'name': service_obj.name,
+            'contexts': sorted(service_obj.contexts),
+            'disabled_on': _format_datetime_field_if_exists(service_obj, 'disabled_on'),
+            'interaction_questions': [],
+        }
 
 
 class TestSectorView:
@@ -354,3 +430,10 @@ class TestInvestmentProjectStageView:
         assert set(first_project_stage.keys()) == set(expected_items)
         assert first_project_stage['name'] == 'Prospect'
         assert not first_project_stage['exclude_from_investment_flow']
+
+
+def _format_datetime_field_if_exists(obj, field_name):
+    value = getattr(obj, field_name)
+    if value is None:
+        return None
+    return format_date_or_datetime(value)

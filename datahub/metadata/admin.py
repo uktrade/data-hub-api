@@ -143,8 +143,8 @@ class ServiceContextFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Service)
-class ServiceAdmin(DisableableMetadataAdmin):
-    """Admin for services."""
+class ServiceAdmin(ReadOnlyMetadataAdmin):
+    """Read only admin for services."""
 
     fields = ('id', 'name', 'contexts', 'disabled_on')
     list_display = ('name', 'get_contexts_display', 'disabled_on')
