@@ -29,6 +29,7 @@ class ActivitySerializer(serializers.Serializer):
             'id': f'dit:DataHubContact:{contact.pk}',
             'type': ['Person', 'dit:Contact'],
             'dit:emailAddress': contact.email,
+            'dit:jobTitle': contact.job_title,
             'name': contact.name,
         }
 
