@@ -53,6 +53,8 @@ service_queryset = models.Service.objects.annotate(
     service_answers_feature_flag_is_active=build_is_feature_flag_active_subquery(
         SERVICE_ANSWERS_FEATURE_FLAG,
     ),
+).prefetch_related(
+    'interaction_questions__answer_options',
 ).filter(
     Q(requires_service_answers_flow_feature_flag=False)
     | Q(service_answers_feature_flag_is_active=True),
