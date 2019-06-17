@@ -21,6 +21,15 @@ class EmailRetrievalError(Exception):
     pass
 
 
+class EmailInboxConnectionError(Exception):
+    """
+    Custom exception for when there was an error in connecting to the email
+    inbox.
+    """
+
+    pass
+
+
 class Mailbox:
     """
     The Mailbox class acts as a gateway to an email inbox - accessed via IMAP.
@@ -87,9 +96,15 @@ class Mailbox:
 
         :yields: An active imaplib server connection object.
         """
-        connection = imaplib.IMAP4_SSL(self.imap_domain, self.imap_port)
-        connection.login(self.username, self.password)
-        connection.select()
+        try:
+            connection = imaplib.IMAP4_SSL(self.imap_domain, self.imap_port)
+            connection.login(self.username, self.password)
+            connection.select()
+        except (connection.error, ConnectionResetError) as exc:
+            exc_message = exc.args[0]
+            raise EmailInboxConnectionError(
+                f'IMAP SSL connection failed with message: "{exc_message}"',
+            )
         try:
             yield connection
         finally:

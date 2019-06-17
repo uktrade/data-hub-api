@@ -1,9 +1,10 @@
 from unittest import mock
 
 import pytest
+from django.core.cache import cache
 from django.test.utils import override_settings
 
-from datahub.email_ingestion.mailbox import MailboxHandler
+from datahub.email_ingestion.mailbox import EmailInboxConnectionError, MailboxHandler
 from datahub.email_ingestion.tasks import ingest_emails
 from datahub.email_ingestion.test.utils import MAILBOXES_SETTING, mock_import_string
 from datahub.feature_flag.models import FeatureFlag
@@ -26,6 +27,14 @@ class TestIngestEmails:
     Test ingest_emails celery task.
     """
 
+    def _refresh_mailbox_handler(self, monkeypatch):
+        mailbox_handler = MailboxHandler()
+        mailbox_handler.initialise_mailboxes()
+        monkeypatch.setattr(
+            'datahub.email_ingestion.tasks.mailbox_handler',
+            mailbox_handler,
+        )
+
     @override_settings(MAILBOXES=MAILBOXES_SETTING)
     def test_ingest_emails_lock_acquired(self, monkeypatch):
         """
@@ -39,17 +48,57 @@ class TestIngestEmails:
             'datahub.email_ingestion.mailbox.Mailbox.process_new_mail',
             process_new_mail_patch,
         )
-        # Refresh the mailbox_handler singleton as we have overidden the MAILBOXES setting
-        mailbox_handler = MailboxHandler()
-        mailbox_handler.initialise_mailboxes()
-        monkeypatch.setattr(
-            'datahub.email_ingestion.tasks.mailbox_handler',
-            mailbox_handler,
-        )
+        self._refresh_mailbox_handler(monkeypatch)
+
         ingest_emails()
         assert process_new_mail_patch.call_count == 2
 
-    @override_settings(MAILBOXES=MAILBOXES_SETTING)
+    @pytest.mark.usefixtures('local_memory_cache')
+    @override_settings(
+        MAILBOXES=MAILBOXES_SETTING,
+        EMAIL_INGESTION_CONNECT_FAILURE_THRESHOLD=5,
+    )
+    def test_ingest_emails_repeated_failures(self, monkeypatch):
+        """
+        Test that repeated failures of the ingest_emails task will only yield
+        one error within a sufficient window.
+        """
+        # Mock import_string to avoid import errors for processor_class path strings
+        mock_import_string(monkeypatch)
+
+        # The process_new_mail call for our test inbox should pass or fail according to
+        # this manifest
+        call_results = [True, False, True, False, False, False, False]
+
+        def failing_connect(self, *args, **kwargs):
+            if self.username == 'mybox2@example.net':
+                try:
+                    self.call_count
+                except AttributeError:
+                    self.call_count = 0
+                result = call_results[self.call_count]
+                self.call_count += 1
+                if not result:
+                    raise EmailInboxConnectionError('Connection error')
+
+        monkeypatch.setattr(
+            'datahub.email_ingestion.mailbox.Mailbox.process_new_mail',
+            failing_connect,
+        )
+        self._refresh_mailbox_handler(monkeypatch)
+
+        # Simulate calling the ingest emails task a few times before we reach
+        # the failure threshold
+        for _i in call_results[:-1]:
+            ingest_emails()
+
+        assert cache.get('email_ingest_failures_mybox2@example.net') == 4
+        # Call ingest_emails the final time - which should raise an error
+        with pytest.raises(EmailInboxConnectionError):
+            ingest_emails()
+        # Ensure that the failure cache is cleared
+        assert cache.get('email_ingest_failures_mybox2@example.net') is None
+
     def test_ingest_emails_lock_not_acquired(self, monkeypatch):
         """
         Test that our mailboxes are not processed when the lock cannot be acquired successfully.
@@ -69,7 +118,6 @@ class TestIngestEmails:
         ingest_emails()
         assert process_new_mail_patch.called is False
 
-    @override_settings(MAILBOXES=MAILBOXES_SETTING)
     def test_ingest_feature_flag_inactive(self, monkeypatch):
         """
         Test that our mailboxes are not processed when the feature flag is not active.

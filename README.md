@@ -304,6 +304,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `EMAIL_INGESTION_FREQUENCY_SECONDS` | No | The frequency (in seconds) that the email ingestion beat should run, defaults to 30.0 |
+| `EMAIL_INGESTION_CONNECT_FAILURE_THRESHOLD` | No | The number of acceptable email inbox connection failures within a window of 10 tries, before an error should be raised |
 
 
 ## Management commands

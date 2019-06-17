@@ -337,6 +337,10 @@ if REDIS_BASE_URL:
         }
     }
 
+# Every 30 seconds, by default
+EMAIL_INGESTION_FREQUENCY_SECONDS = env.float('EMAIL_INGESTION_FREQUENCY_SECONDS', 30.0)
+# Our limit before reporting connection failures in a particular window (out of 10 tries)
+EMAIL_INGESTION_CONNECT_FAILURE_THRESHOLD = env.int('EMAIL_INGESTION_CONNECT_FAILURE_THRESHOLD', 5)
 
 if REDIS_BASE_URL:
     REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
@@ -389,7 +393,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': 30.0, # Every 30 seconds
+            'schedule': EMAIL_INGESTION_FREQUENCY_SECONDS,
         }
 
     CELERY_WORKER_LOG_FORMAT = (
