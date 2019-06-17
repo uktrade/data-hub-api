@@ -1,5 +1,6 @@
 from functools import wraps
 
+from django.db.models import Exists
 from django.http import Http404
 
 from datahub.feature_flag.models import FeatureFlag
@@ -12,6 +13,25 @@ def is_feature_flag_active(code):
     If feature flag doesn't exist, it returns False.
     """
     return FeatureFlag.objects.filter(code=code, is_active=True).exists()
+
+
+def build_is_feature_flag_active_subquery(code):
+    """
+    Return a subquery that checks if a feature flag is active.
+
+    This can be used e.g. to use a feature flag as part of a filter on a query set.
+
+    For example:
+
+        models.Service.objects.annotate(
+            feature_flag_active=build_is_feature_flag_active_subquery(FEATURE_FLAG),
+        ).filter(
+            Q(requires_service_answers_flow_feature_flag=False) | Q(feature_flag_active=True),
+        )
+    """
+    return Exists(
+        FeatureFlag.objects.filter(code=code, is_active=True),
+    )
 
 
 def feature_flagged_view(code):

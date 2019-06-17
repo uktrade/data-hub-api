@@ -149,3 +149,44 @@ def test_removing_assignees_syncs_order_to_es(setup_es):
     expected = {str(assignee.adviser.pk) for assignee in assignees}
     assert indexed == expected
     assert len(indexed) == 1
+
+
+def test_updating_company_name_updates_orders(setup_es):
+    """Test that when a company name is updated, the company's orders are synced to ES."""
+    order = OrderFactory()
+    new_company_name = 'exogenous'
+    order.company.name = new_company_name
+    order.company.save()
+    setup_es.indices.refresh()
+
+    result = setup_es.get(
+        index=OrderSearchApp.es_model.get_write_index(),
+        doc_type=OrderSearchApp.name,
+        id=order.pk,
+    )
+    assert result['_source']['company']['name'] == new_company_name
+
+
+def test_updating_contact_name_updates_orders(setup_es):
+    """Test that when a contact's name is updated, the contacts's orders are synced to ES."""
+    order = OrderFactory()
+    new_first_name = 'Jamie'
+    new_last_name = 'Bloggs'
+
+    contact = order.contact
+    contact.first_name = new_first_name
+    contact.last_name = new_last_name
+    contact.save()
+    setup_es.indices.refresh()
+
+    result = setup_es.get(
+        index=OrderSearchApp.es_model.get_write_index(),
+        doc_type=OrderSearchApp.name,
+        id=order.pk,
+    )
+    assert result['_source']['contact'] == {
+        'id': str(contact.pk),
+        'first_name': new_first_name,
+        'last_name': new_last_name,
+        'name': f'{new_first_name} {new_last_name}',
+    }

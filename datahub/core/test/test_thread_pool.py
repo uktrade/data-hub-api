@@ -12,8 +12,8 @@ def _synchronous_executor_submit(fn, *args, **kwargs):
 
 
 @mock.patch('datahub.core.thread_pool._executor.submit', _synchronous_executor_submit)
-@mock.patch('datahub.core.thread_pool.client')
-def test_error_raises_exception(mock_raven_client):
+@mock.patch('sentry_sdk.capture_exception')
+def test_error_raises_exception(mock_capture_exception):
     """
     Test that if an error occurs whilst executing a thread pool task,
     the exception is raised and sent to sentry.
@@ -23,4 +23,4 @@ def test_error_raises_exception(mock_raven_client):
     with pytest.raises(ValueError):
         submit_to_thread_pool(mock_task)
 
-    assert mock_raven_client.captureException.called
+    assert mock_capture_exception.called
