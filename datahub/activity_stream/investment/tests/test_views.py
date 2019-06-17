@@ -66,6 +66,7 @@ def test_investment_project_added(api_client):
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
                                 'dit:emailAddress': contact.email,
+                                'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
                             }
                             for contact in project.client_contacts.order_by('pk')
@@ -137,6 +138,7 @@ def test_investment_project_with_pm_added(api_client):
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
                                 'dit:emailAddress': contact.email,
+                                'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
                             }
                             for contact in project.client_contacts.order_by('pk')
@@ -210,6 +212,7 @@ def test_investment_project_verify_win_added(api_client):
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
                                 'dit:emailAddress': contact.email,
+                                'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
                             }
                             for contact in project.client_contacts.order_by('pk')
@@ -282,6 +285,7 @@ def test_investment_project_added_with_gva(api_client):
                                 'id': f'dit:DataHubContact:{contact.pk}',
                                 'type': ['Person', 'dit:Contact'],
                                 'dit:emailAddress': contact.email,
+                                'dit:jobTitle': contact.job_title,
                                 'name': contact.name,
                             }
                             for contact in project.client_contacts.order_by('pk')
