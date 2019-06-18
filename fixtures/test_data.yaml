@@ -1568,7 +1568,7 @@
     related_programmes:
       - 1abe5563-6482-41d8-b566-6a9ee9e37c5f
     uk_region: 864cd12a-6095-e211-a939-e4115bead28a
-    service: 9484b82b-3499-e211-a939-e4115bead28a
+    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
     created_on: '2017-01-05T00:00:00Z'
     modified_on: '2017-01-05T00:00:00Z'
 
@@ -1594,7 +1594,7 @@
       - 4e4d24c2-9698-e211-a939-e4115bead28a
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
-    service: 9484b82b-3499-e211-a939-e4115bead28a
+    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
     archived_documents_url_path: '/documents/123'
     created_on: '2017-01-25T00:00:00Z'
     modified_on: '2017-01-25T00:00:00Z'
@@ -1621,7 +1621,7 @@
       - 4e4d24c2-9698-e211-a939-e4115bead28a
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
-    service: 9484b82b-3499-e211-a939-e4115bead28a
+    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
     archived_documents_url_path: '/documents/123'
     created_on: '2017-01-25T00:00:00Z'
     modified_on: '2017-01-25T00:00:00Z'
