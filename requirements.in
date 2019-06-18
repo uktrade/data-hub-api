@@ -7,7 +7,7 @@ Django==2.2.2
 djangorestframework==3.9.4
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
-django-extensions==2.1.7
+django-extensions==2.1.9
 django-filter==2.1.0
 django-reversion==3.0.4
 django-pglocks==1.0.2
