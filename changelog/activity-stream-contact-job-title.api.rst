@@ -1,1 +1,0 @@
-The activity-stream payload will now contain `dit:jobTitle` for all `dit:DataHubContact`.
