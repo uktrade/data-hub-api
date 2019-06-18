@@ -1,3 +1,43 @@
+Data Hub API 13.5.0 (2019-06-18)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The Django Admin Interaction Service section has been made read only.
+
+Internal changes
+----------------
+
+- **Events** Events in the test data for acceptance tests were corrected to use a DIT service that is valid for events.
+
+API
+---
+
+- **Interactions** ``GET /metadata/service/``: The ``interaction_questions`` field was added to responses. It contains a representation of service questions and answer options from ``ServiceQuestion`` and ``ServiceAnswerOption`` models. It is an array of following format::
+
+      [ # Array of ServiceQuestion
+          {
+              'id': <uuid>,
+              'name: <str>,
+              'disabled_on': <datetime>,
+              'answer_options': [ # Array of ServiceAnswerOption
+                  {
+                      'id': <uuid>,
+                      'name': <str>,
+                      'disabled_on': <datetime>
+                  },
+                  ...
+              ]
+          },
+          ...
+      ]
+- The activity-stream payload will now contain ``dit:jobTitle`` for all ``dit:DataHubContact``.
+- The activity-stream payload will now contain ``url`` for all ``dit:DataHubContact``.
+
+
 Data Hub API 13.4.0 (2019-06-14)
 ================================
 
