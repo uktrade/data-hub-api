@@ -23,7 +23,7 @@ decorator==4.4.0          # via ipython, traitlets
 django-admin-ip-restrictor==1.0.0
 django-debug-toolbar==1.11
 django-environ==0.4.5
-django-extensions==2.1.7
+django-extensions==2.1.9
 django-filter==2.1.0
 django-ipware==2.1.0      # via django-admin-ip-restrictor
 django-js-asset==1.2.2    # via django-mptt
