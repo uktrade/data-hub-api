@@ -1,0 +1,1 @@
+The activity-stream payload will now contain ``dit:team`` for all ``dit:DataHubAdviser``.
