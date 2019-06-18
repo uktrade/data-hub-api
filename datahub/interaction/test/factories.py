@@ -16,6 +16,29 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import ServiceFactory
+
+
+class ServiceQuestionFactory(factory.django.DjangoModelFactory):
+    """ServiceQuestion factory."""
+
+    id = factory.LazyFunction(uuid4)
+    name = factory.Faker('word')
+    service = factory.SubFactory(ServiceFactory)
+
+    class Meta:
+        model = 'interaction.ServiceQuestion'
+
+
+class ServiceAnswerOptionFactory(factory.django.DjangoModelFactory):
+    """ServiceQuestion factory."""
+
+    id = factory.LazyFunction(uuid4)
+    name = factory.Faker('word')
+    question = factory.SubFactory(ServiceQuestionFactory)
+
+    class Meta:
+        model = 'interaction.ServiceAnswerOption'
 
 
 class CommunicationChannelFactory(factory.django.DjangoModelFactory):
