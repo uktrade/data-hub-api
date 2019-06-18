@@ -72,6 +72,7 @@ LOCAL_APPS = [
     'datahub.investment.project.proposition',
     'datahub.investment.project.report',
     'datahub.investment.investor_profile',
+    'datahub.notification',
     'datahub.metadata',
     'datahub.oauth',
     'datahub.admin_report',
@@ -568,3 +569,5 @@ for environ_name in domain_environ_names:
             for domain, auth in domain_details.items()
         }
     )
+
+DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default='')
