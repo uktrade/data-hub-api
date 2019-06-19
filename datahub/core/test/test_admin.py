@@ -12,6 +12,7 @@ from datahub.core.admin import (
     custom_change_permission,
     custom_delete_permission,
     custom_view_permission,
+    format_json_as_html,
     get_change_link,
     get_change_url,
     RawIdWidget,
@@ -250,3 +251,26 @@ class TestGetChangeLink:
     def test_returns_empty_string_if_obj_is_none(self):
         """Test that if None is passed, an empty link is returned."""
         assert get_change_link(None) == ''
+
+
+class TestFormatJsonAsHtml:
+    """Tests for format_json_as_html()."""
+
+    @pytest.mark.parametrize(
+        'value,expected_output',
+        (
+            (
+                None,
+                '<pre>null</pre>',
+            ),
+            (
+                {1: '<'},
+                """<pre>{
+  &quot;1&quot;: &quot;&lt;&quot;
+}</pre>""",
+            ),
+        ),
+    )
+    def test_format_json_as_html(self, value, expected_output):
+        """Test that various values are serialised and escaped as expected."""
+        assert format_json_as_html(value) == expected_output
