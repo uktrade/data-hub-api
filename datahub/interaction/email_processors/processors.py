@@ -4,19 +4,24 @@ from rest_framework import serializers
 
 from datahub.email_ingestion.email_processor import EmailProcessor
 from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.utils import (
+    get_all_recipients,
+    get_best_match_adviser_by_email,
+)
 from datahub.interaction.models import Interaction
+from datahub.interaction.notify import notify_meeting_ingest_failure
 from datahub.interaction.serializers import InteractionSerializer
 
 
-def _flatten_serializer_errors_to_string(serializer_errors):
+def _flatten_serializer_errors_to_list(serializer_errors):
     """
-    Flatten DRF Serializer validation errors to a string with one field per line.
+    Flatten DRF Serializer validation errors to a list with one field per item.
     """
-    error_parts = []
+    field_errors = []
     for field_name, details in serializer_errors.items():
         details_string = ','.join([str(detail) for detail in details])
-        error_parts.append(f'{field_name}: {details_string}')
-    return '\n'.join(error_parts)
+        field_errors.append(f'{field_name}: {details_string}')
+    return field_errors
 
 
 def _filter_contacts_to_single_company(contacts, company):
@@ -58,6 +63,17 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
     meeting, parses meeting information and creates a draft Interaction model
     instance for it if the information is valid.
     """
+
+    def _notify_meeting_ingest_failure(self, message, errors):
+        try:
+            sender_email = message.from_[0][1]
+        except IndexError:
+            return
+        sender_adviser = get_best_match_adviser_by_email(sender_email)
+        if not sender_adviser:
+            return
+        recipient_emails = get_all_recipients(message)
+        notify_meeting_ingest_failure(sender_adviser, errors, recipient_emails)
 
     def _to_serializer_format(self, data):
         dit_participants = [
@@ -121,7 +137,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         try:
             interaction_data = email_parser.extract_interaction_data_from_email()
         except ValidationError as exc:
-            return (False, exc.message)  # noqa: B306
+            error_message = exc.args[0]
+            self._notify_meeting_ingest_failure(message, [error_message])
+            return (False, error_message)
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
@@ -142,7 +160,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         try:
             serializer = self.validate_with_serializer(interaction_data)
         except serializers.ValidationError as exc:
-            return (False, _flatten_serializer_errors_to_string(exc.detail))
+            errors = _flatten_serializer_errors_to_list(exc.detail)
+            self._notify_meeting_ingest_failure(message, errors)
+            return (False, '\n'.join(errors))
 
         # For our initial iteration of this feature, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
