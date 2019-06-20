@@ -9,7 +9,10 @@ from datahub.interaction.email_processors.utils import (
     get_best_match_adviser_by_email,
 )
 from datahub.interaction.models import Interaction
-from datahub.interaction.notify import notify_meeting_ingest_failure
+from datahub.interaction.notify import (
+    notify_meeting_ingest_failure,
+    notify_meeting_ingest_success,
+)
 from datahub.interaction.serializers import InteractionSerializer
 
 
@@ -172,4 +175,5 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             return (False, 'Meeting already exists as an interaction')
 
         interaction = self.save_serializer_as_interaction(serializer, interaction_data)
+        notify_meeting_ingest_success(interaction_data['sender'], interaction)
         return (True, f'Successfully created interaction #{interaction.id}')

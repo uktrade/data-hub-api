@@ -7,6 +7,7 @@ from notifications_python_client.notifications import NotificationsAPIClient
 
 class NotificationClient:
     """
+    Class for accessing underlying GOVUK notification service.
     """
 
     def __init__(self):
@@ -32,6 +33,9 @@ class NotificationClient:
         template_identifier,
         context=None,
     ):
+        """
+        Send an email notification using the GOVUK notification service.
+        """
         if not context:
             context = {}
         self.client.send_email_notification(
