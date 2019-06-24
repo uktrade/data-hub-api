@@ -1,7 +1,4 @@
-import json
-
 from django.contrib import admin
-from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
@@ -9,6 +6,7 @@ from datahub.core.admin import (
     custom_add_permission,
     custom_change_permission,
     custom_view_permission,
+    format_json_as_html,
 )
 from datahub.core.utils import join_truthy_strings
 from datahub.interaction.admin_csv_import.views import InteractionCSVImportAdmin
@@ -139,7 +137,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         """
         Return the source field formatted with indentation.
         """
-        return format_html('<pre>{0}</pre>', json.dumps(obj.source, indent=2))
+        return format_json_as_html(obj.source)
 
     pretty_source.short_description = 'source'
 

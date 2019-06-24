@@ -1,9 +1,6 @@
-import json
-
 from django.contrib import admin
-from django.utils.html import format_html
 
-from datahub.core.admin import get_change_link, ViewOnlyAdmin
+from datahub.core.admin import format_json_as_html, get_change_link, ViewOnlyAdmin
 from datahub.user_event_log.models import UserEvent
 
 
@@ -32,6 +29,6 @@ class UserEventAdmin(ViewOnlyAdmin):
 
     def pretty_data(self, obj):
         """Returns the data field formatted with indentation."""
-        return format_html('<pre>{0}</pre>', json.dumps(obj.data, indent=2))
+        return format_json_as_html(obj.data)
 
     pretty_data.short_description = 'data'
