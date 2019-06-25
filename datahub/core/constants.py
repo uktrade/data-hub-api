@@ -153,6 +153,15 @@ class Service(Enum):
     trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
     account_management = Constant('Account Management', '9484b82b-3499-e211-a939-e4115bead28a')
 
+    providing_investment_advice_and_information = Constant(
+        'Providing Investment Advice & Information',
+        'ef3218c1-bed6-4ad8-b8d5-8af2430d32ff',
+    )
+    making_export_introductions = Constant(
+        'Making Introductions (Export)',
+        '1477622e-9adb-4017-8d8d-fe3221f1d2fc',
+    )
+
     investment_enquiry_requested_more_information = Constant(
         'Investment Enquiry – Requested more information from source (IST use only)',
         '73ceedc1-c139-4bdf-9e47-17b1bae488da',
