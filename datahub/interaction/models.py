@@ -241,6 +241,8 @@ class Interaction(ArchivableModel, BaseModel):
     service = models.ForeignKey(
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
+    service_answers = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
+
     subject = models.TextField()
     location = models.CharField(max_length=MAX_LENGTH, blank=True)
     # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
