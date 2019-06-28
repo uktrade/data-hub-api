@@ -1,0 +1,149 @@
+# Service: Making Introductions (Export)
+- model: interaction.servicequestion
+  pk: 054b29fe-c14b-463d-8177-c378d3a819aa
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Who was the company introduced to?
+    service_id: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
+    order: 100.0
+
+- model: interaction.serviceansweroption
+  pk: a0fabd27-587b-49d1-9e56-eb789b66b7cd
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Customers
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 100.0
+- model: interaction.serviceansweroption
+  pk: 2ecdad3d-642a-454c-9bd9-8089b448c319
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Business Partners (e.g. distributors or manufacturers)
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 200.0
+- model: interaction.serviceansweroption
+  pk: 2a8db035-f8fe-4700-9769-d980754b90af
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Financial and Professional Service Providers
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 300.0
+- model: interaction.serviceansweroption
+  pk: c1a1ab4a-a248-4104-b5a1-caab763ebd8b
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Someone else in DIT
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 400.0
+- model: interaction.serviceansweroption
+  pk: 91d496af-0185-449c-a19c-4016c8e78cb0
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Another Government Department
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 500.0
+- model: interaction.serviceansweroption
+  pk: a7c74e31-f54e-4fc6-9ecd-84a68b0a81e6
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: UK Export Finance (UKEF)
+    question_id: 054b29fe-c14b-463d-8177-c378d3a819aa
+    order: 600.0
+
+# Service: Making Introductions (Investment)
+- model: interaction.servicequestion
+  pk: 26c08878-8dd1-4abf-bc59-84918086bf29
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Who was the company introduced to?
+    service_id: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
+    order: 100.0
+
+# Making Investment Introductions
+- model: interaction.serviceansweroption
+  pk: 0529377a-57f1-4b27-baa0-4b9d9bbba8cd
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Customers
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 100.0
+- model: interaction.serviceansweroption
+  pk: faa5a5c7-5703-46d8-a35c-c92a87850655
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Business Partners (e.g. distributors or manufacturers)
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 200.0
+- model: interaction.serviceansweroption
+  pk: 158d945b-7220-47ae-9d80-ce77ef7ef397
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Financial and Professional Service Providers
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 300.0
+- model: interaction.serviceansweroption
+  pk: 71c0bb6a-845d-48a1-9764-5f6aa1e80674
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Investment Opportunities
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 400.0
+- model: interaction.serviceansweroption
+  pk: 693ef762-dd6b-4f85-8d64-1449ec555003
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Someone else in DIT
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 500.0
+- model: interaction.serviceansweroption
+  pk: 3bb0827b-1b62-498b-b940-401e81f27328
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Another Government Department
+    question_id: 26c08878-8dd1-4abf-bc59-84918086bf29
+    order: 600.0
+
+# Making Other Introductions
+- model: interaction.servicequestion
+  pk: 30690502-9fb9-443b-9ddb-897f66f62b7b
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Who was the company introduced to?
+    service_id: 3f5a2216-8cb1-4fb7-9c6b-06ba77d7405b
+    order: 100.0
+
+- model: interaction.serviceansweroption
+  pk: d5312876-921e-4ed0-837b-42115d3d2ad5
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Customers
+    question_id: 30690502-9fb9-443b-9ddb-897f66f62b7b
+    order: 100.0
+- model: interaction.serviceansweroption
+  pk: b2387184-7721-40fe-b2f0-cbb5c3cb0dce
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Business Partners (e.g. distributors or manufacturers)
+    question_id: 30690502-9fb9-443b-9ddb-897f66f62b7b
+    order: 200.0
+- model: interaction.serviceansweroption
+  pk: 7735ef59-6eb9-4044-80ad-30cb5731e6dd
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Financial and Professional Service Providers
+    question_id: 30690502-9fb9-443b-9ddb-897f66f62b7b
+    order: 300.0
+- model: interaction.serviceansweroption
+  pk: 99142407-2c92-4924-9d80-6f27259aeb54
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Someone else in DIT
+    question_id: 30690502-9fb9-443b-9ddb-897f66f62b7b
+    order: 400.0
+- model: interaction.serviceansweroption
+  pk: 04d35056-180c-493b-bfc6-1240a41b2c89
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Another Government Department
+    question_id: 30690502-9fb9-443b-9ddb-897f66f62b7b
+    order: 500.0

@@ -102,7 +102,7 @@ def test_can_see_spi1_start(spi_report):
         (Service.investment_enquiry_transferred_to_lep.value.id, True),
         (Service.investment_enquiry_transferred_to_da.value.id, True),
         (Service.investment_enquiry_transferred_to_lp.value.id, True),
-        (Service.trade_enquiry.value.id, False),
+        (Service.inbound_referral.value.id, False),
         (Service.account_management.value.id, False),
     ),
 )
@@ -139,7 +139,7 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
         (Service.investment_enquiry_transferred_to_lep.value.id, False),
         (Service.investment_enquiry_transferred_to_da.value.id, False),
         (Service.investment_enquiry_transferred_to_lp.value.id, False),
-        (Service.trade_enquiry.value.id, False),
+        (Service.inbound_referral.value.id, False),
         (Service.account_management.value.id, False),
     ),
 )

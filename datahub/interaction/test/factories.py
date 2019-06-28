@@ -61,7 +61,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
-    service_id = constants.Service.trade_enquiry.value.id
+    service_id = constants.Service.inbound_referral.value.id
     dit_team = factory.SelfAttribute('dit_adviser.dit_team')
     archived_documents_url_path = factory.Faker('uri_path')
     was_policy_feedback_provided = False
