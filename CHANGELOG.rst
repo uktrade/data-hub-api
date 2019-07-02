@@ -1,3 +1,34 @@
+Data Hub API 13.6.0 (2019-07-02)
+================================
+
+
+
+API
+---
+
+- **Interactions** ``GET /v3/interaction``, ``GET /v3/interaction/<id>``: A ``service_answers`` field was added to responses.
+- **Interactions** ``POST /v3/interaction``, ``PATCH /v3/interaction/<id>``: An optional (depending on selected Service) ``service_answers`` field was added to request bodies.
+
+  The ``service_answers`` body is expected to be in the following format::
+
+
+
+      {
+          "<service question ID>": {
+              "<service answer option ID>": {
+                  # body reserved for future use
+              }
+          },
+          ...
+      }
+- The activity-stream payload will now contain ``dit:team`` for all ``dit:DataHubAdviser``.
+
+Database schema
+---------------
+
+- **Interactions** A nullable ``service_answers jsonb`` column was added to the ``interaction_interaction`` table to store answers to service questions.
+
+
 Data Hub API 13.5.0 (2019-06-18)
 ================================
 
