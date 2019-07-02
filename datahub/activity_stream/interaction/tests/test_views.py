@@ -66,6 +66,11 @@ def test_interaction_activity(api_client):
                                 'dit:emailAddress':
                                     participant.adviser.contact_email or participant.adviser.email,
                                 'name': participant.adviser.name,
+                                'dit:team': {
+                                    'id': f'dit:DataHubTeam:{participant.team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': participant.team.name,
+                                },
                             }
                             for participant in interaction.dit_participants.order_by('pk')
                         ],
@@ -137,6 +142,11 @@ def test_interaction_investment_project_activity(api_client):
                                 'dit:emailAddress':
                                     participant.adviser.contact_email or participant.adviser.email,
                                 'name': participant.adviser.name,
+                                'dit:team': {
+                                    'id': f'dit:DataHubTeam:{participant.team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': participant.team.name,
+                                },
                             }
                             for participant in interaction.dit_participants.order_by('pk')
                         ],
@@ -214,6 +224,11 @@ def test_service_delivery_activity(api_client):
                                 'dit:emailAddress':
                                     participant.adviser.contact_email or participant.adviser.email,
                                 'name': participant.adviser.name,
+                                'dit:team': {
+                                    'id': f'dit:DataHubTeam:{participant.team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': participant.team.name,
+                                },
                             }
                             for participant in interaction.dit_participants.order_by('pk')
                         ],
@@ -284,6 +299,11 @@ def test_service_delivery_event_activity(api_client):
                                 'dit:emailAddress':
                                     participant.adviser.contact_email or participant.adviser.email,
                                 'name': participant.adviser.name,
+                                'dit:team': {
+                                    'id': f'dit:DataHubTeam:{participant.team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': participant.team.name,
+                                },
                             }
                             for participant in interaction.dit_participants.order_by('pk')
                         ],

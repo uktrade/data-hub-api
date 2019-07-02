@@ -1,7 +1,4 @@
-import json
-
 from django.contrib import admin
-from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
@@ -9,6 +6,7 @@ from datahub.core.admin import (
     custom_add_permission,
     custom_change_permission,
     custom_view_permission,
+    format_json_as_html,
 )
 from datahub.core.utils import join_truthy_strings
 from datahub.interaction.admin_csv_import.views import InteractionCSVImportAdmin
@@ -104,6 +102,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified',
         'dit_adviser',
         'dit_team',
+        'pretty_service_answers',
         'pretty_source',
     )
     list_select_related = (
@@ -116,6 +115,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
+        'service_answers',
         'source',
     )
 
@@ -139,9 +139,15 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         """
         Return the source field formatted with indentation.
         """
-        return format_html('<pre>{0}</pre>', json.dumps(obj.source, indent=2))
+        return format_json_as_html(obj.source)
 
     pretty_source.short_description = 'source'
+
+    def pretty_service_answers(self, obj):
+        """Return the service_answers field formatted with indentation."""
+        return format_json_as_html(obj.service_answers)
+
+    pretty_service_answers.short_description = 'service answers'
 
     def get_urls(self):
         """Gets the URLs for this model's admin views."""

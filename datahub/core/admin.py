@@ -1,3 +1,4 @@
+import json
 from functools import wraps
 from urllib.parse import urlencode
 
@@ -327,6 +328,29 @@ def get_change_link(obj, site=admin.site):
         return ''
 
     return format_html('<a href="{url}">{name}</a>'.format(url=url, name=obj))
+
+
+def format_json_as_html(value):
+    """
+    Serialises an object as pretty JSON, and HTML-encodes it in a <pre> tag.
+
+    This is useful for displaying JSON fields in the admin site.
+
+    Usage example:
+
+        class InteractionAdmin(ModelAdmin):
+            readonly_fields = (
+                # also make sure source is not included
+                'pretty_source',
+            )
+
+            def pretty_source(self, obj):
+                return format_json_as_html(obj.source)
+
+            pretty_source.short_description = 'source'
+
+    """
+    return format_html('<pre>{0}</pre>', json.dumps(value, indent=2))
 
 
 def _make_admin_permission_getter(codename):

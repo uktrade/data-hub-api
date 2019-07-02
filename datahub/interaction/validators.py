@@ -1,7 +1,124 @@
-from rest_framework.exceptions import ValidationError
+from django.utils.translation import gettext_lazy
+from rest_framework import serializers
 
 from datahub.core.validate_utils import DataCombiner
-from datahub.interaction.models import Interaction
+from datahub.interaction.models import Interaction, ServiceAnswerOption
+
+
+class ServiceAnswersValidator:
+    """Validates service answers."""
+
+    required_message = gettext_lazy('This field is required.')
+    question_does_not_exist = gettext_lazy('Question does not exist.')
+    question_does_not_relate_message = gettext_lazy(
+        'This question does not relate to selected service.',
+    )
+    answer_invalid_format_message = gettext_lazy('Answers have invalid format.')
+    answer_not_required_message = gettext_lazy('Answers not required for given service value.')
+    answer_does_not_exist_message = gettext_lazy(
+        'The selected answer option is not valid for this question.',
+    )
+    only_one_answer_per_question_message = gettext_lazy(
+        'Only one answer can be selected for this question.',
+    )
+
+    def __init__(self):
+        """Initialises the validator."""
+        self.instance = None
+
+    def set_context(self, serializer):
+        """Saves a reference to the model object."""
+        self.instance = serializer.instance
+
+    def __call__(self, data):
+        """Performs validation."""
+        data_combiner = DataCombiner(self.instance, data)
+
+        service = data_combiner.get_value('service')
+        service_answers = data_combiner.get_value('service_answers')
+
+        expected_questions = {
+            str(question.pk): question
+            for question in service.interaction_questions.all()
+        } if service else {}
+
+        self._validate_type_and_truthiness(expected_questions, service_answers)
+
+        if service_answers is not None:
+            self._validate_questions(expected_questions, service_answers)
+
+    @classmethod
+    def _validate_type_and_truthiness(cls, expected_questions, service_answers):
+        if service_answers is not None and not isinstance(service_answers, dict):
+            raise serializers.ValidationError({
+                'service_answers': cls.answer_invalid_format_message,
+            })
+
+        if not expected_questions and service_answers:
+            raise serializers.ValidationError({
+                'service_answers': cls.answer_not_required_message,
+            })
+
+        if expected_questions and not service_answers:
+            raise serializers.ValidationError({
+                'service_answers': cls.required_message,
+            })
+
+    @classmethod
+    def _validate_questions(cls, expected_questions, service_answers):
+        errors = {}
+
+        # Add errors for any unanswered questions
+        for question_id in expected_questions.keys() - service_answers.keys():
+            errors[question_id] = [cls.required_message]
+
+        # Add errors for any unexpected questions in provided data
+        for question_id in service_answers.keys() - expected_questions.keys():
+            errors[question_id] = [cls.question_does_not_relate_message]
+
+        # Validate the answer options provided for each question
+        for question_id in service_answers.keys() & expected_questions.keys():
+            answer_options = service_answers[question_id]
+
+            try:
+                cls._validate_question_answers(question_id, answer_options)
+            except serializers.ValidationError as exc:
+                cls._add_errors_to_dict(errors, exc)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+    @classmethod
+    def _validate_question_answers(cls, question_id, provided_answer_options):
+        if len(provided_answer_options) == 0:
+            raise serializers.ValidationError({
+                question_id: cls.required_message,
+            })
+
+        if len(provided_answer_options) > 1:
+            raise serializers.ValidationError({
+                question_id: cls.only_one_answer_per_question_message,
+            })
+
+        (answer_option_id,) = provided_answer_options
+
+        answer_option_is_valid = ServiceAnswerOption.objects.filter(
+            id=answer_option_id,
+            question_id=question_id,
+        ).exists()
+
+        if not answer_option_is_valid:
+            raise serializers.ValidationError({
+                answer_option_id: cls.answer_does_not_exist_message,
+            })
+
+    @staticmethod
+    def _add_errors_to_dict(target, exc):
+        normalised_errors = serializers.as_serializer_error(exc)
+
+        for field, source_errors in normalised_errors.items():
+            target_errors = target.setdefault(field, [])
+            target_errors.extend(source_errors)
 
 
 class ContactsBelongToCompanyValidator:
@@ -33,7 +150,7 @@ class ContactsBelongToCompanyValidator:
         contacts = combiner.get_value_to_many('contacts')
 
         if any(contact.company != company for contact in contacts):
-            raise ValidationError(
+            raise serializers.ValidationError(
                 'The interaction contacts must belong to the specified company.',
                 code='inconsistent_contacts_and_company',
             )
@@ -69,7 +186,7 @@ class StatusChangeValidator:
         new_status = combiner.get_value('status')
         update_changes_status = new_status != self.instance.status
         if existing_interaction_complete and update_changes_status:
-            raise ValidationError(
+            raise serializers.ValidationError(
                 'The status of a complete interaction cannot change.',
                 code='complete_interaction_status_cannot_change',
             )
