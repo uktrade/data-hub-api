@@ -29,9 +29,9 @@ from datahub.interaction.test.factories import (
 from datahub.interaction.test.permissions import (
     NON_RESTRICTED_CHANGE_PERMISSIONS,
 )
+from datahub.interaction.test.utils import random_service
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.metadata.models import Service as ServiceModel
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -62,7 +62,7 @@ class TestAddInteraction(APITestMixin):
                 },
             ],
             'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
+                'id': random_service().pk,
             },
             'subject': 'whatever',
             'was_policy_feedback_provided': False,
@@ -157,7 +157,7 @@ class TestAddInteraction(APITestMixin):
                 'id': contact.pk,
             } for contact in contacts],
             'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
+                'id': random_service().pk,
             },
             'was_policy_feedback_provided': False,
         }
@@ -201,7 +201,7 @@ class TestAddInteraction(APITestMixin):
                 'id': contact.pk,
             }],
             'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
+                'id': random_service().pk,
             },
             'was_policy_feedback_provided': False,
         }
@@ -248,7 +248,7 @@ class TestAddInteraction(APITestMixin):
                 'id': contact.pk,
             }],
             'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
+                'id': random_service().pk,
             },
             'was_policy_feedback_provided': False,
         }
@@ -316,7 +316,7 @@ class TestAddInteraction(APITestMixin):
                 'id': contact.pk,
             }],
             'service': {
-                'id': random_obj_for_model(ServiceModel).pk,
+                'id': random_service().pk,
             },
             'was_policy_feedback_provided': False,
         }
