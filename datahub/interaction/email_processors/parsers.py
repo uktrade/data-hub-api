@@ -132,7 +132,7 @@ class CalendarInteractionEmailParser:
     def _extract_and_validate_contacts(self, all_recipients):
         contacts = []
         for recipient_email in all_recipients:
-            contact, _ = find_active_contact_by_email_address(recipient_email)
+            contact, _ = find_active_contact_by_email_address(recipient_email, 'max_interactions')
             if contact:
                 contacts.append(contact)
         if not contacts:
