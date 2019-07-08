@@ -1,1 +1,0 @@
-The ``/whoami/`` endpoint was opted out of atomic requests as it does not require them. This change is intended to help reduce the occurence of a race condition that occurs when two requests perform OAuth2 introspection on the same token.
