@@ -20,6 +20,7 @@ class OMISOrderAddedSerializer(ActivitySerializer):
             'object': {
                 'id': order_id,
                 'type': [f'dit:OMISOrder'],
+                'startTime': instance.created_on,
                 'name': instance.reference,
                 'attributedTo': [
                     self._get_company(instance.company),
