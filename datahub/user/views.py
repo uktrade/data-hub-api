@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from datahub.user.serializers import WhoAmISerializer
 
 
-@api_view()
 @transaction.non_atomic_requests
+@api_view()
 @permission_classes([IsAuthenticated])
 def who_am_i(request):
     """

@@ -1,3 +1,14 @@
+Data Hub API 13.6.1 (2019-07-08)
+================================
+
+
+
+Internal changes
+----------------
+
+- The ``/whoami/`` endpoint was opted out of atomic requests as it does not require them. This change is intended to help reduce the occurence of a race condition that occurs when two requests perform OAuth2 introspection on the same token.
+
+
 Data Hub API 13.6.0 (2019-07-02)
 ================================
 
