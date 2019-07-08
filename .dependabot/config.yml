@@ -4,8 +4,7 @@ update_configs:
     directory: "/"
     update_schedule: "weekly"
     default_reviewers:
+    - "alixedi"
     - "currycoder"
     - "elcct"
-    - "marcofucci"
-    - "marcuspp"
     - "reupen"
