@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import auto, Enum, IntEnum
 from typing import Optional, Tuple
 
 from django.db.models import Count
@@ -6,48 +6,13 @@ from django.db.models import Count
 from datahub.company.models import Contact
 
 
-def _match_contact(filter_criteria):
+class MatchStrategyName(Enum):
     """
-    This default matching strategy function will attempt to get a single result
-    for the specified criteria.
-    It will fail with an `unmatched` result if there are no matching contacts.
-    It will fail with a `multiple_matches` result if there are multiple matches
-    for this criteria.
+    Enum of contact match strategy identifiers.
     """
-    contact = None
-    try:
-        contact = Contact.objects.get(**filter_criteria)
-        contact_matching_status = ContactMatchingStatus.matched
-    except Contact.DoesNotExist:
-        contact_matching_status = ContactMatchingStatus.unmatched
-    except Contact.MultipleObjectsReturned:
-        contact_matching_status = ContactMatchingStatus.multiple_matches
 
-    return contact, contact_matching_status
-
-
-def _match_contact_max_interactions(filter_criteria):
-    """
-    This matching strategy function is the same as the default strategy, except
-    that it will prefer to return the contact with the most interactions in the
-    case where there are multiple contacts that match the criteria.
-    """
-    contact = None
-    try:
-        contact = Contact.objects.filter(**filter_criteria)\
-            .annotate(interactions_count=Count('interactions'))\
-            .order_by('-interactions_count')[0]
-        contact_matching_status = ContactMatchingStatus.matched
-    except IndexError:
-        contact_matching_status = ContactMatchingStatus.unmatched
-
-    return contact, contact_matching_status
-
-
-MATCH_STRATEGIES = {
-    'max_interactions': _match_contact_max_interactions,
-    'default': _match_contact,
-}
+    MAX_INTERACTIONS = auto()
+    DEFAULT = auto()
 
 
 class ContactMatchingStatus(IntEnum):
@@ -89,6 +54,55 @@ def find_active_contact_by_email_address(
         )
 
     return contact, matching_status
+
+
+def _match_contact(filter_criteria):
+    """
+    This default matching strategy function will attempt to get a single result
+    for the specified criteria.
+    It will fail with an `unmatched` result if there are no matching contacts.
+    It will fail with a `multiple_matches` result if there are multiple matches
+    for this criteria.
+    """
+    contact = None
+    try:
+        contact = Contact.objects.get(**filter_criteria)
+        contact_matching_status = ContactMatchingStatus.matched
+    except Contact.DoesNotExist:
+        contact_matching_status = ContactMatchingStatus.unmatched
+    except Contact.MultipleObjectsReturned:
+        contact_matching_status = ContactMatchingStatus.multiple_matches
+
+    return contact, contact_matching_status
+
+
+def _match_contact_max_interactions(filter_criteria):
+    """
+    This matching strategy function is the same as the default strategy, except
+    that it will prefer to return the contact with the most interactions in the
+    case where there are multiple contacts that match the criteria.
+    """
+    contact = None
+    try:
+        contact = Contact.objects.filter(
+            **filter_criteria,
+        ).annotate(
+            interactions_count=Count('interactions'),
+        ).order_by(
+            '-interactions_count',
+            'pk',
+        )[0]
+        contact_matching_status = ContactMatchingStatus.matched
+    except IndexError:
+        contact_matching_status = ContactMatchingStatus.unmatched
+
+    return contact, contact_matching_status
+
+
+MATCH_STRATEGIES = {
+    MatchStrategyName.MAX_INTERACTIONS: _match_contact_max_interactions,
+    MatchStrategyName.DEFAULT: _match_contact,
+}
 
 
 def _find_active_contact_using_field(value, lookup_field, match_strategy):

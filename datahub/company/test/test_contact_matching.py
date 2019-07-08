@@ -3,6 +3,7 @@ import pytest
 from datahub.company.contact_matching import (
     ContactMatchingStatus,
     find_active_contact_by_email_address,
+    MatchStrategyName,
 )
 from datahub.company.test.factories import ContactFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -49,41 +50,126 @@ EMAIL_MATCHING_CONTACT_TEST_DATA = [
     'email,expected_matching_status,match_on_alternative,match_strategy',
     (
         # same case, match on email
-        ('unique1@primary.com', ContactMatchingStatus.matched, False, 'default'),
+        ('unique1@primary.com', ContactMatchingStatus.matched, False, MatchStrategyName.DEFAULT),
         # same case, match on email_alternative
-        ('unique1@alternative.com', ContactMatchingStatus.matched, True, 'default'),
+        (
+            'unique1@alternative.com',
+            ContactMatchingStatus.matched,
+            True,
+            MatchStrategyName.DEFAULT,
+        ),
         # different case, match on email
-        ('UNIQUE1@PRIMARY.COM', ContactMatchingStatus.matched, False, 'default'),
+        (
+            'UNIQUE1@PRIMARY.COM',
+            ContactMatchingStatus.matched,
+            False,
+            MatchStrategyName.DEFAULT,
+        ),
         # different case, match on email_alternative
-        ('UNIQUE1@ALTERNATIVE.COM', ContactMatchingStatus.matched, True, 'default'),
+        (
+            'UNIQUE1@ALTERNATIVE.COM',
+            ContactMatchingStatus.matched,
+            True,
+            MatchStrategyName.DEFAULT,
+        ),
         # different
-        ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched, None, 'default'),
+        (
+            'UNIQUE@COMPANY.IO',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.DEFAULT,
+        ),
         # duplicate on email
-        ('duplicate@primary.com', ContactMatchingStatus.multiple_matches, None, 'default'),
+        (
+            'duplicate@primary.com',
+            ContactMatchingStatus.multiple_matches,
+            None,
+            MatchStrategyName.DEFAULT,
+        ),
         # duplicate on email_alternative
-        ('duplicate@alternative.com', ContactMatchingStatus.multiple_matches, None, 'default'),
+        (
+            'duplicate@alternative.com',
+            ContactMatchingStatus.multiple_matches,
+            None,
+            MatchStrategyName.DEFAULT,
+        ),
         # archived contact ignored (email value specified)
-        ('archived1@primary.com', ContactMatchingStatus.unmatched, None, 'default'),
+        (
+            'archived1@primary.com',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.DEFAULT,
+        ),
         # archived contact ignored (email_alternative value specified)
-        ('archived1@alternative.com', ContactMatchingStatus.unmatched, None, 'default'),
+        (
+            'archived1@alternative.com',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.DEFAULT,
+        ),
         # same case, match on email
-        ('unique1@primary.com', ContactMatchingStatus.matched, False, 'max_interactions'),
+        (
+            'unique1@primary.com',
+            ContactMatchingStatus.matched,
+            False,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # same case, match on email_alternative
-        ('unique1@alternative.com', ContactMatchingStatus.matched, True, 'max_interactions'),
+        (
+            'unique1@alternative.com',
+            ContactMatchingStatus.matched,
+            True,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # different case, match on email
-        ('UNIQUE1@PRIMARY.COM', ContactMatchingStatus.matched, False, 'max_interactions'),
+        (
+            'UNIQUE1@PRIMARY.COM',
+            ContactMatchingStatus.matched,
+            False,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # different case, match on email_alternative
-        ('UNIQUE1@ALTERNATIVE.COM', ContactMatchingStatus.matched, True, 'max_interactions'),
+        (
+            'UNIQUE1@ALTERNATIVE.COM',
+            ContactMatchingStatus.matched,
+            True,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # different
-        ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched, None, 'max_interactions'),
+        (
+            'UNIQUE@COMPANY.IO',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # duplicate on email
-        ('duplicate@primary.com', ContactMatchingStatus.matched, None, 'max_interactions'),
+        (
+            'duplicate@primary.com',
+            ContactMatchingStatus.matched,
+            None,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # duplicate on email_alternative
-        ('duplicate@alternative.com', ContactMatchingStatus.matched, True, 'max_interactions'),
+        (
+            'duplicate@alternative.com',
+            ContactMatchingStatus.matched,
+            True,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # archived contact ignored (email value specified)
-        ('archived1@primary.com', ContactMatchingStatus.unmatched, None, 'max_interactions'),
+        (
+            'archived1@primary.com',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
         # archived contact ignored (email_alternative value specified)
-        ('archived1@alternative.com', ContactMatchingStatus.unmatched, None, 'max_interactions'),
+        (
+            'archived1@alternative.com',
+            ContactMatchingStatus.unmatched,
+            None,
+            MatchStrategyName.MAX_INTERACTIONS,
+        ),
     ),
 )
 def test_find_active_contact_by_email_address(
