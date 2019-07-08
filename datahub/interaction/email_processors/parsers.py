@@ -6,7 +6,10 @@ import icalendar
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.company.contact_matching import find_active_contact_by_email_address
+from datahub.company.contact_matching import (
+    find_active_contact_by_email_address,
+    MatchStrategy,
+)
 from datahub.company.models.adviser import Advisor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
 
@@ -132,7 +135,10 @@ class CalendarInteractionEmailParser:
     def _extract_and_validate_contacts(self, all_recipients):
         contacts = []
         for recipient_email in all_recipients:
-            contact, _ = find_active_contact_by_email_address(recipient_email)
+            contact, _ = find_active_contact_by_email_address(
+                recipient_email,
+                MatchStrategy.MAX_INTERACTIONS,
+            )
             if contact:
                 contacts.append(contact)
         if not contacts:

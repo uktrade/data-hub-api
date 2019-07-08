@@ -1,7 +1,9 @@
 import factory
 import pytest
 
+from datahub.company.models import Contact
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
 @pytest.fixture()
@@ -33,6 +35,8 @@ def calendar_data_fixture():
         ('Bill Adama', company_1),
         ('Saul Tigh', company_1),
         ('Laura Roslin', company_2),
+        ('Sharon Valerii', company_1),
+        ('Sharon Valerii', company_2),
     ]
     for name, company in contacts:
         first_name, last_name = name.split(' ')
@@ -44,4 +48,12 @@ def calendar_data_fixture():
             email=email,
             company=company,
         )
+    # Ensure that our contact who appears on multiple companies
+    # with a single email address has more interactions for the
+    # contact attributed to 'Company 1'
+    contact_with_interactions = Contact.objects.get(
+        email='sharon.valerii@example.net',
+        company=company_1,
+    )
+    CompanyInteractionFactory(contacts=[contact_with_interactions], company=company_1)
     yield
