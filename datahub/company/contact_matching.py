@@ -25,7 +25,7 @@ class ContactMatchingStatus(IntEnum):
 
 def find_active_contact_by_email_address(
     email,
-    match_strategy='default',
+    match_strategy=MatchStrategyName.DEFAULT,
 ) -> Tuple[Optional[Contact], ContactMatchingStatus]:
     """
     Attempts to find a contact by email address.
