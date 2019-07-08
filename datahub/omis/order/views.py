@@ -62,7 +62,7 @@ class OrderViewSet(CoreViewSet):
         """Extra context provided to the serializer class."""
         return {
             **super().get_serializer_context(),
-            'current_user': self.request.user,
+            'current_user': self.request.user if self.request else None,
         }
 
 
