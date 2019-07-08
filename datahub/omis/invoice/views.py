@@ -21,7 +21,7 @@ class BaseInvoiceViewSet(BaseNestedOrderViewSet):
 
         :raises Http404: if the invoice doesn't exist
         """
-        invoice = self.get_order().invoice
+        invoice = self.get_order_or_404().invoice
         if not invoice:
             raise Http404('The specified invoice does not exist.')
         return invoice
