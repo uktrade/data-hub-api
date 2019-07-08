@@ -5,6 +5,11 @@ from django.db.models import Count
 
 from datahub.company.models import Contact
 
+# NOTE: We may want to review our approach with this utility mechanism if we
+# need to add further strategies.  It could be that a better approach is to move
+# logic to the model layer - as part of a Manager class - and also use exceptions
+# to better signpost matching problems as opposed to returning a value and status
+
 
 def _match_contact(filter_criteria):
     """
