@@ -8,7 +8,7 @@ from django.utils.timezone import utc
 
 from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
-    MatchStrategyName,
+    MatchStrategy,
 )
 from datahub.company.models.adviser import Advisor
 from datahub.email_ingestion.validation import was_email_sent_by_dit
@@ -137,7 +137,7 @@ class CalendarInteractionEmailParser:
         for recipient_email in all_recipients:
             contact, _ = find_active_contact_by_email_address(
                 recipient_email,
-                MatchStrategyName.MAX_INTERACTIONS,
+                MatchStrategy.MAX_INTERACTIONS,
             )
             if contact:
                 contacts.append(contact)

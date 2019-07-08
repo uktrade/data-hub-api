@@ -3,7 +3,7 @@ import pytest
 from datahub.company.contact_matching import (
     ContactMatchingStatus,
     find_active_contact_by_email_address,
-    MatchStrategyName,
+    MatchStrategy,
 )
 from datahub.company.test.factories import ContactFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -50,125 +50,125 @@ EMAIL_MATCHING_CONTACT_TEST_DATA = [
     'email,expected_matching_status,match_on_alternative,match_strategy',
     (
         # same case, match on email
-        ('unique1@primary.com', ContactMatchingStatus.matched, False, MatchStrategyName.DEFAULT),
+        ('unique1@primary.com', ContactMatchingStatus.matched, False, MatchStrategy.DEFAULT),
         # same case, match on email_alternative
         (
             'unique1@alternative.com',
             ContactMatchingStatus.matched,
             True,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # different case, match on email
         (
             'UNIQUE1@PRIMARY.COM',
             ContactMatchingStatus.matched,
             False,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # different case, match on email_alternative
         (
             'UNIQUE1@ALTERNATIVE.COM',
             ContactMatchingStatus.matched,
             True,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # different
         (
             'UNIQUE@COMPANY.IO',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # duplicate on email
         (
             'duplicate@primary.com',
             ContactMatchingStatus.multiple_matches,
             None,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # duplicate on email_alternative
         (
             'duplicate@alternative.com',
             ContactMatchingStatus.multiple_matches,
             None,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # archived contact ignored (email value specified)
         (
             'archived1@primary.com',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # archived contact ignored (email_alternative value specified)
         (
             'archived1@alternative.com',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.DEFAULT,
+            MatchStrategy.DEFAULT,
         ),
         # same case, match on email
         (
             'unique1@primary.com',
             ContactMatchingStatus.matched,
             False,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # same case, match on email_alternative
         (
             'unique1@alternative.com',
             ContactMatchingStatus.matched,
             True,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # different case, match on email
         (
             'UNIQUE1@PRIMARY.COM',
             ContactMatchingStatus.matched,
             False,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # different case, match on email_alternative
         (
             'UNIQUE1@ALTERNATIVE.COM',
             ContactMatchingStatus.matched,
             True,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # different
         (
             'UNIQUE@COMPANY.IO',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # duplicate on email
         (
             'duplicate@primary.com',
             ContactMatchingStatus.matched,
             None,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # duplicate on email_alternative
         (
             'duplicate@alternative.com',
             ContactMatchingStatus.matched,
             True,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # archived contact ignored (email value specified)
         (
             'archived1@primary.com',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
         # archived contact ignored (email_alternative value specified)
         (
             'archived1@alternative.com',
             ContactMatchingStatus.unmatched,
             None,
-            MatchStrategyName.MAX_INTERACTIONS,
+            MatchStrategy.MAX_INTERACTIONS,
         ),
     ),
 )

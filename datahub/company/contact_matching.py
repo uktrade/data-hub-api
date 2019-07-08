@@ -1,59 +1,9 @@
-from enum import auto, Enum, IntEnum
+from enum import Enum, IntEnum
 from typing import Optional, Tuple
 
 from django.db.models import Count
 
 from datahub.company.models import Contact
-
-
-class MatchStrategyName(Enum):
-    """
-    Enum of contact match strategy identifiers.
-    """
-
-    MAX_INTERACTIONS = auto()
-    DEFAULT = auto()
-
-
-class ContactMatchingStatus(IntEnum):
-    """Matching status (for when searching for a contact by email address)."""
-
-    matched = 1
-    unmatched = 2
-    multiple_matches = 3
-
-
-def find_active_contact_by_email_address(
-    email,
-    match_strategy=MatchStrategyName.DEFAULT,
-) -> Tuple[Optional[Contact], ContactMatchingStatus]:
-    """
-    Attempts to find a contact by email address.
-
-    Used e.g. when importing interactions to match interactions to contacts using an
-    email address.
-
-    Only non-archived contacts are checked.
-
-    The following the logic is used:
-    - if a unique match is found using Contact.email, this is used
-    - otherwise, if there is a unique match on Contact.email_alternative, this is used
-    - matching using one of these fields is delegated to the specified `match_strategy` -
-      or a default strategy if this is unspecified
-    """
-    contact, matching_status = _find_active_contact_using_field(
-        email,
-        'email',
-        match_strategy,
-    )
-    if matching_status == ContactMatchingStatus.unmatched:
-        contact, matching_status = _find_active_contact_using_field(
-            email,
-            'email_alternative',
-            match_strategy,
-        )
-
-    return contact, matching_status
 
 
 def _match_contact(filter_criteria):
@@ -99,13 +49,7 @@ def _match_contact_max_interactions(filter_criteria):
     return contact, contact_matching_status
 
 
-MATCH_STRATEGIES = {
-    MatchStrategyName.MAX_INTERACTIONS: _match_contact_max_interactions,
-    MatchStrategyName.DEFAULT: _match_contact,
-}
-
-
-def _find_active_contact_using_field(value, lookup_field, match_strategy):
+def _find_active_contact_using_field(value, lookup_field, match_strategy_func):
     """
     Looks up a contact by performing a case-insensitive search on a particular field.
 
@@ -113,11 +57,64 @@ def _find_active_contact_using_field(value, lookup_field, match_strategy):
 
     :param value: The value to search for
     :param lookup_field: The name of the field to search
-    :param match_strategy: The name of strategy to use when matching a contact
+    :param match_strategy_func: The function to use when matching a contact
     """
     filter_kwargs = {
         'archived': False,
         f'{lookup_field}__iexact': value,
     }
-    match_func = MATCH_STRATEGIES[match_strategy]
-    return match_func(filter_kwargs)
+    return match_strategy_func(filter_kwargs)
+
+
+class MatchStrategy(Enum):
+    """
+    Enum of contact match strategy functions.
+    """
+
+    MAX_INTERACTIONS = _match_contact_max_interactions
+    DEFAULT = _match_contact
+
+
+class ContactMatchingStatus(IntEnum):
+    """Matching status (for when searching for a contact by email address)."""
+
+    matched = 1
+    unmatched = 2
+    multiple_matches = 3
+
+
+def find_active_contact_by_email_address(
+    email,
+    match_strategy_func=MatchStrategy.DEFAULT,
+) -> Tuple[Optional[Contact], ContactMatchingStatus]:
+    """
+    Attempts to find a contact by email address.  Returns a tuple consisting of
+    the Contact that was found (or None) and the ContactMatchingStatus.
+
+    Used e.g. when importing interactions to match interactions to contacts using an
+    email address.
+
+    Only non-archived contacts are checked.
+
+    The following the logic is used:
+    - if a unique match is found using Contact.email, this is used
+    - otherwise, if there is a unique match on Contact.email_alternative, this is used
+    - matching using one of these fields is delegated to the specified `match_strategy` -
+      or a default strategy if this is unspecified.
+      The match strategy will determine whether a contact is found according to
+      certain situations - the ContactMatchingStatus returned will be set by
+      the match strategy.
+    """
+    contact, matching_status = _find_active_contact_using_field(
+        email,
+        'email',
+        match_strategy_func,
+    )
+    if matching_status == ContactMatchingStatus.unmatched:
+        contact, matching_status = _find_active_contact_using_field(
+            email,
+            'email_alternative',
+            match_strategy_func,
+        )
+
+    return contact, matching_status
