@@ -24,6 +24,7 @@ class IProjectCreatedSerializer(ActivitySerializer):
             'object': {
                 'id': project_id,
                 'type': [f'dit:InvestmentProject'],
+                'startTime': instance.created_on,
                 'name': instance.name,
                 'dit:investmentType': {
                     'name': instance.investment_type.name,

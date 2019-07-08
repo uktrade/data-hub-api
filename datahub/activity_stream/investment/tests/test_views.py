@@ -46,6 +46,7 @@ def test_investment_project_added(api_client):
                 'object': {
                     'id': f'dit:DataHubInvestmentProject:{project.id}',
                     'type': ['dit:InvestmentProject'],
+                    'startTime': format_date_or_datetime(project.created_on),
                     'name': project.name,
                     'dit:investmentType': {
                         'name': project.investment_type.name,
@@ -117,6 +118,7 @@ def test_investment_project_with_pm_added(api_client):
                 'object': {
                     'id': f'dit:DataHubInvestmentProject:{project.id}',
                     'type': ['dit:InvestmentProject'],
+                    'startTime': format_date_or_datetime(project.created_on),
                     'name': project.name,
                     'dit:investmentType': {
                         'name': project.investment_type.name,
@@ -191,6 +193,7 @@ def test_investment_project_verify_win_added(api_client):
                 'object': {
                     'id': f'dit:DataHubInvestmentProject:{project.id}',
                     'type': ['dit:InvestmentProject'],
+                    'startTime': format_date_or_datetime(project.created_on),
                     'name': project.name,
                     'dit:investmentType': {
                         'name': project.investment_type.name,
@@ -266,6 +269,7 @@ def test_investment_project_added_with_gva(api_client):
                 'object': {
                     'id': f'dit:DataHubInvestmentProject:{project.id}',
                     'type': ['dit:InvestmentProject'],
+                    'startTime': format_date_or_datetime(project.created_on),
                     'name': project.name,
                     'dit:investmentType': {
                         'name': project.investment_type.name,
