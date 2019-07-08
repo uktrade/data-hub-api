@@ -208,22 +208,47 @@ class BaseNestedOrderViewSet(CoreViewSet):
 
     def get_order(self):
         """
+        :returns: the main order from url kwargs (or None if it a matching order is not found).
+        """
+        try:
+            return self.order_queryset.get(
+                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]},
+            )
+        except (Order.DoesNotExist, KeyError):
+            return None
+
+    def get_order_or_404(self):
+        """
         :returns: the main order from url kwargs.
 
         :raises Http404: if the order doesn't exist
         """
-        try:
-            order = self.order_queryset.get(
-                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]},
-            )
-        except Order.DoesNotExist:
+        order = self.get_order()
+
+        if not order:
             raise Http404('The specified order does not exist.')
+
         return order
 
+    def initial(self, request, *args, **kwargs):
+        """
+        Makes sure that the order_pk in the URL path refers to an existent order.
+
+        :raises Http404: if a matching order cannot be found
+        """
+        super().initial(request, *args, **kwargs)
+
+        self.get_order_or_404()
+
     def get_serializer_context(self):
-        """Extra context provided to the serializer class."""
+        """
+        Extra context provided to the serializer class.
+
+        Note: The DRF built-in docs feature will call this function with an empty dict in
+        self.kwargs. The function should not fail in this case.
+        """
         return {
             **super().get_serializer_context(),
             'order': self.get_order(),
-            'current_user': self.request.user,
+            'current_user': self.request.user if self.request else None,
         }
