@@ -573,3 +573,5 @@ for environ_name in domain_environ_names:
             for domain, auth in domain_details.items()
         }
     )
+
+DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
