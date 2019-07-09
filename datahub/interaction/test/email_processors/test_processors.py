@@ -114,13 +114,12 @@ class TestCalendarInteractionEmailProcessor:
             **interaction_data_overrides,
         }
         email_parser_mock = self._get_email_parser_mock(interaction_data, monkeypatch)
-        assert not Interaction.objects.count()
 
         # Process the message and save a draft interaction
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock.Mock())
         assert result is True
-        interaction = Interaction.objects.first()
+        interaction = Interaction.objects.get(source__meeting__id='12345')
         assert message == f'Successfully created interaction #{interaction.id}'
 
         # Verify dit_participants holds all of the advisers for the interaction
