@@ -21,7 +21,7 @@ class BaseQuoteViewSet(BaseNestedOrderViewSet):
 
         :raises Http404: if the quote doesn't exist
         """
-        quote = self.get_order().quote
+        quote = self.get_order_or_404().quote
         if not quote:
             raise Http404('The specified quote does not exist.')
         return quote

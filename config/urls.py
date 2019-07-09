@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from oauth2_provider.views import TokenView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.documentation import include_docs_urls
 
 from config import api_urls
 from datahub.ping.views import ping
@@ -25,15 +27,28 @@ unversioned_urls = [
     ),
 ]
 
+if settings.ENABLE_API_DOCUMENTATION:
+    unversioned_urls += [
+        path(
+            'docs',
+            include_docs_urls(
+                title=settings.API_DOCUMENTATION_TITLE,
+                authentication_classes=[SessionAuthentication],
+            ),
+        ),
+    ]
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    unversioned_urls += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]
+
+
 urlpatterns = [
     # V1 has actually no version in the URL
     path('', include((api_urls.v1_urls, 'api'), namespace='api-v1')),
     path('v3/', include((api_urls.v3_urls, 'api'), namespace='api-v3')),
     path('v4/', include((api_urls.v4_urls, 'api'), namespace='api-v4')),
 ] + unversioned_urls
-
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ]
