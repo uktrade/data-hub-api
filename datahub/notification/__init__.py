@@ -1,3 +1,3 @@
-from datahub.notification import core
+from datahub.notification.core import client
 
-client = core.client
+__all__ = ('client',)

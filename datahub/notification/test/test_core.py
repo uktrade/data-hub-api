@@ -17,9 +17,7 @@ def test_send_email_notification(context):
     to the underlying notify library as expected.
     """
     client.send_email_notification('john.smith@example.net', 'foobar', context)
-    expected_context = context
-    if not context:
-        expected_context = {}
+    expected_context = context or {}
     notification_api_client = client.client
     notification_api_client.send_email_notification.assert_called_with(
         email_address='john.smith@example.net',

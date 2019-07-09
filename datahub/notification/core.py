@@ -7,7 +7,7 @@ from notifications_python_client.notifications import NotificationsAPIClient
 
 class NotificationClient:
     """
-    Class for accessing underlying GOVUK notification service.
+    For accessing underlying GOVUK notification service.
     """
 
     def __init__(self):
