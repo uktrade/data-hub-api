@@ -1,3 +1,23 @@
+Data Hub API 13.7.0 (2019-07-09)
+================================
+
+
+
+Internal changes
+----------------
+
+- **Interactions** The meeting email invites ingestion parsing logic was adjusted to use a new ``max_interactions``
+  strategy for finding a contact.  This ensures that when multiple contacts are
+  found which match the same email address, the contact with the most interactions
+  attributed to it takes precedence.  It's an imperfect solution, but acts as a best
+  guess for imperfect data.
+
+API
+---
+
+- The activity-stream payload for OMIS and investment projects will now contain ``startTime``.
+
+
 Data Hub API 13.6.1 (2019-07-08)
 ================================
 
