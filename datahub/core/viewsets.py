@@ -25,6 +25,30 @@ class CoreViewSet(
 ):
     """Base class for view sets."""
 
+    @classmethod
+    def as_action_view(cls, action):
+        """
+        Creates a view for a method decorated with the @action decorator.
+
+        Usage example:
+
+            from rest_framework.decorators import action
+
+            class CompanyViewSet(CoreViewSet):
+                @action(methods=['post'], detail=True)
+                def archive(self, request, pk):
+                    pass
+
+            path(
+                'company/<uuid:pk>/archive',
+                CompanyViewSet.as_action_view('archive'),
+                name='archive',
+            )
+        """
+        method = getattr(cls, action)
+        mapping = dict(method.mapping)
+        return cls.as_view(mapping, **method.kwargs)
+
     def perform_create(self, serializer):
         """Custom logic for creating the model instance."""
         extra_data = self.get_additional_data(True)

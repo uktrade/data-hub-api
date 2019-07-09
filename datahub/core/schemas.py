@@ -25,6 +25,9 @@ class ExplicitSerializerSchema(AutoSchema):
             )
             def archive(self, request, pk):
                 pass
+
+
+    See also: CoreViewSet.as_action_view
     """
 
     def __init__(self, serializer_cls, *args, **kwargs):
