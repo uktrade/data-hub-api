@@ -122,7 +122,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_online/sample.eml',
                 {
                     'adviser_email': 'adviser1@trade.gov.uk',
-                    'contact_emails': ['bill.adama@example.net'],
+                    'contact_details': [
+                        ('bill.adama@example.net', 'Company 1'),
+                    ],
                     'secondary_adviser_emails': [],
                     'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 12, 0, tzinfo=utc),
@@ -142,10 +144,11 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/gmail/sample.eml',
                 {
                     'adviser_email': 'adviser3@digital.trade.gov.uk',
-                    'contact_emails': [
-                        'bill.adama@example.net',
-                        'saul.tigh@example.net',
-                        'laura.roslin@example.net',
+                    'contact_details': [
+                        ('bill.adama@example.net', 'Company 1'),
+                        ('saul.tigh@example.net', 'Company 1'),
+                        ('laura.roslin@example.net', 'Company 2'),
+                        ('sharon.valerii@example.net', 'Company 1'),
                     ],
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'top_company_name': 'Company 1',
@@ -169,8 +172,11 @@ class TestCalendarInteractionEmailParser:
         parser = self._get_parser_for_email_file(email_file)
         interaction_data = parser.extract_interaction_data_from_email()
         assert interaction_data['sender'].email == expected_interaction_data['adviser_email']
-        contact_emails = {contact.email for contact in interaction_data['contacts']}
-        assert contact_emails == set(expected_interaction_data['contact_emails'])
+        contacts = interaction_data['contacts']
+        expected_contacts = expected_interaction_data['contact_details'][:]
+        for contact in contacts:
+            expected_contacts.remove((contact.email, contact.company.name))
+        assert len(expected_contacts) == 0
         secondary_adviser_emails = {
             adviser.email for adviser in interaction_data['secondary_advisers']
         }

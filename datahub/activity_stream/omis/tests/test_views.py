@@ -43,6 +43,7 @@ def test_omis_order_added_activity(api_client, order_overrides):
                 'object': {
                     'id': f'dit:DataHubOMISOrder:{order.id}',
                     'type': ['dit:OMISOrder'],
+                    'startTime': format_date_or_datetime(order.created_on),
                     'name': order.reference,
                     'attributedTo': [
                         {
