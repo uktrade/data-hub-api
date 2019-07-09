@@ -7,6 +7,7 @@ from datahub.metadata.registry import registry
 
 def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
+    model = mapping.queryset.model
 
     attrs = {
         'authentication_classes': (),
@@ -17,6 +18,7 @@ def _create_metadata_view(mapping):
         'permission_classes': (),
         'queryset': mapping.queryset,
         'serializer_class': mapping.serializer,
+        '__doc__': f'List all {model._meta.verbose_name_plural}.',
     }
 
     view_set = type(
