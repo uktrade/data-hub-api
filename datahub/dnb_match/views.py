@@ -1,7 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from datahub.company.models import Company
 from datahub.dnb_match.serializers import (
@@ -15,25 +16,29 @@ from datahub.dnb_match.utils import (
 from datahub.oauth.scopes import Scope
 
 
-class BaseMatchingInformationAPIView(GenericAPIView):
+class BaseMatchingInformationAPIView(APIView):
     """Base matching information APIView."""
 
     required_scopes = (Scope.internal_front_end,)
 
     queryset = Company.objects.select_related('dnbmatchingresult')
 
-    lookup_url_kwarg = 'company_pk'
+    def _get_company(self):
+        obj = get_object_or_404(self.queryset, pk=self.kwargs['company_pk'])
+        self.check_object_permissions(self.request, obj)
 
-    def _get_matching_information(self):
+        return obj
+
+    @classmethod
+    def _get_matching_information(cls, company):
         """Get matching candidates and current selection."""
-        company = self.get_object()
         try:
             matching_result = company.dnbmatchingresult.data
         except ObjectDoesNotExist:
             matching_result = {}
 
         response = {
-            'result': self._get_dnb_match_result(matching_result),
+            'result': cls._get_dnb_match_result(matching_result),
             'candidates': _get_list_of_latest_match_candidates(company.pk),
             'company': model_to_dict(company, fields=('id', 'name', 'trading_names')),
         }
@@ -57,7 +62,9 @@ class MatchingInformationAPIView(BaseMatchingInformationAPIView):
 
     def get(self, request, **kwargs):
         """Get matching information."""
-        return self._get_matching_information()
+        company = self._get_company()
+
+        return self._get_matching_information(company)
 
 
 class SelectMatchAPIView(BaseMatchingInformationAPIView):
@@ -65,16 +72,17 @@ class SelectMatchAPIView(BaseMatchingInformationAPIView):
 
     def post(self, request, **kwargs):
         """Create match selection."""
-        company = self.get_object()
+        company = self._get_company()
 
         serializer = SelectMatchingCandidateSerializer(
             data=request.data,
-            context={**self.get_serializer_context(), 'company': company},
+            context={'request': request, 'company': company},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        company.refresh_from_db()
 
-        return self._get_matching_information()
+        return self._get_matching_information(company)
 
 
 class SelectNoMatchAPIView(BaseMatchingInformationAPIView):
@@ -82,16 +90,17 @@ class SelectNoMatchAPIView(BaseMatchingInformationAPIView):
 
     def post(self, request, **kwargs):
         """Create no match."""
-        company = self.get_object()
+        company = self._get_company()
 
         serializer = SelectNoMatchSerializer(
             data=request.data,
-            context={**self.get_serializer_context(), 'company': company},
+            context={'request': request, 'company': company},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        company.refresh_from_db()
 
-        return self._get_matching_information()
+        return self._get_matching_information(company)
 
 
 def _replace_dnb_country_fields(data):

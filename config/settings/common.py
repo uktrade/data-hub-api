@@ -265,6 +265,11 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
+# Currently the docs (at /docs) are behind at setting as they are not fully accurate yet
+# TODO: Remove this once we are happy with the docs
+ENABLE_API_DOCUMENTATION = env.bool('ENABLE_API_DOCUMENTATION', default=False)
+API_DOCUMENTATION_TITLE = 'Data Hub API'
+
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 
@@ -568,3 +573,5 @@ for environ_name in domain_environ_names:
             for domain, auth in domain_details.items()
         }
     )
+
+DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
