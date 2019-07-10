@@ -255,6 +255,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
+| `ENABLE_API_DOCUMENTATION` | No | Whether API documentation is made available at the URL path `/docs` (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
@@ -304,6 +305,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
 
 
 ## Management commands
