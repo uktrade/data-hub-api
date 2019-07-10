@@ -1,3 +1,33 @@
+Data Hub API 13.8.0 (2019-07-10)
+================================
+
+
+
+Features
+--------
+
+- The Django Rest Framework built-in documentation was enabled at the URL path ``/docs``.
+
+  This is currently only enabled if the ``ENABLE_API_DOCUMENTATION`` environment variable is
+  set to ``True`` as the documentation is not fully functional as yet.
+
+  You must also log into Django admin prior to accessing ``/docs``.
+- A new ``notification`` django app was added for the purpose of sending notifications
+  to Data Hub advisers and contacts.  This is a wrapper around the GOVUK Notify 
+  service and will be used initially for sending receipt/bounce notifications to 
+  advisers who use the meeting invite email ingestion tool.
+
+  The app has not yet been added to ``settings.INSTALLED_APPS``; this will happen
+  as part of the follow-up work to use the notification app in the meeting invite
+  email ingestion logic.
+
+Bug fixes
+---------
+
+- An upgrade to sentry-sdk was reverted due to an `observed memory leak
+  <https://github.com/getsentry/sentry-python/issues/419>`_.
+
+
 Data Hub API 13.7.0 (2019-07-09)
 ================================
 
