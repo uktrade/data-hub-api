@@ -1,6 +1,7 @@
 import datetime
 from operator import attrgetter, itemgetter
 from unittest.mock import patch
+from uuid import uuid4
 
 import pytest
 from django.utils.timezone import utc
@@ -153,6 +154,46 @@ DELETE_PERMISSIONS = (
 
 class TestEvidenceDocumentViews(APITestMixin):
     """Tests for the evidence document views."""
+
+    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    def test_collection_view_returns_404_if_project_doesnt_exist(self, http_method):
+        """
+        Test that the collection view returns a 404 if the project ID specified in the URL path
+        doesn't exist.
+        """
+        url = reverse(
+            'api-v3:investment:evidence-document:document-collection',
+            kwargs={
+                'project_pk': uuid4(),
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize(
+        'viewname,http_method',
+        (
+            ('api-v3:investment:evidence-document:document-item', 'get'),
+            ('api-v3:investment:evidence-document:document-item', 'delete'),
+            ('api-v3:investment:evidence-document:document-item-callback', 'post'),
+            ('api-v3:investment:evidence-document:document-item-download', 'get'),
+        ),
+    )
+    def test_item_views_return_404_if_project_doesnt_exist(self, viewname, http_method):
+        """
+        Test that the various item views return a 404 if the project ID specified in the URL
+        path doesn't exist.
+        """
+        entity_document = create_evidence_document(user=self.user)
+        url = reverse(
+            viewname,
+            kwargs={
+                'project_pk': uuid4(),
+                'entity_document_pk': entity_document.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize('permissions,associated,allowed', ADD_PERMISSIONS)
     @patch.object(Document, 'get_signed_upload_url')
