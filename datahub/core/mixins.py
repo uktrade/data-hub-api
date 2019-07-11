@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from datahub.core.schemas import ExplicitSerializerSchema
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -32,7 +33,11 @@ class ArchivableViewSetMixin:
     archive_validators = []
     unarchive_validators = []
 
-    @action(methods=['post'], detail=True)
+    @action(
+        methods=['post'],
+        detail=True,
+        schema=ExplicitSerializerSchema(ArchiveSerializer),
+    )
     def archive(self, request, pk):
         """Archive the object."""
         obj = self.get_object()
@@ -51,7 +56,11 @@ class ArchivableViewSetMixin:
         obj_serializer = self.get_serializer_class()(obj)
         return Response(data=obj_serializer.data)
 
-    @action(methods=['post'], detail=True)
+    @action(
+        methods=['post'],
+        detail=True,
+        schema=ExplicitSerializerSchema(UnarchiveSerializer),
+    )
     def unarchive(self, request, pk):
         """Unarchive the object."""
         obj = self.get_object()

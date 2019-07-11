@@ -12,13 +12,9 @@ item = InteractionViewSet.as_view({
     'patch': 'partial_update',
 })
 
-archive_item = InteractionViewSet.as_view({
-    'post': 'archive',
-})
+archive_item = InteractionViewSet.as_action_view('archive')
 
-unarchive_item = InteractionViewSet.as_view({
-    'post': 'unarchive',
-})
+unarchive_item = InteractionViewSet.as_action_view('unarchive')
 
 urlpatterns = [
     path('interaction', collection, name='collection'),

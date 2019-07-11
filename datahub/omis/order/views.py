@@ -1,9 +1,11 @@
 from django.http import Http404
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from datahub.core.schemas import ExplicitSerializerSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
@@ -28,6 +30,11 @@ class OrderViewSet(CoreViewSet):
         'primary_market',
     )
 
+    @action(
+        methods=['post'],
+        detail=True,
+        schema=ExplicitSerializerSchema(CompleteOrderSerializer),
+    )
     def complete(self, request, *args, **kwargs):
         """Complete an order."""
         instance = self.get_object()
@@ -43,6 +50,11 @@ class OrderViewSet(CoreViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(
+        methods=['post'],
+        detail=True,
+        schema=ExplicitSerializerSchema(CancelOrderSerializer),
+    )
     def cancel(self, request, *args, **kwargs):
         """Cancel an order."""
         instance = self.get_object()

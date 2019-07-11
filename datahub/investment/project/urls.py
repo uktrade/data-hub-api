@@ -41,13 +41,9 @@ audit_item = IProjectAuditViewSet.as_view({
     'get': 'list',
 })
 
-archive_item = IProjectViewSet.as_view({
-    'post': 'archive',
-})
+archive_item = IProjectViewSet.as_action_view('archive')
 
-unarchive_item = IProjectViewSet.as_view({
-    'post': 'unarchive',
-})
+unarchive_item = IProjectViewSet.as_action_view('unarchive')
 
 
 urlpatterns = [
