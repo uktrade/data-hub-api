@@ -49,7 +49,7 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-
+from datahub.user.company_list.tests.factories import CompanyListItemFactory
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
@@ -65,7 +65,10 @@ INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_
 MAPPING = {
     'company.Company': {
         'factory': CompanyFactory,
-        'implicitly_deletable_models': {'investor_profile.LargeCapitalInvestorProfile'},
+        'implicitly_deletable_models': {
+            'company_list.CompanyListItem',
+            'investor_profile.LargeCapitalInvestorProfile',
+        },
         'expired_objects_kwargs': [
             {
                 'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
@@ -110,6 +113,12 @@ MAPPING = {
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': CompanyListItemFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [{}],
+                'unexpired_objects_kwargs': [],
             },
             {
                 'factory': ContactFactory,
@@ -552,7 +561,7 @@ def test_mappings(model_label, config):
             relation['factory']._meta.get_model_class()
             for relation in mapping['relations']
         }
-        assert related_models_in_config == related_models_in_mapping, (
+        assert related_models_in_config <= related_models_in_mapping, (
             f'Missing test cases for relation filters for model {model_label} detected'
         )
 

@@ -17,6 +17,18 @@
     - - view_company
       - company
       - company
+    - - view_companylistitem
+      - company_list
+      - companylistitem
+    - - add_companylistitem
+      - company_list
+      - companylistitem
+    - - change_companylistitem
+      - company_list
+      - companylistitem
+    - - delete_companylistitem
+      - company_list
+      - companylistitem
     - - add_contact
       - company
       - contact
@@ -111,6 +123,18 @@
     - - view_company
       - company
       - company
+    - - view_companylistitem
+      - company_list
+      - companylistitem
+    - - add_companylistitem
+      - company_list
+      - companylistitem
+    - - change_companylistitem
+      - company_list
+      - companylistitem
+    - - delete_companylistitem
+      - company_list
+      - companylistitem
     - - add_contact
       - company
       - contact
@@ -262,6 +286,18 @@
     - - export_company
       - company
       - company
+    - - view_companylistitem
+      - company_list
+      - companylistitem
+    - - add_companylistitem
+      - company_list
+      - companylistitem
+    - - change_companylistitem
+      - company_list
+      - companylistitem
+    - - delete_companylistitem
+      - company_list
+      - companylistitem
     - - add_contact
       - company
       - contact
