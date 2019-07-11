@@ -22,12 +22,12 @@ internal_frontend_urls = [
     ),
     path(
         'order/<uuid:pk>/complete',
-        OrderViewSet.as_view({'post': 'complete'}),
+        OrderViewSet.as_action_view('complete'),
         name='complete',
     ),
     path(
         'order/<uuid:pk>/cancel',
-        OrderViewSet.as_view({'post': 'cancel'}),
+        OrderViewSet.as_action_view('cancel'),
         name='cancel',
     ),
 
