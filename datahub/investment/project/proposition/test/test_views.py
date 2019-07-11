@@ -2310,6 +2310,10 @@ class TestPropositionDocumentViews(APITestMixin):
     @patch('datahub.documents.tasks.delete_document.apply_async')
     def test_document_delete_without_permission(self, delete_document):
         """Tests user can't delete document without permissions."""
+        user = create_test_user(
+            permission_codenames=(),
+            dit_team=TeamFactory(),
+        )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk, original_filename='test.txt',
@@ -2325,7 +2329,8 @@ class TestPropositionDocumentViews(APITestMixin):
                 'entity_document_pk': entity_document.pk,
             },
         )
-        response = self.api_client.delete(url)
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert delete_document.called is False
 
@@ -2415,6 +2420,10 @@ class TestPropositionDocumentViews(APITestMixin):
 
     def test_document_upload_status_no_status_without_permission(self):
         """Tests user without permission can't call upload status endpoint."""
+        user = create_test_user(
+            permission_codenames=(),
+            dit_team=TeamFactory(),
+        )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk, original_filename='test.txt',
@@ -2429,7 +2438,8 @@ class TestPropositionDocumentViews(APITestMixin):
             },
         )
 
-        response = self.api_client.post(url, data={})
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, data={})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
