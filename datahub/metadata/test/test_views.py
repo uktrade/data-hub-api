@@ -94,6 +94,7 @@ def test_view_name_generation():
     assert {pattern.name for pattern in patterns} == frozenset(registry.mappings.keys())
 
 
+@pytest.mark.usefixtures('service_answers_feature_flag')
 def test_ordered_metadata_order_view(ordered_mapping, api_client):
     """
     Test that views with BaseOrderedConstantModel are ordered by the `order` field.
@@ -209,7 +210,7 @@ class TestServiceView:
         """
         url = reverse(viewname='service')
         response = api_client.get(url)
-        service = Service.objects.order_by('name')[0]
+        service = Service.objects.order_by('order')[0]
 
         assert response.status_code == status.HTTP_200_OK
         services = response.json()

@@ -1,0 +1,1348 @@
+- model: metadata.service
+  pk: 0396b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:25:20.000Z'
+    name: Gateway to Global Growth
+    order: 100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 041e7ce1-9d5a-4ce6-b77c-088aef9d816b
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : General Export Enquiry'
+    order: 200.0
+    contexts: ["event", "export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0496b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:39.000Z'
+    name: SG Special Reports
+    order: 300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0596b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Investment - Services
+    order: 2250.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 05c8175a-abf5-4cc6-af34-bcee8699fd4b
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Transferred to DA (IST use only)"
+    order: 3350.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : Outward Mission'
+    order: 690.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0796b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : DSO Interaction'
+    order: 610.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0896b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:04.000Z'
+    name: New Products from Britain (NPFB)
+    order: 800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 09073992-2476-481d-8341-ee575d1f541e
+  fields:
+    disabled_on: null
+    name: 'Account Management : Healthcare UK'
+    order: 511.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0996b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (04) - Action Plan
+    order: 1000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0a96b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (03) - ITR
+    order: 1100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Overseas Business Network Chargeable
+      Services (OBN)'
+    order: 611.0
+    contexts: ["export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 125c80b4-1209-4e24-9bf8-4f350fe13ed7
+  fields:
+    disabled_on: '2018-05-21T14:53:51.000Z'
+    name: Investment - IST Project Manager Notification (IST use only)
+    order: 1300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 12907483-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:26.999Z'
+    name: Overseas Business Network Advisers One-to-One
+    order: 1400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Great International Trade Campaign'
+    order: 660.0
+    contexts: ["event", "other_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Export Introductions
+    order: 310.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 1632b942-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999Z'
+    name: UKEF - Export Insurance Policy
+    order: 1700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 1e36073d-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000Z'
+    name: Trade - P2E (09) - Exit Letter
+    order: 1800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 1ec4e4b9-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - G3 (09) - Exit Letter
+    order: 1900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 1ec5548f-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (07) - Revised Action Plans
+    order: 2000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 1f7de16b-b7ce-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:10.000Z'
+    name: TPU - Opportunity Status
+    order: 2100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 21c3d5d2-9c8f-4dc0-bfd1-aa3ef8769a91
+  fields:
+    disabled_on: '2019-02-14T10:53:20.000Z'
+    name: "Global Growth Pilot (2017) \u2013 Diagnostic completed"
+    order: 2200.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 21f2c8c2-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000Z'
+    name: Investment - IST Research Request (IST use only)
+    order: 2300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 2591b204-8a31-4824-a93b-d7a03dca8cb5
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Assigned to IST-CMC (IST use only)"
+    order: 2400.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 273132d7-de50-41a7-a994-ff7d93302092
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : Someone else in DIT'
+    order: 311.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 330bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Trade - Enquiry
+    order: 2600.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : Market Visit'
+    order: 691.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 34f583c0-6ac8-4981-9954-859c0e568204
+  fields:
+    disabled_on: null
+    name: 'Enquiry received : Other Inbound Investment Referral'
+    order: 233.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 350bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Export Win
+    order: 710.0
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 360bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Overseas Market Introduction
+      Service (OMIS)'
+    order: 612.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : Inward Mission'
+    order: 692.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 380bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Tradeshow Access Programme (TAP)'
+    order: 613.0
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 38a67092-f485-4ea1-8a1a-402b949d2d13
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Assigned to HQ (IST use only)"
+    order: 3300.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 390bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:31:48.000Z'
+    name: Trade - G3 - Actions Record
+    order: 3400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 394b3f03-67ee-4a1a-b7bb-c2a249ab879c
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : UK Export Finance (UKEF)'
+    order: 312.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 3a0bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Enquiry received : General Investment Enquiry'
+    order: 230.0
+    contexts: ["investment_interaction", "investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3a812c0a-62ee-e411-bbc1-e4115bead28a
+  fields:
+    disabled_on: '2015-10-15T11:38:32.000Z'
+    name: "First Time Exporters \u2013 Other"
+    order: 3700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3b679865-ea99-e711-ba5d-e4115bead28a
+  fields:
+    disabled_on: '2019-02-14T10:53:08.000Z'
+    name: Global Growth Pilot (2017)
+    order: 3900.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3b848e75-49fd-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000Z'
+    name: Postgraduates for Interrnational Business - Placement
+    order: 4000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3d6d5ad0-4492-466f-a0d7-1e13f20f8528
+  fields:
+    disabled_on: '2019-02-14T10:53:48.000Z'
+    name: "Global Growth Pilot (2017) \u2013 GGP process complete"
+    order: 4100.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3ef6d80b-609a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999Z'
+    name: Trade - ECR Web Exit Letter
+    order: 4200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 3f5a2216-8cb1-4fb7-9c6b-06ba77d7405b
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Other Introductions
+    order: 360.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'IST Specific Service : IST Visit'
+    order: 830.0
+    contexts: ["investment_interaction", "investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 43dd37db-325f-4cd4-9418-a62ab9c53dda
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Referral to UKEF
+    order: 4500.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 44345a68-49fd-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.000Z'
+    name: Postgraduates for Interrnational Business - Referral
+    order: 4700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 4664f856-166f-4f48-9865-653250f84086
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Diagnostic
+      and Output Report Completed by DIT'
+    order: 614.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 46cd2e66-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999Z'
+    name: UKEF - EFA Advice
+    order: 4900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 47513afa-8313-4ec9-931e-849d4cdd4959
+  fields:
+    disabled_on: null
+    name: 'Enquiry received : HPO High Potential Opportunity Investment Enquiry via
+      IST Target Company'
+    order: 231.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 482fca2e-3bfa-4c4f-8649-17d292aad87f
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Signed
+      Export Growth Plan Received from Company'
+    order: 615.0
+    contexts: ["export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 4840b339-ddc9-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:40.000Z'
+    name: TPU - Opportunity Interest
+    order: 5200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 48e6bc3e-56c5-4bdc-a718-093614547d73
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Transferred to LEP (IST use only)"
+    order: 5300.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 496f0ce8-dcc9-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:44:56.000Z'
+    name: TPU - Opportunity
+    order: 5400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 4d74b1e4-8d16-e611-9bdc-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:12.000Z'
+    name: "Investment \u2013 IST Business Development Multiplier (IST use only)"
+    order: 5500.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 4f142041-2b9d-4776-ace8-22612260eae6
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Confirmed prospect project status (IST use only)"
+    order: 5600.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 50db464c-ea17-4d24-b0f7-75e6a452f82c
+  fields:
+    disabled_on: '2019-02-14T10:53:34.000Z'
+    name: "Global Growth Pilot (2017) \u2013 Eligible GGP customer"
+    order: 5700.0
+    contexts: ["other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 510a4016-4bb9-e211-a646-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : Webinar'
+    order: 693.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5359ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999Z'
+    name: Exhibitions (Not TAP)
+    order: 5900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5459ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000Z'
+    name: Passport Aftercare
+    order: 6000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 549d657d-6930-413d-a14e-18a6427467be
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : Financial and Professional Service Providers'
+    order: 313.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 5559ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:21.000Z'
+    name: Open to Export Assist (OtE)
+    order: 6200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 561c6040-db21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999Z'
+    name: UKEF - Bond Support Scheme
+    order: 6300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5659ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000Z'
+    name: BIS Interaction
+    order: 6400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific Service : Digital Trade Advisers One-to-One'
+    order: 661.0
+    contexts: ["other_interaction", "other_service_delivery", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5759ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2016-05-04T10:56:10.000Z'
+    name: XXX
+    order: 6600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5859ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999Z'
+    name: Trade - OMIS/MSS
+    order: 6700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 58da3eec-a906-48eb-b258-bd3fb0717e7a
+  fields:
+    disabled_on: null
+    name: 'A Specific Service : Significant Assistance'
+    order: 662.0
+    contexts: ["other_service_delivery", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5959ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Investment - Aftercare Company Visit
+    order: 2251.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5befb468-3173-e511-9d3c-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000Z'
+    name: First Time Exporters - Export Insight Visits
+    order: 7000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 5e7ca186-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (05) - Combined 2 & 3
+    order: 7100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 60986f5c-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (05) - Combined 2 & 3
+    order: 7200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 630a242e-c8b9-403d-b9a8-fcddada25051
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Financial and Professional Service Providers'
+    order: 330.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 632b8708-28b6-e611-984a-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : Local Partner Referral'
+    order: 210.0
+    contexts: ["event", "export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 64fc348f-137d-4cc1-8685-6ca15fd3206a
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Investment Opportunities'
+    order: 331.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 65dc115c-dcd8-4441-9d3a-76285a979aa4
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : Other Inbound Referral'
+    order: 220.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 66b76d45-be8f-4828-81fb-9ca9e4b29642
+  fields:
+    disabled_on: null
+    name: 'Enquiry received : HPO High Potential Opportunity Investment Enquiry via
+      IIGB'
+    order: 232.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 6a27f71a-6b4b-4e8f-83b8-35615c13fdc8
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Engagement
+      Letter Signed by Company'
+    order: 616.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 6e3db1a1-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (08) - Evaluation Form
+    order: 7900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 735da232-8058-44a5-be69-5c0e2bec0b7e
+  fields:
+    disabled_on: null
+    name: 'Making Other Introductions : Financial and Professional Service Providers'
+    order: 361.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 73ceedc1-c139-4bdf-9e47-17b1bae488da
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Requested more information from source (IST use\
+      \ only)"
+    order: 8100.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 760b46e5-cb86-4e7d-8a31-1b44c18d1614
+  fields:
+    disabled_on: '2019-02-14T10:53:28.000Z'
+    name: "Global Growth Pilot (2017) \u2013 Diagnostic Output Report completed"
+    order: 8200.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 76d912d6-e9da-4963-80ae-d07f8f6feed7
+  fields:
+    disabled_on: null
+    name: Providing Export Advice & Information
+    order: 410.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 79824229-fd87-483f-b929-8f2b9531492b
+  fields:
+    disabled_on: null
+    name: Investment - IST Aftercare Offered (IST use only)
+    order: 2253.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Investment Introductions
+    order: 332.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 83834540-88d7-4f7c-a2d3-9af9192ad340
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Someone else in DIT'
+    order: 333.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 88efd448-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000Z'
+    name: Investment - IST Commercial Partner Introduction (IST use only)
+    order: 8700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 8c8fbb61-9a25-e611-9bdc-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000Z'
+    name: Investment - IST Business Development Target (IST use only)
+    order: 8800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 8cb7deb7-7618-4eb7-b248-4686ae0634ea
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : Another Government Department'
+    order: 314.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 90f5533d-6acf-4aff-9528-75da9af9b851
+  fields:
+    disabled_on: null
+    name: Providing Other Advice & Information
+    order: 460.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: 9384b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Investment - Business Proposition
+    order: 2252.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9484b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Account Management : General'
+    order: 510.0
+    contexts: ["export_interaction", "export_service_delivery", "investment_interaction",
+      "investment_project_interaction", "other_interaction", "other_service_delivery",
+      "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 94a2473d-e898-4e1c-a082-ddfde8f297ff
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : European Regional Development
+      Fund (ERDF)'
+    order: 618.0
+    contexts: ["export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 952a72f3-5f9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999Z'
+    name: Trade - ECR Web Offer Letter
+    order: 9400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : UK Based'
+    order: 694.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9684b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:32:46.000Z'
+    name: Market Selection Service (MSS)
+    order: 9600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9784b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:40.999Z'
+    name: Trade - G3 (10) - Other
+    order: 9700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9884b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000Z'
+    name: 'Account Management : High Growth'
+    order: 513.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : Other Inbound Export Referral'
+    order: 230.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific Service : UK Region Local'
+    order: 663.0
+    contexts: ["event", "other_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9b84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:14.000Z'
+    name: UK Trade and Investment Website
+    order: 10100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9c84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:29.000Z'
+    name: Post Local
+    order: 10200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9d84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (04) - Action Plan
+    order: 10300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9e8a641f-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000Z'
+    name: Trade - P2E (08) - Evaluation Form
+    order: 10400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 9efb937b-c23f-4248-aab3-986ede3e655d
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : Business Partners (e.g. distributors or manufacturers)'
+    order: 315.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: a222c657-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000Z'
+    name: Trade - P2E (10) - Other
+    order: 10600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: a41c2fac-92c7-44cc-9f33-56fd63bd86db
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Customers'
+    order: 334.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: a4a733b6-eb95-e611-be23-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Account Management : Northern Powerhouse'
+    order: 512.0
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: acd20042-84a5-466e-b27a-fc3726052b59
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Another Government Department'
+    order: 335.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: ad7a7746-2ad5-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.000Z'
+    name: Trade - ECR Web Action Plan
+    order: 11000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: ade9836c-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000Z'
+    name: Investment - IST Specialist Introduction (IST use only)
+    order: 11100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: ae59b1bf-5dc1-48d7-bb4b-49264fe8feea
+  fields:
+    disabled_on: null
+    name: 'Making Export Introductions : Customers'
+    order: 316.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: b2455298-5ccb-4ecb-96f6-86cf61aab4d2
+  fields:
+    disabled_on: null
+    name: 'Making Other Introductions : Business Partners (e.g. distributors or manufacturers)'
+    order: 362.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: bbee73f1-8eee-443e-8e07-c406bd8e696c
+  fields:
+    disabled_on: null
+    name: 'Making Investment Introductions : Business Partners (e.g. distributors
+      or manufacturers)'
+    order: 336.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: bc005d16-48f2-4769-8f63-272226f84dc8
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Project Closed'
+    order: 617.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: bd3d1be3-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2018-05-21T14:59:14.000Z'
+    name: Investment - IST Aftercare (IST use only)
+    order: 11600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: be3d8979-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (06) - 2, 3 & 4
+    order: 11700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: be8b6c03-83cf-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999Z'
+    name: Events - Open to Export Webinars
+    order: 695.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c24f53ed-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (06) - Combined 2, 3 & 4
+    order: 11900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c3f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:39.000Z'
+    name: Researching Export Markets Training (REMs)
+    order: 12000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c4f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Onward Referral
+    order: 12100.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c579b89b-d49d-4926-a6a4-0a1459cd25cb
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Assigned to IST-SAS (IST use only)"
+    order: 2410.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c5f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:01.999Z'
+    name: Events - E-Delivery
+    order: 696.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c6f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999Z'
+    name: Business Visitor
+    order: 12400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c707f81d-ae66-490a-98f5-575438944c43
+  fields:
+    disabled_on: null
+    name: "Investment Enquiry \u2013 Transferred to L&P (IST use only)"
+    order: 3352.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c7dc4f0b-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999Z'
+    name: UKEF - Export Working Capital Scheme
+    order: 12600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c7f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999Z'
+    name: Trade - Passport to Export - Other
+    order: 12700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c8f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999Z'
+    name: BERR - Enquiry
+    order: 12800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: c9f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:29:04.999Z'
+    name: Passport to Export
+    order: 12900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: caf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:29.999Z'
+    name: Export Market Research Scheme (EMRS)
+    order: 13000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: cbf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2015-11-03T10:35:41.000Z'
+    name: Export Insight Visit
+    order: 13100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: ccf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Events : Overseas'
+    order: 697.0
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: cd5ebe29-d5d2-4bf8-836d-7c0d3ea019d0
+  fields:
+    disabled_on: null
+    name: 'Making Other Introductions : Customers'
+    order: 363.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: cdf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (02) - Stage 1
+    order: 13400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: ce7de007-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (07) - Revised Action Plans
+    order: 13500.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: cef9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (03) - ITR
+    order: 13600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: cff9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E - Actions Record
+    order: 13700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d03cce05-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2018-05-21T14:54:16.000Z'
+    name: Investment - IST Client Proposal (IST use only)
+    order: 13800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d1516466-5e62-4c1a-9831-7b1e7e536514
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Trade Development Fund (TDF)'
+    order: 619.0
+    contexts: ["export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d320b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Investment - Company Visit
+    order: 2254.0
+    contexts: ["investment_project_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d420b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:30:03.000Z'
+    name: Investment - Regional Tour
+    order: 14100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d44c334c-0ac7-4151-890e-4a3a5aa47aed
+  fields:
+    disabled_on: null
+    name: 'Making Other Introductions : Someone else in DIT'
+    order: 364.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Export Opportunities'
+    order: 620.0
+    contexts: ["export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d620b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999Z'
+    name: Trade - Open to Export
+    order: 14400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d6d19f54-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999Z'
+    name: Trade - P2E (01) - Offer Letter
+    order: 14500.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d720b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999Z'
+    name: FDI Target
+    order: 14600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d820b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:42:25.000Z'
+    name: Significant Assistance Development Aid (PIMS)
+    order: 14700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: d920b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:29.000Z'
+    name: Passport to Export R & D
+    order: 14800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: da20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:29.000Z'
+    name: Export Communication Review Scheme (ECR)
+    order: 14900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: db20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000Z'
+    name: Global Partnerships
+    order: 15000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: dc20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:43:51.000Z'
+    name: Support for New Inward Investors
+    order: 15100.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: dd20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (02) - Stage 1 Information
+    order: 15200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: e50fb46c-16a8-4b36-98e0-fea3284011d4
+  fields:
+    disabled_on: '2019-02-14T10:53:42.000Z'
+    name: "Global Growth Pilot (2017) \u2013 Export Growth Plan agreed with customer"
+    order: 15300.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: e7238b26-653c-e711-8a1f-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : EiG National Referral'
+    order: 240.0
+    contexts: ["event", "export_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific Service : Language and Culture Advisers One-to-One'
+    order: 664.0
+    contexts: ["other_interaction", "other_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: e9dd3bfe-0c1e-427b-a91a-31e60ca580e5
+  fields:
+    disabled_on: null
+    name: 'Making Other Introductions : Another Government Department'
+    order: 365.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: ef3218c1-bed6-4ad8-b8d5-8af2430d32ff
+  fields:
+    disabled_on: null
+    name: Providing Investment Advice & Information
+    order: 430.0
+    contexts: ["investment_interaction"]
+    requires_service_answers_flow_feature_flag: true
+- model: metadata.service
+  pk: f1ed6742-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000Z'
+    name: Trade - G3 (01) - Offer Letter
+    order: 15800.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f36eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Trade - Services
+    order: 15900.0
+    contexts: ["other_interaction", "interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f46eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:54:56.000Z'
+    name: Tradeshow Access Programme (TAP) Non Funded
+    order: 16000.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f56eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Significant Assistance'
+    order: 621.0
+    contexts: ["export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f66eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:30.999Z'
+    name: FTSE 100 Programme
+    order: 16200.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f76eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-04-25T15:05:19.000Z'
+    name: Trade - Tradeshow Access Programme (TAP)
+    order: 16300.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f86eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21.000Z'
+    name: Entrepreneurial Inward Investment
+    order: 16400.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: f96eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:04.000Z'
+    name: BR Proactive Management
+    order: 16500.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: fa6eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:55:10.000Z'
+    name: Tradeshow Access Programme (TAP) - Solo
+    order: 16600.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: fb6eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:43:09.000Z'
+    name: Support for Current Inward Investors
+    order: 16700.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: fc142e9b-b9eb-47fc-9c58-3b3186457ab1
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : General Enquiry'
+    order: 250.0
+    contexts: ["other_interaction"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19.999Z'
+    name: "First Time Exporters \u2013 Export Savvy"
+    order: 16900.0
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    requires_service_answers_flow_feature_flag: false
