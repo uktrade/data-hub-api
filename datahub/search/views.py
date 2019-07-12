@@ -45,6 +45,7 @@ v4_view_registry = {}
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
+    schema = ExplicitSerializerSchema(query_string_serializer=BasicSearchQuerySerializer())
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)

@@ -32,17 +32,23 @@ class ExplicitSerializerSchema(AutoSchema):
 
     def __init__(
         self,
+        query_string_serializer=None,
         request_body_serializer=None,
         *args,
         **kwargs,
     ):
-        """Initialise the schema with a serialiser."""
+        """Initialise the schema with query string and request body serialisers."""
         super().__init__(*args, **kwargs)
 
+        self.query_string_serializer = query_string_serializer
         self.request_body_serializer = request_body_serializer
 
+    def get_query_string_serializer(self):
+        """Get an instance of the serializer used for the query string."""
+        return self.query_string_serializer
+
     def get_request_body_serializer(self):
-        """Get an instance of self.serializer_cls."""
+        """Get an instance of the serializer used for the request body."""
         return self.request_body_serializer
 
     def get_serializer_configs(self, method):
@@ -57,6 +63,11 @@ class ExplicitSerializerSchema(AutoSchema):
 
         if request_body_serializer:
             serializer_configs.append((request_body_serializer, method == 'PATCH', 'form'))
+
+        query_string_serializer = self.get_query_string_serializer()
+
+        if query_string_serializer:
+            serializer_configs.append((query_string_serializer, False, 'query'))
 
         return serializer_configs
 
