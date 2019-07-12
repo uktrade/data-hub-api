@@ -33,7 +33,7 @@ class OrderViewSet(CoreViewSet):
     @action(
         methods=['post'],
         detail=True,
-        schema=ExplicitSerializerSchema(CompleteOrderSerializer),
+        schema=ExplicitSerializerSchema(request_body_serializer=CompleteOrderSerializer()),
     )
     def complete(self, request, *args, **kwargs):
         """Complete an order."""
@@ -53,7 +53,7 @@ class OrderViewSet(CoreViewSet):
     @action(
         methods=['post'],
         detail=True,
-        schema=ExplicitSerializerSchema(CancelOrderSerializer),
+        schema=ExplicitSerializerSchema(request_body_serializer=CancelOrderSerializer()),
     )
     def cancel(self, request, *args, **kwargs):
         """Cancel an order."""
