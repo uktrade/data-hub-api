@@ -57,5 +57,5 @@ class TestExplicitSerializerSchema:
     )
     def test_get_serializer_fields(self, http_method, expected_fields):
         """Test get_serializer_fields()."""
-        schema = ExplicitSerializerSchema(SimpleSerializer)
+        schema = ExplicitSerializerSchema(request_body_serializer=SimpleSerializer())
         assert schema.get_serializer_fields('/path', http_method) == expected_fields

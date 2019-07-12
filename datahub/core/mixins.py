@@ -36,7 +36,7 @@ class ArchivableViewSetMixin:
     @action(
         methods=['post'],
         detail=True,
-        schema=ExplicitSerializerSchema(ArchiveSerializer),
+        schema=ExplicitSerializerSchema(request_body_serializer=ArchiveSerializer()),
     )
     def archive(self, request, pk):
         """Archive the object."""
@@ -59,7 +59,7 @@ class ArchivableViewSetMixin:
     @action(
         methods=['post'],
         detail=True,
-        schema=ExplicitSerializerSchema(UnarchiveSerializer),
+        schema=ExplicitSerializerSchema(request_body_serializer=UnarchiveSerializer()),
     )
     def unarchive(self, request, pk):
         """Unarchive the object."""
