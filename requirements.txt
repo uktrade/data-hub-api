@@ -118,7 +118,7 @@ requests-mock==1.6.0
 requests==2.22.0
 requests_toolbelt==0.9.1
 s3transfer==0.2.0         # via boto3
-sentry_sdk==0.9.5
+sentry_sdk==0.10.1
 simplejson==3.16.0        # via mail-parser
 six==1.12.0               # via django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, prompt-toolkit, pydocstyle, pytest-xdist, python-dateutil, requests-mock, traitlets
 snowballstemmer==1.2.1    # via pydocstyle
