@@ -306,6 +306,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
+| `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
+| `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
 
 
 ## Management commands
