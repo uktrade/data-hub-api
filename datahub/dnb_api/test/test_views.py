@@ -4,6 +4,16 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
+from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+
+
+@pytest.fixture()
+def dnb_company_search_feature_flag():
+    """
+    Creates the dnb company search feature flag.
+    """
+    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
 
 
 class TestDNBCompanySearchAPI(APITestMixin):
@@ -31,7 +41,14 @@ class TestDNBCompanySearchAPI(APITestMixin):
             ),
         ),
     )
-    def test_post(self, requests_mock, request_data, response_status_code, response_content):
+    def test_post(
+        self,
+        dnb_company_search_feature_flag,
+        requests_mock,
+        request_data,
+        response_status_code,
+        response_content,
+    ):
         """Test for GET proxy."""
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
@@ -58,7 +75,13 @@ class TestDNBCompanySearchAPI(APITestMixin):
             ('application/json', status.HTTP_200_OK),
         ),
     )
-    def test_content_type(self, requests_mock, content_type, expected_status_code):
+    def test_content_type(
+        self,
+        dnb_company_search_feature_flag,
+        requests_mock,
+        content_type,
+        expected_status_code,
+    ):
         """Test that 406 is returned if Content Type is not application/json."""
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
