@@ -1,5 +1,6 @@
 import pytest
 from django.conf import settings
+from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
@@ -39,9 +40,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
 
         url = reverse('api-v4:dnb-api:company-search')
-        # api_client.get transforms data into querystring hence generic is used here
-        response = self.api_client.generic(
-            'POST',
+        response = self.api_client.post(
             url,
             data=request_data,
             content_type='application/json',
@@ -50,3 +49,23 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert response.status_code == response_status_code
         assert response.content == response_content
         assert requests_mock.last_request.body == request_data
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+            ('application/json', status.HTTP_200_OK),
+        ),
+    )
+    def test_content_type(self, requests_mock, content_type, expected_status_code):
+        """Test that 406 is returned if Content Type is not application/json."""
+        requests_mock.post(
+            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
+            status_code=status.HTTP_200_OK,
+        )
+
+        url = reverse('api-v4:dnb-api:company-search')
+        response = self.api_client.post(url, content_type=content_type)
+
+        assert response.status_code == expected_status_code
