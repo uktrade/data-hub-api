@@ -620,7 +620,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         """Tests filtering interaction by service."""
         CompanyInteractionFactory.create_batch(
             5,
-            service_id=constants.Service.trade_enquiry.value.id,
+            service_id=constants.Service.inbound_referral.value.id,
         )
         service_id = constants.Service.account_management.value.id
         CompanyInteractionFactory.create_batch(

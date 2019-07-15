@@ -85,7 +85,7 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'dit_participants': [
                         {'adviser': AdviserFactory},
@@ -105,7 +105,7 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'dit_participants': [
                         {'adviser': AdviserFactory},
@@ -969,7 +969,7 @@ class TestInteractionVersioning(APITestMixin):
                 'notes': 'hello',
                 'company': company.pk,
                 'contacts': [contact.pk],
-                'service': Service.trade_enquiry.value.id,
+                'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
