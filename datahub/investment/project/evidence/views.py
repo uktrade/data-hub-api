@@ -27,27 +27,33 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
         IsAssociatedToInvestmentProjectEvidenceDocumentPermission,
     )
     serializer_class = EvidenceDocumentSerializer
+    queryset = EvidenceDocument.objects.select_related(
+        'investment_project',
+    ).prefetch_related(
+        'tags',
+    )
 
     filter_backends = (
         DjangoFilterBackend,
     )
 
-    def get_queryset(self):
-        """Returns evidence documents queryset."""
-        self._check_project_exists()
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if there is no project corresponding to the project ID specified in
+        the URL path.
+        """
+        super().initial(request, *args, **kwargs)
 
-        return EvidenceDocument.objects.select_related(
-            'investment_project',
-        ).prefetch_related(
-            'tags',
-        ).filter(
+        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
+            raise Http404(self.non_existent_project_error_message)
+
+    def filter_queryset(self, queryset):
+        """Filter the queryset to the project specified in the URL path."""
+        filtered_queryset = super().filter_queryset(queryset)
+
+        return filtered_queryset.filter(
             investment_project_id=self.kwargs['project_pk'],
         )
-
-    def create(self, request, *args, **kwargs):
-        """Creates evidence document."""
-        self._check_project_exists()
-        return super().create(request, *args, **kwargs)
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
@@ -59,7 +65,3 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
         data = self.serializer_class(entity_document).data
         record_user_event(request, USER_EVENT_TYPES.evidence_document_delete, data=data)
         return super().destroy(request, *args, **kwargs)
-
-    def _check_project_exists(self):
-        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
-            raise Http404(self.non_existent_project_error_message)
