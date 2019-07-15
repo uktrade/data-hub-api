@@ -323,6 +323,8 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'grant_amount_offered': '1111.11',
+                    'net_company_receipt': '8888.11',
 
                     # fields not allowed
                     'is_event': True,
@@ -330,8 +332,6 @@ class TestAddInteraction(APITestMixin):
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
-                    'grant_amount_offered': '1111.11',
-                    'net_company_receipt': '8888.11',
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
                     'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
@@ -342,8 +342,6 @@ class TestAddInteraction(APITestMixin):
                     'service_delivery_status': [
                         'This field is only valid for service deliveries.',
                     ],
-                    'grant_amount_offered': ['This field is only valid for service deliveries.'],
-                    'net_company_receipt': ['This field is only valid for service deliveries.'],
                     'policy_areas': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
