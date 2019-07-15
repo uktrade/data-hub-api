@@ -42,6 +42,26 @@ class HawkAuth(AuthBase):
         return request
 
 
+class TokenAuth(AuthBase):
+    """
+    Token authentication class.
+    """
+
+    def __init__(self, token, token_keyword=None):
+        """
+        Initialise the class with the token.
+        """
+        self.token = token
+        self.token_keyword = token_keyword or 'Token'
+
+    def __call__(self, request):
+        """
+        Inject the Authorization header in to the request.
+        """
+        request.headers['Authorization'] = f'{self.token_keyword} {self.token}'
+        return request
+
+
 def _make_response_verifier(sender):
     def verify_response(response, *args, **kwargs):
         if response.ok:

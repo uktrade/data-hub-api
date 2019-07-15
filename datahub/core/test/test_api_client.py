@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from requests import HTTPError
 from requests.auth import HTTPBasicAuth
 
-from datahub.core.api_client import APIClient, HawkAuth
+from datahub.core.api_client import APIClient, HawkAuth, TokenAuth
 
 
 class TestHawkAuth:
@@ -51,6 +51,30 @@ class TestHawkAuth:
         auth(request)
 
         request.register_hook.assert_not_called()
+
+
+class TestTokenAuth:
+    """
+    Tests TokenAuth.
+    """
+
+    @pytest.mark.parametrize(
+        'token_auth_args,expected_authorization',
+        (
+            (
+                ['abc123'], 'Token abc123',
+            ),
+            (
+                ['foobarbaz', 'Key'], 'Key foobarbaz',
+            ),
+        ),
+    )
+    def test_requests_with_no_body_are_signed(self, token_auth_args, expected_authorization):
+        """Tests that requests without a body are signed."""
+        auth = TokenAuth(*token_auth_args)
+        request = Mock(method='GET', url='http://test.com/test', body=None, headers={})
+        auth(request)
+        assert request.headers['Authorization'] == expected_authorization
 
 
 class TestAPIClient:
