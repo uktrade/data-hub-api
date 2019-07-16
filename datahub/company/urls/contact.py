@@ -12,13 +12,9 @@ contact_item = ContactViewSet.as_view({
     'patch': 'partial_update',
 })
 
-contact_archive = ContactViewSet.as_view({
-    'post': 'archive',
-})
+contact_archive = ContactViewSet.as_action_view('archive')
 
-contact_unarchive = ContactViewSet.as_view({
-    'post': 'unarchive',
-})
+contact_unarchive = ContactViewSet.as_action_view('unarchive')
 
 contact_audit = ContactAuditViewSet.as_view({
     'get': 'list',

@@ -415,8 +415,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('is_event', is_blank),
                     OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
-                    OperatorRule('grant_amount_offered', is_blank),
-                    OperatorRule('net_company_receipt', is_blank),
                     when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(

@@ -95,8 +95,8 @@ class TestGetEventView(APITestMixin):
                 'name': Programme.great_branded.value.name,
             }],
             'service': {
-                'id': Service.trade_enquiry.value.id,
-                'name': Service.trade_enquiry.value.name,
+                'id': Service.inbound_referral.value.id,
+                'name': Service.inbound_referral.value.name,
             },
         })
 
@@ -141,7 +141,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'New York',
             'address_country': Country.united_states.value.id,
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
             'end_date': '2010-09-12',
             'organiser': organiser.pk,
@@ -190,8 +190,8 @@ class TestCreateEventView(APITestMixin):
             }],
             'related_programmes': [],
             'service': {
-                'id': Service.trade_enquiry.value.id,
-                'name': Service.trade_enquiry.value.name,
+                'id': Service.inbound_referral.value.id,
+                'name': Service.inbound_referral.value.name,
             },
             'archived_documents_url_path': '',
         }
@@ -219,7 +219,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
             'related_programmes': [Programme.great_branded.value.id],
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -279,8 +279,8 @@ class TestCreateEventView(APITestMixin):
                 'name': Programme.great_branded.value.name,
             }],
             'service': {
-                'id': Service.trade_enquiry.value.id,
-                'name': Service.trade_enquiry.value.name,
+                'id': Service.inbound_referral.value.id,
+                'name': Service.inbound_referral.value.name,
             },
             'archived_documents_url_path': '',
         }
@@ -299,7 +299,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': Team.crm.value.id,
             'organiser': AdviserFactory().pk,
             'teams': [Team.healthcare_uk.value.id],
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
         }
         response = self.api_client.post(url, data=request_data)
@@ -321,7 +321,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
@@ -347,7 +347,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_states.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
@@ -372,7 +372,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'end_date': '2020-01-01',
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
@@ -397,7 +397,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'start_date': '2020-01-02',
             'end_date': '2020-01-01',
             'organiser': AdviserFactory().pk,
@@ -639,7 +639,7 @@ class TestEventVersioning(APITestMixin):
                 'address_1': 'Grand Court Exhibition Centre',
                 'address_town': 'New York',
                 'address_country': Country.united_states.value.id,
-                'service': Service.trade_enquiry.value.id,
+                'service': Service.inbound_referral.value.id,
                 'start_date': '2010-09-12',
                 'end_date': '2010-09-12',
                 'organiser': AdviserFactory().pk,
