@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
+from datahub.core.schemas import ExplicitSerializerSchema
 from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_search_apps
 from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
@@ -44,6 +45,7 @@ v4_view_registry = {}
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
+    schema = ExplicitSerializerSchema(query_string_serializer=BasicSearchQuerySerializer())
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)
@@ -90,8 +92,18 @@ def _get_permission_filters(request):
         yield (app.es_model._doc_type.name, filter_args)
 
 
+class SearchAPIViewSchema(ExplicitSerializerSchema):
+    """Schema used for views based on SearchAPIView."""
+
+    def get_request_body_serializer(self):
+        """Get a serializer instance using the serializer_class attribute on the view."""
+        return self.view.serializer_class()
+
+
 class SearchAPIView(APIView):
     """Filtered search view."""
+
+    schema = SearchAPIViewSchema()
 
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
