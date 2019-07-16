@@ -47,12 +47,12 @@ class TokenAuth(AuthBase):
     Token authentication class.
     """
 
-    def __init__(self, token, token_keyword=None):
+    def __init__(self, token, token_keyword='Token'):
         """
         Initialise the class with the token.
         """
         self.token = token
-        self.token_keyword = token_keyword or 'Token'
+        self.token_keyword = token_keyword
 
     def __call__(self, request):
         """

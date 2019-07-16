@@ -24,20 +24,23 @@ class TestDNBCompanySearchAPI(APITestMixin):
     @pytest.mark.parametrize(
         'request_data,response_status_code,response_content',
         (
-            (
+            pytest.param(
                 b'{"arg": "value"}',
                 200,
                 b'{"took":27}',
+                id='successful call to proxied API',
             ),
-            (
+            pytest.param(
                 b'{"arg": "value"}',
                 400,
                 b'{"error":"msg"}',
+                id='proxied API returns a bad request',
             ),
-            (
+            pytest.param(
                 b'{"arg": "value"}',
                 500,
                 b'{"error":"msg"}',
+                id='proxied API returns a server error',
             ),
         ),
     )
@@ -49,7 +52,9 @@ class TestDNBCompanySearchAPI(APITestMixin):
         response_status_code,
         response_content,
     ):
-        """Test for GET proxy."""
+        """
+        Test for POST proxy.
+        """
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
             status_code=response_status_code,
@@ -66,6 +71,24 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert response.status_code == response_status_code
         assert response.content == response_content
         assert requests_mock.last_request.body == request_data
+
+    def test_post_no_feature_flag(self, requests_mock):
+        """
+        Test for POST proxy.
+        """
+        requests_mock.post(
+            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
+        )
+
+        url = reverse('api-v4:dnb-api:company-search')
+        response = self.api_client.post(
+            url,
+            data={'foo': 'bar'},
+            content_type='application/json',
+        )
+
+        assert response.status_code == 404
+        assert requests_mock.called is False
 
     @pytest.mark.parametrize(
         'content_type,expected_status_code',

@@ -30,10 +30,10 @@ class TestViewUtils:
         mocked_request.content_type = content_type
 
         @enforce_request_content_type(enforced_content_type)
-        def view_method(self, request):
+        def view_func(request):
             return 'foobar'
 
-        result = view_method(None, mocked_request)
+        result = view_func(mocked_request)
         if passes:
             assert result == 'foobar'
         else:

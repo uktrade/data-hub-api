@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.views import APIView
@@ -29,7 +30,7 @@ class ActivityFeedView(APIView):
         'order.view_order',
     )
 
-    @enforce_request_content_type('application/json')
+    @method_decorator(enforce_request_content_type('application/json'))
     def get(self, request):
         """Proxy for GET requests."""
         content_type = request.content_type or ''

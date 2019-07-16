@@ -72,7 +72,7 @@ class TestTokenAuth:
     def test_requests_with_no_body_are_signed(self, token_auth_args, expected_authorization):
         """Tests that requests without a body are signed."""
         auth = TokenAuth(*token_auth_args)
-        request = Mock(method='GET', url='http://test.com/test', body=None, headers={})
+        request = Mock(headers={})
         auth(request)
         assert request.headers['Authorization'] == expected_authorization
 
