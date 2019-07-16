@@ -60,18 +60,26 @@ class PropositionViewSet(CoreViewSet):
     ordering_fields = ('deadline', 'created_on')
     ordering = ('-deadline', '-created_on')
 
-    def get_queryset(self):
-        """Filters the query set to the specified project."""
-        self._check_project_exists()
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if there is no project corresponding to the project ID specified in
+        the URL path.
+        """
+        super().initial(request, *args, **kwargs)
 
-        return self.queryset.filter(
+        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
+            raise Http404(self.non_existent_project_error_message)
+
+    def filter_queryset(self, queryset):
+        """Filter the queryset to the project specified in the URL path."""
+        filtered_queryset = super().filter_queryset(queryset)
+
+        return filtered_queryset.filter(
             investment_project_id=self.kwargs['project_pk'],
         )
 
     def create(self, request, *args, **kwargs):
         """Creates proposition."""
-        self._check_project_exists()
-
         serializer = CreatePropositionSerializer(
             data=request.data,
             context=self.get_serializer_context(),
@@ -85,8 +93,6 @@ class PropositionViewSet(CoreViewSet):
 
     def _action(self, method, action_serializer, request, *args, **kwargs):
         """Invokes action for a proposition."""
-        self._check_project_exists()
-
         if method not in ('abandon', 'complete'):
             raise APIBadRequestException()
 
@@ -127,10 +133,6 @@ class PropositionViewSet(CoreViewSet):
             data['investment_project_id'] = self.kwargs['project_pk']
         return data
 
-    def _check_project_exists(self):
-        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
-            raise Http404(self.non_existent_project_error_message)
-
 
 class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     """Proposition Document ViewSet."""
@@ -144,21 +146,34 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
         IsAssociatedToInvestmentProjectPropositionDocumentPermission,
     )
     serializer_class = PropositionDocumentSerializer
+    queryset = PropositionDocument.objects.select_related(
+        'proposition__investment_project',
+    )
 
     filter_backends = (
         DjangoFilterBackend,
     )
 
-    def create(self, request, *args, **kwargs):
-        """Creates proposition document."""
-        self._check_proposition_exists()
-        return super().create(request, *args, **kwargs)
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if there is no project or proposition corresponding to the IDs
+        specified in the URL path.
+        """
+        super().initial(request, *args, **kwargs)
 
-    def get_queryset(self):
-        """Returns proposition documents queryset."""
-        return PropositionDocument.objects.select_related(
-            'proposition__investment_project',
-        ).filter(
+        proposition_queryset = Proposition.objects.filter(
+            pk=self.kwargs['proposition_pk'],
+            investment_project_id=self.kwargs['project_pk'],
+        )
+
+        if not proposition_queryset.exists():
+            raise Http404(self.non_existent_proposition_error_message)
+
+    def filter_queryset(self, queryset):
+        """Filter the queryset to the project and proposition specified in the URL path."""
+        filtered_queryset = super().filter_queryset(queryset)
+
+        return filtered_queryset.filter(
             proposition_id=self.kwargs['proposition_pk'],
             proposition__investment_project_id=self.kwargs['project_pk'],
         )
@@ -174,7 +189,3 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
         data['proposition_id'] = entity_document.proposition_id
         record_user_event(request, USER_EVENT_TYPES.proposition_document_delete, data=data)
         return super().destroy(request, *args, **kwargs)
-
-    def _check_proposition_exists(self):
-        if not Proposition.objects.filter(pk=self.kwargs['proposition_pk']).exists():
-            raise Http404(self.non_existent_proposition_error_message)

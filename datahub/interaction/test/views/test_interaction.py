@@ -105,7 +105,7 @@ class TestAddInteraction(APITestMixin):
             ],
             'company': company.pk,
             'contacts': [contact.pk],
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
@@ -175,8 +175,8 @@ class TestAddInteraction(APITestMixin):
             }],
             'event': None,
             'service': {
-                'id': str(Service.trade_enquiry.value.id),
-                'name': Service.trade_enquiry.value.name,
+                'id': str(Service.inbound_referral.value.id),
+                'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
             'investment_project': request_data.get('investment_project'),
@@ -251,7 +251,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                 },
                 {
@@ -270,7 +270,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'was_policy_feedback_provided': True,
@@ -293,7 +293,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'was_policy_feedback_provided': True,
@@ -320,9 +320,11 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'grant_amount_offered': '1111.11',
+                    'net_company_receipt': '8888.11',
 
                     # fields not allowed
                     'is_event': True,
@@ -330,8 +332,6 @@ class TestAddInteraction(APITestMixin):
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
-                    'grant_amount_offered': '1111.11',
-                    'net_company_receipt': '8888.11',
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
                     'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
@@ -342,8 +342,6 @@ class TestAddInteraction(APITestMixin):
                     'service_delivery_status': [
                         'This field is only valid for service deliveries.',
                     ],
-                    'grant_amount_offered': ['This field is only valid for service deliveries.'],
-                    'net_company_receipt': ['This field is only valid for service deliveries.'],
                     'policy_areas': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
@@ -365,7 +363,7 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     # fields where None is not allowed
@@ -391,7 +389,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
@@ -414,7 +412,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
@@ -435,7 +433,7 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
 
                     'dit_participants': [],
@@ -458,7 +456,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'status': 'foobar',
                 },
@@ -476,7 +474,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'status': None,
                 },
@@ -524,7 +522,7 @@ class TestAddInteraction(APITestMixin):
                 ],
                 'notes': 'hello',
                 'investment_project': project.pk,
-                'service': Service.trade_enquiry.value.id,
+                'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -563,7 +561,7 @@ class TestAddInteraction(APITestMixin):
                 ],
                 'notes': 'hello',
                 'investment_project': project.pk,
-                'service': Service.trade_enquiry.value.id,
+                'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -596,7 +594,7 @@ class TestAddInteraction(APITestMixin):
                     {'adviser': requester.pk},
                 ],
                 'notes': 'hello',
-                'service': Service.trade_enquiry.value.id,
+                'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
             },
         )
@@ -703,8 +701,8 @@ class TestGetInteraction(APITestMixin):
             ],
             'event': None,
             'service': {
-                'id': str(Service.trade_enquiry.value.id),
-                'name': Service.trade_enquiry.value.name,
+                'id': str(Service.inbound_referral.value.id),
+                'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
             'investment_project': {
@@ -811,8 +809,8 @@ class TestGetInteraction(APITestMixin):
             ],
             'event': None,
             'service': {
-                'id': str(Service.trade_enquiry.value.id),
-                'name': Service.trade_enquiry.value.name,
+                'id': str(Service.inbound_referral.value.id),
+                'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
             'investment_project': {
@@ -1013,7 +1011,7 @@ class TestUpdateInteraction(APITestMixin):
             (
                 {
                     'status': Interaction.STATUSES.complete,
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                 },
                 {
                     'communication_channel': ['This field is required.'],

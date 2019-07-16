@@ -91,7 +91,7 @@ class TestAddServiceDelivery(APITestMixin):
             ],
             'company': company.pk,
             'contacts': [contact.pk],
-            'service': Service.trade_enquiry.value.id,
+            'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
 
             **resolve_data(extra_data),
@@ -157,8 +157,8 @@ class TestAddServiceDelivery(APITestMixin):
             }],
             'event': request_data.get('event'),
             'service': {
-                'id': str(Service.trade_enquiry.value.id),
-                'name': Service.trade_enquiry.value.name,
+                'id': str(Service.inbound_referral.value.id),
+                'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
             'investment_project': None,
@@ -233,7 +233,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -261,7 +261,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -292,7 +292,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -334,7 +334,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
                     'dit_participants': None,
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
@@ -365,7 +365,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -393,7 +393,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -421,7 +421,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -447,7 +447,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
                         random_obj_for_model, ServiceDeliveryStatus,
                     ),
@@ -473,7 +473,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'subject': 'whatever',
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
-                    'service': Service.trade_enquiry.value.id,
+                    'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
 
                     'dit_participants': [],

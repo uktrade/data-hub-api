@@ -27,13 +27,9 @@ company_timeline = CompanyTimelineViewSet.as_view({
     'get': 'list',
 })
 
-company_archive = CompanyViewSet.as_view({
-    'post': 'archive',
-})
+company_archive = CompanyViewSet.as_action_view('archive')
 
-company_unarchive = CompanyViewSet.as_view({
-    'post': 'unarchive',
-})
+company_unarchive = CompanyViewSet.as_action_view('unarchive')
 
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',

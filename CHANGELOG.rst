@@ -1,3 +1,48 @@
+Data Hub API 13.9.0 (2019-07-16)
+================================
+
+
+
+Features
+--------
+
+- **Interactions** The service names were changed to enable front-end to display them in hierarchy. Services no longer required have been disabled.
+
+Bug fixes
+---------
+
+- Schemas in the API documentation were corrected for the following endpoints:
+
+  - all archive endpoints
+  - all unarchive endpoints
+  - the complete OMIS order endpoint
+  - the cancel OMIS order endpoint
+  - all search endpoints
+
+Internal changes
+----------------
+
+- Python was updated from version 3.7.3 to 3.7.4 in deployed environments.
+
+API
+---
+
+- **Interactions** ``POST /v3/interaction`` now accepts TAP related fields ``grant_amount_offered`` and ``net_company_receipt`` for interaction.
+- **Investment** The following endpoints were corrected to return a 404 when a non-existent investment project or proposition was specified:
+
+  - ``GET,POST /v3/investment/{project_pk}/proposition/{proposition_pk}/document``
+  - ``GET,DELETE /v3/investment/{project_pk}/proposition/{proposition_pk}/document/{entity_document_pk}``
+  - ``GET /v3/investment/{project_pk}/proposition/{proposition_pk}/document/{entity_document_pk}/download``
+  - ``POST /v3/investment/{project_pk}/proposition/{proposition_pk}/document/{entity_document_pk}/upload-callback``
+
+  (Previously, they would only return a 404 in some of the possible cases.)
+
+Database schema
+---------------
+
+- An ``order double precision`` column was added to the ``metadata_service`` table to store the order of services.
+
+
 Data Hub API 13.8.0 (2019-07-10)
 ================================
 

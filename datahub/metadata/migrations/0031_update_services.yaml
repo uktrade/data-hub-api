@@ -1,0 +1,421 @@
+- model: metadata.service
+  pk: 9484b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Account Management : General'
+    contexts: ["export_interaction", "export_service_delivery", "investment_interaction",
+      "investment_project_interaction", "other_interaction", "other_service_delivery", "interaction"]
+- model: metadata.service
+  pk: 09073992-2476-481d-8341-ee575d1f541e
+  fields:
+    disabled_on:
+    name: 'Account Management : Healthcare UK'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: a4a733b6-eb95-e611-be23-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Account Management : Northern Powerhouse'
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: 041e7ce1-9d5a-4ce6-b77c-088aef9d816b
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : General Export Enquiry'
+    contexts: ["event", "export_interaction"]
+- model: metadata.service
+  pk: fc142e9b-b9eb-47fc-9c58-3b3186457ab1
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : General Enquiry'
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: 65dc115c-dcd8-4441-9d3a-76285a979aa4
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : Other Inbound Referral'
+    contexts: ["other_interaction"]
+
+- model: metadata.service
+  pk: e7238b26-653c-e711-8a1f-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : EiG National Referral'
+    contexts: ["event", "export_interaction"]
+- model: metadata.service
+  pk: 632b8708-28b6-e611-984a-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : Local Partner Referral'
+    contexts: ["event", "export_interaction"]
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Enquiry or Referral Received : Other Inbound Export Referral'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 58da3eec-a906-48eb-b258-bd3fb0717e7a
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Significant Assistance'
+    contexts: ["other_service_delivery", "interaction"]
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Language and Culture Advisers One-to-One'
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Great International Trade Campaign'
+    contexts: ["event", "other_interaction"]
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Digital Trade Advisers One-to-One'
+    contexts: ["other_service_delivery", "interaction"]
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific Service : UK Region Local'
+    contexts: ["event", "other_service_delivery"]
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : Market Visit'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : Inward Mission'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : Outward Mission'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : UK Based'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: 510a4016-4bb9-e211-a646-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : Webinar'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: ccf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Events : Overseas'
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Export Opportunities'
+    contexts: ["export_service_delivery"]
+- model: metadata.service
+  pk: 350bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Export Win'
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: bc005d16-48f2-4769-8f63-272226f84dc8
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Project Closed'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 4664f856-166f-4f48-9865-653250f84086
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Diagnostic and Output Report Completed by DIT'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 6a27f71a-6b4b-4e8f-83b8-35615c13fdc8
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Engagement Letter Signed by Company'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 482fca2e-3bfa-4c4f-8649-17d292aad87f
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Global Growth Service: Signed Export Growth Plan Received from Company'
+    contexts: ["export_service_delivery"]
+- model: metadata.service
+  pk: 3a0bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'Enquiry received : General Investment Enquiry'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 47513afa-8313-4ec9-931e-849d4cdd4959
+  fields:
+    disabled_on:
+    name: 'Enquiry received : HPO High Potential Opportunity Investment Enquiry via IST Target Company'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 66b76d45-be8f-4828-81fb-9ca9e4b29642
+  fields:
+    disabled_on:
+    name: 'Enquiry received : HPO High Potential Opportunity Investment Enquiry via IIGB'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 34f583c0-6ac8-4981-9954-859c0e568204
+  fields:
+    disabled_on:
+    name: 'Enquiry received : Other Inbound Investment Referral'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'IST Specific Service : IST Visit'
+    contexts: ["investment_interaction", "investment_project_interaction"]
+- model: metadata.service
+  pk: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Export Introductions
+    contexts: ["export_interaction"]
+
+- model: metadata.service
+  pk: ae59b1bf-5dc1-48d7-bb4b-49264fe8feea
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : Customers'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 9efb937b-c23f-4248-aab3-986ede3e655d
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : Business Partners (e.g. distributors or manufacturers)'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 549d657d-6930-413d-a14e-18a6427467be
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : Financial and Professional Service Providers'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 273132d7-de50-41a7-a994-ff7d93302092
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : Someone else in DIT'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 8cb7deb7-7618-4eb7-b248-4686ae0634ea
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : Another Government Department'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 394b3f03-67ee-4a1a-b7bb-c2a249ab879c
+  fields:
+    disabled_on:
+    name: 'Making Export Introductions : UK Export Finance (UKEF)'
+    contexts: ["export_interaction"]
+
+- model: metadata.service
+  pk: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Investment Introductions
+    contexts: ["investment_interaction"]
+
+- model: metadata.service
+  pk: a41c2fac-92c7-44cc-9f33-56fd63bd86db
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Customers'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: bbee73f1-8eee-443e-8e07-c406bd8e696c
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Business Partners (e.g. distributors or manufacturers)'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 630a242e-c8b9-403d-b9a8-fcddada25051
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Financial and Professional Service Providers'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 64fc348f-137d-4cc1-8685-6ca15fd3206a
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Investment Opportunities'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: 83834540-88d7-4f7c-a2d3-9af9192ad340
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Someone else in DIT'
+    contexts: ["investment_interaction"]
+- model: metadata.service
+  pk: acd20042-84a5-466e-b27a-fc3726052b59
+  fields:
+    disabled_on:
+    name: 'Making Investment Introductions : Another Government Department'
+    contexts: ["investment_interaction"]
+
+- model: metadata.service
+  pk: c4f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Onward Referral
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: 360bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Overseas Market Introduction Service (OMIS)'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 94a2473d-e898-4e1c-a082-ddfde8f297ff
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : European Regional Development Fund (ERDF)'
+    contexts: ["export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: d1516466-5e62-4c1a-9831-7b1e7e536514
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Trade Development Fund (TDF)'
+    contexts: ["export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Overseas Business Network Chargeable Services (OBN)'
+    contexts: ["export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: 0796b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : DSO Interaction'
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 43dd37db-325f-4cd4-9418-a62ab9c53dda
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Referral to UKEF
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: f56eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Significant Assistance'
+    contexts: ["export_service_delivery"]
+- model: metadata.service
+  pk: 330bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Trade - Enquiry
+    contexts: ["other_interaction", "interaction"]
+- model: metadata.service
+  pk: f36eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Trade - Services
+    contexts: ["other_interaction", "interaction"]
+- model: metadata.service
+  pk: 380bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: 'A Specific DIT Export Service or Funding : Tradeshow Access Programme (TAP)'
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+- model: metadata.service
+  pk: 5959ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Investment - Aftercare Company Visit
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction",
+      "interaction"]
+- model: metadata.service
+  pk: 9384b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Investment - Business Proposition
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction",
+      "interaction"]
+- model: metadata.service
+  pk: d320b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Investment - Company Visit
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction",
+      "interaction"]
+- model: metadata.service
+  pk: 90f5533d-6acf-4aff-9528-75da9af9b851
+  fields:
+    disabled_on:
+    name: Providing Other Advice & Information
+    requires_service_answers_flow_feature_flag: true
+    contexts:
+    - other_interaction
+- model: metadata.service
+  pk: 3f5a2216-8cb1-4fb7-9c6b-06ba77d7405b
+  fields:
+    disabled_on: '2019-07-04T00:00:00.000Z'
+    name: Making Other Introductions
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+
+- model: metadata.service
+  pk: cd5ebe29-d5d2-4bf8-836d-7c0d3ea019d0
+  fields:
+    disabled_on:
+    name: 'Making Other Introductions : Customers'
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: b2455298-5ccb-4ecb-96f6-86cf61aab4d2
+  fields:
+    disabled_on:
+    name: 'Making Other Introductions : Business Partners (e.g. distributors or manufacturers)'
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: 735da232-8058-44a5-be69-5c0e2bec0b7e
+  fields:
+    disabled_on:
+    name: 'Making Other Introductions : Financial and Professional Service Providers'
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: d44c334c-0ac7-4151-890e-4a3a5aa47aed
+  fields:
+    disabled_on:
+    name: 'Making Other Introductions : Someone else in DIT'
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+- model: metadata.service
+  pk: e9dd3bfe-0c1e-427b-a91a-31e60ca580e5
+  fields:
+    disabled_on:
+    name: 'Making Other Introductions : Another Government Department'
+    requires_service_answers_flow_feature_flag: true
+    contexts: ["other_interaction"]
+
+- model: metadata.service
+  pk: 0596b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    name: Investment - Services
+    contexts: ["investment_project_interaction"]

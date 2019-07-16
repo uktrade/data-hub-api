@@ -150,15 +150,21 @@ class UKRegion(Enum):
 class Service(Enum):
     """Service."""
 
-    trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
-    account_management = Constant('Account Management', '9484b82b-3499-e211-a939-e4115bead28a')
+    inbound_referral = Constant(
+        'Enquiry or Referral Received : Other Inbound Export Referral',
+        '9984b82b-3499-e211-a939-e4115bead28a',
+    )
+    account_management = Constant(
+        'Account Management : General',
+        '9484b82b-3499-e211-a939-e4115bead28a',
+    )
 
     providing_investment_advice_and_information = Constant(
         'Providing Investment Advice & Information',
         'ef3218c1-bed6-4ad8-b8d5-8af2430d32ff',
     )
     making_export_introductions = Constant(
-        'Making Introductions (Export)',
+        'Making Export Introductions',
         '1477622e-9adb-4017-8d8d-fe3221f1d2fc',
     )
 

@@ -1,0 +1,16 @@
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    disabled_on:
+    name: 'A Specific Service : Great International Trade Campaign'
+    order: 660.0
+    contexts: ["event", "other_interaction", "other_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
+- model: metadata.service
+  pk: 041e7ce1-9d5a-4ce6-b77c-088aef9d816b
+  fields:
+    disabled_on: null
+    name: 'Enquiry or Referral Received : General Export Enquiry'
+    order: 200.0
+    contexts: ["export_interaction"]
+    requires_service_answers_flow_feature_flag: false

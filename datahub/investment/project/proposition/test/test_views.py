@@ -1515,6 +1515,164 @@ class TestAbandonProposition(APITestMixin):
         assert proposition.status == PropositionStatus.ongoing
 
 
+@pytest.mark.parametrize('http_method', ('get', 'post'))
+class TestPropositionDocumentCollectionView404Handling(APITestMixin):
+    """Tests for 404-handling in the proposition document collection view."""
+
+    def test_returns_404_for_non_existent_project(self, http_method):
+        """Test that a 404 is returned if an non-existent project is specified."""
+        proposition = PropositionFactory()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'project_pk': uuid.uuid4(),
+                'proposition_pk': proposition.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_non_existent_proposition(self, http_method):
+        """Test that a 404 is returned if an non-existent proposition is specified."""
+        project = InvestmentProjectFactory()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'project_pk': project.pk,
+                'proposition_pk': uuid.uuid4(),
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_mismatched_proposition_and_project(self, http_method):
+        """Test that a 404 is returned if an unrelated project and proposition are specified."""
+        proposition = PropositionFactory()
+        project = InvestmentProjectFactory()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'project_pk': project.pk,
+                'proposition_pk': proposition.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.parametrize(
+    'urlname,http_method',
+    (
+        ('api-v3:investment:proposition:document-item', 'get'),
+        ('api-v3:investment:proposition:document-item', 'delete'),
+        ('api-v3:investment:proposition:document-item-callback', 'post'),
+        ('api-v3:investment:proposition:document-item-download', 'get'),
+    ),
+)
+class TestPropositionDocumentItemViews404Handling(APITestMixin):
+    """Tests for 404-handling in all proposition document item views."""
+
+    def test_returns_404_for_non_existent_project(self, urlname, http_method):
+        """Test that a 404 is returned if a non-existent project is specified."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=self.user,
+        )
+
+        url = reverse(
+            urlname,
+            kwargs={
+                'project_pk': uuid.uuid4(),
+                'proposition_pk': proposition.pk,
+                'entity_document_pk': entity_document.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_non_existent_proposition(self, urlname, http_method):
+        """Test that a 404 is returned if a non-existent proposition is specified."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=self.user,
+        )
+
+        url = reverse(
+            urlname,
+            kwargs={
+                'project_pk': proposition.investment_project.pk,
+                'proposition_pk': uuid.uuid4(),
+                'entity_document_pk': entity_document.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_non_existent_document(self, urlname, http_method):
+        """Test that a 404 is returned if a non-existent document is specified."""
+        proposition = PropositionFactory()
+
+        url = reverse(
+            urlname,
+            kwargs={
+                'project_pk': proposition.investment_project.pk,
+                'proposition_pk': proposition.pk,
+                'entity_document_pk': uuid.uuid4(),
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_unrelated_project(self, urlname, http_method):
+        """Test that a 404 is returned if an unrelated project is specified."""
+        unrelated_project = InvestmentProjectFactory()
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=self.user,
+        )
+
+        url = reverse(
+            urlname,
+            kwargs={
+                'project_pk': unrelated_project.pk,
+                'proposition_pk': proposition.pk,
+                'entity_document_pk': entity_document.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_for_unrelated_proposition(self, urlname, http_method):
+        """Test that a 404 is returned if an unrelated proposition is specified."""
+        proposition = PropositionFactory()
+        unrelated_proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=self.user,
+        )
+
+        url = reverse(
+            urlname,
+            kwargs={
+                'project_pk': proposition.investment_project.pk,
+                'proposition_pk': unrelated_proposition.pk,
+                'entity_document_pk': entity_document.pk,
+            },
+        )
+        response = self.api_client.generic(http_method, url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
 class TestPropositionDocumentViews(APITestMixin):
     """Tests for the proposition document views."""
 
@@ -1657,29 +1815,6 @@ class TestPropositionDocumentViews(APITestMixin):
         assert response.data == {
             'detail': 'You do not have permission to perform this action.',
         }
-
-    def test_cannot_create_document_for_non_existent_proposition(self):
-        """Test that user cannot create document for non existent proposition."""
-        investment_project = InvestmentProjectFactory()
-
-        url = reverse(
-            'api-v3:investment:proposition:document-collection',
-            kwargs={
-                'proposition_pk': uuid.uuid4(),
-                'project_pk': investment_project.pk,
-            },
-        )
-
-        user = create_test_user(permission_codenames=(PropositionDocumentPermission.add_all,))
-        api_client = self.create_api_client(user=user)
-
-        response = api_client.post(
-            url,
-            data={
-                'original_filename': 'test.txt',
-            },
-        )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_documents_list(self, permissions):
@@ -2310,6 +2445,10 @@ class TestPropositionDocumentViews(APITestMixin):
     @patch('datahub.documents.tasks.delete_document.apply_async')
     def test_document_delete_without_permission(self, delete_document):
         """Tests user can't delete document without permissions."""
+        user = create_test_user(
+            permission_codenames=(),
+            dit_team=TeamFactory(),
+        )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk, original_filename='test.txt',
@@ -2325,7 +2464,8 @@ class TestPropositionDocumentViews(APITestMixin):
                 'entity_document_pk': entity_document.pk,
             },
         )
-        response = self.api_client.delete(url)
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert delete_document.called is False
 
@@ -2415,6 +2555,10 @@ class TestPropositionDocumentViews(APITestMixin):
 
     def test_document_upload_status_no_status_without_permission(self):
         """Tests user without permission can't call upload status endpoint."""
+        user = create_test_user(
+            permission_codenames=(),
+            dit_team=TeamFactory(),
+        )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk, original_filename='test.txt',
@@ -2429,7 +2573,8 @@ class TestPropositionDocumentViews(APITestMixin):
             },
         )
 
-        response = self.api_client.post(url, data={})
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, data={})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 

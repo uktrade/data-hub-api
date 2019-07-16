@@ -180,7 +180,7 @@ class Team(BaseConstantModel):
         ]
 
 
-class Service(BaseConstantModel):
+class Service(BaseOrderedConstantModel):
     """Service."""
 
     CONTEXTS = Choices(
@@ -217,7 +217,7 @@ class Service(BaseConstantModel):
                   "'interaction_service_answers_flow' feature flag is active.",
     )
 
-    class Meta(BaseConstantModel.Meta):
+    class Meta(BaseOrderedConstantModel.Meta):
         indexes = [
             GinIndex(fields=['contexts']),
         ]
