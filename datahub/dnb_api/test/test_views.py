@@ -105,7 +105,9 @@ class TestDNBCompanySearchAPI(APITestMixin):
         content_type,
         expected_status_code,
     ):
-        """Test that 406 is returned if Content Type is not application/json."""
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
             status_code=status.HTTP_200_OK,
@@ -115,3 +117,24 @@ class TestDNBCompanySearchAPI(APITestMixin):
         response = self.api_client.post(url, content_type=content_type)
 
         assert response.status_code == expected_status_code
+
+    def test_unauthenticated_not_authorised(self, requests_mock, dnb_company_search_feature_flag):
+        """
+        Ensure that a non-authenticated request gets a 401.
+        """
+        requests_mock.post(
+            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
+        )
+
+        unauthorised_api_client = self.create_api_client()
+        unauthorised_api_client.credentials(Authorization='foo')
+
+        url = reverse('api-v4:dnb-api:company-search')
+        response = unauthorised_api_client.post(
+            url,
+            data={'foo': 'bar'},
+            content_type='application/json',
+        )
+
+        assert response.status_code == 401
+        assert requests_mock.called is False
