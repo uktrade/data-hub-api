@@ -27,6 +27,20 @@ from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 
 
+@pytest.fixture
+def unrelated_objects():
+    """
+    Create some objects not related to a known company.
+
+    This is used in tests below to make sure objects unrelated to the company being merged
+    do not affect the counts of objects that will be affected by the merge.
+    """
+    ContactFactory.create_batch(5)
+    CompanyInteractionFactory.create_batch(5)
+    OrderFactory.create_batch(5)
+    InvestmentProjectFactory.create_batch(5)
+
+
 def company_with_interactions_and_contacts_factory():
     """
     Factory for a company with interactions (and hence contacts, as interactions have contacts).
@@ -139,6 +153,7 @@ class TestDuplicateCompanyMerger:
             ),
         ),
     )
+    @pytest.mark.usefixtures('unrelated_objects')
     def test_get_planned_changes(
         self,
         source_company_factory,
@@ -158,6 +173,7 @@ class TestDuplicateCompanyMerger:
     @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
     @pytest.mark.parametrize('source_num_orders', (0, 1, 3))
+    @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_interactions_contacts_succeeds(
             self,
             source_num_interactions,
@@ -241,6 +257,7 @@ class TestDuplicateCompanyMerger:
             ('investor_company', 'intermediate_company', 'uk_company'),
         ),
     )
+    @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_investment_projects_succeeds(self, fields):
         """
         Tests that perform_merge() moves investment projects to the target company and marks the
