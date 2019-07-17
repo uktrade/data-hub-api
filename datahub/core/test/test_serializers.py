@@ -27,11 +27,19 @@ class TestNestedRelatedField:
         assert model.objects.all().get.call_args_list == [call(pk=uuid_)]
 
     def test_to_internal_str(self):
-        """Tests that model instances are returned for a dict with an 'id' key."""
+        """Tests that model instances are returned for a string."""
         model = MagicMock()
         field = NestedRelatedField(model)
         uuid_ = uuid4()
         assert field.to_internal_value(str(uuid_))
+        assert model.objects.all().get.call_args_list == [call(pk=uuid_)]
+
+    def test_to_internal_uuid(self):
+        """Tests that model instances are returned for a UUID."""
+        model = Mock()
+        field = NestedRelatedField(model)
+        uuid_ = uuid4()
+        assert field.to_internal_value(uuid_)
         assert model.objects.all().get.call_args_list == [call(pk=uuid_)]
 
     def test_to_internal_invalid_id(self):
