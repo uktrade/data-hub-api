@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
@@ -17,6 +18,14 @@ class CompanyListItemPermissions(DjangoModelPermissions):
         'DELETE': [
             f'company.{CompanyPermission.view_company}',
             f'company_list.{CompanyListItemPermissionCode.delete_company_list_item}',
+        ],
+        'GET': [
+            f'company.{CompanyPermission.view_company}',
+            f'company_list.{CompanyListItemPermissionCode.view_company_list_item}',
+        ],
+        'HEAD': [
+            f'company.{CompanyPermission.view_company}',
+            f'company_list.{CompanyListItemPermissionCode.view_company_list_item}',
         ],
         'PUT': [
             f'company.{CompanyPermission.view_company}',
@@ -44,6 +53,18 @@ class CompanyListItemView(APIView):
     )
     # Note: A query set is required for CompanyListItemPermissions
     queryset = CompanyListItem.objects.all()
+
+    def get(self, request, format=None, company_pk=None):
+        """Check if a CompanyListItem exists for the authenticated user and specified company."""
+        company_exists = CompanyListItem.objects.filter(
+            adviser=request.user.pk,
+            company_id=company_pk,
+        ).exists()
+
+        if not company_exists:
+            raise Http404()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request, format=None, company_pk=None):
         """
