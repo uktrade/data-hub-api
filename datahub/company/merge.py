@@ -9,6 +9,7 @@ from datahub.omis.order.models import Order
 
 
 ALLOWED_RELATIONS_FOR_MERGING = {
+    Company._meta.get_field('companylistitem').remote_field,
     Company._meta.get_field('dnbmatchingresult').remote_field,
     Contact.company.field,
     Interaction.company.field,
