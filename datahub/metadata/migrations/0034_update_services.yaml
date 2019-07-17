@@ -1,0 +1,8 @@
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: 'A Specific DIT Export Service or Funding : Export Opportunities'
+    order: 620.0
+    contexts: ["export_interaction", "export_service_delivery"]
+    requires_service_answers_flow_feature_flag: false
