@@ -1,3 +1,42 @@
+Data Hub API 14.0.0 (2019-07-17)
+================================
+
+
+
+Internal changes
+----------------
+
+- **Investment** The context of "Export Opportunities" service has been updated to include export interaction.
+
+API
+---
+
+- **Advisers** The following endpoint was added:
+
+  ``PUT /v4/user/company-list/<company ID>``
+
+  This adds a company to the authenticated user's personal list of companies.
+
+  If the operation is successful, a 2xx status code will be returned. If there is no company with the specified company ID, a 404 wil lbe returned.
+
+  Currently, the response body is unused.
+
+Database schema
+---------------
+
+- **Advisers** A ``company_list_companylistitem`` table was created with the following columns:
+
+  - ``"id" bigserial NOT NULL PRIMARY KEY``
+  - ``"adviser_id" uuid NOT NULL``
+  - ``"company_id" uuid NOT NULL``
+  - ``"created_on" timestamp with time zone NULL``
+  - ``"modified_on" timestamp with time zone NULL``
+  - ``"created_by_id" uuid NULL``
+  - ``"modified_by_id" uuid NULL``
+
+  This table will store a list of companies advisers have added to their personal list of companies.
+
+
 Data Hub API 13.9.0 (2019-07-16)
 ================================
 
