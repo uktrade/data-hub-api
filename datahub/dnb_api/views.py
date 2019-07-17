@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
@@ -36,7 +37,9 @@ class DNBCompanySearchView(APIView):
 
     def _get_upstream_response(self, request):
 
-        search_endpoint = urljoin(settings.DNB_SERVICE_BASE_URL, 'companies/search/')
+        if not settings.DNB_SERVICE_BASE_URL:
+            raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+        search_endpoint = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
         shared_key_auth = TokenAuth(settings.DNB_SERVICE_TOKEN)
         api_client = APIClient(
             search_endpoint,

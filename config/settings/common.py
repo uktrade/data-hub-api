@@ -578,5 +578,5 @@ for environ_name in domain_environ_names:
 
 DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
 
-DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default='')
-DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default='')
+DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
+DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)

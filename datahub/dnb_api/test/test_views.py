@@ -1,5 +1,7 @@
 import pytest
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -74,7 +76,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
 
     def test_post_no_feature_flag(self, requests_mock):
         """
-        Test for POST proxy.
+        Test that POST fails with a 404 when the feature flag is unset.
         """
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
@@ -89,6 +91,20 @@ class TestDNBCompanySearchAPI(APITestMixin):
 
         assert response.status_code == 404
         assert requests_mock.called is False
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        url = reverse('api-v4:dnb-api:company-search')
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                url,
+                data={'foo': 'bar'},
+                content_type='application/json',
+            )
 
     @pytest.mark.parametrize(
         'content_type,expected_status_code',
