@@ -471,8 +471,8 @@ class TestCreateView(APITestMixin):
             response_data['project_manager_request_status']['id']
             == str(project_manager_request_status_id)
         )
-        # GVA Multiplier - Transportation & storage - 2019 - 0.0621 * 1000
-        assert response_data['gross_value_added'] == '62'
+        # GVA Multiplier for Retail & wholesale trade - 2019 - 0.0581 * 1000
+        assert response_data['gross_value_added'] == '58'
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -1128,6 +1128,11 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert str(response_data['foreign_equity_investment']) == '100000'
         assert response_data['gross_value_added'] == expected_gross_value_added
+
+        # Make sure the GVA was actually saved (and an unsaved investment project wasn't
+        # serialised)
+        project.refresh_from_db()
+        assert project.gross_value_added == Decimal(expected_gross_value_added)
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""

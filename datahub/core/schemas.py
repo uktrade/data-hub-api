@@ -1,7 +1,6 @@
 import coreapi
 from rest_framework import serializers
-from rest_framework.schemas import AutoSchema
-from rest_framework.schemas.inspectors import field_to_schema
+from rest_framework.schemas.coreapi import AutoSchema, field_to_schema
 
 
 class ExplicitSerializerSchema(AutoSchema):
