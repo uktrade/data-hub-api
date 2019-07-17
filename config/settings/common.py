@@ -260,6 +260,7 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
