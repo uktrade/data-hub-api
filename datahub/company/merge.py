@@ -6,6 +6,7 @@ from datahub.core.model_helpers import get_related_fields, get_self_referential_
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
+from datahub.user.company_list.models import CompanyListItem
 
 
 ALLOWED_RELATIONS_FOR_MERGING = {
@@ -56,6 +57,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
     MergeConfiguration(Order, ('company',)),
+    MergeConfiguration(CompanyListItem, ('company',)),
 ]
 
 
