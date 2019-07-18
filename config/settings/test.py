@@ -125,3 +125,5 @@ DATAHUB_NOTIFICATION_API_KEY = None
 
 DNB_SERVICE_BASE_URL = 'http://dnb.service/api/'
 DNB_SERVICE_TOKEN = 'dnbtoken1234'
+
+DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
