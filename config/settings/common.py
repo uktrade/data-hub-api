@@ -64,6 +64,7 @@ LOCAL_APPS = [
     'datahub.company',
     'datahub.documents',
     'datahub.email_ingestion',
+    'datahub.dnb_api',
     'datahub.event',
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
@@ -576,3 +577,6 @@ for environ_name in domain_environ_names:
     )
 
 DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
+
+DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
+DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)

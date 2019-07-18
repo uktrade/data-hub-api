@@ -250,13 +250,18 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
+| `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
+| `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
+| `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
+| `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `ENABLE_API_DOCUMENTATION` | No | Whether API documentation is made available at the URL path `/docs` (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
+| `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
 | `ES_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
@@ -275,6 +280,9 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
 | `ENABLE_MI_DASHBOARD_FEED` | No | Whether to enable daily MI dashboard feed (default=False). |
+| `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
+| `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
+| `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `MARKET_ACCESS_ACCESS_KEY_ID` | No | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `MARKET_ACCESS_SECRET_ACCESS_KEY` | If `MARKET_ACCESS_ACCESS_KEY_ID` is set | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `MI_DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials) for MI dashboard. |
@@ -300,12 +308,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
 | `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for Elasticsearch and Redis. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
-| `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
-| `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
-| `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
-| `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
-| `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
-| `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
 
 
 ## Management commands
