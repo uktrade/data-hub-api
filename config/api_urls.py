@@ -17,6 +17,7 @@ from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.project import urls as investment_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
+from datahub.user.company_list import urls as company_list_urls
 
 
 # API V1
@@ -69,4 +70,5 @@ v4_urls = [
         ),
     ),
     path('', include((activity_feed_urls, 'activity-feed'), namespace='activity-feed')),
+    path('', include((company_list_urls, 'company-list'), namespace='company-list')),
 ]

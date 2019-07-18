@@ -1,4 +1,5 @@
 from functools import partial
+from uuid import UUID
 
 from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
@@ -99,7 +100,7 @@ class NestedRelatedField(serializers.RelatedField):
     def to_internal_value(self, data):
         """Converts a user-provided value to a model instance."""
         try:
-            if isinstance(data, str):
+            if isinstance(data, (str, UUID)):
                 id_repr = data
             else:
                 id_repr = data['id']
