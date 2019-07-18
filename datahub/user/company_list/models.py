@@ -25,8 +25,16 @@ class CompanyListItem(BaseModel):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid4)
-    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE)
-    company = models.ForeignKey('company.Company', on_delete=models.CASCADE)
+    adviser = models.ForeignKey(
+        'company.Advisor',
+        on_delete=models.CASCADE,
+        related_name='company_list_items',
+    )
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='company_list_items',
+    )
 
     class Meta:
         constraints = [
