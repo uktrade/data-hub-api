@@ -194,7 +194,11 @@ class TestCalendarInteractionEmailParser:
         (
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
-                ValidationError('Email not sent by DIT'),
+                ValidationError(
+                    'The meeting email did not pass our minimal checks '
+                    'to be verified as having been sent by a valid DIT '
+                    'Adviser email domain.',
+                ),
             ),
             (
                 'email_samples/invalid/no_from_header.eml',
@@ -206,36 +210,49 @@ class TestCalendarInteractionEmailParser:
             ),
             (
                 'email_samples/invalid/email_contacts_unknown.eml',
-                ValidationError('No email recipients were recognised as Contacts'),
+                ValidationError(
+                    'No email recipients were recognised as company '
+                    'contacts in Data Hub - please ensure that at least '
+                    'one recipient is a company contact known by Data Hub.',
+                ),
             ),
             # Calendar entry does not start with "BEGIN:VCALENDAR"
             (
                 'email_samples/invalid/bad_calendar_event.eml',
-                ValidationError('No calendar event could be extracted'),
+                ValidationError(
+                    'No calendar event could be extracted - '
+                    'the iCalendar attachment was either missing or badly formatted.',
+                ),
             ),
             # Calendar entry does not include an "END:VEVENT"
             (
                 'email_samples/invalid/bad_calendar_event_2.eml',
-                ValidationError('No calendar event could be extracted'),
+                ValidationError(
+                    'No calendar event could be extracted - '
+                    'the iCalendar attachment was either missing or badly formatted.',
+                ),
             ),
             (
                 'email_samples/invalid/no_calendar_in_email.eml',
-                ValidationError('No calendar event could be extracted'),
+                ValidationError(
+                    'No calendar event could be extracted - '
+                    'the iCalendar attachment was either missing or badly formatted.',
+                ),
             ),
             (
                 'email_samples/invalid/no_calendar_event.eml',
-                ValidationError('No calendar event was found in the calendar'),
+                ValidationError('No calendar event was found in the iCalendar attachment.'),
             ),
             (
                 'email_samples/invalid/multiple_calendar_events.eml',
                 ValidationError(
-                    'There were 3 events in the calendar '
-                    '- expected 1 event',
+                    'There were 3 events in the calendar - expected 1 event '
+                    'in the iCalendar attachment.',
                 ),
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
-                ValidationError('Calendar event was not status: CONFIRMED'),
+                ValidationError('The calendar event was not status: CONFIRMED.'),
             ),
         ),
     )
