@@ -77,6 +77,7 @@ LOCAL_APPS = [
     'datahub.admin_report',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
+    'datahub.user.company_list',
     'datahub.dbmaintenance',
     'datahub.cleanup',
     'datahub.omis.core',
