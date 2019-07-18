@@ -1,0 +1,1 @@
+The ``metadata_service.requires_service_answers_flow_feature_flag`` column is deprecated will be removed on or after 22 July 2019.
