@@ -4,11 +4,11 @@ cssselect==1.0.3
 
 # Django and django related
 Django==2.2.3
-djangorestframework==3.9.4
+djangorestframework==3.10.1
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
 django-extensions==2.1.9
-django-filter==2.1.0
+django-filter==2.2.0
 django-reversion==3.0.4
 django-pglocks==1.0.2
 django-model-utils==3.2.0
