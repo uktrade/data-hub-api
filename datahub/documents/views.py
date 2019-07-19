@@ -1,6 +1,8 @@
 """Document views."""
 from django.core.exceptions import PermissionDenied
+from rest_framework.decorators import action
 
+from datahub.core.schemas import ExplicitSerializerSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.documents.exceptions import TemporarilyUnavailableException
 from datahub.documents.tasks import delete_document
@@ -19,12 +21,14 @@ class BaseEntityDocumentModelViewSet(CoreViewSet):
 
         return response
 
+    @action(methods=['post'], detail=True, schema=ExplicitSerializerSchema())
     def upload_complete_callback(self, request, *args, **kwargs):
         """File upload done callback."""
         entity_document = self.get_object()
         entity_document.document.schedule_av_scan()
         return self.retrieve(request)
 
+    @action(methods=['get'], detail=True, schema=ExplicitSerializerSchema())
     def download(self, request, *args, **kwargs):
         """Provides download information."""
         entity_document = self.get_object()
