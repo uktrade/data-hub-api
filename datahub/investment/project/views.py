@@ -188,9 +188,15 @@ class IProjectTeamMembersViewSet(CoreViewSet):
     lookup_url_kwarg = 'adviser_pk'
     queryset = _team_member_queryset
 
+    def initial(self, request, *args, **kwargs):
+        """Raise an Http404 if the project referenced in the URL path does not exist."""
+        super().initial(request, *args, **kwargs)
+
+        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
+            raise Http404(self.non_existent_project_error_message)
+
     def get_queryset(self):
         """Filters the query set to the specified project."""
-        self._check_project_exists()
         return self.queryset.filter(
             investment_project_id=self.kwargs['project_pk'],
         ).all()
@@ -208,7 +214,6 @@ class IProjectTeamMembersViewSet(CoreViewSet):
 
         Ensures a 404 is returned if the specified project does not exist.
         """
-        self._check_project_exists()
         return super().create(request, *args, **kwargs)
 
     def destroy_all(self, request, *args, **kwargs):
@@ -219,7 +224,6 @@ class IProjectTeamMembersViewSet(CoreViewSet):
 
     def replace_all(self, request, *args, **kwargs):
         """Replaces all team members in the specified project."""
-        self._check_project_exists()
         queryset = self.get_queryset()
 
         serializer = self.get_serializer(data=request.data, many=True)
@@ -236,11 +240,18 @@ class IProjectTeamMembersViewSet(CoreViewSet):
         return 'Investment project team members'
 
     def get_project(self):
-        """Gets the investment project object referred to in the URL path."""
+        """
+        Gets the investment project object referred to in the URL path.
+
+        This is used by IsAssociatedToInvestmentProjectTeamMemberPermission (which handles a
+        non-existent project correctly).
+
+        Note: self.kwargs will not be populated during view schema introspection.
+        """
         try:
             return InvestmentProject.objects.get(pk=self.kwargs['project_pk'])
-        except InvestmentProject.DoesNotExist:
-            raise Http404(self.non_existent_project_error_message)
+        except (InvestmentProject.DoesNotExist, KeyError):
+            return None
 
     def _update_serializer_data_with_project(self, *args, data=None, many=False, **kwargs):
         if data is not None:
@@ -248,7 +259,3 @@ class IProjectTeamMembersViewSet(CoreViewSet):
             items = data if many else [data]
             for item in items:
                 item['investment_project'] = project_pk
-
-    def _check_project_exists(self):
-        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
-            raise Http404(self.non_existent_project_error_message)
