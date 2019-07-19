@@ -1,4 +1,7 @@
+from django.conf import settings
+from django.contrib import admin
 from django.urls import path
+from django.views.generic import TemplateView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
@@ -14,6 +17,19 @@ enhanced.
 
 
 api_docs_urls = [
+    path(
+        'docs',
+        admin.site.admin_view(
+            TemplateView.as_view(
+                template_name='core/docs/swagger-ui.html',
+                extra_context={
+                    'swagger_ui_css': settings.SWAGGER_UI_CSS,
+                    'swagger_ui_js': settings.SWAGGER_UI_JS,
+                },
+            ),
+        ),
+        name='swagger-ui',
+    ),
     path(
         'docs/schema',
         get_schema_view(
