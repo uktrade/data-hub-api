@@ -259,7 +259,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
-| `ENABLE_API_DOCUMENTATION` | No | Whether API documentation is made available at the URL path `/docs` (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
