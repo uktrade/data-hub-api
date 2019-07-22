@@ -1,3 +1,39 @@
+Data Hub API 13.11.0 (2019-07-22)
+=================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** The ``metadata_service.requires_service_answers_flow_feature_flag`` column is deprecated will be removed on or after 22 July 2019.
+
+Features
+--------
+
+- **Interactions** The ability to send received and bounce notifications in case of success and failure of ingesting calendar invite emails respectively has been added to the DataHub.
+
+  This is currently behind the ``interaction-email-notification`` feature flag.
+- **Interactions** The ``interaction_service_answers_flow`` feature flag was removed and the related functionality is no longer behind a feature flag.
+- An initial endpoint was added for searching for companies through dnb-service
+  (https://github.com/uktrade/dnb-service/).  This endpoint takes care of auth
+  and proxies requests through to the service - it will return error responses
+  from the proxied DNB service.
+
+  There is further work to be done here in terms of iterating features and 
+  hardening the implementation.
+
+Bug fixes
+---------
+
+- **Investment** The schema in the API documentation was corrected for all investment document upload callback endpoints.
+
+Internal changes
+----------------
+
+- Django Rest Framework was updated from version 3.9.4 to version 3.10.1.
+
+
 Data Hub API 13.10.0 (2019-07-17)
 ================================
 
