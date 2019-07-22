@@ -44,16 +44,6 @@ class InteractionDITParticipantListSerializer(serializers.ListSerializer):
         ),
     }
 
-    def bind(self, field_name, parent):
-        """
-        Overridden to set self.partial to False as otherwise allow_empty=False does not behave
-        correctly.
-
-        See https://github.com/encode/django-rest-framework/issues/6509.
-        """
-        super().bind(field_name, parent)
-        self.partial = False
-
     def run_validation(self, data=serializers.empty):
         """
         Validates that there are no duplicate advisers.

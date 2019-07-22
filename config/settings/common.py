@@ -64,6 +64,7 @@ LOCAL_APPS = [
     'datahub.company',
     'datahub.documents',
     'datahub.email_ingestion',
+    'datahub.dnb_api',
     'datahub.event',
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
@@ -259,6 +260,7 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
@@ -576,3 +578,8 @@ for environ_name in domain_environ_names:
     )
 
 DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
+
+DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
+DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
+
+DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)

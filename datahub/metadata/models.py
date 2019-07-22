@@ -211,11 +211,6 @@ class Service(BaseOrderedConstantModel):
         choices=CONTEXTS,
         blank=True,
     )
-    requires_service_answers_flow_feature_flag = models.BooleanField(
-        default=False,
-        help_text='Temporary field that designates that this service should be hidden unless the '
-                  "'interaction_service_answers_flow' feature flag is active.",
-    )
 
     class Meta(BaseOrderedConstantModel.Meta):
         indexes = [

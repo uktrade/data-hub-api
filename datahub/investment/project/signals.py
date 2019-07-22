@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
 from datahub.investment.project.gva_utils import set_gross_value_added_for_investment_project
@@ -42,8 +42,32 @@ def set_gross_value_added_for_investment_project_pre_save(sender, instance, **kw
 
     GVA can change if the sector, business activity is set to retail or the
     foreign equity investment is updated.
+
+    However, business activities are a many-to-many field and so can be updated without
+    triggering this signal. There is a separate signal receiver below to reliably
+    pick up changes to them.
     """
     set_gross_value_added_for_investment_project(instance)
+
+
+@receiver(
+    m2m_changed,
+    sender=InvestmentProject.business_activities.through,
+    dispatch_uid='update_gross_value_added_on_project_business_activities_m2m_changed',
+)
+def update_gross_value_added_on_project_business_activities_m2m_changed(
+    sender,
+    instance,
+    **kwargs,
+):
+    """Update the project's gross value added value when its business activities change."""
+    if kwargs['action'] in ('post_add', 'post_remove', 'post_clear') and not kwargs['reverse']:
+        # Note: we are not in the middle of a call to .save() on the project here
+        # To avoid a double-save, we simply call save on the instance which will trigger the
+        # pre_save signal
+        instance.save(
+            update_fields=('gross_value_added', 'gva_multiplier'),
+        )
 
 
 @receiver(

@@ -34,13 +34,11 @@ proposition_document_item = PropositionDocumentViewSet.as_view({
     'delete': 'destroy',
 })
 
-proposition_document_callback = PropositionDocumentViewSet.as_view({
-    'post': 'upload_complete_callback',
-})
+proposition_document_callback = PropositionDocumentViewSet.as_action_view(
+    'upload_complete_callback',
+)
 
-proposition_document_download = PropositionDocumentViewSet.as_view({
-    'get': 'download',
-})
+proposition_document_download = PropositionDocumentViewSet.as_action_view('download')
 
 urlpatterns = [
     path('proposition', proposition_collection, name='collection'),

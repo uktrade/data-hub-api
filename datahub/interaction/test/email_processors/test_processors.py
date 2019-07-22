@@ -8,10 +8,22 @@ from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
 from datahub.company.models import Advisor, Company, Contact
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.interaction.email_processors.notify import Template
 from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
 from datahub.interaction.models import Interaction
 
+
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+@pytest.fixture()
+def interaction_email_notification_feature_flag():
+    """
+    Creates the email ingestion feature flag.
+    """
+    yield FeatureFlagFactory(code=INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME)
 
 
 @pytest.fixture()
@@ -30,6 +42,34 @@ def base_interaction_data_fixture():
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',
     }
+
+
+@pytest.fixture
+def mock_notify_adviser_by_email(monkeypatch):
+    """
+    Mocks the notify_adviser_by_email function.
+    """
+    mock_notify_adviser_by_email = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.interaction.email_processors.notify.notify_adviser_by_email',
+        mock_notify_adviser_by_email,
+    )
+    return mock_notify_adviser_by_email
+
+
+@pytest.fixture
+def mock_message(base_interaction_data_fixture):
+    """
+    Mock email messsage.
+    """
+    message = mock.Mock()
+    message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
+    message.to = [
+        (None, email)
+        for email in base_interaction_data_fixture['contact_emails']
+    ]
+    message.cc = []
+    return message
 
 
 @pytest.mark.django_db
@@ -103,6 +143,9 @@ class TestCalendarInteractionEmailProcessor:
         expected_subject,
         calendar_data_fixture,
         base_interaction_data_fixture,
+        mock_notify_adviser_by_email,
+        interaction_email_notification_feature_flag,
+        mock_message,
         monkeypatch,
     ):
         """
@@ -117,7 +160,7 @@ class TestCalendarInteractionEmailProcessor:
 
         # Process the message and save a draft interaction
         processor = CalendarInteractionEmailProcessor()
-        result, message = processor.process_email(mock.Mock())
+        result, message = processor.process_email(mock_message)
         assert result is True
         interaction = Interaction.objects.get(source__meeting__id='12345')
         assert message == f'Successfully created interaction #{interaction.id}'
@@ -147,11 +190,22 @@ class TestCalendarInteractionEmailProcessor:
         }
         assert interaction.subject == expected_subject
         assert interaction.status == Interaction.STATUSES.draft
+        mock_notify_adviser_by_email.assert_called_once_with(
+            interaction.dit_adviser,
+            Template.meeting_ingest_success.value,
+            context={
+                'interaction_url': interaction.get_absolute_url(),
+                'recipients': 'bill.adama@example.net, saul.tigh@example.net',
+                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+            },
+        )
 
     def test_process_email_meeting_exists(
         self,
         base_interaction_data_fixture,
         calendar_data_fixture,
+        interaction_email_notification_feature_flag,
+        mock_message,
         monkeypatch,
     ):
         """
@@ -162,11 +216,11 @@ class TestCalendarInteractionEmailProcessor:
         self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
         # Create the calendar interaction initially
-        initial_result, initial_message = processor.process_email(mock.Mock())
+        initial_result, initial_message = processor.process_email(mock_message)
         interaction_id = initial_message.split()[-1].strip('#')
         assert initial_result is True
         # Simulate processing the email again
-        duplicate_result, duplicate_message = processor.process_email(mock.Mock())
+        duplicate_result, duplicate_message = processor.process_email(mock_message)
         assert duplicate_result is False
         assert duplicate_message == 'Meeting already exists as an interaction'
         all_interactions_by_sender = Interaction.objects.filter(
@@ -179,6 +233,9 @@ class TestCalendarInteractionEmailProcessor:
         self,
         base_interaction_data_fixture,
         calendar_data_fixture,
+        mock_notify_adviser_by_email,
+        interaction_email_notification_feature_flag,
+        mock_message,
         monkeypatch,
     ):
         """
@@ -190,10 +247,18 @@ class TestCalendarInteractionEmailProcessor:
         error_message = 'There was a problem with the meeting format'
         mock_parser.side_effect = ValidationError(error_message)
         processor = CalendarInteractionEmailProcessor()
-        # Create the calendar interaction initially
-        result, message = processor.process_email(mock.Mock())
+        result, message = processor.process_email(mock_message)
         assert result is False
         assert message == error_message
+        mock_notify_adviser_by_email.assert_called_once_with(
+            Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
+            Template.meeting_ingest_failure.value,
+            context={
+                'errors': ['There was a problem with the meeting format'],
+                'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
+                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+            },
+        )
 
     @pytest.mark.parametrize(
         'interaction_data_overrides,expected_message',
@@ -220,6 +285,9 @@ class TestCalendarInteractionEmailProcessor:
         expected_message,
         base_interaction_data_fixture,
         calendar_data_fixture,
+        mock_notify_adviser_by_email,
+        interaction_email_notification_feature_flag,
+        mock_message,
         monkeypatch,
     ):
         """
@@ -229,7 +297,15 @@ class TestCalendarInteractionEmailProcessor:
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
         self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
-        # Create the calendar interaction initially
-        result, message = processor.process_email(mock.Mock())
+        result, message = processor.process_email(mock_message)
         assert result is False
         assert message == expected_message
+        mock_notify_adviser_by_email.assert_called_once_with(
+            Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
+            Template.meeting_ingest_failure.value,
+            context={
+                'errors': [expected_message],
+                'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
+                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+            },
+        )

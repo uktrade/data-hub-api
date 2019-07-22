@@ -81,10 +81,7 @@ class TestActivityFeedView(APITestMixin):
         (
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-            ('text/javascript', status.HTTP_406_NOT_ACCEPTABLE),
-            ('application/ld+json', status.HTTP_406_NOT_ACCEPTABLE),
             ('application/json', status.HTTP_200_OK),
-            ('application/json; charset=utf-8', status.HTTP_200_OK),
         ),
     )
     def test_content_type(self, requests_mock, content_type, expected_status_code):
