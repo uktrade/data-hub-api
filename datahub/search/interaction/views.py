@@ -7,6 +7,7 @@ from datahub.core.query_utils import (
 )
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
+from datahub.metadata.query_utils import get_service_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.interaction import InteractionSearchApp
 from datahub.search.interaction.serializers import SearchInteractionQuerySerializer
@@ -107,11 +108,12 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
             # Some policy areas contain commas, so we use a semicolon to delimit multiple values
             delimiter='; ',
         ),
+        service_name=get_service_name_subquery('service'),
     )
     field_titles = {
         'date': 'Date',
         'kind_name': 'Type',
-        'service__name': 'Service',
+        'service_name': 'Service',
         'subject': 'Subject',
         'link': 'Link',
         'company__name': 'Company',

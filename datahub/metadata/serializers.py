@@ -1,10 +1,16 @@
 from functools import partial
 
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.interaction.models import ServiceAnswerOption, ServiceQuestion
 from datahub.metadata.models import Country, OverseasRegion, Service, TeamRole, UKRegion
+
+
+SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE = gettext_lazy(
+    'This field is valid for services without children services.',
+)
 
 
 TeamWithGeographyField = partial(

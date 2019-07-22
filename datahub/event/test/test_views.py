@@ -285,6 +285,32 @@ class TestCreateEventView(APITestMixin):
             'archived_documents_url_path': '',
         }
 
+    def test_create_service_with_children(self):
+        """Tests specifying a service with children."""
+        team = random_obj_for_model(TeamModel)
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'organiser': AdviserFactory().pk,
+            'lead_team': team.pk,
+            'teams': [team.pk],
+            'service': Service.enquiry_or_referral_received.value.id,
+            'start_date': '2010-09-12',
+        }
+        response = self.api_client.post(url, data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'service': ['This field is valid for services without children services.'],
+        }
+
     def test_create_lead_team_not_in_teams(self):
         """Tests specifying a lead team that isn't in the teams array."""
         url = reverse('api-v3:event:collection')

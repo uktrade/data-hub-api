@@ -6,6 +6,7 @@ from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.event.models import Event
+from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -32,6 +33,12 @@ class EventSerializer(serializers.ModelSerializer):
     service = NestedRelatedField('metadata.Service')
     start_date = serializers.DateField()
 
+    def validate_service(self, value):
+        """Make sure only a service without children can be assigned."""
+        if value and value.children.count() > 0:
+            raise serializers.ValidationError(SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE)
+        return value
+
     def validate(self, data):
         """Performs cross-field validation."""
         errors = {}
@@ -42,7 +49,6 @@ class EventSerializer(serializers.ModelSerializer):
             self._validate_dates,
             self._validate_uk_region,
         )
-
         for validator in validators:
             errors.update(validator(combiner))
 

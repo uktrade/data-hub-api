@@ -150,6 +150,11 @@ class UKRegion(Enum):
 class Service(Enum):
     """Service."""
 
+    enquiry_or_referral_received = Constant(
+        'Enquiry or Referral Received',
+        'fee6779d-e127-4e1e-89f6-d614b4df3581',
+    )
+
     inbound_referral = Constant(
         'Enquiry or Referral Received : Other Inbound Export Referral',
         '9984b82b-3499-e211-a939-e4115bead28a',
