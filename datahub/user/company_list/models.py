@@ -6,7 +6,7 @@ from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
 
 
-class CompanyListItemPermission(StrEnum):
+class CompanyListItemPermissionCode(StrEnum):
     """CompanyListItem permission codename constants."""
 
     view_company_list_item = 'view_companylistitem'
