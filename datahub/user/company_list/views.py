@@ -1,14 +1,21 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from datahub.company.models import Company, CompanyPermission
 from datahub.oauth.scopes import Scope
 from datahub.user.company_list.models import CompanyListItem, CompanyListItemPermissionCode
+
+
+CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
+    "An archived company can't be added to a company list.",
+)
 
 
 class CompanyListItemPermissions(DjangoModelPermissions):
@@ -75,6 +82,12 @@ class CompanyListItemView(APIView):
         added on the user's list.
         """
         company = get_object_or_404(Company, pk=company_pk)
+
+        if company.archived:
+            errors = {
+                api_settings.NON_FIELD_ERRORS_KEY: CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
+            }
+            raise serializers.ValidationError(errors)
 
         # update_or_create() is used to avoid an error if there is an existing
         # CompanyListItem for this adviser and company
