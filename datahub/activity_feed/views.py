@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
-from django.http.multipartparser import parse_header
+from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from rest_framework import HTTP_HEADER_ENCODING, status
+from rest_framework import status
 from rest_framework.views import APIView
 
 from datahub.core.api_client import APIClient, HawkAuth
+from datahub.core.view_utils import enforce_request_content_type
 from datahub.oauth.scopes import Scope
 
 
@@ -29,18 +30,10 @@ class ActivityFeedView(APIView):
         'order.view_order',
     )
 
+    @method_decorator(enforce_request_content_type('application/json'))
     def get(self, request):
         """Proxy for GET requests."""
         content_type = request.content_type or ''
-
-        # check that the content type of the request is json
-        base_media_type, _ = parse_header(content_type.encode(HTTP_HEADER_ENCODING))
-        if base_media_type != 'application/json':
-            return HttpResponse(
-                'Please set Content-Type header value to application/json',
-                status=status.HTTP_406_NOT_ACCEPTABLE,
-            )
-
         # if the user doesn't have permissions on all activity models, return an empty list
         # TODO: instead of returning an empty list, we need to filter out the
         # activities that the user doesn't have access to

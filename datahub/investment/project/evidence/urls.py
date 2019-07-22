@@ -14,14 +14,6 @@ evidence_document_item = EvidenceDocumentViewSet.as_view({
     'delete': 'destroy',
 })
 
-evidence_document_callback = EvidenceDocumentViewSet.as_view({
-    'post': 'upload_complete_callback',
-})
-
-evidence_document_download = EvidenceDocumentViewSet.as_view({
-    'get': 'download',
-})
-
 urlpatterns = [
     path(
         'evidence-document',
@@ -35,12 +27,12 @@ urlpatterns = [
     ),
     path(
         'evidence-document/<uuid:entity_document_pk>/upload-callback',
-        evidence_document_callback,
+        EvidenceDocumentViewSet.as_action_view('upload_complete_callback'),
         name='document-item-callback',
     ),
     path(
         'evidence-document/<uuid:entity_document_pk>/download',
-        evidence_document_download,
+        EvidenceDocumentViewSet.as_action_view('download'),
         name='document-item-download',
     ),
 ]
