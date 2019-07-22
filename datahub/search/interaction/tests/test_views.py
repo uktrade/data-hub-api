@@ -918,8 +918,7 @@ class TestInteractionExportView(APITestMixin):
         assert parse_header(response.get('Content-Disposition')) == (
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
-
-        sorted_interactions = Interaction.objects.all().order_by(
+        sorted_interactions = Interaction.objects.order_by(
             orm_ordering,
             'pk',
         )

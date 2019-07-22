@@ -20,6 +20,7 @@ def get_base_interaction_queryset():
         'investment_project',
         'modified_by',
         'service',
+        'service__parent',
         'service_delivery_status',
         'event',
     ).prefetch_related(

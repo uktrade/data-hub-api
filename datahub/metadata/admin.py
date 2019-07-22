@@ -143,11 +143,11 @@ class ServiceContextFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Service)
-class ServiceAdmin(ReadOnlyMetadataAdmin):
+class ServiceAdmin(MPTTModelAdmin, ReadOnlyMetadataAdmin):
     """Read only admin for services."""
 
-    fields = ('id', 'name', 'contexts', 'disabled_on')
-    list_display = ('name', 'get_contexts_display', 'disabled_on')
+    fields = ('id', 'segment', 'parent', 'contexts', 'order', 'disabled_on')
+    list_display = ('segment', 'get_contexts_display', 'order', 'disabled_on')
     list_filter = (
         DisabledOnFilter,
         ServiceContextFilter,

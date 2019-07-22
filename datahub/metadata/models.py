@@ -15,6 +15,31 @@ from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, Dis
 from datahub.core.utils import join_truthy_strings
 
 
+class _MPTTObjectName:
+    """
+    This adds a cached property "name" to the model that gets a full name
+    of the object using parent.
+    """
+
+    PATH_SEPARATOR = ' : '
+
+    @cached_property
+    def name(self):
+        """Full name of the object in the form of a path."""
+        ancestors = self._get_ancestors_and_self_using_parent()
+        return self.PATH_SEPARATOR.join(getattr(ancestor, 'segment', '') for ancestor in ancestors)
+
+    def _get_ancestors_and_self_using_parent(self):
+        ancestors = [self]
+        obj = self
+        while getattr(obj, 'parent', None):
+            obj = obj.parent
+            if obj in ancestors:
+                raise DataHubException('Recursive hierarchy encountered.')
+            ancestors.append(obj)
+        return reversed(ancestors)
+
+
 class BusinessType(BaseConstantModel):
     """Company business type."""
 
@@ -23,10 +48,8 @@ class SectorCluster(BaseConstantModel):
     """Sector cluster."""
 
 
-class Sector(MPTTModel, DisableableModel):
+class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
     """Company sector."""
-
-    PATH_SEPARATOR = ' : '
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
@@ -37,7 +60,10 @@ class Sector(MPTTModel, DisableableModel):
         on_delete=models.PROTECT,
     )
     parent = TreeForeignKey(
-        'self', null=True, blank=True, related_name='children',
+        'self',
+        null=True,
+        blank=True,
+        related_name='children',
         on_delete=models.PROTECT,
     )
 
@@ -47,26 +73,6 @@ class Sector(MPTTModel, DisableableModel):
             self.segment,
             '(disabled)' if self.disabled_on else None,
         )
-
-    @cached_property
-    def name(self):
-        """
-        Full name of the sector in the form of a path.
-
-        self.get_ancestors() is not used as it's incompatible with pre-fetching.
-        """
-        ancestors = self._get_ancestors_using_parent(include_self=True)
-        return self.PATH_SEPARATOR.join(ancestor.segment for ancestor in ancestors)
-
-    def _get_ancestors_using_parent(self, include_self=False):
-        ancestors = [self] if include_self else []
-        obj = self
-        while obj.parent:
-            obj = obj.parent
-            if obj in ancestors:
-                raise DataHubException('Recursive sector hierarchy encountered.')
-            ancestors.append(obj)
-        return reversed(ancestors)
 
     class MPTTMeta:
         order_insertion_by = ('segment',)
@@ -180,8 +186,38 @@ class Team(BaseConstantModel):
         ]
 
 
-class Service(BaseOrderedConstantModel):
-    """Service."""
+class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
+    """
+    Service.
+
+    Services use a tree structure managed by `django-mptt` so that we can group services that
+    are somewhat related and make it easier to find them.
+
+    Only the leaf services can be assigned to Interactions or Events.
+
+    The roles of a Service with children nodes are grouping and visual aid.
+
+    Services can only be added via a Django migration. Services cannot be
+    edited through Django admin to make management easier.
+
+    To add a new Service, you can use `load_yaml_data_in_migration` function and provide a
+    path to the YAML formatted file containing the description of a new service.
+    If you want to modify an existing service, the same function can be used and the
+    primary key of the described service must match the existing service.
+
+    We don't support removal of services. To disable a service, you can use a
+    migration and update its `disabled_on` column value.
+
+    Service name is composed of `segment` column values of each Service (going up the tree through
+    the `parent` column), separated by colons or just the segment value if
+    Service has no parent.
+
+    For example:
+
+    <parent service segment> : <service segment>
+    Enquiry or Referral Received : General Export Enquiry
+    Export Win
+    """
 
     CONTEXTS = Choices(
         # Services that can be attached to an event
@@ -206,16 +242,31 @@ class Service(BaseOrderedConstantModel):
         ('service_delivery', 'Service delivery (deprecated)'),
     )
 
+    segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
+
+    parent = TreeForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        related_name='children',
+        on_delete=models.PROTECT,
+    )
+
     contexts = MultipleChoiceField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=CONTEXTS,
         blank=True,
+        help_text='Contexts are only valid on leaf nodes.',
     )
 
     class Meta(BaseOrderedConstantModel.Meta):
         indexes = [
             GinIndex(fields=['contexts']),
         ]
+        ordering = ('lft', )
+
+    class MPTTMeta:
+        order_insertion_by = ('segment',)
 
 
 class HeadquarterType(BaseOrderedConstantModel):
