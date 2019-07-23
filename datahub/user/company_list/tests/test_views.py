@@ -6,11 +6,13 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.views import CANT_ADD_ARCHIVED_COMPANY_MESSAGE
 
 
 @pytest.mark.parametrize('http_method', ('delete', 'get', 'head', 'put'))
@@ -146,6 +148,17 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         assert company_list_item.created_on == creation_date
         assert company_list_item.modified_on == modified_date
 
+    def test_with_archived_company(self):
+        """Test that an archived company can't be added to the authenticated user's list."""
+        company = ArchivedCompanyFactory()
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.put(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            api_settings.NON_FIELD_ERRORS_KEY: CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
+        }
+
     def test_with_non_existent_company(self):
         """Test that a 404 is returned if the specified company ID is invalid."""
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': uuid4()})
@@ -175,6 +188,18 @@ class TestDeleteCompanyListItemView(APITestMixin):
         authenticated user's list.
         """
         company = CompanyFactory()
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+        assert not CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+
+    def test_with_archived_company(self):
+        """Test that no error is returned when removing an archived company."""
+        company = ArchivedCompanyFactory()
+        CompanyListItem.objects.create(adviser=self.user, company=company)
+
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.delete(url)
 
