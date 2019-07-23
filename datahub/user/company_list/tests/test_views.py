@@ -13,7 +13,7 @@ from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyListItem
 
 
-@pytest.mark.parametrize('http_method', ('delete', 'put'))
+@pytest.mark.parametrize('http_method', ('delete', 'get', 'head', 'put'))
 class TestCompanyListItemAuth(APITestMixin):
     """Tests authentication and authorisation for the company list item views."""
 
@@ -35,6 +35,78 @@ class TestCompanyListItemAuth(APITestMixin):
         response = api_client.generic(http_method, url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestGetCompanyListItemView(APITestMixin):
+    """Tests for the GET method in CompanyListItemView."""
+
+    def test_with_item_on_list(self):
+        """Test that a 204 is returned if the company is on the authenticated user's list."""
+        company = CompanyFactory()
+        CompanyListItem.objects.create(adviser=self.user, company=company)
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+
+    def test_with_item_not_on_list(self):
+        """Test that a 404 is returned if the company is on the authenticated user's list."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {
+            'detail': 'Not found.',
+        }
+
+    def test_with_non_existent_company(self):
+        """Test that a 404 is returned if the company does not exist."""
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': uuid4()})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {
+            'detail': 'Not found.',
+        }
+
+
+class TestHeadCompanyListItemView(APITestMixin):
+    """
+    Tests for the HEAD method in CompanyListItemView.
+
+    These are the same as GET, but without response bodies.
+    """
+
+    def test_with_item_on_list(self):
+        """Test that a 204 is returned if the company is on the authenticated user's list."""
+        company = CompanyFactory()
+        CompanyListItem.objects.create(adviser=self.user, company=company)
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.head(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+
+    def test_with_item_not_on_list(self):
+        """Test that a 404 is returned if the company is on the authenticated user's list."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.head(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.content == b''
+
+    def test_with_non_existent_company(self):
+        """Test that a 404 is returned if the company does not exist."""
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': uuid4()})
+        response = self.api_client.head(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.content == b''
 
 
 class TestCreateOrUpdateCompanyListItemView(APITestMixin):
