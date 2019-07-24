@@ -75,7 +75,7 @@ def get_aggregate_subquery(model, expression):
     return Subquery(queryset)
 
 
-def get_top_related_expression_subquery(related_field, expression, ordering):
+def get_top_related_expression_subquery(related_field, expression, ordering, outer_field='pk'):
     """
     Returns an expression that gets a particular field of the top row for a particular ordering
     of a related model.
@@ -95,7 +95,7 @@ def get_top_related_expression_subquery(related_field, expression, ordering):
     queryset = related_field.model.objects.annotate(
         _annotated_value=wrapped_expression,
     ).filter(
-        **{related_field.name: OuterRef('pk')},
+        **{related_field.name: OuterRef(outer_field)},
     ).order_by(
         *ordering,
     ).values(
