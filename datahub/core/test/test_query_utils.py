@@ -15,9 +15,8 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
-from datahub.core.test.support.factories import BookFactory, PersonFactory
-from datahub.core.test.support.models import Book, Person
-
+from datahub.core.test.support.factories import BookFactory, PersonFactory, PersonListItemFactory
+from datahub.core.test.support.models import Book, Person, PersonListItem
 
 pytestmark = pytest.mark.django_db
 
@@ -67,33 +66,71 @@ class TestGetAggregateSubquery:
             get_aggregate_subquery(Person, Left('proofread_books__name', 5))
 
 
-@pytest.mark.parametrize('expression', ('name', F('name')))
-def test_get_top_related_expression_subquery(expression):
-    """
-    Test that get_top_related_expression_subquery() can be used to get the name of the most
-    recently published book.
-    """
-    person = PersonFactory()
-    book_data = [
-        {'name': 'oldest', 'published_on': date(2010, 1, 1)},
-        {'name': 'in the middle', 'published_on': date(2013, 1, 1)},
-        {'name': 'newest', 'published_on': date(2015, 1, 1)},
-    ]
-    shuffle(book_data)
+class TestGetTopRelatedExpressionSubquery:
+    """Tests for get_top_related_expression_subquery()."""
 
-    for item_data in book_data:
-        BookFactory(
-            proofreader=person,
-            authors=[],
-            **item_data,
+    @pytest.mark.parametrize('expression', ('name', F('name')))
+    def test_with_default_outer_field(self, expression):
+        """
+        Test that a Person query set can annotated with the name of the most
+        recently published book.
+
+        This considers a single many-to-one relationship between Book and Person.
+        """
+        person = PersonFactory()
+        book_data = [
+            {'name': 'oldest', 'published_on': date(2010, 1, 1)},
+            {'name': 'in the middle', 'published_on': date(2013, 1, 1)},
+            {'name': 'newest', 'published_on': date(2015, 1, 1)},
+        ]
+        shuffle(book_data)
+
+        for item_data in book_data:
+            BookFactory(
+                proofreader=person,
+                authors=[],
+                **item_data,
+            )
+
+        queryset = Person.objects.annotate(
+            name_of_latest_book=get_top_related_expression_subquery(
+                Book.proofreader.field, expression, ('-published_on',),
+            ),
         )
+        assert queryset.first().name_of_latest_book == 'newest'
 
-    queryset = Person.objects.annotate(
-        name_of_latest_book=get_top_related_expression_subquery(
-            Book.proofreader.field, expression, ('-published_on',),
-        ),
-    )
-    assert queryset.first().name_of_latest_book == 'newest'
+    def test_with_custom_outer_field(self):
+        """
+        Test that a PersonListItem query set can be annotated with the name of the most
+        recently published book for the person in the list item.
+
+        This involves two relationships:
+
+        - a many-to-one relationship between Book and Person
+        - a many-to-one relationship between PersonListItem and Person
+
+        A custom value is used for the outer_field argument.
+        """
+        person_list_item = PersonListItemFactory()
+        book_data = [
+            {'name': 'oldest', 'published_on': date(2010, 1, 1)},
+            {'name': 'in the middle', 'published_on': date(2013, 1, 1)},
+            {'name': 'newest', 'published_on': date(2015, 1, 1)},
+        ]
+        shuffle(book_data)
+
+        for item_data in book_data:
+            BookFactory(proofreader=person_list_item.person, authors=[], **item_data)
+
+        queryset = PersonListItem.objects.annotate(
+            name_of_latest_book=get_top_related_expression_subquery(
+                Book.proofreader.field,
+                'name',
+                ('-published_on',),
+                outer_field='person__pk',
+            ),
+        )
+        assert queryset.first().name_of_latest_book == 'newest'
 
 
 @pytest.mark.parametrize('genre', ('horror', 'non_fiction', 'invalid-option', None))
