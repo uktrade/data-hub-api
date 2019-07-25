@@ -3,14 +3,18 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 from rest_framework import serializers, status
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from datahub.company.models import Company, CompanyPermission
+from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
 from datahub.user.company_list.models import CompanyListItem, CompanyListItemPermissionCode
+from datahub.user.company_list.queryset import get_company_list_item_queryset
+from datahub.user.company_list.serializers import CompanyListItemSerializer
 
 
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
@@ -39,6 +43,37 @@ class CompanyListItemPermissions(DjangoModelPermissions):
             f'company_list.{CompanyListItemPermissionCode.add_company_list_item}',
         ],
     }
+
+
+class CompanyListViewSet(CoreViewSet):
+    """
+    View set for returning the contents of a company list.
+
+    Note that CompanyListItemView is used for operations relating to a single item.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        CompanyListItemPermissions,
+    )
+    serializer_class = CompanyListItemSerializer
+    filter_backends = (OrderingFilter,)
+    # Note that we want null to be treated as the oldest value when sorting by
+    # how long ago the interaction happened. This happens automatically when sorting by
+    # latest_interaction_time_ago (as opposed to sorting by latest_interaction_date in
+    # descending order)
+    ordering = (
+        'latest_interaction_time_ago',
+        '-latest_interaction_created_on',
+        'latest_interaction_id',
+    )
+    queryset = get_company_list_item_queryset()
+
+    def filter_queryset(self, queryset):
+        """Filter the query set to the items relating to the authenticated users."""
+        queryset = super().filter_queryset(queryset)
+        return queryset.filter(adviser=self.request.user)
 
 
 class CompanyListItemView(APIView):
