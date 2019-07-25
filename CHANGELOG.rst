@@ -35,7 +35,7 @@ Internal changes
 
 
 Data Hub API 13.10.0 (2019-07-17)
-================================
+=================================
 
 
 
@@ -62,7 +62,7 @@ Database schema
 
 - **Advisers** A ``company_list_companylistitem`` table was created with the following columns:
 
-  - ``"id" bigserial NOT NULL PRIMARY KEY``
+  - ``"id" uuid NOT NULL PRIMARY KEY``
   - ``"adviser_id" uuid NOT NULL``
   - ``"company_id" uuid NOT NULL``
   - ``"created_on" timestamp with time zone NULL``
