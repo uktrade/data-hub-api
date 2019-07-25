@@ -10,6 +10,8 @@ def get_company_list_item_queryset():
     """
     Returns an annotated query set used by CompanyListViewSet.
 
+    The annotations are supported by an index on the Interaction model.
+
     (Note that getting all three interaction fields in one expression currently is not easily
     done with the Django ORM, hence three annotations are used.)
     """
