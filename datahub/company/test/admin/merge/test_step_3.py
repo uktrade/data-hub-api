@@ -14,7 +14,7 @@ from reversion.models import Version
 
 from datahub.company.admin.merge.step_3 import REVERSION_REVISION_COMMENT
 from datahub.company.merge import FIELD_TO_DESCRIPTION_MAPPING, INVESTMENT_PROJECT_COMPANY_FIELDS
-from datahub.company.models import Company
+from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     ArchivedCompanyFactory,
     CompanyFactory,
@@ -23,10 +23,14 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
+from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.tests.factories import CompanyListItemFactory
 
 
 class TestConfirmMergeViewGet(AdminTestMixin):
@@ -100,12 +104,14 @@ class TestConfirmMergeViewPost(AdminTestMixin):
     @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
     @pytest.mark.parametrize('source_num_investment_projects', (0, 1, 3))
     @pytest.mark.parametrize('source_num_orders', (0, 3))
+    @pytest.mark.parametrize('source_num_company_list_items', (0, 1, 3))
     def test_merge_succeeds(
         self,
         source_num_interactions,
         source_num_contacts,
         source_num_investment_projects,
         source_num_orders,
+        source_num_company_list_items,
     ):
         """
         Test that the merge succeeds and the source company is marked as a duplicate when the
@@ -119,11 +125,13 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 source_num_contacts,
                 source_num_investment_projects,
                 source_num_orders,
+                source_num_company_list_items,
             )
         target_company = CompanyFactory()
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
         source_orders = list(source_company.orders.all())
+        source_company_list_items = list(source_company.company_list_items.all())
 
         source_investment_projects_by_field = {
             investment_project_field: list(
@@ -154,28 +162,41 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert messages[0].level == django_messages.SUCCESS
 
         merge_entries = []
+
         if len(source_interactions) > 0:
-            interaction_noun = 'interaction' if len(source_interactions) == 1 else 'interactions'
+            interaction_noun = _get_verbose_name(len(source_interactions), Interaction)
             merge_entries.append(
                 f'{len(source_interactions)} {interaction_noun}',
             )
+
         if len(source_contacts) > 0:
-            interaction_noun = 'contact' if len(source_contacts) == 1 else 'contacts'
+            contact_noun = _get_verbose_name(len(source_contacts), Contact)
             merge_entries.append(
-                f'{len(source_contacts)} {interaction_noun}',
+                f'{len(source_contacts)} {contact_noun}',
             )
+
         for field, investment_projects in source_investment_projects_by_field.items():
             num_investment_projects = len(investment_projects)
             if num_investment_projects > 0:
-                project_noun = 'project' if num_investment_projects == 1 else 'projects'
+                project_noun = _get_verbose_name(num_investment_projects, InvestmentProject)
                 description = FIELD_TO_DESCRIPTION_MAPPING.get(field)
                 merge_entries.append(
-                    f'{num_investment_projects} investment {project_noun}{description}',
+                    f'{num_investment_projects} {project_noun}{description}',
                 )
+
         if len(source_orders) > 0:
-            order_noun = 'order' if len(source_contacts) == 1 else 'orders'
+            order_noun = _get_verbose_name(len(source_orders), Order)
             merge_entries.append(
                 f'{len(source_orders)} {order_noun}',
+            )
+
+        if len(source_company_list_items) > 0:
+            company_list_item_noun = _get_verbose_name(
+                len(source_company_list_items),
+                CompanyListItem,
+            )
+            merge_entries.append(
+                f'{len(source_company_list_items)} {company_list_item_noun}',
             )
 
         merge_entries = ', '.join(merge_entries)
@@ -315,7 +336,13 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert not source_company.transferred_to
 
 
-def _company_factory(num_interactions, num_contacts, num_investment_projects, num_orders):
+def _company_factory(
+        num_interactions,
+        num_contacts,
+        num_investment_projects,
+        num_orders,
+        num_company_list_items,
+):
     """
     Factory for a company that has companies, interactions, investment projects and OMIS orders.
     """
@@ -323,6 +350,7 @@ def _company_factory(num_interactions, num_contacts, num_investment_projects, nu
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
     OrderFactory.create_batch(num_orders, company=company)
+    CompanyListItemFactory.create_batch(num_company_list_items, company=company)
 
     fields_iter = cycle(INVESTMENT_PROJECT_COMPANY_FIELDS)
     fields = islice(fields_iter, 0, num_investment_projects)
@@ -345,3 +373,7 @@ def _make_confirm_merge_url(source_company, target_company):
 def _get_changelist_url():
     changelist_route_name = admin_urlname(Company._meta, 'changelist')
     return reverse(changelist_route_name)
+
+
+def _get_verbose_name(count, model):
+    return model._meta.verbose_name if count == 1 else model._meta.verbose_name_plural
