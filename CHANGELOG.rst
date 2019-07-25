@@ -1,3 +1,53 @@
+Data Hub API 13.12.0 (2019-07-25)
+=================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** The ``metadata_service.requires_service_answers_flow_feature_flag`` column was removed from the database.
+
+Features
+--------
+
+- **Companies** The admin site company merging tool now updates users' personal company lists if they contain the company being archived.
+
+API
+---
+
+- **Advisers** ``PUT /v4/user/company-list/<company ID>``: A 400 is now returned if an archived company is specified.
+
+  In this case, the response body will contain::
+
+      {
+          "non_field_errors": "An archived company can't be added to a company list."
+      }
+
+  (Note that it is still possible to remove archived companies from a user's company list.)
+- **Advisers** The following endpoint was added:
+
+  - ``GET /v4/user/company-list/<company ID>``
+
+  It checks if a company is on the authenticated user's personal list of companies.
+
+  If the company is on the user's list, a 2xx status code will be returned. If it is not, a 404 will be returned.
+- **Advisers** The following endpoint was added:
+
+  ``DELETE /v4/user/company-list/<company ID>``
+
+  This removes a company from the authenticated user's personal list of companies.
+
+  If the operation is successful, a 2xx status code will be returned. If there is no company with the specified company ID, a 404 wil lbe returned.
+
+  Currently, the response body is unused.
+
+Database schema
+---------------
+
+- **Interactions** The ``metadata_service.requires_service_answers_flow_feature_flag`` column was removed from the database.
+
+
 Data Hub API 13.11.0 (2019-07-22)
 =================================
 
@@ -35,7 +85,7 @@ Internal changes
 
 
 Data Hub API 13.10.0 (2019-07-17)
-================================
+=================================
 
 
 
@@ -62,7 +112,7 @@ Database schema
 
 - **Advisers** A ``company_list_companylistitem`` table was created with the following columns:
 
-  - ``"id" bigserial NOT NULL PRIMARY KEY``
+  - ``"id" uuid NOT NULL PRIMARY KEY``
   - ``"adviser_id" uuid NOT NULL``
   - ``"company_id" uuid NOT NULL``
   - ``"created_on" timestamp with time zone NULL``
