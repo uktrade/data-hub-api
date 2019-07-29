@@ -132,6 +132,27 @@ class TestGetTopRelatedExpressionSubquery:
         )
         assert queryset.first().name_of_latest_book == 'newest'
 
+    def test_with_no_related_objects(self):
+        """
+        Test that, if a Person query set is annotated with the name of the most
+        recently published proofread books, and there are no such books, the annotation
+        value is None.
+
+        This considers a single many-to-one relationship between Book and Person.
+        """
+        created_person = PersonFactory()
+
+        queryset = Person.objects.annotate(
+            name_of_latest_book=get_top_related_expression_subquery(
+                Book.proofreader.field,
+                'name',
+                ('-published_on',),
+            ),
+        )
+        returned_person = queryset.first()
+        assert returned_person == created_person
+        assert returned_person.name_of_latest_book is None
+
 
 @pytest.mark.parametrize('genre', ('horror', 'non_fiction', 'invalid-option', None))
 def test_get_choices_as_case_expression(genre):
