@@ -66,7 +66,7 @@ idna==2.8                 # via requests
 importlib-metadata==0.17  # via pluggy, pytest
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.22         # via mail-parser
-ipdb==0.12
+ipdb==0.12.1
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.7.0
 itypes==1.1.0             # via coreapi
