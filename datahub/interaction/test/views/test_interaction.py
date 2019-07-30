@@ -137,12 +137,6 @@ class TestAddInteraction(APITestMixin):
             },
             'subject': 'whatever',
             'date': '2017-04-18',
-            'dit_adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -157,10 +151,6 @@ class TestAddInteraction(APITestMixin):
                     },
                 },
             ],
-            'dit_team': {
-                'id': str(adviser.dit_team.pk),
-                'name': adviser.dit_team.name,
-            },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
@@ -553,7 +543,7 @@ class TestAddInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_adviser']['id'] == str(requester.pk)
+        assert response_data['dit_participants'][0]['adviser']['id'] == str(requester.pk)
         assert response_data['investment_project']['id'] == str(project.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
@@ -683,12 +673,6 @@ class TestGetInteraction(APITestMixin):
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
-            'dit_adviser': {
-                'id': str(interaction.dit_adviser.pk),
-                'first_name': interaction.dit_adviser.first_name,
-                'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -704,10 +688,6 @@ class TestGetInteraction(APITestMixin):
                 }
                 for dit_participant in interaction.dit_participants.order_by('pk')
             ],
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
-            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
@@ -792,12 +772,6 @@ class TestGetInteraction(APITestMixin):
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
-            'dit_adviser': {
-                'id': str(interaction.dit_adviser.pk),
-                'first_name': interaction.dit_adviser.first_name,
-                'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -812,10 +786,6 @@ class TestGetInteraction(APITestMixin):
                     },
                 },
             ],
-            'dit_team': {
-                'id': str(interaction.dit_team.pk),
-                'name': interaction.dit_team.name,
-            },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
