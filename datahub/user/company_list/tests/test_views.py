@@ -1,4 +1,6 @@
 from datetime import datetime
+from functools import partial
+from random import sample
 from uuid import uuid4
 
 import pytest
@@ -9,10 +11,149 @@ from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
 from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.tests.factories import CompanyListItemFactory
 from datahub.user.company_list.views import CANT_ADD_ARCHIVED_COMPANY_MESSAGE
+
+
+def company_with_interactions_factory(num_interactions):
+    """Factory for a company with interactions."""
+    company = CompanyFactory()
+    CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    return company
+
+
+class TestCompanyListView(APITestMixin):
+    """Tests for CompanyListView."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned for an unauthenticated user."""
+        url = reverse('api-v4:company-list:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_returns_403_if_without_permissions(self, api_client):
+        """Test that a 403 is returned for a user with no permissions."""
+        user = create_test_user(dit_team=TeamFactory())
+
+        url = reverse('api-v4:company-list:collection')
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_with_no_list_items(self):
+        """
+        Test that an empty list is returned if the user does not have any companies on their
+        list.
+        """
+        url = reverse('api-v4:company-list:collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    def test_with_only_items_on_other_users_list(self):
+        """
+        Test that an empty list is returned if the user has no companies on their list,
+        but other users have companies on theirs.
+        """
+        CompanyListItemFactory.create_batch(5)
+
+        url = reverse('api-v4:company-list:collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    @pytest.mark.parametrize(
+        'company_factory',
+        (
+            CompanyFactory,
+            ArchivedCompanyFactory,
+            partial(company_with_interactions_factory, 1),
+            partial(company_with_interactions_factory, 10),
+        ),
+    )
+    def test_with_item(self, company_factory):
+        """Test serialisation of various companies."""
+        company = company_factory()
+        list_item = CompanyListItemFactory(adviser=self.user, company=company)
+
+        latest_interaction = company.interactions.order_by('-date', '-created_by', 'pk').first()
+
+        url = reverse('api-v4:company-list:collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == [
+            {
+                'company': {
+                    'id': str(company.pk),
+                    'archived': company.archived,
+                    'name': company.name,
+                    'trading_names': company.trading_names,
+                },
+                'created_on': format_date_or_datetime(list_item.created_on),
+                'latest_interaction': {
+                    'id': str(latest_interaction.pk),
+                    'created_on': format_date_or_datetime(latest_interaction.created_on),
+                    'date': format_date_or_datetime(latest_interaction.date.date()),
+                    'subject': latest_interaction.subject,
+                } if latest_interaction else None,
+            },
+        ]
+
+    def test_sorting(self):
+        """
+        Test that list items are sorted in reverse order of the date of the latest
+        interaction with the company.
+
+        Note that we want companies without any interactions to be sorted last.
+        """
+        # These dates are in the order we expect them to be returned
+        interaction_dates = [
+            datetime(2019, 10, 8, tzinfo=utc),
+            datetime(2016, 9, 7, tzinfo=utc),
+            datetime(2009, 5, 6, tzinfo=utc),
+            None,
+        ]
+        shuffled_dates = sample(interaction_dates, len(interaction_dates))
+        list_items = CompanyListItemFactory.create_batch(
+            len(interaction_dates),
+            adviser=self.user,
+        )
+
+        for interaction_date, list_item in zip(shuffled_dates, list_items):
+            if interaction_date:
+                CompanyInteractionFactory(date=interaction_date, company=list_item.company)
+
+        url = reverse('api-v4:company-list:collection')
+
+        # Make sure future interactions are also sorted correctly
+        with freeze_time('2017-12-11 09:00:00'):
+            response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()['results']
+        assert len(results) == len(interaction_dates)
+
+        actual_interaction_dates = [
+            result['latest_interaction']['date'] if result['latest_interaction'] else None
+            for result in results
+        ]
+        expected_interaction_dates = [
+            format_date_or_datetime(date_.date()) if date_ else None
+            for date_ in interaction_dates
+        ]
+        assert actual_interaction_dates == expected_interaction_dates
 
 
 @pytest.mark.parametrize('http_method', ('delete', 'get', 'head', 'put'))

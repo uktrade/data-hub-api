@@ -92,6 +92,16 @@ class Book(models.Model):
         return self.name
 
 
+class PersonListItem(models.Model):
+    """An item on a list of people."""
+
+    person = models.ForeignKey(Person, related_name='+', on_delete=models.CASCADE)
+
+    def __str__(self):
+        """Human-friendly string representation."""
+        return self.name
+
+
 class MultiAddressModel(models.Model):
     """Model that has 2 addresses."""
 
