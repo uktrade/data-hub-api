@@ -328,6 +328,8 @@ class Interaction(ArchivableModel, BaseModel):
     class Meta:
         indexes = [
             models.Index(fields=['-date', '-created_on']),
+            # For the list of a user's personal companies (displayed on the Data Hub home page)
+            models.Index(fields=['company', '-date', '-created_on', 'id']),
             # For activity-stream
             models.Index(fields=['modified_on', 'id']),
             # For meeting update lookups

@@ -60,6 +60,15 @@ class BookFactory(factory.django.DjangoModelFactory):
         model = 'support.Book'
 
 
+class PersonListItemFactory(factory.django.DjangoModelFactory):
+    """PersonListItem factory."""
+
+    person = factory.SubFactory(PersonFactory)
+
+    class Meta:
+        model = 'support.PersonListItem'
+
+
 class MultiAddressModelFactory(factory.django.DjangoModelFactory):
     """MultiAddressModel factory."""
 
