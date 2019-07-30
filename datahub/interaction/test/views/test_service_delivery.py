@@ -119,12 +119,6 @@ class TestAddServiceDelivery(APITestMixin):
                 request_data.get('was_policy_feedback_provided', False),
             'subject': 'whatever',
             'date': '2017-04-18',
-            'dit_adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
-            },
             'dit_participants': [
                 {
                     'adviser': {
@@ -139,10 +133,6 @@ class TestAddServiceDelivery(APITestMixin):
                     },
                 },
             ],
-            'dit_team': {
-                'id': str(adviser.dit_team.pk),
-                'name': adviser.dit_team.name,
-            },
             'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),

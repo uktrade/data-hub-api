@@ -14,8 +14,6 @@ def get_base_interaction_queryset():
         'company',
         'created_by',
         'archived_by',
-        'dit_adviser',
-        'dit_team',
         'communication_channel',
         'investment_project',
         'modified_by',
