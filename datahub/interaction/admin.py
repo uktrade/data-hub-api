@@ -100,8 +100,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'archived_documents_url_path',
         'created',
         'modified',
-        'dit_adviser',
-        'dit_team',
         'pretty_service_answers',
         'pretty_source',
     )

@@ -753,6 +753,9 @@ class TestGetInteraction(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['contacts'].sort(key=itemgetter('id'))
+        response_data['dit_participants'].sort(
+            key=lambda dit_participant: dit_participant['adviser']['id'],
+        )
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.KINDS.interaction,
@@ -775,16 +778,17 @@ class TestGetInteraction(APITestMixin):
             'dit_participants': [
                 {
                     'adviser': {
-                        'id': str(interaction.dit_adviser.pk),
-                        'first_name': interaction.dit_adviser.first_name,
-                        'last_name': interaction.dit_adviser.last_name,
-                        'name': interaction.dit_adviser.name,
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'last_name': dit_participant.adviser.last_name,
+                        'name': dit_participant.adviser.name,
                     },
                     'team': {
-                        'id': str(interaction.dit_team.pk),
-                        'name': interaction.dit_team.name,
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
                     },
-                },
+                }
+                for dit_participant in interaction.dit_participants.all()
             ],
             'notes': interaction.notes,
             'company': {
