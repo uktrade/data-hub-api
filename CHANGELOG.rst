@@ -1,3 +1,14 @@
+Data Hub API 13.13.1 (2019-07-31)
+=================================
+
+
+
+Internal changes
+----------------
+
+- **Interactions** A migration was updated to not create a database index concurrently due to a problem encountered during deployment.
+
+
 Data Hub API 13.13.0 (2019-07-30)
 =================================
 
