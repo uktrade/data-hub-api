@@ -5,6 +5,10 @@ from django.conf import settings
 
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.monitoring.interactions.email_processors import (
+    record_failure,
+    record_success,
+)
 from datahub.notification.notify import notify_adviser_by_email
 
 
@@ -25,6 +29,7 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
     Notify an adviser that a meeting ingest has failed - including error
     details and intended recipients.
     """
+    record_failure(adviser)
     if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
             f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
@@ -49,6 +54,7 @@ def notify_meeting_ingest_success(adviser, interaction, recipients):
     Notify an adviser that a meeting ingest has succeeeded - including a link
     to the interaction and intended recipients.
     """
+    record_success(adviser)
     if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
             f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '

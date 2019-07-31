@@ -30,6 +30,9 @@ boto3==1.9.192
 
 notifications-python-client==5.3.0
 
+# Prometheus
+prometheus-client==0.7.1
+
 # Email
 mail-parser==3.9.3
 icalendar==4.0.3

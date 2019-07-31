@@ -92,6 +92,7 @@ LOCAL_APPS = [
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.user_event_log',
     'datahub.activity_feed',
+    'datahub.monitoring',
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
@@ -583,3 +584,4 @@ DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)
+PUSHGATEWAY_URL = env('PUSHGATEWAY_URL', default=None)
