@@ -27,7 +27,7 @@ class PreferNullConcat(Func):
     arg_joiner = ' || '
 
 
-def get_string_agg_subquery(model, expression, delimiter=', '):
+def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
     """
     Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
@@ -42,7 +42,7 @@ def get_string_agg_subquery(model, expression, delimiter=', '):
     """
     return get_aggregate_subquery(
         model,
-        StringAgg(expression, delimiter, ordering=(expression,)),
+        StringAgg(expression, delimiter, ordering=(expression,), distinct=distinct),
     )
 
 
