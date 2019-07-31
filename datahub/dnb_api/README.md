@@ -6,7 +6,7 @@
 
 **Request JSON Body:**
 - `search_term` - required - The string search term to use to find the company e.g. `"siemens"`
-- `address_counrty` - optional - A string ISO Alpha 2 code representing the country to use to filter search results e.g. `"GB"`
+- `address_country` - optional - A string ISO Alpha 2 code representing the country to use to filter search results e.g. `"GB"`
 - `address_postcode` - optional - A string representing the postcode of the business address/registered address to filter search results e.g. `"BN1 4SE"`
 - `page_size` - optional - Integer number of results to show per page of results, defaults to `10`
 - `page_number` - optional - Integer of the page of results to return, defaults to `1`
@@ -112,7 +112,7 @@
         ],
         "legal_status": "corporation"
       },
-      "datahub_company": {}
+      "datahub_company": null
     }
   ]
 }
