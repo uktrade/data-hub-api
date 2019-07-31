@@ -47,7 +47,7 @@ def to_many_field(wrapped_func):
             field.set(extracted)
         else:
             # if the wrapped func returns a value, it's treated as a default value.
-            value = wrapped_func(self)
+            value = wrapped_func(self, **kwargs)
             if value is not None:
                 field.set(value)
 
