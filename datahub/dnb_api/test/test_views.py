@@ -1,13 +1,19 @@
+import datetime
+import json
+
 import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
 @pytest.fixture()
@@ -18,30 +24,101 @@ def dnb_company_search_feature_flag():
     yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
 
 
+@pytest.fixture()
+def dnb_company_search_datahub_companies():
+    """
+    Creates Data Hub companies for hydrating DNB search results with.
+    """
+    # Company with no interactions
+    CompanyFactory(duns_number='1234567', id='6083b732-b07a-42d6-ada4-c8082293285b')
+    # Company with two interactions
+    company = CompanyFactory(duns_number='7654321', id='6083b732-b07a-42d6-ada4-c99999999999')
+
+    interaction_date = make_aware(
+        datetime.datetime(year=2019, month=8, day=1, hour=16, minute=0, second=0),
+    )
+    latest_interaction = CompanyInteractionFactory(
+        id='6083b732-b07a-42d6-ada4-222222222222',
+        date=interaction_date,
+        subject='Meeting with Joe Bloggs',
+        company=company,
+    )
+    latest_interaction.created_on = interaction_date
+    latest_interaction.save()
+
+    older_interaction_date = make_aware(datetime.datetime(year=2018, month=8, day=1))
+    older_interaction = CompanyInteractionFactory(
+        id='6083b732-b07a-42d6-ada4-111111111111',
+        date=older_interaction_date,
+        subject='Meeting with John Smith',
+        company=company,
+    )
+    older_interaction.created_on = older_interaction_date
+
+
 class TestDNBCompanySearchAPI(APITestMixin):
     """
     DNB Company Search view test case.
     """
 
     @pytest.mark.parametrize(
-        'request_data,response_status_code,response_content',
+        'request_data,response_status_code,upstream_response_content,response_data',
         (
             pytest.param(
                 b'{"arg": "value"}',
                 200,
-                b'{"took":27}',
-                id='successful call to proxied API',
+                b'{"results":[{"duns_number":"9999999"}]}',
+                {
+                    'results': [
+                        {
+                            'dnb_company': {'duns_number': '9999999'},
+                            'datahub_company': None,
+                        },
+                    ],
+                },
+                id='successful call to proxied API with company that cannot be hydrated',
+            ),
+            pytest.param(
+                b'{"arg": "value"}',
+                200,
+                b'{"results":[{"duns_number":"1234567"}, {"duns_number":"7654321"}]}',
+                {
+                    'results': [
+                        {
+                            'dnb_company': {'duns_number': '1234567'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c8082293285b',
+                                'latest_interaction': None,
+                            },
+                        },
+                        {
+                            'dnb_company': {'duns_number': '7654321'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c99999999999',
+                                'latest_interaction': {
+                                    'id': '6083b732-b07a-42d6-ada4-222222222222',
+                                    'date': '2019-08-01',
+                                    'created_on': '2019-08-01T16:00:00Z',
+                                    'subject': 'Meeting with Joe Bloggs',
+                                },
+                            },
+                        },
+                    ],
+                },
+                id='successful call to proxied API with company that can be hydrated',
             ),
             pytest.param(
                 b'{"arg": "value"}',
                 400,
                 b'{"error":"msg"}',
+                {'error': 'msg'},
                 id='proxied API returns a bad request',
             ),
             pytest.param(
                 b'{"arg": "value"}',
                 500,
                 b'{"error":"msg"}',
+                {'error': 'msg'},
                 id='proxied API returns a server error',
             ),
         ),
@@ -49,10 +126,12 @@ class TestDNBCompanySearchAPI(APITestMixin):
     def test_post(
         self,
         dnb_company_search_feature_flag,
+        dnb_company_search_datahub_companies,
         requests_mock,
         request_data,
         response_status_code,
-        response_content,
+        upstream_response_content,
+        response_data,
     ):
         """
         Test for POST proxy.
@@ -60,7 +139,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
             status_code=response_status_code,
-            content=response_content,
+            content=upstream_response_content,
         )
 
         url = reverse('api-v4:dnb-api:company-search')
@@ -71,7 +150,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
 
         assert response.status_code == response_status_code
-        assert response.content == response_content
+        assert json.loads(response.content) == response_data
         assert requests_mock.last_request.body == request_data
 
     def test_post_no_feature_flag(self, requests_mock):
@@ -127,6 +206,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         requests_mock.post(
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
             status_code=status.HTTP_200_OK,
+            content=b'{"results":[]}',
         )
 
         url = reverse('api-v4:dnb-api:company-search')
