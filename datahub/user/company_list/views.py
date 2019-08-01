@@ -126,12 +126,7 @@ class CompanyListItemView(APIView):
 
         # update_or_create() is used to avoid an error if there is an existing
         # CompanyListItem for this adviser and company
-        self.queryset.update_or_create(
-            defaults={
-                'adviser': request.user,
-                'company': company,
-            },
-        )
+        self.queryset.update_or_create(adviser=request.user, company=company)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
