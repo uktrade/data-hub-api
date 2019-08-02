@@ -121,6 +121,17 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         """
         return self.contact_email or self.email
 
+    def get_email_domain(self):
+        """
+        :returns: Domain for adviser's current email.
+        """
+        email = self.get_current_email()
+        try:
+            _, domain = email.rsplit('@', maxsplit=1)
+        except ValueError:
+            return None
+        return domain.lower()
+
     class Meta:
         indexes = [
             models.Index(fields=['first_name', 'last_name']),
