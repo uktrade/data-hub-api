@@ -3,6 +3,7 @@ from functools import partial
 from random import sample
 from uuid import uuid4
 
+import factory
 import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
@@ -263,6 +264,38 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
+        assert CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+
+    def test_does_not_overwrite_other_items(self):
+        """Test that adding an item does not overwrite other (unrelated) items."""
+        existing_companies = CompanyFactory.create_batch(5)
+        CompanyListItemFactory.create_batch(
+            5,
+            adviser=self.user,
+            company=factory.Iterator(existing_companies),
+        )
+        company_to_add = CompanyFactory()
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company_to_add.pk})
+        response = self.api_client.put(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        companies_after = {
+            item.company for item in CompanyListItem.objects.filter(adviser=self.user)
+        }
+        assert companies_after == {*existing_companies, company_to_add}
+
+    def test_two_advisers_can_have_the_same_company(self):
+        """Test that two advisers can have the same company on their list."""
+        other_user_item = CompanyListItemFactory()
+        other_user = other_user_item.adviser
+        company = other_user_item.company
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.put(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        assert CompanyListItem.objects.filter(adviser=other_user, company=company).exists()
         assert CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
 
     def test_with_existing_item(self):
