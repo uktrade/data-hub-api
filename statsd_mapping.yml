@@ -1,0 +1,8 @@
+mappings:
+- match: "datahub.*.calendar-invite-ingest.*.*"
+  name: "calendar_invite_ingest_total"
+  labels:
+    source: "$1"
+    result: "$2"
+    domain: "$3"
+    job: "calendar-invite-ingest"

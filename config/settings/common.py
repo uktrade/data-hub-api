@@ -567,13 +567,13 @@ MAILBOXES = {
 DIT_EMAIL_INGEST_WHITELIST = env.list('DIT_EMAIL_INGEST_WHITELIST', default=[])
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [
-    environ_name 
+    environ_name
     for environ_name in env.ENVIRON.keys()
     if environ_name.startswith('DIT_EMAIL_DOMAIN_')
 ]
 
 # Go through all DIT_EMAIL_DOMAIN_* environment variables and extract
-# dictionary with key email domain and value consisting of 
+# dictionary with key email domain and value consisting of
 # authentication method/minimum pass result pairs e.g.
 # example.com=dmarc:pass|spf:pass|dkim:pass becomes
 # {'example.com': [['dmarc', 'pass'], ['spf', 'pass'], ['dkim', 'pass']]}
@@ -592,3 +592,7 @@ DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)
+
+STATSD_HOST = env('STATSD_HOST', default='localhost')
+STATSD_PORT = env('STATSD_PORT', default='9125')
+STATSD_PREFIX = env('STATSD_PREFIX', default='datahub-api')
