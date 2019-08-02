@@ -6,6 +6,7 @@ This page contains a non-exhaustive list of documents related to specific develo
 * [Code Review guidelines](./Code&#32;review&#32;guidelines.md)
 * [Incremental Pull Requests](./Incremental&#32;Pull&#32;Requests.md)
 * [Managing dependencies](./Managing&#32;dependencies.md)
+* [Maintaining the API documentation](./Maintaining&#32;the&#32;API&#32;documentation.md)
 * [Document upload architectural design](./Document&#32;upload.md)
 * [How elasticsearch mapping migration works and how to use it](./Elasticsearch&#32;migrations.md)
 * [How to prepare a release](./How&#32;to&#32;prepare&#32;a&#32;release.md)
