@@ -241,6 +241,7 @@ class MailboxHandler:
             return
         mailbox.process_new_mail()
     ```
+
     """
 
     def __init__(self):
