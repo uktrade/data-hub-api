@@ -454,7 +454,9 @@ class TestAddInteraction(APITestMixin):
                     'company': CompanyFactory,
                     'contacts': [ContactFactory],
                     'dit_participants': [
-                        {'adviser': AdviserFactory},
+                        {
+                            'adviser': AdviserFactory,
+                        },
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
@@ -464,6 +466,28 @@ class TestAddInteraction(APITestMixin):
                     'status': ['"foobar" is not a valid choice.'],
                 },
             ),
+
+            # service must be without children
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': CompanyFactory,
+                    'contacts': [ContactFactory],
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.enquiry_or_referral_received.value.id,
+                    'was_policy_feedback_provided': False,
+                },
+                {
+                    'service': ['This field is valid for services without children services.'],
+                },
+            ),
+
             (
                 {
                     'kind': Interaction.KINDS.interaction,

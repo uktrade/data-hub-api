@@ -11,5 +11,6 @@ def random_service(disabled=False):
         Service.objects.filter(
             disabled_on__isnull=not disabled,
             interaction_questions__isnull=True,
+            children__isnull=True,
         ),
     )
