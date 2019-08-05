@@ -17,6 +17,7 @@ from datahub.core.query_utils import (
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory, PersonListItemFactory
 from datahub.core.test.support.models import Book, Person, PersonListItem
+from datahub.core.test_utils import join_attr_values
 
 pytestmark = pytest.mark.django_db
 
@@ -28,13 +29,15 @@ def test_get_string_agg_subquery(num_authors):
     all authors for each book into one field.
     """
     authors = PersonFactory.create_batch(num_authors)
-    BookFactory(authors=authors)
+    book = BookFactory(authors=authors)
     queryset = Book.objects.annotate(
         author_names=get_string_agg_subquery(Book, 'authors__first_name'),
     )
-    author_names_str = queryset.first().author_names
-    actual_author_names = sorted(author_names_str.split(', ')) if author_names_str else []
-    expected_author_names = sorted(author.first_name for author in authors)
+    actual_author_names = queryset.first().author_names or ''
+    expected_author_names = join_attr_values(
+        book.authors.order_by('first_name'),
+        'first_name',
+    )
     assert actual_author_names == expected_author_names
 
 
