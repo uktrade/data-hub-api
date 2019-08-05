@@ -1,12 +1,11 @@
-import json
 from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from rest_framework.renderers import JSONRenderer
+from rest_framework import status
 from rest_framework.views import APIView
 
 from datahub.core.api_client import APIClient, TokenAuth
@@ -35,25 +34,52 @@ class DNBCompanySearchView(APIView):
         on Data Hub.
         """
         upstream_response = self._get_upstream_response(request)
-        response_body_text = upstream_response.text
 
-        if upstream_response.status_code == 200:
-            response_body = json.loads(upstream_response.text)
-            response_body['results'] = self._transpose_and_hydrate(response_body['results'])
-            response_body_text = JSONRenderer().render(response_body)
+        if upstream_response.status_code == status.HTTP_200_OK:
+            response_body = upstream_response.json()
+            response_body['results'] = self._format_and_hydrate(response_body['results'])
+            return JsonResponse(response_body)
 
         return HttpResponse(
-            response_body_text,
+            upstream_response.text,
             status=upstream_response.status_code,
             content_type=upstream_response.headers.get('content-type'),
         )
 
-    def _transpose_and_hydrate(self, dnb_results):
+    def _format_and_hydrate(self, dnb_results):
         """
-        Transpose each result from DNB such that there is a "dnb_company" key and
+        Format each result from DNB such that there is a "dnb_company" key and
         a "datahub_company" key.  The value for "datahub_company" represents
         the corresponding Company entry on Data Hub for the DNB result, if it
         exists.
+
+        This changes a DNB result entry from:
+
+        {
+          "duns_number": "999999999",
+          "primary_name": "My Company LTD",
+          ...
+        }
+
+        To:
+
+        {
+          "dnb_company": {
+            "duns_number": "999999999",
+            "primary_name": "My Company LTD",
+            ...
+          },
+          "datahub_company": {
+            "id": "0f5216e0-849f-11e6-ae22-56b6b6499611",
+            "latest_interaction": {
+              "id": "e8c3534f-4f60-4c93-9880-09c22e4fc011",
+              "created_on": "2018-04-08T14:00:00Z",
+              "date": "2018-06-06",
+              "subject": "Meeting with Joe Bloggs"
+            }
+          }
+        }
+
         """
         duns_numbers = [result['duns_number'] for result in dnb_results]
         matching_datahub_companies = get_company_queryset().filter(duns_number__in=duns_numbers)
@@ -65,11 +91,12 @@ class DNBCompanySearchView(APIView):
 
         for dnb_result in dnb_results:
             duns_number = dnb_result['duns_number']
-            hydrated_result = {'dnb_company': dnb_result, 'datahub_company': None}
             datahub_company = datahub_companies_by_duns.get(duns_number)
             if datahub_company:
                 datahub_company_data = DNBMatchedCompanySerializer(datahub_company).data
-                hydrated_result['datahub_company'] = datahub_company_data
+            else:
+                datahub_company_data = None
+            hydrated_result = {'dnb_company': dnb_result, 'datahub_company': datahub_company_data}
             hydrated_results.append(hydrated_result)
 
         return hydrated_results
