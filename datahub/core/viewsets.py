@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.core.exceptions import FieldDoesNotExist
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
@@ -47,7 +49,14 @@ class CoreViewSet(
         """
         method = getattr(cls, action)
         mapping = dict(method.mapping)
-        return cls.as_view(mapping, **method.kwargs)
+        initkwargs = method.kwargs
+        # If the method is defined on a mixin class, a single schema instance will end up
+        # being shared between the subclasses, which causes problems with schema generation.
+        # We work around this by making a copy of it.
+        schema = initkwargs.get('schema')
+        if schema is not None:
+            initkwargs['schema'] = copy(schema)
+        return cls.as_view(mapping, **initkwargs)
 
     def perform_create(self, serializer):
         """Custom logic for creating the model instance."""

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Swagger</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{{ swagger_ui_css.url }}"
+        integrity="{{ swagger_ui_css.integrity }}"
+        crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script
+        src="{{ swagger_ui_js.url }}"
+        integrity="{{ swagger_ui_js.integrity }}"
+        crossorigin="anonymous">
+    </script>
+    <script>
+    const ui = SwaggerUIBundle({
+        url: "{% url 'api-docs:openapi-schema' %}",
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout"
+      })
+    </script>
+  </body>
+</html>
