@@ -1,11 +1,12 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ViewSet
 from reversion.models import Version
 
 from datahub.core.audit_utils import diff_versions
 
 
-class AuditViewSet(GenericViewSet):
+class AuditViewSet(ViewSet):
     """Generic view set for audit logs.
 
     Subclasses must set the queryset class attribute.
@@ -16,6 +17,12 @@ class AuditViewSet(GenericViewSet):
     queryset = None
     pagination_class = LimitOffsetPagination
 
+    def get_object(self):
+        """Get the model object referenced in the URL path."""
+        obj = get_object_or_404(self.queryset, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def list(self, request, *args, **kwargs):
         """Lists audit log entries (paginated)."""
         instance = self.get_object()
@@ -23,15 +30,17 @@ class AuditViewSet(GenericViewSet):
 
     def create_response(self, instance):
         """Creates an audit log response."""
+        paginator = self.pagination_class()
+
         versions = Version.objects.get_for_object(instance)
         proxied_versions = _VersionQuerySetProxy(versions)
-        versions_subset = self.paginator.paginate_queryset(proxied_versions, self.request)
+        versions_subset = paginator.paginate_queryset(proxied_versions, self.request)
 
         version_pairs = (
             (versions_subset[n], versions_subset[n + 1]) for n in range(len(versions_subset) - 1)
         )
         results = self._construct_changelog(version_pairs)
-        return self.paginator.get_paginated_response(results)
+        return paginator.get_paginated_response(results)
 
     @classmethod
     def _construct_changelog(cls, version_pairs):
