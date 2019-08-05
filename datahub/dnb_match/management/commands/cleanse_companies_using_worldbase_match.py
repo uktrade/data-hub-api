@@ -95,7 +95,6 @@ class Command(BaseCommand):
         subquery_for_matched_duns_numbers = DnBMatchingResult.objects.filter(
             company__archived=False,
         ).annotate(
-            dnb_match=KeyTransform('dnb_match', 'data'),
             matched_duns_number=KeyTextTransform(
                 'duns_number',
                 KeyTransform('dnb_match', 'data'),
@@ -116,7 +115,6 @@ class Command(BaseCommand):
         ).values('duns_number')
 
         return Company.objects.annotate(
-            wb_record=KeyTransform('wb_record', 'dnbmatchingresult__data'),
             matched_duns_number=KeyTextTransform(
                 'DUNS Number',
                 KeyTransform('wb_record', 'dnbmatchingresult__data'),
