@@ -4,7 +4,6 @@ from collections import Counter
 from csv import DictReader
 from decimal import Decimal
 from io import StringIO
-from itertools import chain
 from unittest import mock
 from uuid import UUID
 
@@ -1119,7 +1118,8 @@ class TestInvestmentProjectExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchInvestmentExportAPIView.field_titles.values())
 
-        expected_row_data = [
+        # E123 is ignored as there are seemingly unresolvable indentation errors in the dict below
+        expected_row_data = [  # noqa: E123
             {
                 'Date created': project.created_on,
                 'Project reference': project.project_code,
@@ -1145,10 +1145,23 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Global account manager': self._get_global_account_manager_name(project),
                 'Project assurance adviser':
                     get_attr_or_none(project, 'project_assurance_adviser.name'),
-                'Other team members': join_attr_values(project.team_members.all(), 'adviser.name'),
-                'Delivery partners': join_attr_values(project.delivery_partners.all()),
-                'Possible UK regions': join_attr_values(project.uk_region_locations.all()),
-                'Actual UK regions': join_attr_values(project.actual_uk_regions.all()),
+                'Other team members':
+                    join_attr_values(
+                        project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
+                        'adviser.name',
+                    ),
+                'Delivery partners':
+                    join_attr_values(
+                        project.delivery_partners.order_by('name'),
+                    ),
+                'Possible UK regions':
+                    join_attr_values(
+                        project.uk_region_locations.order_by('name'),
+                    ),
+                'Actual UK regions':
+                    join_attr_values(
+                        project.actual_uk_regions.order_by('name'),
+                    ),
                 'Specific investment programme':
                     get_attr_or_none(project, 'specific_programme.name'),
                 'Referral source activity':
@@ -1177,21 +1190,6 @@ class TestInvestmentProjectExportView(APITestMixin):
         # item is an ordered dict so is cast to a dict to make the comparison easier to
         # interpret in the event of the assert actual_rows == expected_rows failing.
         actual_rows = [dict(item) for item in reader]
-
-        # Support for ordering was added to StringAgg in Django 2.2. However, it is not
-        # currently used due to https://code.djangoproject.com/ticket/30315. While that
-        # remains the case, our StringAgg fields are unordered and we use this workaround to
-        # compare them.
-        unordered_fields = (
-            'Other team members',
-            'Delivery partners',
-            'Possible UK regions',
-            'Actual UK regions',
-        )
-
-        for row in chain(actual_rows, expected_rows):
-            for field in unordered_fields:
-                row[field] = frozenset(row[field].split(', '))
 
         assert actual_rows == expected_rows
 

@@ -383,7 +383,7 @@ def join_attr_values(iterable, attr='name', separator=', '):
     attr can also be a dotted path (to specify sub-attributes).
     """
     getter = attrgetter(attr)
-    return separator.join(sorted(getter(value) for value in iterable))
+    return separator.join(getter(value) for value in iterable)
 
 
 def format_csv_data(rows):
