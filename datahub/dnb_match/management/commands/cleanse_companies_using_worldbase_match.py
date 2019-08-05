@@ -1,11 +1,9 @@
 from logging import getLogger
 
 import reversion
-from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, OuterRef, Q
-from django.db.models.functions import Cast
 
 from datahub.company.models import Company
 from datahub.dnb_match.models import DnBMatchingResult
@@ -100,7 +98,7 @@ class Command(BaseCommand):
             dnb_match=KeyTransform('dnb_match', 'data'),
             matched_duns_number=KeyTextTransform(
                 'duns_number',
-                Cast('dnb_match', JSONField()),
+                KeyTransform('dnb_match', 'data'),
             ),
         ).values(
             'matched_duns_number',
@@ -121,7 +119,7 @@ class Command(BaseCommand):
             wb_record=KeyTransform('wb_record', 'dnbmatchingresult__data'),
             matched_duns_number=KeyTextTransform(
                 'DUNS Number',
-                Cast('wb_record', JSONField()),
+                KeyTransform('wb_record', 'dnbmatchingresult__data'),
             ),
         ).filter(
             duns_number__isnull=True,
