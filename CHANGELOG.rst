@@ -1,3 +1,19 @@
+Data Hub API 13.13.2 (2019-08-05)
+=================================
+
+
+
+Bug fixes
+---------
+
+- **Advisers** ``PUT /v4/user/company-list/<company ID>``: A bug was fixed where multiple companies could not be added to a company list.
+
+Internal changes
+----------------
+
+- The Gunicorn log format was updated to include request times in seconds.
+
+
 Data Hub API 13.13.1 (2019-07-31)
 =================================
 
