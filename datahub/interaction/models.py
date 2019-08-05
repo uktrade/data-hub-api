@@ -6,6 +6,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from model_utils import Choices
+from mptt.fields import TreeForeignKey
 
 from datahub.core import reversion
 from datahub.core.models import (
@@ -130,7 +131,7 @@ class InteractionDITParticipant(models.Model):
 class ServiceQuestion(BaseOrderedConstantModel):
     """Service question model."""
 
-    service = models.ForeignKey(
+    service = TreeForeignKey(
         'metadata.Service',
         related_name='interaction_questions',
         on_delete=models.PROTECT,
@@ -238,8 +239,11 @@ class Interaction(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
         help_text='For service deliveries only.',
     )
-    service = models.ForeignKey(
-        'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
+    service = TreeForeignKey(
+        'metadata.Service',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     service_answers = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
 
