@@ -8,7 +8,9 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from rest_framework import status
 from rest_framework.views import APIView
 
+from datahub.company.models import CompanyPermission
 from datahub.core.api_client import APIClient, TokenAuth
+from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.dnb_api.queryset import get_company_queryset
@@ -23,7 +25,12 @@ class DNBCompanySearchView(APIView):
     """
 
     required_scopes = (Scope.internal_front_end,)
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+        ),
+    )
 
     @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
     @method_decorator(enforce_request_content_type('application/json'))
@@ -93,7 +100,10 @@ class DNBCompanySearchView(APIView):
             duns_number = dnb_result['duns_number']
             datahub_company = datahub_companies_by_duns.get(duns_number)
             if datahub_company:
-                datahub_company_data = DNBMatchedCompanySerializer(datahub_company).data
+                datahub_company_data = DNBMatchedCompanySerializer(
+                    datahub_company,
+                    context={'request': self.request},
+                ).data
             else:
                 datahub_company_data = None
             hydrated_result = {'dnb_company': dnb_result, 'datahub_company': datahub_company_data}
