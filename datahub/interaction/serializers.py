@@ -33,6 +33,7 @@ from datahub.interaction.validators import (
 )
 from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
+from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
 class InteractionDITParticipantListSerializer(serializers.ListSerializer):
@@ -192,6 +193,12 @@ class InteractionSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+
+    def validate_service(self, value):
+        """Make sure only a service without children can be assigned."""
+        if value and value.children.count() > 0:
+            raise serializers.ValidationError(SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE)
+        return value
 
     def validate(self, data):
         """

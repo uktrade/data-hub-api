@@ -251,6 +251,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
 | `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
+| `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DJANGO_SECRET_KEY`  | Yes | |
@@ -259,7 +260,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
-| `ENABLE_API_DOCUMENTATION` | No | Whether API documentation is made available at the URL path `/docs` (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
@@ -306,15 +306,13 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
+| `STATSD_HOST` | No | StatsD host url. |
+| `STATSD_PORT` | No | StatsD port number. |
+| `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
 | `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for Elasticsearch and Redis. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
-| `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
-| `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
-| `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
-| `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
-| `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
 
 
 ## Management commands

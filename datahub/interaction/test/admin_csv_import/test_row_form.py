@@ -31,7 +31,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
 )
 from datahub.interaction.test.utils import random_service
-from datahub.metadata.test.factories import ServiceFactory, TeamFactory
+from datahub.metadata.test.factories import ChildServiceFactory, ServiceFactory, TeamFactory
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
     {
@@ -232,7 +232,7 @@ class TestInteractionCSVRowFormValidation:
             ),
             pytest.param(
                 {
-                    'service': lambda: ServiceFactory.create_batch(2, name='Duplicate')[0].name,
+                    'service': lambda: ServiceFactory.create_batch(2, segment='Duplicate')[0].name,
                 },
                 {
                     'service': ['There is more than one matching service.'],
@@ -773,13 +773,19 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             ),
             pytest.param(
                 'service',
-                lambda: ServiceFactory(name='UNIQUE EXPORT DEAL'),
+                lambda: ServiceFactory(segment='UNIQUE EXPORT DEAL'),
                 lambda obj: obj.name,
                 id='service look-up (same case)',
             ),
             pytest.param(
                 'service',
-                lambda: ServiceFactory(name='UNIQUE EXPORT DEAL'),
+                lambda: ChildServiceFactory(segment='UNIQUE EXPORT', parent__segment='DEAL'),
+                lambda obj: obj.name,
+                id='service look-up (same case)',
+            ),
+            pytest.param(
+                'service',
+                lambda: ServiceFactory(segment='UNIQUE EXPORT DEAL'),
                 lambda obj: obj.name.lower(),
                 id='service look-up (case-insensitive)',
             ),

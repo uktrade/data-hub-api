@@ -260,7 +260,6 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
@@ -268,10 +267,20 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-# Currently the docs (at /docs) are behind at setting as they are not fully accurate yet
-# TODO: Remove this once we are happy with the docs
-ENABLE_API_DOCUMENTATION = env.bool('ENABLE_API_DOCUMENTATION', default=False)
-API_DOCUMENTATION_TITLE = 'Data Hub API'
+
+# Swagger UI resources used in the Swagger UI view
+# (used in config/api_docs_urls.py and datahub/core/templates/core/docs/swagger-ui.html)
+#
+# See https://unpkg.com/ for info on unpkg and if are updating these (the integrity value
+# can be obtained by adding ?meta to the URL of the resource).
+SWAGGER_UI_CSS = {
+    'url': 'https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui.css',
+    'integrity': 'sha384-tgOpIqeb5Ds0xSeXMInWaZ1o8ujNJdUUIiDk/ZpnZjFDQl0t1yxsBpGsG8/fjDZS',
+}
+SWAGGER_UI_JS = {
+    'url': 'https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui-bundle.js',
+    'integrity': 'sha384-61ytfM+owD7jIzMmLJD2aRIp30qF9hY+2KyBhMk89VT/kR7Dhwa5UBTmwLZbA2Pz',
+}
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
@@ -558,13 +567,13 @@ MAILBOXES = {
 DIT_EMAIL_INGEST_WHITELIST = env.list('DIT_EMAIL_INGEST_WHITELIST', default=[])
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [
-    environ_name 
+    environ_name
     for environ_name in env.ENVIRON.keys()
     if environ_name.startswith('DIT_EMAIL_DOMAIN_')
 ]
 
 # Go through all DIT_EMAIL_DOMAIN_* environment variables and extract
-# dictionary with key email domain and value consisting of 
+# dictionary with key email domain and value consisting of
 # authentication method/minimum pass result pairs e.g.
 # example.com=dmarc:pass|spf:pass|dkim:pass becomes
 # {'example.com': [['dmarc', 'pass'], ['spf', 'pass'], ['dkim', 'pass']]}
@@ -583,3 +592,7 @@ DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)
+
+STATSD_HOST = env('STATSD_HOST', default='localhost')
+STATSD_PORT = env('STATSD_PORT', default='9125')
+STATSD_PREFIX = env('STATSD_PREFIX', default='datahub-api')

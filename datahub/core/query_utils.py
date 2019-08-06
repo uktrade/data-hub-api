@@ -33,18 +33,17 @@ def get_string_agg_subquery(model, expression, delimiter=', '):
 
     The passed model must be the model of the query set being annotated.
 
-    At present values are concatenated in an undefined order, however Django 2.2 added support for
-    providing an ordering.
-
-    TODO: However, the StringAgg ordering keyword argument is not currently used due to the
-     problem described in https://code.djangoproject.com/ticket/30315.
+    Values are sorted alphabetically before concatenation.
 
     Usage example:
         Company.objects.annotate(
             export_to_country_names=get_string_agg_subquery(Company, 'export_to_countries__name'),
         )
     """
-    return get_aggregate_subquery(model, StringAgg(expression, delimiter))
+    return get_aggregate_subquery(
+        model,
+        StringAgg(expression, delimiter, ordering=(expression,)),
+    )
 
 
 def get_aggregate_subquery(model, expression):
