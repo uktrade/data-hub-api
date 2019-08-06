@@ -53,6 +53,21 @@ class DNBCompanySearchView(APIView):
             content_type=upstream_response.headers.get('content-type'),
         )
 
+    def _get_datahub_companies_by_duns(self, duns_numbers):
+        datahub_companies = get_company_queryset().filter(duns_number__in=duns_numbers)
+        return {
+            company.duns_number: company for company in datahub_companies
+        }
+
+    def _get_datahub_company_data(self, datahub_company):
+        if datahub_company:
+            return DNBMatchedCompanySerializer(
+                datahub_company,
+                context={'request': self.request},
+            ).data
+        else:
+            return None
+
     def _format_and_hydrate(self, dnb_results):
         """
         Format each result from DNB such that there is a "dnb_company" key and
@@ -89,23 +104,14 @@ class DNBCompanySearchView(APIView):
 
         """
         duns_numbers = [result['duns_number'] for result in dnb_results]
-        matching_datahub_companies = get_company_queryset().filter(duns_number__in=duns_numbers)
-        datahub_companies_by_duns = {
-            company.duns_number: company for company in matching_datahub_companies
-        }
+        datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
 
         hydrated_results = []
 
         for dnb_result in dnb_results:
             duns_number = dnb_result['duns_number']
             datahub_company = datahub_companies_by_duns.get(duns_number)
-            if datahub_company:
-                datahub_company_data = DNBMatchedCompanySerializer(
-                    datahub_company,
-                    context={'request': self.request},
-                ).data
-            else:
-                datahub_company_data = None
+            datahub_company_data = self._get_datahub_company_data(datahub_company)
             hydrated_result = {'dnb_company': dnb_result, 'datahub_company': datahub_company_data}
             hydrated_results.append(hydrated_result)
 
