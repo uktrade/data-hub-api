@@ -10,7 +10,7 @@ class ServiceQuestionID(Enum):
     making_export_introductions = '054b29fe-c14b-463d-8177-c378d3a819aa'
 
 
-class ServiceAnswerID(Enum):
+class ServiceAnswerOptionID(Enum):
     """ServiceAnswerOption."""
 
     # providing_investment_advice_and_information
