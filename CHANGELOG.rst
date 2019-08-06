@@ -1,3 +1,43 @@
+Data Hub API 13.14 (2019-08-06)
+===============================
+
+
+
+Features
+--------
+
+- **Interactions** The ``service`` metadata data model has been changed from a flat list of services to a tree structure with a help of ``django-mptt`` library.
+- **Interactions** It is now possible to monitor the number of failed and successful calendar invites being ingested in DataHub using StatsD.
+- The API documentation at the URL path ``/docs`` was updated to use OpenAPI following the upgrade to Django Rest Framework 3.10.0.
+
+  It is now enabled by default.
+
+  There are currently some missing or incorrect details as we are dependent on the web framework we are using. These should be corrected over time.
+
+Bug fixes
+---------
+
+- Comma- and semicolon-delimited values in CSV exports are now always sorted alphabetically. (Previously, they were in an unspecified order which could change between exports.)
+
+Database schema
+---------------
+
+- **Interactions** The ``metadata_service`` table column ``name`` is deprecated and will be removed on or after the 5th of September 2019.
+- **Interactions** The following columns were added to ``metadata_service`` table to transform flat services list into a tree structure:
+   - segment (character varying(255)) not null
+   - level (integer) not null
+   - lft (integer) not null
+   - parent_id (uuid)
+   - rght (integer) not null
+   - tree_id (integer) not null
+
+  Columns ``level``, ``lft``, ``rght``, ``tree_id`` are being used by ``django-mptt`` library to manage the tree structure.
+
+  The ``parent_id`` field points at the parent service.
+
+  At present only the leaf nodes are being used as interaction's service foreign keys.
+
+
 Data Hub API 13.13.2 (2019-08-05)
 =================================
 
