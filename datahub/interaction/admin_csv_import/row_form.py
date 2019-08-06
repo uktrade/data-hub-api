@@ -214,10 +214,7 @@ class InteractionCSVRowForm(forms.Form):
         if not subject and service:
             data['subject'] = service.name
 
-        # Attempt to look up the contact
-        data['contact'], data['contact_matching_status'] = find_active_contact_by_email_address(
-            data.get('contact_email'),
-        )
+        self._populate_contact(data)
 
         self._validate_not_duplicate_of_prior_row(data)
         self._validate_not_duplicate_of_existing_interaction(data)
@@ -298,6 +295,20 @@ class InteractionCSVRowForm(forms.Form):
             )
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
+
+    @staticmethod
+    def _populate_contact(data):
+        """Attempt to look up the contact using the provided email address."""
+        contact_email = data.get('contact_email')
+
+        if not contact_email:
+            # No contact email address was provided, or it did not pass validation.
+            # Skip the look-up in this case.
+            return
+
+        data['contact'], data['contact_matching_status'] = find_active_contact_by_email_address(
+            contact_email,
+        )
 
     def _check_adviser_1_and_2_are_different(self, data):
         adviser_1 = data.get('adviser_1')
