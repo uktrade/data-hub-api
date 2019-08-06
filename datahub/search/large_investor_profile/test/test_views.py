@@ -2,7 +2,6 @@ from cgi import parse_header
 from collections import Counter
 from csv import DictReader
 from io import StringIO
-from itertools import chain
 
 import pytest
 from django.conf import settings
@@ -692,36 +691,36 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                 ),
                 'Date last modified': profile.modified_on,
                 'UK regions of interest': join_attr_values(
-                    profile.uk_region_locations.all(),
+                    profile.uk_region_locations.order_by('name'),
                 ),
                 'Restrictions': join_attr_values(
-                    profile.restrictions.all(),
+                    profile.restrictions.order_by('name'),
                 ),
                 'Time horizons': join_attr_values(
-                    profile.time_horizons.all(),
+                    profile.time_horizons.order_by('name'),
                 ),
                 'Investment types': join_attr_values(
-                    profile.investment_types.all(),
+                    profile.investment_types.order_by('name'),
                 ),
                 'Deal ticket sizes': join_attr_values(
-                    profile.deal_ticket_sizes.all(),
+                    profile.deal_ticket_sizes.order_by('name'),
                 ),
                 'Desired deal roles': join_attr_values(
-                    profile.desired_deal_roles.all(),
+                    profile.desired_deal_roles.order_by('name'),
                 ),
                 'Required checks conducted by': get_attr_or_none(
                     profile, 'required_checks_conducted_by.name',
                 ),
                 'Required checks conducted on': profile.required_checks_conducted_on,
                 'Other countries being considered': join_attr_values(
-                    profile.other_countries_being_considered.all(),
+                    profile.other_countries_being_considered.order_by('name'),
                 ),
                 'Construction risks': join_attr_values(
-                    profile.construction_risks.all(),
+                    profile.construction_risks.order_by('name'),
                 ),
                 'Data Hub profile reference': str(profile.pk),
                 'Asset classes of interest': join_attr_values(
-                    profile.asset_classes_of_interest.all(),
+                    profile.asset_classes_of_interest.order_by('name'),
                 ),
                 'Data Hub link': (
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
@@ -736,25 +735,5 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         # item is an ordered dict so is cast to a dict to make the comparison easier to
         # interpret in the event of the assert actual_rows == expected_rows failing.
         actual_rows = [dict(item) for item in reader]
-
-        # Support for ordering was added to StringAgg in Django 2.2. However, it is not
-        # currently used due to https://code.djangoproject.com/ticket/30315. While that
-        # remains the case, our StringAgg fields are unordered and we use this workaround to
-        # compare them.
-        unordered_fields = [
-            'Asset classes of interest',
-            'Construction risks',
-            'Deal ticket sizes',
-            'Desired deal roles',
-            'Investment types',
-            'Other countries being considered',
-            'Restrictions',
-            'Time horizons',
-            'UK regions of interest',
-        ]
-
-        for row in chain(actual_rows, expected_rows):
-            for field in unordered_fields:
-                row[field] = frozenset(row[field].split(', '))
 
         assert actual_rows == expected_rows

@@ -17,6 +17,7 @@ class EventViewSet(CoreViewSet):
         'organiser',
         'uk_region',
         'service',
+        'service__parent',
     ).prefetch_related(
         'teams',
         'related_programmes',

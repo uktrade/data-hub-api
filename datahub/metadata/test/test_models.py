@@ -2,6 +2,7 @@ import pytest
 from mptt.exceptions import InvalidMove
 
 from datahub.core.exceptions import DataHubException
+from datahub.metadata.models import Service
 from datahub.metadata.test.factories import SectorFactory
 
 pytestmark = pytest.mark.django_db
@@ -71,3 +72,14 @@ def test_sector_name_level_recursive_unsaved():
     sector.parent = sector
     with pytest.raises(DataHubException):
         sector.name
+
+
+def test_service_with_children_has_no_contexts():
+    """
+    Test that services with children have no context.
+
+    Services with children are being shown depending on if any of their children
+    have desired context.
+    """
+    services = Service.objects.filter(children__isnull=False)
+    assert all(service.contexts == [] for service in services)

@@ -24,6 +24,7 @@ from datahub.interaction.admin_csv_import.duplicate_checking import (
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionDITParticipant
 from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import Service, Team
+from datahub.metadata.query_utils import get_service_name_subquery
 
 
 OBJECT_DISABLED_MESSAGE = gettext_lazy('This option is disabled.')
@@ -141,7 +142,7 @@ class InteractionCSVRowForm(forms.Form):
         required=False,
     )
     service = NoDuplicatesModelChoiceField(
-        Service.objects.all(),
+        Service.objects.annotate(name=get_service_name_subquery()).filter(children__isnull=True),
         to_field_name='name__iexact',
         validators=[_validate_not_disabled],
     )

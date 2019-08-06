@@ -18,6 +18,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.query_utils import get_bracketed_concat_expression, get_full_name_expression
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -918,8 +919,7 @@ class TestInteractionExportView(APITestMixin):
         assert parse_header(response.get('Content-Disposition')) == (
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
-
-        sorted_interactions = Interaction.objects.all().order_by(
+        sorted_interactions = Interaction.objects.order_by(
             orm_ordering,
             'pk',
         )
@@ -955,14 +955,22 @@ class TestInteractionExportView(APITestMixin):
                     'service_delivery_status.name',
                 ),
                 'Net company receipt': interaction.net_company_receipt,
-                'Policy issue types': join_attr_values(interaction.policy_issue_types.all()),
-                'Policy areas': join_attr_values(interaction.policy_areas.all(), separator='; '),
+                'Policy issue types': join_attr_values(
+                    interaction.policy_issue_types.order_by('name'),
+                ),
+                'Policy areas': join_attr_values(
+                    interaction.policy_areas.order_by('name'),
+                    separator='; ',
+                ),
                 'Policy feedback notes': interaction.policy_feedback_notes,
             }
             for interaction in sorted_interactions
         ]
 
-        actual_row_data = [_format_actual_csv_row(row) for row in reader]
+        # DictReader uses OrderedDicts, we convert them to normal dicts to get better errors
+        # when the assertion fails
+        actual_row_data = [dict(item) for item in reader]
+
         assert actual_row_data == format_csv_data(expected_row_data)
 
 
@@ -1075,10 +1083,13 @@ class TestInteractionBasicSearch(APITestMixin):
 
 
 def _format_expected_contacts(interaction):
-    formatted_contact_names = sorted(
-        [_format_expected_contact_name(contact) for contact in interaction.contacts.all()],
+    queryset = interaction.contacts.order_by(
+        get_full_name_expression(bracketed_field_name='job_title'),
     )
-    return ', '.join(formatted_contact_names)
+
+    return ', '.join(
+        _format_expected_contact_name(contact) for contact in queryset
+    )
 
 
 def _format_expected_contact_name(contact):
@@ -1089,41 +1100,20 @@ def _format_expected_contact_name(contact):
 
 
 def _format_expected_advisers(interaction):
-    formatted_contact_names = sorted(
-        _format_expected_adviser_name(dit_participant)
-        for dit_participant in interaction.dit_participants.all()
+    queryset = interaction.dit_participants.order_by(
+        get_bracketed_concat_expression(
+            'adviser__first_name',
+            'adviser__last_name',
+            expression_to_bracket='team__name',
+        ),
     )
-    return ', '.join(formatted_contact_names)
+
+    return ', '.join(
+        _format_expected_adviser_name(dit_participant) for dit_participant in queryset
+    )
 
 
 def _format_expected_adviser_name(dit_participant):
     adviser_name = dit_participant.adviser.name if dit_participant.adviser else ''
     team_name = f'({dit_participant.team.name})' if dit_participant.team else ''
     return join_truthy_strings(adviser_name, team_name)
-
-
-def _format_actual_csv_row(row):
-    return {key: _format_actual_csv_value(key, value) for key, value in row.items()}
-
-
-def _format_actual_csv_value(key, value):
-    """
-    Sorts the value of multi-value fields for a row alphabetically as they are unordered at
-    present.
-
-    TODO Django 2.2 added ordering support to StringAgg, which will remove the need for this.
-     However, it is not currently used due to https://code.djangoproject.com/ticket/30315.
-    """
-    multi_value_fields_and_separators = {
-        'Advisers': ', ',
-        'Contacts': ', ',
-        'Policy areas': '; ',
-        'Policy issue types': ', ',
-    }
-
-    if key in multi_value_fields_and_separators:
-        separator = multi_value_fields_and_separators[key]
-        sorted_split_values = sorted(value.split(separator))
-        return separator.join(sorted_split_values)
-
-    return value

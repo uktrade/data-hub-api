@@ -11,7 +11,25 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     """Service factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
-    name = factory.Sequence(lambda n: f'name {n}')
+    segment = factory.Sequence(lambda n: f'name {n}')
+
+    contexts = factory.LazyFunction(
+        lambda: sample(
+            Service.CONTEXTS._db_values,
+            randrange(0, len(Service.CONTEXTS._db_values)),
+        ),
+    )
+
+    class Meta:
+        model = 'metadata.Service'
+
+
+class ChildServiceFactory(factory.django.DjangoModelFactory):
+    """Child service factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    segment = factory.Sequence(lambda n: f'child name {n}')
+    parent = factory.SubFactory(ServiceFactory)
     contexts = factory.LazyFunction(
         lambda: sample(
             Service.CONTEXTS._db_values,

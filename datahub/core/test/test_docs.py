@@ -1,14 +1,37 @@
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.core.test_utils import get_admin_user
+from datahub.core.test_utils import AdminTestMixin, create_test_user, get_admin_user
+
+
+class TestDocsSwaggerUIView(AdminTestMixin):
+    """Test the Swagger UI view."""
+
+    def test_redirects_to_login_page_if_not_logged_in(self, client):
+        """Test that the view redirects to the login page if the user isn't authenticated."""
+        url = reverse('api-docs:swagger-ui')
+        response = client.get(url, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.redirect_chain) == 1
+        assert response.redirect_chain == [
+            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
+        ]
+
+    def test_returns_200_if_authenticated(self, client):
+        """Test that a 200 is returned if the user is authenticated via the admin site."""
+        url = reverse('api-docs:swagger-ui')
+        user = create_test_user(is_staff=True, password=self.PASSWORD)
+
+        client = self.create_client(user=user)
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db
-class TestDocsView:
-    """Test the DRF docs view."""
+class TestDocsSchemaView:
+    """Test the OpenAPI schema view."""
 
     def test_returns_200_if_logged_in(self, client):
         """
@@ -20,16 +43,14 @@ class TestDocsView:
         user = get_admin_user(password=password)
         client.login(username=user.email, password=password)
 
-        url = reverse('api-docs:docs-index')
+        url = reverse('api-docs:openapi-schema')
         response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert settings.API_DOCUMENTATION_TITLE.encode('utf-8') in response.rendered_content
 
     def test_returns_403_if_not_logged_in(self, client):
         """Test that a 403 error is returned if the user is not logged in."""
-        url = reverse('api-docs:docs-index')
+        url = reverse('api-docs:openapi-schema')
         response = client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert settings.API_DOCUMENTATION_TITLE.encode('utf-8') not in response.rendered_content

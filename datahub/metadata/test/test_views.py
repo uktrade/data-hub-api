@@ -39,7 +39,7 @@ def pytest_generate_tests(metafunc):
         for view_id, mapping in registry.mappings.items():
             with suppress(FieldDoesNotExist):
                 mapping.model._meta.get_field('order')  # check if model has field order
-                view_data.append((view_id, mapping.model))
+                view_data.append((view_id, mapping.queryset))
 
         metafunc.parametrize(
             'ordered_mapping',
@@ -89,14 +89,16 @@ def test_ordered_metadata_order_view(ordered_mapping, api_client):
     """
     Test that views with BaseOrderedConstantModel are ordered by the `order` field.
     """
-    metadata_view_name, model = ordered_mapping
+    metadata_view_name, queryset = ordered_mapping
 
     url = reverse(viewname=metadata_view_name)
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     response_names = [value['name'] for value in response.json()]
-    assert response_names == list(model.objects.order_by('order').values_list('name', flat=True))
+    assert response_names == [
+        obj.name for obj in queryset.order_by('order')
+    ]
 
 
 def test_administrative_area_view(api_client):
@@ -199,7 +201,8 @@ class TestServiceView:
         """
         url = reverse(viewname='service')
         response = api_client.get(url)
-        service = Service.objects.order_by('order')[0]
+        service_queryset = Service.objects.filter(children__isnull=True)
+        service = service_queryset.order_by('order')[0]
 
         assert response.status_code == status.HTTP_200_OK
         services = response.json()
@@ -213,7 +216,7 @@ class TestServiceView:
             'disabled_on': disabled_on,
             'interaction_questions': [],
         }
-        assert len(services) == Service.objects.count()
+        assert len(services) == service_queryset.count()
 
     @pytest.mark.parametrize(
         'contexts',
