@@ -1,6 +1,7 @@
 from datetime import date
 from random import shuffle
 
+import factory
 import pytest
 from django.conf import settings
 from django.db.models import F, Max
@@ -12,6 +13,7 @@ from datahub.core.query_utils import (
     get_choices_as_case_expression,
     get_front_end_url_expression,
     get_full_name_expression,
+    get_queryset_object,
     get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
@@ -314,3 +316,38 @@ def test_get_front_end_url_expression(monkeypatch):
         url=get_front_end_url_expression('book', 'pk'),
     )
     assert queryset.first().url == f'http://test/{book.pk}'
+
+
+class TestGetQuerysetObject:
+    """Tests for get_queryset_object()."""
+
+    @pytest.mark.parametrize(
+        'get_name,expected_exception',
+        (
+            (
+                'Spring',
+                Book.MultipleObjectsReturned,
+            ),
+            (
+                'Winter',
+                Book.DoesNotExist,
+            ),
+        ),
+    )
+    def test_raises_exception_when_not_one_match(self, get_name, expected_exception):
+        """Test that exceptions are raised when no matches or multiple matches are found."""
+        book_names = ['Spring', 'Spring', 'Summer']
+        BookFactory.create_batch(
+            len(book_names),
+            name=factory.Iterator(book_names),
+        )
+        with pytest.raises(expected_exception):
+            get_queryset_object(Book.objects.all(), name=get_name)
+
+    def test_returns_object_when_one_match(self):
+        """Test that the object is returned when there is exactly one match."""
+        expected_book = BookFactory(name='Summer')
+        BookFactory.create_batch(2, name='Spring')
+
+        book = get_queryset_object(Book.objects.all(), name='Summer')
+        assert book == expected_book
