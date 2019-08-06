@@ -253,13 +253,12 @@ class TestDNBCompanySearchAPI(APITestMixin):
                 b'{"results":[{"duns_number":"7654321"}]}',
                 {
                     'results': [
-                        # latest_interaction is None, because the user does not have permission
+                        # latest_interaction is omitted, because the user does not have permission
                         # to view interactions
                         {
                             'dnb_company': {'duns_number': '7654321'},
                             'datahub_company': {
                                 'id': '6083b732-b07a-42d6-ada4-c99999999999',
-                                'latest_interaction': None,
                             },
                         },
                     ],
