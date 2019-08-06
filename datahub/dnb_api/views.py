@@ -65,8 +65,7 @@ class DNBCompanySearchView(APIView):
                 datahub_company,
                 context={'request': self.request},
             ).data
-        else:
-            return None
+        return None
 
     def _format_and_hydrate(self, dnb_results):
         """
