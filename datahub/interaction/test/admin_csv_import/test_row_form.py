@@ -595,6 +595,36 @@ class TestInteractionCSVRowFormValidation:
         form = InteractionCSVRowForm(data=data, duplicate_tracker=duplicate_tracker)
         assert form.errors == expected_errors
 
+    def test_does_not_look_up_blank_contact_email(self, monkeypatch):
+        """Test that, if a blank contact email is provided, a contact look-up is not attempted."""
+        mock_find_active_contact_by_email_address = Mock(
+            return_value=(None, None),
+        )
+        monkeypatch.setattr(
+            'datahub.interaction.admin_csv_import.row_form.find_active_contact_by_email_address',
+            mock_find_active_contact_by_email_address,
+        )
+
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        service = random_service(disabled=False)
+        communication_channel = random_communication_channel()
+
+        data = {
+            'theme': Interaction.THEMES.export,
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+
+            'contact_email': '',
+        }
+        form = InteractionCSVRowForm(data=data)
+        assert form.errors == {
+            'contact_email': ['This field is required.'],
+        }
+        assert not mock_find_active_contact_by_email_address.called
+
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormSerializerUsage:
