@@ -275,6 +275,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
+| `GUNICORN_ENABLE_STATSD` | No | Whether to enable Gunicorn StatD instrumentation (default=False). |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
 | `HAWK_RECEIVER_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
