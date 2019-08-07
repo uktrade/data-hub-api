@@ -12,6 +12,7 @@ class BusinessTypeConstant(Enum):
         runs whenever the migrate command is run).
         The signal receiver only creates and updates business types; it does not delete them.
         See datahub.company.signals for the implementation.
+
     """
 
     charity = Constant('Charity', '9dd14e94-5d95-e211-a939-e4115bead28a')
