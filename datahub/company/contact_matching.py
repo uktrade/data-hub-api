@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 from django.db.models import Count
 
 from datahub.company.models import Contact
+from datahub.core.query_utils import get_queryset_object
 
 # NOTE: We may want to review our approach with this utility mechanism if we
 # need to add further strategies.  It could be that a better approach is to move
@@ -21,7 +22,7 @@ def _match_contact(filter_criteria):
     """
     contact = None
     try:
-        contact = Contact.objects.get(**filter_criteria)
+        contact = get_queryset_object(Contact.objects.all(), **filter_criteria)
         contact_matching_status = ContactMatchingStatus.matched
     except Contact.DoesNotExist:
         contact_matching_status = ContactMatchingStatus.unmatched
