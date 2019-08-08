@@ -6,7 +6,10 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
-from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.parsers import (
+    CalendarInteractionEmailParser,
+    USER_READABLE_ERROR_MESSAGES,
+)
 
 
 @pytest.mark.django_db
@@ -210,49 +213,33 @@ class TestCalendarInteractionEmailParser:
             ),
             (
                 'email_samples/invalid/email_contacts_unknown.eml',
-                ValidationError(
-                    'No email recipients were recognised as company '
-                    'contacts in Data Hub - please ensure that at least '
-                    'one recipient is a company contact known by Data Hub.',
-                ),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['no_contacts']),
             ),
             # Calendar entry does not start with "BEGIN:VCALENDAR"
             (
                 'email_samples/invalid/bad_calendar_event.eml',
-                ValidationError(
-                    'No calendar event could be extracted - '
-                    'the iCalendar attachment was either missing or badly formatted.',
-                ),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
             # Calendar entry does not include an "END:VEVENT"
             (
                 'email_samples/invalid/bad_calendar_event_2.eml',
-                ValidationError(
-                    'No calendar event could be extracted - '
-                    'the iCalendar attachment was either missing or badly formatted.',
-                ),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
             (
                 'email_samples/invalid/no_calendar_in_email.eml',
-                ValidationError(
-                    'No calendar event could be extracted - '
-                    'the iCalendar attachment was either missing or badly formatted.',
-                ),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
             (
                 'email_samples/invalid/no_calendar_event.eml',
-                ValidationError('No calendar event was found in the iCalendar attachment.'),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
             (
                 'email_samples/invalid/multiple_calendar_events.eml',
-                ValidationError(
-                    'There were 3 events in the calendar - expected 1 event '
-                    'in the iCalendar attachment.',
-                ),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
-                ValidationError('The calendar event was not status: CONFIRMED.'),
+                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
             ),
         ),
     )
