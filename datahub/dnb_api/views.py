@@ -67,6 +67,22 @@ class DNBCompanySearchView(APIView):
             ).data
         return None
 
+    def _get_hydrated_results(self, dnb_results, datahub_companies_by_duns):
+        dnb_datahub_company_pairs = (
+            (
+                dnb_company,
+                self._get_datahub_company_data(
+                    datahub_companies_by_duns.get(dnb_company['duns_number']),
+                ),
+            ) for dnb_company in dnb_results
+        )
+        return [
+            {
+                'dnb_company': dnb_company,
+                'datahub_company': datahub_company,
+            } for dnb_company, datahub_company in dnb_datahub_company_pairs
+        ]
+
     def _format_and_hydrate(self, dnb_results):
         """
         Format each result from DNB such that there is a "dnb_company" key and
@@ -104,16 +120,7 @@ class DNBCompanySearchView(APIView):
         """
         duns_numbers = [result['duns_number'] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
-
-        hydrated_results = []
-
-        for dnb_result in dnb_results:
-            duns_number = dnb_result['duns_number']
-            datahub_company = datahub_companies_by_duns.get(duns_number)
-            datahub_company_data = self._get_datahub_company_data(datahub_company)
-            hydrated_result = {'dnb_company': dnb_result, 'datahub_company': datahub_company_data}
-            hydrated_results.append(hydrated_result)
-
+        hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
 
     def _get_upstream_response(self, request):

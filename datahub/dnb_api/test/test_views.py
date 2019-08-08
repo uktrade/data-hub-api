@@ -5,7 +5,8 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
-from django.utils.timezone import make_aware
+from django.utils.timezone import utc
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -36,26 +37,23 @@ def dnb_company_search_datahub_companies():
     # Company with two interactions
     company = CompanyFactory(duns_number='7654321', id='6083b732-b07a-42d6-ada4-c99999999999')
 
-    interaction_date = make_aware(
-        datetime.datetime(year=2019, month=8, day=1, hour=16, minute=0, second=0),
-    )
-    latest_interaction = CompanyInteractionFactory(
-        id='6083b732-b07a-42d6-ada4-222222222222',
-        date=interaction_date,
-        subject='Meeting with Joe Bloggs',
-        company=company,
-    )
-    latest_interaction.created_on = interaction_date
-    latest_interaction.save()
+    interaction_date = datetime.datetime(year=2019, month=8, day=1, hour=16, minute=0, tzinfo=utc)
+    with freeze_time(interaction_date):
+        CompanyInteractionFactory(
+            id='6083b732-b07a-42d6-ada4-222222222222',
+            date=interaction_date,
+            subject='Meeting with Joe Bloggs',
+            company=company,
+        )
 
-    older_interaction_date = make_aware(datetime.datetime(year=2018, month=8, day=1))
-    older_interaction = CompanyInteractionFactory(
-        id='6083b732-b07a-42d6-ada4-111111111111',
-        date=older_interaction_date,
-        subject='Meeting with John Smith',
-        company=company,
-    )
-    older_interaction.created_on = older_interaction_date
+    older_interaction_date = datetime.datetime(year=2018, month=8, day=1, tzinfo=utc)
+    with freeze_time(older_interaction_date):
+        CompanyInteractionFactory(
+            id='6083b732-b07a-42d6-ada4-111111111111',
+            date=older_interaction_date,
+            subject='Meeting with John Smith',
+            company=company,
+        )
 
 
 class TestDNBCompanySearchAPI(APITestMixin):
@@ -142,6 +140,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
             settings.DNB_SERVICE_BASE_URL + 'companies/search/',
             status_code=response_status_code,
             content=upstream_response_content,
+            headers={'content-type': 'application/json'},
         )
 
         user = create_test_user(
@@ -160,7 +159,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
 
         assert response.status_code == response_status_code
-        assert json.loads(response.content) == response_data
+        assert response.json() == response_data
         assert requests_mock.last_request.body == request_data
 
     def test_post_no_feature_flag(self, requests_mock):
