@@ -1,0 +1,1 @@
+The search CSV export was updated to handle interactions with multiple teams in the 'Team of latest interaction' column. Multiple team names are separated by commas, and duplicate teams are omitted. The column was accordingly renamed 'Teams of latest interaction'.

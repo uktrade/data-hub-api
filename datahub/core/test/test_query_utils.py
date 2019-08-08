@@ -1,5 +1,5 @@
 from datetime import date
-from random import shuffle
+from random import sample, shuffle
 
 import factory
 import pytest
@@ -19,28 +19,48 @@ from datahub.core.query_utils import (
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory, PersonListItemFactory
 from datahub.core.test.support.models import Book, Person, PersonListItem
-from datahub.core.test_utils import join_attr_values
 
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('num_authors', range(3))
-def test_get_string_agg_subquery(num_authors):
-    """
-    Test that get_string_agg_subquery() can be used to concatenate the first names of
-    all authors for each book into one field.
-    """
-    authors = PersonFactory.create_batch(num_authors)
-    book = BookFactory(authors=authors)
-    queryset = Book.objects.annotate(
-        author_names=get_string_agg_subquery(Book, 'authors__first_name'),
+class TestGetStringAggSubquery:
+    """Tests for get_string_agg_subquery()."""
+
+    @pytest.mark.parametrize(
+        'names,distinct,expected_result',
+        (
+            ([], False, None),
+            (['Barbara'], False, 'Barbara'),
+            (['Barbara', 'Claire'], False, 'Barbara, Claire'),
+            (['Barbara', 'Claire', 'John'], False, 'Barbara, Claire, John'),
+            (['Barbara', 'Claire', 'Claire'], False, 'Barbara, Claire, Claire'),
+            ([], True, None),
+            (['Barbara', 'Claire', 'John'], True, 'Barbara, Claire, John'),
+            (['Barbara', 'Claire', 'Claire'], True, 'Barbara, Claire'),
+            (
+                ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
+                True,
+                'Barbara, Claire, John, Samantha',
+            ),
+        ),
     )
-    actual_author_names = queryset.first().author_names or ''
-    expected_author_names = join_attr_values(
-        book.authors.order_by('first_name'),
-        'first_name',
-    )
-    assert actual_author_names == expected_author_names
+    def test_can_annotate_queryset(self, names, distinct, expected_result):
+        """
+        Test that the first names of all authors for each book can be concatenated into
+        one field as a query set annotation for various cases.
+        """
+        authors = PersonFactory.create_batch(
+            len(names),
+            first_name=factory.Iterator(
+                sample(names, len(names)),
+            ),
+        )
+        BookFactory(authors=authors)
+        queryset = Book.objects.annotate(
+            author_names=get_string_agg_subquery(Book, 'authors__first_name', distinct=distinct),
+        )
+        actual_author_names = queryset.first().author_names
+        assert actual_author_names == expected_result
 
 
 class TestGetAggregateSubquery:
