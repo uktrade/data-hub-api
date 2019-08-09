@@ -169,57 +169,6 @@ class TestAddInteraction(APITestMixin):
             'non_field_errors': ['The interaction contacts must belong to the specified company.'],
         }
 
-    def test_participant_copied_to_adviser_and_team(self):
-        """
-        Test that dit_adviser and dit_team are set on the model instance if dit_participants
-        is provided.
-
-        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
-         dit_team fields.
-        """
-        contact = ContactFactory()
-        communication_channel = random_obj_for_model(CommunicationChannel)
-        dit_adviser = AdviserFactory()
-
-        url = reverse('api-v3:interaction:collection')
-        request_data = {
-            'kind': Interaction.KINDS.interaction,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_participants': [
-                {
-                    'adviser': {
-                        'id': dit_adviser.pk,
-                    },
-                },
-            ],
-            'company': {
-                'id': contact.company.pk,
-            },
-            'contacts': [{
-                'id': contact.pk,
-            }],
-            'service': {
-                'id': random_service().pk,
-            },
-            'was_policy_feedback_provided': False,
-        }
-
-        api_client = self.create_api_client()
-        response = api_client.post(url, request_data)
-        assert response.status_code == status.HTTP_201_CREATED
-
-        interaction = Interaction.objects.get(pk=response.json()['id'])
-        assert interaction.dit_adviser == dit_adviser
-        assert interaction.dit_team == dit_adviser.dit_team
-
-        assert interaction.dit_participants.count() == 1
-
-        dit_participant = interaction.dit_participants.first()
-        assert dit_participant.adviser == dit_adviser
-        assert dit_participant.team == dit_adviser.dit_team
-
     def test_multiple_participating_advisers_can_be_specified(self):
         """Test that an interaction can be created with multiple DIT participants."""
         contact = ContactFactory()
@@ -372,8 +321,6 @@ class TestUpdateInteraction(APITestMixin):
                 'archived_by': 123,
                 'archived_on': date.today(),
                 'archived_reason': 'test',
-                'dit_adviser': None,
-                'dit_team': None,
             },
         )
 
@@ -383,8 +330,6 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['archived_by'] is None
         assert response.data['archived_on'] is None
         assert response.data['archived_reason'] is None
-        assert response.data['dit_adviser']['id'] == str(interaction.dit_adviser.pk)
-        assert response.data['dit_team']['id'] == str(interaction.dit_team.pk)
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -496,46 +441,6 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['notes'] == data['notes']
-
-    def test_updates_adviser_and_team_when_updating_participants(self):
-        """
-        Test that dit_adviser and dit_team are updating if DIT participants are updated. (This is
-        for backwards compatibility.)
-
-        TODO: remove once the dit_participants field has fully replaced the dit_adviser and
-         dit_team fields.
-        """
-        interaction = CompanyInteractionFactory(dit_participants=[])
-        InteractionDITParticipantFactory.create_batch(
-            3,
-            interaction=interaction,
-        )
-
-        new_advisers = AdviserFactory.create_batch(2)
-
-        request_data = {
-            'dit_participants': [
-                {
-                    'adviser': {
-                        'id': adviser.pk,
-                    },
-                }
-                for adviser in new_advisers
-            ],
-        }
-
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, data=request_data)
-        assert response.status_code == status.HTTP_200_OK
-
-        response_data = response.json()
-        expected_adviser = new_advisers[0]
-        assert response_data['dit_adviser']['id'] == str(expected_adviser.pk)
-        assert response_data['dit_team']['id'] == str(expected_adviser.dit_team.pk)
-
-        interaction.refresh_from_db()
-        assert interaction.dit_adviser == expected_adviser
-        assert interaction.dit_team == expected_adviser.dit_team
 
     def test_can_replace_some_participants(self):
         """Test that a subset of existing DIT participants can be replaced."""

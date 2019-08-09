@@ -93,8 +93,6 @@ class InteractionDITParticipant(models.Model):
     """
     Many-to-many model between an interaction and an adviser (called a DIT participant).
 
-    This will replace Interaction.dit_adviser and Interaction.dit_team.
-
     Due to a small number of old records that have only a team or an adviser,
     adviser and team are nullable (but do not have blank=True, to avoid any further
     such records being created).
@@ -249,24 +247,7 @@ class Interaction(ArchivableModel, BaseModel):
 
     subject = models.TextField()
     location = models.CharField(max_length=MAX_LENGTH, blank=True)
-    # TODO: dit_adviser is being replaced with InteractionDITParticipant, and dit_adviser will be
-    #  removed once the migration is complete
-    dit_adviser = models.ForeignKey(
-        'company.Advisor',
-        related_name='%(class)ss',
-        null=True,
-        on_delete=models.PROTECT,
-        help_text='This field is deprecated and has been replaced by DIT participants.',
-    )
     notes = models.TextField(max_length=10000, blank=True)
-    # TODO: dit_team is being replaced with InteractionDITParticipant, and dit_team will be
-    #  removed once the migration is complete
-    dit_team = models.ForeignKey(
-        'metadata.Team',
-        null=True,
-        on_delete=models.PROTECT,
-        help_text='This field is deprecated and has been replaced by DIT participants.',
-    )
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,
         on_delete=models.SET_NULL,

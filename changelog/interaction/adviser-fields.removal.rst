@@ -1,0 +1,1 @@
+``GET /v3/interaction, GET /v3/interaction/<id>, POST /v3/interaction, PATCH /v3/interaction/<id>``: The deprecated ``dit_adviser`` and ``dit_team`` fields were removed from responses. Please use ``dit_participants`` instead.
