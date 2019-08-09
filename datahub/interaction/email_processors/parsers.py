@@ -3,6 +3,7 @@ import datetime
 from collections import Counter
 
 import icalendar
+from celery.utils.log import get_task_logger
 from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
@@ -16,6 +17,8 @@ from datahub.interaction.email_processors.utils import (
     get_best_match_adviser_by_email,
 )
 
+
+logger = get_task_logger(__name__)
 
 ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
@@ -96,6 +99,21 @@ def _convert_calendar_time_to_utc_datetime(calendar_time):
     return calendar_time.astimezone(utc)
 
 
+def _log_and_raise_validation_error(email, internal_error, user_readable_error=None):
+    """
+    Log an email format error as an info level message and raise a ValidationError.
+    The ValidationError can be raised with a user readable string if
+    `user_readable_error` is set, otherwise it will be raised with the `internal_error`.
+    """
+    error_with_message_info = (
+        f'Ingested email with ID "{email.message_id}" (received {email.received[0]["date_utc"]}) '
+        f'was not valid: {internal_error}'
+    )
+    logger.info(error_with_message_info)
+    validation_error_message = user_readable_error or internal_error
+    raise ValidationError(validation_error_message)
+
+
 class CalendarInteractionEmailParser:
     """
     Parses and extracts calendar interaction information from a MailParser email
@@ -113,18 +131,22 @@ class CalendarInteractionEmailParser:
         try:
             sender_email = self.message.from_[0][1]
         except IndexError:
-            log_message = 'Email was malformed - missing "from" header'
-            raise ValidationError(log_message)
-        if not was_email_sent_by_dit(self.message):
-            log_message = (
-                'The meeting email did not pass our minimal checks to be verified as '
-                'having been sent by a valid DIT Adviser email domain.'
+            _log_and_raise_validation_error(
+                self.message,
+                'Email was malformed - missing "from" header.',
             )
-            raise ValidationError(log_message)
+        if not was_email_sent_by_dit(self.message):
+            _log_and_raise_validation_error(
+                self.message,
+                'The meeting email did not pass our minimal checks to be verified as '
+                'having been sent by a valid DIT Adviser email domain.',
+            )
         sender_adviser = get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
-            log_message = 'Email not sent by recognised DIT Adviser'
-            raise ValidationError(log_message)
+            _log_and_raise_validation_error(
+                self.message,
+                'Email was not sent by a recognised DIT Adviser.',
+            )
         return sender_adviser
 
     def _extract_and_validate_contacts(self, all_recipients):
@@ -137,11 +159,11 @@ class CalendarInteractionEmailParser:
             if contact:
                 contacts.append(contact)
         if not contacts:
-            log_message = (
-                'The meeting email had no recipients which were recognised as Data Hub '
-                'contacts.'
+            _log_and_raise_validation_error(
+                self.message,
+                'The meeting email had no recipients which were recognised as Data Hub contacts.',
+                USER_READABLE_ERROR_MESSAGES['no_contacts'],
             )
-            raise ValidationError(USER_READABLE_ERROR_MESSAGES['no_contacts'])
         return contacts
 
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
@@ -157,30 +179,41 @@ class CalendarInteractionEmailParser:
         return secondary_advisers
 
     def _extract_and_validate_calendar_event_component(self):
-        error = ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format'])
+        readable_error = USER_READABLE_ERROR_MESSAGES['bad_calendar_format']
         calendar_string = _extract_calendar_string_from_text(self.message)
         if not calendar_string:
             calendar_string = _extract_calendar_string_from_attachments(self.message)
         if not calendar_string:
-            log_message = "There was no calendar attachment on the email"
-            raise error
+            _log_and_raise_validation_error(
+                self.message,
+                'There was no iCalendar attachment on the email.',
+                readable_error,
+            )
         try:
             calendar = icalendar.Calendar.from_ical(calendar_string)
-        except ValueError as exc:
-            raise error from exc
+        except ValueError:
+            _log_and_raise_validation_error(
+                self.message,
+                'The iCalendar attachment was badly formatted.',
+                readable_error,
+            )
         calendar_event_components = [
             comp for comp in calendar.walk()
             if comp.name == CALENDAR_COMPONENT_VEVENT
         ]
         if len(calendar_event_components) == 0:
-            log_message = 'No calendar event was found in the iCalendar attachment.'
-            raise error
-        if len(calendar_event_components) > 1:
-            log_message = (
-                f'There were {len(calendar_event_components)} events in the calendar '
-                '- expected 1 event in the iCalendar attachment.'
+            _log_and_raise_validation_error(
+                self.message,
+                'No calendar event was found in the iCalendar attachment.',
+                readable_error,
             )
-            raise error
+        if len(calendar_event_components) > 1:
+            _log_and_raise_validation_error(
+                self.message,
+                f'There were {len(calendar_event_components)} events in the calendar '
+                '- expected 1 event in the iCalendar attachment.',
+                readable_error,
+            )
         return calendar_event_components[0]
 
     def _extract_and_validate_calendar_event_metadata(self):
@@ -198,8 +231,11 @@ class CalendarInteractionEmailParser:
 
         meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
         if not meeting_confirmed:
-            log_message = f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
-            raise ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format'])
+            _log_and_raise_validation_error(
+                self.message,
+                f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
+                USER_READABLE_ERROR_MESSAGES['bad_calendar_format'],
+            )
 
         return calendar_event
 
