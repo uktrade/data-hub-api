@@ -1,0 +1,5 @@
+The following management commands were removed as they are no longer required:
+
+- ``update_service_delivery_grant_fields``
+
+These commands were used to make corrections following the initial data migration into Data Hub and no longer in use.
