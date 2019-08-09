@@ -107,7 +107,14 @@ class InvestmentProject(BaseESModel):
     number_safeguarded_jobs = Long()
     modified_on = Date()
     project_arrived_in_triage_on = Date()
-    project_code = fields.NormalizedKeyword(copy_to='project_code_trigram')
+    # TODO: Update queries to use the trigram sub-field (once indexed) and remove
+    #  project_code_trigram
+    project_code = fields.NormalizedKeyword(
+        copy_to='project_code_trigram',
+        fields={
+            'trigram': fields.TrigramText(),
+        },
+    )
     project_code_trigram = fields.TrigramText()
     proposal_deadline = Date()
     other_business_activity = fields.TextWithKeyword()

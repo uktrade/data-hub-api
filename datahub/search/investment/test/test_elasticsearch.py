@@ -460,6 +460,12 @@ def test_mapping(setup_es):
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'copy_to': ['project_code_trigram'],
                     'type': 'keyword',
+                    'fields': {
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'project_code_trigram': {
                     'analyzer': 'trigram_analyzer',
