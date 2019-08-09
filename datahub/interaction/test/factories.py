@@ -60,9 +60,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     subject = factory.Faker('sentence', nb_words=8)
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
-    dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.inbound_referral.value.id
-    dit_team = factory.SelfAttribute('dit_adviser.dit_team')
     archived_documents_url_path = factory.Faker('uri_path')
     was_policy_feedback_provided = False
 
@@ -76,7 +74,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         return [ContactFactory(company=self.company)] if self.company else []
 
     @to_many_field
-    def dit_participants(self):
+    def dit_participants(self, **kwargs):
         """
         Instances of InteractionDITParticipant.
 
@@ -85,8 +83,9 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         return [
             InteractionDITParticipantFactory(
                 interaction=self,
-                adviser=self.dit_adviser,
-                team=self.dit_team,
+                adviser=kwargs.pop('adviser', factory.SubFactory(AdviserFactory)),
+                team=kwargs.pop('team', factory.SelfAttribute('adviser.dit_team')),
+                **kwargs,
             ),
         ]
 
@@ -176,11 +175,7 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
     """Factory for a DIT participant in an interaction."""
 
-    interaction = factory.SubFactory(
-        CompanyInteractionFactory,
-        dit_adviser=factory.SelfAttribute('..adviser'),
-        dit_team=factory.SelfAttribute('..team'),
-    )
+    interaction = factory.SubFactory(CompanyInteractionFactory)
     adviser = factory.SubFactory(AdviserFactory)
     team = factory.SelfAttribute('adviser.dit_team')
 

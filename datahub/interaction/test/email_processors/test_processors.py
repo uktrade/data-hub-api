@@ -190,8 +190,12 @@ class TestCalendarInteractionEmailProcessor:
         }
         assert interaction.subject == expected_subject
         assert interaction.status == Interaction.STATUSES.draft
+
+        sender_participant = interaction.dit_participants.get(
+            adviser__email__iexact=interaction_data['sender_email'],
+        )
         mock_notify_adviser_by_email.assert_called_once_with(
-            interaction.dit_adviser,
+            sender_participant.adviser,
             Template.meeting_ingest_success.value,
             context={
                 'interaction_url': interaction.get_absolute_url(),

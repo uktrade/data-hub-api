@@ -534,8 +534,6 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -563,8 +561,6 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -593,9 +589,7 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy service delivery for testing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     communication_channel: ~
     investment_project: ~
     was_policy_feedback_provided: false
@@ -626,9 +620,7 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy interaction for testing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
     investment_project: ~
     policy_areas:
@@ -664,9 +656,7 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy interaction for testing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     communication_channel: ~
     investment_project: ~
     policy_areas:
@@ -702,9 +692,7 @@
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
-    dit_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
     notes: This is a dummy service delivery for testing
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a
     communication_channel: ~
     investment_project: ~
     was_policy_feedback_provided: false
@@ -736,9 +724,7 @@
     service_delivery_status: 45329c18-6095-e211-a939-e4115bead28a
     grant_amount_offered: '2500.00'
     net_company_receipt: '2000.12'
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy service delivery for testing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
     communication_channel: ~
     investment_project: ~
     was_policy_feedback_provided: false
@@ -1395,8 +1381,6 @@
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Discussed site details
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 72c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -1422,8 +1406,6 @@
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Provided funding information
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -1449,8 +1431,6 @@
       - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
     service: 9484b82b-3499-e211-a939-e4115bead28a
     subject: Chat about tigers
-    dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -1476,8 +1456,6 @@
       - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
     service: 9484b82b-3499-e211-a939-e4115bead28a
     subject: Chat about monkeys
-    dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -1503,8 +1481,6 @@
       - 6791d583-7a52-418f-a0d3-d8d527f20d43
     service: 0796b92b-3499-e211-a939-e4115bead28a
     subject: Email about golf balls
-    dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
@@ -1530,8 +1506,6 @@
       - 6791d583-7a52-418f-a0d3-d8d527f20d43
     service: 0796b92b-3499-e211-a939-e4115bead28a
     subject: Website feedback about lawn mowers
-    dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
