@@ -1,5 +1,6 @@
 The following management commands were removed as they are no longer required:
 
+- ``update_investment_project_delivery_partners``
 - ``update_investment_project_referral_source_activity_marketing``
 - ``update_investment_project_referral_source_activity_website``
 - ``update_service_delivery_grant_fields``
