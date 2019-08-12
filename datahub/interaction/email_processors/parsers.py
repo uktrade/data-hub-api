@@ -3,7 +3,6 @@ import datetime
 from collections import Counter
 
 import icalendar
-from celery.utils.log import get_task_logger
 from django.utils.timezone import utc
 
 from datahub.company.contact_matching import (
@@ -17,8 +16,6 @@ from datahub.interaction.email_processors.utils import (
     get_best_match_adviser_by_email,
 )
 
-
-logger = get_task_logger(__name__)
 
 ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
