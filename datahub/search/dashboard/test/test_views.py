@@ -60,7 +60,7 @@ class TestDashboard(APITestMixin):
 
     def test_intelligent_homepage_limit(self, setup_es):
         """Test the limit param."""
-        CompanyInteractionFactory.create_batch(15, dit_adviser=self.user)
+        CompanyInteractionFactory.create_batch(15, dit_participants__adviser=self.user)
         ContactFactory.create_batch(15, created_by=self.user)
 
         setup_es.indices.refresh()
@@ -83,7 +83,7 @@ class TestDashboard(APITestMixin):
         requester = create_test_user(
             permission_codenames=(InteractionPermission.view_all,),
         )
-        CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
+        CompanyInteractionFactory.create_batch(5, dit_participants__adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
 
         setup_es.indices.refresh()
@@ -108,7 +108,7 @@ class TestDashboard(APITestMixin):
         requester = create_test_user(
             permission_codenames=('view_contact',),
         )
-        CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
+        InteractionDITParticipantFactory.create_batch(5, adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
 
         setup_es.indices.refresh()

@@ -162,18 +162,10 @@ class InteractionSerializer(serializers.ModelSerializer):
     )
     created_by = NestedAdviserField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)
-    # dit_adviser has been replaced by dit_participants but is retained for temporary backwards
-    # compatibility
-    # TODO: Remove following deprecation period
-    dit_adviser = NestedAdviserField(read_only=True)
     dit_participants = InteractionDITParticipantSerializer(
         many=True,
         allow_empty=False,
     )
-    # dit_team has been replaced by dit_participants but is retained for temporary backwards
-    # compatibility
-    # TODO: Remove following deprecation period
-    dit_team = NestedRelatedField(Team, read_only=True)
     communication_channel = NestedRelatedField(
         CommunicationChannel, required=False, allow_null=True,
     )
@@ -208,25 +200,11 @@ class InteractionSerializer(serializers.ModelSerializer):
 
         This is removed because the value is not stored; it is instead inferred from contents
         of the the event field during serialisation.
-
-        It also:
-          - checks that if `dit_participants` has been provided, `dit_adviser` or `dit_team`
-          haven't also been provided
-          - copies the first value in `contacts` to `contact`
-          - copies the first value in `dit_participants` to `dit_adviser` and `dit_team`
         """
         self._validate_theme(data)
 
         if 'is_event' in data:
             del data['is_event']
-
-        # If dit_participants has been provided, this copies the first participant to
-        # dit_adviser and dit_team (for backwards compatibility).
-        # TODO Remove once dit_adviser and dit_team removed from the database.
-        if 'dit_participants' in data:
-            first_participant = data['dit_participants'][0]
-            data['dit_adviser'] = first_participant['adviser']
-            data['dit_team'] = first_participant['adviser'].dit_team
 
         # Ensure that archived=False is set for creations/updates, when the
         # existing instance does not have a value for it
@@ -340,9 +318,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'modified_by',
             'modified_on',
             'date',
-            'dit_adviser',
             'dit_participants',
-            'dit_team',
             'communication_channel',
             'grant_amount_offered',
             'investment_project',

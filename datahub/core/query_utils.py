@@ -27,7 +27,7 @@ class PreferNullConcat(Func):
     arg_joiner = ' || '
 
 
-def get_string_agg_subquery(model, expression, delimiter=', '):
+def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
     """
     Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
@@ -42,7 +42,7 @@ def get_string_agg_subquery(model, expression, delimiter=', '):
     """
     return get_aggregate_subquery(
         model,
-        StringAgg(expression, delimiter, ordering=(expression,)),
+        StringAgg(expression, delimiter, ordering=(expression,), distinct=distinct),
     )
 
 
@@ -229,3 +229,21 @@ def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
         pk_expression,
         Value(url_suffix),
     )
+
+
+def get_queryset_object(queryset, **filters):
+    """
+    Safer version of QuerySet.get() that avoids loading all objects into memory when there
+    are multiple results.
+
+    (When there are multiple results, QuerySet.get() loads all of them into memory even though
+    it raises an exception when multiple matches are found. This can lead to out-of-memory
+    situations when there are a very large number of matches. This function avoids that by
+    applying a LIMIT to the query.)
+
+    TODO: This will be fixed in Django 3.0 and we should be able to remove this function once
+    Django 3.0 has been released and we have updated to it.
+
+    See https://code.djangoproject.com/ticket/6785 for more information.
+    """
+    return queryset.filter(**filters)[:2].get()

@@ -34,6 +34,7 @@ def get_unreferenced_objects_query(
             )
 
     :returns: queryset for unreferenced objects
+
     """
     if relation_exclusion_filter_mapping is None:
         relation_exclusion_filter_mapping = {}

@@ -3,7 +3,7 @@ lxml==4.4.0
 cssselect==1.0.3
 
 # Django and django related
-Django==2.2.3
+Django==2.2.4
 djangorestframework==3.10.2
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
@@ -80,7 +80,7 @@ flake8-print==3.1.0
 flake8-quotes==2.1.0
 flake8-string-format==0.2.3
 pep8-naming==0.8.2
-pydocstyle==3.0.0
+pydocstyle==4.0.0
 
 gunicorn==19.9.0
 gevent==1.4.0
