@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from pathlib import PurePath
 
@@ -6,10 +5,7 @@ import mailparser
 import pytest
 from django.utils.timezone import utc
 
-from datahub.interaction.email_processors.constants import (
-    InvalidInviteErrorCode,
-    USER_READABLE_ERROR_MESSAGES,
-)
+from datahub.interaction.email_processors.constants import InvalidInviteErrorCode
 from datahub.interaction.email_processors.parsers import (
     CalendarInteractionEmailParser,
     InvalidInviteError,
@@ -225,7 +221,10 @@ class TestCalendarInteractionEmailParser:
             (
                 'email_samples/invalid/email_contacts_unknown.eml',
                 InvalidInviteError(
-                    'The meeting email had no recipients which were recognised as Data Hub contacts.',
+                    (
+                        'The meeting email had no recipients which were recognised as '
+                        'Data Hub contacts.'
+                    ),
                     error_code=InvalidInviteErrorCode.no_known_contacts,
                 ),
             ),

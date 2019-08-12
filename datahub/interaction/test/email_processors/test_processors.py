@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from unittest import mock
 from uuid import UUID
@@ -268,6 +269,7 @@ class TestCalendarInteractionEmailProcessor:
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
+        caplog,
         invalid_invite_error_code,
         expected_to_notify,
     ):
@@ -275,6 +277,7 @@ class TestCalendarInteractionEmailProcessor:
         Test that process_email returns an expected message when the parser
         raises a ValidationError.
         """
+        caplog.set_level(logging.INFO)
         interaction_data = {**base_interaction_data_fixture}
         mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
         error_message = 'There was a problem with the meeting format'
@@ -286,6 +289,13 @@ class TestCalendarInteractionEmailProcessor:
         result, message = processor.process_email(mock_message)
         assert result is False
         assert message == error_message
+        expected_log = (
+            'datahub.interaction.email_processors.processors',
+            20,
+            'Ingested email with ID "abc123" (received 2019-08-01T00:00:01) '
+            f'was not valid: {error_message}',
+        )
+        assert expected_log in caplog.record_tuples
         if expected_to_notify:
             expected_error_message = (
                 USER_READABLE_ERROR_MESSAGES.get(invalid_invite_error_code) or error_message
