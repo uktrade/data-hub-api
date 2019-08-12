@@ -1,3 +1,48 @@
+Data Hub API 14.0.0 (2019-08-12)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``GET /v3/interaction, GET /v3/interaction/<id>, POST /v3/interaction, PATCH /v3/interaction/<id>``: The deprecated ``dit_adviser`` and ``dit_team`` fields were removed from responses. Please use ``dit_participants`` instead.
+- **Interactions** ``interaction_interaction``: The deprecated ``dit_adviser_id`` and ``dit_team_id`` columns were prepared for removal and will shortly be removed. Please use the ``interaction_interactionditparticipant`` table instead.
+
+Features
+--------
+
+- **Contacts** The search CSV export was updated to handle interactions with multiple teams in the 'Team of latest interaction' column. Multiple team names are separated by commas, and duplicate teams are omitted. The column was accordingly renamed 'Teams of latest interaction'.
+- **Interactions** It's now possible to edit the advisers and teams associated with an interaction from the admin site.
+- It's now possible to configure Gunicorn to `emit monitoring metrics <http://docs.gunicorn.org/en/stable/instrumentation.html>`_ to a StatsD host.
+
+Bug fixes
+---------
+
+- **Interactions** An out-of-memory crash when trying to import a CSV file with blank ``contact_email`` values was fixed.
+
+  (This would only have happened if there were a large number of active contacts in the database with blank email addresses.)
+
+API
+---
+
+- **Companies** ``POST /v4/dnb/company-search``: This endpoint was modified to ensure that DNB
+  results were hydrated with the corresponding Data Hub company, if it is present
+  and can be matched (by duns number).
+
+  The API response returns Data Hub companies alongside DNB data in the following format::
+
+      "datahub_company": {
+          "id": "0f5216e0-849f-11e6-ae22-56b6b6499611",
+          "latest_interaction": {
+              "id": "e8c3534f-4f60-4c93-9880-09c22e4fc011",
+              "created_on": "2018-04-08T14:00:00Z",
+              "date": "2018-06-06",
+              "subject": "Exported to Canada"
+          }
+      }
+
+
 Data Hub API 13.14.0 (2019-08-06)
 =================================
 
