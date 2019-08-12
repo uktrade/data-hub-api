@@ -1,4 +1,4 @@
-from django.db.models import Case, F, Max, Value, When
+from django.db.models import Case, Max, Value, When
 from django.db.models.functions import NullIf
 
 from datahub.company.models import Contact as DBContact
@@ -7,6 +7,7 @@ from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_front_end_url_expression,
     get_full_name_expression,
+    get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
 from datahub.interaction.models import Interaction as DBInteraction
@@ -105,9 +106,9 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
             DBContact,
             Max('interactions__date'),
         ),
-        team_of_latest_interaction=get_top_related_expression_subquery(
+        teams_of_latest_interaction=get_top_related_expression_subquery(
             DBInteraction.contacts.field,
-            F('dit_team__name'),
+            get_string_agg_subquery(DBInteraction, 'dit_participants__team__name', distinct=True),
             ('-date',),
         ),
     )
@@ -127,6 +128,6 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'email': 'Email address',
         'accepts_dit_email_marketing': 'Accepts DIT email marketing',
         'date_of_latest_interaction': 'Date of latest interaction',
-        'team_of_latest_interaction': 'Team of latest interaction',
+        'teams_of_latest_interaction': 'Teams of latest interaction',
         'created_by__dit_team__name': 'Created by team',
     }

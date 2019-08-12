@@ -5,6 +5,7 @@ from datahub.core.admin import (
     BaseModelAdminMixin,
     custom_add_permission,
     custom_change_permission,
+    custom_delete_permission,
     custom_view_permission,
     format_json_as_html,
 )
@@ -24,44 +25,24 @@ admin.site.register(CommunicationChannel, DisableableMetadataAdmin)
 admin.site.register((PolicyArea, PolicyIssueType), OrderedMetadataAdmin)
 
 
+@custom_view_permission(InteractionPermission.view_all)
+@custom_add_permission(InteractionPermission.change_all)
+@custom_change_permission(InteractionPermission.change_all)
+@custom_delete_permission(InteractionPermission.change_all)
 class InteractionDITParticipantInline(admin.TabularInline):
-    """
-    Inline admin for InteractionDITParticipant.
-
-    Currently view-only while the legacy Interaction.dit_adviser and Interaction.dit_team fields
-    still exist (to avoid the need to keep them in sync when edits are made via the admin site).
-    """
+    """Inline admin for InteractionDITParticipant."""
 
     model = InteractionDITParticipant
+    min_num = 1
+    extra = 0
+
     fields = ('adviser', 'team')
+    autocomplete_fields = ('adviser', 'team')
+
     verbose_name = 'DIT participant'
     # Note: verbose_name_plural does not get automatically updated here if verbose_name is set,
     # so we have to set it manually
     verbose_name_plural = 'DIT participants'
-
-    def has_add_permission(self, request, obj=None):
-        """
-        Gets whether the user can add new objects for this model.
-
-        Always returns False.
-        """
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        """
-        Gets whether the user can change objects for this model.
-
-        Always returns False.
-        """
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        """
-        Gets whether the user can delete objects for this model.
-
-        Always returns False.
-        """
-        return False
 
 
 @admin.register(Interaction)
@@ -100,8 +81,6 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'archived_documents_url_path',
         'created',
         'modified',
-        'dit_adviser',
-        'dit_team',
         'pretty_service_answers',
         'pretty_source',
     )

@@ -28,7 +28,10 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.contact.views import SearchContactExportAPIView
@@ -530,6 +533,11 @@ class TestContactExportView(APITestMixin):
             contacts=[ContactFactory(), ContactFactory(), ContactFactory()],
         )
         CompanyInteractionFactory.create_batch(10)
+        interaction_with_multiple_teams = CompanyInteractionFactory()
+        InteractionDITParticipantFactory.create_batch(
+            5,
+            interaction=interaction_with_multiple_teams,
+        )
 
         setup_es.indices.refresh()
 
@@ -560,7 +568,8 @@ class TestContactExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
 
-        expected_row_data = [
+        # E123 is ignored as there are seemingly unresolvable indentation errors in the dict below
+        expected_row_data = [  # noqa: E123
             {
                 'Name': contact.name,
                 'Job title': contact.job_title,
@@ -587,15 +596,29 @@ class TestContactExportView(APITestMixin):
                 'Date of latest interaction':
                     max(contact.interactions.all(), key=attrgetter('date')).date
                     if contact.interactions.all() else None,
-                'Team of latest interaction':
-                    max(contact.interactions.all(), key=attrgetter('date')).dit_team.name
-                    if contact.interactions.all() else None,
+                'Teams of latest interaction':
+                    _format_interaction_team_names(
+                        max(contact.interactions.all(), key=attrgetter('date')),
+                    )
+                    if contact.interactions.exists() else None,
                 'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
             }
             for contact in sorted_contacts
         ]
 
-        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
+        actual_row_data = [dict(row) for row in reader]
+        assert actual_row_data == format_csv_data(expected_row_data)
+
+
+def _format_interaction_team_names(interaction):
+    names = interaction.dit_participants.values_list(
+        'team__name',
+        flat=True,
+    ).order_by(
+        'team__name',
+    ).distinct()
+
+    return ', '.join(names)
 
 
 class TestBasicSearch(APITestMixin):

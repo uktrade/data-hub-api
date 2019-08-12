@@ -22,7 +22,6 @@ def to_many_field(wrapped_func):
     explicitly provided.
 
     Example:
-
         class MyFactory(factory.django.DjangoModelFactory):
             ...
             @to_many_field
@@ -33,6 +32,7 @@ def to_many_field(wrapped_func):
         Usage:
             fac = MyFactory(my_m2m_field=[obj3])  # creates an object with my_m2m_field == [obj3]
             fac = MyFactory()  # creates an object with my_m2m_field == [obj1, obj2]
+
     """
     @factory.post_generation
     @wraps(wrapped_func)
@@ -47,7 +47,7 @@ def to_many_field(wrapped_func):
             field.set(extracted)
         else:
             # if the wrapped func returns a value, it's treated as a default value.
-            value = wrapped_func(self)
+            value = wrapped_func(self, **kwargs)
             if value is not None:
                 field.set(value)
 

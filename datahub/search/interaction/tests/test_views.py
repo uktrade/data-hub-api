@@ -68,8 +68,8 @@ def interactions(setup_es):
                     ContactFactory(company=company_1, first_name='Francis', last_name='Brady'),
                     ContactFactory(company=company_1, first_name='Zanger Za', last_name='Qa'),
                 ],
-                dit_adviser__first_name='Angela',
-                dit_adviser__last_name='Lawson',
+                dit_participants__adviser__first_name='Angela',
+                dit_participants__adviser__last_name='Lawson',
             ),
             CompanyInteractionFactory(
                 subject='a coffee',
@@ -78,8 +78,8 @@ def interactions(setup_es):
                 contacts=[
                     ContactFactory(company=company_1, first_name='Try', last_name='Slanger'),
                 ],
-                dit_adviser__first_name='Zed',
-                dit_adviser__last_name='Zeddy',
+                dit_participants__adviser__first_name='Zed',
+                dit_participants__adviser__last_name='Zeddy',
             ),
             CompanyInteractionFactory(
                 subject='Email about exhibition',
@@ -88,8 +88,8 @@ def interactions(setup_es):
                 contacts=[
                     ContactFactory(company=company_1, first_name='Caroline', last_name='Green'),
                 ],
-                dit_adviser__first_name='Prime',
-                dit_adviser__last_name='Zeddy',
+                dit_participants__adviser__first_name='Prime',
+                dit_participants__adviser__last_name='Zeddy',
             ),
             CompanyInteractionFactory(
                 subject='talking about cats',
@@ -98,8 +98,8 @@ def interactions(setup_es):
                 contacts=[
                     ContactFactory(company=company_1, first_name='Full', last_name='Bridge'),
                 ],
-                dit_adviser__first_name='Low',
-                dit_adviser__last_name='Tremon',
+                dit_participants__adviser__first_name='Low',
+                dit_participants__adviser__last_name='Tremon',
             ),
             CompanyInteractionFactory(
                 subject='Event at HQ',
@@ -108,8 +108,8 @@ def interactions(setup_es):
                 contacts=[
                     ContactFactory(company=company_1, first_name='Diane', last_name='Pree'),
                 ],
-                dit_adviser__first_name='Trevor',
-                dit_adviser__last_name='Saleman',
+                dit_participants__adviser__first_name='Trevor',
+                dit_participants__adviser__last_name='Saleman',
             ),
         ])
 
