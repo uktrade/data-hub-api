@@ -1,1 +1,0 @@
-``interaction_interaction``: The deprecated ``dit_adviser_id`` and ``dit_team_id`` columns were prepared for removal and will shortly be removed. Please use the ``interaction_interactionditparticipant`` table instead.
