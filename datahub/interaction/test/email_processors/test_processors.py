@@ -277,7 +277,7 @@ class TestCalendarInteractionEmailProcessor:
         Test that process_email returns an expected message when the parser
         raises a ValidationError.
         """
-        caplog.set_level(logging.INFO)
+        caplog.set_level(logging.WARNING)
         interaction_data = {**base_interaction_data_fixture}
         mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
         error_message = 'There was a problem with the meeting format'
@@ -291,7 +291,7 @@ class TestCalendarInteractionEmailProcessor:
         assert message == error_message
         expected_log = (
             'datahub.interaction.email_processors.processors',
-            20,
+            30,
             'Ingested email with ID "abc123" (received 2019-08-01T00:00:01) '
             f'was not valid: {error_message}',
         )

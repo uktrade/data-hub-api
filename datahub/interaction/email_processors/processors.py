@@ -139,7 +139,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             f'Ingested email with ID "{message.message_id}" (received '
             f'{message.received[0]["date_utc"]}) was not valid: {error_message}'
         )
-        logger.info(error_with_email_info)
+        logger.warning(error_with_email_info)
         # Only notify users if the error code is one that we can notify users about
         if exception.error_code in NOTIFIABLE_ERROR_CODES:
             readable_error = (
