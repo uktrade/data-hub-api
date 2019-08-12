@@ -1,5 +1,5 @@
 # For CH Sync
-lxml==4.4.0
+lxml==4.4.1
 cssselect==1.1.0
 
 # Django and django related
