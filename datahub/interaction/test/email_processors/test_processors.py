@@ -252,11 +252,11 @@ class TestCalendarInteractionEmailProcessor:
             ),
             (
                 InvalidInviteErrorCode.sender_unverified,
-                True,
+                False,
             ),
             (
                 InvalidInviteErrorCode.malformed_email,
-                True,
+                False,
             ),
         ),
     )

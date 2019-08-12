@@ -2,6 +2,10 @@ from enum import Enum
 
 
 class InvalidInviteErrorCode(Enum):
+    """
+    Error codes collect the reasons that an invite can be invalid in to groups -
+    the codes are the keys to these groups.
+    """
 
     malformed_email = 'malformed_email'
     sender_unverified = 'sender_unverified'
