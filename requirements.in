@@ -1,6 +1,6 @@
 # For CH Sync
 lxml==4.4.0
-cssselect==1.0.3
+cssselect==1.1.0
 
 # Django and django related
 Django==2.2.4
