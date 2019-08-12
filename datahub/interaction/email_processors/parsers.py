@@ -4,7 +4,6 @@ from collections import Counter
 
 import icalendar
 from celery.utils.log import get_task_logger
-from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
 from datahub.company.contact_matching import (
@@ -12,6 +11,7 @@ from datahub.company.contact_matching import (
     MatchStrategy,
 )
 from datahub.email_ingestion.validation import was_email_sent_by_dit
+from datahub.interaction.email_processors.constants import InvalidInviteErrorCode
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
     get_best_match_adviser_by_email,
@@ -24,23 +24,6 @@ ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
 CALENDAR_STATUS_CONFIRMED = 'CONFIRMED'
 CALENDAR_COMPONENT_VEVENT = 'VEVENT'
-
-USER_READABLE_ERROR_MESSAGES = {
-    'no_contacts': (
-        'The calendar invitation you sent to Data Hub did not include an email address '
-        'that is recognised as a contact on Data Hub. The invitation must also be sent '
-        'to Data Hub at the same time (and not forwarded to Data Hub later). Please '
-        'check both of these things when resending your invitation and if you still '
-        'see this message after resending the invitation, contact the Data Hub support '
-        'team.',
-    ),
-    'bad_calendar_format': (
-        'It looks like you sent something to Data Hub that was not a calendar invitation. '
-        'Please send to Data Hub a calendar invitation (not an email or another type of '
-        'message). If you still see this error message after sending a calendar email, '
-        'please contact the Data Hub support team.',
-    ),
-}
 
 
 def _get_top_company_from_contacts(contacts):
@@ -99,19 +82,17 @@ def _convert_calendar_time_to_utc_datetime(calendar_time):
     return calendar_time.astimezone(utc)
 
 
-def _log_and_raise_validation_error(email, internal_error, user_readable_error=None):
+class InvalidInviteError(Exception):
     """
-    Log an email format error as an info level message and raise a ValidationError.
-    The ValidationError can be raised with a user readable string if
-    `user_readable_error` is set, otherwise it will be raised with the `internal_error`.
+    A custom exception for when the email invite is not valid.
     """
-    error_with_message_info = (
-        f'Ingested email with ID "{email.message_id}" (received {email.received[0]["date_utc"]}) '
-        f'was not valid: {internal_error}'
-    )
-    logger.info(error_with_message_info)
-    validation_error_message = user_readable_error or internal_error
-    raise ValidationError(validation_error_message)
+
+    def __init__(self, message, error_code):
+        """
+        Initialise with an error code.
+        """
+        super().__init__(message)
+        self.error_code = error_code
 
 
 class CalendarInteractionEmailParser:
@@ -131,21 +112,21 @@ class CalendarInteractionEmailParser:
         try:
             sender_email = self.message.from_[0][1]
         except IndexError:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'Email was malformed - missing "from" header.',
+                InvalidInviteErrorCode.malformed_email,
             )
         if not was_email_sent_by_dit(self.message):
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'The meeting email did not pass our minimal checks to be verified as '
                 'having been sent by a valid DIT Adviser email domain.',
+                InvalidInviteErrorCode.sender_unverified,
             )
         sender_adviser = get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'Email was not sent by a recognised DIT Adviser.',
+                InvalidInviteErrorCode.sender_unverified,
             )
         return sender_adviser
 
@@ -159,10 +140,9 @@ class CalendarInteractionEmailParser:
             if contact:
                 contacts.append(contact)
         if not contacts:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'The meeting email had no recipients which were recognised as Data Hub contacts.',
-                USER_READABLE_ERROR_MESSAGES['no_contacts'],
+                InvalidInviteErrorCode.no_known_contacts,
             )
         return contacts
 
@@ -179,40 +159,36 @@ class CalendarInteractionEmailParser:
         return secondary_advisers
 
     def _extract_and_validate_calendar_event_component(self):
-        readable_error = USER_READABLE_ERROR_MESSAGES['bad_calendar_format']
+        error_code = InvalidInviteErrorCode.bad_calendar_format
         calendar_string = _extract_calendar_string_from_text(self.message)
         if not calendar_string:
             calendar_string = _extract_calendar_string_from_attachments(self.message)
         if not calendar_string:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'There was no iCalendar attachment on the email.',
-                readable_error,
+                error_code,
             )
         try:
             calendar = icalendar.Calendar.from_ical(calendar_string)
         except ValueError:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'The iCalendar attachment was badly formatted.',
-                readable_error,
+                error_code,
             )
         calendar_event_components = [
             comp for comp in calendar.walk()
             if comp.name == CALENDAR_COMPONENT_VEVENT
         ]
         if len(calendar_event_components) == 0:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 'No calendar event was found in the iCalendar attachment.',
-                readable_error,
+                error_code,
             )
         if len(calendar_event_components) > 1:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 f'There were {len(calendar_event_components)} events in the calendar '
                 '- expected 1 event in the iCalendar attachment.',
-                readable_error,
+                error_code,
             )
         return calendar_event_components[0]
 
@@ -231,10 +207,9 @@ class CalendarInteractionEmailParser:
 
         meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
         if not meeting_confirmed:
-            _log_and_raise_validation_error(
-                self.message,
+            raise InvalidInviteError(
                 f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
-                USER_READABLE_ERROR_MESSAGES['bad_calendar_format'],
+                InvalidInviteErrorCode.bad_calendar_format,
             )
 
         return calendar_event
@@ -243,7 +218,7 @@ class CalendarInteractionEmailParser:
         """
         Extract interaction data from the email message as a dictionary.
 
-        This raises a ValidationError if the interaction data could not be fully extracted
+        This raises an InvalidInviteError if the interaction data could not be fully extracted
         or is invalid according to business logic.
         """
         calendar_event = self._extract_and_validate_calendar_event_metadata()

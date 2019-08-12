@@ -4,13 +4,17 @@ from uuid import UUID
 
 import pytest
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.interaction.email_processors.constants import (
+    InvalidInviteErrorCode,
+    USER_READABLE_ERROR_MESSAGES,
+)
 from datahub.interaction.email_processors.notify import Template
+from datahub.interaction.email_processors.parsers import InvalidInviteError
 from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
 from datahub.interaction.models import Interaction
 
@@ -69,6 +73,8 @@ def mock_message(base_interaction_data_fixture):
         for email in base_interaction_data_fixture['contact_emails']
     ]
     message.cc = []
+    message.message_id = 'abc123'
+    message.received = [{'date_utc': '2019-08-01T00:00:01'}]
     return message
 
 
@@ -233,6 +239,27 @@ class TestCalendarInteractionEmailProcessor:
         assert all_interactions_by_sender.count() == 1
         assert all_interactions_by_sender[0].id == UUID(interaction_id)
 
+    @pytest.mark.parametrize(
+        'invalid_invite_error_code,expected_to_notify',
+        (
+            (
+                InvalidInviteErrorCode.bad_calendar_format,
+                True,
+            ),
+            (
+                InvalidInviteErrorCode.no_known_contacts,
+                True,
+            ),
+            (
+                InvalidInviteErrorCode.sender_unverified,
+                True,
+            ),
+            (
+                InvalidInviteErrorCode.malformed_email,
+                True,
+            ),
+        ),
+    )
     def test_process_email_parser_validation_error(
         self,
         base_interaction_data_fixture,
@@ -241,6 +268,8 @@ class TestCalendarInteractionEmailProcessor:
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
+        invalid_invite_error_code,
+        expected_to_notify,
     ):
         """
         Test that process_email returns an expected message when the parser
@@ -249,20 +278,31 @@ class TestCalendarInteractionEmailProcessor:
         interaction_data = {**base_interaction_data_fixture}
         mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
         error_message = 'There was a problem with the meeting format'
-        mock_parser.side_effect = ValidationError(error_message)
+        mock_parser.side_effect = InvalidInviteError(
+            error_message,
+            error_code=invalid_invite_error_code,
+        )
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock_message)
         assert result is False
         assert message == error_message
-        mock_notify_adviser_by_email.assert_called_once_with(
-            Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
-            Template.meeting_ingest_failure.value,
-            context={
-                'errors': ['There was a problem with the meeting format'],
-                'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
-                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
-            },
-        )
+        if expected_to_notify:
+            expected_error_message = (
+                USER_READABLE_ERROR_MESSAGES.get(invalid_invite_error_code) or error_message
+            )
+            mock_notify_adviser_by_email.assert_called_once_with(
+                Advisor.objects.filter(
+                    email=base_interaction_data_fixture['sender_email'],
+                ).first(),
+                Template.meeting_ingest_failure.value,
+                context={
+                    'errors': [expected_error_message],
+                    'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
+                    'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+                },
+            )
+        else:
+            mock_notify_adviser_by_email.assert_not_called()
 
     @pytest.mark.parametrize(
         'interaction_data_overrides,expected_message',

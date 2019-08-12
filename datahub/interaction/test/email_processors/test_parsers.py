@@ -4,12 +4,15 @@ from pathlib import PurePath
 
 import mailparser
 import pytest
-from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
+from datahub.interaction.email_processors.constants import (
+    InvalidInviteErrorCode,
+    USER_READABLE_ERROR_MESSAGES,
+)
 from datahub.interaction.email_processors.parsers import (
     CalendarInteractionEmailParser,
-    USER_READABLE_ERROR_MESSAGES,
+    InvalidInviteError,
 )
 
 
@@ -194,66 +197,82 @@ class TestCalendarInteractionEmailParser:
         assert interaction_data['subject'] == expected_interaction_data['subject']
 
     @pytest.mark.parametrize(
-        'email_file,expected_error,expected_log_message',
+        'email_file,expected_error',
         (
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
-                ValidationError(
+                InvalidInviteError(
                     'The meeting email did not pass our minimal checks '
                     'to be verified as having been sent by a valid DIT '
                     'Adviser email domain.',
+                    error_code=InvalidInviteErrorCode.sender_unverified,
                 ),
-                'The meeting email did not pass our minimal checks '
-                'to be verified as having been sent by a valid DIT '
-                'Adviser email domain.',
             ),
             (
                 'email_samples/invalid/no_from_header.eml',
-                ValidationError('Email was malformed - missing "from" header.'),
-                'Email was malformed - missing "from" header.',
+                InvalidInviteError(
+                    'Email was malformed - missing "from" header.',
+                    error_code=InvalidInviteErrorCode.malformed_email,
+                ),
             ),
             (
                 'email_samples/invalid/email_not_sent_by_known_adviser.eml',
-                ValidationError('Email was not sent by a recognised DIT Adviser.'),
-                'Email was not sent by a recognised DIT Adviser.',
+                InvalidInviteError(
+                    'Email was not sent by a recognised DIT Adviser.',
+                    error_code=InvalidInviteErrorCode.sender_unverified,
+                ),
             ),
             (
                 'email_samples/invalid/email_contacts_unknown.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['no_contacts']),
-                'The meeting email had no recipients which were recognised as Data Hub contacts.',
+                InvalidInviteError(
+                    'The meeting email had no recipients which were recognised as Data Hub contacts.',
+                    error_code=InvalidInviteErrorCode.no_known_contacts,
+                ),
             ),
             # Calendar entry does not start with "BEGIN:VCALENDAR"
             (
                 'email_samples/invalid/bad_calendar_event.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'There was no iCalendar attachment on the email.',
+                InvalidInviteError(
+                    'There was no iCalendar attachment on the email.',
+                    error_code=InvalidInviteErrorCode.no_known_contacts,
+                ),
             ),
             # Calendar entry does not include an "END:VEVENT"
             (
                 'email_samples/invalid/bad_calendar_event_2.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'The iCalendar attachment was badly formatted.',
+                InvalidInviteError(
+                    'The iCalendar attachment was badly formatted.',
+                    error_code=InvalidInviteErrorCode.bad_calendar_format,
+                ),
             ),
             (
                 'email_samples/invalid/no_calendar_in_email.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'There was no iCalendar attachment on the email.',
+                InvalidInviteError(
+                    'There was no iCalendar attachment on the email.',
+                    error_code=InvalidInviteErrorCode.bad_calendar_format,
+                ),
             ),
             (
                 'email_samples/invalid/no_calendar_event.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'No calendar event was found in the iCalendar attachment.',
+                InvalidInviteError(
+                    'No calendar event was found in the iCalendar attachment.',
+                    error_code=InvalidInviteErrorCode.bad_calendar_format,
+                ),
             ),
             (
                 'email_samples/invalid/multiple_calendar_events.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'There were 3 events in the calendar - expected 1 event '
-                'in the iCalendar attachment.',
+                InvalidInviteError(
+                    'There were 3 events in the calendar - expected 1 event '
+                    'in the iCalendar attachment.',
+                    error_code=InvalidInviteErrorCode.bad_calendar_format,
+                ),
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
-                ValidationError(USER_READABLE_ERROR_MESSAGES['bad_calendar_format']),
-                'The calendar event was not status: CONFIRMED.',
+                InvalidInviteError(
+                    'The calendar event was not status: CONFIRMED.',
+                    error_code=InvalidInviteErrorCode.bad_calendar_format,
+                ),
             ),
         ),
     )
@@ -261,24 +280,13 @@ class TestCalendarInteractionEmailParser:
         self,
         email_file,
         expected_error,
-        expected_log_message,
-        caplog,
         calendar_data_fixture,
     ):
         """
         Functional test to ensure that the extract_interaction_data_from_email method
         raises ValidationErrors as expected in a number of situations.
         """
-        caplog.set_level(logging.INFO)
         parser = self._get_parser_for_email_file(email_file)
-        email_message = parser.message
         with pytest.raises(expected_error.__class__) as excinfo:
             parser.extract_interaction_data_from_email()
         assert excinfo.value.args[0] == expected_error.args[0]
-        expected_log = (
-            'datahub.interaction.email_processors.parsers',
-            20,
-            f'Ingested email with ID "{email_message.message_id}" (received '
-            f'{email_message.received[0]["date_utc"]}) was not valid: {expected_log_message}',
-        )
-        assert expected_log in caplog.record_tuples

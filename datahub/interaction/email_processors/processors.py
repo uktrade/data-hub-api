@@ -1,14 +1,17 @@
 from celery.utils.log import get_task_logger
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 
 from datahub.email_ingestion.email_processor import EmailProcessor
+from datahub.interaction.email_processors.constants import USER_READABLE_ERROR_MESSAGES
 from datahub.interaction.email_processors.notify import (
     notify_meeting_ingest_failure,
     notify_meeting_ingest_success,
 )
-from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.parsers import (
+    CalendarInteractionEmailParser,
+    InvalidInviteError,
+)
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
     get_best_match_adviser_by_email,
@@ -151,9 +154,16 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         email_parser = CalendarInteractionEmailParser(message)
         try:
             interaction_data = email_parser.extract_interaction_data_from_email()
-        except ValidationError as exc:
-            self._notify_meeting_ingest_failure(message, exc.messages)
-            return (False, exc.message)  # noqa: B306
+        except InvalidInviteError as exc:
+            error_message = exc.args[0]
+            error_with_email_info = (
+                f'Ingested email with ID "{message.message_id}" (received '
+                f'{message.received[0]["date_utc"]}) was not valid: {error_message}'
+            )
+            logger.info(error_with_email_info)
+            readable_error = USER_READABLE_ERROR_MESSAGES.get(exc.error_code) or error_message
+            self._notify_meeting_ingest_failure(message, [readable_error])
+            return (False, error_message)
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
