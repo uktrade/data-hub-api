@@ -44,6 +44,12 @@ def test_mapping(setup_es):
                         'address_postcode_trigram',
                     ],
                     'type': 'text',
+                    'fields': {
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'address_postcode_trigram': {
                     'analyzer': 'trigram_analyzer',

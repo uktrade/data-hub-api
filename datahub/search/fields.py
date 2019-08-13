@@ -11,6 +11,12 @@ NormalizedKeyword = partial(
 )
 TrigramText = partial(Text, analyzer='trigram_analyzer')
 EnglishText = partial(Text, analyzer='english_analyzer')
+TextWithTrigram = partial(
+    Text,
+    fields={
+        'trigram': TrigramText(),
+    },
+)
 
 
 class TextWithKeyword(Text):
@@ -102,11 +108,7 @@ def company_field():
                     'keyword': NormalizedKeyword(),
                 },
             ),
-            'trading_names': Text(
-                fields={
-                    'trigram': TrigramText(),
-                },
-            ),
+            'trading_names': TextWithTrigram(),
         },
     )
 
@@ -116,11 +118,7 @@ def country_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': Text(
-                fields={
-                    'trigram': TrigramText(),
-                },
-            ),
+            'name': TextWithTrigram(),
         },
     )
 
@@ -143,11 +141,7 @@ def address_field(index_country=True):
             'line_2': Text(index=False),
             'town': Text(index=False),
             'county': Text(index=False),
-            'postcode': Text(
-                fields={
-                    'trigram': TrigramText(),
-                },
-            ),
+            'postcode': TextWithTrigram(),
             'country': nested_country_field,
         },
     )

@@ -94,7 +94,9 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     address = fields.address_field()
     registered_address = fields.address_field()
-    trading_names = Text(
+    # TODO: Update queries to use the trigram sub-field (once indexed) and remove
+    #  trading_names_trigram
+    trading_names = fields.TextWithTrigram(
         copy_to=['trading_names_trigram'],
     )
     trading_names_trigram = fields.TrigramText()
