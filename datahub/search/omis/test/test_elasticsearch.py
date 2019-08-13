@@ -347,7 +347,6 @@ def test_mapping(setup_es):
                     'type': 'object',
                 },
                 'reference': {
-                    'copy_to': ['reference_trigram'],
                     'normalizer': 'lowercase_asciifolding_normalizer',
                     'type': 'keyword',
                     'fields': {
@@ -356,10 +355,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'reference_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'sector': {
                     'properties': {
@@ -451,28 +446,20 @@ def test_mapping(setup_es):
                     'type': 'object',
                 },
                 'subtotal_cost': {
-                    'copy_to': ['subtotal_cost_string'],
                     'type': 'integer',
                     'fields': {
                         'keyword': {
                             'type': 'keyword',
                         },
                     },
-                },
-                'subtotal_cost_string': {
-                    'type': 'keyword',
                 },
                 'total_cost': {
-                    'copy_to': ['total_cost_string'],
                     'type': 'integer',
                     'fields': {
                         'keyword': {
                             'type': 'keyword',
                         },
                     },
-                },
-                'total_cost_string': {
-                    'type': 'keyword',
                 },
                 'vat_cost': {
                     'index': False,

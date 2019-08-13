@@ -76,11 +76,6 @@ def test_mapping(setup_es):
                     'type': 'text',
                 },
                 'registered_address_postcode': {
-                    'copy_to': ['registered_address_postcode_trigram'],
-                    'type': 'text',
-                },
-                'registered_address_postcode_trigram': {
-                    'analyzer': 'trigram_analyzer',
                     'type': 'text',
                 },
                 'registered_address_town': {

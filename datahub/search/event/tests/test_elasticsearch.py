@@ -40,9 +40,6 @@ def test_mapping(setup_es):
                     'type': 'keyword',
                 },
                 'address_postcode': {
-                    'copy_to': [
-                        'address_postcode_trigram',
-                    ],
                     'type': 'text',
                     'fields': {
                         'trigram': {
@@ -50,10 +47,6 @@ def test_mapping(setup_es):
                             'type': 'text',
                         },
                     },
-                },
-                'address_postcode_trigram': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text',
                 },
                 'address_town': {
                     'normalizer': 'lowercase_asciifolding_normalizer',

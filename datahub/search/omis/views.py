@@ -51,7 +51,7 @@ class SearchOrderAPIViewMixin:
         'assigned_to_adviser': 'assignees.id',
         'assigned_to_team': 'assignees.dit_team.id',
         'company': 'company.id',
-        'reference': 'reference_trigram',
+        'reference': 'reference.trigram',
     }
 
     COMPOSITE_FILTERS = {
