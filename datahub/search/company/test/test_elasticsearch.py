@@ -245,6 +245,12 @@ def test_mapping(setup_es):
                 'trading_names': {
                     'copy_to': ['trading_names_trigram'],
                     'type': 'text',
+                    'fields': {
+                        'trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text',
+                        },
+                    },
                 },
                 'trading_names_trigram': {
                     'analyzer': 'trigram_analyzer',
