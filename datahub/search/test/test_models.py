@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
-from datahub.search.utils import get_model_copy_to_target_field_names, get_model_field_names
+from datahub.search.utils import get_model_field_names
 
 
 class TestBaseESModel:
@@ -43,12 +43,11 @@ def test_validate_model_fields(search_app):
 
     fields = get_model_field_names(es_model)
 
-    copy_to_fields = get_model_copy_to_target_field_names(es_model)
     computed_fields = es_model.COMPUTED_MAPPINGS.keys()
     db_model_properties = _get_object_properties(db_model)
     db_model_fields = _get_db_model_fields(db_model)
 
-    valid_fields = copy_to_fields | computed_fields | db_model_properties | db_model_fields
+    valid_fields = computed_fields | db_model_properties | db_model_fields
     invalid_fields = fields - valid_fields
 
     assert not invalid_fields

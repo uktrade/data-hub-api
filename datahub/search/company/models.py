@@ -94,12 +94,7 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     address = fields.address_field()
     registered_address = fields.address_field()
-    # TODO: Update queries to use the trigram sub-field (once indexed) and remove
-    #  trading_names_trigram
-    trading_names = fields.TextWithTrigram(
-        copy_to=['trading_names_trigram'],
-    )
-    trading_names_trigram = fields.TrigramText()
+    trading_names = fields.TextWithTrigram()
     turnover_range = fields.id_name_field()
     uk_region = fields.id_name_field()
     uk_based = Boolean()
@@ -143,7 +138,7 @@ class Company(BaseESModel):
         'name.trigram',
         'company_number',
         'trading_names',  # to find 2-letter words
-        'trading_names_trigram',
+        'trading_names.trigram',
         'reference_code',
 
         'address.country.name.trigram',
