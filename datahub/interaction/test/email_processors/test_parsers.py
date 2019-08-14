@@ -5,11 +5,13 @@ import mailparser
 import pytest
 from django.utils.timezone import utc
 
-from datahub.interaction.email_processors.constants import InvalidInviteErrorCode
-from datahub.interaction.email_processors.parsers import (
-    CalendarInteractionEmailParser,
-    InvalidInviteError,
+from datahub.interaction.email_processors.exceptions import (
+    BadCalendarInviteError,
+    MalformedEmailError,
+    NoContactsError,
+    SenderUnverifiedError,
 )
+from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
 
 
 @pytest.mark.django_db
@@ -197,80 +199,70 @@ class TestCalendarInteractionEmailParser:
         (
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
-                InvalidInviteError(
+                SenderUnverifiedError(
                     'The meeting email did not pass our minimal checks '
                     'to be verified as having been sent by a valid DIT '
                     'Adviser email domain.',
-                    error_code=InvalidInviteErrorCode.sender_unverified,
                 ),
             ),
             (
                 'email_samples/invalid/no_from_header.eml',
-                InvalidInviteError(
+                MalformedEmailError(
                     'Email was malformed - missing "from" header.',
-                    error_code=InvalidInviteErrorCode.malformed_email,
                 ),
             ),
             (
                 'email_samples/invalid/email_not_sent_by_known_adviser.eml',
-                InvalidInviteError(
+                SenderUnverifiedError(
                     'Email was not sent by a recognised DIT Adviser.',
-                    error_code=InvalidInviteErrorCode.sender_unverified,
                 ),
             ),
             (
                 'email_samples/invalid/email_contacts_unknown.eml',
-                InvalidInviteError(
+                NoContactsError(
                     (
                         'The meeting email had no recipients which were recognised as '
                         'Data Hub contacts.'
                     ),
-                    error_code=InvalidInviteErrorCode.no_known_contacts,
                 ),
             ),
             # Calendar entry does not start with "BEGIN:VCALENDAR"
             (
                 'email_samples/invalid/bad_calendar_event.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'There was no iCalendar attachment on the email.',
-                    error_code=InvalidInviteErrorCode.no_known_contacts,
                 ),
             ),
             # Calendar entry does not include an "END:VEVENT"
             (
                 'email_samples/invalid/bad_calendar_event_2.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'The iCalendar attachment was badly formatted.',
-                    error_code=InvalidInviteErrorCode.bad_calendar_format,
                 ),
             ),
             (
                 'email_samples/invalid/no_calendar_in_email.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'There was no iCalendar attachment on the email.',
-                    error_code=InvalidInviteErrorCode.bad_calendar_format,
                 ),
             ),
             (
                 'email_samples/invalid/no_calendar_event.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'No calendar event was found in the iCalendar attachment.',
-                    error_code=InvalidInviteErrorCode.bad_calendar_format,
                 ),
             ),
             (
                 'email_samples/invalid/multiple_calendar_events.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'There were 3 events in the calendar - expected 1 event '
                     'in the iCalendar attachment.',
-                    error_code=InvalidInviteErrorCode.bad_calendar_format,
                 ),
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
-                InvalidInviteError(
+                BadCalendarInviteError(
                     'The calendar event was not status: CONFIRMED.',
-                    error_code=InvalidInviteErrorCode.bad_calendar_format,
                 ),
             ),
         ),

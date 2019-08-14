@@ -3,18 +3,16 @@ from django.db import transaction
 from rest_framework import serializers
 
 from datahub.email_ingestion.email_processor import EmailProcessor
-from datahub.interaction.email_processors.constants import (
-    InvalidInviteErrorCode,
-    USER_READABLE_ERROR_MESSAGES,
+from datahub.interaction.email_processors.exceptions import (
+    BadCalendarInviteError,
+    InvalidInviteError,
+    NoContactsError,
 )
 from datahub.interaction.email_processors.notify import (
     notify_meeting_ingest_failure,
     notify_meeting_ingest_success,
 )
-from datahub.interaction.email_processors.parsers import (
-    CalendarInteractionEmailParser,
-    InvalidInviteError,
-)
+from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
     get_best_match_adviser_by_email,
@@ -30,10 +28,23 @@ logger = get_task_logger(__name__)
 # notify users if the email is malformed or if the sender was unverified
 # as these situations *could* point to malicious activity and we should offer
 # no hints in these situations.
-NOTIFIABLE_ERROR_CODES = [
-    InvalidInviteErrorCode.no_known_contacts,
-    InvalidInviteErrorCode.bad_calendar_format,
-]
+READABLE_ERROR_MESSAGES = {
+    BadCalendarInviteError: (
+        'It looks like you sent something to Data Hub that was not a calendar invitation. '
+        'Please send to Data Hub a calendar invitation (not an email or another type of '
+        'message). If you still see this error message after sending a calendar email, '
+        'please contact the Data Hub support team.'
+    ),
+    NoContactsError: (
+        'The calendar invitation you sent to Data Hub did not include an email address '
+        'that is recognised as a contact on Data Hub. The invitation must also be sent '
+        'to Data Hub at the same time (and not forwarded to Data Hub later). Please '
+        'check both of these things when resending your invitation and if you still '
+        'see this message after resending the invitation, contact the Data Hub support '
+        'team.'
+    ),
+}
+NOTIFIABLE_EXCEPTIONS = READABLE_ERROR_MESSAGES.keys()
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
@@ -140,11 +151,10 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             f'{message.received[0]["date_utc"]}) was not valid: {error_message}'
         )
         logger.warning(error_with_email_info)
+        exc_class = exception.__class__
         # Only notify users if the error code is one that we can notify users about
-        if exception.error_code in NOTIFIABLE_ERROR_CODES:
-            readable_error = (
-                USER_READABLE_ERROR_MESSAGES.get(exception.error_code) or error_message
-            )
+        if exc_class in NOTIFIABLE_EXCEPTIONS:
+            readable_error = READABLE_ERROR_MESSAGES[exc_class]
             self._notify_meeting_ingest_failure(message, [readable_error])
 
     def validate_with_serializer(self, data):

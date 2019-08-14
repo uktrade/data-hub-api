@@ -10,13 +10,17 @@ from django.utils.timezone import utc
 from datahub.company.models import Advisor, Company, Contact
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
-from datahub.interaction.email_processors.constants import (
-    InvalidInviteErrorCode,
-    USER_READABLE_ERROR_MESSAGES,
+from datahub.interaction.email_processors.exceptions import (
+    BadCalendarInviteError,
+    MalformedEmailError,
+    NoContactsError,
+    SenderUnverifiedError,
 )
 from datahub.interaction.email_processors.notify import Template
-from datahub.interaction.email_processors.parsers import InvalidInviteError
-from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
+from datahub.interaction.email_processors.processors import (
+    CalendarInteractionEmailProcessor,
+    READABLE_ERROR_MESSAGES,
+)
 from datahub.interaction.models import Interaction
 
 
@@ -241,22 +245,22 @@ class TestCalendarInteractionEmailProcessor:
         assert all_interactions_by_sender[0].id == UUID(interaction_id)
 
     @pytest.mark.parametrize(
-        'invalid_invite_error_code,expected_to_notify',
+        'invalid_invite_exception_class,expected_to_notify',
         (
             (
-                InvalidInviteErrorCode.bad_calendar_format,
+                BadCalendarInviteError,
                 True,
             ),
             (
-                InvalidInviteErrorCode.no_known_contacts,
+                NoContactsError,
                 True,
             ),
             (
-                InvalidInviteErrorCode.sender_unverified,
+                SenderUnverifiedError,
                 False,
             ),
             (
-                InvalidInviteErrorCode.malformed_email,
+                MalformedEmailError,
                 False,
             ),
         ),
@@ -270,7 +274,7 @@ class TestCalendarInteractionEmailProcessor:
         mock_message,
         monkeypatch,
         caplog,
-        invalid_invite_error_code,
+        invalid_invite_exception_class,
         expected_to_notify,
     ):
         """
@@ -281,9 +285,8 @@ class TestCalendarInteractionEmailProcessor:
         interaction_data = {**base_interaction_data_fixture}
         mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
         error_message = 'There was a problem with the meeting format'
-        mock_parser.side_effect = InvalidInviteError(
+        mock_parser.side_effect = invalid_invite_exception_class(
             error_message,
-            error_code=invalid_invite_error_code,
         )
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock_message)
@@ -298,7 +301,7 @@ class TestCalendarInteractionEmailProcessor:
         assert expected_log in caplog.record_tuples
         if expected_to_notify:
             expected_error_message = (
-                USER_READABLE_ERROR_MESSAGES.get(invalid_invite_error_code) or error_message
+                READABLE_ERROR_MESSAGES[invalid_invite_exception_class]
             )
             mock_notify_adviser_by_email.assert_called_once_with(
                 Advisor.objects.filter(
