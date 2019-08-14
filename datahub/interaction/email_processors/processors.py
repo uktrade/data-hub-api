@@ -44,7 +44,7 @@ READABLE_ERROR_MESSAGES = {
         'team.'
     ),
 }
-NOTIFIABLE_EXCEPTIONS = READABLE_ERROR_MESSAGES.keys()
+NOTIFIABLE_EXCEPTIONS = (BadCalendarInviteError, NoContactsError)
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
@@ -154,7 +154,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         exc_class = exception.__class__
         # Only notify users if the error code is one that we can notify users about
         if exc_class in NOTIFIABLE_EXCEPTIONS:
-            readable_error = READABLE_ERROR_MESSAGES[exc_class]
+            readable_error = READABLE_ERROR_MESSAGES.get(exc_class) or error_message
             self._notify_meeting_ingest_failure(message, [readable_error])
 
     def validate_with_serializer(self, data):
