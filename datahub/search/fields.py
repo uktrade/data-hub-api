@@ -19,29 +19,6 @@ TextWithTrigram = partial(
 )
 
 
-class TextWithKeyword(Text):
-    """
-    Text field with keyword sub-field.
-
-    This definition is in line with the data type Elasticsearch uses for dynamically mapped text
-    fields, and is intended to be used to explicitly define fields that were previously
-    implicitly added to the ES mapping.
-    """
-
-    # The default value Elasticsearch uses for ignore_above when dynamically mapping text fields
-    ES_DEFAULT_IGNORE_ABOVE = 256
-
-    def __init__(self, *args, **kwargs):
-        """Initialises the field, creating a keyword sub-field."""
-        super().__init__(
-            *args,
-            **kwargs,
-            fields={
-                'keyword': Keyword(ignore_above=self.ES_DEFAULT_IGNORE_ABOVE),
-            },
-        )
-
-
 def contact_or_adviser_field(include_dit_team=False):
     """Object field for advisers and contacts."""
     props = {
@@ -169,11 +146,4 @@ def sector_field():
             'name': NormalizedKeyword(),
             'ancestors': ancestors,
         },
-    )
-
-
-def object_field(*fields):
-    """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
-    return Object(
-        properties={field: TextWithKeyword() for field in fields},
     )
