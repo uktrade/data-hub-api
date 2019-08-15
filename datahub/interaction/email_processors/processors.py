@@ -28,7 +28,7 @@ logger = get_task_logger(__name__)
 # notify users if the email is malformed or if the sender was unverified
 # as these situations *could* point to malicious activity and we should offer
 # no hints in these situations.
-READABLE_ERROR_MESSAGES = {
+EXCEPTION_NOTIFY_MESSAGES = {
     BadCalendarInviteError: (
         'It looks like you sent something to Data Hub that was not a calendar invitation. '
         'Please send to Data Hub a calendar invitation (not an email or another type of '
@@ -44,7 +44,6 @@ READABLE_ERROR_MESSAGES = {
         'team.'
     ),
 }
-NOTIFIABLE_EXCEPTIONS = (BadCalendarInviteError, NoContactsError)
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
@@ -145,16 +144,16 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         Given an InvalidInviteError and an email message, log the error that
         the user triggered and notify them with an explanation (if applicable).
         """
-        error_message = exception.args[0]
+        error_str = repr(exception)
         error_with_email_info = (
             f'Ingested email with ID "{message.message_id}" (received '
-            f'{message.received[0]["date_utc"]}) was not valid: {error_message}'
+            f'{message.received[0]["date_utc"]}) was not valid: {error_str}'
         )
         logger.warning(error_with_email_info)
         exc_class = exception.__class__
         # Only notify users if the error code is one that we can notify users about
-        if exc_class in NOTIFIABLE_EXCEPTIONS:
-            readable_error = READABLE_ERROR_MESSAGES.get(exc_class) or error_message
+        if exc_class in EXCEPTION_NOTIFY_MESSAGES:
+            readable_error = EXCEPTION_NOTIFY_MESSAGES[exc_class]
             self._notify_meeting_ingest_failure(message, [readable_error])
 
     def validate_with_serializer(self, data):
@@ -197,7 +196,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction_data = email_parser.extract_interaction_data_from_email()
         except InvalidInviteError as exc:
             self._handle_invalid_invite(exc, message)
-            return (False, exc.args[0])
+            return (False, repr(exc))
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company

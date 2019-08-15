@@ -19,7 +19,7 @@ from datahub.interaction.email_processors.exceptions import (
 from datahub.interaction.email_processors.notify import Template
 from datahub.interaction.email_processors.processors import (
     CalendarInteractionEmailProcessor,
-    READABLE_ERROR_MESSAGES,
+    EXCEPTION_NOTIFY_MESSAGES,
 )
 from datahub.interaction.models import Interaction
 
@@ -284,24 +284,23 @@ class TestCalendarInteractionEmailProcessor:
         caplog.set_level(logging.WARNING)
         interaction_data = {**base_interaction_data_fixture}
         mock_parser = self._get_email_parser_mock(interaction_data, monkeypatch)
-        error_message = 'There was a problem with the meeting format'
-        mock_parser.side_effect = invalid_invite_exception_class(
-            error_message,
-        )
+        exception = invalid_invite_exception_class('There was a problem with the meeting format')
+        mock_parser.side_effect = exception
+        expected_exception_string = repr(exception)
         processor = CalendarInteractionEmailProcessor()
         result, message = processor.process_email(mock_message)
         assert result is False
-        assert message == error_message
+        assert message == expected_exception_string
         expected_log = (
             'datahub.interaction.email_processors.processors',
             30,
             'Ingested email with ID "abc123" (received 2019-08-01T00:00:01) '
-            f'was not valid: {error_message}',
+            f'was not valid: {expected_exception_string}',
         )
         assert expected_log in caplog.record_tuples
         if expected_to_notify:
             expected_error_message = (
-                READABLE_ERROR_MESSAGES[invalid_invite_exception_class]
+                EXCEPTION_NOTIFY_MESSAGES[invalid_invite_exception_class]
             )
             mock_notify_adviser_by_email.assert_called_once_with(
                 Advisor.objects.filter(
