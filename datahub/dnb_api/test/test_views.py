@@ -1,65 +1,120 @@
-import datetime
 import json
+from urllib.parse import urljoin
 
 import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
-from django.utils.timezone import utc
-from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import CompanyPermission
+from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.models import InteractionPermission
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.metadata.models import Country
+
+DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 
 
-@pytest.fixture()
-def dnb_company_search_feature_flag():
+@pytest.mark.parametrize(
+    'url',
+    (
+        reverse('api-v4:dnb-api:company-search'),
+        reverse('api-v4:dnb-api:company-create'),
+
+    ),
+)
+class TestDNBAPICommon(APITestMixin):
     """
-    Creates the dnb company search feature flag.
+    Test common functionality in company-search as well
+    as company-create endpoints.
     """
-    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
 
+    def test_post_no_feature_flag(self, requests_mock, url):
+        """
+        Test that POST fails with a 404 when the feature flag is unset.
+        """
+        requests_mock.post(DNB_SEARCH_URL)
 
-@pytest.fixture()
-def dnb_company_search_datahub_companies():
-    """
-    Creates Data Hub companies for hydrating DNB search results with.
-    """
-    # Company with no interactions
-    CompanyFactory(duns_number='1234567', id='6083b732-b07a-42d6-ada4-c8082293285b')
-    # Company with two interactions
-    company = CompanyFactory(duns_number='7654321', id='6083b732-b07a-42d6-ada4-c99999999999')
-
-    interaction_date = datetime.datetime(year=2019, month=8, day=1, hour=16, minute=0, tzinfo=utc)
-    with freeze_time(interaction_date):
-        CompanyInteractionFactory(
-            id='6083b732-b07a-42d6-ada4-222222222222',
-            date=interaction_date,
-            subject='Meeting with Joe Bloggs',
-            company=company,
+        response = self.api_client.post(
+            url,
+            content_type='application/json',
         )
 
-    older_interaction_date = datetime.datetime(year=2018, month=8, day=1, tzinfo=utc)
-    with freeze_time(older_interaction_date):
-        CompanyInteractionFactory(
-            id='6083b732-b07a-42d6-ada4-111111111111',
-            date=older_interaction_date,
-            subject='Meeting with John Smith',
-            company=company,
+        assert response.status_code == 404
+        assert requests_mock.called is False
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag, url):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                url,
+                data={'duns_number': '123456789'},
+            )
+
+    def test_unauthenticated_not_authorised(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        url,
+    ):
+        """
+        Ensure that a non-authenticated request gets a 401.
+        """
+        requests_mock.post(DNB_SEARCH_URL)
+
+        unauthorised_api_client = self.create_api_client()
+        unauthorised_api_client.credentials(Authorization='foo')
+
+        response = unauthorised_api_client.post(
+            url,
+            data={'foo': 'bar'},
         )
+
+        assert response.status_code == 401
+        assert requests_mock.called is False
 
 
 class TestDNBCompanySearchAPI(APITestMixin):
     """
     DNB Company Search view test case.
     """
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+        ),
+    )
+    def test_content_type(
+        self,
+        dnb_company_search_feature_flag,
+        requests_mock,
+        dnb_response_non_uk,
+        content_type,
+        expected_status_code,
+    ):
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            status_code=status.HTTP_200_OK,
+            json=dnb_response_non_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-search'),
+            content_type=content_type,
+        )
+
+        assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
         'request_data,response_status_code,upstream_response_content,response_data',
@@ -137,7 +192,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         Test for POST proxy.
         """
         requests_mock.post(
-            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
+            DNB_SEARCH_URL,
             status_code=response_status_code,
             content=upstream_response_content,
             headers={'content-type': 'application/json'},
@@ -161,88 +216,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert response.status_code == response_status_code
         assert response.json() == response_data
         assert requests_mock.last_request.body == request_data
-
-    def test_post_no_feature_flag(self, requests_mock):
-        """
-        Test that POST fails with a 404 when the feature flag is unset.
-        """
-        requests_mock.post(
-            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
-        )
-
-        url = reverse('api-v4:dnb-api:company-search')
-        response = self.api_client.post(
-            url,
-            data={'foo': 'bar'},
-            content_type='application/json',
-        )
-
-        assert response.status_code == 404
-        assert requests_mock.called is False
-
-    @override_settings(DNB_SERVICE_BASE_URL=None)
-    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
-        is not set.
-        """
-        url = reverse('api-v4:dnb-api:company-search')
-        with pytest.raises(ImproperlyConfigured):
-            self.api_client.post(
-                url,
-                data={'foo': 'bar'},
-                content_type='application/json',
-            )
-
-    @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
-            (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-            ('application/json', status.HTTP_200_OK),
-        ),
-    )
-    def test_content_type(
-        self,
-        dnb_company_search_feature_flag,
-        requests_mock,
-        content_type,
-        expected_status_code,
-    ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
-        """
-        requests_mock.post(
-            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
-            status_code=status.HTTP_200_OK,
-            content=b'{"results":[]}',
-        )
-
-        url = reverse('api-v4:dnb-api:company-search')
-        response = self.api_client.post(url, content_type=content_type)
-
-        assert response.status_code == expected_status_code
-
-    def test_unauthenticated_not_authorised(self, requests_mock, dnb_company_search_feature_flag):
-        """
-        Ensure that a non-authenticated request gets a 401.
-        """
-        requests_mock.post(
-            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
-        )
-
-        unauthorised_api_client = self.create_api_client()
-        unauthorised_api_client.credentials(Authorization='foo')
-
-        url = reverse('api-v4:dnb-api:company-search')
-        response = unauthorised_api_client.post(
-            url,
-            data={'foo': 'bar'},
-            content_type='application/json',
-        )
-
-        assert response.status_code == 401
-        assert requests_mock.called is False
 
     @pytest.mark.parametrize(
         'response_status_code,upstream_response_content,response_data,permission_codenames',
@@ -315,10 +288,10 @@ class TestDNBCompanySearchAPI(APITestMixin):
         permission_codenames,
     ):
         """
-        Test for POST proxy.
+        Test for POST proxy permissions.
         """
         requests_mock.post(
-            settings.DNB_SERVICE_BASE_URL + 'companies/search/',
+            DNB_SEARCH_URL,
             status_code=response_status_code,
             content=upstream_response_content,
         )
@@ -333,3 +306,367 @@ class TestDNBCompanySearchAPI(APITestMixin):
 
         assert response.status_code == response_status_code
         assert json.loads(response.content) == response_data
+
+
+class TestDNBCompanyCreateAPI(APITestMixin):
+    """
+    DNB Company Create view test case.
+    """
+
+    def _assert_companies_same(self, company, dnb_company):
+        """
+        Check whether the given DataHub company is the same as the given DNB company.
+        """
+        country = Country.objects.filter(
+            iso_alpha2_code=dnb_company['address_country'],
+        ).first()
+
+        company_number = (
+            dnb_company['registration_numbers'][0].get('registration_number')
+            if country.iso_alpha2_code == 'GB' else None
+        )
+
+        [company.pop(k) for k in ('id', 'created_on', 'modified_on')]
+
+        assert company == {
+            'name': dnb_company['primary_name'],
+            'trading_names': dnb_company['trading_names'],
+            'address': {
+                'country': {
+                    'id': str(country.id),
+                    'name': country.name,
+                },
+                'line_1': dnb_company['address_line_1'],
+                'line_2': dnb_company['address_line_2'],
+                'town': dnb_company['address_town'],
+                'county': dnb_company['address_county'],
+                'postcode': dnb_company['address_postcode'],
+            },
+            'registered_address': None,
+            'reference_code': '',
+            'uk_based': (dnb_company['address_country'] == 'GB'),
+            'duns_number': dnb_company['duns_number'],
+            'company_number': company_number,
+            'number_of_employees': dnb_company['employee_number'],
+            'is_number_of_employees_estimated': dnb_company['is_employees_number_estimated'],
+            'employee_range': None,
+            'turnover': float(dnb_company['annual_sales']),
+            'is_turnover_estimated': dnb_company['is_annual_sales_estimated'],
+            'turnover_range': None,
+            'website': f'http://{dnb_company["domain"]}',
+            'business_type': None,
+            'description': None,
+            'global_headquarters': None,
+            'headquarter_type': None,
+            'sector': None,
+            'uk_region': None,
+            'vat_number': '',
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': '',
+            'archived_on': None,
+            'archived_reason': None,
+            'export_experience_category': None,
+            'export_to_countries': [],
+            'future_interest_countries': [],
+            'one_list_group_global_account_manager': None,
+            'one_list_group_tier': None,
+            'transfer_reason': '',
+            'transferred_by': None,
+            'transferred_to': None,
+            'transferred_on': None,
+            'contacts': [],
+        }
+
+    def test_post_non_uk(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_non_uk,
+    ):
+        """
+        Test create-company endpoint for a non-uk company.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_non_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company = response.json()
+        dnb_company = dnb_response_non_uk['results'].pop()
+        self._assert_companies_same(company, dnb_company)
+
+        datahub_company = Company.objects.filter(
+            duns_number=company['duns_number'],
+        ).first()
+        assert datahub_company is not None
+        assert datahub_company.created_by == self.user
+        assert datahub_company.modified_by == self.user
+
+    def test_post_uk(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+    ):
+        """
+        Test create-company endpoint for a UK company.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company = response.json()
+        dnb_company = dnb_response_uk['results'].pop()
+        self._assert_companies_same(company, dnb_company)
+
+        datahub_company = Company.objects.filter(
+            duns_number=company['duns_number'],
+        ).first()
+        assert datahub_company is not None
+        assert datahub_company.created_by == self.user
+        assert datahub_company.modified_by == self.user
+
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {'duns_number': None},
+            {'duns_number': 'foobarbaz'},
+            {'duns_number': '12345678'},
+            {'duns_number': '1234567890'},
+            {'not_duns_number': '123456789'},
+        ),
+    )
+    def test_post_invalid(
+        self,
+        dnb_company_search_feature_flag,
+        data,
+    ):
+        """
+        Test that a query without `duns_number` returns 400.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data=data,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.parametrize(
+        'results, expected_status_code, expected_message',
+        (
+            ([], 400, 'Cannot find a company with duns_number: 123456789'),
+            (['foo', 'bar'], 502, 'Multiple companies found with duns_number: 123456789'),
+        ),
+    )
+    def test_post_none_or_multiple_companies_found(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        results,
+        expected_status_code,
+        expected_message,
+    ):
+        """
+        Test if a given `duns_number` gets anything other than a single company
+        from dnb-service, the create-company endpoint returns a 400.
+
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json={'results': results},
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == expected_status_code
+        assert response.json()['detail'] == expected_message
+
+    @pytest.mark.parametrize(
+        'missing_required_field',
+        (
+            'primary_name',
+            'trading_names',
+            'duns_number',
+            'address_line_1',
+            'address_line_2',
+            'address_town',
+            'address_county',
+            'address_postcode',
+            'address_country',
+        ),
+    )
+    def test_post_missing_required_fields(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+        missing_required_field,
+    ):
+        """
+        Test if dnb-service returns a company with missing required fields,
+        the create-company endpoint returns 400.
+        """
+        dnb_response_uk['results'][0].pop(missing_required_field)
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        response.status_code == status.HTTP_400_BAD_REQUEST
+        response.json() == {
+            'error': (
+                'DNB response for 123456789 missing required field:'
+                f'{missing_required_field}'
+            ),
+        }
+
+    def test_post_existing(
+        self,
+        dnb_company_search_feature_flag,
+    ):
+        """
+        Test if create-company endpoint returns 400 if the company with the given
+        duns_number already exists in DataHub.
+        """
+        company = CompanyFactory()
+        duns_number = company.duns_number
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': duns_number,
+            },
+        )
+
+        response.status_code == status.HTTP_400_BAD_REQUEST
+        response.json() == {
+            'detail': f'Company with duns_number: {duns_number} already exists in DataHub.',
+        }
+
+    def test_post_invalid_country(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+    ):
+        """
+        Test if create-company endpoint returns 400 if the company is based in a country
+        that does not exist in DataHub.
+        """
+        dnb_response_uk['results'][0]['address_country'] == 'FOO'
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+        ),
+    )
+    def test_post_dnb_service_error(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        status_code,
+    ):
+        """
+        Test if create-company endpoint returns 400 if the company is based in a country
+        that does not exist in DataHub.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            status_code=status_code,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.add_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_post_no_permission(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+        permissions,
+    ):
+        """
+        Create-company endpoint should return 403 if the user does not
+        have the necessary permissions.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN

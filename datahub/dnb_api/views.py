@@ -1,22 +1,26 @@
-from urllib.parse import urljoin
+import logging
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.models import CompanyPermission
-from datahub.core.api_client import APIClient, TokenAuth
+from datahub.company.serializers import DNBCompanySerializer, DUNSNumberSerializer
+from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import DNBMatchedCompanySerializer
+from datahub.dnb_api.utils import format_dnb_company, search_dnb
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
+
+
+logger = logging.getLogger(__name__)
 
 
 class DNBCompanySearchView(APIView):
@@ -40,7 +44,7 @@ class DNBCompanySearchView(APIView):
         with Data Hub company details if the company exists (and can be matched)
         on Data Hub.
         """
-        upstream_response = self._get_upstream_response(request)
+        upstream_response = search_dnb(request.data)
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
@@ -123,22 +127,62 @@ class DNBCompanySearchView(APIView):
         hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
 
-    def _get_upstream_response(self, request):
 
-        if not settings.DNB_SERVICE_BASE_URL:
-            raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
-        search_endpoint = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
-        shared_key_auth = TokenAuth(settings.DNB_SERVICE_TOKEN)
-        api_client = APIClient(
-            search_endpoint,
-            shared_key_auth,
-            raise_for_status=False,
+class DNBCompanyCreateView(APIView):
+    """
+    View for creating datahub company from DNB data.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.add_company}',
+        ),
+    )
+
+    @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
+    def post(self, request):
+        """
+        Given a duns_number, get the data for the company from dnb-service
+        and create a record in DataHub.
+        """
+        duns_serializer = DUNSNumberSerializer(data=request.data)
+        duns_serializer.is_valid(raise_exception=True)
+        duns_number = duns_serializer.validated_data['duns_number']
+
+        dnb_response = search_dnb({'duns_number': duns_number})
+
+        if dnb_response.status_code != status.HTTP_200_OK:
+            error_message = f'DNB service returned: {dnb_response.status_code}'
+            logger.error(error_message)
+            raise APIUpstreamException(error_message)
+
+        dnb_companies = dnb_response.json().get('results', [])
+
+        if not dnb_companies:
+            error_message = f'Cannot find a company with duns_number: {duns_number}'
+            logger.error(error_message)
+            raise APIBadRequestException(error_message)
+
+        if len(dnb_companies) > 1:
+            error_message = f'Multiple companies found with duns_number: {duns_number}'
+            logger.error(error_message)
+            raise APIUpstreamException(error_message)
+
+        company_serializer = DNBCompanySerializer(
+            data=format_dnb_company(
+                dnb_companies[0],
+            ),
         )
-        return api_client.request(
-            request.method,
-            '',
-            data=request.body,
-            headers={
-                'Content-Type': request.content_type,
-            },
+
+        company_serializer.is_valid(raise_exception=True)
+        datahub_company = company_serializer.save(
+            created_by=request.user,
+            modified_by=request.user,
+        )
+
+        return Response(
+            company_serializer.to_representation(datahub_company),
         )
