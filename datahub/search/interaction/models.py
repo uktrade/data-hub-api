@@ -65,8 +65,13 @@ class Interaction(BaseESModel):
     policy_issue_types = fields.id_unindexed_name_field()
     service = fields.id_name_field()
     service_delivery_status = fields.id_name_field()
+    # TODO: Update queries to use the english sub-field (once indexed) and remove
+    #  subject_english
     subject = fields.NormalizedKeyword(
         copy_to=['subject_english'],
+        fields={
+            'english': fields.EnglishText(),
+        },
     )
     subject_english = fields.EnglishText()
     was_policy_feedback_provided = Boolean()

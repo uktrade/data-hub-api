@@ -1,6 +1,6 @@
 # For CH Sync
-lxml==4.4.0
-cssselect==1.0.3
+lxml==4.4.1
+cssselect==1.1.0
 
 # Django and django related
 Django==2.2.4
@@ -10,7 +10,7 @@ django-environ==0.4.5
 django-extensions==2.2.1
 django-filter==2.2.0
 django-reversion==3.0.4
-django-pglocks==1.0.2
+django-pglocks==1.0.3
 django-model-utils==3.2.0
 django-mptt==0.10.0
 django-oauth-toolkit==1.2.0
@@ -26,7 +26,7 @@ python-dateutil==2.8.0
 psycopg2==2.8.3
 psycogreen==1.0.1
 
-boto3==1.9.200
+boto3==1.9.205
 
 notifications-python-client==5.3.0
 
@@ -39,7 +39,7 @@ icalendar==4.0.3
 
 # REDIS
 django-redis==4.10.0
-redis==3.3.5
+redis==3.3.6
 
 # ES
 elasticsearch==6.4.0
@@ -57,7 +57,6 @@ pytest-sugar==0.9.2
 pytest-cov==2.7.1
 pytest-xdist==1.29.0
 ipython==7.7.0
-ipdb==0.12.2
 factory-boy==2.12.0
 freezegun==0.3.12
 requests-mock==1.6.0

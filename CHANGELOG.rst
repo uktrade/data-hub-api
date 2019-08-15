@@ -1,3 +1,30 @@
+Data Hub API 14.1.0 (2019-08-15)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Interactions** ``interaction_interaction``: The deprecated ``dit_adviser_id`` and ``dit_team_id`` columns were removed. Please use the ``interaction_interactionditparticipant`` table instead.
+- The following management commands were removed as they are no longer required:
+
+  - ``update_investment_project_archived_state``
+  - ``update_investment_project_comments``
+  - ``update_investment_project_delivery_partners``
+  - ``update_investment_project_referral_source_activity_marketing``
+  - ``update_investment_project_referral_source_activity_website``
+  - ``update_omis_uk_regions``
+  - ``update_service_delivery_grant_fields``
+
+  These commands were used to make corrections following the initial data migration into Data Hub and no longer in use.
+
+Internal changes
+----------------
+
+- Various sub-fields were added to all Elasticsearch mapping types as replacements for the few remaining uses of the ``copy_to`` mapping parameter.
+
+
 Data Hub API 14.0.0 (2019-08-12)
 ================================
 
