@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from datahub.notification.core import client
+from datahub.notification.core import notify_gateway
 
 
 @shared_task(
@@ -14,10 +14,16 @@ def send_email_notification(
     recipient_email,
     template_identifier,
     context=None,
+    notify_service_name=None,
 ):
     """
     Celery task to call the notify API to send a templated email notification
     to an email address.
     """
-    response = client.send_email_notification(recipient_email, template_identifier, context)
+    response = notify_gateway.send_email_notification(
+        recipient_email,
+        template_identifier,
+        context,
+        notify_service_name,
+    )
     return response['id']
