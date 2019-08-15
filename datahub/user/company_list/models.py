@@ -9,7 +9,11 @@ from datahub.core.utils import StrEnum
 
 
 class CompanyList(BaseModel):
-    """A user-created list of companies."""
+    """
+    A user-created list of companies.
+
+    (List contents are stored in the separate CompanyListItem model.)
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     name = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
@@ -64,6 +68,11 @@ class CompanyListItem(BaseModel):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid4)
+    # TODO: This field is nullable while it is being populated for existing list items.
+    #  null=True will be removed once that is complete
+    list = models.ForeignKey(CompanyList, models.CASCADE, null=True, related_name='items')
+    # TODO: This field will be made nullable and then removed (using the usual deprecation
+    #  process) once the company list functionality has been updated to use list.adviser instead
     adviser = models.ForeignKey(
         'company.Advisor',
         on_delete=models.CASCADE,
@@ -75,8 +84,14 @@ class CompanyListItem(BaseModel):
         related_name='company_list_items',
     )
 
+    def __str__(self):
+        """Human-friendly representation."""
+        return f'{self.company} – {self.list}'
+
     class Meta:
         constraints = [
+            # TODO: Change this constraint to be for list and company once list has been made
+            #  non-nullable
             models.UniqueConstraint(
                 fields=('adviser', 'company'),
                 name='unique_adviser_and_company',
