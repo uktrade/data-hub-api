@@ -16,7 +16,10 @@ from datahub.core.test_utils import APITestMixin, create_test_user, format_date_
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyList, CompanyListItem
-from datahub.user.company_list.tests.factories import CompanyListFactory, CompanyListItemFactory
+from datahub.user.company_list.tests.factories import (
+    CompanyListFactory,
+    LegacyCompanyListItemFactory,
+)
 from datahub.user.company_list.views import (
     CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
     DEFAULT_LEGACY_LIST_NAME,
@@ -67,7 +70,7 @@ class TestCompanyListView(APITestMixin):
         Test that an empty list is returned if the user has no companies on their list,
         but other users have companies on theirs.
         """
-        CompanyListItemFactory.create_batch(5)
+        LegacyCompanyListItemFactory.create_batch(5)
 
         url = reverse('api-v4:company-list:collection')
         response = self.api_client.get(url)
@@ -88,7 +91,7 @@ class TestCompanyListView(APITestMixin):
     def test_with_item(self, company_factory):
         """Test serialisation of various companies."""
         company = company_factory()
-        list_item = CompanyListItemFactory(adviser=self.user, company=company)
+        list_item = LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         latest_interaction = company.interactions.order_by('-date', '-created_by', 'pk').first()
 
@@ -130,9 +133,10 @@ class TestCompanyListView(APITestMixin):
             None,
         ]
         shuffled_dates = sample(interaction_dates, len(interaction_dates))
-        list_items = CompanyListItemFactory.create_batch(
+        company_list = CompanyListFactory(adviser=self.user, is_legacy_default=True)
+        list_items = LegacyCompanyListItemFactory.create_batch(
             len(interaction_dates),
-            adviser=self.user,
+            list=company_list,
         )
 
         for interaction_date, list_item in zip(shuffled_dates, list_items):
@@ -190,7 +194,7 @@ class TestGetCompanyListItemView(APITestMixin):
     def test_with_item_on_list(self):
         """Test that a 204 is returned if the company is on the authenticated user's list."""
         company = CompanyFactory()
-        CompanyListItem.objects.create(adviser=self.user, company=company)
+        LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.get(url)
@@ -230,7 +234,7 @@ class TestHeadCompanyListItemView(APITestMixin):
     def test_with_item_on_list(self):
         """Test that a 204 is returned if the company is on the authenticated user's list."""
         company = CompanyFactory()
-        CompanyListItem.objects.create(adviser=self.user, company=company)
+        LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.head(url)
@@ -320,9 +324,10 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
     def test_does_not_overwrite_other_items(self):
         """Test that adding an item does not overwrite other (unrelated) items."""
         existing_companies = CompanyFactory.create_batch(5)
-        CompanyListItemFactory.create_batch(
+        company_list = CompanyListFactory(adviser=self.user, is_legacy_default=True)
+        LegacyCompanyListItemFactory.create_batch(
             5,
-            adviser=self.user,
+            list=company_list,
             company=factory.Iterator(existing_companies),
         )
         company_to_add = CompanyFactory()
@@ -338,7 +343,7 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
     def test_two_advisers_can_have_the_same_company(self):
         """Test that two advisers can have the same company on their list."""
-        other_user_item = CompanyListItemFactory()
+        other_user_item = LegacyCompanyListItemFactory()
         other_user = other_user_item.adviser
         company = other_user_item.company
 
@@ -359,7 +364,7 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         company = CompanyFactory()
 
         with freeze_time(creation_date):
-            CompanyListItem.objects.create(adviser=self.user, company=company)
+            LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
 
@@ -369,7 +374,7 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
 
-        company_list_item = CompanyListItem.objects.get(adviser=self.user, company=company)
+        company_list_item = CompanyListItem.objects.get(list__adviser=self.user, company=company)
         assert company_list_item.created_on == creation_date
         assert company_list_item.modified_on == modified_date
 
@@ -398,14 +403,17 @@ class TestDeleteCompanyListItemView(APITestMixin):
     def test_with_existing_item(self):
         """Test that a company can be removed from the authenticated user's list."""
         company = CompanyFactory()
-        CompanyListItem.objects.create(adviser=self.user, company=company)
+        LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
-        assert not CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+        assert not CompanyListItem.objects.filter(
+            adviser=self.user,
+            company=company,
+        ).exists()
 
     def test_with_new_item(self):
         """
@@ -418,19 +426,25 @@ class TestDeleteCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
-        assert not CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+        assert not CompanyListItem.objects.filter(
+            adviser=self.user,
+            company=company,
+        ).exists()
 
     def test_with_archived_company(self):
         """Test that no error is returned when removing an archived company."""
         company = ArchivedCompanyFactory()
-        CompanyListItem.objects.create(adviser=self.user, company=company)
+        LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
-        assert not CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+        assert not CompanyListItem.objects.filter(
+            adviser=self.user,
+            company=company,
+        ).exists()
 
     def test_with_non_existent_company(self):
         """Test that a 404 is returned if the specified company ID is invalid."""
