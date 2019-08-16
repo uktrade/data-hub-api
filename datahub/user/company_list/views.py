@@ -1,5 +1,7 @@
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 from rest_framework import serializers, status
@@ -12,7 +14,11 @@ from rest_framework.views import APIView
 from datahub.company.models import Company, CompanyPermission
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
-from datahub.user.company_list.models import CompanyListItem, CompanyListItemPermissionCode
+from datahub.user.company_list.models import (
+    CompanyList,
+    CompanyListItem,
+    CompanyListItemPermissionCode,
+)
 from datahub.user.company_list.queryset import get_company_list_item_queryset
 from datahub.user.company_list.serializers import CompanyListItemSerializer
 
@@ -20,6 +26,8 @@ from datahub.user.company_list.serializers import CompanyListItemSerializer
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
     "An archived company can't be added to a company list.",
 )
+
+DEFAULT_LEGACY_LIST_NAME = '1. My list'
 
 
 class CompanyListItemPermissions(DjangoModelPermissions):
@@ -108,6 +116,7 @@ class CompanyListItemView(APIView):
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    @method_decorator(transaction.non_atomic_requests)
     def put(self, request, format=None, company_pk=None):
         """
         Create a CompanyListItem for the authenticated user and specified company
@@ -124,9 +133,20 @@ class CompanyListItemView(APIView):
             }
             raise serializers.ValidationError(errors)
 
-        # update_or_create() is used to avoid an error if there is an existing
+        adviser = request.user
+        default_legacy_list = _get_default_list_for_user(adviser)
+
+        # get_or_create() is used to avoid an error if there is an existing
         # CompanyListItem for this adviser and company
-        self.queryset.update_or_create(adviser=request.user, company=company)
+        self.queryset.get_or_create(
+            adviser=adviser,
+            company=company,
+            defaults={
+                'list': default_legacy_list,
+                'created_by': adviser,
+                'modified_by': adviser,
+            },
+        )
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
@@ -146,3 +166,16 @@ class CompanyListItemView(APIView):
         ).delete()
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+def _get_default_list_for_user(adviser):
+    company_list, _ = CompanyList.objects.get_or_create(
+        adviser=adviser,
+        is_legacy_default=True,
+        defaults={
+            'created_by': adviser,
+            'name': DEFAULT_LEGACY_LIST_NAME,
+            'modified_by': adviser,
+        },
+    )
+    return company_list
