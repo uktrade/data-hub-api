@@ -271,9 +271,14 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
-        list_item = CompanyListItem.objects.filter(adviser=self.user, company=company).first()
+        list_item = CompanyListItem.objects.filter(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+            company=company,
+        ).first()
 
         assert list_item
+        assert list_item.adviser == self.user
         assert list_item.created_by == self.user
         assert list_item.modified_by == self.user
 
@@ -291,10 +296,13 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        list_item = CompanyListItem.objects.get(adviser=self.user, company=company)
+        list_item = CompanyListItem.objects.get(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+            company=company,
+        )
         list_ = list_item.list
         assert list_
-        assert list_.is_legacy_default
         assert list_.name == DEFAULT_LEGACY_LIST_NAME
         assert list_.adviser == self.user
         assert list_.created_by == self.user
@@ -313,7 +321,11 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        list_item = CompanyListItem.objects.get(adviser=self.user, company=company)
+        list_item = CompanyListItem.objects.get(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+            company=company,
+        )
         list_ = list_item.list
         assert list_
         assert list_.is_legacy_default
@@ -336,23 +348,33 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         response = self.api_client.put(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        companies_after = {
-            item.company for item in CompanyListItem.objects.filter(adviser=self.user)
-        }
+        list_item_queryset = CompanyListItem.objects.filter(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+        )
+        companies_after = {item.company for item in list_item_queryset}
         assert companies_after == {*existing_companies, company_to_add}
 
     def test_two_advisers_can_have_the_same_company(self):
         """Test that two advisers can have the same company on their list."""
         other_user_item = LegacyCompanyListItemFactory()
-        other_user = other_user_item.adviser
+        other_user = other_user_item.list.adviser
         company = other_user_item.company
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
         response = self.api_client.put(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        assert CompanyListItem.objects.filter(adviser=other_user, company=company).exists()
-        assert CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+        assert CompanyListItem.objects.filter(
+            list__adviser=other_user,
+            list__is_legacy_default=True,
+            company=company,
+        ).exists()
+        assert CompanyListItem.objects.filter(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+            company=company,
+        ).exists()
 
     def test_with_existing_item(self):
         """
@@ -364,7 +386,11 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         company = CompanyFactory()
 
         with freeze_time(creation_date):
-            LegacyCompanyListItemFactory(list__adviser=self.user, company=company)
+            LegacyCompanyListItemFactory(
+                company=company,
+                list__adviser=self.user,
+                list__is_legacy_default=True,
+            )
 
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
 
@@ -374,7 +400,11 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
 
-        company_list_item = CompanyListItem.objects.get(list__adviser=self.user, company=company)
+        company_list_item = CompanyListItem.objects.get(
+            list__adviser=self.user,
+            list__is_legacy_default=True,
+            company=company,
+        )
         assert company_list_item.created_on == creation_date
         assert company_list_item.modified_on == modified_date
 
@@ -411,7 +441,8 @@ class TestDeleteCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
         assert not CompanyListItem.objects.filter(
-            adviser=self.user,
+            list__adviser=self.user,
+            list__is_legacy_default=True,
             company=company,
         ).exists()
 
@@ -427,7 +458,8 @@ class TestDeleteCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
         assert not CompanyListItem.objects.filter(
-            adviser=self.user,
+            list__adviser=self.user,
+            list__is_legacy_default=True,
             company=company,
         ).exists()
 
@@ -442,7 +474,8 @@ class TestDeleteCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
         assert not CompanyListItem.objects.filter(
-            adviser=self.user,
+            list__adviser=self.user,
+            list__is_legacy_default=True,
             company=company,
         ).exists()
 
