@@ -33,7 +33,7 @@ class TestTemplates:
     not strictly mandatory.
     """
 
-    def test_order_info(self, settings):
+    def test_order_info(self, settings, notify_client):
         """
         Test the order info template.
         If the template variables have been changed in GOV.UK notifications this
@@ -44,7 +44,7 @@ class TestTemplates:
 
         notify.order_info(OrderFactory(), what_happened='', why='')
 
-    def test_order_created(self, settings):
+    def test_order_created(self, settings, notify_client):
         """
         Test the order created template.
         If the template variables have been changed in GOV.UK notifications this
@@ -69,7 +69,7 @@ class TestTemplates:
 
         notify.order_created(order)
 
-    def test_you_have_been_added_for_adviser(self, settings):
+    def test_you_have_been_added_for_adviser(self, settings, notify_client):
         """
         Test the notification for when an adviser is added to an order.
         If the template variables have been changed in GOV.UK notifications this
@@ -87,7 +87,7 @@ class TestTemplates:
             creation_date=dateutil_parse('2017-05-18'),
         )
 
-    def test_you_have_been_removed_for_adviser(self, settings):
+    def test_you_have_been_removed_for_adviser(self, settings, notify_client):
         """
         Test the notification for when an adviser is removed from an order.
         If the template variables have been changed in GOV.UK notifications this
@@ -100,7 +100,7 @@ class TestTemplates:
 
         notify.adviser_removed(order=order, adviser=AdviserFactory())
 
-    def test_order_paid(self, settings):
+    def test_order_paid(self, settings, notify_client):
         """
         Test templates of order paid for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
@@ -113,7 +113,7 @@ class TestTemplates:
 
         notify.order_paid(order)
 
-    def test_order_completed(self, settings):
+    def test_order_completed(self, settings, notify_client):
         """
         Test templates of order completed for advisers.
         If the template variables have been changed in GOV.UK notifications this
@@ -126,7 +126,7 @@ class TestTemplates:
 
         notify.order_completed(order)
 
-    def test_order_cancelled(self, settings):
+    def test_order_cancelled(self, settings, notify_client):
         """
         Test templates of order cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
@@ -139,7 +139,7 @@ class TestTemplates:
 
         notify.order_cancelled(order)
 
-    def test_quote_sent(self, settings):
+    def test_quote_sent(self, settings, notify_client):
         """
         Test templates of quote sent for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
@@ -152,7 +152,7 @@ class TestTemplates:
 
         notify.quote_generated(order)
 
-    def test_quote_accepted(self, settings):
+    def test_quote_accepted(self, settings, notify_client):
         """
         Test templates of quote accepted for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
@@ -165,7 +165,7 @@ class TestTemplates:
 
         notify.quote_accepted(order)
 
-    def test_quote_cancelled(self, settings):
+    def test_quote_cancelled(self, settings, notify_client):
         """
         Test templates of quote cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
