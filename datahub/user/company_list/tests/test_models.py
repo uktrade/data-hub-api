@@ -22,11 +22,12 @@ class TestCompanyList:
         with pytest.raises(IntegrityError):
             CompanyListFactory(adviser=adviser, is_legacy_default=True)
 
-    def test_cannot_have_non_legacy_default_list(self):
-        """
-        Test that is_legacy_default=False is not allowed.
+    def test_can_have_multiple_non_legacy_lists_for_the_same_adviser(self):
+        """Test that multiple lists with is_legacy_default=True are allowed."""
+        adviser = AdviserFactory()
 
-        This is while the list field is being populated on CompanyListItem objects.
-        """
-        with pytest.raises(IntegrityError):
-            CompanyListFactory(is_legacy_default=False)
+        try:
+            CompanyListFactory(adviser=adviser, is_legacy_default=True)
+            CompanyListFactory.create_batch(3, adviser=adviser, is_legacy_default=False)
+        except IntegrityError:
+            pytest.fail('Should not raise an IntegrityError.')

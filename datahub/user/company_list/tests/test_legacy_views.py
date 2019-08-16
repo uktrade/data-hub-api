@@ -22,6 +22,7 @@ from datahub.user.company_list.legacy_views import (
 from datahub.user.company_list.models import CompanyList, CompanyListItem
 from datahub.user.company_list.tests.factories import (
     CompanyListFactory,
+    CompanyListItemFactory,
     LegacyCompanyListItemFactory,
 )
 
@@ -71,6 +72,20 @@ class TestCompanyListView(APITestMixin):
         but other users have companies on theirs.
         """
         LegacyCompanyListItemFactory.create_batch(5)
+
+        url = reverse('api-v4:company-list:collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    def test_with_only_non_legacy_items(self):
+        """
+        Test that an empty list is returned if the user has no companies on their legacy list,
+        but does have items on non-legacy lists.
+        """
+        CompanyListItemFactory.create_batch(5, adviser=self.user)
 
         url = reverse('api-v4:company-list:collection')
         response = self.api_client.get(url)
@@ -213,6 +228,24 @@ class TestGetCompanyListItemView(APITestMixin):
             'detail': 'Not found.',
         }
 
+    def test_with_item_on_non_legacy_list(self):
+        """
+        Test that a 404 is returned if the company is not on the authenticated user's legacy
+        list, but is on a non-legacy list.
+        """
+        non_legacy_item = CompanyListItemFactory(adviser=self.user)
+
+        url = reverse(
+            'api-v4:company-list:item',
+            kwargs={'company_pk': non_legacy_item.company.pk},
+        )
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {
+            'detail': 'Not found.',
+        }
+
     def test_with_non_existent_company(self):
         """Test that a 404 is returned if the company does not exist."""
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': uuid4()})
@@ -246,6 +279,21 @@ class TestHeadCompanyListItemView(APITestMixin):
         """Test that a 404 is returned if the company is on the authenticated user's list."""
         company = CompanyFactory()
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.head(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.content == b''
+
+    def test_with_item_on_non_legacy_list(self):
+        """
+        Test that a 404 is returned if the company is not on the authenticated user's legacy
+        list, but is on a non-legacy list.
+        """
+        non_legacy_item = CompanyListItemFactory(adviser=self.user)
+
+        url = reverse(
+            'api-v4:company-list:item', kwargs={'company_pk': non_legacy_item.company.pk},
+        )
         response = self.api_client.head(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -383,6 +431,28 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
         assert company_list_item.created_on == creation_date
         assert company_list_item.modified_on == modified_date
 
+    def test_with_item_on_non_legacy_list(self):
+        """
+        Test that if the specified company is on a non-legacy list, it can still be added to a
+        legacy list and remains on the non-legacy list.
+        """
+        non_legacy_item = CompanyListItemFactory(adviser=self.user)
+        company = non_legacy_item.company
+
+        url = reverse(
+            'api-v4:company-list:item',
+            kwargs={'company_pk': non_legacy_item.company.pk},
+        )
+        response = self.api_client.put(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        non_legacy_item.refresh_from_db()
+        legacy_item = _get_queryset_for_adviser_and_company(self.user, company).get()
+
+        assert legacy_item != non_legacy_item
+        assert not non_legacy_item.list.is_legacy_default
+
     def test_with_archived_company(self):
         """Test that an archived company can't be added to the authenticated user's list."""
         company = ArchivedCompanyFactory()
@@ -429,6 +499,26 @@ class TestDeleteCompanyListItemView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
         assert not _get_queryset_for_adviser_and_company(self.user, company).exists()
+
+    def test_with_item_on_non_legacy_list(self):
+        """
+        Test that if the specified company is on a non-legacy list, it remains after trying to
+        remove it from the legacy list.
+        """
+        non_legacy_item = CompanyListItemFactory(adviser=self.user)
+
+        url = reverse(
+            'api-v4:company-list:item',
+            kwargs={'company_pk': non_legacy_item.company.pk},
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        try:
+            non_legacy_item.refresh_from_db()
+        except CompanyListItem.DoesNotExist:
+            pytest.fail('Object should exist')
 
     def test_with_archived_company(self):
         """Test that no error is returned when removing an archived company."""
