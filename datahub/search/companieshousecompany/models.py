@@ -30,11 +30,7 @@ class CompaniesHouseCompany(BaseESModel):
     registered_address_2 = Text()
     registered_address_town = fields.NormalizedKeyword()
     registered_address_county = Text()
-    # TODO: Remove registered_address_postcode_trigram
-    registered_address_postcode = fields.Text(
-        copy_to='registered_address_postcode_trigram',
-    )
-    registered_address_postcode_trigram = fields.TrigramText()
+    registered_address_postcode = fields.Text()
     registered_address_country = fields.id_name_field()
 
     sic_code_1 = Text()
