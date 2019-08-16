@@ -186,13 +186,8 @@ def test_mapping(setup_es):
                     'type': 'object',
                 },
                 'client_requirements': {
-                    'fields': {
-                        'keyword': {
-                            'ignore_above': 256,
-                            'type': 'keyword',
-                        },
-                    },
                     'type': 'text',
+                    'index': False,
                 },
                 'comments': {
                     'analyzer': 'english_analyzer',
@@ -211,22 +206,12 @@ def test_mapping(setup_es):
                 'country_lost_to': {
                     'properties': {
                         'id': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
-                            'type': 'text',
+                            'type': 'keyword',
+                            'index': False,
                         },
                         'name': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
                             'type': 'text',
+                            'index': False,
                         },
                     },
                     'type': 'object',
@@ -410,13 +395,8 @@ def test_mapping(setup_es):
                 'number_new_jobs': {'type': 'integer'},
                 'number_safeguarded_jobs': {'type': 'long'},
                 'other_business_activity': {
-                    'fields': {
-                        'keyword': {
-                            'ignore_above': 256,
-                            'type': 'keyword',
-                        },
-                    },
                     'type': 'text',
+                    'index': False,
                 },
                 'project_arrived_in_triage_on': {'type': 'date'},
                 'project_assurance_adviser': {
@@ -512,31 +492,16 @@ def test_mapping(setup_es):
                 'quotable_as_public_case_study': {'type': 'boolean'},
                 'r_and_d_budget': {'type': 'boolean'},
                 'reason_abandoned': {
-                    'fields': {
-                        'keyword': {
-                            'ignore_above': 256,
-                            'type': 'keyword',
-                        },
-                    },
                     'type': 'text',
+                    'index': False,
                 },
                 'reason_delayed': {
-                    'fields': {
-                        'keyword': {
-                            'ignore_above': 256,
-                            'type': 'keyword',
-                        },
-                    },
                     'type': 'text',
+                    'index': False,
                 },
                 'reason_lost': {
-                    'fields': {
-                        'keyword': {
-                            'ignore_above': 256,
-                            'type': 'keyword',
-                        },
-                    },
                     'type': 'text',
+                    'index': False,
                 },
                 'referral_source_activity': {
                     'properties': {
@@ -575,40 +540,20 @@ def test_mapping(setup_es):
                 'referral_source_adviser': {
                     'properties': {
                         'first_name': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
                             'type': 'text',
+                            'index': False,
                         },
                         'id': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
-                            'type': 'text',
+                            'type': 'keyword',
+                            'index': False,
                         },
                         'last_name': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
                             'type': 'text',
+                            'index': False,
                         },
                         'name': {
-                            'fields': {
-                                'keyword': {
-                                    'ignore_above': 256,
-                                    'type': 'keyword',
-                                },
-                            },
                             'type': 'text',
+                            'index': False,
                         },
                     },
                     'type': 'object',
