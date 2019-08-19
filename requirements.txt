@@ -61,7 +61,7 @@ greenlet==0.4.15          # via gevent
 gunicorn==19.9.0
 icalendar==4.0.3
 idna==2.8                 # via requests
-importlib-metadata==0.17  # via pluggy, pytest
+importlib-metadata==0.19  # via pluggy, pytest
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.22         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
