@@ -189,7 +189,7 @@ class TestCompanyListItemAuth(APITestMixin):
 
 
 class TestGetCompanyListItemView(APITestMixin):
-    """Tests for the GET method in CompanyListItemView."""
+    """Tests for the GET method in LegacyCompanyListItemView."""
 
     def test_with_item_on_list(self):
         """Test that a 204 is returned if the company is on the authenticated user's list."""
@@ -226,7 +226,7 @@ class TestGetCompanyListItemView(APITestMixin):
 
 class TestHeadCompanyListItemView(APITestMixin):
     """
-    Tests for the HEAD method in CompanyListItemView.
+    Tests for the HEAD method in LegacyCompanyListItemView.
 
     These are the same as GET, but without response bodies.
     """
@@ -261,7 +261,7 @@ class TestHeadCompanyListItemView(APITestMixin):
 
 
 class TestCreateOrUpdateCompanyListItemView(APITestMixin):
-    """Tests for the PUT method in CompanyListItemView."""
+    """Tests for the PUT method in LegacyCompanyListItemView."""
 
     def test_creates_new_items(self):
         """Test that a company can be added to the authenticated user's list."""
@@ -398,7 +398,7 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
 
 class TestDeleteCompanyListItemView(APITestMixin):
-    """Tests for the DELETE method in CompanyListItemView."""
+    """Tests for the DELETE method in LegacyCompanyListItemView."""
 
     def test_with_existing_item(self):
         """Test that a company can be removed from the authenticated user's list."""
