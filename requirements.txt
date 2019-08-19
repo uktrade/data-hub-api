@@ -42,7 +42,7 @@ elasticsearch==6.4.0
 entrypoints==0.3          # via flake8
 execnet==1.6.0            # via pytest-xdist
 factory-boy==2.12.0
-faker==1.0.7              # via factory-boy
+faker==2.0.0              # via factory-boy
 flake8-blind-except==0.1.1
 flake8-bugbear==19.3.0
 flake8-commas==2.0.0
