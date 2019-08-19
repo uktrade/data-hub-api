@@ -12,7 +12,7 @@ attrs==19.1.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.0.0
 boto3==1.9.205
-botocore==1.12.205        # via boto3, s3transfer
+botocore==1.12.210        # via boto3, s3transfer
 celery[redis]==4.3
 certifi==2019.3.9         # via requests, sentry-sdk
 chardet==3.0.4
