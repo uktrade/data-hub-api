@@ -38,7 +38,7 @@ djangorestframework==3.10.2
 docopt==0.6.2             # via notifications-python-client
 docutils==0.14            # via botocore
 elasticsearch-dsl==6.3.1
-elasticsearch==6.4.0
+elasticsearch==7.0.2
 entrypoints==0.3          # via flake8
 execnet==1.6.0            # via pytest-xdist
 factory-boy==2.12.0
