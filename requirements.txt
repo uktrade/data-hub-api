@@ -17,7 +17,7 @@ celery[redis]==4.3
 certifi==2019.3.9         # via requests, sentry-sdk
 chardet==3.0.4
 click==7.0                # via pip-tools, towncrier
-coverage==4.5.3           # via pytest-cov
+coverage==4.5.4           # via pytest-cov
 cssselect==1.1.0
 decorator==4.4.0          # via ipython, traitlets
 django-admin-ip-restrictor==1.0.0
