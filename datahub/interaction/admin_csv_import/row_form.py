@@ -21,7 +21,12 @@ from datahub.event.models import Event
 from datahub.interaction.admin_csv_import.duplicate_checking import (
     is_duplicate_of_existing_interaction,
 )
-from datahub.interaction.models import CommunicationChannel, Interaction, InteractionDITParticipant
+from datahub.interaction.models import (
+    CommunicationChannel,
+    Interaction,
+    InteractionDITParticipant,
+    ServiceAnswerOption,
+)
 from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import Service, Team
 from datahub.metadata.query_utils import get_service_name_subquery
@@ -47,6 +52,15 @@ DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE = gettext_lazy(
 DUPLICATE_OF_ANOTHER_ROW_MESSAGE = gettext_lazy(
     'This interaction appears to be a duplicate as there is another row in this file with the '
     'same service, date and contact.',
+)
+SERVICE_ANSWER_NOT_FOUND = gettext_lazy(
+    'A service answer could not be found with the specified name and service.',
+)
+SERVICE_ANSWER_NOT_REQUIRED = gettext_lazy(
+    'A service answer was provided when the selected service does not require it.',
+)
+SERVICE_ANSWER_REQUIRED = gettext_lazy(
+    'A service answer is required for the specified service.',
 )
 
 
@@ -146,6 +160,8 @@ class InteractionCSVRowForm(forms.Form):
         to_field_name='name__iexact',
         validators=[_validate_not_disabled],
     )
+    service_answer = forms.CharField(required=False)
+
     communication_channel = NoDuplicatesModelChoiceField(
         CommunicationChannel.objects.all(),
         to_field_name='name__iexact',
@@ -199,6 +215,7 @@ class InteractionCSVRowForm(forms.Form):
         kind = data.get('kind')
         subject = data.get('subject')
         service = data.get('service')
+        self._populate_service_answers(data)
 
         # Ignore communication channel for service deliveries (as it is not a valid field for
         # service deliveries, but we are likely to get it in provided data anyway)
@@ -296,6 +313,55 @@ class InteractionCSVRowForm(forms.Form):
         except ValidationError as exc:
             self.add_error(adviser_field, exc)
 
+    def _populate_service_answers(self, data):
+        """Transform service_answer into service_answers dictionary."""
+        service = data.get('service')
+        if not service:
+            return
+
+        service_answer = data.get('service_answer')
+
+        if not service.interaction_questions.exists():
+            if service_answer:
+                self.add_error(
+                    'service_answer',
+                    ValidationError(
+                        SERVICE_ANSWER_NOT_REQUIRED,
+                        code='service_answer_not_required',
+                    ),
+                )
+            # if service has no questions and answer is not provided, there is nothing to do
+            return
+
+        if not service_answer:
+            self.add_error(
+                'service_answer',
+                ValidationError(
+                    SERVICE_ANSWER_REQUIRED,
+                    code='service_answer_required',
+                ),
+            )
+            return
+
+        try:
+            service_answer_option_db = ServiceAnswerOption.objects.get(
+                name__iexact=service_answer,
+                question__service=service,
+            )
+            data['service_answers'] = {
+                str(service_answer_option_db.question.pk): {
+                    str(service_answer_option_db.pk): {},
+                },
+            }
+        except ServiceAnswerOption.DoesNotExist:
+            self.add_error(
+                'service_answer',
+                ValidationError(
+                    SERVICE_ANSWER_NOT_FOUND,
+                    code='service_answer_not_found',
+                ),
+            )
+
     @staticmethod
     def _populate_contact(data):
         """Attempt to look up the contact using the provided email address."""
@@ -365,6 +431,7 @@ class InteractionCSVRowForm(forms.Form):
             'kind': data['kind'],
             'notes': data.get('notes'),
             'service': data['service'],
+            'service_answers': data.get('service_answers'),
             'status': Interaction.STATUSES.complete,
             'subject': subject,
             'theme': data['theme'],

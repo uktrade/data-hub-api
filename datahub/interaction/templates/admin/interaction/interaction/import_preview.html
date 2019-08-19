@@ -41,6 +41,7 @@
         <th>{% trans 'Date' %}</th>
         <th>{% trans 'Advisers' %}</th>
         <th>{% trans 'Service' %}</th>
+        <th>{% trans 'Service answer' %}</th>
         <th>{% trans 'Contact' %}</th>
         <th>{% trans 'Company' %}</th>
         <th>{% trans 'Communication channel' %}</th>
@@ -61,6 +62,7 @@
         {% endfor %}
       </td>
       <td>{{ row.service }}</td>
+      <td>{{ row.service_answer }}</td>
       <td>
         {% for contact in row.contacts %}
           {% if not forloop.first %}<br>{%  endif %}
