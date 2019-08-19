@@ -36,7 +36,7 @@ django-reversion==3.0.4
 django==2.2.4
 djangorestframework==3.10.2
 docopt==0.6.2             # via notifications-python-client
-docutils==0.14            # via botocore
+docutils==0.15.2            # via botocore
 elasticsearch-dsl==6.3.1
 elasticsearch==6.4.0
 entrypoints==0.3          # via flake8
