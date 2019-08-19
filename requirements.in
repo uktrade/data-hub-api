@@ -39,7 +39,7 @@ icalendar==4.0.3
 
 # REDIS
 django-redis==4.10.0
-redis==3.3.6
+redis==3.3.7
 
 # ES
 elasticsearch==6.4.0
