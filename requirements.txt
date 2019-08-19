@@ -80,7 +80,7 @@ more-itertools==7.0.0     # via pytest
 notifications-python-client==5.3.0
 oauthlib==2.1.0
 packaging==19.0           # via pytest, pytest-sugar
-parso==0.5.0              # via jedi
+parso==0.5.1              # via jedi
 pathtools==0.1.2          # via watchdog
 pep8-naming==0.8.2
 pexpect==4.7.0            # via ipython
