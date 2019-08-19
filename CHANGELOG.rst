@@ -1,3 +1,44 @@
+Data Hub API 14.2.0 (2019-08-19)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Investment** ``POST /v3/search/investment_project``: The ``sortby`` value ``referral_source_adviser.name`` is no longer accepted.
+
+  This ``sortby`` value was non-functional and was returning a 500 error if an attempt to use it was made.
+
+Features
+--------
+
+- **Interactions** It is now possible to upload interactions with service answers using the interaction upload tool in the Django admin.
+
+Internal changes
+----------------
+
+- **Advisers** Items added to company lists are now internally associated with a default list for each user. This is in preparation for it being possible for users to have multiple company lists.
+- All remaining uses of the ``copy_to`` mapping parameter were removed from all Elasticsearch mapping types. All search queries were updated to use corresponding sub-fields instead.
+
+Database schema
+---------------
+
+- **Advisers** A ``company_list_companylist`` table with the following columns was created:
+
+  - ``"created_on" timestamp with time zone NULL``
+  - ``"modified_on" timestamp with time zone NULL``
+  - ``"id" uuid NOT NULL PRIMARY KEY``
+  - ``"name" varchar(255) NOT NULL``
+  - ``"is_legacy_default" boolean NOT NULL``
+  - ``"adviser_id" uuid NOT NULL``
+  - ``"created_by_id" uuid NULL``
+  - ``"modified_by_id" uuid NULL``
+
+  This will be used to store the IDs and names of user-created lists of companies.
+- **Advisers** A ``"list_id" uuid NULL`` column was added to the ``company_list_companylisttem`` table.
+
+
 Data Hub API 14.1.0 (2019-08-15)
 ================================
 

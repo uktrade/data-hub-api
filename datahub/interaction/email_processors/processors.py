@@ -1,9 +1,13 @@
 from celery.utils.log import get_task_logger
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 
 from datahub.email_ingestion.email_processor import EmailProcessor
+from datahub.interaction.email_processors.exceptions import (
+    BadCalendarInviteError,
+    InvalidInviteError,
+    NoContactsError,
+)
 from datahub.interaction.email_processors.notify import (
     notify_meeting_ingest_failure,
     notify_meeting_ingest_success,
@@ -18,6 +22,28 @@ from datahub.interaction.serializers import InteractionSerializer
 
 
 logger = get_task_logger(__name__)
+
+
+# Invalid email error codes that we can notify users about - we should not
+# notify users if the email is malformed or if the sender was unverified
+# as these situations *could* point to malicious activity and we should offer
+# no hints in these situations.
+EXCEPTION_NOTIFY_MESSAGES = {
+    BadCalendarInviteError: (
+        'It looks like you sent something to Data Hub that was not a calendar invitation. '
+        'Please send to Data Hub a calendar invitation (not an email or another type of '
+        'message). If you still see this error message after sending a calendar email, '
+        'please contact the Data Hub support team.'
+    ),
+    NoContactsError: (
+        'The calendar invitation you sent to Data Hub did not include an email address '
+        'that is recognised as a contact on Data Hub. The invitation must also be sent '
+        'to Data Hub at the same time (and not forwarded to Data Hub later). Please '
+        'check both of these things when resending your invitation and if you still '
+        'see this message after resending the invitation, contact the Data Hub support '
+        'team.'
+    ),
+}
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
@@ -113,6 +139,23 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
 
         return data_for_serializer
 
+    def _handle_invalid_invite(self, exception, message):
+        """
+        Given an InvalidInviteError and an email message, log the error that
+        the user triggered and notify them with an explanation (if applicable).
+        """
+        error_str = repr(exception)
+        error_with_email_info = (
+            f'Ingested email with ID "{message.message_id}" (received '
+            f'{message.received[0]["date_utc"]}) was not valid: {error_str}'
+        )
+        logger.warning(error_with_email_info)
+        exc_class = exception.__class__
+        # Only notify users if the error code is one that we can notify users about
+        if exc_class in EXCEPTION_NOTIFY_MESSAGES:
+            readable_error = EXCEPTION_NOTIFY_MESSAGES[exc_class]
+            self._notify_meeting_ingest_failure(message, [readable_error])
+
     def validate_with_serializer(self, data):
         """
         Transforms extracted data into a dict suitable for use with InteractionSerializer
@@ -151,9 +194,9 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         email_parser = CalendarInteractionEmailParser(message)
         try:
             interaction_data = email_parser.extract_interaction_data_from_email()
-        except ValidationError as exc:
-            self._notify_meeting_ingest_failure(message, exc.messages)
-            return (False, exc.message)  # noqa: B306
+        except InvalidInviteError as exc:
+            self._handle_invalid_invite(exc, message)
+            return (False, repr(exc))
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company

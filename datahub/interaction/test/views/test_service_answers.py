@@ -20,7 +20,7 @@ from datahub.interaction.test.permissions import (
     NON_RESTRICTED_ADD_PERMISSIONS,
     NON_RESTRICTED_VIEW_PERMISSIONS,
 )
-from datahub.interaction.test.views.constants import ServiceAnswerID, ServiceQuestionID
+from datahub.interaction.test.views.constants import ServiceAnswerOptionID, ServiceQuestionID
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.metadata.models import Service
 from datahub.metadata.test.factories import TeamFactory
@@ -59,7 +59,7 @@ class TestServiceAnswers(APITestMixin):
             'service': service.pk,
             'service_answers': {
                 ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                    ServiceAnswerID.piai_banking_and_funding.value: {},
+                    ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                 },
             },
         }
@@ -95,7 +95,7 @@ class TestServiceAnswers(APITestMixin):
                 {
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -109,7 +109,7 @@ class TestServiceAnswers(APITestMixin):
                 {
                     'service_answers': {
                         ServiceQuestionID.making_export_introductions.value: {
-                            ServiceAnswerID.making_export_introductions_customers.value: {},
+                            ServiceAnswerOptionID.making_export_introductions_customers.value: {},
                         },
                     },
                 },
@@ -142,12 +142,12 @@ class TestServiceAnswers(APITestMixin):
                 {
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.making_export_introductions_customers.value,
+                            ServiceAnswerOptionID.making_export_introductions_customers.value,
                         },
                     },
                 },
                 {
-                    ServiceAnswerID.making_export_introductions_customers.value: [
+                    ServiceAnswerOptionID.making_export_introductions_customers.value: [
                         'The selected answer option is not valid for this question.',
                     ],
                 },
@@ -158,9 +158,8 @@ class TestServiceAnswers(APITestMixin):
                 {
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
-                            ServiceAnswerID.piai_dit_or_government_services.value: {
-                            },
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_dit_or_government_services.value: {},
                         },
                     },
                 },
@@ -212,7 +211,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -221,7 +220,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_dit_or_government_services.value: {},
+                            ServiceAnswerOptionID.piai_dit_or_government_services.value: {},
                         },
                     },
                 },
@@ -233,7 +232,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -242,7 +241,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.making_export_introductions.value.id,
                     'service_answers': {
                         ServiceQuestionID.making_export_introductions.value: {
-                            ServiceAnswerID.making_export_introductions_customers.value: {},
+                            ServiceAnswerOptionID.making_export_introductions_customers.value: {},
                         },
                     },
                 },
@@ -273,7 +272,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -282,7 +281,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.account_management.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -299,7 +298,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -308,7 +307,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.making_export_introductions.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -328,7 +327,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -352,7 +351,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_dit_or_government_services.value: {},
+                            ServiceAnswerOptionID.piai_dit_or_government_services.value: {},
                         },
                     },
                 },
@@ -361,12 +360,12 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.making_export_introductions_customers.value: {},
+                            ServiceAnswerOptionID.making_export_introductions_customers.value: {},
                         },
                     },
                 },
                 {
-                    ServiceAnswerID.making_export_introductions_customers.value: [
+                    ServiceAnswerOptionID.making_export_introductions_customers.value: [
                         'The selected answer option is not valid for this question.',
                     ],
                 },
@@ -378,7 +377,7 @@ class TestServiceAnswers(APITestMixin):
                         ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                            ServiceAnswerID.piai_banking_and_funding.value: {},
+                            ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                         },
                     },
                 },
@@ -417,7 +416,7 @@ class TestServiceAnswers(APITestMixin):
             'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
             'service_answers': {
                 ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
-                    ServiceAnswerID.piai_banking_and_funding.value: {},
+                    ServiceAnswerOptionID.piai_banking_and_funding.value: {},
                 },
             },
         }

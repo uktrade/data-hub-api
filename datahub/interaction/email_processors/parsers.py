@@ -3,7 +3,6 @@ import datetime
 from collections import Counter
 
 import icalendar
-from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 
 from datahub.company.contact_matching import (
@@ -11,6 +10,12 @@ from datahub.company.contact_matching import (
     MatchStrategy,
 )
 from datahub.email_ingestion.validation import was_email_sent_by_dit
+from datahub.interaction.email_processors.exceptions import (
+    BadCalendarInviteError,
+    MalformedEmailError,
+    NoContactsError,
+    SenderUnverifiedError,
+)
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
     get_best_match_adviser_by_email,
@@ -96,15 +101,17 @@ class CalendarInteractionEmailParser:
         try:
             sender_email = self.message.from_[0][1]
         except IndexError:
-            raise ValidationError('Email was malformed - missing "from" header')
+            raise MalformedEmailError('Email was malformed - missing "from" header.')
         if not was_email_sent_by_dit(self.message):
-            raise ValidationError(
+            raise SenderUnverifiedError(
                 'The meeting email did not pass our minimal checks to be verified as '
                 'having been sent by a valid DIT Adviser email domain.',
             )
         sender_adviser = get_best_match_adviser_by_email(sender_email)
         if not sender_adviser:
-            raise ValidationError('Email not sent by recognised DIT Adviser')
+            raise SenderUnverifiedError(
+                'Email was not sent by a recognised DIT Adviser.',
+            )
         return sender_adviser
 
     def _extract_and_validate_contacts(self, all_recipients):
@@ -117,9 +124,8 @@ class CalendarInteractionEmailParser:
             if contact:
                 contacts.append(contact)
         if not contacts:
-            raise ValidationError(
-                'No email recipients were recognised as company contacts in Data Hub - please '
-                'ensure that at least one recipient is a company contact known by Data Hub.',
+            raise NoContactsError(
+                'The meeting email had no recipients which were recognised as Data Hub contacts.',
             )
         return contacts
 
@@ -136,27 +142,29 @@ class CalendarInteractionEmailParser:
         return secondary_advisers
 
     def _extract_and_validate_calendar_event_component(self):
-        error = ValidationError(
-            'No calendar event could be extracted - the iCalendar attachment was either '
-            'missing or badly formatted.',
-        )
         calendar_string = _extract_calendar_string_from_text(self.message)
         if not calendar_string:
             calendar_string = _extract_calendar_string_from_attachments(self.message)
         if not calendar_string:
-            raise error
+            raise BadCalendarInviteError(
+                'There was no iCalendar attachment on the email.',
+            )
         try:
             calendar = icalendar.Calendar.from_ical(calendar_string)
-        except ValueError as exc:
-            raise error from exc
+        except ValueError:
+            raise BadCalendarInviteError(
+                'The iCalendar attachment was badly formatted.',
+            )
         calendar_event_components = [
             comp for comp in calendar.walk()
             if comp.name == CALENDAR_COMPONENT_VEVENT
         ]
         if len(calendar_event_components) == 0:
-            raise ValidationError('No calendar event was found in the iCalendar attachment.')
+            raise BadCalendarInviteError(
+                'No calendar event was found in the iCalendar attachment.',
+            )
         if len(calendar_event_components) > 1:
-            raise ValidationError(
+            raise BadCalendarInviteError(
                 f'There were {len(calendar_event_components)} events in the calendar '
                 '- expected 1 event in the iCalendar attachment.',
             )
@@ -177,7 +185,7 @@ class CalendarInteractionEmailParser:
 
         meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
         if not meeting_confirmed:
-            raise ValidationError(
+            raise BadCalendarInviteError(
                 f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
             )
 
@@ -187,7 +195,7 @@ class CalendarInteractionEmailParser:
         """
         Extract interaction data from the email message as a dictionary.
 
-        This raises a ValidationError if the interaction data could not be fully extracted
+        This raises an InvalidInviteError if the interaction data could not be fully extracted
         or is invalid according to business logic.
         """
         calendar_event = self._extract_and_validate_calendar_event_metadata()

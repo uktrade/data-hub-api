@@ -8,29 +8,6 @@ from datahub.search.models import BaseESModel
 DOC_TYPE = 'investment_project'
 
 
-def _referral_source_adviser_mapping():
-    """
-    Mapping for referral_source_adviser.
-
-    referral_source_adviser is not using contact_or_adviser_mapping because the mapping for it
-    was not explicitly defined, and so was implicitly auto-created.
-
-    The mapping here reflects how it has been auto-created. Further down the line, this mapping
-    and contact_or_adviser_mapping will be harmonised.
-    """
-    return fields.object_field('id', 'first_name', 'last_name', 'name')
-
-
-def _country_lost_to_mapping():
-    """
-    Mapping for country_lost_to.
-
-    The mapping for country_lost_to was implicitly auto-created. This reflects how it was
-    auto-created so that we can explicitly define it in the model.
-    """
-    return fields.object_field('id', 'name')
-
-
 def _related_investment_project_field():
     """Field for a related investment project."""
     return Object(properties={
@@ -70,10 +47,15 @@ class InvestmentProject(BaseESModel):
     client_cannot_provide_total_investment = Boolean()
     client_contacts = fields.contact_or_adviser_field()
     client_relationship_manager = fields.contact_or_adviser_field(include_dit_team=True)
-    client_requirements = fields.TextWithKeyword()
+    client_requirements = Text(index=False)
     comments = fields.EnglishText()
     country_investment_originates_from = fields.id_name_field()
-    country_lost_to = _country_lost_to_mapping()
+    country_lost_to = Object(
+        properties={
+            'id': Keyword(index=False),
+            'name': Text(index=False),
+        },
+    )
     created_on = Date()
     created_by = fields.contact_or_adviser_field(include_dit_team=True)
     date_abandoned = Date()
@@ -107,27 +89,30 @@ class InvestmentProject(BaseESModel):
     number_safeguarded_jobs = Long()
     modified_on = Date()
     project_arrived_in_triage_on = Date()
-    # TODO: Update queries to use the trigram sub-field (once indexed) and remove
-    #  project_code_trigram
     project_code = fields.NormalizedKeyword(
-        copy_to='project_code_trigram',
         fields={
             'trigram': fields.TrigramText(),
         },
     )
-    project_code_trigram = fields.TrigramText()
     proposal_deadline = Date()
-    other_business_activity = fields.TextWithKeyword()
+    other_business_activity = Text(index=False)
     quotable_as_public_case_study = Boolean()
     r_and_d_budget = Boolean()
-    reason_abandoned = fields.TextWithKeyword()
-    reason_delayed = fields.TextWithKeyword()
-    reason_lost = fields.TextWithKeyword()
+    reason_abandoned = Text(index=False)
+    reason_delayed = Text(index=False)
+    reason_lost = Text(index=False)
     referral_source_activity = fields.id_name_field()
     referral_source_activity_event = fields.NormalizedKeyword()
     referral_source_activity_marketing = fields.id_name_field()
     referral_source_activity_website = fields.id_name_field()
-    referral_source_adviser = _referral_source_adviser_mapping()
+    referral_source_adviser = Object(
+        properties={
+            'id': Keyword(index=False),
+            'first_name': Text(index=False),
+            'last_name': Text(index=False),
+            'name': Text(index=False),
+        },
+    )
     sector = fields.sector_field()
     site_decided = Boolean()
     some_new_jobs = Boolean()
@@ -196,7 +181,7 @@ class InvestmentProject(BaseESModel):
         'uk_company.name.trigram',
         'investor_company.name',
         'investor_company.name.trigram',
-        'project_code_trigram',
+        'project_code.trigram',
     )
 
     class Meta:
