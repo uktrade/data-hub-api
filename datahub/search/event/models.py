@@ -15,10 +15,7 @@ class Event(BaseESModel):
     address_2 = Text()
     address_town = fields.NormalizedKeyword()
     address_county = fields.NormalizedKeyword()
-    # TODO: Update queries to use the trigram sub-field (once indexed) and remove
-    #  address_postcode_trigram
-    address_postcode = fields.TextWithTrigram(copy_to='address_postcode_trigram')
-    address_postcode_trigram = fields.TrigramText()
+    address_postcode = fields.TextWithTrigram()
     address_country = fields.id_name_partial_field()
     created_on = Date()
     disabled_on = Date()
@@ -60,7 +57,7 @@ class Event(BaseESModel):
         'name',
         'name.trigram',
         'address_country.name.trigram',
-        'address_postcode_trigram',
+        'address_postcode.trigram',
         'uk_region.name.trigram',
         'organiser.name.trigram',
         'teams.name',

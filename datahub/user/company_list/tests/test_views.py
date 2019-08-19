@@ -15,9 +15,12 @@ from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactor
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.test.factories import TeamFactory
-from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.tests.factories import CompanyListItemFactory
-from datahub.user.company_list.views import CANT_ADD_ARCHIVED_COMPANY_MESSAGE
+from datahub.user.company_list.models import CompanyList, CompanyListItem
+from datahub.user.company_list.tests.factories import CompanyListFactory, CompanyListItemFactory
+from datahub.user.company_list.views import (
+    CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
+    DEFAULT_LEGACY_LIST_NAME,
+)
 
 
 def company_with_interactions_factory(num_interactions):
@@ -256,7 +259,7 @@ class TestHeadCompanyListItemView(APITestMixin):
 class TestCreateOrUpdateCompanyListItemView(APITestMixin):
     """Tests for the PUT method in CompanyListItemView."""
 
-    def test_with_new_item(self):
+    def test_creates_new_items(self):
         """Test that a company can be added to the authenticated user's list."""
         company = CompanyFactory()
         url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
@@ -264,7 +267,55 @@ class TestCreateOrUpdateCompanyListItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
-        assert CompanyListItem.objects.filter(adviser=self.user, company=company).exists()
+        list_item = CompanyListItem.objects.filter(adviser=self.user, company=company).first()
+
+        assert list_item
+        assert list_item.created_by == self.user
+        assert list_item.modified_by == self.user
+
+    def test_creates_a_legacy_list_when_adding_a_new_item(self):
+        """
+        Test that when a list item is added, a legacy default list is created when it didn't
+        already exist.
+        """
+        # Existing company lists for other users should not matter
+        unrelated_lists = CompanyListFactory.create_batch(5, is_legacy_default=True)
+        company = CompanyFactory()
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.put(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        list_item = CompanyListItem.objects.get(adviser=self.user, company=company)
+        list_ = list_item.list
+        assert list_
+        assert list_.is_legacy_default
+        assert list_.name == DEFAULT_LEGACY_LIST_NAME
+        assert list_.adviser == self.user
+        assert list_.created_by == self.user
+        assert list_.modified_by == self.user
+
+        assert CompanyList.objects.count() == len(unrelated_lists) + 1
+
+    def test_reuses_an_existing_legacy_list_when_adding_a_new_item(self):
+        """Test that when a list item is added, an existing legacy default list is reused."""
+        existing_list_name = 'existing list'
+        CompanyListFactory(adviser=self.user, is_legacy_default=True, name=existing_list_name)
+        company = CompanyFactory()
+
+        url = reverse('api-v4:company-list:item', kwargs={'company_pk': company.pk})
+        response = self.api_client.put(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        list_item = CompanyListItem.objects.get(adviser=self.user, company=company)
+        list_ = list_item.list
+        assert list_
+        assert list_.is_legacy_default
+        assert list_.name == existing_list_name
+
+        assert CompanyList.objects.count() == 1
 
     def test_does_not_overwrite_other_items(self):
         """Test that adding an item does not overwrite other (unrelated) items."""

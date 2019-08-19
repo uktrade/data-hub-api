@@ -12,14 +12,11 @@ class Order(BaseESModel):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    # TODO: Update queries to use the trigram sub-field (once indexed) and remove copy_to field
     reference = fields.NormalizedKeyword(
-        copy_to=['reference_trigram'],
         fields={
             'trigram': fields.TrigramText(),
         },
     )
-    reference_trigram = fields.TrigramText()
     status = fields.NormalizedKeyword()
     company = fields.company_field()
     contact = fields.contact_or_adviser_field()
@@ -45,21 +42,13 @@ class Order(BaseESModel):
     vat_number = Keyword(index=False)
     vat_verified = Boolean(index=False)
     net_cost = Integer(index=False)
-    subtotal_cost_string = Keyword()
-    # TODO: Update queries to use the keyword sub-field (once indexed) and remove
-    #  subtotal_cost_string
     subtotal_cost = Integer(
-        copy_to=['subtotal_cost_string'],
         fields={
             'keyword': Keyword(),
         },
     )
     vat_cost = Integer(index=False)
-    total_cost_string = Keyword()
-    # TODO: Update queries to use the keyword sub-field (once indexed) and remove
-    #  total_cost_string
     total_cost = Integer(
-        copy_to=['total_cost_string'],
         fields={
             'keyword': Keyword(),
         },
@@ -109,13 +98,13 @@ class Order(BaseESModel):
 
     SEARCH_FIELDS = (
         'id',
-        'reference_trigram',
+        'reference.trigram',
         'company.name',
         'company.name.trigram',
         'contact.name',
         'contact.name.trigram',
-        'total_cost_string',
-        'subtotal_cost_string',
+        'total_cost.keyword',
+        'subtotal_cost.keyword',
     )
 
     class Meta:

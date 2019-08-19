@@ -29,6 +29,7 @@ from datahub.interaction.test.admin_csv_import.utils import random_communication
 from datahub.interaction.test.factories import (
     CommunicationChannelFactory,
     CompanyInteractionFactory,
+    ServiceAnswerOptionFactory,
 )
 from datahub.interaction.test.utils import random_service
 from datahub.metadata.test.factories import ChildServiceFactory, ServiceFactory, TeamFactory
@@ -322,6 +323,46 @@ class TestInteractionCSVRowFormValidation:
                     'event_id': ['This field is only valid for service deliveries.'],
                 },
                 id='cannot specify event_id for an interaction',
+            ),
+            pytest.param(
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'service': lambda: ServiceAnswerOptionFactory().question.service.name,
+                    'service_answer': 'Feline super heroes',
+                },
+                {
+                    'service_answer': [
+                        'A service answer could not be found with the specified name and service.',
+                    ],
+                },
+                id='cannot specify non existent service answer',
+            ),
+            pytest.param(
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'service': lambda: ServiceFactory().name,
+                    'service_answer': 'Feline friends',
+                },
+                {
+                    'service_answer': [
+                        'A service answer was provided when the selected service '
+                        'does not require it.',
+                    ],
+                },
+                id='cannot specify a service answer when not required by the selected service',
+            ),
+            pytest.param(
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'service': lambda: ServiceAnswerOptionFactory().question.service.name,
+                    'service_answer': '',
+                },
+                {
+                    'service_answer': [
+                        'A service answer is required for the specified service.',
+                    ],
+                },
+                id='cannot service answer blank when is required',
             ),
         ),
     )
@@ -947,6 +988,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
     def test_subject_falls_back_to_service(self, kind):
         """Test that if subject is not specified, the name of the service is used instead."""
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        ContactFactory(email='person@company.com')
         service = random_service()
         communication_channel = random_communication_channel()
 
@@ -1015,6 +1057,39 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             assert actual_email.lower() == input_email.lower()
         else:
             assert not contact
+
+    @pytest.mark.parametrize(
+        'service_answer_name',
+        ('Documents & Regulations', 'Markets & Sectors'),
+    )
+    def test_service_answer(self, service_answer_name):
+        """
+        Test that valid service answer will be transformed into service_answers dictionary
+        and is not case sensitive.
+        """
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        ContactFactory(email='person@company.com')
+        service_answer = ServiceAnswerOptionFactory(name=service_answer_name)
+        communication_channel = random_communication_channel()
+
+        data = {
+            'theme': Interaction.THEMES.export,
+            'kind': Interaction.KINDS.interaction,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': 'person@company.com',
+            'service': service_answer.question.service.name,
+            'service_answer': service_answer.name.lower(),
+            'communication_channel': communication_channel.name,
+        }
+
+        form = InteractionCSVRowForm(data=data)
+        assert not form.errors
+        assert form.cleaned_data['service_answers'] == {
+            str(service_answer.question.id): {
+                str(service_answer.id): {},
+            },
+        }
 
 
 @pytest.mark.django_db
@@ -1114,6 +1189,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'kind': data['kind'],
             'notes': '',
             'service': service,
+            'service_answers': None,
             'status': Interaction.STATUSES.complete,
             'subject': service.name,
             'theme': data['theme'],
@@ -1157,6 +1233,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'kind': data['kind'],
             'notes': data['notes'],
             'service': service,
+            'service_answers': None,
             'status': Interaction.STATUSES.complete,
             'subject': data['subject'],
             'theme': data['theme'],
@@ -1268,6 +1345,39 @@ class TestInteractionCSVRowFormSaving:
         )
 
         assert actual_advisers_and_teams == expected_advisers_and_teams
+
+    def test_save_service_answer(self):
+        """Test saving an interaction with service answer."""
+        user = AdviserFactory(first_name='Admin', last_name='User')
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        communication_channel = random_communication_channel()
+        source = {'test-source': 'test-value'}
+        service_answer = ServiceAnswerOptionFactory()
+
+        data = {
+            'theme': Interaction.THEMES.export,
+            'kind': Interaction.KINDS.interaction,
+            'date': '02/03/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service_answer.question.service.name,
+            'service_answer': service_answer.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        interaction = form.save(user, source=source)
+        interaction.refresh_from_db()
+
+        assert interaction.service.id == service_answer.question.service.id
+        assert interaction.service.name == service_answer.question.service.name
+        assert interaction.service_answers == {
+            str(service_answer.question.id): {
+                str(service_answer.id): {},
+            },
+        }
 
     def test_save_with_unmatched_contact_raises_error(self):
         """Test that saving an interaction with an unmatched contact raises an error."""

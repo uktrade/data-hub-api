@@ -78,7 +78,6 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'referral_source_activity_event',
         'referral_source_activity_marketing.name',
         'referral_source_activity_website.name',
-        'referral_source_adviser.name',
         'sector.name',
         'site_decided',
         'stage.name',

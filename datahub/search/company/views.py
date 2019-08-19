@@ -57,7 +57,7 @@ class SearchCompanyAPIViewMixin:
             'name',  # to find 2-letter words
             'name.trigram',
             'trading_names',  # to find 2-letter words
-            'trading_names_trigram',
+            'trading_names.trigram',
         ],
         'country': [
             'address.country.id',
@@ -133,7 +133,7 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
             'name',  # to find 2-letter words
             'name.trigram',
             'trading_names',  # to find 2-letter words
-            'trading_names_trigram',
+            'trading_names.trigram',
         ],
     }
 
