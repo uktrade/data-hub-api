@@ -4,8 +4,18 @@ from datahub.user.company_list.legacy_views import (
     LegacyCompanyListItemView,
     LegacyCompanyListViewSet,
 )
+from datahub.user.company_list.views import CompanyListViewSet
 
 urlpatterns = [
+    path(
+        'company-list',
+        CompanyListViewSet.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='list-collection',
+    ),
     path(
         'user/company-list',
         LegacyCompanyListViewSet.as_view(
