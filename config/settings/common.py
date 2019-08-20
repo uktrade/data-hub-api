@@ -95,6 +95,7 @@ LOCAL_APPS = [
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
+    'datahub.datasets',
 ]
 
 MI_APPS = [
@@ -406,11 +407,11 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': 30.0, # Every 30 seconds
+            'schedule': 30.0,  # Every 30 seconds
         }
 
     CELERY_WORKER_LOG_FORMAT = (
-        "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
+        '[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s'
     )
 
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
@@ -524,6 +525,12 @@ _add_hawk_credentials(
     'MARKET_ACCESS_ACCESS_KEY_ID',
     'MARKET_ACCESS_SECRET_ACCESS_KEY',
     HawkScope.public_company,
+)
+
+_add_hawk_credentials(
+    'DATA_FLOW_API_ACCESS_KEY_ID',
+    'DATA_FLOW_API_SECRET_ACCESS_KEY',
+    HawkScope.data_flow_api,
 )
 
 # To read data from Activity Stream

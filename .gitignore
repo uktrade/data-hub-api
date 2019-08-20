@@ -79,3 +79,6 @@ docker-volumes/
 
 # celery
 celerybeat-schedule
+
+#VI
+*.swp
