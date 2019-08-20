@@ -31,5 +31,13 @@ class APIMethodNotAllowedException(APIException):
     default_code = 'method_not_allowed'
 
 
+class APIUpstreamException(APIException):
+    """DRF Exception for the 502 status code."""
+
+    status_code = status.HTTP_502_BAD_GATEWAY
+    default_detail = _('Cannot process request due to an error in an upstream service.')
+    default_code = 'bad_gateway'
+
+
 class SimulationRollback(Exception):
     """Used to roll back deletions during a simulation."""
