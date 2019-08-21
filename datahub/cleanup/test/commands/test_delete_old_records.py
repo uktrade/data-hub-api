@@ -492,6 +492,7 @@ MAPPING = {
                     {
                         'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                         'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': None,
                     },
                 ],
                 'unexpired_objects_kwargs': [
