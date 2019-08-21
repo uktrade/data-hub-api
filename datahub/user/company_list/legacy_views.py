@@ -53,11 +53,19 @@ class CompanyListItemPermissions(DjangoModelPermissions):
     }
 
 
-class CompanyListViewSet(CoreViewSet):
+class LegacyCompanyListViewSet(CoreViewSet):
     """
-    View set for returning the contents of a company list.
+    Legacy view set for returning the contents of a company list.
 
-    Note that CompanyListItemView is used for operations relating to a single item.
+    Note that LegacyCompanyListItemView is used for operations relating to a single item.
+
+    Note that this view only supports a single company list per user and is being replaced
+    with views that support multiple lists per user.
+
+    TODO: Update this view to filter by CompanyListItem.list.is_legacy_list
+     and CompanyListItem.list.adviser instead of CompanyListItem.adviser.
+
+    TODO: Deprecate and remove once multiple list functionality has been released.
     """
 
     required_scopes = (Scope.internal_front_end,)
@@ -84,16 +92,22 @@ class CompanyListViewSet(CoreViewSet):
         return queryset.filter(adviser=self.request.user)
 
 
-class CompanyListItemView(APIView):
+class LegacyCompanyListItemView(APIView):
     """
-    View for adding and removing a company to and from a user's list of companies.
+    Legacy view for adding and removing a company to and from a user's list of companies.
 
-    This does not use CoreViewSet at present as the desired behaviour is slightly
+    Note that this view only supports a single company list per user and is being replaced
+    with views that support multiple lists per user.
+
+    This does not use CoreViewSet as the desired behaviour is slightly
     different due to the simple nature of the functionality (which is effectively
-    starring and unstarring a company).
+    starring and unstarring a company). For future iterations switching to CoreViewSet
+    would probably make sense.
 
-    However, if the functionality becomes more complicated (e.g. multiple lists per user)
-    switching to CoreViewSet would probably make sense.
+    TODO: Update this view to filter by CompanyListItem.list.is_legacy_list
+     and CompanyListItem.list.adviser instead of CompanyListItem.adviser.
+
+    TODO: Deprecate and remove once multiple list functionality has been released.
     """
 
     required_scopes = (Scope.internal_front_end,)
