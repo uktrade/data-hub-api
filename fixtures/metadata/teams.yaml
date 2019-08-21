@@ -262,6 +262,18 @@
     - - export_company
       - company
       - company
+    - - view_companylist
+      - company_list
+      - companylist
+    - - add_companylist
+      - company_list
+      - companylist
+    - - change_companylist
+      - company_list
+      - companylist
+    - - delete_companylist
+      - company_list
+      - companylist
     - - view_companylistitem
       - company_list
       - companylistitem
