@@ -21,7 +21,7 @@ class NotifyGateway:
     def _initialise_clients(self):
         clients = {}
         for service_name, api_key_setting_name in NOTIFY_KEYS.items():
-            api_key = getattr(settings, api_key_setting_name, None)
+            api_key = getattr(settings, api_key_setting_name)
             if api_key:
                 clients[service_name] = NotificationsAPIClient(api_key)
             else:
@@ -48,7 +48,7 @@ class NotifyGateway:
         Send an email notification using the GOVUK notification service.
         """
         # TODO: the default notify service name should be in a setting, not a constant.
-        # This will be fixed when we fully move over omis notifications from its
+        # This will be fixed when we fully move over OMIS notifications from its
         # own notification package to this app
         if not notify_service_name:
             notify_service_name = DEFAULT_SERVICE_NAME
