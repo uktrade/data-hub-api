@@ -10,6 +10,7 @@ from datahub.interaction.email_processors.exceptions import (
     MalformedEmailError,
     NoContactsError,
     SenderUnverifiedError,
+    UnconfirmedCalendarInviteError,
 )
 from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
 
@@ -261,7 +262,7 @@ class TestCalendarInteractionEmailParser:
             ),
             (
                 'email_samples/invalid/calendar_event_unconfirmed.eml',
-                BadCalendarInviteError(
+                UnconfirmedCalendarInviteError(
                     'The calendar event was not status: CONFIRMED.',
                 ),
             ),
