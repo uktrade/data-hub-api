@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.notification import notify_gateway
-from datahub.notification.constants import DEFAULT_SERVICE_NAME, OMIS_SERVICE_NAME
+from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceName
 from datahub.notification.tasks import send_email_notification
 
 
@@ -11,7 +11,7 @@ from datahub.notification.tasks import send_email_notification
     (
         (None, None),
         ({'foo': 'bar'}, None),
-        ({'foo': 'bar'}, OMIS_SERVICE_NAME),
+        ({'foo': 'bar'}, NotifyServiceName.omis),
     ),
 )
 def test_send_email_notification(context, service_name):

@@ -2,7 +2,7 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.notification import notify_gateway
-from datahub.notification.constants import DEFAULT_SERVICE_NAME, OMIS_SERVICE_NAME
+from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceName
 from datahub.notification.notify import (
     notify_adviser_by_email,
     notify_by_email,
@@ -15,7 +15,7 @@ from datahub.notification.notify import (
     'adviser_data,notify_service_name',
     (
         ({'contact_email': ''}, None),
-        ({}, OMIS_SERVICE_NAME),
+        ({}, NotifyServiceName.omis),
     ),
 )
 def test_notify_adviser_by_email(adviser_data, notify_service_name):
@@ -38,7 +38,7 @@ def test_notify_adviser_by_email(adviser_data, notify_service_name):
     'notify_service_name',
     (
         None,
-        OMIS_SERVICE_NAME,
+        NotifyServiceName.omis,
     ),
 )
 def test_notify_contact_by_email(notify_service_name):
@@ -61,7 +61,7 @@ def test_notify_contact_by_email(notify_service_name):
     'notify_service_name',
     (
         None,
-        OMIS_SERVICE_NAME,
+        NotifyServiceName.omis,
     ),
 )
 def test_notify_by_email(notify_service_name):
