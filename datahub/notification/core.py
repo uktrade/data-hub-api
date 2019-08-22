@@ -29,10 +29,9 @@ class NotifyGateway:
                 client.send_email_notification.return_value = {'id': 'abc123'}
                 clients[service_name] = client
                 warnings.warn(
-                    f'`settings.{api_key_setting_name}` not specified therefore '
-                    'notifications will be mocked. '
-                    "You might want to change this if it's not a "
-                    'testing or development environment.',
+                    f'`settings.{api_key_setting_name}` not specified therefore notifications '
+                    "will be mocked. You might want to change this if it's not a testing or "
+                    'development environment.',
                     RuntimeWarning,
                     stacklevel=2,
                 )

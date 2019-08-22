@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.notification import notify_gateway
-from datahub.notification.constants import DEFAULT_SERVICE_NAME, OMIS_SERVICE_NAME
+from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceName
 
 
 @pytest.mark.parametrize(
@@ -9,7 +9,7 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, OMIS_SERVICE_NA
     (
         (None, None),
         ({'foo': 'bar'}, None),
-        ({'foo': 'bar'}, OMIS_SERVICE_NAME),
+        ({'foo': 'bar'}, NotifyServiceName.omis),
     ),
 )
 def test_send_email_notification(context, service_name):
