@@ -16,6 +16,12 @@ class SenderUnverifiedError(InvalidInviteError):
     """
 
 
+class UnconfirmedCalendarInviteError(InvalidInviteError):
+    """
+    Exception for when the calendar invite was not confirmed.
+    """
+
+
 class BadCalendarInviteError(InvalidInviteError):
     """
     Exception for when the calendar invite was bad.
