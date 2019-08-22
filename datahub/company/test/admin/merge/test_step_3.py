@@ -30,7 +30,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.tests.factories import CompanyListItemFactory
+from datahub.user.company_list.tests.factories import LegacyCompanyListItemFactory
 
 
 class TestConfirmMergeViewGet(AdminTestMixin):
@@ -350,7 +350,7 @@ def _company_factory(
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
     OrderFactory.create_batch(num_orders, company=company)
-    CompanyListItemFactory.create_batch(num_company_list_items, company=company)
+    LegacyCompanyListItemFactory.create_batch(num_company_list_items, company=company)
 
     fields_iter = cycle(INVESTMENT_PROJECT_COMPANY_FIELDS)
     fields = islice(fields_iter, 0, num_investment_projects)

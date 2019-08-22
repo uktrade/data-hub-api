@@ -49,7 +49,7 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.user.company_list.tests.factories import CompanyListItemFactory
+from datahub.user.company_list.tests.factories import LegacyCompanyListItemFactory
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
@@ -115,7 +115,7 @@ MAPPING = {
                 'unexpired_objects_kwargs': [{}],
             },
             {
-                'factory': CompanyListItemFactory,
+                'factory': LegacyCompanyListItemFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [{}],
                 'unexpired_objects_kwargs': [],
@@ -492,6 +492,7 @@ MAPPING = {
                     {
                         'created_on': ORDER_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                         'modified_on': ORDER_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
+                        'level2_approved_on': None,
                     },
                 ],
                 'unexpired_objects_kwargs': [
