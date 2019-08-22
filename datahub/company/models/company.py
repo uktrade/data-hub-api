@@ -37,6 +37,7 @@ class CompanyPermission(StrEnum):
     view_company_document = 'view_company_document'
     view_company_timeline = 'view_company_timeline'
     export_company = 'export_company'
+    add_company = 'add_company'
 
 
 class ExportExperienceCategory(BaseConstantModel):
