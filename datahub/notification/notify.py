@@ -23,7 +23,12 @@ def notify_by_email(email_address, template_identifier, context, notify_service_
     Notify an email address, using a GOVUK notify template and some template
     context.
     """
+    kwargs = {'context': context}
+    # TODO: Remove this check when we can assume that all celery workers will
+    # accept a notify_service_name kwarg - after this has been released.
+    if notify_service_name:
+        kwargs['notify_service_name'] = notify_service_name
     send_email_notification.apply_async(
         args=(email_address, template_identifier),
-        kwargs={'context': context, 'notify_service_name': notify_service_name},
+        kwargs=kwargs,
     )
