@@ -25,6 +25,13 @@ class NotifyGateway:
             if api_key:
                 clients[service_name] = NotificationsAPIClient(api_key)
             else:
+                # Mocking the client when we don't have an API key set gives us a dummy client.
+                # It has some benefits:
+                # 1) It allows developers to use local copies without needing to find API
+                #    credentials.
+                # 2) It means we do not need to complicate the client and provide a separate
+                #    execution path when the API key is unset.
+
                 client = mock.Mock(spec_set=NotificationsAPIClient)
                 client.send_email_notification.return_value = {'id': 'abc123'}
                 clients[service_name] = client
