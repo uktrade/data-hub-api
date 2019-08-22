@@ -1,3 +1,26 @@
+Data Hub API 14.3.0 (2019-08-22)
+================================
+
+
+
+Internal changes
+----------------
+
+- **Advisers** A data migration was added to associate all existing company list items with a default list for each user. This is in preparation for it being possible for users to have multiple company lists.
+- Celery was `configured to send task events by default <http://docs.celeryproject.org/en/latest/userguide/configuration.html#events>`_ (for better compatibility with the Flower monitoring tool).
+- The Celery ``conf`` inspect command was disabled for security reasons.
+
+API
+---
+
+- An endpoint was added for creating companies through dnb-service (https://github.com/uktrade/dnb-service/) given a ``duns_number``.
+
+Database schema
+---------------
+
+- **Advisers** ``company_list_companylisttem.list_id`` was made ``NOT NULL``.
+
+
 Data Hub API 14.2.0 (2019-08-19)
 ================================
 
