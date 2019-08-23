@@ -1,3 +1,41 @@
+Data Hub API 14.4.0 (2019-08-23)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Advisers** The ``company_list_companylisttem.adviser_id`` column is deprecated and will be removed on or after 2 September 2019.
+
+Features
+--------
+
+- The ``datahub.notification`` app was adapted so that it can work with multiple
+  GOVUK notify API keys - so that different apps can define their GOVUK notify
+  templates on different notify service instances.
+
+Bug fixes
+---------
+
+- **Interactions** Meeting invite ingestion was adjusted so that users do not get error 
+  notifications when they send a meeting cancellation.
+
+  The notification celery task was modified so that 400/403 level responses do not
+  have automatic retries.
+
+Internal changes
+----------------
+
+- **Advisers** The initial teams fixture (used for tests and new environments) was updated so that only the ``DIT_staff`` group has permission to use the company lists feature.
+- **Advisers** All legacy company list endpoints now fully operate on a default list for each user. This is in preparation for it being possible for users to have multiple company lists.
+
+Database schema
+---------------
+
+- **Advisers** The ``company_list_companylisttem.adviser_id`` column was made nullable.
+
+
 Data Hub API 14.3.0 (2019-08-22)
 ================================
 
