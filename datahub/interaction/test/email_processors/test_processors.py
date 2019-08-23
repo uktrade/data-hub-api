@@ -15,6 +15,7 @@ from datahub.interaction.email_processors.exceptions import (
     MalformedEmailError,
     NoContactsError,
     SenderUnverifiedError,
+    UnconfirmedCalendarInviteError,
 )
 from datahub.interaction.email_processors.notify import Template
 from datahub.interaction.email_processors.processors import (
@@ -261,6 +262,10 @@ class TestCalendarInteractionEmailProcessor:
             ),
             (
                 MalformedEmailError,
+                False,
+            ),
+            (
+                UnconfirmedCalendarInviteError,
                 False,
             ),
         ),

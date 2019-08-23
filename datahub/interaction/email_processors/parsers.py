@@ -15,6 +15,7 @@ from datahub.interaction.email_processors.exceptions import (
     MalformedEmailError,
     NoContactsError,
     SenderUnverifiedError,
+    UnconfirmedCalendarInviteError,
 )
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
@@ -185,7 +186,9 @@ class CalendarInteractionEmailParser:
 
         meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
         if not meeting_confirmed:
-            raise BadCalendarInviteError(
+            # This will not send a notification as it is not in
+            # processors.EXCEPTION_NOTIFY_MESSAGES
+            raise UnconfirmedCalendarInviteError(
                 f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
             )
 

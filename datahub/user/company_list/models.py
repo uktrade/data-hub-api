@@ -69,11 +69,12 @@ class CompanyListItem(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     list = models.ForeignKey(CompanyList, models.CASCADE, related_name='items')
-    # TODO: This field will be made nullable and then removed (using the usual deprecation
-    #  process) once the company list functionality has been updated to use list.adviser instead
+    # This field is deprecated (use list.adviser instead)
+    # TODO: Remove this field (using the usual deprecation process)
     adviser = models.ForeignKey(
         'company.Advisor',
         on_delete=models.CASCADE,
+        null=True,
         related_name='company_list_items',
     )
     company = models.ForeignKey(
@@ -92,12 +93,4 @@ class CompanyListItem(BaseModel):
                 fields=('list', 'company'),
                 name='unique_list_and_company',
             ),
-            # TODO: Remove this once existing endpoints are no longer querying the adviser field
-            models.UniqueConstraint(
-                fields=('adviser', 'company'),
-                name='unique_adviser_and_company',
-            ),
-        ]
-        indexes = [
-            models.Index(fields=('adviser', 'company')),
         ]
