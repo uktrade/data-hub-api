@@ -10,7 +10,7 @@ class CompanyListViewSet(CoreViewSet):
     """
     Views for managing the authenticated user's company lists.
 
-    This covers creating and listing lists.
+    This covers creating, updating (i.e. renaming) and listing lists.
     """
 
     required_scopes = (Scope.internal_front_end,)
@@ -29,11 +29,13 @@ class CompanyListViewSet(CoreViewSet):
 
         This makes sure that adviser is set to self.request.user when a list is created
         (in the same way created_by and modified_by are).
-
-        TODO: When we have support for updating (i.e. renaming) lists, change this to not overwrite
-         adviser when create=False.
         """
         additional_data = super().get_additional_data(create)
+
+        if not create:
+            # A list is being updated rather than created, so leave the adviser field unchanged
+            # (as there is no reason to change it)
+            return additional_data
 
         return {
             **additional_data,
