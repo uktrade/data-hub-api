@@ -89,7 +89,10 @@ class LegacyCompanyListViewSet(CoreViewSet):
     def filter_queryset(self, queryset):
         """Filter the query set to the items relating to the authenticated users."""
         queryset = super().filter_queryset(queryset)
-        return queryset.filter(adviser=self.request.user)
+        return queryset.filter(
+            list__adviser=self.request.user,
+            list__is_legacy_default=True,
+        )
 
 
 class LegacyCompanyListItemView(APIView):
@@ -121,7 +124,8 @@ class LegacyCompanyListItemView(APIView):
     def get(self, request, format=None, company_pk=None):
         """Check if a CompanyListItem exists for the authenticated user and specified company."""
         company_exists = CompanyListItem.objects.filter(
-            adviser=request.user.pk,
+            list__adviser=request.user,
+            list__is_legacy_default=True,
             company_id=company_pk,
         ).exists()
 
@@ -153,10 +157,10 @@ class LegacyCompanyListItemView(APIView):
         # get_or_create() is used to avoid an error if there is an existing
         # CompanyListItem for this adviser and company
         self.queryset.get_or_create(
-            adviser=adviser,
             company=company,
+            list=default_legacy_list,
             defaults={
-                'list': default_legacy_list,
+                'adviser': adviser,
                 'created_by': adviser,
                 'modified_by': adviser,
             },
@@ -175,7 +179,8 @@ class LegacyCompanyListItemView(APIView):
         company = get_object_or_404(Company, pk=company_pk)
 
         self.queryset.filter(
-            adviser=request.user,
+            list__adviser=request.user,
+            list__is_legacy_default=True,
             company=company,
         ).delete()
 

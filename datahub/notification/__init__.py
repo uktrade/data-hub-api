@@ -1,3 +1,3 @@
-from datahub.notification.core import client
+from datahub.notification.core import notify_gateway
 
-__all__ = ('client',)
+__all__ = ('notify_gateway',)
