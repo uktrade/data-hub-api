@@ -104,6 +104,45 @@ class CompanyListItemAPIView(APIView):
         return obj
 
 
+class CompanyListItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a company list."""
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        CompanyListItemPermissions,
+    )
+    serializer_class = CompanyListItemSerializer
+    filter_backends = (OrderingFilter,)
+    # Note that we want null to be treated as the oldest value when sorting by
+    # how long ago the interaction happened. This happens automatically when sorting by
+    # latest_interaction_time_ago (as opposed to sorting by latest_interaction_date in
+    # descending order)
+    ordering = (
+        'latest_interaction_time_ago',
+        '-latest_interaction_created_on',
+        'latest_interaction_id',
+    )
+    queryset = get_company_list_item_queryset()
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if company list specified in the URL path does not exist.
+        """
+        super().initial(request, *args, **kwargs)
+
+        if not CompanyList.objects.filter(pk=self.kwargs['company_list_pk']).exists():
+            raise Http404
+
+    def filter_queryset(self, queryset):
+        """Filter the query set to the items relating to the authenticated users."""
+        queryset = super().filter_queryset(queryset)
+        return queryset.filter(
+            list__adviser=self.request.user,
+            list__pk=self.request.parser_context['kwargs']['company_list_pk'],
+        )
+
+
 class LegacyCompanyListViewSet(CoreViewSet):
     """
     Legacy view set for returning the contents of a company list.

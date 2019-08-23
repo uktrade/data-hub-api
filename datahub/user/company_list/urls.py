@@ -2,6 +2,7 @@ from django.urls import path
 
 from datahub.user.company_list.views import (
     CompanyListItemAPIView,
+    CompanyListItemViewSet,
     LegacyCompanyListItemView,
     LegacyCompanyListViewSet,
 )
@@ -12,6 +13,15 @@ urlpatterns = [
         'company-list/<uuid:company_list_pk>/<uuid:company_pk>',
         CompanyListItemAPIView.as_view(),
         name='list-item',
+    ),
+    path(
+        'company-list/<uuid:company_list_pk>',
+        CompanyListItemViewSet.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='list-collection',
     ),
     path(
         'user/company-list',
