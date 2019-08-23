@@ -8,6 +8,7 @@ from datahub.notification.core import notify_gateway
     bind=True,
     acks_late=True,
     priority=9,
+    max_retries=5,
 )
 def send_email_notification(
     self,
@@ -28,8 +29,10 @@ def send_email_notification(
             notify_service_name,
         )
     except HTTPError as exc:
-        # Raise 400/403 responses without retry
+        # Raise 400/403 responses without retry - these are problems with the
+        # way we are calling the notify service and retries will not result in
+        # a successful outcome.
         if exc.status_code in (400, 403):
-            raise exc
-        raise self.retry(exc=exc, max_retries=5, countdown=60)
+            raise
+        raise self.retry(exc=exc, countdown=60)
     return response['id']
