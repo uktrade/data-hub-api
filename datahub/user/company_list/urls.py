@@ -1,8 +1,18 @@
 from django.urls import path
 
-from datahub.user.company_list.views import LegacyCompanyListItemView, LegacyCompanyListViewSet
+from datahub.user.company_list.views import (
+    CompanyListItemAPIView,
+    LegacyCompanyListItemView,
+    LegacyCompanyListViewSet,
+)
+
 
 urlpatterns = [
+    path(
+        'company-list/<uuid:company_list_pk>/<uuid:company_pk>',
+        CompanyListItemAPIView.as_view(),
+        name='list-item',
+    ),
     path(
         'user/company-list',
         LegacyCompanyListViewSet.as_view(

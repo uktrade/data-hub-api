@@ -53,6 +53,57 @@ class CompanyListItemPermissions(DjangoModelPermissions):
     }
 
 
+class CompanyListItemAPIView(APIView):
+    """
+    A view for adding and removing a company to and from a selected list of companies
+    that belongs to a user.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        CompanyListItemPermissions,
+    )
+    # Note: A query set is required for CompanyListItemPermissions
+    queryset = CompanyListItem.objects.all()
+    serializer_class = CompanyListItemSerializer
+
+    @method_decorator(transaction.non_atomic_requests)
+    def put(self, request, company_list_pk, company_pk, format=None):
+        """Add company to a list."""
+        company = get_object_or_404(Company, pk=company_pk)
+        if company.archived:
+            errors = {
+                api_settings.NON_FIELD_ERRORS_KEY: CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
+            }
+            raise serializers.ValidationError(errors)
+
+        adviser = request.user
+        company_list = self._get_company_list(request, company_list_pk)
+
+        # get_or_create() is used to avoid an error if there is an existing
+        # CompanyListItem for this adviser and company
+        self.queryset.get_or_create(
+            company=company,
+            list=company_list,
+            defaults={
+                'created_by': adviser,
+                'modified_by': adviser,
+            },
+        )
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    def _get_company_list(self, request, company_list_pk):
+        obj = get_object_or_404(
+            CompanyList,
+            adviser=request.user,
+            pk=company_list_pk,
+        )
+        self.check_object_permissions(request, obj)
+        return obj
+
+
 class LegacyCompanyListViewSet(CoreViewSet):
     """
     Legacy view set for returning the contents of a company list.
