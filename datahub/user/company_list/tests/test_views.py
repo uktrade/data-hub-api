@@ -1,4 +1,5 @@
 from random import sample
+from uuid import uuid4
 
 import factory
 import pytest
@@ -12,6 +13,10 @@ from datahub.user.company_list.tests.factories import CompanyListFactory
 
 
 list_collection_url = reverse('api-v4:company-list:list-collection')
+
+
+def _get_list_detail_url(list_pk):
+    return reverse('api-v4:company-list:list-detail', kwargs={'pk': list_pk})
 
 
 class TestListCompanyListsView(APITestMixin):
@@ -179,3 +184,108 @@ class TestAddCompanyListView(APITestMixin):
         assert company_list.adviser == self.user
         assert company_list.created_by == self.user
         assert company_list.modified_by == self.user
+
+
+class TestUpdateCompanyListView(APITestMixin):
+    """Tests for renaming a company list."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        url = _get_list_detail_url(uuid4())
+
+        response = api_client.patch(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['change_companylist'], status.HTTP_200_OK),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        company_list = CompanyListFactory(adviser=user)
+        url = _get_list_detail_url(company_list.pk)
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.patch(
+            url,
+            data={
+                'name': 'test list',
+            },
+        )
+        assert response.status_code == expected_status
+
+    @pytest.mark.parametrize(
+        'request_data,expected_errors',
+        (
+            pytest.param(
+                {
+                    'name': None,
+                },
+                {
+                    'name': ['This field may not be null.'],
+                },
+                id='name is null',
+            ),
+            pytest.param(
+                {
+                    'name': '',
+                },
+                {
+                    'name': ['This field may not be blank.'],
+                },
+                id='name is empty string',
+            ),
+        ),
+    )
+    def test_validation(self, request_data, expected_errors):
+        """Test validation."""
+        company_list = CompanyListFactory(adviser=self.user)
+        url = _get_list_detail_url(company_list.pk)
+        response = self.api_client.patch(url, data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_errors
+
+    def test_can_successfully_rename_a_list(self):
+        """Test that a list can be renamed."""
+        company_list = CompanyListFactory(adviser=self.user, name='old name')
+        url = _get_list_detail_url(company_list.pk)
+
+        new_name = 'new name'
+        response = self.api_client.patch(
+            url,
+            data={
+                'name': new_name,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'id': str(company_list.pk),
+            'name': new_name,
+            'created_on': format_date_or_datetime(company_list.created_on),
+        }
+
+        company_list.refresh_from_db()
+        assert company_list.name == new_name
+
+    def test_cannot_rename_another_users_list(self):
+        """Test that another user's list can't be renamed."""
+        company_list = CompanyListFactory(name='old name')
+        url = _get_list_detail_url(company_list.pk)
+
+        new_name = 'new name'
+        response = self.api_client.patch(
+            url,
+            data={
+                'name': new_name,
+            },
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
