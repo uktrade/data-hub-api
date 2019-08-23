@@ -95,7 +95,7 @@ LOCAL_APPS = [
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
-    'datahub.datasets',
+    'datahub.dataset',
 ]
 
 MI_APPS = [

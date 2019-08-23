@@ -76,6 +76,10 @@ HAWK_RECEIVER_CREDENTIALS = {
         'key': 'public-company-key',
         'scope': HawkScope.public_company,
     },
+    'data-flow-api-id': {
+        'key': 'data-flow-api-key',
+        'scope': HawkScope.data_flow_api,
+    },
 }
 
 DOCUMENT_BUCKETS = {
