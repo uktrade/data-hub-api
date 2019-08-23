@@ -186,6 +186,8 @@ class CalendarInteractionEmailParser:
 
         meeting_confirmed = calendar_event['status'] == CALENDAR_STATUS_CONFIRMED
         if not meeting_confirmed:
+            # This will not send a notification as it is not in
+            # processors.EXCEPTION_NOTIFY_MESSAGES
             raise UnconfirmedCalendarInviteError(
                 f'The calendar event was not status: {CALENDAR_STATUS_CONFIRMED}.',
             )
