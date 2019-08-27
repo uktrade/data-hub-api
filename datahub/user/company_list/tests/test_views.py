@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
+from datahub.company.models import Company
 from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -499,6 +500,139 @@ class TestCompanyListItemViewSet(APITestMixin):
             for date_ in interaction_dates
         ]
         assert actual_interaction_dates == expected_interaction_dates
+
+
+class TestDeleteCompanyListItemAPIView(APITestMixin):
+    """Tests for the DELETE method in CompanyListItemAPIView."""
+
+    def test_with_existing_item(self):
+        """Test that a company can be removed from the authenticated user's list."""
+        company = CompanyFactory()
+        company_list_item = CompanyListItemFactory(list__adviser=self.user, company=company)
+
+        url = reverse(
+            'api-v4:company-list:list-item',
+            kwargs={
+                'company_list_pk': company_list_item.list_id,
+                'company_pk': company.pk,
+            },
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+        assert not CompanyListItem.objects.filter(
+            list_id=company_list_item.list_id,
+            list__adviser=self.user,
+            company=company,
+        ).exists()
+
+    def test_with_new_item(self):
+        """
+        Test that 404 status code is returned if the specified company was not on the
+        authenticated user's list.
+        """
+        company = CompanyFactory()
+        company_list = CompanyListFactory(adviser=self.user)
+        url = reverse(
+            'api-v4:company-list:list-item',
+            kwargs={
+                'company_list_pk': company_list.pk,
+                'company_pk': company.pk,
+            },
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.content == b'{"detail":"Not found."}'
+        assert not CompanyListItem.objects.filter(
+            list_id=company_list.id,
+            company=company,
+        ).exists()
+
+    def test_with_archived_company(self):
+        """Test that no error is returned when removing an archived company."""
+        company = ArchivedCompanyFactory()
+        company_list_item = CompanyListItemFactory(list__adviser=self.user, company=company)
+
+        url = reverse(
+            'api-v4:company-list:list-item',
+            kwargs={
+                'company_list_pk': company_list_item.list_id,
+                'company_pk': company.pk,
+            },
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+        assert not CompanyListItem.objects.filter(
+            list_id=company_list_item.list_id,
+            list__adviser=self.user,
+            company=company,
+        ).exists()
+
+    def test_that_actual_company_is_not_deleted(self):
+        """Test that a company is not removed from database after removing from user's list."""
+        company = CompanyFactory()
+        company_list_item = CompanyListItemFactory(list__adviser=self.user, company=company)
+
+        url = reverse(
+            'api-v4:company-list:list-item',
+            kwargs={
+                'company_list_pk': company_list_item.list_id,
+                'company_pk': company.pk,
+            },
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+        assert not CompanyListItem.objects.filter(
+            list_id=company_list_item.list_id,
+            list__adviser=self.user,
+            company=company,
+        ).exists()
+        assert Company.objects.filter(pk=company.pk).exists()
+
+    def test_with_multiple_lists(self):
+        """Test that deleting company from one list will not delete it from the other lists."""
+        company = CompanyFactory()
+        company_list_items = CompanyListItemFactory.create_batch(
+            5,
+            list__adviser=self.user,
+            company=company,
+        )
+
+        # company exists on 5 user's lists
+        assert CompanyListItem.objects.filter(
+            list__adviser=self.user,
+            company=company,
+        ).count() == 5
+
+        url = reverse(
+            'api-v4:company-list:list-item',
+            kwargs={
+                'company_list_pk': company_list_items[0].list_id,
+                'company_pk': company.pk,
+            },
+        )
+
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+        assert not CompanyListItem.objects.filter(
+            list_id=company_list_items[0].list_id,
+            list__adviser=self.user,
+            company=company,
+        ).exists()
+
+        # The company exists on 4 other lists
+        assert CompanyListItem.objects.filter(
+            list__adviser=self.user,
+            company=company,
+        ).count() == 4
 
 
 def _get_queryset_for_list_adviser_and_company(company_list, adviser, company):
