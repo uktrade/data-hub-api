@@ -94,6 +94,26 @@ class CompanyListItemAPIView(APIView):
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    def delete(self, request, company_list_pk, company_pk=None, format=None):
+        """
+        Delete a CompanyListItem for the selected list of authenticated user and
+        specified company if it exists.
+        """
+        company = get_object_or_404(Company, pk=company_pk)
+
+        to_delete_qs = self.queryset.filter(
+            list_id=company_list_pk,
+            list__adviser_id=request.user.pk,
+            company=company,
+        )
+
+        if not to_delete_qs.exists():
+            raise Http404
+
+        to_delete_qs.delete()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
     def _get_company_list(self, request, company_list_pk):
         obj = get_object_or_404(
             CompanyList,
