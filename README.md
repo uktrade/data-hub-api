@@ -260,6 +260,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `DIT_EMAIL_INGEST_WHITELIST` | No | A list of emails that email ingestion is allowed to ingest emails from. |
+| `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |

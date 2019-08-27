@@ -133,6 +133,12 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             ]),
             False,
         ),
+        # Blacklisted email
+        (
+            'blacklisted@trade.gov.uk',
+            None,
+            False,
+        ),
     ),
 )
 def test_email_sent_by_dit(email, authentication_results, expected_result):
