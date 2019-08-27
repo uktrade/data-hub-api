@@ -150,6 +150,13 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dmarc=pass spf=pass'
             ),
         ),
+        # Blacklisted email
+        (
+            'blacklisted@trade.gov.uk',
+            None,
+            False,
+            None,
+        ),
     ),
 )
 def test_email_sent_by_dit(
