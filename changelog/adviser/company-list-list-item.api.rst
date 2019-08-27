@@ -1,0 +1,38 @@
+The following endpoint was added:
+
+``GET /v4/company-list/<company list ID>/item``
+
+It lists all the companies on the authenticated user's selected list, with responses in the following format::
+
+    {
+        "count": <int>,
+        "previous": <url>,
+        "next": <url>,
+        "results": [
+            {
+                "company": {
+                    "id": <string>,
+                    "archived": <boolean>,
+                    "name": <string>,
+                    "trading_names": [<string>, <string>, ...]
+                },
+                "created_on": <ISO timestamp>,
+                "latest_interaction": {
+                    "id": <string>,
+                    "created_on": <ISO timestamp>,
+                    "date": <ISO date>,
+                    "subject": <string>
+                }
+            },
+            ...
+        ]
+    }
+
+
+``latest_interaction`` may be ``null`` if the company has no interactions.
+
+Results are sorted by ``latest_interaction.date`` in reverse chronological order, with ``null`` values last.
+
+The endpoint has pagination in line with other endpoints; to retrieve all results pass a large value for the ``limit`` query parameter (e.g. ``?limit=1000``).
+
+If selected list does not exist, the endpoint will return 404 status code.

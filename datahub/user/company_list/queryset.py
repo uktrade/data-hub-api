@@ -8,7 +8,7 @@ from datahub.user.company_list.models import CompanyListItem
 
 def get_company_list_item_queryset():
     """
-    Returns an annotated query set used by LegacyCompanyListViewSet.
+    Returns an annotated query set used by CompanyListItemViewSet and LegacyCompanyListViewSet.
 
     The annotations are supported by an index on the Interaction model.
 
