@@ -568,6 +568,8 @@ MAILBOXES = {
     },
 }
 
+DIT_EMAIL_INGEST_BLACKLIST = [email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])]
+
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [
     environ_name

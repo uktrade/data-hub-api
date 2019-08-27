@@ -70,6 +70,9 @@ def was_email_sent_by_dit(message):
     except IndexError:
         return False
 
+    if from_email.lower() in settings.DIT_EMAIL_INGEST_BLACKLIST:
+        return False
+
     try:
         domain_auth_methods = settings.DIT_EMAIL_DOMAINS[from_domain]
     except KeyError:

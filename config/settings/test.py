@@ -110,6 +110,10 @@ DOCUMENT_BUCKETS = {
     }
 }
 
+DIT_EMAIL_INGEST_BLACKLIST = [
+    'blacklisted@trade.gov.uk',
+]
+
 DIT_EMAIL_DOMAINS = {
     'trade.gov.uk': [['exempt']],
     'digital.trade.gov.uk': [['spf', 'pass'], ['dmarc', 'bestguesspass'], ['dkim', 'pass']],
