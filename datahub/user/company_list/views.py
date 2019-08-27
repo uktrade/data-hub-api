@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Count
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
@@ -22,6 +23,7 @@ from datahub.user.company_list.models import (
     CompanyListItem,
     CompanyListItemPermissionCode,
 )
+from datahub.user.company_list.queryset import get_company_list_item_queryset
 from datahub.user.company_list.serializers import CompanyListItemSerializer
 from datahub.user.company_list.serializers import CompanyListSerializer
 
@@ -74,11 +76,54 @@ class CompanyListItemAPIPermissions(DjangoModelPermissions):
     """DRF permissions class for the company list item view."""
 
     perms_map = {
+        'GET': [
+            f'company.{CompanyPermission.view_company}',
+            f'company_list.{CompanyListItemPermissionCode.view_company_list_item}',
+        ],
         'PUT': [
             f'company.{CompanyPermission.view_company}',
             f'company_list.{CompanyListItemPermissionCode.add_company_list_item}',
         ],
     }
+
+
+class CompanyListItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a company list."""
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        CompanyListItemAPIPermissions,
+    )
+    serializer_class = CompanyListItemSerializer
+    filter_backends = (OrderingFilter,)
+    # Note that we want null to be treated as the oldest value when sorting by
+    # how long ago the interaction happened. This happens automatically when sorting by
+    # latest_interaction_time_ago (as opposed to sorting by latest_interaction_date in
+    # descending order)
+    ordering = (
+        'latest_interaction_time_ago',
+        '-latest_interaction_created_on',
+        'latest_interaction_id',
+    )
+    queryset = get_company_list_item_queryset()
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if user's company list specified in the URL path does not exist.
+        """
+        super().initial(request, *args, **kwargs)
+
+        if not CompanyList.objects.filter(
+            pk=self.kwargs['company_list_pk'],
+            adviser=self.request.user,
+        ).exists():
+            raise Http404()
+
+    def filter_queryset(self, queryset):
+        """Filter the query set to the items relating to the authenticated users."""
+        queryset = super().filter_queryset(queryset)
+        return queryset.filter(list__pk=self.kwargs['company_list_pk'])
 
 
 class CompanyListItemAPIView(APIView):
