@@ -218,6 +218,7 @@ class Company(ArchivableModel, BaseModel):
     failed_dnb_investigation = models.BooleanField(
         null=True,
         blank=True,
+        default=False,
         help_text='Whether this company failed DNB investigation.',
     )
 
