@@ -39,8 +39,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=gmail.com',
                 'compauth=pass (reason=109)',
             ]),
-            # TODO: Will need review as we adjust domain verification during trial
-            False,
+            True,
         ),
         # Invalid authentication results - dkim
         (
