@@ -28,7 +28,7 @@ class Mailbox:
     them using associated processing classes.
 
     When an email is retrieved from the inbox successfully, it is marked as
-    SEEN on the upstream IMAP inbox.  This is the mechanism we use to ensure
+    DELETED on the upstream IMAP inbox.  This is the mechanism we use to ensure
     that emails are only ever processed once.
 
     The first processor to successfully consume and process the message will stop
@@ -174,7 +174,7 @@ class Mailbox:
         """
         Generator method which gets new messages from the email inbox. After a
         message has been yielded (or an error has been logged while parsing it),
-        it is flagged as SEEN on the inbox so that it will not be ingested again later.
+        it is flagged as DELETED on the inbox so that it will not be ingested again later.
         We only consider messages that have not been seen for ingestion.
 
         :yields: A mailparser.Message object for each parsed message.
@@ -209,8 +209,10 @@ class Mailbox:
                 if message:
                     yield message
 
-                # Mark the email as read in the inbox
-                connection.uid('store', uid, '+FLAGS', '(\\SEEN)')
+                # Mark the email for deletion in the inbox
+                connection.uid('store', uid, '+FLAGS', '(\\Deleted)')
+            # Delete the emails which were marked for deletion
+            connection.expunge()
 
     def process_new_mail(self):
         """
