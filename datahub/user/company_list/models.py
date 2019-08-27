@@ -40,12 +40,6 @@ class CompanyList(BaseModel):
                 condition=Q(is_legacy_default=True),
                 name='unique_adviser_if_legacy_default',
             ),
-            # While CompanyListItem.list is still being populated for existing objects,
-            # is_legacy_default=False is not allowed
-            models.CheckConstraint(
-                check=Q(is_legacy_default=True),
-                name='disallow_is_legacy_default_false',
-            ),
         ]
 
 
