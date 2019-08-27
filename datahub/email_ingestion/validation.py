@@ -1,22 +1,25 @@
+import re
+
+from celery.utils.log import get_task_logger
 from django.conf import settings
 
-DEFAULT_AUTH_METHODS = (('spf', 'pass'), ('dmarc', 'bestguesspass'), ('compauth', 'pass'))
+logger = get_task_logger(__name__)
 
 
-def _verify_authentication(message, auth_methods=None):
+ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')
+
+
+def _verify_authentication(message, auth_methods):
     """
     Verify the Authentication-Results header of a MailParser object.
 
     :param message: mailparse.MailParser object - the message to check
-    :param auth_methods: Optional - An iterable of pairs of email authentication methods
+    :param auth_methods: An iterable of pairs of email authentication methods
         to and their minimum results to check.
-        Defaults to (('dkim', 'pass'), ('spf', 'pass'), ('dmarc', 'pass')).
 
     :returns: A boolean for whether or not the Authentication-Results header
         was verified.
     """
-    if not auth_methods:
-        auth_methods = [*DEFAULT_AUTH_METHODS]
     header_contents = ' '.join(message.authentication_results.splitlines())
     auth_results = {auth_method: False for auth_method, _ in auth_methods}
 
@@ -37,6 +40,22 @@ def _verify_authentication(message, auth_methods=None):
     return all_auth_pass
 
 
+def _log_unknown_domain(from_domain, message):
+    log_auth_methods = r'|'.join(re.escape(auth_method) for auth_method in ALL_AUTH_METHODS)
+    auth_header_contents = ' '.join(message.authentication_results.splitlines())
+    authentication_results = re.findall(
+        fr'((?:{log_auth_methods})=[a-z0-9]+)',
+        auth_header_contents,
+        flags=re.IGNORECASE,
+    )
+    authentication_results.sort()
+    authentication_results_str = ' '.join(authentication_results)
+    logger.warning(
+        f'Domain "{from_domain}" not present in DIT_EMAIL_DOMAINS setting. '
+        f'This email had the following authentication results: {authentication_results_str}',
+    )
+
+
 def was_email_sent_by_dit(message):
     """
     Checks whether an email message was sent by a valid DIT address.
@@ -54,11 +73,8 @@ def was_email_sent_by_dit(message):
     try:
         domain_auth_methods = settings.DIT_EMAIL_DOMAINS[from_domain]
     except KeyError:
-        # TODO: Once we are past the pilot period this should return False.
-        #  For now, we are relaxed about the authentication methods
-        #  and allowed incoming DIT domains as this information is very hard to
-        #  source exhaustively.
-        domain_auth_methods = [*DEFAULT_AUTH_METHODS]
+        _log_unknown_domain(from_domain, message)
+        return False
 
     from_domain_is_authentication_exempt = domain_auth_methods == [['exempt']]
     if from_domain_is_authentication_exempt:
