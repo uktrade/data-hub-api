@@ -84,6 +84,10 @@ class CompanyListItemAPIPermissions(DjangoModelPermissions):
             f'company.{CompanyPermission.view_company}',
             f'company_list.{CompanyListItemPermissionCode.add_company_list_item}',
         ],
+        'DELETE': [
+            f'company.{CompanyPermission.view_company}',
+            f'company_list.{CompanyListItemPermissionCode.delete_company_list_item}',
+        ],
     }
 
 
@@ -164,6 +168,19 @@ class CompanyListItemAPIView(APIView):
                 'modified_by': adviser,
             },
         )
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @method_decorator(transaction.non_atomic_requests)
+    def delete(self, request, company_list_pk, company_pk=None, format=None):
+        """
+        Delete a CompanyListItem for the selected list of authenticated user and
+        specified company if it exists.
+        """
+        company_list = get_object_or_404(CompanyList, pk=company_list_pk, adviser=request.user)
+        company = get_object_or_404(Company, pk=company_pk)
+
+        self.queryset.filter(list=company_list, company=company).delete()
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
