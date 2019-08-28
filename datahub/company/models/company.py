@@ -215,6 +215,11 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+    pending_dnb_investigation = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Whether this company is to be investigated by DNB.',
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
