@@ -104,3 +104,45 @@ class TestUnarchiveCompany(APITestMixin):
                     'record for the following reason: Duplicate record.',
                 ],
         }
+
+    def test_cannot_unarchive_transferred_company(self):
+        """Test that a transferred company cannot be unarchived."""
+        transfer_reason = 'duplicate'
+        transfer_company = CompanyFactory()
+        company = CompanyFactory(
+            archived=True,
+            transferred_to=transfer_company,
+            transfer_reason=transfer_reason,
+        )
+        url = reverse('api-v4:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            api_settings.NON_FIELD_ERRORS_KEY:
+                [
+                    f'This record is no longer in use and its data has been transferred to another'
+                    f' record for the following reason: Duplicate record.',
+                ],
+        }
+
+    def test_cannot_unarchive_company_with_restricted_reason(self):
+        """
+        Test that a company archived with a restricted reason cannot be unarchived.
+        """
+        archived_reason = 'Not a valid company'
+        company = CompanyFactory(
+            archived=True,
+            archived_reason=archived_reason,
+        )
+        url = reverse('api-v4:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            api_settings.NON_FIELD_ERRORS_KEY:
+                [
+                    f'Records that have been archived with the reason "{archived_reason}" '
+                    'cannot be unarchived.',
+                ],
+        }

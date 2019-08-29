@@ -23,7 +23,10 @@ from datahub.company.serializers import (
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
 )
-from datahub.company.validators import NotATransferredCompanyValidator
+from datahub.company.validators import (
+    ArchiveReasonRestrictedValidator,
+    NotATransferredCompanyValidator,
+)
 from datahub.core.audit import AuditViewSet
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
@@ -41,7 +44,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
 
     serializer_class = CompanySerializer
     required_scopes = (Scope.internal_front_end,)
-    unarchive_validators = (NotATransferredCompanyValidator(),)
+    unarchive_validators = (ArchiveReasonRestrictedValidator(), NotATransferredCompanyValidator())
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id',)
     ordering_fields = ('name', 'created_on')
