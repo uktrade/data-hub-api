@@ -2,7 +2,19 @@ from rest_framework import serializers
 
 from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
-from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.models import CompanyList, CompanyListItem
+
+
+class CompanyListSerializer(serializers.ModelSerializer):
+    """Serialiser for a company list."""
+
+    class Meta:
+        model = CompanyList
+        fields = (
+            'id',
+            'name',
+            'created_on',
+        )
 
 
 class CompanyListItemSerializer(serializers.ModelSerializer):
