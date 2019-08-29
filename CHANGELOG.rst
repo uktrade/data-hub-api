@@ -1,3 +1,43 @@
+Data Hub API 14.5.0 (2019-08-29)
+================================
+
+
+
+Internal changes
+----------------
+
+- **Advisers** An internal constraint preventing multiple company lists per user was removed now that the existing company list functionality is aware of multiple lists.
+
+API
+---
+
+- **Advisers** The following endpoint was added:
+
+  - ``POST /v4/company-list``: Create a company list for the authenticated user.
+
+    The request body must be in following format::
+
+      {
+        "name": "string"
+      }
+- **Advisers** The following endpoint was added:
+
+  - ``GET /v4/company-list``: Lists the authenticated user's company lists.
+
+    This is a paginated endpoint. Items are sorted by name, and are in the following format::
+
+      {
+        "id": "string",
+        "name": "string",
+        "created_on": "ISO timestamp"
+      }
+
+Database schema
+---------------
+
+- **Companies** The ``company_company`` table now has a boolean field called ``pending_dnb_investigation``. This is to record whether a company is under DNB investigation.
+
+
 Data Hub API 14.4.0 (2019-08-23)
 ================================
 
