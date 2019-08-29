@@ -109,6 +109,9 @@ DIT_EMAIL_INGEST_WHITELIST = [
     'adviser3@digital.trade.gov.uk',
     'correspondence3@digital.trade.gov.uk',
     'unknown@trade.gov.uk',
+    # This needs to be on the whitelist so that the blacklist logic can trigger.
+    # The whitelist will eventually be removed
+    'blacklisted@trade.gov.uk',
 ]
 DIT_EMAIL_INGEST_BLACKLIST = [
     'blacklisted@trade.gov.uk',
