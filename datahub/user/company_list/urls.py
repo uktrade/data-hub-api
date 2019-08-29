@@ -18,6 +18,15 @@ urlpatterns = [
         name='list-collection',
     ),
     path(
+        'company-list/<uuid:pk>',
+        CompanyListViewSet.as_view(
+            {
+                'patch': 'partial_update',
+            },
+        ),
+        name='list-detail',
+    ),
+    path(
         'user/company-list',
         LegacyCompanyListViewSet.as_view(
             {
