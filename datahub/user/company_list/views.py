@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 
 from datahub.core.viewsets import CoreViewSet
@@ -16,7 +17,8 @@ class CompanyListViewSet(CoreViewSet):
     required_scopes = (Scope.internal_front_end,)
     queryset = CompanyList.objects.all()
     serializer_class = CompanyListSerializer
-    filter_backends = (OrderingFilter,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_fields = ('items__company_id',)
     ordering = ('name', 'created_on', 'pk')
 
     def get_queryset(self):
