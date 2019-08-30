@@ -49,7 +49,7 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.user.company_list.tests.factories import LegacyCompanyListItemFactory
+from datahub.user.company_list.test.factories import LegacyCompanyListItemFactory
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
