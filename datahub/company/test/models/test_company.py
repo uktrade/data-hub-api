@@ -1,4 +1,5 @@
 import pytest
+from django.db.utils import IntegrityError
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -29,6 +30,14 @@ class TestPendingDNBInvestigation(APITestMixin):
         assert not Company.objects.get(
             id=company.id,
         ).pending_dnb_investigation
+
+    def test_model_null(self):
+        """
+        Check if trying to create a new company that has `pending_dnb_investigation`
+        set to None raises an error.
+        """
+        with pytest.raises(IntegrityError):
+            CompanyFactory(pending_dnb_investigation=None)
 
     @pytest.mark.parametrize(
         'company_data',
