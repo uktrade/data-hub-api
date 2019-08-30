@@ -7,9 +7,10 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.user.company_list.models import CompanyList
-from datahub.user.company_list.tests.factories import CompanyListFactory
+from datahub.user.company_list.tests.factories import CompanyListFactory, CompanyListItemFactory
 
 
 list_collection_url = reverse('api-v4:company-list:list-collection')
@@ -92,6 +93,84 @@ class TestListCompanyListsView(APITestMixin):
         response_data = response.json()
         actual_list_names = [result['name'] for result in response_data['results']]
         assert actual_list_names == expected_list_names
+
+    def test_filter_by_invalid_company_id(self):
+        """
+        Test that an error is returned when trying to filter by a company ID that is not a
+        valid UUID.
+        """
+        response = self.api_client.get(
+            list_collection_url,
+            data={
+                'items__company_id': 'invalid_id',
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'items__company_id': ["'invalid_id' is not a valid UUID."],
+        }
+
+    def test_can_filter_by_valid_company_id(self):
+        """Test that a user's lists can be filtered to those containing a particular company."""
+        company_to_filter_by = CompanyFactory()
+
+        # Create some lists containing `company_to_filter_by`
+        expected_lists = CompanyListFactory.create_batch(3, adviser=self.user)
+        CompanyListItemFactory.create_batch(
+            len(expected_lists),
+            list=factory.Iterator(expected_lists),
+            company=company_to_filter_by,
+        )
+
+        # Create some lists without `company_to_filter_by` that should not be returned
+        CompanyListFactory.create_batch(3, adviser=self.user)
+
+        response = self.api_client.get(
+            list_collection_url,
+            data={
+                'items__company_id': company_to_filter_by.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        assert len(results) == len(expected_lists)
+
+        expected_list_ids = {str(list_.pk) for list_ in expected_lists}
+        actual_list_ids = {result['id'] for result in results}
+        assert actual_list_ids == expected_list_ids
+
+    def test_returns_no_lists_if_filtered_by_company_not_on_a_list(self):
+        """
+        Test that no lists are returned when filtering lists by a company not on any of the
+        authenticated user's lists.
+        """
+        # Create some lists and list items for the user
+        CompanyListItemFactory.create_batch(5, list__adviser=self.user)
+
+        # Filter by a company not on a list
+        response = self.api_client.get(
+            list_collection_url,
+            data={
+                'items__company_id': CompanyFactory().pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['results'] == []
+
+    def test_filtering_by_company_id_doesnt_return_other_users_lists(self):
+        """Test that filtering by company ID doesn't return other users' lists."""
+        # Create a list item belonging to another user
+        list_item = CompanyListItemFactory()
+
+        response = self.api_client.get(
+            list_collection_url,
+            data={
+                'items__company_id': list_item.company.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['results'] == []
 
 
 class TestAddCompanyListView(APITestMixin):
