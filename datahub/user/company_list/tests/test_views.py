@@ -7,9 +7,10 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.user.company_list.models import CompanyList
+from datahub.user.company_list.models import CompanyList, CompanyListItem
 from datahub.user.company_list.tests.factories import CompanyListFactory, CompanyListItemFactory
 
 
@@ -367,4 +368,79 @@ class TestUpdateCompanyListView(APITestMixin):
             },
         )
 
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestDeleteCompanyListView(APITestMixin):
+    """Tests for deleting a company list."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        url = _get_list_detail_url(uuid4())
+
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['delete_companylist'], status.HTTP_204_NO_CONTENT),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        company_list = CompanyListFactory(adviser=user)
+        url = _get_list_detail_url(company_list.pk)
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
+        assert response.status_code == expected_status
+
+    def test_can_delete_a_list(self):
+        """Test that a list (including its items) can be deleted."""
+        company_list = CompanyListFactory(adviser=self.user)
+        list_item = CompanyListItemFactory(list=company_list)
+
+        url = _get_list_detail_url(company_list.pk)
+
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+
+        with pytest.raises(CompanyListItem.DoesNotExist):
+            list_item.refresh_from_db()
+
+        # The company should not be deleted
+        assert Company.objects.filter(pk=list_item.company.pk).exists()
+
+    def test_other_lists_are_not_affected(self):
+        """Test that other lists are not affected when a list is deleted."""
+        list_to_delete = CompanyListFactory(adviser=self.user)
+        list_item = CompanyListItemFactory(list=list_to_delete)
+
+        other_list = CompanyListFactory(adviser=self.user)
+        other_list_item = CompanyListItemFactory(company=list_item.company)
+
+        url = _get_list_detail_url(list_to_delete.pk)
+
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.content == b''
+
+        try:
+            other_list.refresh_from_db()
+            other_list_item.refresh_from_db()
+        except (CompanyList.DoesNotExist, CompanyListItem.DoesNotExist):
+            pytest.fail('Other lists should not be affected.')
+
+    def test_cannot_delete_another_users_list(self):
+        """Test that another user's list can't be deleted."""
+        company_list = CompanyListFactory()
+        url = _get_list_detail_url(company_list.pk)
+
+        response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
