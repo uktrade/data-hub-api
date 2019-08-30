@@ -21,6 +21,7 @@ urlpatterns = [
         'company-list/<uuid:pk>',
         CompanyListViewSet.as_view(
             {
+                'delete': 'destroy',
                 'patch': 'partial_update',
             },
         ),
