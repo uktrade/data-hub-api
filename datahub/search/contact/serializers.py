@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from rest_framework import serializers
 
 from datahub.search.serializers import (
@@ -5,6 +7,9 @@ from datahub.search.serializers import (
     SingleOrListField,
     StringUUIDField,
 )
+
+
+logger = getLogger(__name__)
 
 
 class SearchContactQuerySerializer(EntitySearchQuerySerializer):
@@ -21,30 +26,48 @@ class SearchContactQuerySerializer(EntitySearchQuerySerializer):
     created_by = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_exists = serializers.BooleanField(required=False)
 
-    # TODO: Deprecate unused sort by values, and add logging to double-check that they aren't
-    #  being used
-    SORT_BY_FIELDS = (
-        'address_country.name',
+    # Deprecated sorting options
+    # TODO: Remove following deprecation period.
+    deprecated_sortby_fields = {
+        'accepts_dit_email_marketing',
         'address_county',
         'address_same_as_company',
         'address_town',
         'adviser.name',
         'archived',
-        'archived_on',
         'archived_by.name',
-        'company.name',
-        'accepts_dit_email_marketing',
-        'created_on',
+        'archived_on',
+        'company_sector.name',
         'email',
         'first_name',
         'id',
         'job_title',
-        'last_name',
-        'modified_on',
         'name',
         'primary',
         'telephone_countrycode',
         'telephone_number',
         'title.name',
-        'company_sector.name',
+    }
+
+    SORT_BY_FIELDS = (
+        'address_country.name',
+        'company.name',
+        'created_on',
+        'last_name',
+        'modified_on',
+        *deprecated_sortby_fields,
     )
+
+    def validate(self, data):
+        """
+        Log all uses of deprecated sorting options as an extra check to make sure that they
+        aren't being used before we get rid of them.
+
+        TODO: Remove following deprecation period.
+        """
+        sortby = data.get('sortby')
+        if sortby and sortby.field in self.deprecated_sortby_fields:
+            logger.error(
+                f'The following deprecated contact search sortby field was used: {sortby.field}',
+            )
+        return super().validate(data)
