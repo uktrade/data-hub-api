@@ -110,7 +110,7 @@ pytz==2019.2              # via celery, django, icalendar
 pyyaml==5.1.2
 redis==3.3.8
 requests-futures==1.0.0   # via piprot
-requests-mock==1.6.0
+requests-mock==1.7.0
 requests==2.22.0
 requests_toolbelt==0.9.1
 s3transfer==0.2.1         # via boto3
