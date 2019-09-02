@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from rest_framework.mixins import DestroyModelMixin
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
@@ -7,11 +8,11 @@ from datahub.user.company_list.models import CompanyList
 from datahub.user.company_list.serializers import CompanyListSerializer
 
 
-class CompanyListViewSet(CoreViewSet):
+class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
     """
     Views for managing the authenticated user's company lists.
 
-    This covers creating, updating (i.e. renaming) and listing lists.
+    This covers creating, updating (i.e. renaming), deleting and listing lists.
     """
 
     required_scopes = (Scope.internal_front_end,)
