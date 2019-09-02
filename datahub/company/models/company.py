@@ -132,6 +132,19 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         related_name='companies_with_future_interest',
     )
+    imputed_future_interest_countries = models.ManyToManyField(
+        metadata_models.Country,
+        blank=True,
+        related_name='companies_with_imputed_future_interest',
+        help_text='These countries of interest come from external data sources',
+    )
+    disregarded_future_interest_countries = models.ManyToManyField(
+        metadata_models.Country,
+        blank=True,
+        related_name='companies_with_disregarded_future_interest',
+        help_text=('These countries of interest are to be disregarded even if '
+            'present in imputed_future_interest_countries'),
+    )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey(

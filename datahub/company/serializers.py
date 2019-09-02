@@ -273,6 +273,12 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     future_interest_countries = NestedRelatedField(
         meta_models.Country, many=True, required=False,
     )
+    imputed_future_interest_countries = NestedRelatedField(
+        meta_models.Country, many=True, required=False,
+    )
+    disregarded_future_interest_countries = NestedRelatedField(
+        meta_models.Country, many=True, required=False,
+    )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
     )
@@ -428,6 +434,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_number_of_employees_estimated',
             'export_to_countries',
             'future_interest_countries',
+            'imputed_future_interest_countries',
+            'disregarded_future_interest_countries',
             'headquarter_type',
             'one_list_group_global_account_manager',
             'global_headquarters',
@@ -540,6 +548,8 @@ class PublicCompanySerializer(CompanySerializer):
             'export_experience_category',
             'export_to_countries',
             'future_interest_countries',
+            'imputed_future_interest_countries',
+            'disregarded_future_interest_countries',
             'global_headquarters',
             'headquarter_type',
             'id',

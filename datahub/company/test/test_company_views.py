@@ -279,6 +279,8 @@ class TestGetCompany(APITestMixin):
             },
             'export_to_countries': [],
             'future_interest_countries': [],
+            'imputed_future_interest_countries': [],
+            'disregarded_future_interest_countries': [],
             'headquarter_type': company.headquarter_type,
             'sector': {
                 'id': str(company.sector.id),

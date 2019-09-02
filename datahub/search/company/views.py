@@ -108,6 +108,8 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
         'export_experience_category',
         'export_to_countries',
         'future_interest_countries',
+        'imputed_future_interest_countries',
+        'disregarded_future_interest_countries',
         'global_headquarters',
         'headquarter_type',
         'modified_on',

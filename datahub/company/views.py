@@ -72,6 +72,8 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
         'export_to_countries',
         'future_interest_countries',
+        'imputed_future_interest_countries',
+        'disregarded_future_interest_countries',
         'sector__parent__parent',
         'sector__parent',
         'sector',
