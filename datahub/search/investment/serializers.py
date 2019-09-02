@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateTimeField
@@ -7,6 +9,9 @@ from datahub.search.serializers import (
     SingleOrListField,
     StringUUIDField,
 )
+
+
+logger = getLogger(__name__)
 
 
 class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
@@ -37,9 +42,8 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     gross_value_added_start = serializers.IntegerField(required=False, min_value=0)
     gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
 
-    # TODO: Deprecate unused sort by values, and add logging to double-check that they aren't
-    #  being used
-    SORT_BY_FIELDS = (
+    # TODO: Remove these following deprecation period.
+    deprecated_sortby_fields = {
         'actual_land_date',
         'approved_commitment_to_invest',
         'approved_fdi',
@@ -54,8 +58,6 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'client_cannot_provide_total_investment',
         'client_contacts.name',
         'client_relationship_manager.name',
-        'created_on',
-        'estimated_land_date',
         'export_revenue',
         'fdi_type.name',
         'foreign_equity_investment',
@@ -66,7 +68,6 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'investor_company.name',
         'likelihood_to_land.name',
         'modified_on',
-        'name',
         'new_tech_to_uk',
         'non_fdi_r_and_d_budget',
         'number_new_jobs',
@@ -80,7 +81,29 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'referral_source_activity_website.name',
         'sector.name',
         'site_decided',
-        'stage.name',
         'total_investment',
         'uk_company.name',
+    }
+
+    SORT_BY_FIELDS = (
+        'created_on',
+        'estimated_land_date',
+        'name',
+        'stage.name',
+        *deprecated_sortby_fields,
     )
+
+    def validate(self, data):
+        """
+        Log all uses of deprecated sorting options as an extra check to make sure that they
+        aren't being used before we get rid of them.
+
+        TODO: Remove following deprecation period.
+        """
+        sortby = data.get('sortby')
+        if sortby and sortby.field in self.deprecated_sortby_fields:
+            logger.error(
+                f'The following deprecated investment project search sortby field was used:'
+                f' {sortby.field}',
+            )
+        return super().validate(data)
