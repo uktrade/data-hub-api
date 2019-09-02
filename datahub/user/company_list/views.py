@@ -1,7 +1,9 @@
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.mixins import DestroyModelMixin
 
+from datahub.core.query_utils import get_aggregate_subquery
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
 from datahub.user.company_list.models import CompanyList
@@ -16,7 +18,9 @@ class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
     """
 
     required_scopes = (Scope.internal_front_end,)
-    queryset = CompanyList.objects.all()
+    queryset = CompanyList.objects.annotate(
+        item_count=get_aggregate_subquery(CompanyList, Count('items')),
+    )
     serializer_class = CompanyListSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('items__company_id',)
