@@ -73,9 +73,27 @@ class TestListCompanyListsView(APITestMixin):
         assert len(results) == 1
         assert results[0] == {
             'id': str(company_list.pk),
+            'item_count': 0,
             'name': company_list.name,
             'created_on': format_date_or_datetime(company_list.created_on),
         }
+
+    @pytest.mark.parametrize('num_items', (0, 5, 10))
+    def test_includes_accurate_item_count(self, num_items):
+        """Test that the correct item count is returned."""
+        company_list = CompanyListFactory(adviser=self.user)
+        CompanyListItemFactory.create_batch(num_items, list=company_list)
+
+        # Create some unrelated items – should not affect the count
+        CompanyListItemFactory.create_batch(7)
+
+        response = self.api_client.get(list_collection_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        result = next(result for result in results if result['id'] == str(company_list.pk))
+
+        assert result['item_count'] == num_items
 
     def test_lists_are_sorted_by_name(self):
         """Test that returned lists are sorted by name."""
@@ -348,6 +366,7 @@ class TestUpdateCompanyListView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': str(company_list.pk),
+            'item_count': 0,
             'name': new_name,
             'created_on': format_date_or_datetime(company_list.created_on),
         }
