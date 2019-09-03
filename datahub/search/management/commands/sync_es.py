@@ -13,6 +13,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         """Handle arguments."""
+        # TODO: This argument is actually the search app name, not the model name, and
+        #  the argument should therefore be renamed
         parser.add_argument(
             '--model',
             action='append',
