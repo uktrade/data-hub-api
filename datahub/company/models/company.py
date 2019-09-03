@@ -1,5 +1,6 @@
 """Company models."""
 import uuid
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField, JSONField
@@ -28,6 +29,9 @@ from datahub.metadata import models as metadata_models
 from datahub.metadata.models import BusinessType
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+logger = getLogger(__name__)
 
 
 class CompanyPermission(StrEnum):
@@ -143,7 +147,7 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         related_name='companies_with_disregarded_future_interest',
         help_text=('These countries of interest are to be disregarded even if '
-            'present in imputed_future_interest_countries'),
+                   'present in imputed_future_interest_countries'),
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -283,6 +287,70 @@ class Company(ArchivableModel, BaseModel):
 
         united_kingdom_id = uuid.UUID(constants.Country.united_kingdom.value.id)
         return self.address_country.id == united_kingdom_id
+
+    @property
+    def combined_future_interest_countries(self):
+        """
+        Presents a combined view of manually entered and externally sourced
+        future interest countries.
+        1. future_interest_countries contains manually entered list of countries
+        2. imputed_future_interest_countries comes from external sources and
+            is periodically refreshed.
+        3. disregarded_future_interest_countries are those countries in 2. which
+            a user has manually chosen to disregard.
+
+        The combined view we return is 1 + (2 - 3)
+        """
+        return sorted(list(
+            set(self.future_interest_countries.all())
+            | (
+                set(self.imputed_future_interest_countries.all())
+                - set(self.disregarded_future_interest_countries.all())
+            ),
+        ), key=lambda c: c.name)
+
+    @combined_future_interest_countries.setter
+    def combined_future_interest_countries(self, input_countries):
+        """
+        Setter for the combined view of the three M2M fields having to do with
+        future_interest_countries.
+        Will take a list of countries and decide how to modify
+        future_interest_countries and disregarded_future_interest_countries.
+        """
+        input_countries = set(input_countries)
+        combined = set(self.combined_future_interest_countries)
+
+        deleted = combined - input_countries
+        added = input_countries - combined
+        logger.info(
+            'Setting combined future interest countries to %s for company %s'
+            'which means we are removing countries %s and adding countries %s',
+            input_countries, self.id, deleted, added,
+        )
+
+        user = set(self.future_interest_countries.all())
+        imputed = set(self.imputed_future_interest_countries.all())
+        disregarded = set(self.disregarded_future_interest_countries.all())
+        # If we are removing a country that is user supplied, then we
+        # remove it from self.future_interest_countries (these are the manually
+        # entered countries).
+        # However, to remove a country which is in imputed_future_interest_countries,
+        # we have to add it to disregarded_future_interest_countries,
+        # because imputed will be refreshed periodically by external sources.
+        for dc in deleted:
+            if dc in user:
+                self.future_interest_countries.remove(dc)
+            if dc in imputed:
+                self.disregarded_future_interest_countries.add(dc)
+
+        # If we are adding a country, then in all cases we add it to
+        # self.future_interest_countries (these are the manually entered
+        # countries). If the country is also in disregarded_future_interest_countries,
+        # then we remove it from there.
+        for ac in added:
+            self.future_interest_countries.add(ac)
+            if ac in disregarded:
+                self.disregarded_future_interest_countries.remove(ac)
 
     @cached_property
     def companies_house_data(self):
