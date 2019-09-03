@@ -9,6 +9,7 @@ from datahub.company import views as company_views
 from datahub.company.urls import ch_company as ch_company_urls
 from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
+from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
 from datahub.dnb_match import urls as dnb_match_urls
 from datahub.event import urls as event_urls
@@ -73,4 +74,5 @@ v4_urls = [
     ),
     path('', include((activity_feed_urls, 'activity-feed'), namespace='activity-feed')),
     path('', include((company_list_urls, 'company-list'), namespace='company-list')),
+    path('dataset/', include((dataset_urls, 'dataset'), namespace='dataset')),
 ]
