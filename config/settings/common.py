@@ -459,16 +459,6 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     )
 }
 
-# DT07 reporting service (used for company timeline)
-DATA_SCIENCE_COMPANY_API_URL = env('DATA_SCIENCE_COMPANY_API_URL', default='')
-DATA_SCIENCE_COMPANY_API_ID = env('DATA_SCIENCE_COMPANY_API_ID', default='')
-DATA_SCIENCE_COMPANY_API_KEY = env('DATA_SCIENCE_COMPANY_API_KEY', default='')
-DATA_SCIENCE_COMPANY_API_TIMEOUT = 15  # seconds
-# The company timeline API doesn't sign responses at present
-DATA_SCIENCE_COMPANY_API_VERIFY_RESPONSES = env(
-    'DATA_SCIENCE_COMPANY_API_VERIFY_RESPONSES', default=True,
-)
-
 # OMIS
 
 # given to clients and generally available
