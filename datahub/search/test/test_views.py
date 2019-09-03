@@ -508,8 +508,8 @@ class TestFilteredSearch(APITestMixin):
 
     def test_search_sort_asc_with_null_values(self, setup_es, setup_data):
         """Tests placement of null values in sorted results when order is ascending."""
-        InvestmentProjectFactory(name='Earth 1', total_investment=1000)
-        InvestmentProjectFactory(name='Earth 2')
+        InvestmentProjectFactory(name='Earth 1', estimated_land_date=datetime.date(2010, 1, 1))
+        InvestmentProjectFactory(name='Earth 2', estimated_land_date=None)
 
         setup_es.indices.refresh()
 
@@ -520,7 +520,7 @@ class TestFilteredSearch(APITestMixin):
             url,
             data={
                 'original_query': term,
-                'sortby': 'total_investment:asc',
+                'sortby': 'estimated_land_date:asc',
             },
         )
 
@@ -528,16 +528,16 @@ class TestFilteredSearch(APITestMixin):
         assert response.data['count'] == 2
         assert [
             ('Earth 2', None),
-            ('Earth 1', 1000),
+            ('Earth 1', '2010-01-01'),
         ] == [
-            (investment['name'], investment['total_investment'])
+            (investment['name'], investment['estimated_land_date'])
             for investment in response.data['results']
         ]
 
     def test_search_sort_desc_with_null_values(self, setup_es, setup_data):
         """Tests placement of null values in sorted results when order is descending."""
-        InvestmentProjectFactory(name='Ether 1', total_investment=1000)
-        InvestmentProjectFactory(name='Ether 2')
+        InvestmentProjectFactory(name='Ether 1', estimated_land_date=datetime.date(2010, 1, 1))
+        InvestmentProjectFactory(name='Ether 2', estimated_land_date=None)
 
         setup_es.indices.refresh()
 
@@ -548,17 +548,17 @@ class TestFilteredSearch(APITestMixin):
             url,
             data={
                 'original_query': term,
-                'sortby': 'total_investment:desc',
+                'sortby': 'estimated_land_date:desc',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
         assert [
-            ('Ether 1', 1000),
+            ('Ether 1', '2010-01-01'),
             ('Ether 2', None),
         ] == [
-            (investment['name'], investment['total_investment'])
+            (investment['name'], investment['estimated_land_date'])
             for investment in response.data['results']
         ]
 

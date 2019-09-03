@@ -885,27 +885,6 @@ class TestSearch(APITestMixin):
             investment_project['stage']['name'] for investment_project in response.data['results']
         ]
 
-    def test_sort_by_deprecated_field_logs_error(self, setup_es, caplog):
-        """Test that sorting by a deprecated sorting option logs an error."""
-        caplog.set_level('ERROR')
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': '',
-                'sortby': 'average_salary.name',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        expected_message = (
-            'The following deprecated investment project search sortby field was used: '
-            'average_salary.name'
-        )
-        assert expected_message in caplog.text
-
 
 class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
@@ -1096,7 +1075,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         'request_sortby,orm_ordering',
         (
             ('created_on:desc', '-created_on'),
-            ('investor_company.name', 'investor_company__name'),
+            ('stage.name', 'stage__name'),
         ),
     )
     def test_export(self, setup_es, request_sortby, orm_ordering):
