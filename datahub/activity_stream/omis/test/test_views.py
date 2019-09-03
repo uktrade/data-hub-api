@@ -1,8 +1,8 @@
 import pytest
 from rest_framework import status
 
-from datahub.activity_stream.tests import hawk
-from datahub.activity_stream.tests.utils import get_url
+from datahub.activity_stream.test import hawk
+from datahub.activity_stream.test.utils import get_url
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.omis.order.test.factories import OrderFactory
 
