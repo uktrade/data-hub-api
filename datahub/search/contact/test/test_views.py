@@ -484,6 +484,26 @@ class TestSearch(APITestMixin):
             for contact in response.data['results']
         ]
 
+    def test_sort_by_deprecated_field_logs_error(self, setup_es, caplog):
+        """Test that sorting by a deprecated sorting option logs an error."""
+        caplog.set_level('ERROR')
+
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': '',
+                'sortby': 'company_sector.name:desc',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        expected_message = (
+            'The following deprecated contact search sortby field was used: company_sector.name'
+        )
+        assert expected_message in caplog.text
+
 
 class TestContactExportView(APITestMixin):
     """Tests the contact export view."""

@@ -216,8 +216,6 @@ class Company(ArchivableModel, BaseModel):
         related_name='+',
     )
     pending_dnb_investigation = models.BooleanField(
-        null=True,
-        blank=True,
         default=False,
         help_text='Whether this company is to be investigated by DNB.',
     )
