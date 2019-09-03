@@ -92,6 +92,7 @@ LOCAL_APPS = [
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.user_event_log',
     'datahub.activity_feed',
+    'datahub.dataset',
 
     # TODO: delete after the whole data cleansing piece of work is complete
     'datahub.dnb_match',
@@ -526,6 +527,12 @@ _add_hawk_credentials(
     'MARKET_ACCESS_ACCESS_KEY_ID',
     'MARKET_ACCESS_SECRET_ACCESS_KEY',
     HawkScope.public_company,
+)
+
+_add_hawk_credentials(
+    'DATA_FLOW_API_ACCESS_KEY_ID',
+    'DATA_FLOW_API_SECRET_ACCESS_KEY',
+    HawkScope.data_flow_api,
 )
 
 # To read data from Activity Stream
