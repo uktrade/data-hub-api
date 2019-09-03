@@ -1,1 +1,0 @@
-``GET /v4/company/<id>>/timeline``: This endpoint is deprecated and will be removed on or after 9 September 2019. Please use ``/v4/activity-feed`` instead.

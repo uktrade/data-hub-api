@@ -1,3 +1,97 @@
+Data Hub API 14.6.0 (2019-09-03)
+================================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** ``GET /v4/company/<id>>/timeline``: This endpoint is deprecated and will be removed on or after 9 September 2019. Please use ``/v4/activity-feed`` instead.
+- **Contacts** ``POST /v3/search/contact``, ``POST /v3/search/contact/export`` the following ``sortby`` values are deprecated and will be removed on or after 12 September 2019:
+
+  - ``accepts_dit_email_marketing``
+  - ``address_county``
+  - ``address_same_as_company``
+  - ``address_town``
+  - ``adviser.name``
+  - ``archived``
+  - ``archived_by.name``
+  - ``archived_on``
+  - ``company_sector.name``
+  - ``email``
+  - ``first_name``
+  - ``id``
+  - ``job_title``
+  - ``name``
+  - ``primary``
+  - ``telephone_countrycode``
+  - ``telephone_number``
+  - ``title.name``
+- **Investment** ``POST /v3/search/investment_project``, ``POST /v3/search/investment_project/export`` the following ``sortby`` values are deprecated and will be removed on or after 12 September 2019:
+
+  - ``actual_land_date``
+  - ``approved_commitment_to_invest``
+  - ``approved_fdi``
+  - ``approved_good_value``
+  - ``approved_high_value``
+  - ``approved_landed``
+  - ``approved_non_fdi``
+  - ``archived``
+  - ``archived_by.name``
+  - ``average_salary.name``
+  - ``business_activities.name``
+  - ``client_cannot_provide_total_investment``
+  - ``client_contacts.name``
+  - ``client_relationship_manager.name``
+  - ``export_revenue``
+  - ``fdi_type.name``
+  - ``foreign_equity_investment``
+  - ``government_assistance``
+  - ``id``
+  - ``intermediate_company.name``
+  - ``investment_type.name``
+  - ``investor_company.name``
+  - ``likelihood_to_land.name``
+  - ``modified_on``
+  - ``new_tech_to_uk``
+  - ``non_fdi_r_and_d_budget``
+  - ``number_new_jobs``
+  - ``project_assurance_adviser.name``
+  - ``project_code``
+  - ``project_manager.name``
+  - ``r_and_d_budget``
+  - ``referral_source_activity.name``
+  - ``referral_source_activity_event``
+  - ``referral_source_activity_marketing.name``
+  - ``referral_source_activity_website.name``
+  - ``sector.name``
+  - ``site_decided``
+  - ``total_investment``
+  - ``uk_company.name``
+
+API
+---
+
+- **Advisers** The following endpoint was added:
+
+  - ``DELETE /v4/company-list/<list ID>``: Delete a company list and all its items.
+- **Advisers** ``GET /v4/company-list``: The ``items__company_id`` query parameter can now be used to get the authenticated user's lists that contain a particular company.
+- **Advisers** The following endpoint was added:
+
+  - ``PATCH /v4/company-list/<list ID>``: Rename a company list.
+
+    The request body must be in following format::
+
+      {
+        "name": "string"
+      }
+
+Database schema
+---------------
+
+- **Companies** The ``pending_dnb_investigation`` field in the ``company_company`` table is now non-nullable.
+
+
 Data Hub API 14.5.0 (2019-08-29)
 ================================
 
