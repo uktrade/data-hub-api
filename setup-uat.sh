@@ -68,6 +68,6 @@ AccessToken.objects.create(
 python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
-python /app/manage.py sync_es
+python /app/manage.py sync_es --foreground
 python /app/manage.py collectstatic --noinput
 DEBUG=False gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0
