@@ -11,7 +11,7 @@ from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.user.company_list.models import CompanyList, CompanyListItem
-from datahub.user.company_list.tests.factories import CompanyListFactory, CompanyListItemFactory
+from datahub.user.company_list.test.factories import CompanyListFactory, CompanyListItemFactory
 
 
 list_collection_url = reverse('api-v4:company-list:list-collection')

@@ -2,8 +2,8 @@ import pytest
 from django.conf import settings
 from rest_framework import status
 
-from datahub.activity_stream.tests import hawk
-from datahub.activity_stream.tests.utils import get_url
+from datahub.activity_stream.test import hawk
+from datahub.activity_stream.test.utils import get_url
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
