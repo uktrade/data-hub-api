@@ -20,10 +20,11 @@ and should not contain any full stops. A good candidate would be your branch nam
 
 * ``feature``: new features or changes.
 * ``bugfix``: fixes a bug.
-* ``removal``: feature deprecation or removal. API related news should also have an equivalent .api entry.
-  Include upcoming changes when possible.
+* ``removal``: removal of deprecated feature. API related news should also have an equivalent .api entry.
+* ``deprecation``: feature deprecation. API related news should also have an equivalent .api entry. Include an
+  earliest date for the actual removal of the feature when possible, and details of any other relevant upcoming changes.
 * ``internal``: internal changes e.g. dependencies updated, test data updated etc.
-* ``api``: any changes to the API. Removal/deprecations should also have an equivalent .removal entry.
+* ``api``: any changes to the API. Removals and deprecations should also have an equivalent .removal or .deprecation entry.
   Include upcoming changes when possible.
 * ``db``: any changes to the database schema.
 
