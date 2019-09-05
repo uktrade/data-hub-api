@@ -17,11 +17,10 @@ from datahub.oauth.scopes import Scope
 from datahub.user.company_list.models import (
     CompanyList,
     CompanyListItem,
-    CompanyListItemPermissionCode,
 )
+from datahub.user.company_list.models import CompanyListItemPermissionCode
 from datahub.user.company_list.queryset import get_company_list_item_queryset
 from datahub.user.company_list.serializers import CompanyListItemSerializer
-
 
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
     "An archived company can't be added to a company list.",
