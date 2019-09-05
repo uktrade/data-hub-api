@@ -2,7 +2,7 @@ import pytest
 from django.db import IntegrityError
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.user.company_list.tests.factories import CompanyListFactory
+from datahub.user.company_list.test.factories import CompanyListFactory
 
 
 @pytest.mark.django_db

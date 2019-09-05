@@ -8,10 +8,14 @@ from datahub.user.company_list.models import CompanyList, CompanyListItem
 class CompanyListSerializer(serializers.ModelSerializer):
     """Serialiser for a company list."""
 
+    # This is an annotation on the query set
+    item_count = serializers.ReadOnlyField()
+
     class Meta:
         model = CompanyList
         fields = (
             'id',
+            'item_count',
             'name',
             'created_on',
         )

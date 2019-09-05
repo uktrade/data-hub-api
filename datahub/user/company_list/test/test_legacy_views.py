@@ -20,7 +20,7 @@ from datahub.user.company_list.legacy_views import (
     DEFAULT_LEGACY_LIST_NAME,
 )
 from datahub.user.company_list.models import CompanyList, CompanyListItem
-from datahub.user.company_list.tests.factories import (
+from datahub.user.company_list.test.factories import (
     CompanyListFactory,
     CompanyListItemFactory,
     LegacyCompanyListItemFactory,
