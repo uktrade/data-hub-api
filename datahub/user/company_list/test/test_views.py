@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import partial
 from random import sample
 from uuid import uuid4
 
@@ -12,8 +13,8 @@ from rest_framework.settings import api_settings
 
 from datahub.company.models import Company
 from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
-from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.core.test_utils import format_date_or_datetime
+from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyList
 from datahub.user.company_list.models import CompanyListItem
@@ -23,6 +24,13 @@ from datahub.user.company_list.views import (
 )
 
 list_collection_url = reverse('api-v4:company-list:list-collection')
+
+
+def company_with_interactions_factory(num_interactions):
+    """Factory for a company with interactions."""
+    company = CompanyFactory()
+    CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    return company
 
 
 def _get_list_detail_url(list_pk):
@@ -644,6 +652,187 @@ class TestCreateOrUpdateCompanyListItemAPIView(APITestMixin):
         ).exists()
 
 
+class TestCompanyListItemViewSet(APITestMixin):
+    """Tests for CompanyListItemViewSet."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned for an unauthenticated user."""
+        company_list = CompanyListFactory()
+
+        url = _get_list_item_collection_url(company_list.pk)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_returns_403_if_without_permissions(self, api_client):
+        """Test that a 403 is returned for a user with no permissions."""
+        user = create_test_user(dit_team=TeamFactory())
+        company_list = CompanyListFactory(adviser=user)
+
+        api_client = self.create_api_client(user=user)
+
+        url = _get_list_item_collection_url(company_list.pk)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_with_no_list_items(self):
+        """
+        Test that an empty list is returned if the user does not have any companies on the
+        selected list.
+        """
+        company_list = CompanyListFactory(adviser=self.user)
+
+        url = _get_list_item_collection_url(company_list.pk)
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    def test_with_list_that_does_not_exist(self):
+        """Test that 404 status is returned if selected list does not exist."""
+        url = _get_list_item_collection_url(uuid4())
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_with_list_that_does_not_belong_to_user(self):
+        """Test that 404 status is returned if selected list does not belong to user."""
+        company_list = CompanyListFactory()
+        url = _get_list_item_collection_url(company_list.pk)
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_with_only_items_on_other_users_lists(self):
+        """
+        Test that an empty list is returned if the user has no companies on their selected list,
+        but other users have companies on theirs.
+        """
+        CompanyListItemFactory.create_batch(5)
+
+        company_list = CompanyListFactory(adviser=self.user)
+
+        url = _get_list_item_collection_url(company_list.pk)
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == []
+
+    def test_with_multiple_user_lists(self):
+        """Test that user who owns multiple lists can list all their contents."""
+        lists = CompanyListFactory.create_batch(5, adviser=self.user)
+
+        company_list_companies = {}
+
+        # add multiple companies to user's lists
+        for company_list in lists:
+            companies = CompanyFactory.create_batch(5)
+            company_list_companies[company_list.pk] = companies
+
+            CompanyListItemFactory.create_batch(
+                len(companies),
+                list=company_list,
+                company=factory.Iterator(companies),
+            )
+
+        # check if contents of each user's list can be listed
+        for company_list in lists:
+            url = _get_list_item_collection_url(company_list.pk)
+            response = self.api_client.get(url)
+
+            assert response.status_code == status.HTTP_200_OK
+            response_data = response.json()
+
+            result_company_ids = {result['company']['id'] for result in response_data['results']}
+            assert result_company_ids == {
+                str(company.id) for company in company_list_companies[company_list.pk]
+            }
+
+    @pytest.mark.parametrize(
+        'company_factory',
+        (
+            CompanyFactory,
+            ArchivedCompanyFactory,
+            partial(company_with_interactions_factory, 1),
+            partial(company_with_interactions_factory, 10),
+        ),
+    )
+    def test_with_item(self, company_factory):
+        """Test serialisation of various companies."""
+        company = company_factory()
+        list_item = CompanyListItemFactory(list__adviser=self.user, company=company)
+
+        latest_interaction = company.interactions.order_by('-date', '-created_by', 'pk').first()
+
+        url = _get_list_item_collection_url(list_item.list.pk)
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['results'] == [
+            {
+                'company': {
+                    'id': str(company.pk),
+                    'archived': company.archived,
+                    'name': company.name,
+                    'trading_names': company.trading_names,
+                },
+                'created_on': format_date_or_datetime(list_item.created_on),
+                'latest_interaction': {
+                    'id': str(latest_interaction.pk),
+                    'created_on': format_date_or_datetime(latest_interaction.created_on),
+                    'date': format_date_or_datetime(latest_interaction.date.date()),
+                    'subject': latest_interaction.subject,
+                } if latest_interaction else None,
+            },
+        ]
+
+    def test_sorting(self):
+        """
+        Test that list items are sorted in reverse order of the date of the latest
+        interaction with the company.
+        Note that we want companies without any interactions to be sorted last.
+        """
+        # These dates are in the order we expect them to be returned
+        # `None` represents a company without any interactions
+        interaction_dates = [
+            datetime(2019, 10, 8, tzinfo=utc),
+            datetime(2016, 9, 7, tzinfo=utc),
+            datetime(2009, 5, 6, tzinfo=utc),
+            None,
+        ]
+        shuffled_dates = sample(interaction_dates, len(interaction_dates))
+        company_list = CompanyListFactory(adviser=self.user)
+        list_items = CompanyListItemFactory.create_batch(len(interaction_dates), list=company_list)
+
+        for interaction_date, list_item in zip(shuffled_dates, list_items):
+            if interaction_date:
+                CompanyInteractionFactory(date=interaction_date, company=list_item.company)
+
+        url = _get_list_item_collection_url(company_list.pk)
+
+        # Make sure future interactions are also sorted correctly
+        with freeze_time('2017-12-11 09:00:00'):
+            response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()['results']
+        assert len(results) == len(interaction_dates)
+
+        actual_interaction_dates = [
+            result['latest_interaction']['date'] if result['latest_interaction'] else None
+            for result in results
+        ]
+        expected_interaction_dates = [
+            format_date_or_datetime(date_.date()) if date_ else None
+            for date_ in interaction_dates
+        ]
+        assert actual_interaction_dates == expected_interaction_dates
+
+
 def _get_queryset_for_list_and_company(company_list, company):
     return CompanyListItem.objects.filter(list=company_list, company=company)
 
@@ -655,4 +844,11 @@ def _get_list_item_url(company_list_pk, company_pk):
             'company_list_pk': company_list_pk,
             'company_pk': company_pk,
         },
+    )
+
+
+def _get_list_item_collection_url(company_list_pk):
+    return reverse(
+        'api-v4:company-list:item-collection',
+        kwargs={'company_list_pk': company_list_pk},
     )
