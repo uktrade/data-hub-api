@@ -8,13 +8,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.models import CompanyPermission
-from datahub.company.serializers import DNBCompanySerializer, DUNSNumberSerializer
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.dnb_api.queryset import get_company_queryset
-from datahub.dnb_api.serializers import DNBMatchedCompanySerializer
+from datahub.dnb_api.serializers import (
+    DNBCompanySerializer,
+    DNBMatchedCompanySerializer,
+    DUNSNumberSerializer,
+)
 from datahub.dnb_api.utils import format_dnb_company, search_dnb
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
