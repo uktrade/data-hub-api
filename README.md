@@ -145,7 +145,7 @@ Dependencies:
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
 
-    ./manage.py sync_es
+    ./manage.py sync_es --foreground
     ```
 
 13. Create a superuser:
@@ -362,10 +362,16 @@ Create the Elasticsearch index (if it doesn't exist) and update the mapping:
 ./manage.py init_es
 ```
 
-Resync all Elasticsearch records:
+Resync all Elasticsearch records (using Celery):
 
 ```shell
 ./manage.py sync_es
+```
+
+Resync all Elasticsearch records synchronously (without Celery running):
+
+```shell
+./manage.py sync_es --foreground
 ```
 
 You can resync only specific models by using the `--model=` argument.
