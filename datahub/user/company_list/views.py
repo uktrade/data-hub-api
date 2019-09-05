@@ -36,7 +36,13 @@ class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
     """
     Views for managing the authenticated user's company lists.
 
-    This covers creating, updating (i.e. renaming), deleting and listing lists.
+    This covers:
+
+    - creating a list
+    - updating (i.e. renaming) a list
+    - deleting a list
+    - listing lists
+    - retrieving details of a single list
     """
 
     required_scopes = (Scope.internal_front_end,)
