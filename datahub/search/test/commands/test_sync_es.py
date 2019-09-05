@@ -18,64 +18,63 @@ def test_fails_if_index_doesnt_exist():
         management.call_command(sync_es.Command())
 
 
-@mock.patch('datahub.search.management.commands.sync_es.sync_es')
-@mock.patch('datahub.search.management.commands.sync_es.get_search_apps_by_name')
-@mock.patch(
-    'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True),
-)
-@pytest.mark.django_db
-def test_sync_es(get_search_apps_by_name_mock, sync_es_mock):
-    """Tests syncing app to Elasticsearch."""
-    management.call_command(sync_es.Command(), batch_size=1)
-
-    sync_es_mock.assert_called_once_with(
-        batch_size=1,
-        search_apps=get_search_apps_by_name_mock.return_value,
-    )
-
-
 @pytest.mark.parametrize(
     'search_model',
     (app.name for app in get_search_apps()),
 )
-@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch('datahub.search.management.commands.sync_es.sync_model')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
 )
-def test_sync_one_model(sync_app_mock, search_model):
+def test_sync_one_model(sync_model_mock, search_model):
     """
-    Test that --model can be used to specify what we weant to sync.
+    Test that --model can be used to specify what we want to sync.
     """
     management.call_command(sync_es.Command(), model=[search_model])
 
-    assert sync_app_mock.call_count == 1
+    assert sync_model_mock.apply_async.call_count == 1
 
 
-@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch('datahub.search.management.commands.sync_es.sync_model')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
 )
-def test_sync_all_models(sync_app_mock):
+def test_sync_all_models(sync_model_mock):
     """
     Test that if --model is not used, all the search apps are synced.
     """
     management.call_command(sync_es.Command())
 
-    assert sync_app_mock.call_count == len(get_search_apps())
+    assert sync_model_mock.apply_async.call_count == len(get_search_apps())
 
 
-@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch('datahub.search.management.commands.sync_es.sync_model')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
 )
-def test_sync_invalid_model(sync_app_mock):
+def test_sync_synchronously(sync_model_mock):
+    """
+    Test that --foreground can be used to run the command in a synchronous (blocking) fashion.
+    """
+    app = get_search_apps()[0]
+    management.call_command(sync_es.Command(), model=[app.name], foreground=True)
+
+    assert sync_model_mock.apply.call_count == 1
+    assert not sync_model_mock.apply_async.called
+
+
+@mock.patch('datahub.search.management.commands.sync_es.sync_model')
+@mock.patch(
+    'datahub.search.apps.index_exists',
+    mock.Mock(return_value=True),
+)
+def test_sync_invalid_model(sync_model_mock):
     """
     Test that if an invalid value is used with --model, nothing gets synced.
     """
     management.call_command(sync_es.Command(), model='invalid')
 
-    assert sync_app_mock.call_count == 0
+    assert sync_model_mock.apply_async.call_count == 0
