@@ -312,6 +312,13 @@ class Company(ArchivableModel, BaseModel):
             return self.global_headquarters
         return self
 
+    @cached_property
+    def one_list_group_tier(self):
+        """
+        :returns: the One List Tier of the group this company is part of.
+        """
+        return self.get_one_list_group_tier()
+
     def get_one_list_group_tier(self):
         """
         :returns: the One List Tier of the group this company is part of.

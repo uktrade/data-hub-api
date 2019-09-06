@@ -89,8 +89,10 @@ class TestCompany:
         group_global_headquarters = company.global_headquarters or company
         if not group_global_headquarters.one_list_tier:
             assert not company.get_one_list_group_tier()
+            assert not company.one_list_group_tier
         else:
             assert company.get_one_list_group_tier() == one_list_tier
+            assert company.one_list_group_tier == one_list_tier
 
     @pytest.mark.parametrize(
         'build_company',
