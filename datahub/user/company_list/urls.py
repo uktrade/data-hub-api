@@ -26,6 +26,7 @@ urlpatterns = [
         CompanyListViewSet.as_view(
             {
                 'delete': 'destroy',
+                'get': 'retrieve',
                 'patch': 'partial_update',
             },
         ),
