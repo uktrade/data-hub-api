@@ -22,7 +22,6 @@ DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/
     (
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
-
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -507,17 +506,17 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.json()['detail'] == expected_message
 
     @pytest.mark.parametrize(
-        'missing_required_field',
+        'missing_required_field, expected_error',
         (
-            'primary_name',
-            'trading_names',
-            'duns_number',
-            'address_line_1',
-            'address_line_2',
-            'address_town',
-            'address_county',
-            'address_postcode',
-            'address_country',
+            ('primary_name', {'name': ['This field may not be null.']}),
+            ('trading_names', {'trading_names': ['This field may not be null.']}),
+            ('duns_number', {'duns_number': ['This field may not be null.']}),
+            ('address_line_1', {'address': {'line_1': ['This field may not be null.']}}),
+            ('address_line_2', {'address': {'line_2': ['This field may not be null.']}}),
+            ('address_town', {'address': {'town': ['This field may not be null.']}}),
+            ('address_county', {'address': {'county': ['This field may not be null.']}}),
+            ('address_postcode', {'address': {'postcode': ['This field may not be null.']}}),
+            ('address_country', {'address': {'country': ['Must be a valid UUID.']}}),
         ),
     )
     def test_post_missing_required_fields(
@@ -526,6 +525,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         dnb_company_search_feature_flag,
         dnb_response_uk,
         missing_required_field,
+        expected_error,
     ):
         """
         Test if dnb-service returns a company with missing required fields,
@@ -544,13 +544,8 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             },
         )
 
-        response.status_code == status.HTTP_400_BAD_REQUEST
-        response.json() == {
-            'error': (
-                'DNB response for 123456789 missing required field:'
-                f'{missing_required_field}'
-            ),
-        }
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_error
 
     def test_post_existing(
         self,
@@ -560,8 +555,8 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test if create-company endpoint returns 400 if the company with the given
         duns_number already exists in DataHub.
         """
-        company = CompanyFactory()
-        duns_number = company.duns_number
+        duns_number = 123456789
+        CompanyFactory(duns_number=duns_number)
 
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-create'),
@@ -570,9 +565,10 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             },
         )
 
-        response.status_code == status.HTTP_400_BAD_REQUEST
-        response.json() == {
-            'detail': f'Company with duns_number: {duns_number} already exists in DataHub.',
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'duns_number': [
+                f'Company with duns_number: {duns_number} already exists in DataHub.'],
         }
 
     def test_post_invalid_country(
@@ -585,7 +581,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test if create-company endpoint returns 400 if the company is based in a country
         that does not exist in DataHub.
         """
-        dnb_response_uk['results'][0]['address_country'] == 'FOO'
+        dnb_response_uk['results'][0]['address_country'] = 'FOO'
         requests_mock.post(
             DNB_SEARCH_URL,
             json=dnb_response_uk,
@@ -598,7 +594,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             },
         )
 
-        response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
         'status_code',
