@@ -61,6 +61,12 @@ class DNBCompanySerializer(CompanySerializer):
     is temporary.
     """
 
+    duns_number = serializers.CharField(
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator,),
+    )
+
     class Meta(CompanySerializer.Meta):
         read_only_fields = []
         dnb_read_only_fields = []
