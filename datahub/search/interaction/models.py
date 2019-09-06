@@ -47,6 +47,7 @@ class Interaction(BaseESModel):
     id = Keyword()
     company = fields.company_field()
     company_sector = fields.sector_field()
+    company_one_list_group_tier = fields.id_name_field()
     communication_channel = fields.id_name_field()
     contacts = _contact_field()
     created_on = Date()
@@ -87,6 +88,9 @@ class Interaction(BaseESModel):
 
     COMPUTED_MAPPINGS = {
         'company_sector': dict_utils.computed_nested_sector_dict('company.sector'),
+        'company_one_list_group_tier': dict_utils.computed_nested_id_name_dict(
+            'company.one_list_group_tier',
+        ),
         'investment_project_sector': dict_utils.computed_nested_sector_dict(
             'investment_project.sector',
         ),

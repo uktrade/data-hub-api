@@ -47,6 +47,10 @@ def test_interaction_to_dict(setup_es, factory_cls):
                 'id': str(ancestor.pk),
             } for ancestor in interaction.company.sector.get_ancestors()],
         } if interaction.company else None,
+        'company_one_list_group_tier': {
+            'id': str(interaction.company.one_list_group_tier.pk),
+            'name': interaction.company.one_list_group_tier.name,
+        } if interaction.company and interaction.company.one_list_group_tier else None,
         'contacts': [
             {
                 'id': str(obj.pk),
@@ -139,6 +143,10 @@ def test_service_delivery_to_dict(setup_es):
                 'id': str(ancestor.pk),
             } for ancestor in interaction.company.sector.get_ancestors()],
         },
+        'company_one_list_group_tier': {
+            'id': interaction.company.one_list_group_tier.pk,
+            'name': interaction.company.one_list_group_tier.name,
+        } if interaction.company.one_list_group_tier else None,
         'contacts': [
             {
                 'id': str(obj.pk),
