@@ -7,7 +7,12 @@
 
     [[tool.towncrier.type]]
         directory = "removal"
-        name = "Deprecations and removals"
+        name = "Removals"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "deprecation"
+        name = "Deprecations"
         showcontent = true
 
     [[tool.towncrier.type]]
