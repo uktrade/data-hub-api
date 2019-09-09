@@ -61,7 +61,7 @@ factory-boy==2.12.0
 freezegun==0.3.12
 requests-mock==1.7.0
 django-debug-toolbar==2.0
-werkzeug==0.15.5  # Required by runserver_plus - useful for local dev
+werkzeug==0.15.6  # Required by runserver_plus - useful for local dev
 pip-tools==4.1.0
 piprot==0.9.10
 towncrier==19.2.0
