@@ -4,7 +4,7 @@ cssselect==1.1.0
 
 # Django and django related
 Django==2.2.4
-djangorestframework==3.10.2
+djangorestframework==3.10.3
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
 django-extensions==2.2.1
