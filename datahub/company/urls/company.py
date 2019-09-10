@@ -1,6 +1,5 @@
 from django.urls import path
 
-from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
     CompanyAuditViewSet,
     CompanyViewSet,
@@ -23,10 +22,6 @@ company_audit = CompanyAuditViewSet.as_view({
     'get': 'list',
 })
 
-company_timeline = CompanyTimelineViewSet.as_view({
-    'get': 'list',
-})
-
 company_archive = CompanyViewSet.as_action_view('archive')
 
 company_unarchive = CompanyViewSet.as_action_view('unarchive')
@@ -45,7 +40,6 @@ urls = [
     path('company/<uuid:pk>/archive', company_archive, name='archive'),
     path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
-    path('company/<uuid:pk>/timeline', company_timeline, name='timeline-collection'),
     path(
         'company/<uuid:pk>/one-list-group-core-team',
         one_list_group_core_team,
