@@ -5,8 +5,12 @@ import pytest
 from django.core.management.sql import emit_post_migrate_signal
 from django.db import DEFAULT_DB_ALIAS
 
-from datahub.company.constants import BusinessTypeConstant
+from datahub.company.constants import (
+    BusinessTypeConstant,
+    NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG,
+)
 from datahub.company.test.factories import CompanyFactory
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import BusinessType
 from datahub.notification.core import notify_gateway
 
@@ -46,6 +50,7 @@ class TestNotifyDNBInvestigation:
     """
 
     def _get_dnb_investigation_notify_client(self):
+        FeatureFlagFactory(code=NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG, is_active=True)
         client = notify_gateway.clients['dnb_investigation']
         client.reset_mock()
         return client

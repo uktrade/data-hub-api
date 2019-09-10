@@ -2,6 +2,8 @@ from enum import Enum
 
 from django.conf import settings
 
+from datahub.company.constants import NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.notify import notify_by_email
 
@@ -18,6 +20,8 @@ def notify_new_dnb_investigation(company):
     """
     Notify DNB of a new company investigation.
     """
+    if not is_feature_flag_active(NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG):
+        return
     investigation_context = get_dnb_investigation_context(company)
     recipients = settings.DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS
     for email_address in recipients:

@@ -3,12 +3,14 @@ from unittest import mock
 import pytest
 from django.test.utils import override_settings
 
+from datahub.company.constants import NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG
 from datahub.company.notify import (
     get_dnb_investigation_context,
     notify_new_dnb_investigation,
     Template,
 )
 from datahub.company.test.factories import CompanyFactory
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.notification.constants import NotifyServiceName
 
 pytestmark = pytest.mark.django_db
@@ -54,6 +56,7 @@ def test_notify_new_dnb_investigation(monkeypatch):
     """
     Test notify_new_dnb_investigation triggers a call to the expected notification helper function.
     """
+    FeatureFlagFactory(code=NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG, is_active=True)
     mocked_notify_by_email = mock.Mock()
     notification_recipients = ['a@example.net', 'b@example.net']
     company = CompanyFactory(dnb_investigation_data={'telephopne_number': '12345678'})
@@ -73,3 +76,20 @@ def test_notify_new_dnb_investigation(monkeypatch):
         assert call_args[2]['contact_number'] == expected_phone_number
         assert call_args[3] == NotifyServiceName.dnb_investigation
         mocked_notify_by_email.call_count == 2
+
+
+def test_notify_new_dnb_investigation_no_feature_flag(monkeypatch):
+    """
+    Test notify_new_dnb_investigation triggers a call to the expected notification helper function.
+    """
+    mocked_notify_by_email = mock.Mock()
+    notification_recipients = ['a@example.net', 'b@example.net']
+    company = CompanyFactory(dnb_investigation_data={'telephopne_number': '12345678'})
+    monkeypatch.setattr(
+        'datahub.notification.notify.notify_by_email', mocked_notify_by_email,
+    )
+    with override_settings(
+        DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS=notification_recipients,
+    ):
+        notify_new_dnb_investigation(company)
+    mocked_notify_by_email.assert_not_called()
