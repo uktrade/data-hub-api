@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
-from django.db.models.functions import Concat, NullIf
+from django.db.models.functions import Coalesce, Concat, NullIf
 
 
 class ConcatWS(Func):
@@ -247,3 +247,8 @@ def get_queryset_object(queryset, **filters):
     See https://code.djangoproject.com/ticket/6785 for more information.
     """
     return queryset.filter(**filters)[:2].get()
+
+
+def get_empty_string_if_null_expression(field):
+    """Get empty string if field is None."""
+    return Coalesce(field, Value(''))
