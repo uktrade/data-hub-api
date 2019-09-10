@@ -39,6 +39,7 @@ class SearchCompanyAPIViewMixin:
 
     FILTER_FIELDS = (
         'archived',
+        'future_interest_countries',
         'headquarter_type',
         'name',
         'sector_descends',
@@ -50,6 +51,7 @@ class SearchCompanyAPIViewMixin:
     REMAP_FIELDS = {
         'headquarter_type': 'headquarter_type.id',
         'uk_region': 'uk_region.id',
+        'future_interest_countries': 'future_interest_countries.id'
     }
 
     COMPOSITE_FILTERS = {
