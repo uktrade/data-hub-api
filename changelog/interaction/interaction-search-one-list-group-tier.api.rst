@@ -1,4 +1,4 @@
-The ``/v3/search/interaction/`` endpoint was modified to return 
+The ``/v3/search/interaction`` endpoint was modified to return 
 ``company_one_list_group_tier`` in search results. This will be in the following
 format:
 
@@ -15,6 +15,6 @@ format:
 The value could alternatively be null (if the interaction's company does not
 have a one list group tier).
 
-A filter was added to ``/v3/search/interaction/`` - ``company__one_list_group_tier`` -
+A filter was added to ``/v3/search/interaction`` - ``company__one_list_group_tier`` -
 which allows callers to filter interaction searches to companies attributed to a
 particular one list group tier.

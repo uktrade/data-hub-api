@@ -145,7 +145,7 @@ def interactions(setup_es):
                 date=dateutil_parse('2016-09-02T00:00:00Z'),
                 company=company_4,
                 contacts=[
-                    ContactFactory(company=company_3, first_name='Bob', last_name='Smith'),
+                    ContactFactory(company=company_4, first_name='Bob', last_name='Smith'),
                 ],
                 dit_participants__adviser__first_name='Trevor',
                 dit_participants__adviser__last_name='Saleman',
