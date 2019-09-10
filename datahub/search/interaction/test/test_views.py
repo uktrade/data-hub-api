@@ -51,12 +51,6 @@ from datahub.search.interaction.views import SearchInteractionExportAPIView
 
 pytestmark = pytest.mark.django_db
 
-USED_ONE_LIST_TIER_IDS = [
-    'b91bf800-8d53-e311-aef3-441ea13961e2',
-    'bb1bf800-8d53-e311-aef3-441ea13961e2',
-]
-UNUSED_ONE_LIST_TIER_ID = '572dfefe-cd1d-e611-9bdc-e4115bead28a'
-
 
 @pytest.fixture
 def interactions(setup_es):
@@ -65,18 +59,6 @@ def interactions(setup_es):
     with freeze_time('2017-01-01 13:00:00'):
         company_1 = CompanyFactory(name='ABC Trading Ltd')
         company_2 = CompanyFactory(name='Little Puddle Ltd')
-        company_3 = CompanyFactory(
-            name='Global HQ Ltd',
-            one_list_tier=OneListTier.objects.get(id=USED_ONE_LIST_TIER_IDS[0]),
-        )
-        company_4 = CompanyFactory(
-            name='Regional Subsidiary Ltd',
-            global_headquarters=company_3,
-        )
-        company_5 = CompanyFactory(
-            name='Other Company Ltd',
-            one_list_tier=OneListTier.objects.get(id=USED_ONE_LIST_TIER_IDS[1]),
-        )
         data.extend([
             CompanyInteractionFactory(
                 subject='Exports meeting',
@@ -126,36 +108,6 @@ def interactions(setup_es):
                 company=company_2,
                 contacts=[
                     ContactFactory(company=company_1, first_name='Diane', last_name='Pree'),
-                ],
-                dit_participants__adviser__first_name='Trevor',
-                dit_participants__adviser__last_name='Saleman',
-            ),
-            CompanyInteractionFactory(
-                subject='Global HQ chat',
-                date=dateutil_parse('2016-09-02T00:00:00Z'),
-                company=company_3,
-                contacts=[
-                    ContactFactory(company=company_3, first_name='Bob', last_name='Smith'),
-                ],
-                dit_participants__adviser__first_name='Trevor',
-                dit_participants__adviser__last_name='Saleman',
-            ),
-            CompanyInteractionFactory(
-                subject='Regional Subsidiary chat',
-                date=dateutil_parse('2016-09-02T00:00:00Z'),
-                company=company_4,
-                contacts=[
-                    ContactFactory(company=company_4, first_name='Bob', last_name='Smith'),
-                ],
-                dit_participants__adviser__first_name='Trevor',
-                dit_participants__adviser__last_name='Saleman',
-            ),
-            CompanyInteractionFactory(
-                subject='Other Company chat',
-                date=dateutil_parse('2016-09-02T00:00:00Z'),
-                company=company_5,
-                contacts=[
-                    ContactFactory(company=company_5, first_name='Bob', last_name='Smith'),
                 ],
                 dit_participants__adviser__first_name='Trevor',
                 dit_participants__adviser__last_name='Saleman',
@@ -216,7 +168,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['results']) == 7
+        assert len(response_data['results']) == 4
 
     def test_default_sort(self, setup_es):
         """Tests default sorting of results by date (descending)."""
@@ -520,54 +472,101 @@ class TestInteractionEntitySearchView(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    @pytest.mark.parametrize(
-        'one_list_tier_id,expected_interaction_subjects',
-        (
-            (USED_ONE_LIST_TIER_IDS[0], {'Regional Subsidiary chat', 'Global HQ chat'}),
-            (UNUSED_ONE_LIST_TIER_ID, set()),
-        ),
-    )
     def test_filter_by_one_list_tier_group(
         self,
         setup_es,
-        interactions,
-        one_list_tier_id,
-        expected_interaction_subjects,
     ):
         """
         Test that we can filter by one list tier group.
         """
+        one_list_tier = OneListTier.objects.all().order_by('?')[0]
+        company_1 = CompanyFactory(
+            name='Global HQ Ltd',
+            one_list_tier=one_list_tier,
+        )
+        company_2 = CompanyFactory(
+            name='Regional Subsidiary Ltd',
+            global_headquarters=company_1,
+        )
+        CompanyInteractionFactory(
+            subject='Global HQ chat',
+            date=dateutil_parse('2016-09-02T00:00:00Z'),
+            company=company_1,
+            contacts=[
+                ContactFactory(company=company_1, first_name='Bob', last_name='Smith'),
+            ],
+            dit_participants__adviser__first_name='Trevor',
+            dit_participants__adviser__last_name='Saleman',
+        )
+        CompanyInteractionFactory(
+            subject='Regional Subsidiary chat',
+            date=dateutil_parse('2016-09-02T00:00:00Z'),
+            company=company_2,
+            contacts=[
+                ContactFactory(company=company_2, first_name='Bob', last_name='Smith'),
+            ],
+            dit_participants__adviser__first_name='Trevor',
+            dit_participants__adviser__last_name='Saleman',
+        )
+
         setup_es.indices.refresh()
 
-        expected_one_list_tier_group = OneListTier.objects.get(id=one_list_tier_id)
         url = reverse('api-v3:search:interaction')
 
         response = self.api_client.post(
             url,
             data={
-                'company__one_list_group_tier': one_list_tier_id,
+                'company__one_list_group_tier': one_list_tier.id,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == len(expected_interaction_subjects)
-        assert len(response.data['results']) == len(expected_interaction_subjects)
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
         matched_interaction_subjects = {result['subject'] for result in response.data['results']}
 
-        assert matched_interaction_subjects == expected_interaction_subjects
+        assert matched_interaction_subjects == {'Global HQ chat', 'Regional Subsidiary chat'}
         assert all(
-            result['company_one_list_group_tier']['name'] == expected_one_list_tier_group.name
+            result['company_one_list_group_tier']['name'] == one_list_tier.name
             for result in response.data['results']
         )
 
     def test_filter_by_multiple_one_list_tier_groups(
         self,
         setup_es,
-        interactions,
     ):
         """
         Test that we can filter by multiple one list tier groups.
         """
+        one_list_tiers = OneListTier.objects.all().order_by('?')[0:2]
+        company_1 = CompanyFactory(
+            name='Global HQ Ltd',
+            one_list_tier=one_list_tiers[0],
+        )
+        company_2 = CompanyFactory(
+            name='Other Company',
+            one_list_tier=one_list_tiers[1],
+        )
+        CompanyInteractionFactory(
+            subject='Global HQ chat',
+            date=dateutil_parse('2016-09-02T00:00:00Z'),
+            company=company_1,
+            contacts=[
+                ContactFactory(company=company_1, first_name='Bob', last_name='Smith'),
+            ],
+            dit_participants__adviser__first_name='Trevor',
+            dit_participants__adviser__last_name='Saleman',
+        )
+        CompanyInteractionFactory(
+            subject='Other Company chat',
+            date=dateutil_parse('2016-09-02T00:00:00Z'),
+            company=company_2,
+            contacts=[
+                ContactFactory(company=company_2, first_name='Bob', last_name='Smith'),
+            ],
+            dit_participants__adviser__first_name='Trevor',
+            dit_participants__adviser__last_name='Saleman',
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -575,18 +574,17 @@ class TestInteractionEntitySearchView(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'company__one_list_group_tier': USED_ONE_LIST_TIER_IDS,
+                'company__one_list_group_tier': [tier.id for tier in one_list_tiers],
             },
         )
 
         expected_interaction_subjects = {
-            'Regional Subsidiary chat',
             'Global HQ chat',
             'Other Company chat',
         }
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
-        assert len(response.data['results']) == 3
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
         matched_interaction_subjects = {result['subject'] for result in response.data['results']}
 
         assert matched_interaction_subjects == expected_interaction_subjects
@@ -825,9 +823,6 @@ class TestInteractionEntitySearchView(APITestMixin):
                 },
                 {
                     'Email about exhibition',
-                    'Regional Subsidiary chat',
-                    'Global HQ chat',
-                    'Other Company chat',
                 },
             ),
         ),
