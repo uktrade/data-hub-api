@@ -490,23 +490,11 @@ class TestInteractionEntitySearchView(APITestMixin):
         )
         CompanyInteractionFactory(
             subject='Global HQ chat',
-            date=dateutil_parse('2016-09-02T00:00:00Z'),
             company=company_1,
-            contacts=[
-                ContactFactory(company=company_1, first_name='Bob', last_name='Smith'),
-            ],
-            dit_participants__adviser__first_name='Trevor',
-            dit_participants__adviser__last_name='Saleman',
         )
         CompanyInteractionFactory(
             subject='Regional Subsidiary chat',
-            date=dateutil_parse('2016-09-02T00:00:00Z'),
             company=company_2,
-            contacts=[
-                ContactFactory(company=company_2, first_name='Bob', last_name='Smith'),
-            ],
-            dit_participants__adviser__first_name='Trevor',
-            dit_participants__adviser__last_name='Saleman',
         )
 
         setup_es.indices.refresh()
@@ -549,23 +537,11 @@ class TestInteractionEntitySearchView(APITestMixin):
         )
         CompanyInteractionFactory(
             subject='Global HQ chat',
-            date=dateutil_parse('2016-09-02T00:00:00Z'),
             company=company_1,
-            contacts=[
-                ContactFactory(company=company_1, first_name='Bob', last_name='Smith'),
-            ],
-            dit_participants__adviser__first_name='Trevor',
-            dit_participants__adviser__last_name='Saleman',
         )
         CompanyInteractionFactory(
             subject='Other Company chat',
-            date=dateutil_parse('2016-09-02T00:00:00Z'),
             company=company_2,
-            contacts=[
-                ContactFactory(company=company_2, first_name='Bob', last_name='Smith'),
-            ],
-            dit_participants__adviser__first_name='Trevor',
-            dit_participants__adviser__last_name='Saleman',
         )
         setup_es.indices.refresh()
 
