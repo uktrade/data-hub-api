@@ -1,5 +1,7 @@
 import logging
+from functools import partial
 
+from django.db import transaction
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 
@@ -29,6 +31,7 @@ def company_business_type_post_migrate(sender, **kwargs):
 @receiver(
     post_save,
     sender=Company,
+    dispatch_uid='notify_dnb_post_save_company',
 )
 def notify_dnb_investigation(sender, instance, created, raw, **kwargs):
     """
@@ -36,6 +39,13 @@ def notify_dnb_investigation(sender, instance, created, raw, **kwargs):
     for a company which has `pending_dnb_investigation=True` and was not created
     through a data fixture (or similar).
     """
-    if created and not raw and instance.pending_dnb_investigation:
-        logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
-        notify_new_dnb_investigation(instance)
+    if raw:
+        return
+
+    if created and instance.pending_dnb_investigation:
+        transaction.on_commit(partial(_notify_dnb_investigation, instance))
+
+
+def _notify_dnb_investigation(instance):
+    logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
+    notify_new_dnb_investigation(instance)

@@ -44,6 +44,7 @@ class TestCompanyBusinessTypePostMigrate:
         mocked_load_constants_to_database.assert_called_once()
 
 
+@pytest.mark.usefixtures('synchronous_on_commit')
 class TestNotifyDNBInvestigation:
     """
     Test the `notify_dnb_investigation` signal is triggered appropriately.
