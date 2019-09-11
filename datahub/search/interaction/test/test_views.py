@@ -307,9 +307,9 @@ class TestInteractionEntitySearchView(APITestMixin):
                 } for ancestor in interaction.company.sector.get_ancestors()],
             },
             'company_one_list_group_tier': {
-                'id': interaction.company.one_list_group_tier.pk,
-                'name': interaction.company.one_list_group_tier.name,
-            } if interaction.company.one_list_group_tier else None,
+                'id': interaction.company.get_one_list_group_tier().pk,
+                'name': interaction.company.get_one_list_group_tier().name,
+            } if interaction.company.get_one_list_group_tier() else None,
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -538,7 +538,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         """
         Test that we can filter by multiple one list tier groups.
         """
-        one_list_tiers = OneListTier.objects.all().order_by('?')[0:2]
+        one_list_tiers = list(OneListTier.objects.all().order_by('?')[0:2])
         company_1 = CompanyFactory(
             name='Global HQ Ltd',
             one_list_tier=one_list_tiers[0],
@@ -1149,9 +1149,9 @@ class TestInteractionBasicSearch(APITestMixin):
                 'trading_names': interaction.company.trading_names,
             },
             'company_one_list_group_tier': {
-                'id': interaction.company.one_list_group_tier.pk,
-                'name': interaction.company.one_list_group_tier.name,
-            } if interaction.company.one_list_group_tier else None,
+                'id': interaction.company.get_one_list_group_tier().pk,
+                'name': interaction.company.get_one_list_group_tier().name,
+            } if interaction.company.get_one_list_group_tier() else None,
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
                 'name': interaction.company.sector.name,

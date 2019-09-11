@@ -88,8 +88,8 @@ class Interaction(BaseESModel):
 
     COMPUTED_MAPPINGS = {
         'company_sector': dict_utils.computed_nested_sector_dict('company.sector'),
-        'company_one_list_group_tier': dict_utils.computed_nested_id_name_dict(
-            'company.one_list_group_tier',
+        'company_one_list_group_tier': lambda obj: dict_utils.id_name_dict(
+            obj.company.get_one_list_group_tier() if obj.company else None,
         ),
         'investment_project_sector': dict_utils.computed_nested_sector_dict(
             'investment_project.sector',
