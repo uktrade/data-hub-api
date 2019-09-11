@@ -1,5 +1,6 @@
 import environ
 
+
 environ.Env.read_env()  # reads the .env file
 env = environ.Env()
 
@@ -58,23 +59,31 @@ HAWK_RECEIVER_IP_WHITELIST = ['1.2.3.4']
 HAWK_RECEIVER_CREDENTIALS = {
     'some-id': {
         'key': 'some-secret',
-        'scope': HawkScope.activity_stream,
+        'scopes': (HawkScope.activity_stream, ),
     },
     'test-id-with-scope': {
         'key': 'test-key-with-scope',
-        'scope': next(iter(HawkScope.__members__.values())),
+        'scopes': (next(iter(HawkScope.__members__.values())), ),
     },
     'test-id-without-scope': {
         'key': 'test-key-without-scope',
-        'scope': object(),
+        'scopes': (),
+    },
+    'test-id-with-multiple-scopes': {
+        'key': 'test-key-with-multiple-scopes',
+        'scopes': list(HawkScope.__members__.values())[:2],
+    },
+    'test-id-with-metadata-scope': {
+        'key': 'test-key-with-metadata-scope',
+        'scopes': (HawkScope.metadata, ),
     },
     'public-company-id': {
         'key': 'public-company-key',
-        'scope': HawkScope.public_company,
+        'scopes': (HawkScope.public_company, ),
     },
     'data-flow-api-id': {
         'key': 'data-flow-api-key',
-        'scope': HawkScope.data_flow_api,
+        'scopes': (HawkScope.data_flow_api, ),
     },
 }
 

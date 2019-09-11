@@ -410,3 +410,23 @@ class TestHawkScopePermission:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {'content': 'hawk-test-view-with-scope'}
+
+    def test_authorises_when_with_one_of_the_required_scopes(self, api_client):
+        """
+        Test that a 200 is returned if the request is Hawk authenticated and the client has
+        one of the required scope.
+        """
+        sender = _auth_sender(
+            key_id='test-id-with-multiple-scopes',
+            secret_key='test-key-with-multiple-scopes',
+            url=_url_with_scope,
+        )
+        response = api_client.get(
+            _url_with_scope(),
+            content_type='',
+            HTTP_AUTHORIZATION=sender.request_header,
+            HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {'content': 'hawk-test-view-with-scope'}
