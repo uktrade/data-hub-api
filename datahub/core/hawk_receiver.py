@@ -128,7 +128,7 @@ class HawkScopePermission(BasePermission):
         if not isinstance(request.successful_authenticator, HawkAuthentication):
             return False
 
-        return required_hawk_scope == request.auth.resource.credentials['scope']
+        return required_hawk_scope in request.auth.resource.credentials['scopes']
 
 
 def _lookup_credentials(access_key_id):

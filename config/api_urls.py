@@ -17,10 +17,10 @@ from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.project import urls as investment_urls
+from datahub.metadata import urls as metadata_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
 from datahub.user.company_list import urls as company_list_urls
-
 
 # API V1
 
@@ -75,4 +75,5 @@ v4_urls = [
     path('', include((activity_feed_urls, 'activity-feed'), namespace='activity-feed')),
     path('', include((company_list_urls, 'company-list'), namespace='company-list')),
     path('dataset/', include((dataset_urls, 'dataset'), namespace='dataset')),
+    path('metadata/', include((metadata_urls, 'metadata'), namespace='metadata')),
 ]

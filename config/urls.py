@@ -5,16 +5,17 @@ from oauth2_provider.views import TokenView
 
 from config import api_urls
 from config.api_docs_urls import api_docs_urls
+from datahub.metadata.urls import legacy_urlpatterns as metadata_legacy_urlpatterns
 from datahub.ping.views import ping
 from datahub.user.views import who_am_i
-
 
 unversioned_urls = [
     path('admin/', admin.site.urls),
     path('', include('datahub.admin_report.urls')),
     path('', include('datahub.investment.project.report.urls')),
     path('ping.xml', ping, name='ping'),
-    path('metadata/', include('datahub.metadata.urls')),
+    # TODO: `metadata/` should be removed after deprecation period
+    path('metadata/', include(metadata_legacy_urlpatterns)),
     path('token/', TokenView.as_view(), name='token'),
     path('whoami/', who_am_i, name='who_am_i'),
     path(
