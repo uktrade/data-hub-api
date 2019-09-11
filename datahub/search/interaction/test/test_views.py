@@ -504,7 +504,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'company__one_list_group_tier': one_list_tier.id,
+                'company_one_list_group_tier': one_list_tier.id,
             },
         )
 
@@ -550,7 +550,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'company__one_list_group_tier': [tier.id for tier in one_list_tiers],
+                'company_one_list_group_tier': [tier.id for tier in one_list_tiers],
             },
         )
 

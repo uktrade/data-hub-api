@@ -28,7 +28,7 @@ class SearchInteractionAPIViewMixin:
         'kind',
         'company',
         'company_name',
-        'company__one_list_group_tier',
+        'company_one_list_group_tier',
         'created_on_exists',
         'dit_participants__adviser',
         'dit_participants__team',
@@ -45,7 +45,7 @@ class SearchInteractionAPIViewMixin:
 
     REMAP_FIELDS = {
         'company': 'company.id',
-        'company__one_list_group_tier': 'company_one_list_group_tier.id',
+        'company_one_list_group_tier': 'company_one_list_group_tier.id',
         'dit_participants__adviser': 'dit_participants.adviser.id',
         'dit_participants__team': 'dit_participants.team.id',
         'communication_channel': 'communication_channel.id',
