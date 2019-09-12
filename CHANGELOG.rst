@@ -46,17 +46,14 @@ API
   the field ``location`` is deprecated and will be removed on or after 19 September.
 - **Interactions** The ``/v3/search/interaction`` endpoint was modified to return 
   ``company_one_list_group_tier`` in search results. This will be in the following
-  format:
+  format::
 
-
-  ```
-  ...
-  "company_one_list_group_tier": {
-      "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
-      "name": "Tier A - Strategic Account"
-  }
-  ...
-  ```
+    ...
+    "company_one_list_group_tier": {
+        "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
+        "name": "Tier A - Strategic Account"
+    }
+    ...
 
   The value could alternatively be null (if the interaction's company does not
   have a one list group tier).
@@ -67,29 +64,27 @@ API
 - A field ``iso_alpha2_code`` was added to the ``GET /metadata/country/`` API
   endpoint.
 
-  This endpoint now returns results of the following format:
+  This endpoint now returns results of the following format::
 
-  ```
-  ...
-  {
-      "id": "80756b9a-5d95-e211-a939-e4115bead28a",
-      "name": "United Kingdom",
-      "disabled_on": null,
-      "overseas_region": null,
-      "iso_alpha2_code": "GB"
-  },
-  {
-      "id": "81756b9a-5d95-e211-a939-e4115bead28a",
-      "name": "United States",
-      "disabled_on": null,
-      "overseas_region": {
-          "name": "North America",
-          "id": "fdfbbc8d-0e8a-479a-b10f-4979d582ff87"
-      },
-      "iso_alpha2_code": "US"
-  },
-  ...
-  ```
+    ...
+    {
+        "id": "80756b9a-5d95-e211-a939-e4115bead28a",
+        "name": "United Kingdom",
+        "disabled_on": null,
+        "overseas_region": null,
+        "iso_alpha2_code": "GB"
+    },
+    {
+        "id": "81756b9a-5d95-e211-a939-e4115bead28a",
+        "name": "United States",
+        "disabled_on": null,
+        "overseas_region": {
+            "name": "North America",
+            "id": "fdfbbc8d-0e8a-479a-b10f-4979d582ff87"
+        },
+        "iso_alpha2_code": "US"
+    },
+    ...
 
 Database schema
 ---------------
