@@ -34,6 +34,7 @@ class CountrySerializer(ConstantModelSerializer):
     """Country serializer."""
 
     overseas_region = NestedRelatedField(OverseasRegion, read_only=True)
+    iso_alpha2_code = serializers.ReadOnlyField()
 
 
 class ServiceAnswerOptionSerializer(serializers.ModelSerializer):

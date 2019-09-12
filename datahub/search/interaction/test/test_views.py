@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import OneListTier
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.query_utils import get_bracketed_concat_expression, get_full_name_expression
@@ -305,6 +306,10 @@ class TestInteractionEntitySearchView(APITestMixin):
                     'id': str(ancestor.pk),
                 } for ancestor in interaction.company.sector.get_ancestors()],
             },
+            'company_one_list_group_tier': {
+                'id': interaction.company.get_one_list_group_tier().pk,
+                'name': interaction.company.get_one_list_group_tier().name,
+            } if interaction.company.get_one_list_group_tier() else None,
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -466,6 +471,99 @@ class TestInteractionEntitySearchView(APITestMixin):
         else:
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
+
+    def test_filter_by_one_list_tier_group(
+        self,
+        setup_es,
+    ):
+        """
+        Test that we can filter by one list tier group.
+        """
+        one_list_tier = OneListTier.objects.all().order_by('?')[0]
+        company_1 = CompanyFactory(
+            name='Global HQ Ltd',
+            one_list_tier=one_list_tier,
+        )
+        company_2 = CompanyFactory(
+            name='Regional Subsidiary Ltd',
+            global_headquarters=company_1,
+        )
+        CompanyInteractionFactory(
+            subject='Global HQ chat',
+            company=company_1,
+        )
+        CompanyInteractionFactory(
+            subject='Regional Subsidiary chat',
+            company=company_2,
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company_one_list_group_tier': one_list_tier.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        matched_interaction_subjects = {result['subject'] for result in response.data['results']}
+
+        assert matched_interaction_subjects == {'Global HQ chat', 'Regional Subsidiary chat'}
+        assert all(
+            result['company_one_list_group_tier']['name'] == one_list_tier.name
+            for result in response.data['results']
+        )
+
+    def test_filter_by_multiple_one_list_tier_groups(
+        self,
+        setup_es,
+    ):
+        """
+        Test that we can filter by multiple one list tier groups.
+        """
+        one_list_tiers = list(OneListTier.objects.all().order_by('?')[0:2])
+        company_1 = CompanyFactory(
+            name='Global HQ Ltd',
+            one_list_tier=one_list_tiers[0],
+        )
+        company_2 = CompanyFactory(
+            name='Other Company',
+            one_list_tier=one_list_tiers[1],
+        )
+        CompanyInteractionFactory(
+            subject='Global HQ chat',
+            company=company_1,
+        )
+        CompanyInteractionFactory(
+            subject='Other Company chat',
+            company=company_2,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company_one_list_group_tier': [tier.id for tier in one_list_tiers],
+            },
+        )
+
+        expected_interaction_subjects = {
+            'Global HQ chat',
+            'Other Company chat',
+        }
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        matched_interaction_subjects = {result['subject'] for result in response.data['results']}
+
+        assert matched_interaction_subjects == expected_interaction_subjects
 
     @pytest.mark.parametrize(
         'created_on_exists',
@@ -1026,6 +1124,10 @@ class TestInteractionBasicSearch(APITestMixin):
                 'name': interaction.company.name,
                 'trading_names': interaction.company.trading_names,
             },
+            'company_one_list_group_tier': {
+                'id': interaction.company.get_one_list_group_tier().pk,
+                'name': interaction.company.get_one_list_group_tier().name,
+            } if interaction.company.get_one_list_group_tier() else None,
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
                 'name': interaction.company.sector.name,

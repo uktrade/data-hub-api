@@ -15,6 +15,7 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     kind = SingleOrListField(child=serializers.CharField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)
+    company_one_list_group_tier = SingleOrListField(child=StringUUIDField(), required=False)
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
     created_on_exists = serializers.BooleanField(required=False)

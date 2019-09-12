@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via flake8-bugbear, packaging, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.9.220
-botocore==1.12.220        # via boto3, s3transfer
+boto3==1.9.225
+botocore==1.12.225        # via boto3, s3transfer
 celery[redis]==4.3
 certifi==2019.6.16        # via requests, sentry-sdk
 chardet==3.0.4
@@ -33,8 +33,8 @@ django-oauth-toolkit==1.2.0
 django-pglocks==1.0.3
 django-redis==4.10.0
 django-reversion==3.0.4
-django==2.2.4
-djangorestframework==3.10.2
+django==2.2.5
+djangorestframework==3.10.3
 docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
 elasticsearch-dsl==6.3.1
@@ -130,7 +130,7 @@ urllib3==1.25.3           # via botocore, elasticsearch, requests, sentry-sdk
 vine==1.3.0               # via amqp, celery
 watchdog==0.9.0
 wcwidth==0.1.7            # via prompt-toolkit, pytest
-werkzeug==0.15.5
+werkzeug==0.15.6
 whitenoise==4.1.3
 zipp==0.5.2               # via importlib-metadata
 

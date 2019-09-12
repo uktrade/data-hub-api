@@ -208,6 +208,64 @@ class TestListCompanyListsView(APITestMixin):
         assert response.json()['results'] == []
 
 
+class TestGetCompanyListView(APITestMixin):
+    """Tests for getting a single company list."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        url = _get_list_detail_url(uuid4())
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_companylist'], status.HTTP_200_OK),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        company_list = CompanyListFactory(adviser=user)
+        url = _get_list_detail_url(company_list.pk)
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+        assert response.status_code == expected_status
+
+    def test_returns_404_if_list_doesnt_exist(self):
+        """Test that a 404 is returned if the list ID doesn't exist."""
+        url = _get_list_detail_url(uuid4())
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_can_get_a_list(self):
+        """Test that details of a single list can be retrieved."""
+        company_list = CompanyListFactory(adviser=self.user)
+        url = _get_list_detail_url(company_list.pk)
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'id': str(company_list.pk),
+            'item_count': 0,
+            'name': company_list.name,
+            'created_on': format_date_or_datetime(company_list.created_on),
+        }
+
+    def test_cannot_get_another_users_list(self):
+        """Test that another user's list can't be retrieved."""
+        company_list = CompanyListFactory()
+        url = _get_list_detail_url(company_list.pk)
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
 class TestAddCompanyListView(APITestMixin):
     """Tests for adding a company list."""
 

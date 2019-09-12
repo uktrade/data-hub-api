@@ -3,8 +3,8 @@ lxml==4.4.1
 cssselect==1.1.0
 
 # Django and django related
-Django==2.2.4
-djangorestframework==3.10.2
+Django==2.2.5
+djangorestframework==3.10.3
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
 django-extensions==2.2.1
@@ -26,7 +26,7 @@ python-dateutil==2.8.0
 psycopg2==2.8.3
 psycogreen==1.0.1
 
-boto3==1.9.220
+boto3==1.9.225
 
 notifications-python-client==5.3.0
 
@@ -61,7 +61,7 @@ factory-boy==2.12.0
 freezegun==0.3.12
 requests-mock==1.7.0
 django-debug-toolbar==2.0
-werkzeug==0.15.5  # Required by runserver_plus - useful for local dev
+werkzeug==0.15.6  # Required by runserver_plus - useful for local dev
 pip-tools==4.1.0
 piprot==0.9.10
 towncrier==19.2.0
