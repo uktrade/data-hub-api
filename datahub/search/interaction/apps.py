@@ -21,6 +21,8 @@ class InteractionSearchApp(SearchApp):
         'company__sector',
         'company__sector__parent',
         'company__sector__parent__parent',
+        'company__one_list_tier',
+        'company__global_headquarters__one_list_tier',
         'communication_channel',
         'investment_project',
         'investment_project__sector',

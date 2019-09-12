@@ -23,3 +23,6 @@ class Template(Enum):
     quote_accepted_for_adviser = 'd7b7f327-f814-4eed-9130-0a2ef988691f'
     quote_cancelled_for_customer = '86dd03cd-53b6-41b2-9eed-c3d2f6a0fda1'
     quote_cancelled_for_adviser = 'a36fff71-e62b-4d51-a374-4cdf3e50ac47'
+
+
+OMIS_USE_NOTIFICATION_APP_FEATURE_FLAG_NAME = 'omis_use_notification_app'

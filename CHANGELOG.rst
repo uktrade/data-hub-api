@@ -1,3 +1,107 @@
+Data Hub API 14.8.0 (2019-09-12)
+================================
+
+
+
+Removals
+--------
+
+- **Companies** ``GET /v4/company/<id>>/timeline``: This deprecated endpoint was removed. Please use ``/v4/activity-feed`` instead.
+
+Deprecations
+------------
+
+- **Interactions** The field ``location`` is deprecated. Please check the API and Database schema
+  categories for more details.
+
+Features
+--------
+
+- **OMIS** The notification logic in ``datahub.omis`` was adjusted to optionally use the
+  ``datahub.notification`` app for triggering GOVUK notifications. This 
+  functionality can be switched on using a feature flag.
+
+Bug fixes
+---------
+
+- **Investment** The spellings of ``Leisure`` and ``Commercial`` in the Asset Class Interest metadata for Investor Profiles were fixed.
+
+API
+---
+
+- **Advisers** The following endpoint was added:
+
+  - ``GET /v4/company-list/<id>``: Gets details of a single company list belonging to the authenticated user.
+
+  Responses are in the following format::
+
+    {
+      "id": "string",
+      "name": "string",
+      "item_count": integer,
+      "created_on": "ISO timestamp"
+    }
+- **Companies** ``GET /v4/company/<id>>/timeline``: This deprecated endpoint was removed. Please use ``/v4/activity-feed`` instead.
+- **Interactions** ``GET,PATCH /v3/interaction/<uuid:pk>`` and ``GET,POST /v3/interaction``:
+  the field ``location`` is deprecated and will be removed on or after 19 September.
+- **Interactions** The ``/v3/search/interaction`` endpoint was modified to return 
+  ``company_one_list_group_tier`` in search results. This will be in the following
+  format:
+
+
+  ```
+  ...
+  "company_one_list_group_tier": {
+      "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
+      "name": "Tier A - Strategic Account"
+  }
+  ...
+  ```
+
+  The value could alternatively be null (if the interaction's company does not
+  have a one list group tier).
+
+  A filter was added to ``/v3/search/interaction`` - ``company_one_list_group_tier`` -
+  which allows callers to filter interaction searches to companies attributed to a
+  particular one list group tier.
+- A field ``iso_alpha2_code`` was added to the ``GET /metadata/country/`` API
+  endpoint.
+
+  This endpoint now returns results of the following format:
+
+  ```
+  ...
+  {
+      "id": "80756b9a-5d95-e211-a939-e4115bead28a",
+      "name": "United Kingdom",
+      "disabled_on": null,
+      "overseas_region": null,
+      "iso_alpha2_code": "GB"
+  },
+  {
+      "id": "81756b9a-5d95-e211-a939-e4115bead28a",
+      "name": "United States",
+      "disabled_on": null,
+      "overseas_region": {
+          "name": "North America",
+          "id": "fdfbbc8d-0e8a-479a-b10f-4979d582ff87"
+      },
+      "iso_alpha2_code": "US"
+  },
+  ...
+  ```
+
+Database schema
+---------------
+
+- **Companies** The ``company__company`` table now contains the ``dnb_investigation_data`` column.
+
+  This column contains auxiliary data for the company that is required only for the purpose of investigation.
+- **Interactions** The column ``interaction_interaction.location`` is deprecated and will be removed
+  on or after 19 September.
+- **Investment** ``Bank`` and ``Corporate investor`` were added to the ``investor_type`` metadata for ``investor_profile``.
+
+
 Data Hub API 14.7.0 (2019-09-05)
 ================================
 

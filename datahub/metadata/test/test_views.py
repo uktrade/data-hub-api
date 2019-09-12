@@ -145,6 +145,7 @@ def test_country_view(api_client):
             'name': country.overseas_region.name,
         },
         'disabled_on': format_date_or_datetime(country.disabled_on),
+        'iso_alpha2_code': country.iso_alpha2_code,
     }
 
 
