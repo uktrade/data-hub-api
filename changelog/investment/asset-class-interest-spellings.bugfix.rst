@@ -1,1 +1,0 @@
-The spellings of ``Leisure`` and ``Commercial`` in the Asset Class Interest metadata for Investor Profiles were fixed.

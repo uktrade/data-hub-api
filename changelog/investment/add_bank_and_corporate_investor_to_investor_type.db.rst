@@ -1,1 +1,0 @@
-``Bank`` and ``Corporate investor`` were added to the ``investor_type`` metadata for ``investor_profile``.
