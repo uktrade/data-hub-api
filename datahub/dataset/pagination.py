@@ -7,3 +7,11 @@ class OMISDatasetViewCursorPagination(CursorPagination):
     """
 
     ordering = ('created_on', 'pk')
+
+
+class ContactsDatasetViewCursorPagination(CursorPagination):
+    """
+    Cursor Pagination for ContactsDatasetView
+    """
+
+    ordering = ('created_on', 'pk')
