@@ -326,6 +326,7 @@ class TestGetCompany(APITestMixin):
             'transferred_on': None,
             'transferred_to': None,
             'transfer_reason': '',
+            'pending_dnb_investigation': False,
         }
 
     def test_get_company_without_country(self):
@@ -368,6 +369,27 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['website'] == expected_website
+
+    @pytest.mark.parametrize(
+        'pending_dnb_investigation',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_get_company_pending_dnb_investigation(self, pending_dnb_investigation):
+        """
+        Test that `pending_dnb_investigation` is set for a company API result
+        as expected.
+        """
+        company = CompanyFactory(
+            pending_dnb_investigation=pending_dnb_investigation,
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['pending_dnb_investigation'] == pending_dnb_investigation
 
     @pytest.mark.parametrize(
         'build_company',
@@ -664,6 +686,7 @@ class TestUpdateCompany(APITestMixin):
             is_turnover_estimated=False,
             number_of_employees=95,
             is_number_of_employees_estimated=False,
+            pending_dnb_investigation=True,
         )
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
@@ -679,6 +702,7 @@ class TestUpdateCompany(APITestMixin):
                 'is_turnover_estimated': True,
                 'number_of_employees': 96,
                 'is_number_of_employees_estimated': True,
+                'pending_dnb_investigation': False,
             },
         )
 
@@ -696,6 +720,7 @@ class TestUpdateCompany(APITestMixin):
         assert not response_data['is_turnover_estimated']
         assert response_data['number_of_employees'] == 95
         assert not response_data['is_number_of_employees_estimated']
+        assert response_data['pending_dnb_investigation']
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
