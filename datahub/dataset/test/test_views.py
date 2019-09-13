@@ -15,6 +15,13 @@ from datahub.core.test_utils import (
     HawkAPITestClient,
     join_attr_values,
 )
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    CompanyInteractionFactoryWithPolicyFeedback,
+    EventServiceDeliveryFactory,
+    InvestmentProjectInteractionFactory,
+    ServiceDeliveryFactory,
+)
 from datahub.omis.order.test.factories import (
     OrderCancelledFactory,
     OrderCompleteFactory,
@@ -54,6 +61,12 @@ def omis_dataset_view_url():
 def contacts_dataset_view_url():
     """Returns ContactsDatasetView url"""
     yield reverse('api-v4:dataset:contacts-dataset')
+
+
+@pytest.fixture
+def interactions_dataset_view_url():
+    """Returns InteractionsDatasetView url"""
+    yield reverse('api-v4:dataset:interactions-dataset')
 
 
 def get_expected_data_from_order(order):
@@ -277,4 +290,175 @@ class TestContactsDatasetViewSet:
     def test_no_data(self, data_flow_api_client, contacts_dataset_view_url):
         """Test that without any data available, endpoint completes the request successfully"""
         response = data_flow_api_client.get(contacts_dataset_view_url)
+        assert response.status_code == status.HTTP_200_OK
+
+
+def get_expected_data_from_interaction(interaction):
+    """Returns expected API response dictionary for the given interaction"""
+    participant = interaction.dit_participants.order_by('pk').last()
+    contact = interaction.contacts.all().order_by('pk').last()
+    return {
+        'date': format_date_or_datetime(interaction.date),
+        'kind': interaction.kind,
+        'company__name': interaction.company.name,
+        'company__company_number': interaction.company.company_number,
+        'company__id': str(interaction.company.id),
+        'investment_project__cdms_project_code': get_attr_or_none(
+            interaction,
+            'investment_project.cdms_project_code',
+        ),
+        'company__address_postcode': interaction.company.address_postcode,
+        'company__address_1': interaction.company.address_1,
+        'company__address_2': interaction.company.address_2,
+        'company__address_town': interaction.company.address_town,
+        'company__address_country__name': interaction.company.address_country.name,
+        'company__website': interaction.company.website,
+        'company__employee_range__name': interaction.company.employee_range.name,
+        'company__turnover_range__name': interaction.company.turnover_range.name,
+        'company__uk_region__name': interaction.company.uk_region.name,
+        'subject': interaction.subject,
+        'notes': interaction.notes,
+        'net_company_receipt': (
+            float(interaction.net_company_receipt)
+            if interaction.net_company_receipt is not None
+            else None
+        ),
+        'grant_amount_offered': (
+            float(interaction.grant_amount_offered)
+            if interaction.grant_amount_offered is not None
+            else None
+        ),
+        'service_delivery_status__name': get_attr_or_none(
+            interaction,
+            'service_delivery_status.name',
+        ),
+        'event__name': get_attr_or_none(interaction, 'event.name'),
+        'event__event_type__name': get_attr_or_none(
+            interaction, 'event.event_type.name',
+        ),
+        'event__start_date': (
+            format_date_or_datetime(interaction.event.start_date)
+            if interaction.event is not None
+            else None
+        ),
+        'event__address_town': get_attr_or_none(interaction, 'event.address_town'),
+        'event__address_country__name': get_attr_or_none(
+            interaction,
+            'event.address_country.name',
+        ),
+        'event__uk_region__name': get_attr_or_none(interaction, 'event.uk_region.name'),
+        'created_on': format_date_or_datetime(interaction.created_on),
+        'communication_channel__name': get_attr_or_none(
+            interaction,
+            'communication_channel.name',
+        ),
+        'sector': get_attr_or_none(interaction, 'company.sector.name'),
+        'interaction_link': interaction.get_absolute_url(),
+        'adviser_name': get_attr_or_none(participant, 'adviser.name'),
+        'adviser_phone': get_attr_or_none(participant, 'adviser.telephone_number'),
+        'adviser_email': get_attr_or_none(participant, 'adviser.email'),
+        'adviser_team': get_attr_or_none(participant, 'adviser.dit_team.name'),
+        'service_delivery': get_attr_or_none(interaction, 'service.name'),
+        'event_service': get_attr_or_none(interaction, 'event.service.name'),
+        'contact_name': contact.name,
+        'contact_telephone_number': contact.telephone_number,
+        'contact_email': contact.email,
+        'contact_address_postcode': contact.address_postcode,
+        'contact_address_1': contact.address_1,
+        'contact_address_2': contact.address_2,
+        'contact_address_town': contact.address_town,
+        'contact_address_country': get_attr_or_none(
+            contact,
+            'address_country.name',
+        ),
+    }
+
+
+@pytest.mark.django_db
+class TestInteractionsDatasetView:
+    """
+    Tests for InteractionsDatasetView
+    """
+
+    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
+    def test_other_methods_not_allowed(
+        self,
+        data_flow_api_client,
+        method,
+        interactions_dataset_view_url,
+    ):
+        """Test that various HTTP methods are not allowed."""
+        response = data_flow_api_client.request(method, interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    def test_without_scope(self, hawk_api_client, interactions_dataset_view_url):
+        """Test that making a request without the correct Hawk scope returns an error."""
+        hawk_api_client.set_credentials(
+            'test-id-without-scope',
+            'test-key-without-scope',
+        )
+        response = hawk_api_client.get(interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_without_credentials(self, api_client, interactions_dataset_view_url):
+        """Test that making a request without credentials returns an error."""
+        response = api_client.get(interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'interaction_factory', (
+            CompanyInteractionFactory,
+            CompanyInteractionFactoryWithPolicyFeedback,
+            EventServiceDeliveryFactory,
+            InvestmentProjectInteractionFactory,
+            ServiceDeliveryFactory,
+        ),
+    )
+    def test_success(
+            self,
+            data_flow_api_client,
+            interactions_dataset_view_url,
+            interaction_factory,
+    ):
+        """Test that endpoint returns with expected data for a single interaction"""
+        interaction = interaction_factory()
+        response = data_flow_api_client.get(interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_interaction(interaction)
+        assert result == expected_result
+
+    def test_with_multiple_interactions(self, data_flow_api_client, interactions_dataset_view_url):
+        """Test that the correct number of records are returned in the right order"""
+        with freeze_time('2019-01-01 12:30:00'):
+            interaction1 = CompanyInteractionFactory()
+        with freeze_time('2019-01-03 12:00:00'):
+            interaction2 = CompanyInteractionFactory()
+        with freeze_time('2019-01-01 12:00:00'):
+            interaction3 = CompanyInteractionFactory()
+            interaction4 = CompanyInteractionFactory()
+
+        response = data_flow_api_client.get(interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+        assert len(response_results) == 4
+        expected_list = sorted(
+            [interaction3, interaction4],
+            key=lambda item: item.pk,
+        ) + [interaction1, interaction2]
+        for index, interaction in enumerate(expected_list):
+            assert interaction.get_absolute_url() == response_results[index]['interaction_link']
+
+    def test_pagination(self, data_flow_api_client, interactions_dataset_view_url):
+        """Test that the next page url is populated correctly"""
+        CompanyInteractionFactory.create_batch(settings.REST_FRAMEWORK['PAGE_SIZE'] + 1)
+        response = data_flow_api_client.get(interactions_dataset_view_url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['next'] is not None
+
+    def test_no_data(self, data_flow_api_client, interactions_dataset_view_url):
+        """Test that an empty dataset is returned successfully"""
+        response = data_flow_api_client.get(interactions_dataset_view_url)
         assert response.status_code == status.HTTP_200_OK

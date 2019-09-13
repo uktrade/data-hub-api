@@ -15,3 +15,11 @@ class ContactsDatasetViewCursorPagination(CursorPagination):
     """
 
     ordering = ('created_on', 'pk')
+
+
+class InteractionsDatasetViewCursorPagination(CursorPagination):
+    """
+    Cursor Pagination for InteractionsDatasetView
+    """
+
+    ordering = ('created_on', 'pk')
