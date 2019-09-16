@@ -4,7 +4,9 @@ import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.constants import Country, Sector, UKRegion
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -176,3 +178,28 @@ def dnb_company_search_datahub_companies():
             subject='Meeting with John Smith',
             company=company,
         )
+
+
+@pytest.fixture
+def investigation_payload():
+    """
+    Valid DNB company investigation payload.
+    """
+    return {
+        'business_type': BusinessTypeConstant.company.value.id,
+        'name': 'Test Company',
+        'website': 'http://www.test.com',
+        'telephone_number': '12345678',
+        'address': {
+            'line_1': 'Foo',
+            'line_2': 'Bar',
+            'town': 'Baz',
+            'county': 'Qux',
+            'country': {
+                'id': Country.united_kingdom.value.id,
+            },
+            'postcode': 'AB5 XY2',
+        },
+        'sector': Sector.renewable_energy_wind.value.id,
+        'uk_region': UKRegion.east_midlands.value.id,
+    }
