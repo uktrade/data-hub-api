@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Company, CompanyExportCountry, Contact
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
@@ -18,6 +18,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
     Order.company.field,
+    CompanyExportCountry.company.field,
 }
 
 
@@ -70,7 +71,6 @@ def is_company_a_valid_merge_source(company: Company):
     # First, check that there are no references to the company from other objects
     # (other than via the fields specified in ALLOWED_RELATIONS_FOR_MERGING).
     relations = get_related_fields(Company)
-
     has_related_objects = any(
         getattr(company, relation.name).count()
         for relation in relations
