@@ -19,5 +19,4 @@ registry.register(
 registry.register(
     metadata_id='one-list-tier',
     model=OneListTier,
-    queryset=OneListTier.objects.all(),
 )
