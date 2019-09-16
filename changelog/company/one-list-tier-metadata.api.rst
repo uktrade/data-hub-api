@@ -1,6 +1,6 @@
-A metadata API endpoint was added for One List Tiers.
-``GET /metadata/one-list-tier`` lists all One List Tier models in the following
-format::
+Two metdata API endpoints were added for One List Tiers.
+``GET /metadata/one-list-tier/`` and ``GET /v4/metadata/one-list-tier`` list 
+all One List Tier models in the following format::
 
     [
         {
