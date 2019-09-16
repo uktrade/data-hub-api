@@ -19,5 +19,5 @@ registry.register(
 registry.register(
     metadata_id='one-list-tier',
     model=OneListTier,
-    queryset=OneListTier.objects.filter(disabled_on__isnull=True),
+    queryset=OneListTier.objects.all(),
 )
