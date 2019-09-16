@@ -375,6 +375,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'transferred_to': None,
             'transferred_on': None,
             'contacts': [],
+            'pending_dnb_investigation': False,
         }
 
     def test_post_non_uk(
