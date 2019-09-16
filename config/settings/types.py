@@ -13,3 +13,4 @@ class HawkScope(Enum):
     activity_stream = auto()
     public_company = auto()
     data_flow_api = auto()
+    metadata = auto()
