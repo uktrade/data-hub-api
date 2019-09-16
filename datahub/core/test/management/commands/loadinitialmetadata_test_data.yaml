@@ -9,8 +9,6 @@
     export_to_countries:
     - 35afd8d0-5d95-e211-a939-e4115bead28a
     - 36afd8d0-5d95-e211-a939-e4115bead28a
-    future_interest_countries:
-    - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 82 Ramsgate Rd
     address_town: Willington

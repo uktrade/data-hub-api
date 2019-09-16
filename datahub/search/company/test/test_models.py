@@ -1,10 +1,16 @@
 from collections import Counter
+from unittest import mock
 
 import pytest
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
 from datahub.core.constants import Country as CountryConstant
-from datahub.search.company.models import Company as ESCompany, get_suggestions
+from datahub.search.company.models import (
+    Company as ESCompany,
+    get_future_interest_countries,
+    get_suggestions,
+)
+
 
 pytestmark = pytest.mark.django_db
 
@@ -15,6 +21,7 @@ class TestCompanyElasticModel:
     def test_company_dbmodel_to_dict(self, setup_es):
         """Tests conversion of db model to dict."""
         company = CompanyFactory()
+        CompanyExportCountryFactory(company=company)
 
         result = ESCompany.db_object_to_dict(company)
 
@@ -57,7 +64,7 @@ class TestCompanyElasticModel:
     def test_company_dbmodels_to_es_documents(self, setup_es):
         """Tests conversion of db models to Elasticsearch documents."""
         companies = CompanyFactory.create_batch(2)
-
+        CompanyExportCountryFactory(company=companies[0])
         result = ESCompany.db_objects_to_es_documents(companies)
 
         assert len(list(result)) == len(companies)
@@ -126,3 +133,17 @@ class TestCompanyElasticModel:
 
         else:
             assert Counter(result) == Counter(expected_input_suggestions)
+
+    def test_company_get_future_interest_countries(self):
+        """Test the get_future_interest_countries function"""
+        company = CompanyFactory()
+        with mock.patch.object(
+            company,
+            'get_active_future_export_countries',
+            return_value=[mock.MagicMock(), mock.MagicMock()],
+        ) as mocked:
+            result = get_future_interest_countries(company)
+        assert result == [
+            {'id': str(mocked.return_value[0].id), 'name': mocked.return_value[0].name},
+            {'id': str(mocked.return_value[1].id), 'name': mocked.return_value[1].name},
+        ]

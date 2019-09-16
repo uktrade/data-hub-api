@@ -2,6 +2,7 @@ import uuid
 from cgi import parse_header
 from csv import DictReader
 from io import StringIO
+from operator import attrgetter
 from unittest import mock
 from uuid import UUID, uuid4
 
@@ -13,7 +14,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
@@ -39,7 +40,7 @@ def setup_data(setup_es):
     country_us = constants.Country.united_states.value.id
     country_anguilla = constants.Country.anguilla.value.id
     uk_region = constants.UKRegion.south_east.value.id
-    CompanyFactory(
+    company_1 = CompanyFactory(
         name='abc defg ltd',
         trading_names=['helm', 'nop'],
         address_1='1 Fake Lane',
@@ -50,12 +51,16 @@ def setup_data(setup_es):
         export_to_countries=[
             constants.Country.france.value.id,
         ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-            constants.Country.united_states.value.id,
-        ],
     )
-    CompanyFactory(
+    CompanyExportCountryFactory(
+        company=company_1,
+        country_id=constants.Country.japan.value.id,
+    )
+    CompanyExportCountryFactory(
+        company=company_1,
+        country_id=constants.Country.united_states.value.id,
+    )
+    company_2 = CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
         address_1='1 Fake Lane',
@@ -66,9 +71,10 @@ def setup_data(setup_es):
             constants.Country.canada.value.id,
             constants.Country.france.value.id,
         ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-        ],
+    )
+    CompanyExportCountryFactory(
+        company=company_2,
+        country_id=constants.Country.japan.value.id,
     )
     CompanyFactory(
         name='archived',
@@ -124,6 +130,7 @@ class TestSearch(APITestMixin):
             one_list_tier=None,
             one_list_account_owner=None,
         )
+        export_country = CompanyExportCountryFactory(company=company)
         setup_es.indices.refresh()
 
         url = reverse('api-v4:search:company')
@@ -188,7 +195,10 @@ class TestSearch(APITestMixin):
                         'name': company.export_experience_category.name,
                     },
                     'export_to_countries': [],
-                    'future_interest_countries': [],
+                    'future_interest_countries': [{
+                        'id': str(export_country.country.id),
+                        'name': str(export_country.country.name),
+                    }],
                     'headquarter_type': company.headquarter_type,
                     'sector': {
                         'id': str(company.sector.id),
@@ -568,14 +578,20 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
-        CompanyFactory.create_batch(
+        companies_1 = CompanyFactory.create_batch(
             3,
             turnover=None,
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
-            future_interest_countries=Country.objects.order_by('?')[:3],
         )
+        future_interest_countries = Country.objects.order_by('?')[:3]
+        for company in companies_1:
+            for country in future_interest_countries:
+                CompanyExportCountryFactory(company=company, country=country)
+            # This one shouldn't show up
+            CompanyExportCountryFactory(company=company, disabled=True)
+
         CompanyFactory.create_batch(
             2,
             hq=True,
@@ -619,7 +635,7 @@ class TestCompanyExportView(APITestMixin):
                     company.export_to_countries.order_by('name'),
                 ),
                 'Countries of interest': join_attr_values(
-                    company.future_interest_countries.order_by('name'),
+                    sorted(company.get_active_future_export_countries(), key=attrgetter('name')),
                 ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
