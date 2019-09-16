@@ -76,3 +76,14 @@ def format_dnb_company(dnb_company):
         # 'global_headquarters': None,
         # 'headquarter_type': None,
     }
+
+
+def format_dnb_company_investigation(data):
+    """
+    Format DNB company investigation payload to something
+    DNBCompanyInvestigationSerlizer can parse.
+    """
+    data['dnb_investigation_data'] = {
+        'telephone_number': data.pop('telephone_number', None),
+    }
+    return data
