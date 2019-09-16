@@ -6,10 +6,19 @@ from django.utils.timezone import now, utc
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Advisor, Company, ExportExperienceCategory
+from datahub.company.models import (
+    Advisor,
+    Company,
+    ExportExperienceCategory,
+)
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
-from datahub.metadata.models import EmployeeRange, HeadquarterType, TurnoverRange
+from datahub.metadata.models import (
+    Country,
+    EmployeeRange,
+    HeadquarterType,
+    TurnoverRange,
+)
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -175,3 +184,16 @@ class ArchivedContactFactory(ContactFactory):
     archived_on = factory.Faker('past_datetime', tzinfo=utc)
     archived_by = factory.LazyFunction(lambda: random_obj_for_model(Advisor))
     archived_reason = factory.Faker('sentence')
+
+
+class CompanyCountryOfInterestFactory(factory.django.DjangoModelFactory):
+    """CompanyCountryOfInterest Factory"""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    company = factory.SubFactory(CompanyFactory)
+    country = factory.Iterator(Country.objects.all())  # Avoid non-unique errors
+    source = 'user'
+    deleted = False
+
+    class Meta:
+        model = 'company.CompanyCountryOfInterest'

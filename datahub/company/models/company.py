@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -131,6 +131,8 @@ class Company(ArchivableModel, BaseModel):
         metadata_models.Country,
         blank=True,
         related_name='companies_with_future_interest',
+        help_text='This field is now deprecated. Use the get_active_countries_of_interest'
+        ' method.',
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -259,6 +261,49 @@ class Company(ArchivableModel, BaseModel):
                 )
             except CompaniesHouseCompany.DoesNotExist:
                 return None
+
+    def get_active_countries_of_interest(self):
+        """
+        Get a list of unique countries for which there are active (non-deleted)
+        CompanyCountryOfInterest Objects
+        """
+        # Optimizing for the case where self.raw_countries_of_interest AND
+        # raw_countries_of_interest__country have been pre-fetched
+        seen_countries = set()
+        for company_country in self.raw_countries_of_interest.all():
+            if (
+                company_country.deleted is False
+                and company_country.country_id not in seen_countries
+            ):
+                seen_countries.add(company_country.country_id)
+                yield company_country.country
+
+    @transaction.atomic
+    def set_user_edited_countries_of_interest(self, countries):
+        """
+        Given a list of countries of interest *supplied by the user*,
+        update and delete CompanyCountryOfInterest objects,
+        as necessary.
+        """
+        currently_active_countries = self.get_active_countries_of_interest()
+
+        for country in countries:
+            # Only potentially create a new user-source CompanyCountryOfInterest if
+            # the country is not already active. If the user saves a big list of countries,
+            # some of which were actually externally sourced, we don't want to promote them
+            # automatically to user-sourced.
+            if country not in currently_active_countries:
+                CompanyCountryOfInterest.objects.update_or_create(
+                    company=self, country=country, source='user',
+                    defaults={'deleted': False},
+                )
+
+        # Delete any countries_of_interest that are not in input
+        self.raw_countries_of_interest.exclude(
+            country__in=countries,
+        ).update(
+            deleted=True,
+        )
 
     def mark_as_transferred(self, to, reason, user):
         """
@@ -435,3 +480,49 @@ class CompaniesHouseCompany(models.Model):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
+
+
+class CompanyCountryOfInterest(models.Model):
+    """
+    Record that a Company is interested in exporting to a Country.
+    Source can be either 'user', indicating that the country was entered manually
+    by a user on the frontend,
+    or 'external', indicating that the country came in via an import from data science.
+    Data science imports should not be able to remove any user-entered countries,
+    only add to them.
+    On the other hand, the user should be able to override and delete countries that
+    came from data science. When this happens, the 'deleted' field is set to True.
+    """
+
+    SOURCES = Choices(
+        ('user', 'User entered'),
+        ('external', 'External'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.CASCADE,
+        related_name='companies_with_interest',
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='raw_countries_of_interest',
+    )
+    source = models.CharField(max_length=16, choices=SOURCES)
+    deleted = models.BooleanField(blank=True, default=False)
+
+    class Meta:
+        unique_together = (
+            ('country', 'company', 'source'),
+        )
+        verbose_name_plural = 'Company Countries of Interest'
+
+    def __str__(self):
+        """
+        Human readable name
+        """
+        return (
+            f'<CompanyCountryOfInterest: {self.company.name} interested in {self.country.name}; '
+            f'Source: {self.source}; Deleted: {self.deleted}>'
+        )

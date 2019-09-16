@@ -2,6 +2,7 @@ from datahub.company.models.adviser import Advisor
 from datahub.company.models.company import (
     CompaniesHouseCompany,
     Company,
+    CompanyCountryOfInterest,
     CompanyPermission,
     ExportExperienceCategory,
     OneListCoreTeamMember,
@@ -13,6 +14,7 @@ __all__ = (
     'Advisor',
     'CompaniesHouseCompany',
     'Company',
+    'CompanyCountryOfInterest',
     'CompanyPermission',
     'Contact',
     'ContactPermission',

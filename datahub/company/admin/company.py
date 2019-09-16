@@ -157,7 +157,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 'fields': (
                     'export_experience_category',
                     'export_to_countries',
-                    'future_interest_countries',
                 ),
             },
         ),

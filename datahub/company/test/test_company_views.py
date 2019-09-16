@@ -7,10 +7,15 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+import datahub.metadata.models as metadata_models
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import OneListTier
 from datahub.company.serializers import CompanySerializer
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyCountryOfInterestFactory,
+    CompanyFactory,
+)
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
 from datahub.core.test_utils import (
     APITestMixin,
@@ -18,7 +23,6 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     random_obj_for_model,
 )
-from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -524,6 +528,53 @@ class TestGetCompany(APITestMixin):
 
                 },
             }
+
+    @pytest.mark.countries_of_interest
+    def test_get_company_with_countries_of_interest(self):
+        """
+        Test that when you get a company that has countries of interest,
+        (e.g. for which there exist non-deleted CompanyCountryOfInterest objects)
+        these countries are returned in the expected format in the
+        future_interest_countries field.
+        """
+        ghq = CompanyFactory(
+            global_headquarters=None,
+            one_list_tier=OneListTier.objects.first(),
+            one_list_account_owner=AdviserFactory(),
+        )
+        company = CompanyFactory(
+            company_number='123',
+            trading_names=['Xyz trading', 'Abc trading'],
+            global_headquarters=ghq,
+            one_list_tier=None,
+            one_list_account_owner=None,
+        )
+        countries = metadata_models.Country.objects.all()[:3]
+        for country in countries:
+            CompanyCountryOfInterestFactory(
+                company=company,
+                country=country,
+            )
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_company_document',
+            ),
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()['future_interest_countries']
+        expected_data = [
+            {'id': str(c.id), 'name': c.name}
+            for c in countries
+        ]
+        response_data = sorted(response_data, key=lambda d: d['id'])
+        expected_data = sorted(expected_data, key=lambda d: d['id'])
+        assert expected_data == response_data
 
 
 class TestUpdateCompany(APITestMixin):
@@ -1090,10 +1141,62 @@ class TestUpdateCompany(APITestMixin):
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
 
+    @pytest.mark.countries_of_interest
+    def test_update_company_with_countries_of_interest(self):
+        """
+        Test that when you update a company's countries of interest,
+        utilizing the future_interest_countries field,
+        the CompanyCountryOfInterest objects are updated as expected.
+        """
+        ghq = CompanyFactory(
+            global_headquarters=None,
+            one_list_tier=OneListTier.objects.first(),
+            one_list_account_owner=AdviserFactory(),
+        )
+        company = CompanyFactory(
+            company_number='123',
+            trading_names=['Xyz trading', 'Abc trading'],
+            global_headquarters=ghq,
+            one_list_tier=None,
+            one_list_account_owner=None,
+        )
+        countries = metadata_models.Country.objects.all()[:3]
+        for country in countries[:2]:
+            CompanyCountryOfInterestFactory(
+                company=company,
+                country=country,
+            )
+
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_company_document',
+            ),
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'future_interest_countries': [
+                    {'id': c.id, 'name': c.name}
+                    for c in countries[1:3]
+                ],
+            },
+        )
+        response = api_client.get(url)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK
+        assert response_data['id'] == str(company.id)
+        company.refresh_from_db()
+        assert set(company.get_active_countries_of_interest()) == set(countries[1:3])
+
 
 class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
 
+    @pytest.mark.countries_of_interest
     @pytest.mark.parametrize(
         'data,expected_response',
         (
@@ -1242,6 +1345,29 @@ class TestAddCompany(APITestMixin):
                     },
                 },
             ),
+            # Future_interest_countries are saved
+            (
+                {'future_interest_countries': [
+                    {
+                        'id': Country.united_kingdom.value.id,
+                        'name': Country.united_kingdom.value.name,
+                    },
+                    {
+                        'id': Country.united_states.value.id,
+                        'name': Country.united_states.value.name,
+                    },
+                ]},
+                {'future_interest_countries': [
+                    {
+                        'id': Country.united_kingdom.value.id,
+                        'name': Country.united_kingdom.value.name,
+                    },
+                    {
+                        'id': Country.united_states.value.id,
+                        'name': Country.united_states.value.name,
+                    },
+                ]},
+            ),
         ),
     )
     def test_success_cases(self, data, expected_response):
@@ -1249,7 +1375,7 @@ class TestAddCompany(APITestMixin):
         post_data = {
             'name': 'Acme',
             'business_type': BusinessTypeConstant.company.value.id,
-            'sector': random_obj_for_model(Sector).id,
+            'sector': random_obj_for_model(metadata_models.Sector).id,
             'address': {
                 'line_1': '75 Stramford Road',
                 'town': 'London',
@@ -1433,7 +1559,7 @@ class TestAddCompany(APITestMixin):
         post_data = {
             'name': 'Acme',
             'business_type': BusinessTypeConstant.company.value.id,
-            'sector': random_obj_for_model(Sector).id,
+            'sector': random_obj_for_model(metadata_models.Sector).id,
             'address': {
                 'line_1': '75 Stramford Road',
                 'town': 'London',
