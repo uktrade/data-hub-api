@@ -1,6 +1,10 @@
 from django.urls import path
 
-from datahub.dnb_api.views import DNBCompanyCreateView, DNBCompanySearchView
+from datahub.dnb_api.views import (
+    DNBCompanyCreateInvestigationView,
+    DNBCompanyCreateView,
+    DNBCompanySearchView,
+)
 
 urlpatterns = [
     path(
@@ -12,5 +16,10 @@ urlpatterns = [
         'company-create',
         DNBCompanyCreateView.as_view(),
         name='company-create',
+    ),
+    path(
+        'company-create-investigation',
+        DNBCompanyCreateInvestigationView.as_view(),
+        name='company-create-investigation',
     ),
 ]
