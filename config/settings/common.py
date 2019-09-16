@@ -527,7 +527,7 @@ _add_hawk_credentials(
 
 _add_hawk_credentials(
     'DATA_HUB_FRONTEND_ACCESS_KEY_ID',
-    'DATA_HUB_FRONTEND_ACCESS_KEY',
+    'DATA_HUB_FRONTEND_SECRET_ACCESS_KEY',
     (HawkScope.metadata, ),
 )
 
