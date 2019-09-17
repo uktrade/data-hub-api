@@ -443,67 +443,6 @@ class TestSearch(APITestMixin):
             'abcdef',
         ] == [contact['last_name'] for contact in response.data['results']]
 
-    def test_search_contact_sort_by_company_sector_desc(self, setup_es):
-        """Tests sorting by company_sector in descending order."""
-        company1 = CompanyFactory(
-            sector_id=Sector.renewable_energy_wind.value.id,
-        )
-        company2 = CompanyFactory(
-            sector_id=Sector.aerospace_assembly_aircraft.value.id,
-        )
-
-        ContactFactory(
-            first_name='61409aa1fd47d4a5',
-            company=company1,
-        )
-        ContactFactory(
-            first_name='61409aa1fd47d4a5',
-            company=company2,
-        )
-
-        setup_es.indices.refresh()
-
-        term = '61409aa1fd47d4a5'
-
-        url = reverse('api-v3:search:contact')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': term,
-                'sortby': 'company_sector.name:desc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert [
-            company1.sector.id,
-            company2.sector.id,
-        ] == [
-            uuid.UUID(contact['company_sector']['id'])
-            for contact in response.data['results']
-        ]
-
-    def test_sort_by_deprecated_field_logs_error(self, setup_es, caplog):
-        """Test that sorting by a deprecated sorting option logs an error."""
-        caplog.set_level('ERROR')
-
-        url = reverse('api-v3:search:contact')
-        response = self.api_client.post(
-            url,
-            data={
-                'original_query': '',
-                'sortby': 'company_sector.name:desc',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        expected_message = (
-            'The following deprecated contact search sortby field was used: company_sector.name'
-        )
-        assert expected_message in caplog.text
-
 
 class TestContactExportView(APITestMixin):
     """Tests the contact export view."""
