@@ -43,17 +43,18 @@ class OMISDatasetView(HawkResponseSigningMixin, APIView):
     def get_dataset(self):
         """Returns list of OMIS Dataset records"""
         return Order.objects.annotate(
+            sector_name=get_sector_name_subquery('sector'),
             services=get_string_agg_subquery(Order, 'service_types__name'),
         ).values(
-            'cancelled_on',
             'cancellation_reason__name',
-            'company__name',
+            'cancelled_on',
             'company__address_1',
             'company__address_2',
             'company__address_town',
             'company__address_county',
             'company__address_country__name',
             'company__address_postcode',
+            'company__name',
             'company__registered_address_1',
             'company__registered_address_2',
             'company__registered_address_town',
@@ -72,7 +73,7 @@ class OMISDatasetView(HawkResponseSigningMixin, APIView):
             'paid_on',
             'primary_market__name',
             'reference',
-            'sector__segment',
+            'sector_name',
             'services',
             'status',
             'subtotal_cost',
