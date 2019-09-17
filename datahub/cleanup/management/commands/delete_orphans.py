@@ -34,6 +34,7 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
                 Company._meta.get_field('dnbmatchingresult'),
+                Company._meta.get_field('raw_countries_of_interest'),
             ),
         ),
         'event.Event': ModelCleanupConfig(
