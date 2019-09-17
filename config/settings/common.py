@@ -490,7 +490,7 @@ HAWK_RECEIVER_NONCE_EXPIRY_SECONDS = 60
 HAWK_RECEIVER_CREDENTIALS = {}
 
 
-def _add_hawk_credentials(id_env_name, key_env_name, scope):
+def _add_hawk_credentials(id_env_name, key_env_name, scopes):
     id_ = env(id_env_name, default=None)
 
     if not id_:
@@ -503,26 +503,32 @@ def _add_hawk_credentials(id_env_name, key_env_name, scope):
 
     HAWK_RECEIVER_CREDENTIALS[id_] = {
         'key': env(key_env_name),
-        'scope': scope,
+        'scopes': scopes,
     }
 
 
 _add_hawk_credentials(
     'ACTIVITY_STREAM_ACCESS_KEY_ID',
     'ACTIVITY_STREAM_SECRET_ACCESS_KEY',
-    HawkScope.activity_stream,
+    (HawkScope.activity_stream, ),
 )
 
 _add_hawk_credentials(
     'MARKET_ACCESS_ACCESS_KEY_ID',
     'MARKET_ACCESS_SECRET_ACCESS_KEY',
-    HawkScope.public_company,
+    (HawkScope.public_company, HawkScope.metadata, ),
 )
 
 _add_hawk_credentials(
     'DATA_FLOW_API_ACCESS_KEY_ID',
     'DATA_FLOW_API_SECRET_ACCESS_KEY',
-    HawkScope.data_flow_api,
+    (HawkScope.data_flow_api, ),
+)
+
+_add_hawk_credentials(
+    'DATA_HUB_FRONTEND_ACCESS_KEY_ID',
+    'DATA_HUB_FRONTEND_SECRET_ACCESS_KEY',
+    (HawkScope.metadata, ),
 )
 
 # To read data from Activity Stream

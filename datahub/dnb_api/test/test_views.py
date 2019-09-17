@@ -22,6 +22,7 @@ DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/
     (
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
+        reverse('api-v4:dnb-api:company-create-investigation'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -43,18 +44,6 @@ class TestDNBAPICommon(APITestMixin):
 
         assert response.status_code == 404
         assert requests_mock.called is False
-
-    @override_settings(DNB_SERVICE_BASE_URL=None)
-    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag, url):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
-        is not set.
-        """
-        with pytest.raises(ImproperlyConfigured):
-            self.api_client.post(
-                url,
-                data={'duns_number': '123456789'},
-            )
 
     def test_unauthenticated_not_authorised(
         self,
@@ -83,6 +72,18 @@ class TestDNBCompanySearchAPI(APITestMixin):
     """
     DNB Company Search view test case.
     """
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                reverse('api-v4:dnb-api:company-search'),
+                data={},
+            )
 
     @pytest.mark.parametrize(
         'content_type,expected_status_code',
@@ -375,7 +376,20 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'transferred_to': None,
             'transferred_on': None,
             'contacts': [],
+            'pending_dnb_investigation': False,
         }
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                reverse('api-v4:dnb-api:company-search'),
+                data={'duns_number': '12345678'},
+            )
 
     def test_post_non_uk(
         self,
@@ -663,6 +677,148 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             data={
                 'duns_number': 123456789,
             },
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
+    """
+    Tests for dnb-company-create-investigation endpoint.
+    """
+
+    @pytest.mark.parametrize(
+        'investigation_override',
+        (
+            {},
+            {'telephone_number': None},
+            {'website': None},
+        ),
+    )
+    def test_post(
+            self,
+            dnb_company_search_feature_flag,
+            investigation_payload,
+            investigation_override,
+    ):
+        """
+        Test if we can post the unhappy path data to create a
+        Company record with `pending_dnb_investigation` set to
+        True.
+        """
+        payload = {
+            **investigation_payload,
+            **investigation_override,
+        }
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create-investigation'),
+            data=payload,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        company = Company.objects.get(
+            pk=response.json()['id'],
+        )
+        assert company.pending_dnb_investigation
+        assert company.created_by == self.user
+        assert company.modified_by == self.user
+        assert company.name == payload['name']
+        assert company.website == payload['website']
+        assert company.dnb_investigation_data == {
+            'telephone_number': payload['telephone_number'],
+        }
+        assert company.address_1 == payload['address']['line_1']
+        assert company.address_2 == payload['address']['line_2']
+        assert company.address_town == payload['address']['town']
+        assert company.address_county == payload['address']['county']
+        assert company.address_postcode == payload['address']['postcode']
+        assert str(company.address_country.id) == payload['address']['country']['id']
+        assert str(company.business_type.id) == payload['business_type']
+        assert str(company.sector.id) == payload['sector']
+        assert str(company.uk_region.id) == payload['uk_region']
+
+    @pytest.mark.parametrize(
+        'investigation_override, expected_error',
+        (
+            # Website and telephone_number cannot both be null
+            (
+                {'website': None, 'telephone_number': None},
+                {'non_field_errors': ['Either website or telephone_number must be provided.']},
+            ),
+            # If website is specified, it should be a valid URL
+            (
+                {'website': 'test'},
+                {'website': ['Enter a valid URL.']},
+            ),
+            # Other fields that are required and enforced by CompanySerializer
+            (
+                {'name': None},
+                {'name': ['This field may not be null.']},
+            ),
+            (
+                {'business_type': None},
+                {'business_type': ['This field is required.']},
+            ),
+            (
+                {'address': None},
+                {'address': ['This field may not be null.']},
+            ),
+            (
+                {'sector': None},
+                {'sector': ['This field is required.']},
+            ),
+            (
+                {'uk_region': None},
+                {'uk_region': ['This field is required.']},
+            ),
+        ),
+    )
+    def test_post_invalid(
+            self,
+            dnb_company_search_feature_flag,
+            investigation_payload,
+            investigation_override,
+            expected_error,
+    ):
+        """
+        Test if we post invalid data to the create-company-investigation
+        endpoint, we get an error.
+        """
+        payload = {
+            **investigation_payload,
+            **investigation_override,
+        }
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create-investigation'),
+            data=payload,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_error
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.add_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_post_no_permission(
+        self,
+        dnb_company_search_feature_flag,
+        permissions,
+    ):
+        """
+        Create-company-investigation endpoint should return 403 if the user does not
+        have the necessary permissions.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-create-investigation'),
+            data={},
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN

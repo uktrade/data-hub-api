@@ -122,7 +122,7 @@ class TestDNBInvestigationData:
             None,
             {},
             {'foo': 'bar'},
-            {'telephopne_number': '12345678'},
+            {'telephone_number': '12345678'},
             {'telephone_number': None},
         ),
     )
@@ -144,7 +144,5 @@ class TestDNBInvestigationData:
                 'postcode': company.address_postcode,
             },
             'website': company.website,
-            'telephone_number': investigation_data.get(
-                'telephone_number',
-            ),
+            'telephone_number': investigation_data.get('telephone_number'),
         }

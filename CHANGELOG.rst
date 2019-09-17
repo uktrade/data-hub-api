@@ -1,3 +1,164 @@
+Data Hub API 15.0.0 (2019-09-17)
+================================
+
+
+
+Removals
+--------
+
+- **Contacts** ``POST /v3/search/contact``, ``POST /v3/search/contact/export`` various deprecated ``sortby`` values were removed. See the API section for more details.
+- **Investment** ``POST /v3/search/investment_project``, ``POST /v3/search/investment_project/export`` various deprecated ``sortby`` values were removed. See the API section for more details.
+- All ``/metadata/*`` endpoints are deprecated and will be removed on or after 17th October 2019. Please use corresponding ``/v4/metadata`` endpoints instead.
+
+Internal changes
+----------------
+
+- The ``dnb_api`` package now has a ``DNBCompanyInvestigationSerializer``.
+
+  This is used to store stub companies in the database when users cannot find a company in the DNB API and want to create a new company subject to DNB review.
+
+API
+---
+
+- **Companies** The ``GET /v4/company`` and ``GET /v4/company/<uuid:pk>`` endpoints were
+  modified to return the boolean ``pending_dnb_investigation`` in responses.
+  The format of the responses are as follows::
+
+    "pending_dnb_investigation": true,
+- **Contacts** The following endpoint was added:
+
+  - ``GET /v4/dataset/contacts-dataset``: Present required fields data of all contacts to be consumed by data-flow and used in data-workspace for reporting and analyst access.
+- **Contacts** ``POST /v3/search/contact``, ``POST /v3/search/contact/export`` the following deprecated ``sortby`` values were removed:
+
+  - ``accepts_dit_email_marketing``
+  - ``address_county``
+  - ``address_same_as_company``
+  - ``address_town``
+  - ``adviser.name``
+  - ``archived``
+  - ``archived_by.name``
+  - ``archived_on``
+  - ``company_sector.name``
+  - ``email``
+  - ``first_name``
+  - ``id``
+  - ``job_title``
+  - ``name``
+  - ``primary``
+  - ``telephone_countrycode``
+  - ``telephone_number``
+  - ``title.name``
+- **Investment** ``POST /v3/search/investment_project``, ``POST /v3/search/investment_project/export`` the following deprecated ``sortby`` values were removed:
+
+  - ``actual_land_date``
+  - ``approved_commitment_to_invest``
+  - ``approved_fdi``
+  - ``approved_good_value``
+  - ``approved_high_value``
+  - ``approved_landed``
+  - ``approved_non_fdi``
+  - ``archived``
+  - ``archived_by.name``
+  - ``average_salary.name``
+  - ``business_activities.name``
+  - ``client_cannot_provide_total_investment``
+  - ``client_contacts.name``
+  - ``client_relationship_manager.name``
+  - ``export_revenue``
+  - ``fdi_type.name``
+  - ``foreign_equity_investment``
+  - ``government_assistance``
+  - ``id``
+  - ``intermediate_company.name``
+  - ``investment_type.name``
+  - ``investor_company.name``
+  - ``likelihood_to_land.name``
+  - ``modified_on``
+  - ``new_tech_to_uk``
+  - ``non_fdi_r_and_d_budget``
+  - ``number_new_jobs``
+  - ``project_assurance_adviser.name``
+  - ``project_code``
+  - ``project_manager.name``
+  - ``r_and_d_budget``
+  - ``referral_source_activity.name``
+  - ``referral_source_activity_event``
+  - ``referral_source_activity_marketing.name``
+  - ``referral_source_activity_website.name``
+  - ``sector.name``
+  - ``site_decided``
+  - ``total_investment``
+  - ``uk_company.name``
+- An endpoint ``POST /v4/dnb/company-create-investigation`` was added for creating stub companies in DataHub for investigation by DNB.
+- The ``POST /v4/dnb/company-create`` endpoint was modified to return the boolean
+  ``pending_dnb_investigation`` in responses representing created Data Hub
+  companies.
+
+  The format of the response is as follows::
+
+    "pending_dnb_investigation": true,
+- Following endpoints were added to replace existing ``/metadata`` endpoint:
+
+  - ``GET /v4/metadata/administrative-area``
+  - ``GET /v4/metadata/business-type``
+  - ``GET /v4/metadata/capital-investment/asset-class-interest``
+  - ``GET /v4/metadata/capital-investment/construction-risk``
+  - ``GET /v4/metadata/capital-investment/deal-ticket-size``
+  - ``GET /v4/metadata/capital-investment/desired-deal-role``
+  - ``GET /v4/metadata/capital-investment/equity-percentage``
+  - ``GET /v4/metadata/capital-investment/investor-type``
+  - ``GET /v4/metadata/capital-investment/large-capital-investment-type``
+  - ``GET /v4/metadata/capital-investment/required-checks-conducted``
+  - ``GET /v4/metadata/capital-investment/restriction``
+  - ``GET /v4/metadata/capital-investment/return-rate``
+  - ``GET /v4/metadata/capital-investment/time-horizon``
+  - ``GET /v4/metadata/communication-channel``
+  - ``GET /v4/metadata/country``
+  - ``GET /v4/metadata/employee-range``
+  - ``GET /v4/metadata/event-type``
+  - ``GET /v4/metadata/evidence-tag``
+  - ``GET /v4/metadata/export-experience-category``
+  - ``GET /v4/metadata/fdi-type``
+  - ``GET /v4/metadata/fdi-value``
+  - ``GET /v4/metadata/headquarter-type``
+  - ``GET /v4/metadata/investment-activity-type``
+  - ``GET /v4/metadata/investment-business-activity``
+  - ``GET /v4/metadata/investment-delivery-partner``
+  - ``GET /v4/metadata/investment-investor-type``
+  - ``GET /v4/metadata/investment-involvement``
+  - ``GET /v4/metadata/investment-project-stage``
+  - ``GET /v4/metadata/investment-specific-programme``
+  - ``GET /v4/metadata/investment-strategic-driver``
+  - ``GET /v4/metadata/investment-type``
+  - ``GET /v4/metadata/likelihood-to-land``
+  - ``GET /v4/metadata/location-type``
+  - ``GET /v4/metadata/omis-market``
+  - ``GET /v4/metadata/order-cancellation-reason``
+  - ``GET /v4/metadata/order-service-type``
+  - ``GET /v4/metadata/overseas-region``
+  - ``GET /v4/metadata/policy-area``
+  - ``GET /v4/metadata/policy-issue-type``
+  - ``GET /v4/metadata/programme``
+  - ``GET /v4/metadata/project-manager-request-status``
+  - ``GET /v4/metadata/referral-source-activity``
+  - ``GET /v4/metadata/referral-source-marketing``
+  - ``GET /v4/metadata/referral-source-website``
+  - ``GET /v4/metadata/salary-range``
+  - ``GET /v4/metadata/sector``
+  - ``GET /v4/metadata/service-delivery-status``
+  - ``GET /v4/metadata/service``
+  - ``GET /v4/metadata/team-role``
+  - ``GET /v4/metadata/team``
+  - ``GET /v4/metadata/title``
+  - ``GET /v4/metadata/turnover``
+  - ``GET /v4/metadata/uk-region``
+
+  The responses are exactly the same as their corresponding ``/metadata`` endpoints.
+
+  New endpoints use Hawk authentication.
+- All ``/metadata/*`` endpoints are deprecated and will be removed on or after 15th October 2019. Please use corresponding ``/v4/metadata`` endpoints instead.
+
+
 Data Hub API 14.8.0 (2019-09-12)
 ================================
 
@@ -18,7 +179,7 @@ Features
 --------
 
 - **OMIS** The notification logic in ``datahub.omis`` was adjusted to optionally use the
-  ``datahub.notification`` app for triggering GOVUK notifications. This 
+  ``datahub.notification`` app for triggering GOVUK notifications. This
   functionality can be switched on using a feature flag.
 
 Bug fixes
@@ -44,19 +205,16 @@ API
 - **Companies** ``GET /v4/company/<id>>/timeline``: This deprecated endpoint was removed. Please use ``/v4/activity-feed`` instead.
 - **Interactions** ``GET,PATCH /v3/interaction/<uuid:pk>`` and ``GET,POST /v3/interaction``:
   the field ``location`` is deprecated and will be removed on or after 19 September.
-- **Interactions** The ``/v3/search/interaction`` endpoint was modified to return 
+- **Interactions** The ``/v3/search/interaction`` endpoint was modified to return
   ``company_one_list_group_tier`` in search results. This will be in the following
-  format:
+  format::
 
-
-  ```
-  ...
-  "company_one_list_group_tier": {
-      "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
-      "name": "Tier A - Strategic Account"
-  }
-  ...
-  ```
+    ...
+    "company_one_list_group_tier": {
+        "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
+        "name": "Tier A - Strategic Account"
+    }
+    ...
 
   The value could alternatively be null (if the interaction's company does not
   have a one list group tier).
@@ -67,29 +225,27 @@ API
 - A field ``iso_alpha2_code`` was added to the ``GET /metadata/country/`` API
   endpoint.
 
-  This endpoint now returns results of the following format:
+  This endpoint now returns results of the following format::
 
-  ```
-  ...
-  {
-      "id": "80756b9a-5d95-e211-a939-e4115bead28a",
-      "name": "United Kingdom",
-      "disabled_on": null,
-      "overseas_region": null,
-      "iso_alpha2_code": "GB"
-  },
-  {
-      "id": "81756b9a-5d95-e211-a939-e4115bead28a",
-      "name": "United States",
-      "disabled_on": null,
-      "overseas_region": {
-          "name": "North America",
-          "id": "fdfbbc8d-0e8a-479a-b10f-4979d582ff87"
-      },
-      "iso_alpha2_code": "US"
-  },
-  ...
-  ```
+    ...
+    {
+        "id": "80756b9a-5d95-e211-a939-e4115bead28a",
+        "name": "United Kingdom",
+        "disabled_on": null,
+        "overseas_region": null,
+        "iso_alpha2_code": "GB"
+    },
+    {
+        "id": "81756b9a-5d95-e211-a939-e4115bead28a",
+        "name": "United States",
+        "disabled_on": null,
+        "overseas_region": {
+            "name": "North America",
+            "id": "fdfbbc8d-0e8a-479a-b10f-4979d582ff87"
+        },
+        "iso_alpha2_code": "US"
+    },
+    ...
 
 Database schema
 ---------------
@@ -348,7 +504,7 @@ Features
 Bug fixes
 ---------
 
-- **Interactions** Meeting invite ingestion was adjusted so that users do not get error 
+- **Interactions** Meeting invite ingestion was adjusted so that users do not get error
   notifications when they send a meeting cancellation.
 
   The notification celery task was modified so that 400/403 level responses do not
@@ -605,7 +761,7 @@ API
               },
               ...
           ]
-      }        
+      }
 
 
   ``latest_interaction`` may be ``null`` if the company has no interactions.
@@ -687,7 +843,7 @@ Features
   and proxies requests through to the service - it will return error responses
   from the proxied DNB service.
 
-  There is further work to be done here in terms of iterating features and 
+  There is further work to be done here in terms of iterating features and
   hardening the implementation.
 
 Bug fixes
@@ -800,8 +956,8 @@ Features
 
   You must also log into Django admin prior to accessing ``/docs``.
 - A new ``notification`` django app was added for the purpose of sending notifications
-  to Data Hub advisers and contacts.  This is a wrapper around the GOVUK Notify 
-  service and will be used initially for sending receipt/bounce notifications to 
+  to Data Hub advisers and contacts.  This is a wrapper around the GOVUK Notify
+  service and will be used initially for sending receipt/bounce notifications to
   advisers who use the meeting invite email ingestion tool.
 
   The app has not yet been added to ``settings.INSTALLED_APPS``; this will happen
@@ -959,7 +1115,7 @@ API
 
 - **Interactions** ``POST /v3/interaction, PATCH /v3/interaction/<id>``: The API now correctly returns an error if ``service_delivery`` is specified for ``kind`` when ``theme`` is ``investment``.
 - It is now possible to get a list of OMIS orders added in activity-stream `format.
-  <https://www.w3.org/TR/activitystreams-core/>`_ 
+  <https://www.w3.org/TR/activitystreams-core/>`_
 
   The URL for this is:
 
@@ -989,7 +1145,7 @@ Features
   interactions. This enables DIT advisers to create interactions more easily.
 
   This is the first instance of a Data Hub app using the framework provided by the
-  ``datahub.email_ingestion`` app.  There will be subsequent iterations on the 
+  ``datahub.email_ingestion`` app.  There will be subsequent iterations on the
   ``CalendarInteractionEmailProcessor`` class to improve the user experience - most
   notably sending notifications of bounce/receipt to advisers.
 
@@ -998,7 +1154,7 @@ API
 
 - ``GET /v4/activity-feed`` now returns an empty list if the authenticated user doesn't have permissions to view all interactions, investment projects or OMIS orders.
 - It is now possible to get a list of investment projects created in activity-stream `format.
-  <https://www.w3.org/TR/activitystreams-core/>`_ 
+  <https://www.w3.org/TR/activitystreams-core/>`_
 
   The URL for this is:
 
