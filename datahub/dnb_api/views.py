@@ -14,11 +14,12 @@ from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
+    DNBCompanyInvestigationSerializer,
     DNBCompanySerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
 )
-from datahub.dnb_api.utils import format_dnb_company, search_dnb
+from datahub.dnb_api.utils import format_dnb_company, format_dnb_company_investigation, search_dnb
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
 
@@ -184,6 +185,47 @@ class DNBCompanyCreateView(APIView):
         datahub_company = company_serializer.save(
             created_by=request.user,
             modified_by=request.user,
+        )
+
+        return Response(
+            company_serializer.to_representation(datahub_company),
+        )
+
+
+class DNBCompanyCreateInvestigationView(APIView):
+    """
+    View for creating a company for DNB to investigate.
+
+    This view is not inheriting from CoreViewSet because
+    `format_dnb_company_investigation` mutates `request.data`
+    which when shoehorned into CoreViewSet does not result in
+    less or more readable code.
+    """
+
+    required_scopes = (Scope.internal_front_end, )
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.add_company}',
+        ),
+    )
+
+    @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
+    def post(self, request):
+        """
+        Given a minimal set of fields that may be necessary for DNB investigation,
+        create a Company record in DataHub.
+        """
+        company_serializer = DNBCompanyInvestigationSerializer(
+            data=format_dnb_company_investigation(request.data),
+        )
+        company_serializer.is_valid(raise_exception=True)
+
+        datahub_company = company_serializer.save(
+            created_by=request.user,
+            modified_by=request.user,
+            pending_dnb_investigation=True,
         )
 
         return Response(
