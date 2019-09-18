@@ -45,9 +45,9 @@ class TestCompanyBusinessTypePostMigrate:
 
 
 @pytest.mark.usefixtures('synchronous_on_commit')
-class TestNotifyDNBInvestigation:
+class TestNotifyDNBInvestigationPostSave:
     """
-    Test the `notify_dnb_investigation` signal is triggered appropriately.
+    Test the `notify_dnb_investigation_post_save` signal is triggered appropriately.
     """
 
     def _get_dnb_investigation_notify_client(self):

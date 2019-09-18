@@ -31,9 +31,9 @@ def company_business_type_post_migrate(sender, **kwargs):
 @receiver(
     post_save,
     sender=Company,
-    dispatch_uid='notify_dnb_post_save_company',
+    dispatch_uid='notify_dnb_investigation_post_save',
 )
-def notify_dnb_investigation(sender, instance, created, raw, **kwargs):
+def notify_dnb_investigation_post_save(sender, instance, created, raw, **kwargs):
     """
     Notify recipients of a new company that needs investigation by DNB. This will only be triggered
     for a company which has `pending_dnb_investigation=True` and was not created
@@ -43,9 +43,9 @@ def notify_dnb_investigation(sender, instance, created, raw, **kwargs):
         return
 
     if created and instance.pending_dnb_investigation:
-        transaction.on_commit(partial(_notify_dnb_investigation, instance))
+        transaction.on_commit(partial(_notify_dnb_investigation_post_save, instance))
 
 
-def _notify_dnb_investigation(instance):
+def _notify_dnb_investigation_post_save(instance):
     logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
     notify_new_dnb_investigation(instance)
