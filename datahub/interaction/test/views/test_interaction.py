@@ -67,10 +67,6 @@ class TestAddInteraction(APITestMixin):
             {
                 'status': Interaction.STATUSES.draft,
             },
-            # interaction with a location
-            {
-                'location': 'Windsor House',
-            },
             # investment project interaction
             {
                 'investment_project': InvestmentProjectFactory,
@@ -185,7 +181,6 @@ class TestAddInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            'location': request_data.get('location', ''),
             'archived': False,
             'archived_by': None,
             'archived_on': None,
@@ -729,7 +724,6 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            'location': '',
             'archived': False,
             'archived_by': None,
             'archived_on': None,
@@ -831,7 +825,6 @@ class TestGetInteraction(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            'location': '',
             'archived': False,
             'archived_by': None,
             'archived_on': None,
