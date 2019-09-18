@@ -14,7 +14,7 @@ This is currently done by creating [newsfragments](../changelog/) with details o
 
 To do that:
 
-* Create an `.api `, `.removal` and, if necessary, a `.db` newsfragment announcing the change. See [example](https://github.com/uktrade/data-hub-leeloo/pull/1082/files).
+* Create an `.api `, `.deprecation` and, if necessary, a `.db` newsfragment announcing the change. See [example](https://github.com/uktrade/data-hub-leeloo/commit/ff5484b4331cd8a42dfd962d00438274d9edc6a6).
 * Open a PR and merge it into develop after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
