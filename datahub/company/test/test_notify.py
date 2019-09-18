@@ -22,7 +22,7 @@ pytestmark = pytest.mark.django_db
         None,
         {},
         {'foo': 'bar'},
-        {'telephopne_number': '12345678'},
+        {'telephone_number': '12345678'},
         {'telephone_number': None},
     ),
 )
@@ -48,7 +48,7 @@ def test_get_dnb_investigation_context(investigation_data):
         'business_name': company.name,
         'business_address': expected_address,
         'website': company.website or '',
-        'contact_number': investigation_data.get('telephone_number', ''),
+        'contact_number': investigation_data.get('telephone_number') or '',
     }
 
 

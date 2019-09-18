@@ -63,7 +63,7 @@ class TestNotifyDNBInvestigationPostSave:
         """
         client = self._get_dnb_investigation_notify_client()
         CompanyFactory(pending_dnb_investigation=True)
-        client.send_email_notification.assert_called()
+        client.send_email_notification.assert_called_once()
 
     def test_notify_signal_company_not_pending_no_investigation(self):
         """

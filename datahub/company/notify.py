@@ -53,5 +53,5 @@ def get_dnb_investigation_context(company):
             address_part for address_part in address_parts if address_part
         ),
         'website': company.website or '',
-        'contact_number': dnb_investigation_data.get('telephone_number', ''),
+        'contact_number': dnb_investigation_data.get('telephone_number') or '',
     }
