@@ -246,7 +246,6 @@ class Interaction(ArchivableModel, BaseModel):
     service_answers = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
 
     subject = models.TextField()
-    location = models.CharField(max_length=MAX_LENGTH, blank=True)
     notes = models.TextField(max_length=10000, blank=True)
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,

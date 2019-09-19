@@ -173,13 +173,11 @@ class CalendarInteractionEmailParser:
 
     def _extract_and_validate_calendar_event_metadata(self):
         event_component = self._extract_and_validate_calendar_event_component()
-        location = str(event_component.get('location') or '')
         calendar_event = {
             'subject': str(event_component.get('summary')),
             'start': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstart')),
             'end': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtend')),
             'sent': _convert_calendar_time_to_utc_datetime(event_component.decoded('dtstamp')),
-            'location': location,
             'status': str(event_component.get('status')),
             'uid': str(event_component.get('uid')),
         }
@@ -214,7 +212,6 @@ class CalendarInteractionEmailParser:
             'secondary_advisers': secondary_advisers,
             'top_company': top_company,
             'date': calendar_event['start'],
-            'location': calendar_event['location'],
             'meeting_details': calendar_event,
             'subject': calendar_event['subject'],
         }

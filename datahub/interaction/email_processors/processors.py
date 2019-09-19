@@ -133,7 +133,6 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             'kind': Interaction.KINDS.interaction,
             'status': Interaction.STATUSES.draft,
             'subject': data['subject'],
-            'location': data['location'],
             'was_policy_feedback_provided': False,
         }
 
