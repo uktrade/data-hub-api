@@ -1,3 +1,49 @@
+Data Hub API 15.1.0 (2019-09-19)
+================================
+
+
+
+Removals
+--------
+
+- **Interactions** The ``location`` field for interactions was removed following its deprecation
+  period. Please see the API and DB sections for further detail.
+
+Features
+--------
+
+- **Companies** A feature was added to notify a configurable list of recipients when a company
+  is added to Data Hub which has the ``pending_dnb_investigation`` flag set. The
+  intention is for this to be used to send investigation details to DNB directly;
+  though notifications will be monitored with a DIT email address to begin with.
+
+API
+---
+
+- **Companies** Two metdata API endpoints were added for One List Tiers.
+  ``GET /metadata/one-list-tier/`` and ``GET /v4/metadata/one-list-tier`` list 
+  all One List Tier models in the following format::
+
+      [
+          {
+              "id": "b91bf800-8d53-e311-aef3-441ea13961e2",
+              "name": "Tier A - Strategic Account",
+              "disabled_on": null
+          },
+          ...,
+      ]
+- **Interactions** The ``location`` field was removed from the ``GET /v3/interaction`` and
+  ``GET /v3/interaction/<uuid:pk>`` API endpoints.
+- **OMIS** The following API endpoint is updated
+    - ``GET /v4/dataset/omis-dataset``: The sector__segment field was removed and sector_name was added which is a string of multiple sector names separated by ",".
+
+Database schema
+---------------
+
+- **Interactions** The ``location`` field was removed from the django state for the ``Interaction``
+  model.
+
+
 Data Hub API 15.0.0 (2019-09-17)
 ================================
 
