@@ -115,34 +115,3 @@ class TestDNBInvestigationData:
         company = CompanyFactory(dnb_investigation_data=investigation_data)
         db_company = Company.objects.get(id=company.id)
         assert db_company.dnb_investigation_data == investigation_data
-
-    @pytest.mark.parametrize(
-        'investigation_data',
-        (
-            None,
-            {},
-            {'foo': 'bar'},
-            {'telephone_number': '12345678'},
-            {'telephone_number': None},
-        ),
-    )
-    def test_get_dnb_investigation_context(self, investigation_data):
-        """
-        Test if get_dnb_investigation_context returns a dict with sensible
-        values for the required fields.
-        """
-        company = CompanyFactory(dnb_investigation_data=investigation_data)
-        investigation_data = investigation_data or {}
-        assert company.get_dnb_investigation_context() == {
-            'name': company.name,
-            'address': {
-                'line_1': company.address_1,
-                'line_2': company.address_2,
-                'town': company.address_town,
-                'county': company.address_county,
-                'country': company.address_country.name,
-                'postcode': company.address_postcode,
-            },
-            'website': company.website,
-            'telephone_number': investigation_data.get('telephone_number'),
-        }
