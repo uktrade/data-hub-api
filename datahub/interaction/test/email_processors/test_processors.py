@@ -48,7 +48,6 @@ def base_interaction_data_fixture():
         'secondary_adviser_emails': [],
         'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
         'top_company_name': 'Company 1',
-        'location': 'Windsor House',
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',
     }
@@ -113,7 +112,6 @@ class TestCalendarInteractionEmailProcessor:
             'secondary_advisers': secondary_advisers,
             'top_company': Company.objects.get(name=interaction_data['top_company_name']),
             'date': interaction_data['date'],
-            'location': interaction_data['location'],
             'meeting_details': interaction_data['meeting_details'],
             'subject': interaction_data['subject'],
         }
@@ -196,7 +194,6 @@ class TestCalendarInteractionEmailProcessor:
                 assert contact in interaction_contacts
         assert interaction.company.name == interaction_data['top_company_name']
         assert interaction.date == interaction_data['date']
-        assert interaction.location == interaction_data['location']
         assert interaction.source == {
             'meeting': {'id': interaction_data['meeting_details']['uid']},
         }
@@ -324,13 +321,6 @@ class TestCalendarInteractionEmailProcessor:
     @pytest.mark.parametrize(
         'interaction_data_overrides,expected_message',
         (
-            # string fields too long
-            (
-                {
-                    'location': 'x' * (MAX_LENGTH + 1),
-                },
-                'location: Ensure this field has no more than 255 characters.',
-            ),
             # No contacts present
             (
                 {

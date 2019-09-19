@@ -334,7 +334,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_feedback_notes',
             'policy_issue_types',
             'was_policy_feedback_provided',
-            'location',
             'archived',
             'archived_by',
             'archived_on',
