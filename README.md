@@ -265,6 +265,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
+| `DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS` | No | Email addresses for recipients that should receive DNB company investigation notifications. |
+| `DNB_INVESTIGATION_NOTIFICATION_API_KEY` | No | GOVUK notify API key to use for sending DNB company investigation notifications. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |

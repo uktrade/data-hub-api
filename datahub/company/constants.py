@@ -3,6 +3,9 @@ from enum import Enum
 from datahub.core.constants import Constant
 
 
+NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG = 'notify-dnb-investigations'
+
+
 class BusinessTypeConstant(Enum):
     """
     Business type constants.

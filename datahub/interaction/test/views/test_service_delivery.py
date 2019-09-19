@@ -167,7 +167,6 @@ class TestAddServiceDelivery(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
-            'location': '',
             'archived': False,
             'archived_by': None,
             'archived_on': None,
