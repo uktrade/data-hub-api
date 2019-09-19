@@ -59,7 +59,7 @@ def test_notify_new_dnb_investigation(monkeypatch):
     FeatureFlagFactory(code=NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG, is_active=True)
     mocked_notify_by_email = mock.Mock()
     notification_recipients = ['a@example.net', 'b@example.net']
-    company = CompanyFactory(dnb_investigation_data={'telephopne_number': '12345678'})
+    company = CompanyFactory(dnb_investigation_data={'telephone_number': '12345678'})
     monkeypatch.setattr(
         'datahub.notification.notify.notify_by_email', mocked_notify_by_email,
     )
@@ -84,7 +84,7 @@ def test_notify_new_dnb_investigation_no_feature_flag(monkeypatch):
     """
     mocked_notify_by_email = mock.Mock()
     notification_recipients = ['a@example.net', 'b@example.net']
-    company = CompanyFactory(dnb_investigation_data={'telephopne_number': '12345678'})
+    company = CompanyFactory(dnb_investigation_data={'telephone_number': '12345678'})
     monkeypatch.setattr(
         'datahub.notification.notify.notify_by_email', mocked_notify_by_email,
     )
