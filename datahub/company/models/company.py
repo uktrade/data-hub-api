@@ -232,28 +232,6 @@ class Company(ArchivableModel, BaseModel):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
 
-    def get_dnb_investigation_context(self):
-        """
-        Get a dict with values for fields that are to be sent
-        to DNB for investigation.
-        """
-        dnb_investigation_data = self.dnb_investigation_data or {}
-        return {
-            'name': self.name,
-            'address': {
-                'line_1': self.address_1,
-                'line_2': self.address_2,
-                'town': self.address_town,
-                'county': self.address_county,
-                'country': self.address_country.name,
-                'postcode': self.address_postcode,
-            },
-            'website': self.website,
-            'telephone_number': dnb_investigation_data.get(
-                'telephone_number',
-            ),
-        }
-
     class Meta:
         verbose_name_plural = 'companies'
         permissions = (

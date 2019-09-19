@@ -36,10 +36,6 @@ class TestCalendarInteractionEmailParser:
                     'start': datetime(2019, 3, 29, 12, 00, tzinfo=utc),
                     'end': datetime(2019, 3, 29, 12, 30, tzinfo=utc),
                     'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=utc),
-                    'location': (
-                        'SOMEWHERE Agency (10 Tunstall Studios, 34-44 Tunstall Road, '
-                        '10/11 Tunstall Studios, London, England, United Kingdom)'
-                    ),
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E008000000001670528522E6D40100000'
@@ -54,7 +50,6 @@ class TestCalendarInteractionEmailParser:
                     'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
                     'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
                     'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
-                    'location': '',
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
@@ -66,10 +61,6 @@ class TestCalendarInteractionEmailParser:
                     'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
                     'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
                     'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
-                    'location': (
-                        'Somewhere, Unit FF - 305 - شارع المركز المالي - دبي - '
-                        'United Arab Emirates'
-                    ),
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
@@ -82,7 +73,6 @@ class TestCalendarInteractionEmailParser:
                     'start': datetime(2019, 5, 19, tzinfo=utc),
                     'end': datetime(2019, 5, 20, tzinfo=utc),
                     'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=utc),
-                    'location': '',
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E00800000000CCE64C7E7709D50100000000000000001'
@@ -97,7 +87,6 @@ class TestCalendarInteractionEmailParser:
                     'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=utc),
                     'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=utc),
                     'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=utc),
-                    'location': 'Windsor House',
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E00800000000399124F77909D501000000'
@@ -134,11 +123,6 @@ class TestCalendarInteractionEmailParser:
                     'secondary_adviser_emails': [],
                     'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 12, 0, tzinfo=utc),
-                    'location': (
-                        'SOMEWHERE Agency (10 Tunstall Studios, 34-44 '
-                        'Tunstall Road, 10/11 Tunstall Studios, London, '
-                        'England, United Kingdom)'
-                    ),
                     'subject': 'test meet',
                 },
             ),
@@ -159,7 +143,6 @@ class TestCalendarInteractionEmailParser:
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
-                    'location': '',
                     'subject': 'initial',
                 },
             ),
@@ -192,7 +175,6 @@ class TestCalendarInteractionEmailParser:
             interaction_data['top_company'].name == expected_interaction_data['top_company_name']
         )
         assert interaction_data['date'] == expected_interaction_data['date']
-        assert interaction_data['location'] == expected_interaction_data['location']
         assert interaction_data['subject'] == expected_interaction_data['subject']
 
     @pytest.mark.parametrize(
