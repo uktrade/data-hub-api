@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 NO_CREDENTIALS_MESSAGE = 'Authentication credentials were not provided.'
 INCORRECT_CREDENTIALS_MESSAGE = 'Incorrect authentication credentials.'
-PAAS_ADDED_X_FORWARDED_FOR_IPS = 2
 
 
 class HawkAuthentication(BaseAuthentication):
@@ -28,55 +27,11 @@ class HawkAuthentication(BaseAuthentication):
         return 'Hawk'
 
     def authenticate(self, request):
-        """Authenticates a request using two mechanisms:
+        """Authenticates a request using Hawk signature in the Authorization header
 
-        1. The X-Forwarded-For-Header, compared against a whitelist
-        2. A Hawk signature in the Authorization header
-
-        If either of these suggest we cannot authenticate, AuthenticationFailed
-        is raised, as required in the DRF authentication flow
+        If we cannot authenticate, AuthenticationFailed is raised, as required
+        in the DRF authentication flow
         """
-        self._check_ip(request)
-        return self._authenticate_by_hawk(request)
-
-    def _check_ip(self, request):
-        """Blocks incoming connections based on IP in X-Forwarded-For
-
-        Ideally, this would be done at the network level. However, this is
-        not possible in PaaS. However, they do always add two IPs, with
-        the first one being the IP connection are made from, so we can
-        check the second-from-the-end with some confidence it hasn't been
-        spoofed.
-
-        This wouldn't be able to be trusted in other environments, but we're
-        not running in non-PaaS environments in production.
-        """
-        if 'HTTP_X_FORWARDED_FOR' not in request.META:
-            logger.warning(
-                'Failed authentication: no X-Forwarded-For header passed',
-            )
-            raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
-
-        x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR']
-        ip_addresses = x_forwarded_for.split(',')
-        if len(ip_addresses) < PAAS_ADDED_X_FORWARDED_FOR_IPS:
-            logger.warning(
-                'Failed authentication: the X-Forwarded-For header does not '
-                'contain enough IP addresses',
-            )
-            raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
-
-        # PaaS appends 2 IPs, where the IP connected from is the first
-        remote_address = ip_addresses[-PAAS_ADDED_X_FORWARDED_FOR_IPS].strip()
-
-        if remote_address not in settings.HAWK_RECEIVER_IP_WHITELIST:
-            logger.warning(
-                'Failed authentication: the X-Forwarded-For header was not '
-                f'produced by a whitelisted IP - found {remote_address}',
-            )
-            raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
-
-    def _authenticate_by_hawk(self, request):
         if 'HTTP_AUTHORIZATION' not in request.META:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
