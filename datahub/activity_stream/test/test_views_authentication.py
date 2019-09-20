@@ -60,6 +60,27 @@ def test_401_wrong_creds(api_client, endpoint):
     ACTIVITY_STREAM_URLS,
 )
 @pytest.mark.django_db
+def test_401_wrong_ip_adress(api_client, endpoint):
+    """If the request has an invalid client IP address, then a 403 is returned."""
+    url = get_url(endpoint)
+    sender = hawk.sender(url)
+    response = api_client.get(
+        url,
+        content_type='',
+        HTTP_AUTHORIZATION=sender.request_header,
+        HTTP_X_FORWARDED_FOR='9.10.11.12, 5.6.7.8',
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json() == {
+        'detail': 'Incorrect authentication credentials.',
+    }
+
+
+@pytest.mark.parametrize(
+    'endpoint',
+    ACTIVITY_STREAM_URLS,
+)
+@pytest.mark.django_db
 def test_403_returned(api_client, endpoint):
     """
     Test that a 403 is returned if the request is Hawk authenticated but the client doesn't have

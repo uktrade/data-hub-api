@@ -28,12 +28,14 @@ from datahub.oauth.scopes import Scope
 class HawkAPITestClient:
     """Simple test client for making requests signed using Hawk."""
 
+    DEFAULT_HTTP_X_FORWARDED_FOR = '1.2.3.4, 123.123.123.123'
     unset = object()
 
     def __init__(self):
         """Initialise the client and create an APIClient instance."""
         self.api_client = APIClient()
         self.credentials = None
+        self.http_x_forwarded_for = self.DEFAULT_HTTP_X_FORWARDED_FOR
 
     def set_credentials(self, id_, key, algorithm='sha256'):
         """Set the credentials for requests."""
@@ -42,6 +44,10 @@ class HawkAPITestClient:
             'key': key,
             'algorithm': algorithm,
         }
+
+    def set_http_x_forwarded_for(self, http_x_forwarded_for):
+        """Set client IP addresses."""
+        self.http_x_forwarded_for = http_x_forwarded_for
 
     def get(self, path, params=None):
         """Make a GET request (optionally with query params)."""
@@ -82,7 +88,7 @@ class HawkAPITestClient:
             method,
             url,
             HTTP_AUTHORIZATION=sender.request_header,
-            HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
+            HTTP_X_FORWARDED_FOR=self.http_x_forwarded_for,
             data=body,
             content_type=content_type,
         )

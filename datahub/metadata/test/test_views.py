@@ -114,6 +114,15 @@ def test_without_scope(metadata_view_name, metadata_client):
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+def test_with_wrong_ip(metadata_view_name, metadata_client):
+    """Test that making a request without the correct client IP returns an error."""
+    url = reverse(viewname=metadata_view_name)
+    metadata_client.set_http_x_forwarded_for('1.1.1.1')
+    response = metadata_client.get(url)
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_view_name_generation():
     """Test urls are generated correctly."""
     patterns = urls.urlpatterns
