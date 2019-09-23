@@ -33,5 +33,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(populate_new_model_sql, reverse_sql=populate_old_m2m_table_sql),
+        migrations.RunSQL(
+            populate_new_model_sql,
+            reverse_sql=populate_old_m2m_table_sql,
+            elidable=True,
+        ),
     ]
