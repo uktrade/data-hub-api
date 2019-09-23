@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import Mock
 
 import pytest
 from django.utils.timezone import utc
@@ -203,3 +204,16 @@ def investigation_payload():
         'sector': Sector.renewable_energy_wind.value.id,
         'uk_region': UKRegion.east_midlands.value.id,
     }
+
+
+@pytest.fixture
+def statsd_mock(monkeypatch):
+    """
+    Returns a mock statsd client instance.
+    """
+    mock_statsd = Mock()
+    monkeypatch.setattr(
+        'datahub.dnb_api.views.statsd',
+        mock_statsd,
+    )
+    return mock_statsd
