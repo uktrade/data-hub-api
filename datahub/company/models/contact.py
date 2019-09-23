@@ -93,6 +93,10 @@ class Contact(ArchivableModel, BaseModel):
             (ContactPermission.view_contact_document.value, 'Can view contact document'),
             (ContactPermission.export_contact.value, 'Can export contact'),
         )
+        indexes = [
+            # For datasets app which includes API endpoints to be consumed by data-flow
+            models.Index(fields=('created_on', 'id')),
+        ]
 
     @property
     def name(self):
