@@ -6,6 +6,7 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from statsd.defaults.django import statsd
 
 from datahub.company.models import CompanyPermission
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
@@ -49,10 +50,13 @@ class DNBCompanySearchView(APIView):
         on Data Hub.
         """
         upstream_response = search_dnb(request.data)
+        statsd.incr(f'dnb.search.{upstream_response.status_code}')
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
-            response_body['results'] = self._format_and_hydrate(response_body['results'])
+            response_body['results'] = self._format_and_hydrate(
+                response_body.get('results', []),
+            )
             return JsonResponse(response_body)
 
         return HttpResponse(
@@ -157,6 +161,7 @@ class DNBCompanyCreateView(APIView):
         duns_number = duns_serializer.validated_data['duns_number']
 
         dnb_response = search_dnb({'duns_number': duns_number})
+        statsd.incr(f'dnb.search.{dnb_response.status_code}')
 
         if dnb_response.status_code != status.HTTP_200_OK:
             error_message = f'DNB service returned: {dnb_response.status_code}'
@@ -187,6 +192,7 @@ class DNBCompanyCreateView(APIView):
             modified_by=request.user,
         )
 
+        statsd.incr(f'dnb.create.company')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
@@ -228,6 +234,7 @@ class DNBCompanyCreateInvestigationView(APIView):
             pending_dnb_investigation=True,
         )
 
+        statsd.incr(f'dnb.create.investigation')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
