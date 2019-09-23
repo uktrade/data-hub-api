@@ -1,6 +1,7 @@
 from django.urls import path
 
-from datahub.dataset.views import ContactsDatasetView, OMISDatasetView
+from datahub.dataset.contact.views import ContactsDatasetView
+from datahub.dataset.order.views import OMISDatasetView
 
 
 urlpatterns = [
