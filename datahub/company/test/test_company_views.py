@@ -13,7 +13,7 @@ from datahub.company.models import OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompanyCountryOfInterestFactory,
+    CompanyExportCountryFactory,
     CompanyFactory,
 )
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
@@ -529,11 +529,11 @@ class TestGetCompany(APITestMixin):
                 },
             }
 
-    @pytest.mark.countries_of_interest
-    def test_get_company_with_countries_of_interest(self):
+    @pytest.mark.export_countries
+    def test_get_company_with_export_countries(self):
         """
         Test that when you get a company that has countries of interest,
-        (e.g. for which there exist non-deleted CompanyCountryOfInterest objects)
+        (e.g. for which there exist non-deleted CompanyExportCountry objects)
         these countries are returned in the expected format in the
         future_interest_countries field.
         """
@@ -551,7 +551,7 @@ class TestGetCompany(APITestMixin):
         )
         countries = metadata_models.Country.objects.all()[:3]
         for country in countries:
-            CompanyCountryOfInterestFactory(
+            CompanyExportCountryFactory(
                 company=company,
                 country=country,
             )
@@ -1141,12 +1141,12 @@ class TestUpdateCompany(APITestMixin):
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
 
-    @pytest.mark.countries_of_interest
-    def test_update_company_with_countries_of_interest(self):
+    @pytest.mark.export_countries
+    def test_update_company_with_export_countries(self):
         """
         Test that when you update a company's countries of interest,
         utilizing the future_interest_countries field,
-        the CompanyCountryOfInterest objects are updated as expected.
+        the CompanyExportCountry objects are updated as expected.
         """
         ghq = CompanyFactory(
             global_headquarters=None,
@@ -1162,7 +1162,7 @@ class TestUpdateCompany(APITestMixin):
         )
         countries = metadata_models.Country.objects.all()[:3]
         for country in countries[:2]:
-            CompanyCountryOfInterestFactory(
+            CompanyExportCountryFactory(
                 company=company,
                 country=country,
             )
@@ -1190,13 +1190,13 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response_data['id'] == str(company.id)
         company.refresh_from_db()
-        assert set(company.get_active_countries_of_interest()) == set(countries[1:3])
+        assert set(company.get_active_export_countries()) == set(countries[1:3])
 
 
 class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
 
-    @pytest.mark.countries_of_interest
+    @pytest.mark.export_countries
     @pytest.mark.parametrize(
         'data,expected_response',
         (
@@ -1357,7 +1357,7 @@ class TestAddCompany(APITestMixin):
                         'name': Country.united_states.value.name,
                     },
                 ]},
-                {'future_interest_countries': [
+                {'future_interest_countries': sorted([
                     {
                         'id': Country.united_kingdom.value.id,
                         'name': Country.united_kingdom.value.name,
@@ -1366,7 +1366,7 @@ class TestAddCompany(APITestMixin):
                         'id': Country.united_states.value.id,
                         'name': Country.united_states.value.name,
                     },
-                ]},
+                ], key=lambda country: country['id'])},
             ),
         ),
     )

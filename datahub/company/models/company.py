@@ -131,7 +131,7 @@ class Company(ArchivableModel, BaseModel):
         metadata_models.Country,
         blank=True,
         related_name='companies_with_future_interest',
-        help_text='This field is now deprecated. Use the get_active_countries_of_interest'
+        help_text='This field is now deprecated. Use the get_active_export_countries'
         ' method.',
     )
     description = models.TextField(blank=True, null=True)
@@ -262,48 +262,67 @@ class Company(ArchivableModel, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    def get_active_countries_of_interest(self):
+    def get_active_export_countries(self):
         """
         Get a list of unique countries for which there are active (non-deleted)
-        CompanyCountryOfInterest Objects
+        CompanyExportCountry Objects
         """
-        # Optimizing for the case where self.raw_countries_of_interest AND
-        # raw_countries_of_interest__country have been pre-fetched
-        seen_countries = set()
-        for company_country in self.raw_countries_of_interest.all():
-            if (
-                company_country.deleted is False
-                and company_country.country_id not in seen_countries
-            ):
-                seen_countries.add(company_country.country_id)
-                yield company_country.country
+        if (
+            hasattr(self, '_prefetched_objects_cache')
+            and 'unfiltered_export_countries' in self._prefetched_objects_cache
+        ):
+            # If unfiltered_export_countries has been prefetched, we assume
+            # that unfiltered_export_countries__country has been as well.
+            # If it hasn't then the below will cause N queries to get each country.
+            return sorted([
+                cec.country
+                for cec
+                in self.unfiltered_export_countries.all()
+                if not cec.deleted
+            ], key=lambda c: c.id)
+        else:
+            # An optimised query to get the countries in the case where
+            # the necessary prefetches have not been made.
+            return list(metadata_models.Country.objects.filter(
+                id__in=self.unfiltered_export_countries.filter(
+                    deleted=False,
+                ).values_list('country_id'),
+            ).order_by('id'))
 
     @transaction.atomic
-    def set_user_edited_countries_of_interest(self, countries):
+    def set_user_edited_export_countries(self, countries):
         """
         Given a list of countries of interest *supplied by the user*,
-        update and delete CompanyCountryOfInterest objects,
+        update and delete CompanyExportCountry objects,
         as necessary.
         """
-        currently_active_countries = self.get_active_countries_of_interest()
+        # Set to keep track of which input countries have been dealt with
+        countries = set(countries)
 
-        for country in countries:
-            # Only potentially create a new user-source CompanyCountryOfInterest if
-            # the country is not already active. If the user saves a big list of countries,
-            # some of which were actually externally sourced, we don't want to promote them
-            # automatically to user-sourced.
-            if country not in currently_active_countries:
-                CompanyCountryOfInterest.objects.update_or_create(
-                    company=self, country=country, source='user',
-                    defaults={'deleted': False},
-                )
-
-        # Delete any countries_of_interest that are not in input
-        self.raw_countries_of_interest.exclude(
-            country__in=countries,
-        ).update(
-            deleted=True,
-        )
+        for cec in self.unfiltered_export_countries.select_related('country'):
+            changed = False
+            if cec.country in countries:
+                if CompanyExportCountry.SOURCES.user not in cec.source:
+                    cec.source.append(CompanyExportCountry.SOURCES.user)
+                    changed = True
+                if cec.deleted:
+                    cec.deleted = False
+                    changed = True
+                countries.remove(cec.country)
+            else:
+                if not cec.deleted:
+                    cec.deleted = True
+                    changed = True
+            if changed:
+                cec.save()
+        for undiscovered_country in countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                source=[CompanyExportCountry.SOURCES.user],
+            )
 
     def mark_as_transferred(self, to, reason, user):
         """
@@ -482,7 +501,7 @@ class CompaniesHouseCompany(models.Model):
         verbose_name_plural = 'Companies House companies'
 
 
-class CompanyCountryOfInterest(models.Model):
+class CompanyExportCountry(models.Model):
     """
     Record that a Company is interested in exporting to a Country.
     Source can be either 'user', indicating that the country was entered manually
@@ -507,22 +526,25 @@ class CompanyCountryOfInterest(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        related_name='raw_countries_of_interest',
+        related_name='unfiltered_export_countries',
     )
-    source = models.CharField(max_length=16, choices=SOURCES)
+    source = ArrayField(
+        models.CharField(max_length=16, choices=SOURCES),
+    )
     deleted = models.BooleanField(blank=True, default=False)
 
     class Meta:
-        unique_together = (
-            ('country', 'company', 'source'),
-        )
-        verbose_name_plural = 'Company Countries of Interest'
+        constraints = [models.UniqueConstraint(
+            fields=['country', 'company'],
+            name='unique_country_company',
+        )]
+        verbose_name_plural = 'company export countries'
 
     def __str__(self):
         """
         Human readable name
         """
         return (
-            f'<CompanyCountryOfInterest: {self.company.name} interested in {self.country.name}; '
-            f'Source: {self.source}; Deleted: {self.deleted}>'
+            f'{self.company.name} interested in {self.country.name}; '
+            f'Sources: {self.source}; Deleted: {self.deleted}'
         )

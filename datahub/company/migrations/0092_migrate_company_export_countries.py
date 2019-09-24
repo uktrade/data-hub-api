@@ -3,15 +3,14 @@ import uuid
 from django.db import migrations
 
 
-NEW_MODEL_TABLE_NAME = 'company_companycountryofinterest'
+NEW_MODEL_TABLE_NAME = 'company_companyexportcountry'
 OLD_M2M_TABLE_NAME = 'company_company_future_interest_countries'
 
 
 populate_new_model_sql = f"""
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     INSERT INTO {NEW_MODEL_TABLE_NAME} (
         id, company_id, country_id, source, deleted
-    ) SELECT uuid_generate_v4(), company_id, country_id, 'user', false
+    ) SELECT uuid_generate_v4(), company_id, country_id, ARRAY['user'], false
     FROM {OLD_M2M_TABLE_NAME};
     DELETE FROM {OLD_M2M_TABLE_NAME};
 """
@@ -20,19 +19,24 @@ populate_new_model_sql = f"""
 populate_old_m2m_table_sql = f"""
     INSERT INTO {OLD_M2M_TABLE_NAME} (company_id, country_id)
     SELECT company_id, country_id from
-    {NEW_MODEL_TABLE_NAME} WHERE source = 'user'
+    {NEW_MODEL_TABLE_NAME} WHERE 'user' = ANY(source)
     AND deleted = false;
-    DELETE FROM {NEW_MODEL_TABLE_NAME} WHERE source = 'user';
+    DELETE FROM {NEW_MODEL_TABLE_NAME} WHERE source = ARRAY['user']::varchar[];
+    UPDATE {NEW_MODEL_TABLE_NAME} SET source = ARRAY['external'];
 """
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0091_add_company_country_of_interest_model'),
+        ('company', '0091_add_company_export_country_model'),
     ]
 
     operations = [
+        migrations.RunSQL(
+            'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.RunSQL(
             populate_new_model_sql,
             reverse_sql=populate_old_m2m_table_sql,

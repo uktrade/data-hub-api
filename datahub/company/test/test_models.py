@@ -2,10 +2,10 @@ import factory
 import pytest
 from django.conf import settings
 
-from datahub.company.models import OneListTier
+from datahub.company.models import Company, CompanyExportCountry, OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompanyCountryOfInterestFactory,
+    CompanyExportCountryFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
@@ -16,6 +16,10 @@ from datahub.metadata.models import Country
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
+
+
+EXTERNAL = CompanyExportCountry.SOURCES.external
+USER = CompanyExportCountry.SOURCES.user
 
 
 class TestCompany:
@@ -204,215 +208,267 @@ class TestCompany:
         actual_global_account_manager = company.get_one_list_group_global_account_manager()
         assert group_global_headquarters.one_list_account_owner == actual_global_account_manager
 
-    @pytest.mark.countries_of_interest
-    def test_get_active_company_countries_of_interest_empty(self):
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_empty(self):
         """
-        Test the get_active_company_countries_of_interest method when there are no
-        CompanyCountryOfInterest objects at all.
+        Test the get_active_company_export_countries method when there are no
+        CompanyExportCountry objects at all.
         """
         company = CompanyFactory()
-        assert list(company.get_active_countries_of_interest()) == []
+        assert list(company.get_active_export_countries()) == []
 
-    @pytest.mark.countries_of_interest
-    def test_get_active_company_countries_of_interest_all_deleted(self):
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_all_deleted(self):
         """
-        Test the get_active_company_countries_of_interest method when all of the company's
+        Test the get_active_company_export_countries method when all of the company's
         countries of interest are deleted.
         """
         company = CompanyFactory()
-        CompanyCountryOfInterestFactory.create_batch(3, company=company, deleted=True)
-        assert list(company.get_active_countries_of_interest()) == []
+        CompanyExportCountryFactory.create_batch(3, company=company, deleted=True)
+        assert list(company.get_active_export_countries()) == []
 
-    @pytest.mark.countries_of_interest
-    def test_get_active_company_countries_of_interest_all_for_other_companies(self):
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_all_for_other_companies(self):
         """
-        Test the get_active_company_countries_of_interest method when all countries
+        Test the get_active_company_export_countries method when all countries
         of interest are for another company.
         """
         company = CompanyFactory()
         company_2 = CompanyFactory()
-        CompanyCountryOfInterestFactory.create_batch(3, company=company_2)
-        assert list(company.get_active_countries_of_interest()) == []
+        CompanyExportCountryFactory.create_batch(3, company=company_2)
+        assert list(company.get_active_export_countries()) == []
 
-    @pytest.mark.countries_of_interest
-    def test_get_active_company_countries_of_interest_mix(self):
+    @pytest.mark.export_countries
+    @pytest.mark.parametrize('prefetch', [True, False, 'partial'])
+    def test_get_active_company_export_countries_mix(self, prefetch):
         """
-        Test the get_active_company_countries_of_interest method when there is a mix
+        Test the get_active_company_export_countries method when there is a mix
         of sources for the company's countries of interest. (It should have no effect
         on the output of this method.)
         """
         company = CompanyFactory()
         company_2 = CompanyFactory()
-        ccoi1 = CompanyCountryOfInterestFactory(
-            company=company, source='user', deleted=False,
+        cec1 = CompanyExportCountryFactory(
+            company=company, source=[USER], deleted=False,
         )
-        ccoi2 = CompanyCountryOfInterestFactory(
-            company=company, source='external', deleted=False,
+        cec2 = CompanyExportCountryFactory(
+            company=company, source=[EXTERNAL], deleted=False,
         )
-        _ = CompanyCountryOfInterestFactory(company=company_2)
-        _ = CompanyCountryOfInterestFactory(company=company, deleted=True)
-        CompanyCountryOfInterestFactory.create_batch(3, company=company, deleted=True)
-        assert list(company.get_active_countries_of_interest()) == sorted(
-            [ccoi1.country, ccoi2.country], key=lambda c: c.name,
+        cec3 = CompanyExportCountryFactory(
+            company=company, source=[USER, EXTERNAL], deleted=False,
+        )
+        _ = CompanyExportCountryFactory(company=company_2)
+        _ = CompanyExportCountryFactory(company=company, deleted=True)
+        CompanyExportCountryFactory.create_batch(3, company=company, deleted=True)
+
+        companies = Company.objects.filter(id=company.id)
+        # Should work regardless of prefetches
+        if prefetch:
+            companies = companies.prefetch_related('unfiltered_export_countries')
+            if prefetch is True:
+                companies = companies.prefetch_related('unfiltered_export_countries__country')
+
+        assert list(companies[0].get_active_export_countries()) == sorted(
+            [cec1.country, cec2.country, cec3.country], key=lambda c: c.name,
         )
 
-    @pytest.mark.countries_of_interest
-    def test_get_active_company_countries_of_interest_non_unique(self):
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_all_new(self):
         """
-        If there is a user source and an external source for the same country,
-        the country should only be returned once
-        """
-        company = CompanyFactory()
-        ccoi1 = CompanyCountryOfInterestFactory(
-            company=company, source='user', deleted=False,
-        )
-        CompanyCountryOfInterestFactory(
-            company=company, country=ccoi1.country, source='external', deleted=False,
-        )
-        assert list(company.get_active_countries_of_interest()) == [ccoi1.country]
-
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_all_new(self):
-        """
-        Test the set_user_edited_countries_of_interest method with a list
+        Test the set_user_edited_export_countries method with a list
         of all new countries.
         """
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
-        _ = CompanyCountryOfInterestFactory(company=company_2)
+        _ = CompanyExportCountryFactory(company=company_2)
         countries = Country.objects.all()[:2]
-        company_1.set_user_edited_countries_of_interest([countries[0], countries[1]])
+        company_1.set_user_edited_export_countries([countries[0], countries[1]])
         assert (
-            list(company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'))
-            == [(countries[0].id, 'user', False), (countries[1].id, 'user', False)]
+            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
+            == [(countries[0].id, [USER], False), (countries[1].id, [USER], False)]
         )
 
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_including_existing_external(self):
+    @pytest.mark.export_countries
+    @pytest.mark.parametrize('existing_source', [
+        [USER], [EXTERNAL], [USER, EXTERNAL], [EXTERNAL, USER],
+    ])
+    def test_set_user_edited_export_countries_remove_country(self, existing_source):
+        """
+        Test the set_user_edited_export_countries method, if there is an existing
+        CompanyExportCountry, we can mark it deleted no matter what the source is.
+        """
+        company_1 = CompanyFactory()
+        c1 = CompanyExportCountryFactory(
+            company=company_1, source=existing_source,
+        )
+        company_1.set_user_edited_export_countries([])
+        assert (
+            list(
+                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+            )
+            == [(c1.country.id, existing_source, True)]
+        )
+
+    @pytest.mark.export_countries
+    @pytest.mark.parametrize('existing_source', [
+        [USER], [EXTERNAL], [USER, EXTERNAL], [EXTERNAL, USER],
+    ])
+    def test_set_user_edited_export_countries_undelete_country(self, existing_source):
+        """
+        Test the set_user_edited_export_countries method, if there is an existing
+        CompanyExportCountry which is marked as deleted,
+        we can un-delete it no matter what the source is.
+        """
+        company_1 = CompanyFactory()
+        c1 = CompanyExportCountryFactory(
+            company=company_1,
+            source=existing_source,
+            deleted=True,
+        )
+        company_1.set_user_edited_export_countries([c1.country])
+        expected_source = existing_source
+        if USER not in expected_source:
+            expected_source.append(USER)
+        assert (
+            list(
+                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+            )
+            == [(c1.country.id, existing_source, False)]
+        )
+
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_including_existing_external(self):
         """
         If we already had an externally sourced country of interest that was not deleted,
         then saving that country again by the user shouldn't change its source to user.
         """
         company_1 = CompanyFactory()
-        c1 = CompanyCountryOfInterestFactory(company=company_1, source='external', deleted=False)
-        company_1.set_user_edited_countries_of_interest([c1.country])
+        c1 = CompanyExportCountryFactory(
+            company=company_1,
+            source=[EXTERNAL],
+            deleted=False,
+        )
+        company_1.set_user_edited_export_countries([c1.country])
         assert (
-            list(company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'))
-            == [(c1.country.id, 'external', False)]
+            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
+            == [(c1.country.id, [EXTERNAL, USER], False)]
         )
 
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_including_existing_deleted_external(self):
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_including_existing_deleted_external(self):
         """
         If we  had an externally sourced country of interest that *was* deleted,
         then that has to be un-deleted, plus the user-sourced country has to be added
         as well.
         """
         company_1 = CompanyFactory()
-        c1 = CompanyCountryOfInterestFactory(company=company_1, source='external', deleted=True)
-        company_1.set_user_edited_countries_of_interest([c1.country])
+        c1 = CompanyExportCountryFactory(
+            company=company_1,
+            source=[EXTERNAL],
+            deleted=True,
+        )
+        company_1.set_user_edited_export_countries([c1.country])
         assert (
-            list(company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'))
-            == [(c1.country.id, 'external', True), (c1.country.id, 'user', False)]
+            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
+            == [(c1.country.id, [EXTERNAL, USER], False)]
         )
 
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_all_existing_some_deleted(self):
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_all_existing_some_deleted(self):
         """
-        Test the set_user_edited_countries_of_interest method, if the input we supply
+        Test the set_user_edited_export_countries method, if the input we supply
         only contains countries of interest that already exist, albeit some of them
         deleted
         """
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
-        _ = CompanyCountryOfInterestFactory(company=company_2)
-        c1 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user',
+        _ = CompanyExportCountryFactory(company=company_2)
+        c1 = CompanyExportCountryFactory(
+            company=company_1, source=[USER],
         )
-        c2 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user', deleted=True,
+        c2 = CompanyExportCountryFactory(
+            company=company_1, source=[USER], deleted=True,
         )
-        company_1.set_user_edited_countries_of_interest([c1.country, c2.country])
+        company_1.set_user_edited_export_countries([c1.country, c2.country])
         assert (
             sorted(list(
-                company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
             ))
-            == sorted([(c1.country.id, 'user', False), (c2.country.id, 'user', False)])
+            == sorted([(c1.country.id, [USER], False), (c2.country.id, [USER], False)])
         )
 
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_some_removed_some_added(self):
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_some_removed_some_added(self):
         """
-        Test the set_user_edited_countries_of_interest method, if we supply input
+        Test the set_user_edited_export_countries method, if we supply input
         that represents the removal of some countries of interest and the addition of others.
         """
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
-        CompanyCountryOfInterestFactory.create_batch(3, company=company_2)
-        c1 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user',
+        CompanyExportCountryFactory.create_batch(3, company=company_2)
+        c1 = CompanyExportCountryFactory(
+            company=company_1, source=[USER],
         )
-        c2 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user', deleted=True,
+        c2 = CompanyExportCountryFactory(
+            company=company_1, source=[USER], deleted=True,
         )
         # We'll remove c3
-        c3 = CompanyCountryOfInterestFactory(
-            company=company_1, source='external',
+        c3 = CompanyExportCountryFactory(
+            company=company_1, source=[EXTERNAL],
         )
-        c4 = CompanyCountryOfInterestFactory(
-            company=company_1, source='external', deleted=True,
+        c4 = CompanyExportCountryFactory(
+            company=company_1, source=[EXTERNAL], deleted=True,
         )
 
         other_country = Country.objects.exclude(id__in=[c1.id, c2.id, c3.id, c4.id]).first()
-        company_1.set_user_edited_countries_of_interest([
+        company_1.set_user_edited_export_countries([
             c1.country, c2.country, c4.country, other_country,
         ])
 
         assert (
             sorted(list(
-                company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
             ))
             == sorted([
-                (c1.country_id, 'user', False),
-                (c2.country_id, 'user', False),
-                (c3.country_id, 'external', True),
-                (c4.country_id, 'external', True),
-                (c4.country_id, 'user', False),
-                (other_country.id, 'user', False),
+                (c1.country_id, [USER], False),
+                (c2.country_id, [USER], False),
+                (c3.country_id, [EXTERNAL], True),
+                (c4.country_id, [EXTERNAL, USER], False),
+                (other_country.id, [USER], False),
             ])
         )
 
-    @pytest.mark.countries_of_interest
-    def test_set_user_edited_countries_of_interest_all_removed(self):
+    @pytest.mark.export_countries
+    def test_set_user_edited_export_countries_all_removed(self):
         """
-        Test the set_user_edited_countries_of_interest method if we remove all
+        Test the set_user_edited_export_countries method if we remove all
         countries of interest
         """
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
-        CompanyCountryOfInterestFactory.create_batch(3, company=company_2)
-        c1 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user',
+        CompanyExportCountryFactory.create_batch(3, company=company_2)
+        c1 = CompanyExportCountryFactory(
+            company=company_1, source=[USER],
         )
-        c2 = CompanyCountryOfInterestFactory(
-            company=company_1, source='user', deleted=True,
+        c2 = CompanyExportCountryFactory(
+            company=company_1, source=[USER], deleted=True,
         )
-        c3 = CompanyCountryOfInterestFactory(
-            company=company_1, source='external',
+        c3 = CompanyExportCountryFactory(
+            company=company_1, source=[EXTERNAL],
         )
-        c4 = CompanyCountryOfInterestFactory(
-            company=company_1, source='external', deleted=True,
+        c4 = CompanyExportCountryFactory(
+            company=company_1, source=[EXTERNAL], deleted=True,
         )
-        company_1.set_user_edited_countries_of_interest([])
+        company_1.set_user_edited_export_countries([])
         assert (
             sorted(list(
-                company_1.raw_countries_of_interest.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
             ))
             == sorted([
-                (c1.country_id, 'user', True),
-                (c2.country_id, 'user', True),
-                (c3.country_id, 'external', True),
-                (c4.country_id, 'external', True),
+                (c1.country_id, [USER], True),
+                (c2.country_id, [USER], True),
+                (c3.country_id, [EXTERNAL], True),
+                (c4.country_id, [EXTERNAL], True),
             ])
         )
 
@@ -449,20 +505,19 @@ class TestContact:
         assert str(contact) == expected_output
 
 
-@pytest.mark.countries_of_interest
-class TestCompanyCountryOfInterest:
-    """Tests for the CompanyCountryOfInterest model."""
+@pytest.mark.export_countries
+class TestCompanyExportCountry:
+    """Tests for the CompanyExportCountry model."""
 
     def test_str(self):
-        """Test the human-friendly string representation of a CompanyCountryOfInterest object."""
+        """Test the human-friendly string representation of a CompanyExportCountry object."""
         company = CompanyFactory(name='Acme Corp.')
-        ccoi = CompanyCountryOfInterestFactory.build(
+        cec = CompanyExportCountryFactory.build(
             country=Country.objects.get(id=constants.Country.anguilla.value.id),
             company=company,
-            source='user',
+            source=[USER],
             deleted=False,
         )
-        assert str(ccoi) == (
-            '<CompanyCountryOfInterest: Acme Corp. interested in Anguilla; '
-            'Source: user; Deleted: False>'
+        assert str(cec) == (
+            """Acme Corp. interested in Anguilla; Sources: ['user']; Deleted: False"""
         )

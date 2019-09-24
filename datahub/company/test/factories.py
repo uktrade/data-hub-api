@@ -9,6 +9,7 @@ from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
     Advisor,
     Company,
+    CompanyExportCountry,
     ExportExperienceCategory,
 )
 from datahub.core import constants
@@ -186,14 +187,14 @@ class ArchivedContactFactory(ContactFactory):
     archived_reason = factory.Faker('sentence')
 
 
-class CompanyCountryOfInterestFactory(factory.django.DjangoModelFactory):
-    """CompanyCountryOfInterest Factory"""
+class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
+    """CompanyExportCountry Factory"""
 
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.Iterator(Country.objects.all())  # Avoid non-unique errors
-    source = 'user'
+    source = [CompanyExportCountry.SOURCES.user]
     deleted = False
 
     class Meta:
-        model = 'company.CompanyCountryOfInterest'
+        model = 'company.CompanyExportCountry'

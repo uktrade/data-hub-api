@@ -272,7 +272,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     future_interest_countries = NestedRelatedField(
         meta_models.Country, many=True, required=False,
-        source='get_active_countries_of_interest',
+        source='get_active_export_countries',
     )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
@@ -400,25 +400,25 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     def update(self, instance, validated_data):
         """
         Updates the Company instance.
-        This override calls the set_user_edited_countries_of_interest method on
+        This override calls the set_user_edited_export_countries method on
         the instance, after it has been updated with all other fields.
         """
-        active_countries_of_interest = validated_data.pop('get_active_countries_of_interest', None)
+        active_export_countries = validated_data.pop('get_active_export_countries', None)
         super().update(instance, validated_data)
-        if active_countries_of_interest is not None:
-            instance.set_user_edited_countries_of_interest(active_countries_of_interest)
+        if active_export_countries is not None:
+            instance.set_user_edited_export_countries(active_export_countries)
         return instance
 
     def create(self, validated_data):
         """
         Creates the Company instance.
-        This override calls the set_user_edited_countries_of_interest method on
+        This override calls the set_user_edited_export_countries method on
         the instance, after it has been created.
         """
-        active_countries_of_interest = validated_data.pop('get_active_countries_of_interest', None)
+        active_export_countries = validated_data.pop('get_active_export_countries', None)
         instance = super().create(validated_data)
-        if active_countries_of_interest is not None:
-            instance.set_user_edited_countries_of_interest(active_countries_of_interest)
+        if active_export_countries is not None:
+            instance.set_user_edited_export_countries(active_export_countries)
         return instance
 
     class Meta:
