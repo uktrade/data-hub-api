@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('metadata', '0038_remove_service_name_from_db'),
-        ('company', '0090_add_company_dnb_investigation_data'),
+        ('company', '0091_add_composite_index_to_contact'),
     ]
 
     operations = [

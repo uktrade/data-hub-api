@@ -29,7 +29,7 @@ populate_old_m2m_table_sql = f"""
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0091_add_company_export_country_model'),
+        ('company', '0092_add_company_export_country_model'),
     ]
 
     operations = [
