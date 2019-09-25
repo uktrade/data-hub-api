@@ -3,6 +3,7 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -180,13 +181,24 @@ class DNBCompanyCreateView(APIView):
             logger.error(error_message)
             raise APIUpstreamException(error_message)
 
+        formatted_company_data = format_dnb_company(
+            dnb_companies[0],
+        )
         company_serializer = DNBCompanySerializer(
-            data=format_dnb_company(
-                dnb_companies[0],
-            ),
+            data=formatted_company_data,
         )
 
-        company_serializer.is_valid(raise_exception=True)
+        try:
+            company_serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            logger.error(
+                'Company data sourced from DNB:\n'
+                f'{formatted_company_data}\n'
+                'Failed serializer validation with errors:\n'
+                f'{company_serializer.errors}',
+            )
+            raise
+
         datahub_company = company_serializer.save(
             created_by=request.user,
             modified_by=request.user,
