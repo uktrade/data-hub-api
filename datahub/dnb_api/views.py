@@ -137,12 +137,6 @@ class DNBCompanySearchView(APIView):
         return hydrated_results
 
 
-class DNBDataFailedSaveValidation(Exception):
-    """
-    Exception for when DNB company data could not be saved as a Data Hub Company model.
-    """
-
-
 class DNBCompanyCreateView(APIView):
     """
     View for creating datahub company from DNB data.
