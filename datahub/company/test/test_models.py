@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 import factory
 import pytest
 from django.conf import settings
@@ -281,10 +283,10 @@ class TestCompany:
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
         _ = CompanyExportCountryFactory(company=company_2)
-        countries = Country.objects.all()[:2]
+        countries = sorted(Country.objects.order_by('?')[:2], key=attrgetter('name'))
         company_1.set_user_edited_export_countries([countries[0], countries[1]])
         assert (
-            list(company_1.unfiltered_export_countries.values_list(
+            list(company_1.unfiltered_export_countries.order_by('country__name').values_list(
                 'country', 'sources', 'deleted'),
             )
             == [(countries[0].id, [USER_SOURCE], False), (countries[1].id, [USER_SOURCE], False)]
@@ -496,6 +498,174 @@ class TestCompany:
                 (c5.country_id, [EXTERNAL_SOURCE], True),
                 (c6.country_id, [EXTERNAL_SOURCE], True),
             ])
+        )
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    def test_set_external_source_export_countries_all_new(self):
+        """
+        The simple case where we are just creating some brand new
+        CompanyExportCountry objects
+        """
+        company_1 = CompanyFactory()
+        countries = Country.objects.all()[:2]
+        company_1.set_external_source_export_countries(countries)
+        assert (
+            sorted(list(
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
+            ))
+            == sorted([
+                (countries[0].id, [EXTERNAL_SOURCE], False),
+                (countries[1].id, [EXTERNAL_SOURCE], False),
+            ])
+        )
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    def test_set_external_source_export_countries_dont_undelete(self):
+        """
+        In this test we add some countries and see what happens to existing countries.
+
+        External sources should not be able to un-delete CompanyExportCountrys,
+        but on the other-hand *will* be created even if a user-source deleted cec
+        exists.
+        """
+        company_1 = CompanyFactory()
+
+        # This one should be unaffected, the user has deleted it and external-source
+        # countries cannot override this.
+        cec1 = CompanyExportCountryFactory(
+            company=company_1,
+            sources=[EXTERNAL_SOURCE],
+            deleted=True,
+        )
+        # This is a user-source country deleted by the user. This doesn't affect us:
+        # we can go ahead and create an external-source country of interest.
+        cec2 = CompanyExportCountryFactory(
+            company=company_1,
+            sources=[USER_SOURCE],
+            deleted=True,
+        )
+        company_1.set_external_source_export_countries([cec1.country, cec2.country])
+        assert (
+            sorted(list(
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
+            ))
+            == sorted([
+                (cec1.country_id, [EXTERNAL_SOURCE], True),  # Unaffacted
+                (cec2.country_id, [USER_SOURCE, EXTERNAL_SOURCE], True),  # external source added
+            ])
+        )
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    def test_set_external_source_export_countries_remove_countries(self):
+        """
+        In this test we remove all external-source countries (set it to []),
+        and see what happens to existing countries.
+
+        External sources import should only be able to delete external-source
+        CompanyExportCountrys that are not soft-deleted.
+        """
+        company_1 = CompanyFactory()
+        countries = Country.objects.all()[:3]
+
+        # This one should not be affected because it has deleted=True
+        # (which means the user has deleted it, and we don't want to lose that fact)
+        deleted_external_cec = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[0],
+            sources=[EXTERNAL_SOURCE],
+            deleted=True,
+        )
+        # This one should be completely deleted from db, because
+        # it is external source and not marked deleted by user,
+        # and we are deleting it now.
+        CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[1],
+            sources=[EXTERNAL_SOURCE],
+            deleted=False,
+        )
+        # This one should not be affected because it was added by the user.
+        deleted_user_cec = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[2],
+            sources=[USER_SOURCE],
+            deleted=False,
+        )
+        company_1.set_external_source_export_countries([])
+        assert (
+            sorted(list(
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
+            ))
+            == sorted([
+                (deleted_external_cec.country_id, [EXTERNAL_SOURCE], True),  # Unchanged
+                # active_external_cec completely removed because it was only externally sourced.
+                (deleted_user_cec.country_id, [USER_SOURCE], False),  # Unchanged
+            ])
+        )
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    @pytest.mark.parametrize('deleted_pre_existing', [True, False])
+    def test_set_external_source_export_countries_some_added_some_removed(
+        self, deleted_pre_existing,
+    ):
+        """
+        Test adding some countries, removing some countries, leaving some alone.
+        We use two cases, where the pre-existing countries are deleted or not.
+        """
+        company_1 = CompanyFactory()
+        countries = Country.objects.all()[:5]
+        pre_existing_user_source_countries = countries[:2]
+        pre_existing_external_source_countries = countries[2:4]
+
+        # This is the new set; country[2] is removed and country[5] is added
+        new_set_of_external_source_countries = countries[3:5]
+
+        expected = []
+        for country in pre_existing_user_source_countries:
+            CompanyExportCountryFactory(
+                company=company_1,
+                country=country,
+                sources=[USER_SOURCE],
+                deleted=deleted_pre_existing,
+            )
+            expected.append((country.id, [USER_SOURCE], deleted_pre_existing))
+
+        for country in pre_existing_external_source_countries:
+            CompanyExportCountryFactory(
+                company=company_1,
+                country=country,
+                sources=[EXTERNAL_SOURCE],
+                deleted=deleted_pre_existing,
+            )
+
+        company_1.set_external_source_export_countries(new_set_of_external_source_countries)
+
+        if deleted_pre_existing:
+            expected = [
+                (countries[0].id, [USER_SOURCE], True),
+                (countries[1].id, [USER_SOURCE], True),
+                # Countries[2] not changed, because it was already marked deleted by user.
+                (countries[2].id, [EXTERNAL_SOURCE], True),
+                (countries[3].id, [EXTERNAL_SOURCE], True),
+                (countries[4].id, [EXTERNAL_SOURCE], False),
+            ]
+        else:
+            expected = [
+                (countries[0].id, [USER_SOURCE], False),
+                (countries[1].id, [USER_SOURCE], False),
+                # countries[2] completely removed because it was only externally sourced.
+                (countries[3].id, [EXTERNAL_SOURCE], False),
+                (countries[4].id, [EXTERNAL_SOURCE], False),
+            ]
+
+        assert (
+            sorted(list(
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
+            )) == sorted(expected)
         )
 
 

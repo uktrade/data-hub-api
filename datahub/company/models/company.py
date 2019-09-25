@@ -305,13 +305,13 @@ class Company(ArchivableModel, BaseModel):
         for cec in self.unfiltered_export_countries.select_related('country'):
             changed = False
             if cec.country in countries:
+                countries.remove(cec.country)
                 if CompanyExportCountry.SOURCES.user not in cec.sources:
                     cec.sources.append(CompanyExportCountry.SOURCES.user)
                     changed = True
                 if cec.deleted:
                     cec.deleted = False
                     changed = True
-                countries.remove(cec.country)
             else:
                 if not cec.deleted:
                     cec.deleted = True
@@ -331,6 +331,55 @@ class Company(ArchivableModel, BaseModel):
                 company=self,
                 country=undiscovered_country,
                 sources=[CompanyExportCountry.SOURCES.user],
+            )
+
+    def set_external_source_export_countries(self, countries):
+        """
+        Given a list of countries *imported from external sources*,
+        update and delete CompanyExportCountry objects accordingly
+        """
+        countries = set(countries)
+        if (
+            hasattr(self, '_prefetched_objects_cache')
+            and 'unfiltered_export_countries' in self._prefetched_objects_cache
+        ):
+            # If unfiltered_export_countries has been prefetched, we assume
+            # that unfiltered_export_countries__country has been as well.
+            # If it hasn't then the below will cause N queries to get each country.
+            export_countries = self.unfiltered_export_countries.all()
+        else:
+            export_countries = self.unfiltered_export_countries.select_related('country')
+
+        for cec in export_countries:
+            changed = False
+            if cec.country in countries:
+                countries.remove(cec.country)
+                if CompanyExportCountry.SOURCES.external not in cec.sources:
+                    cec.sources.append(CompanyExportCountry.SOURCES.external)
+                    changed = True
+                # We cannot change deleted to False. That means the user has
+                # marked the country as deleted and external sources cannot override
+                # that.
+            else:
+                if (
+                    CompanyExportCountry.SOURCES.external in cec.sources
+                    and cec.deleted is False
+                ):
+                    cec.sources.remove(CompanyExportCountry.SOURCES.external)
+                    changed = True
+            if changed:
+                if cec.sources == []:
+                    cec.delete()
+                else:
+                    cec.save()
+
+        for undiscovered_country in countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.external],
             )
 
     def mark_as_transferred(self, to, reason, user):
