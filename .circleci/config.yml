@@ -28,7 +28,7 @@ job_defaults: &job_defaults
     DJANGO_SETTINGS_MODULE: config.settings.local
     ES_INDEX_PREFIX: test_index
     ES5_URL: http://localhost:9200
-    HAWK_RECEIVER_IP_WHITELIST: 1.2.3.4
+    PAAS_IP_WHITELIST: 1.2.3.4
     AWS_DEFAULT_REGION: eu-west-2
     AWS_ACCESS_KEY_ID: foo
     AWS_SECRET_ACCESS_KEY: bar
@@ -37,6 +37,8 @@ job_defaults: &job_defaults
     RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
     RESOURCE_SERVER_AUTH_TOKEN: sso-token
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
+    DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
+    DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
 
   working_directory: ~/app
 
