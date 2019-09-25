@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models, transaction
+from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -289,7 +289,6 @@ class Company(ArchivableModel, BaseModel):
                 ).values_list('country_id'),
             ).order_by('id'))
 
-    @transaction.atomic
     def set_user_edited_export_countries(self, countries):
         """
         Given a list of countries of interest *supplied by the user*,
