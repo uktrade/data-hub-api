@@ -302,11 +302,16 @@ class TestCompany:
             company=company_1, source=existing_source,
         )
         company_1.set_user_edited_export_countries([])
+        expected_source = [s for s in existing_source if s != USER]
+        if expected_source == []:
+            expected_result = []
+        else:
+            expected_result = [(c1.country.id, expected_source, True)]
         assert (
             list(
                 company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
             )
-            == [(c1.country.id, existing_source, True)]
+            == expected_result
         )
 
     @pytest.mark.export_countries
@@ -447,10 +452,10 @@ class TestCompany:
         company_1 = CompanyFactory()
         company_2 = CompanyFactory()
         CompanyExportCountryFactory.create_batch(3, company=company_2)
-        c1 = CompanyExportCountryFactory(
+        CompanyExportCountryFactory(
             company=company_1, source=[USER],
         )
-        c2 = CompanyExportCountryFactory(
+        CompanyExportCountryFactory(
             company=company_1, source=[USER], deleted=True,
         )
         c3 = CompanyExportCountryFactory(
@@ -459,16 +464,22 @@ class TestCompany:
         c4 = CompanyExportCountryFactory(
             company=company_1, source=[EXTERNAL], deleted=True,
         )
+        c5 = CompanyExportCountryFactory(
+            company=company_1, source=[EXTERNAL, USER], deleted=True,
+        )
+        c6 = CompanyExportCountryFactory(
+            company=company_1, source=[USER, EXTERNAL], deleted=False,
+        )
         company_1.set_user_edited_export_countries([])
         assert (
             sorted(list(
                 company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
             ))
             == sorted([
-                (c1.country_id, [USER], True),
-                (c2.country_id, [USER], True),
                 (c3.country_id, [EXTERNAL], True),
                 (c4.country_id, [EXTERNAL], True),
+                (c5.country_id, [EXTERNAL], True),
+                (c6.country_id, [EXTERNAL], True),
             ])
         )
 

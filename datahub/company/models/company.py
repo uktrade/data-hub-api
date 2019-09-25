@@ -293,8 +293,11 @@ class Company(ArchivableModel, BaseModel):
     def set_user_edited_export_countries(self, countries):
         """
         Given a list of countries of interest *supplied by the user*,
-        update and delete CompanyExportCountry objects,
-        as necessary.
+        update and delete CompanyExportCountry objects, as necessary.
+
+        Any existing CompanyExportCountries not in countries will be marked as deleted,
+        and have the 'user' source removed. If 'user' is the only source,
+        then the object will be completely removed from DB.
         """
         # Set to keep track of which input countries have been dealt with
         countries = set(countries)
@@ -313,8 +316,14 @@ class Company(ArchivableModel, BaseModel):
                 if not cec.deleted:
                     cec.deleted = True
                     changed = True
+                if CompanyExportCountry.SOURCES.user in cec.source:
+                    cec.source.remove(CompanyExportCountry.SOURCES.user)
+                    changed = True
             if changed:
-                cec.save()
+                if cec.source == []:
+                    cec.delete()
+                else:
+                    cec.save()
         for undiscovered_country in countries:
             # Country was not discovered in self.unfiltered_export_countries,
             # so we need to create it now.
