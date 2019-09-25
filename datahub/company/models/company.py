@@ -510,6 +510,7 @@ class CompaniesHouseCompany(models.Model):
         verbose_name_plural = 'Companies House companies'
 
 
+@reversion.register_base_model()
 class CompanyExportCountry(models.Model):
     """
     Record that a Company is interested in exporting to a Country.
