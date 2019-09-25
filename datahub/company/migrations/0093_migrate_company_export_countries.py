@@ -9,7 +9,7 @@ OLD_M2M_TABLE_NAME = 'company_company_future_interest_countries'
 
 populate_new_model_sql = f"""
     INSERT INTO {NEW_MODEL_TABLE_NAME} (
-        id, company_id, country_id, source, deleted
+        id, company_id, country_id, sources, deleted
     ) SELECT uuid_generate_v4(), company_id, country_id, ARRAY['user'], false
     FROM {OLD_M2M_TABLE_NAME};
     DELETE FROM {OLD_M2M_TABLE_NAME};
@@ -19,10 +19,10 @@ populate_new_model_sql = f"""
 populate_old_m2m_table_sql = f"""
     INSERT INTO {OLD_M2M_TABLE_NAME} (company_id, country_id)
     SELECT company_id, country_id from
-    {NEW_MODEL_TABLE_NAME} WHERE 'user' = ANY(source)
+    {NEW_MODEL_TABLE_NAME} WHERE 'user' = ANY(sources)
     AND deleted = false;
-    DELETE FROM {NEW_MODEL_TABLE_NAME} WHERE source = ARRAY['user']::varchar[];
-    UPDATE {NEW_MODEL_TABLE_NAME} SET source = ARRAY['external'];
+    DELETE FROM {NEW_MODEL_TABLE_NAME} WHERE sources = ARRAY['user']::varchar[];
+    UPDATE {NEW_MODEL_TABLE_NAME} SET sources = ARRAY['external'];
 """
 
 

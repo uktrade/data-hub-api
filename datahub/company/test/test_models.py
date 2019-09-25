@@ -18,8 +18,8 @@ from datahub.metadata.models import Country
 pytestmark = pytest.mark.django_db
 
 
-EXTERNAL = CompanyExportCountry.SOURCES.external
-USER = CompanyExportCountry.SOURCES.user
+EXTERNAL_SOURCE = CompanyExportCountry.SOURCES.external
+USER_SOURCE = CompanyExportCountry.SOURCES.user
 
 
 class TestCompany:
@@ -249,13 +249,13 @@ class TestCompany:
         company = CompanyFactory()
         company_2 = CompanyFactory()
         cec1 = CompanyExportCountryFactory(
-            company=company, source=[USER], deleted=False,
+            company=company, sources=[USER_SOURCE], deleted=False,
         )
         cec2 = CompanyExportCountryFactory(
-            company=company, source=[EXTERNAL], deleted=False,
+            company=company, sources=[EXTERNAL_SOURCE], deleted=False,
         )
         cec3 = CompanyExportCountryFactory(
-            company=company, source=[USER, EXTERNAL], deleted=False,
+            company=company, sources=[USER_SOURCE, EXTERNAL_SOURCE], deleted=False,
         )
         _ = CompanyExportCountryFactory(company=company_2)
         _ = CompanyExportCountryFactory(company=company, deleted=True)
@@ -284,41 +284,49 @@ class TestCompany:
         countries = Country.objects.all()[:2]
         company_1.set_user_edited_export_countries([countries[0], countries[1]])
         assert (
-            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
-            == [(countries[0].id, [USER], False), (countries[1].id, [USER], False)]
+            list(company_1.unfiltered_export_countries.values_list(
+                'country', 'sources', 'deleted'),
+            )
+            == [(countries[0].id, [USER_SOURCE], False), (countries[1].id, [USER_SOURCE], False)]
         )
 
     @pytest.mark.export_countries
-    @pytest.mark.parametrize('existing_source', [
-        [USER], [EXTERNAL], [USER, EXTERNAL], [EXTERNAL, USER],
+    @pytest.mark.parametrize('existing_sources', [
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
     ])
-    def test_set_user_edited_export_countries_remove_country(self, existing_source):
+    def test_set_user_edited_export_countries_remove_country(self, existing_sources):
         """
         Test the set_user_edited_export_countries method, if there is an existing
         CompanyExportCountry, we can mark it deleted no matter what the source is.
         """
         company_1 = CompanyFactory()
         c1 = CompanyExportCountryFactory(
-            company=company_1, source=existing_source,
+            company=company_1, sources=existing_sources,
         )
         company_1.set_user_edited_export_countries([])
-        expected_source = [s for s in existing_source if s != USER]
-        if expected_source == []:
+        expected_sources = [s for s in existing_sources if s != USER_SOURCE]
+        if expected_sources == []:
             expected_result = []
         else:
-            expected_result = [(c1.country.id, expected_source, True)]
+            expected_result = [(c1.country.id, expected_sources, True)]
         assert (
             list(
-                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
             )
             == expected_result
         )
 
     @pytest.mark.export_countries
-    @pytest.mark.parametrize('existing_source', [
-        [USER], [EXTERNAL], [USER, EXTERNAL], [EXTERNAL, USER],
+    @pytest.mark.parametrize('existing_sources', [
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
     ])
-    def test_set_user_edited_export_countries_undelete_country(self, existing_source):
+    def test_set_user_edited_export_countries_undelete_country(self, existing_sources):
         """
         Test the set_user_edited_export_countries method, if there is an existing
         CompanyExportCountry which is marked as deleted,
@@ -327,18 +335,18 @@ class TestCompany:
         company_1 = CompanyFactory()
         c1 = CompanyExportCountryFactory(
             company=company_1,
-            source=existing_source,
+            sources=existing_sources,
             deleted=True,
         )
         company_1.set_user_edited_export_countries([c1.country])
-        expected_source = existing_source
-        if USER not in expected_source:
-            expected_source.append(USER)
+        expected_sources = existing_sources
+        if USER_SOURCE not in expected_sources:
+            expected_sources.append(USER_SOURCE)
         assert (
-            list(
-                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
-            )
-            == [(c1.country.id, existing_source, False)]
+            list(company_1.unfiltered_export_countries.values_list(
+                'country', 'sources', 'deleted',
+            ))
+            == [(c1.country.id, existing_sources, False)]
         )
 
     @pytest.mark.export_countries
@@ -350,13 +358,15 @@ class TestCompany:
         company_1 = CompanyFactory()
         c1 = CompanyExportCountryFactory(
             company=company_1,
-            source=[EXTERNAL],
+            sources=[EXTERNAL_SOURCE],
             deleted=False,
         )
         company_1.set_user_edited_export_countries([c1.country])
         assert (
-            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
-            == [(c1.country.id, [EXTERNAL, USER], False)]
+            list(company_1.unfiltered_export_countries.values_list(
+                'country', 'sources', 'deleted'),
+            )
+            == [(c1.country.id, [EXTERNAL_SOURCE, USER_SOURCE], False)]
         )
 
     @pytest.mark.export_countries
@@ -369,13 +379,15 @@ class TestCompany:
         company_1 = CompanyFactory()
         c1 = CompanyExportCountryFactory(
             company=company_1,
-            source=[EXTERNAL],
+            sources=[EXTERNAL_SOURCE],
             deleted=True,
         )
         company_1.set_user_edited_export_countries([c1.country])
         assert (
-            list(company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'))
-            == [(c1.country.id, [EXTERNAL, USER], False)]
+            list(company_1.unfiltered_export_countries.values_list(
+                'country', 'sources', 'deleted'),
+            )
+            == [(c1.country.id, [EXTERNAL_SOURCE, USER_SOURCE], False)]
         )
 
     @pytest.mark.export_countries
@@ -389,17 +401,20 @@ class TestCompany:
         company_2 = CompanyFactory()
         _ = CompanyExportCountryFactory(company=company_2)
         c1 = CompanyExportCountryFactory(
-            company=company_1, source=[USER],
+            company=company_1, sources=[USER_SOURCE],
         )
         c2 = CompanyExportCountryFactory(
-            company=company_1, source=[USER], deleted=True,
+            company=company_1, sources=[USER_SOURCE], deleted=True,
         )
         company_1.set_user_edited_export_countries([c1.country, c2.country])
         assert (
             sorted(list(
-                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
             ))
-            == sorted([(c1.country.id, [USER], False), (c2.country.id, [USER], False)])
+            == sorted([
+                (c1.country.id, [USER_SOURCE], False),
+                (c2.country.id, [USER_SOURCE], False),
+            ])
         )
 
     @pytest.mark.export_countries
@@ -412,17 +427,17 @@ class TestCompany:
         company_2 = CompanyFactory()
         CompanyExportCountryFactory.create_batch(3, company=company_2)
         c1 = CompanyExportCountryFactory(
-            company=company_1, source=[USER],
+            company=company_1, sources=[USER_SOURCE],
         )
         c2 = CompanyExportCountryFactory(
-            company=company_1, source=[USER], deleted=True,
+            company=company_1, sources=[USER_SOURCE], deleted=True,
         )
         # We'll remove c3
         c3 = CompanyExportCountryFactory(
-            company=company_1, source=[EXTERNAL],
+            company=company_1, sources=[EXTERNAL_SOURCE],
         )
         c4 = CompanyExportCountryFactory(
-            company=company_1, source=[EXTERNAL], deleted=True,
+            company=company_1, sources=[EXTERNAL_SOURCE], deleted=True,
         )
 
         other_country = Country.objects.exclude(id__in=[c1.id, c2.id, c3.id, c4.id]).first()
@@ -432,14 +447,14 @@ class TestCompany:
 
         assert (
             sorted(list(
-                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
             ))
             == sorted([
-                (c1.country_id, [USER], False),
-                (c2.country_id, [USER], False),
-                (c3.country_id, [EXTERNAL], True),
-                (c4.country_id, [EXTERNAL, USER], False),
-                (other_country.id, [USER], False),
+                (c1.country_id, [USER_SOURCE], False),
+                (c2.country_id, [USER_SOURCE], False),
+                (c3.country_id, [EXTERNAL_SOURCE], True),
+                (c4.country_id, [EXTERNAL_SOURCE, USER_SOURCE], False),
+                (other_country.id, [USER_SOURCE], False),
             ])
         )
 
@@ -453,33 +468,33 @@ class TestCompany:
         company_2 = CompanyFactory()
         CompanyExportCountryFactory.create_batch(3, company=company_2)
         CompanyExportCountryFactory(
-            company=company_1, source=[USER],
+            company=company_1, sources=[USER_SOURCE],
         )
         CompanyExportCountryFactory(
-            company=company_1, source=[USER], deleted=True,
+            company=company_1, sources=[USER_SOURCE], deleted=True,
         )
         c3 = CompanyExportCountryFactory(
-            company=company_1, source=[EXTERNAL],
+            company=company_1, sources=[EXTERNAL_SOURCE],
         )
         c4 = CompanyExportCountryFactory(
-            company=company_1, source=[EXTERNAL], deleted=True,
+            company=company_1, sources=[EXTERNAL_SOURCE], deleted=True,
         )
         c5 = CompanyExportCountryFactory(
-            company=company_1, source=[EXTERNAL, USER], deleted=True,
+            company=company_1, sources=[EXTERNAL_SOURCE, USER_SOURCE], deleted=True,
         )
         c6 = CompanyExportCountryFactory(
-            company=company_1, source=[USER, EXTERNAL], deleted=False,
+            company=company_1, sources=[USER_SOURCE, EXTERNAL_SOURCE], deleted=False,
         )
         company_1.set_user_edited_export_countries([])
         assert (
             sorted(list(
-                company_1.unfiltered_export_countries.values_list('country', 'source', 'deleted'),
+                company_1.unfiltered_export_countries.values_list('country', 'sources', 'deleted'),
             ))
             == sorted([
-                (c3.country_id, [EXTERNAL], True),
-                (c4.country_id, [EXTERNAL], True),
-                (c5.country_id, [EXTERNAL], True),
-                (c6.country_id, [EXTERNAL], True),
+                (c3.country_id, [EXTERNAL_SOURCE], True),
+                (c4.country_id, [EXTERNAL_SOURCE], True),
+                (c5.country_id, [EXTERNAL_SOURCE], True),
+                (c6.country_id, [EXTERNAL_SOURCE], True),
             ])
         )
 
@@ -526,7 +541,7 @@ class TestCompanyExportCountry:
         cec = CompanyExportCountryFactory.build(
             country=Country.objects.get(id=constants.Country.anguilla.value.id),
             company=company,
-            source=[USER],
+            sources=[USER_SOURCE],
             deleted=False,
         )
         assert str(cec) == (

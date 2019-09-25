@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             name='CompanyExportCountry',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('source', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('user', 'User entered'), ('external', 'External')], max_length=16), size=None)),
+                ('sources', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('user', 'User entered'), ('external', 'External')], max_length=255), size=None)),
                 ('deleted', models.BooleanField(blank=True, default=False)),
                 ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='unfiltered_export_countries', to='company.Company')),
                 ('country', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='companies_with_interest', to='metadata.Country')),

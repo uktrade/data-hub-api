@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from operator import itemgetter
 
 import factory
 import pytest
@@ -537,15 +538,9 @@ class TestGetCompany(APITestMixin):
         these countries are returned in the expected format in the
         future_interest_countries field.
         """
-        ghq = CompanyFactory(
-            global_headquarters=None,
-            one_list_tier=OneListTier.objects.first(),
-            one_list_account_owner=AdviserFactory(),
-        )
         company = CompanyFactory(
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
-            global_headquarters=ghq,
             one_list_tier=None,
             one_list_account_owner=None,
         )
@@ -567,14 +562,20 @@ class TestGetCompany(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()['future_interest_countries']
-        expected_data = [
-            {'id': str(c.id), 'name': c.name}
-            for c in countries
+        actual_future_interest_countries = response.json()['future_interest_countries']
+        expected_future_interest_countries = [
+            {'id': str(country.id), 'name': country.name}
+            for country in countries
         ]
-        response_data = sorted(response_data, key=lambda d: d['id'])
-        expected_data = sorted(expected_data, key=lambda d: d['id'])
-        assert expected_data == response_data
+        actual_future_interest_countries = sorted(
+            actual_future_interest_countries,
+            key=itemgetter('id'),
+        )
+        expected_future_interest_countries = sorted(
+            expected_future_interest_countries,
+            key=itemgetter('id'),
+        )
+        assert expected_future_interest_countries == actual_future_interest_countries
 
 
 class TestUpdateCompany(APITestMixin):
@@ -1148,44 +1149,28 @@ class TestUpdateCompany(APITestMixin):
         utilizing the future_interest_countries field,
         the CompanyExportCountry objects are updated as expected.
         """
-        ghq = CompanyFactory(
-            global_headquarters=None,
-            one_list_tier=OneListTier.objects.first(),
-            one_list_account_owner=AdviserFactory(),
-        )
         company = CompanyFactory(
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
-            global_headquarters=ghq,
             one_list_tier=None,
             one_list_account_owner=None,
         )
-        countries = metadata_models.Country.objects.all()[:3]
+        countries = list(metadata_models.Country.objects.order_by('?')[:3])
         for country in countries[:2]:
             CompanyExportCountryFactory(
                 company=company,
                 country=country,
             )
-
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_company_document',
-            ),
-        )
-        api_client = self.create_api_client(user=user)
-
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
                 'future_interest_countries': [
-                    {'id': c.id, 'name': c.name}
-                    for c in countries[1:3]
+                    {'id': country.id, 'name': country.name}
+                    for country in countries[1:3]
                 ],
             },
         )
-        response = api_client.get(url)
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK
         assert response_data['id'] == str(company.id)

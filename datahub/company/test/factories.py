@@ -193,7 +193,7 @@ class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.Iterator(Country.objects.all())  # Avoid non-unique errors
-    source = [CompanyExportCountry.SOURCES.user]
+    sources = [CompanyExportCountry.SOURCES.user]
     deleted = False
 
     class Meta:

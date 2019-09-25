@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -289,6 +289,7 @@ class Company(ArchivableModel, BaseModel):
                 ).values_list('country_id'),
             ).order_by('id'))
 
+    @transaction.atomic
     def set_user_edited_export_countries(self, countries):
         """
         Given a list of countries of interest *supplied by the user*,
@@ -304,8 +305,8 @@ class Company(ArchivableModel, BaseModel):
         for cec in self.unfiltered_export_countries.select_related('country'):
             changed = False
             if cec.country in countries:
-                if CompanyExportCountry.SOURCES.user not in cec.source:
-                    cec.source.append(CompanyExportCountry.SOURCES.user)
+                if CompanyExportCountry.SOURCES.user not in cec.sources:
+                    cec.sources.append(CompanyExportCountry.SOURCES.user)
                     changed = True
                 if cec.deleted:
                     cec.deleted = False
@@ -315,11 +316,11 @@ class Company(ArchivableModel, BaseModel):
                 if not cec.deleted:
                     cec.deleted = True
                     changed = True
-                if CompanyExportCountry.SOURCES.user in cec.source:
-                    cec.source.remove(CompanyExportCountry.SOURCES.user)
+                if CompanyExportCountry.SOURCES.user in cec.sources:
+                    cec.sources.remove(CompanyExportCountry.SOURCES.user)
                     changed = True
             if changed:
-                if cec.source == []:
+                if cec.sources == []:
                     cec.delete()
                 else:
                     cec.save()
@@ -329,7 +330,7 @@ class Company(ArchivableModel, BaseModel):
             CompanyExportCountry.objects.create(
                 company=self,
                 country=undiscovered_country,
-                source=[CompanyExportCountry.SOURCES.user],
+                sources=[CompanyExportCountry.SOURCES.user],
             )
 
     def mark_as_transferred(self, to, reason, user):
@@ -536,16 +537,18 @@ class CompanyExportCountry(models.Model):
         on_delete=models.CASCADE,
         related_name='unfiltered_export_countries',
     )
-    source = ArrayField(
-        models.CharField(max_length=16, choices=SOURCES),
+    sources = ArrayField(
+        models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=SOURCES),
     )
-    deleted = models.BooleanField(blank=True, default=False)
+    deleted = models.BooleanField(default=False)
 
     class Meta:
-        constraints = [models.UniqueConstraint(
-            fields=['country', 'company'],
-            name='unique_country_company',
-        )]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['country', 'company'],
+                name='unique_country_company',
+            ),
+        ]
         verbose_name_plural = 'company export countries'
 
     def __str__(self):
@@ -553,6 +556,6 @@ class CompanyExportCountry(models.Model):
         Human readable name
         """
         return (
-            f'{self.company.name} interested in {self.country.name}; '
-            f'Sources: {self.source}; Deleted: {self.deleted}'
+            f'{self.company} interested in {self.country}; '
+            f'Sources: {self.sources}; Deleted: {self.deleted}'
         )
