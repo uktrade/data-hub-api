@@ -215,7 +215,7 @@ class TestCompany:
         CompanyExportCountry objects at all.
         """
         company = CompanyFactory()
-        assert list(company.get_active_export_countries()) == []
+        assert list(company.get_active_future_export_countries()) == []
 
     @pytest.mark.export_countries
     def test_get_active_company_export_countries_all_deleted(self):
@@ -225,7 +225,7 @@ class TestCompany:
         """
         company = CompanyFactory()
         CompanyExportCountryFactory.create_batch(3, company=company, deleted=True)
-        assert list(company.get_active_export_countries()) == []
+        assert list(company.get_active_future_export_countries()) == []
 
     @pytest.mark.export_countries
     def test_get_active_company_export_countries_all_for_other_companies(self):
@@ -236,7 +236,7 @@ class TestCompany:
         company = CompanyFactory()
         company_2 = CompanyFactory()
         CompanyExportCountryFactory.create_batch(3, company=company_2)
-        assert list(company.get_active_export_countries()) == []
+        assert list(company.get_active_future_export_countries()) == []
 
     @pytest.mark.export_countries
     @pytest.mark.parametrize('prefetch', [True, False, 'partial'])
@@ -268,7 +268,7 @@ class TestCompany:
             if prefetch is True:
                 companies = companies.prefetch_related('unfiltered_export_countries__country')
 
-        assert list(companies[0].get_active_export_countries()) == sorted(
+        assert list(companies[0].get_active_future_export_countries()) == sorted(
             [cec1.country, cec2.country, cec3.country], key=lambda c: c.name,
         )
 

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='company',
             name='future_interest_countries',
-            field=models.ManyToManyField(blank=True, help_text='This field is now deprecated. Use the get_active_export_countries method.', related_name='companies_with_future_interest', to='metadata.Country'),
+            field=models.ManyToManyField(blank=True, help_text='This field is now deprecated. Use the get_active_future_export_countries method.', related_name='companies_with_future_interest', to='metadata.Country'),
         ),
         migrations.CreateModel(
             name='CompanyExportCountry',

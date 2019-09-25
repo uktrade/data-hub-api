@@ -131,7 +131,7 @@ class Company(ArchivableModel, BaseModel):
         metadata_models.Country,
         blank=True,
         related_name='companies_with_future_interest',
-        help_text='This field is now deprecated. Use the get_active_export_countries'
+        help_text='This field is now deprecated. Use the get_active_future_export_countries'
         ' method.',
     )
     description = models.TextField(blank=True, null=True)
@@ -262,7 +262,7 @@ class Company(ArchivableModel, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    def get_active_export_countries(self):
+    def get_active_future_export_countries(self):
         """
         Get a list of unique countries for which there are active (non-deleted)
         CompanyExportCountry Objects

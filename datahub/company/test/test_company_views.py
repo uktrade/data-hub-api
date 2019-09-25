@@ -1190,7 +1190,7 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response_data['id'] == str(company.id)
         company.refresh_from_db()
-        assert set(company.get_active_export_countries()) == set(countries[1:3])
+        assert set(company.get_active_future_export_countries()) == set(countries[1:3])
 
 
 class TestAddCompany(APITestMixin):

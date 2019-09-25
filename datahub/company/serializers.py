@@ -272,7 +272,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     future_interest_countries = NestedRelatedField(
         meta_models.Country, many=True, required=False,
-        source='get_active_export_countries',
+        source='get_active_future_export_countries',
     )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
@@ -403,10 +403,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         This override calls the set_user_edited_export_countries method on
         the instance, after it has been updated with all other fields.
         """
-        active_export_countries = validated_data.pop('get_active_export_countries', None)
+        active_future_export_countries = validated_data.pop(
+            'get_active_future_export_countries',
+            None,
+        )
         super().update(instance, validated_data)
-        if active_export_countries is not None:
-            instance.set_user_edited_export_countries(active_export_countries)
+        if active_future_export_countries is not None:
+            instance.set_user_edited_export_countries(active_future_export_countries)
         return instance
 
     def create(self, validated_data):
@@ -415,10 +418,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         This override calls the set_user_edited_export_countries method on
         the instance, after it has been created.
         """
-        active_export_countries = validated_data.pop('get_active_export_countries', None)
+        active_future_export_countries = validated_data.pop(
+            'get_active_future_export_countries',
+            None,
+        )
         instance = super().create(validated_data)
-        if active_export_countries is not None:
-            instance.set_user_edited_export_countries(active_export_countries)
+        if active_future_export_countries is not None:
+            instance.set_user_edited_export_countries(active_future_export_countries)
         return instance
 
     class Meta:
