@@ -566,6 +566,7 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
+                'Countries of interest': '',
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (

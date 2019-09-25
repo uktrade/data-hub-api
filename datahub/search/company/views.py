@@ -171,6 +171,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'sector_name': 'Sector',
         'address_country__name': 'Country',
         'uk_region__name': 'UK region',
+        'future_interest_countries': 'Countries of interest',
         'archived': 'Archived',
         'created_on': 'Date created',
         'number_of_employees_value': 'Number of employees',

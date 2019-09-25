@@ -79,3 +79,9 @@ docker-volumes/
 
 # celery
 celerybeat-schedule
+
+# Redis
+dump.rdb
+
+#IDE
+.idea/
