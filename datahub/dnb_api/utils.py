@@ -46,7 +46,7 @@ def format_dnb_company(dnb_company):
     }
 
     domain = dnb_company.get('domain')
-    company_website = f'http://{domain}' if domain else None
+    company_website = f'http://{domain}' if domain else ''
 
     return {
         'name': dnb_company.get('primary_name'),

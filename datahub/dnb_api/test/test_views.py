@@ -613,8 +613,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         field_overrides,
     ):
         """
-        Test if dnb-service returns a company with missing required fields,
-        the create-company endpoint returns 400.
+        Test if dnb-service returns a company with missing optional fields,
+        the create-company endpoint still returns 200 and the company is saved
+        successfully.
         """
         dnb_response_uk['results'][0].update(field_overrides)
         requests_mock.post(
