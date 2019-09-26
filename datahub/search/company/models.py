@@ -65,6 +65,16 @@ def get_suggestions(db_company):
     }
 
 
+def get_future_interest_countries(db_company):
+    """Get value for the future_interest_countries field"""
+    countries = db_company.get_active_future_export_countries()
+    return [
+        dict_utils.id_name_dict(country)
+        for country
+        in countries
+    ]
+
+
 class Company(BaseESModel):
     """Elasticsearch representation of Company model."""
 
@@ -114,6 +124,7 @@ class Company(BaseESModel):
         'suggest': get_suggestions,
         'address': partial(dict_utils.address_dict, prefix='address'),
         'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
+        'future_interest_countries': get_future_interest_countries,
     }
 
     MAPPINGS = {
@@ -122,7 +133,6 @@ class Company(BaseESModel):
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
-        'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
