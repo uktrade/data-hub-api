@@ -1,3 +1,35 @@
+Data Hub API 15.2.0 (2019-09-26)
+================================
+
+
+
+Removals
+--------
+
+- **Interactions** The ``location`` column was removed from the ``interaction_interaction`` DB table.
+
+Bug fixes
+---------
+
+- Fixed a bug in the DNB company save API endpoint which prevented DNB companies
+  with no value for `domain` being saved as Data Hub companies.
+
+Internal changes
+----------------
+
+- **Contacts** Dataset app is split up into subpackages. i.e. datahub.dataset.views to datahub.dataset.contact.views
+- **OMIS** Dataset app is split up into subpackages. i.e. datahub.dataset.views to datahub.dataset.order.views
+- The PaaS IP checks have been removed from Hawk authorisation code. A separate authentication class to check the IP has been implemented instead.
+
+  The PaaS IP check can now be disabled using ``DISABLE_PAAS_IP_CHECK`` environment variable.
+
+Database schema
+---------------
+
+- **Companies** Composite index (created_on, id) is defined on Contact model for the sake of API endpoints defined under dataset app.
+- **Interactions** The ``location`` column was removed from the ``interaction_interaction`` table.
+
+
 Data Hub API 15.1.0 (2019-09-19)
 ================================
 
