@@ -56,7 +56,7 @@ the change logs for dependencies that are being updated in case they have any br
 `pip install -r requirements.txt`, but that may leave behind redundant packages that 
 have been removed which can cause problems.)
 
-5. Commit the changes to a new branch, along with a brief [news fragment](../changelog/README.rst) 
+5. Commit the changes to a new branch, along with a brief [news fragment](../changelog/README.md) 
 (unless something significant was updated, this can just say 'Various dependencies were updated').
 
 6. Create a PR. Include links to the change logs for dependencies in `requirements.in` that 
