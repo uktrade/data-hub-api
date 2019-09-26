@@ -25,6 +25,7 @@ from datahub.company.serializers import (
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
+from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -82,7 +83,7 @@ class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, 
     """Read-only company view set using Hawk-authentication (with no user context)."""
 
     serializer_class = PublicCompanySerializer
-    authentication_classes = (HawkAuthentication,)
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
     permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.public_company
 
