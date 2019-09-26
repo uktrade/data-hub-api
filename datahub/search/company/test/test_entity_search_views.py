@@ -46,6 +46,13 @@ def setup_data(setup_es):
         address_country_id=country_uk,
         registered_address_country_id=country_uk,
         uk_region_id=uk_region,
+        export_to_countries=[
+            constants.Country.france.value.id,
+        ],
+        future_interest_countries=[
+            constants.Country.japan.value.id,
+            constants.Country.united_states.value.id,
+        ],
     )
     CompanyFactory(
         name='abc defg us ltd',
@@ -54,6 +61,13 @@ def setup_data(setup_es):
         address_town='Downtown',
         address_country_id=country_us,
         registered_address_country_id=country_us,
+        export_to_countries=[
+            constants.Country.canada.value.id,
+            constants.Country.france.value.id,
+        ],
+        future_interest_countries=[
+            constants.Country.japan.value.id,
+        ],
     )
     CompanyFactory(
         name='archived',
@@ -235,6 +249,38 @@ class TestSearch(APITestMixin):
             (
                 {
                     'uk_based': True,
+                },
+                ['abc defg ltd'],
+            ),
+
+            # export_to_countries
+            (
+                {
+                    'export_to_countries': constants.Country.france.value.id,
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # export_to_countries
+            (
+                {
+                    'export_to_countries': constants.Country.canada.value.id,
+                },
+                ['abc defg us ltd'],
+            ),
+
+            # future_interest_countries
+            (
+                {
+                    'future_interest_countries': constants.Country.japan.value.id,
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # future_interest_countries
+            (
+                {
+                    'future_interest_countries': constants.Country.united_states.value.id,
                 },
                 ['abc defg ltd'],
             ),
