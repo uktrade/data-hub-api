@@ -45,6 +45,9 @@ def format_dnb_company(dnb_company):
         for reg in dnb_company['registration_numbers']
     }
 
+    domain = dnb_company.get('domain')
+    company_website = f'http://{domain}' if domain else None
+
     return {
         'name': dnb_company.get('primary_name'),
         'trading_names': dnb_company.get('trading_names'),
@@ -66,7 +69,7 @@ def format_dnb_company(dnb_company):
         'is_number_of_employees_estimated': dnb_company.get('is_employees_number_estimated'),
         'turnover': dnb_company.get('annual_sales'),
         'is_turnover_estimated': dnb_company.get('is_annual_sales_estimated'),
-        'website': f'http://{dnb_company.get("domain")}',
+        'website': company_website,
         # TODO: Extract sensible values for the following fields form the data:
         # 'business_type': None,
         # 'description': None,

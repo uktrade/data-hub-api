@@ -595,6 +595,44 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_error
 
+    @pytest.mark.parametrize(
+        'field_overrides',
+        (
+            {'domain': None},
+            {'trading_names': []},
+            {'annual_sales': None},
+            {'employee_number': None},
+            {'is_employee_number_estimated': None},
+        ),
+    )
+    def test_post_missing_optional_fields(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+        field_overrides,
+    ):
+        """
+        Test if dnb-service returns a company with missing required fields,
+        the create-company endpoint returns 400.
+        """
+        dnb_response_uk['results'][0].update(field_overrides)
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        created_company = Company.objects.first()
+        assert created_company.name == dnb_response_uk['results'][0]['primary_name']
+
     def test_post_existing(
         self,
         dnb_company_search_feature_flag,
