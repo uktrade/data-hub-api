@@ -51,7 +51,7 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-@reversion.register_base_model()
+@reversion.register_base_model(follow=['unfiltered_export_countries'])
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
