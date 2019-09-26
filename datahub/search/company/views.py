@@ -45,11 +45,13 @@ class SearchCompanyAPIViewMixin:
         'country',
         'uk_based',
         'uk_region',
+        'export_to_countries',
     )
 
     REMAP_FIELDS = {
         'headquarter_type': 'headquarter_type.id',
         'uk_region': 'uk_region.id',
+        'export_to_countries': 'export_to_countries.id',
     }
 
     COMPOSITE_FILTERS = {

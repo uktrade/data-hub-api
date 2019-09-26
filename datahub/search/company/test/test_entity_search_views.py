@@ -26,6 +26,7 @@ from datahub.core.test_utils import (
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.models import get_suggestions
+from datahub.search.company.test.factories import ExportingCompanyFactory
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = pytest.mark.django_db
@@ -484,6 +485,38 @@ class TestSearch(APITestMixin):
             assert [
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
+
+    @pytest.mark.parametrize(
+        'country_id,expected_count',
+        (
+            # name
+            (constants.Country.canada.value.id, 2),
+            (constants.Country.france.value.id, 2),
+            (constants.Country.argentina.value.id, 0),
+        ),
+    )
+    def test_exporting_company_filters(self, setup_es, country_id, expected_count):
+        """Tests filter based on country for companies that are currently exporting."""
+        ExportingCompanyFactory(
+            name='whiskers and tabby',
+        )
+        ExportingCompanyFactory(
+            name='1a',
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'export_to_countries': country_id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == expected_count
 
 
 class TestCompanyExportView(APITestMixin):
