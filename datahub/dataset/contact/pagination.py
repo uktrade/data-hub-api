@@ -6,4 +6,5 @@ class ContactsDatasetViewCursorPagination(CursorPagination):
     Cursor Pagination for ContactsDatasetView
     """
 
-    ordering = ('created_on', 'pk')
+    ordering = ('id', 'created_on')
+    page_size_query_param = 'page_size'

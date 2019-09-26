@@ -49,6 +49,7 @@ class ContactsDatasetView(HawkResponseSigningMixin, APIView):
             'created_on',
             'email',
             'email_alternative',
+            'id',
             'job_title',
             'name',
             'notes',

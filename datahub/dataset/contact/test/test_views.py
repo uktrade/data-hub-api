@@ -45,6 +45,7 @@ def get_expected_data_from_contact(contact):
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
         'email_alternative': contact.email_alternative,
+        'id': str(contact.id),
         'job_title': contact.job_title,
         'name': contact.name,
         'notes': contact.notes,
@@ -116,8 +117,10 @@ class TestContactsDatasetViewSet:
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 4
-        expected_contact_list = sorted([contact_3, contact_4],
-                                       key=lambda item: item.pk) + [contact_1, contact_2]
+        expected_contact_list = sorted(
+            [contact_1, contact_2, contact_3, contact_4],
+            key=lambda item: (item.id, item.created_on),
+        )
         for index, contact in enumerate(expected_contact_list):
             assert contact.email == response_results[index]['email']
 
