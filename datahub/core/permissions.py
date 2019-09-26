@@ -1,8 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 from datahub.core.exceptions import APIMethodNotAllowedException
+
+logger = logging.getLogger(__name__)
+
 
 # View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {

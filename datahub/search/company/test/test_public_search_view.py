@@ -87,6 +87,14 @@ class TestPublicCompanySearch:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_without_whitelisted_ip(self, public_company_api_client):
+        """Test that making a request without the whitelisted client IP returns an error."""
+        url = reverse('api-v4:search:public-company')
+        public_company_api_client.set_http_x_forwarded_for('1.1.1.1')
+        response = public_company_api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     def test_response_body(self, setup_es, public_company_api_client):
         """Tests the response body of a search query."""
         company = CompanyFactory(

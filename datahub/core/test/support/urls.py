@@ -6,6 +6,7 @@ from datahub.core.test.support.views import (
     max_upload_size_view,
     MultiAddressModelViewset,
     MyDisableableModelViewset,
+    PaasIPView,
 )
 
 urlpatterns = [
@@ -41,6 +42,11 @@ urlpatterns = [
         'test-hawk-with-scope/',
         HawkViewWithScope.as_view(),
         name='test-hawk-with-scope',
+    ),
+    path(
+        'test-paas-ip/',
+        PaasIPView.as_view(),
+        name='test-paas-ip',
     ),
     path(
         'test-max-upload-size/',

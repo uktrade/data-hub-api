@@ -51,6 +51,15 @@ class TestPublicCompanyViewSet:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_without_whitelisted_ip(self, public_company_api_client):
+        """Test that making a request without the whitelisted IP returns an error."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company:public-item', kwargs={'pk': company.pk})
+        public_company_api_client.set_http_x_forwarded_for('1.1.1.1')
+        response = public_company_api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
     def test_other_methods_not_allowed(self, method, public_company_api_client):
         """Test that various HTTP methods are not allowed."""
