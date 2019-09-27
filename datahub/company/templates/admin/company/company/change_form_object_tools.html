@@ -8,7 +8,7 @@
       Merge with another company
     </a>
   </li>
-    {% if original.archived %}
+    {% if original.archived and not original.transferred_to %}
     <li>
         <a href="{% url opts|admin_urlname:'unarchive-company' %}?company={{ original.pk|admin_urlquote }}">
           Unarchive company

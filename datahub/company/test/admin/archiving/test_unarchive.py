@@ -4,7 +4,11 @@ from django.urls import reverse
 from rest_framework import status
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
+from datahub.company.test.factories import (
+    ArchivedCompanyFactory,
+    CompanyFactory,
+    DuplicateCompanyFactory,
+)
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.core.utils import reverse_with_query_string
 
@@ -60,11 +64,20 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
 
         assert unarchive_url not in response.rendered_content
 
-    def test_link_does_not_exist_company_not_archived(self):
+    @pytest.mark.parametrize(
+        'company_creator',
+        (
+            # A company that has not been archived
+            CompanyFactory,
+            # A company that was archived as part of the merge process
+            DuplicateCompanyFactory,
+        ),
+    )
+    def test_link_does_not_exist_company_not_unarchivable(self, company_creator):
         """
-        Test that the link does not exist for a user with only the view company permission.
+        Test that the link does not exist when the company is not unarchivable.
         """
-        company = CompanyFactory()
+        company = company_creator()
 
         change_route_name = admin_urlname(Company._meta, 'change')
         change_url = reverse(change_route_name, args=(company.pk,))
@@ -82,17 +95,26 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
     """Tests GET requests for the 'unarchive company' view."""
 
     @pytest.mark.parametrize(
-        'company_callable,expected_status_code',
+        'company_callable,expected_status_code,expected_archived_value',
         (
             # Unarchive of an archived company is successful
             (
                 ArchivedCompanyFactory,
                 status.HTTP_302_FOUND,
+                False,
             ),
-            # Unarchive of an un-archived company responds with bad request
+            # Unarchive of an non-archived company responds with bad request
             (
                 CompanyFactory,
                 status.HTTP_400_BAD_REQUEST,
+                False,
+            ),
+            # Unarchive of a duplicate company responds with a 302, but does not unarchive the
+            # company
+            (
+                DuplicateCompanyFactory,
+                status.HTTP_302_FOUND,
+                True,
             ),
         ),
     )
@@ -100,6 +122,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         self,
         company_callable,
         expected_status_code,
+        expected_archived_value,
     ):
         """
         Test the unarchive view when called on companies in different states.
@@ -118,10 +141,11 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
 
         assert response.status_code == expected_status_code
         company.refresh_from_db()
-        assert company.archived is False
-        assert not company.archived_on
-        assert not company.archived_by
-        assert not company.archived_reason
+        assert company.archived is expected_archived_value
+        if expected_archived_value is False:
+            assert not company.archived_on
+            assert not company.archived_by
+            assert not company.archived_reason
 
     def test_unarchive_company_does_not_exist(self):
         """
