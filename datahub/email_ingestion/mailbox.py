@@ -172,9 +172,13 @@ class Mailbox:
 
     def get_new_mail(self):
         """
-        Generator method which gets new messages from the email inbox. After a
-        message has been yielded (or an error has been logged while parsing it),
-        it is flagged as DELETED on the inbox so that it will not be ingested again later.
+        Generator method which gets new messages from the email inbox.
+
+        After a message has been yielded (or an error has been logged while parsing it), it is
+        flagged as DELETED on the inbox. Finally, the function will call `expunge()` on the mailbox
+        (which will delete all messages marked for deletion) - this will be called after all unread
+        messages have been yielded by the generator.
+
         We only consider messages that have not been seen for ingestion.
 
         :yields: A mailparser.Message object for each parsed message.
