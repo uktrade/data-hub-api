@@ -82,19 +82,17 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
     """Tests GET requests for the 'unarchive company' view."""
 
     @pytest.mark.parametrize(
-        'company_callable,expected_status_code,expected_archived_value',
+        'company_callable,expected_status_code',
         (
             # Unarchive of an archived company is successful
             (
                 ArchivedCompanyFactory,
                 status.HTTP_302_FOUND,
-                False,
             ),
             # Unarchive of an un-archived company responds with bad request
             (
                 CompanyFactory,
                 status.HTTP_400_BAD_REQUEST,
-                False,
             ),
         ),
     )
@@ -102,7 +100,6 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         self,
         company_callable,
         expected_status_code,
-        expected_archived_value,
     ):
         """
         Test the unarchive view when called on companies in different states.
@@ -118,13 +115,13 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         )
 
         response = self.client.get(unarchive_url)
+
         assert response.status_code == expected_status_code
         company.refresh_from_db()
-        assert company.archived == expected_archived_value
-        if expected_archived_value is False:
-            assert not company.archived_on
-            assert not company.archived_by
-            assert not company.archived_reason
+        assert company.archived is False
+        assert not company.archived_on
+        assert not company.archived_by
+        assert not company.archived_reason
 
     def test_unarchive_company_does_not_exist(self):
         """
