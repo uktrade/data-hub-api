@@ -49,3 +49,17 @@ def notify_dnb_investigation_post_save(sender, instance, created, raw, **kwargs)
 def _notify_dnb_investigation_post_save(instance):
     logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
     notify_new_dnb_investigation(instance)
+
+
+import reversion
+def _re_add_company_to_revision(sender, revision, versions, **kwargs):
+    found_companies = []
+    import ipdb
+    ipdb.set_trace()
+    for version in versions:
+        if isinstance(version.object, Company):
+            found_companies.append(version.object)
+    for company in found_companies:
+        reversion.add_to_revision(company)
+
+reversion.signals.pre_revision_commit.connect(_re_add_company_to_revision)

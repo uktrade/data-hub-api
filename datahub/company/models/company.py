@@ -51,7 +51,8 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-@reversion.register_base_model(follow=['unfiltered_export_countries'])
+import datahub.company.django_serializers.company
+@reversion.register_base_model(follow=['unfiltered_export_countries'], format="company")
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
@@ -510,7 +511,7 @@ class CompaniesHouseCompany(models.Model):
         verbose_name_plural = 'Companies House companies'
 
 
-@reversion.register_base_model()
+@reversion.register_base_model(follow=('company',))
 class CompanyExportCountry(models.Model):
     """
     Record that a Company is interested in exporting to a Country.

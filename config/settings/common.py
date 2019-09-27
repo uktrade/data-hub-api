@@ -604,3 +604,7 @@ DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=Non
 STATSD_HOST = env('STATSD_HOST', default='localhost')
 STATSD_PORT = env('STATSD_PORT', default='9125')
 STATSD_PREFIX = env('STATSD_PREFIX', default='datahub-api')
+
+SERIALIZATION_MODULES = {
+    'company': 'datahub.company.django_serializers.company',
+}
