@@ -10,6 +10,6 @@ Here are some useful resources to have a look at if this is your first time cont
 * [Coding style](./Coding&#32;style.md)
 * [PR and code review guidelines](./Code&#32;review&#32;guidelines.md)
 * [Incremental pull requests](./Incremental&#32;Pull&#32;Requests.md)
-* [News fragments](../changelog/README.rst)
+* [News fragments](../changelog/README.md)
 
 Guides for more specific topics are listed in [docs/README.md](./README.md). 
