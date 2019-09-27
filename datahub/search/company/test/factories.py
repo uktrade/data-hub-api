@@ -12,3 +12,10 @@ class ExportingCompanyFactory(CompanyFactory):
             constants.Country.canada.value.id,
             constants.Country.france.value.id
         ]
+
+    @to_many_field
+    def future_interest_countries(self):  # noqa: D102
+        return [
+            constants.Country.japan.value.id,
+            constants.Country.united_states.value.id
+        ]

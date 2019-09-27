@@ -496,7 +496,10 @@ class TestSearch(APITestMixin):
         ),
     )
     def test_exporting_company_filters(self, setup_es, country_id, expected_count):
-        """Tests filter based on country for companies that are currently exporting."""
+        """
+        Tests filter based on country for companies that are currently exporting.
+        """
+
         ExportingCompanyFactory(
             name='whiskers and tabby',
         )
@@ -511,6 +514,41 @@ class TestSearch(APITestMixin):
             url,
             data={
                 'export_to_countries': country_id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == expected_count
+
+    @pytest.mark.parametrize(
+        'country_id,expected_count',
+        (
+            # name
+            (constants.Country.japan.value.id, 2),
+            (constants.Country.united_states.value.id, 2),
+            (constants.Country.france.value.id, 0),
+        ),
+    )
+    def test_future_interest_countries_company_filters(self, setup_es, country_id, expected_count):
+        """
+        Tests filter based on country that the company has future interest in exporting.
+        """
+
+        ExportingCompanyFactory(
+            name='whiskers and tabby',
+        )
+        ExportingCompanyFactory(
+            name='1a',
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'future_interest_countries': country_id,
             },
         )
 

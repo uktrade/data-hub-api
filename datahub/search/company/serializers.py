@@ -22,6 +22,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     uk_based = serializers.BooleanField(required=False)
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
     export_to_countries = SingleOrListField(child=StringUUIDField(), required=False)
+    future_interest_countries = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',
