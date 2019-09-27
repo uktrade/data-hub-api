@@ -234,10 +234,19 @@ class DNBCompanyCreateInvestigationView(APIView):
         Given a minimal set of fields that may be necessary for DNB investigation,
         create a Company record in DataHub.
         """
-        company_serializer = DNBCompanyInvestigationSerializer(
-            data=format_dnb_company_investigation(request.data),
-        )
-        company_serializer.is_valid(raise_exception=True)
+        formatted_company_data = format_dnb_company_investigation(request.data)
+        company_serializer = DNBCompanyInvestigationSerializer(data=formatted_company_data)
+
+        try:
+            company_serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
+                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
+                sentry_sdk.capture_message(
+                    'Company investigation payload failed serializer validation',
+                )
+            raise
 
         datahub_company = company_serializer.save(
             created_by=request.user,
