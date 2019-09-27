@@ -1,36 +1,42 @@
 # How to prepare a release
 
 
-## Decide on the new version number
-The current format is `<major>.<minor>.<patch>`.
+## Decide on the release type
 
-Start from [the latest](https://github.com/uktrade/data-hub-leeloo/blob/develop/CHANGELOG.md) and increase the number depending on if it's a major, a minor or a patch release.
+You'll need to decide if the release is a major, minor or patch release.
+
+As a general guide:
+
+* if the new version contains _only_ non-breaking bug fixes, then it's a patch version
+* if it contains breaking API changes, then it's a major version
+* anything else is a minor version 
+
+You can run `towncrier --draft --version draft` to generate a draft changelog and help you decide.
 
 ## Update the changelog
-Create a branch from develop:
 
-```
-git checkout develop && git pull
-git checkout -b changelog-<version>
-```
+Once you've reviewed the draft changelog and decided on the release type, you can create the changelog by running:
 
-Compile the changelog:
-
-```
-towncrier --version <version>
+```shell
+scripts/create_changelog.py <major|minor|patch>
 ```
 
-Add and push the changes:
+The command will:
 
-```
-git add .
-git commit -m 'Add changelog for <version>'
-git push origin changelog-<version>
-```
+- determine the new version number
+- create a branch named `changelog/<version>`
+- commit the changelog to it
+- push the branch
+- open your browser window ready to create a PR
 
-In GitHub, open a PR to merge `changelog-<version>` into `develop` and assign at least two developers for review.
+If the command fails, review the error and investigate.
 
-When ready, merge `changelog-<version>` into `develop` and delete the merged branch.
+In your web browser, check the changelog preview, and then open a PR to merge `changelog/<version>` 
+into `develop`.
+
+Assign at least two developers for review.
+
+When ready, merge `changelog/<version>` into `develop` and delete the merged branch.
 
 ## Prepare the release
 
