@@ -200,7 +200,7 @@ class Mailbox:
                     )
                     logger.exception(error_message)
                     # Just set the message to None so that we still mark it as
-                    # read later
+                    # deleted later
                     message = None
                 except EmailRetrievalError:
                     # We should fail and exit immediately in this case, as it's
