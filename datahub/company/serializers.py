@@ -440,6 +440,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'address',
             'registered_address',
             'pending_dnb_investigation',
+            'export_potential',
         )
         read_only_fields = (
             'archived',
@@ -454,6 +455,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'number_of_employees',
             'is_number_of_employees_estimated',
             'pending_dnb_investigation',
+            'export_potential',
         )
         dnb_read_only_fields = (
             'name',
