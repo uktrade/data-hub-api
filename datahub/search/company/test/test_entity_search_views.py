@@ -46,6 +46,13 @@ def setup_data(setup_es):
         address_country_id=country_uk,
         registered_address_country_id=country_uk,
         uk_region_id=uk_region,
+        export_to_countries=[
+            constants.Country.france.value.id,
+        ],
+        future_interest_countries=[
+            constants.Country.japan.value.id,
+            constants.Country.united_states.value.id,
+        ],
     )
     CompanyFactory(
         name='abc defg us ltd',
@@ -54,6 +61,13 @@ def setup_data(setup_es):
         address_town='Downtown',
         address_country_id=country_us,
         registered_address_country_id=country_us,
+        export_to_countries=[
+            constants.Country.canada.value.id,
+            constants.Country.france.value.id,
+        ],
+        future_interest_countries=[
+            constants.Country.japan.value.id,
+        ],
     )
     CompanyFactory(
         name='archived',
@@ -235,6 +249,38 @@ class TestSearch(APITestMixin):
             (
                 {
                     'uk_based': True,
+                },
+                ['abc defg ltd'],
+            ),
+
+            # export_to_countries
+            (
+                {
+                    'export_to_countries': constants.Country.france.value.id,
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # export_to_countries
+            (
+                {
+                    'export_to_countries': constants.Country.canada.value.id,
+                },
+                ['abc defg us ltd'],
+            ),
+
+            # future_interest_countries
+            (
+                {
+                    'future_interest_countries': constants.Country.japan.value.id,
+                },
+                ['abc defg ltd', 'abc defg us ltd'],
+            ),
+
+            # future_interest_countries
+            (
+                {
+                    'future_interest_countries': constants.Country.united_states.value.id,
                 },
                 ['abc defg ltd'],
             ),
@@ -484,136 +530,6 @@ class TestSearch(APITestMixin):
             assert [
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
-
-    @pytest.mark.parametrize(
-        'country_id,expected_count,expected_companies',
-        (
-            (
-                constants.Country.canada.value.id,
-                2,
-                ['abc canada france ltd', 'abc def canada ltd'],
-            ),
-            (
-                constants.Country.france.value.id,
-                1,
-                ['abc canada france ltd'],
-            ),
-            (
-                constants.Country.argentina.value.id,
-                0,
-                [],
-            ),
-        ),
-    )
-    def test_exporting_company_filters(
-        self,
-        setup_es,
-        country_id,
-        expected_count,
-        expected_companies,
-    ):
-        """
-        Tests filter based on country for companies that are currently exporting.
-        """
-        CompanyFactory(
-            name='abc def canada ltd',
-            export_to_countries=[
-                constants.Country.canada.value.id,
-            ],
-        )
-        CompanyFactory(
-            name='abc canada france ltd',
-            export_to_countries=[
-                constants.Country.canada.value.id,
-                constants.Country.france.value.id,
-            ],
-        )
-        CompanyFactory(
-            name='non exporting inc',
-        )
-        setup_es.indices.refresh()
-
-        url = reverse('api-v4:search:company')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'export_to_countries': country_id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == expected_count
-        assert [
-            result['name']
-            for result in response_data['results']
-        ] == expected_companies
-
-    @pytest.mark.parametrize(
-        'country_id,expected_count,expected_companies',
-        (
-            (
-                constants.Country.japan.value.id,
-                2,
-                ['abc japan ltd', 'abc japan usa ltd'],
-            ),
-            (
-                constants.Country.united_states.value.id,
-                1,
-                ['abc japan usa ltd'],
-            ),
-            (
-                constants.Country.argentina.value.id,
-                0,
-                [],
-            ),
-        ),
-    )
-    def test_future_interest_countries_company_filters(
-        self,
-        setup_es,
-        country_id,
-        expected_count,
-        expected_companies,
-    ):
-        """
-        Tests filter based on country that the company has future interest in exporting.
-        """
-        CompanyFactory(
-            name='abc japan ltd',
-            future_interest_countries=[
-                constants.Country.japan.value.id,
-            ],
-        )
-        CompanyFactory(
-            name='abc japan usa ltd',
-            future_interest_countries=[
-                constants.Country.japan.value.id,
-                constants.Country.united_states.value.id,
-            ],
-        )
-        CompanyFactory(
-            name='non interested in exporting inc',
-        )
-        setup_es.indices.refresh()
-
-        url = reverse('api-v4:search:company')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'future_interest_countries': country_id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == expected_count
-        assert [
-            result['name']
-            for result in response_data['results']
-        ] == expected_companies
 
 
 class TestCompanyExportView(APITestMixin):
