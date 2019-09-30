@@ -51,10 +51,11 @@ def _notify_dnb_investigation_post_save(instance):
     logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
     notify_new_dnb_investigation(instance)
 
+
 @receiver(
     post_save,
     sender=CompanyExportCountry,
-    dispatch_uid='add_company_to_revision_after_post_export_country_save'
+    dispatch_uid='add_company_to_revision_after_post_export_country_save',
 )
 def _add_company_to_revision_post_save(sender, instance, created, raw, **kwargs):
     """
@@ -76,7 +77,7 @@ def _add_company_to_revision_post_save(sender, instance, created, raw, **kwargs)
 @receiver(
     post_delete,
     sender=CompanyExportCountry,
-    dispatch_uid='add_company_to_revision_after_post_export_country_delete'
+    dispatch_uid='add_company_to_revision_after_post_export_country_delete',
 )
 def _add_company_to_revision_post_delete(sender, instance, using, **kwargs):
     """

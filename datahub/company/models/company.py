@@ -51,7 +51,7 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-@reversion.register_base_model(format="company")
+@reversion.register_base_model(format='company')
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 

@@ -1,5 +1,6 @@
-import factory
 import json
+
+import factory
 import pytest
 import reversion
 from django.conf import settings
@@ -541,6 +542,10 @@ class TestCompanyVersions:
     """
 
     def test_future_interest_countries_field(self):
+        """
+        Test that the future_interest_countries field is set by the results of
+        the get_active_future_export_country method.
+        """
         with reversion.create_revision():
             company = CompanyFactory()
         version = Version.objects.get_for_object(company).get()  # Should only be one
@@ -548,22 +553,27 @@ class TestCompanyVersions:
         with reversion.create_revision():
             cecs = CompanyExportCountryFactory.create_batch(2, company=company)
 
-        version = Version.objects.get_for_object(company).first()  # These are sorted by descending id
+        # These are sorted by descending id
+        version = Version.objects.get_for_object(company).first()
         assert json.loads(version.serialized_data)[0]['fields']['future_interest_countries'] == [
             str(cec.country_id) for cec in cecs
         ]
 
     def test_future_interest_countries_field_after_delete(self):
+        """
+        Test that the future_interest_countries field is updated when a related
+        CompanyExportCountry is deleted.
+        """
         company = CompanyFactory()
         cecs = CompanyExportCountryFactory.create_batch(2, company=company)
         with reversion.create_revision():
             cecs[1].delete()
         version = Version.objects.get_for_object(company).first()
         assert json.loads(version.serialized_data)[0]['fields']['future_interest_countries'] == [
-            str(cecs[0].country_id)
+            str(cecs[0].country_id),
         ]
 
-        
+
 @pytest.mark.export_countries
 class TestCompanyExportCountry:
     """Tests for the CompanyExportCountry model."""
