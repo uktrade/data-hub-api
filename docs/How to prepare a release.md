@@ -81,7 +81,7 @@ In GitHub, [create a release](https://github.com/uktrade/data-hub-leeloo/release
 * **Tag version**: `v<version>` e.g. `v6.3.0`
 * **Target**: `master`
 * **Release title**: `v<version>` e.g. `v6.3.0`
-* **Describe this release**: copy/paste the notes from the compiled changelog after converting the rst text into md using something like [pandoc](http://pandoc.org/try/).
+* **Describe this release**: copy/paste the notes from the compiled changelog.
 
 And click on _Publish release_.
 
