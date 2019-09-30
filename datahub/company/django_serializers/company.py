@@ -12,22 +12,16 @@ class Serializer(JSONSerializer):
         company.
     """
 
-    def handle_m2m_field(self, obj, field):
+    def end_object(self, obj):
         """
-        Custom handling of m2m fields. For most fields,
-        return the default rendering from the super class.
-        However:
-        1. If the field name is 'future_interest_countries',
-            instead call the get_active_future_export_countries method on the object,
-            and return a list of ids of the countries thereby returned.
+        Change the serialized data for the future_interest_countries field,
+        and then call end_object on the super class.
         """
-        if field.name == 'future_interest_countries':
-            self._current[field.name] = [
-                self._value_from_field(value, value._meta.pk)
-                for value in obj.get_active_future_export_countries()
-            ]
-        else:
-            super().handle_m2m_field(obj, field)
+        self._current['future_interest_countries'] = [
+            self._value_from_field(value, value._meta.pk)
+            for value in obj.get_active_future_export_countries()
+        ]
+        return super().end_object(obj)
 
 
 def Deserializer(stream_or_string, **options):  # noqa: N802
