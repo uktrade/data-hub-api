@@ -499,7 +499,6 @@ class TestSearch(APITestMixin):
         """
         Tests filter based on country for companies that are currently exporting.
         """
-
         ExportingCompanyFactory(
             name='whiskers and tabby',
         )
@@ -534,7 +533,6 @@ class TestSearch(APITestMixin):
         """
         Tests filter based on country that the company has future interest in exporting.
         """
-
         ExportingCompanyFactory(
             name='whiskers and tabby',
         )
