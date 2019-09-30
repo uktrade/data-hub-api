@@ -51,8 +51,7 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-import datahub.company.django_serializers.company
-@reversion.register_base_model(follow=['unfiltered_export_countries'], format="company")
+@reversion.register_base_model(format="company")
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 

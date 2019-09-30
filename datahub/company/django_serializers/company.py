@@ -6,7 +6,6 @@ from django.core.serializers.json import (
 
 class Serializer(JSONSerializer):
     def handle_m2m_field(self, obj, field):
-
         if field.name == 'future_interest_countries':
             self._current[field.name] = [
                 self._value_from_field(value, value._meta.pk)
