@@ -505,22 +505,28 @@ class TestSearch(APITestMixin):
             ),
         ),
     )
-    def test_exporting_company_filters(self, setup_es, country_id, expected_count, expected_companies):
+    def test_exporting_company_filters(
+        self,
+        setup_es,
+        country_id,
+        expected_count,
+        expected_companies,
+    ):
         """
         Tests filter based on country for companies that are currently exporting.
         """
         CompanyFactory(
             name='abc def canada ltd',
-            export_to_countries = [
+            export_to_countries=[
                 constants.Country.canada.value.id,
-            ]
+            ],
         )
         CompanyFactory(
             name='abc canada france ltd',
-            export_to_countries = [
+            export_to_countries=[
                 constants.Country.canada.value.id,
                 constants.Country.france.value.id,
-            ]
+            ],
         )
         CompanyFactory(
             name='non exporting inc',
@@ -564,22 +570,28 @@ class TestSearch(APITestMixin):
             ),
         ),
     )
-    def test_future_interest_countries_company_filters(self, setup_es, country_id, expected_count, expected_companies):
+    def test_future_interest_countries_company_filters(
+        self,
+        setup_es,
+        country_id,
+        expected_count,
+        expected_companies,
+    ):
         """
         Tests filter based on country that the company has future interest in exporting.
         """
         CompanyFactory(
             name='abc japan ltd',
-            future_interest_countries = [
+            future_interest_countries=[
                 constants.Country.japan.value.id,
-            ]
+            ],
         )
         CompanyFactory(
             name='abc japan usa ltd',
-            future_interest_countries = [
+            future_interest_countries=[
                 constants.Country.japan.value.id,
                 constants.Country.united_states.value.id,
-            ]
+            ],
         )
         CompanyFactory(
             name='non interested in exporting inc',

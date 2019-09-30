@@ -77,7 +77,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     def future_interest_countries(self):  # noqa: D102
         return []
 
-
     class Params:
         hq = factory.Trait(
             headquarter_type=factory.LazyFunction(lambda: random_obj_for_model(HeadquarterType)),
