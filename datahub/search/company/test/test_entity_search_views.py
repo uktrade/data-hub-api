@@ -26,7 +26,6 @@ from datahub.core.test_utils import (
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.models import get_suggestions
-from datahub.search.company.test.factories import ExportingCompanyFactory
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = pytest.mark.django_db
@@ -487,23 +486,44 @@ class TestSearch(APITestMixin):
             ] == ids[start:end]
 
     @pytest.mark.parametrize(
-        'country_id,expected_count',
+        'country_id,expected_count,expected_companies',
         (
-            # name
-            (constants.Country.canada.value.id, 2),
-            (constants.Country.france.value.id, 2),
-            (constants.Country.argentina.value.id, 0),
+            (
+                constants.Country.canada.value.id,
+                2,
+                ['abc canada france ltd', 'abc def canada ltd'],
+            ),
+            (
+                constants.Country.france.value.id,
+                1,
+                ['abc canada france ltd'],
+            ),
+            (
+                constants.Country.argentina.value.id,
+                0,
+                [],
+            ),
         ),
     )
-    def test_exporting_company_filters(self, setup_es, country_id, expected_count):
+    def test_exporting_company_filters(self, setup_es, country_id, expected_count, expected_companies):
         """
         Tests filter based on country for companies that are currently exporting.
         """
-        ExportingCompanyFactory(
-            name='whiskers and tabby',
+        CompanyFactory(
+            name='abc def canada ltd',
+            export_to_countries = [
+                constants.Country.canada.value.id,
+            ]
         )
-        ExportingCompanyFactory(
-            name='1a',
+        CompanyFactory(
+            name='abc canada france ltd',
+            export_to_countries = [
+                constants.Country.canada.value.id,
+                constants.Country.france.value.id,
+            ]
+        )
+        CompanyFactory(
+            name='non exporting inc',
         )
         setup_es.indices.refresh()
 
@@ -519,25 +539,50 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == expected_count
+        assert [
+            result['name']
+            for result in response_data['results']
+        ] == expected_companies
 
     @pytest.mark.parametrize(
-        'country_id,expected_count',
+        'country_id,expected_count,expected_companies',
         (
-            # name
-            (constants.Country.japan.value.id, 2),
-            (constants.Country.united_states.value.id, 2),
-            (constants.Country.france.value.id, 0),
+            (
+                constants.Country.japan.value.id,
+                2,
+                ['abc japan usa ltd', 'abc japan ltd'],
+            ),
+            (
+                constants.Country.united_states.value.id,
+                1,
+                ['abc japan usa ltd'],
+            ),
+            (
+                constants.Country.argentina.value.id,
+                0,
+                [],
+            ),
         ),
     )
-    def test_future_interest_countries_company_filters(self, setup_es, country_id, expected_count):
+    def test_future_interest_countries_company_filters(self, setup_es, country_id, expected_count, expected_companies):
         """
         Tests filter based on country that the company has future interest in exporting.
         """
-        ExportingCompanyFactory(
-            name='whiskers and tabby',
+        CompanyFactory(
+            name='abc japan ltd',
+            future_interest_countries = [
+                constants.Country.japan.value.id,
+            ]
         )
-        ExportingCompanyFactory(
-            name='1a',
+        CompanyFactory(
+            name='abc japan usa ltd',
+            future_interest_countries = [
+                constants.Country.japan.value.id,
+                constants.Country.united_states.value.id,
+            ]
+        )
+        CompanyFactory(
+            name='non interested in exporting inc',
         )
         setup_es.indices.refresh()
 
@@ -553,6 +598,10 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == expected_count
+        assert [
+            result['name']
+            for result in response_data['results']
+        ] == expected_companies
 
 
 class TestCompanyExportView(APITestMixin):

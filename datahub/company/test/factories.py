@@ -8,6 +8,7 @@ from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPI
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Advisor, Company, ExportExperienceCategory
 from datahub.core import constants
+from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.metadata.models import EmployeeRange, HeadquarterType, TurnoverRange
 from datahub.metadata.test.factories import TeamFactory
@@ -67,6 +68,15 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     is_number_of_employees_estimated = True
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
+
+    @to_many_field
+    def export_to_countries(self):  # noqa: D102
+        return []
+
+    @to_many_field
+    def future_interest_countries(self):  # noqa: D102
+        return []
+
 
     class Params:
         hq = factory.Trait(
