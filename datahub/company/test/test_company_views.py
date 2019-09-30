@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import OneListTier
+from datahub.company.models import Company, OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
@@ -277,6 +277,7 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.export_experience_category.id),
                 'name': company.export_experience_category.name,
             },
+            'export_potential': None,
             'export_to_countries': [],
             'future_interest_countries': [],
             'headquarter_type': company.headquarter_type,
@@ -687,6 +688,7 @@ class TestUpdateCompany(APITestMixin):
             number_of_employees=95,
             is_number_of_employees_estimated=False,
             pending_dnb_investigation=True,
+            export_potential=Company.EXPORT_POTENTIAL_SCORES.very_high,
         )
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
@@ -703,6 +705,7 @@ class TestUpdateCompany(APITestMixin):
                 'number_of_employees': 96,
                 'is_number_of_employees_estimated': True,
                 'pending_dnb_investigation': False,
+                'export_potential': Company.EXPORT_POTENTIAL_SCORES.very_low,
             },
         )
 
@@ -721,6 +724,7 @@ class TestUpdateCompany(APITestMixin):
         assert response_data['number_of_employees'] == 95
         assert not response_data['is_number_of_employees_estimated']
         assert response_data['pending_dnb_investigation']
+        assert response_data['export_potential'] == Company.EXPORT_POTENTIAL_SCORES.very_high
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -1089,6 +1093,28 @@ class TestUpdateCompany(APITestMixin):
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
+
+    @pytest.mark.parametrize(
+        'score',
+        (
+            'very_high',
+            'medium',
+            'low',
+            None,
+        ),
+    )
+    def test_get_company_with_export_potential(self, score):
+        """
+        Test imported export_potential field on a company appears as is
+        """
+        company = CompanyFactory(
+            export_potential=score,
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['export_potential'] == score
 
 
 class TestAddCompany(APITestMixin):
