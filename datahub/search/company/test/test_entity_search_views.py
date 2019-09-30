@@ -556,7 +556,7 @@ class TestSearch(APITestMixin):
             (
                 constants.Country.japan.value.id,
                 2,
-                ['abc japan usa ltd', 'abc japan ltd'],
+                ['abc japan ltd', 'abc japan usa ltd'],
             ),
             (
                 constants.Country.united_states.value.id,
