@@ -71,10 +71,16 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def export_to_countries(self):  # noqa: D102
+        """
+        Add support for setting `export_to_countries`.
+        """
         return []
 
     @to_many_field
     def future_interest_countries(self):  # noqa: D102
+        """
+        Add support for setting `future_interest_countries`.
+        """
         return []
 
     class Params:
