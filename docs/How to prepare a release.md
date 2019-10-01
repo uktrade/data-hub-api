@@ -4,7 +4,7 @@
 ## Decide on the new version number
 The current format is `<major>.<minor>.<patch>`.
 
-Start from [the latest](https://github.com/uktrade/data-hub-leeloo/blob/develop/CHANGELOG.rst) and increase the number depending on if it's a major, a minor or a patch release.
+Start from [the latest](https://github.com/uktrade/data-hub-leeloo/blob/develop/CHANGELOG.md) and increase the number depending on if it's a major, a minor or a patch release.
 
 ## Update the changelog
 Create a branch from develop:
@@ -61,7 +61,7 @@ Releasing to production happens manually but after it has been announced and app
 Post in the `#data-hub` slack channel the following (replace `<version>` with the version number and `<service-manager>` with the person resposible for approvals):
 
 ```
-@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-leeloo/blob/master/CHANGELOG.rst. @<service-manager> Are you happy for us to release?
+@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-leeloo/blob/master/CHANGELOG.md. @<service-manager> Are you happy for us to release?
 ```
 
 After the approval, the release can be deployed.
@@ -81,7 +81,7 @@ In GitHub, [create a release](https://github.com/uktrade/data-hub-leeloo/release
 * **Tag version**: `v<version>` e.g. `v6.3.0`
 * **Target**: `master`
 * **Release title**: `v<version>` e.g. `v6.3.0`
-* **Describe this release**: copy/paste the notes from the compiled changelog after converting the rst text into md using something like [pandoc](http://pandoc.org/try/).
+* **Describe this release**: copy/paste the notes from the compiled changelog.
 
 And click on _Publish release_.
 
