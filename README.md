@@ -260,6 +260,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. | 
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
@@ -268,6 +269,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS` | No | Email addresses for recipients that should receive DNB company investigation notifications. |
 | `DNB_INVESTIGATION_NOTIFICATION_API_KEY` | No | GOVUK notify API key to use for sending DNB company investigation notifications. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
+| `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
@@ -282,7 +284,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `GUNICORN_ENABLE_STATSD` | No | Whether to enable Gunicorn StatD instrumentation (default=False). |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
-| `HAWK_RECEIVER_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE` | No | Maximum file size in bytes for interaction admin CSV uploads (default=2MB). |
 | `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
@@ -303,6 +304,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
 | `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
@@ -416,7 +418,7 @@ adding and upgrading dependencies.
 
 The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
-* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `HAWK_RECEIVER_IP_WHITELIST`.
+* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `PAAS_IP_WHITELIST`.
 
 * Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 
@@ -425,7 +427,7 @@ The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
 The authentication blocks requests that do not have a whitelisted IP in the second-from-the-end IP in `X-Forwarded-For` header. In general, this cannot be trusted. However, in PaaS, this can be, and this is the only production environment. Ideally, this would be done at a lower level than HTTP, but this is not possible with the current architecture.
 
-If making requests to this endpoint locally, you must manually add this header.
+If making requests to this endpoint locally, you must manually add this header or disable the check using `DISABLE_PAAS_IP_CHECK` environment variable.
 
 
 ### Hawk authentication

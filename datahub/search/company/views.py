@@ -4,6 +4,7 @@ from django.db.models.functions import Cast, Concat, Upper
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
+from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -90,7 +91,7 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
 
     search_app = CompanySearchApp
     serializer_class = PublicSearchCompanyQuerySerializer
-    authentication_classes = (HawkAuthentication,)
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
     permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.public_company
     fields_to_include = (

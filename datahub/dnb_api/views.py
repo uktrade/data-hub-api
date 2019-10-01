@@ -1,8 +1,10 @@
 import logging
 
+import sentry_sdk
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -180,13 +182,22 @@ class DNBCompanyCreateView(APIView):
             logger.error(error_message)
             raise APIUpstreamException(error_message)
 
+        formatted_company_data = format_dnb_company(
+            dnb_companies[0],
+        )
         company_serializer = DNBCompanySerializer(
-            data=format_dnb_company(
-                dnb_companies[0],
-            ),
+            data=formatted_company_data,
         )
 
-        company_serializer.is_valid(raise_exception=True)
+        try:
+            company_serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
+                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
+                sentry_sdk.capture_message('Company data from DNB failed DH serializer validation')
+            raise
+
         datahub_company = company_serializer.save(
             created_by=request.user,
             modified_by=request.user,
@@ -223,10 +234,19 @@ class DNBCompanyCreateInvestigationView(APIView):
         Given a minimal set of fields that may be necessary for DNB investigation,
         create a Company record in DataHub.
         """
-        company_serializer = DNBCompanyInvestigationSerializer(
-            data=format_dnb_company_investigation(request.data),
-        )
-        company_serializer.is_valid(raise_exception=True)
+        formatted_company_data = format_dnb_company_investigation(request.data)
+        company_serializer = DNBCompanyInvestigationSerializer(data=formatted_company_data)
+
+        try:
+            company_serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
+                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
+                sentry_sdk.capture_message(
+                    'Company investigation payload failed serializer validation',
+                )
+            raise
 
         datahub_company = company_serializer.save(
             created_by=request.user,

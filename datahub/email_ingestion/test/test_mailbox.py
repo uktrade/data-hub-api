@@ -126,14 +126,15 @@ class TestMailbox:
             expected_email_message = expected_email_messages[count]
             # Ensure that the messages our mailbox retrieves are those that we expect
             assert message == expected_email_message['message_content']
-            # Ensure that a call was made to mark each message retrieved as SEEN
+            # Ensure that a call was made to mark each message retrieved as Deleted
             mocked_imap.uid.assert_any_call(
                 'store',
                 expected_email_message['uid'],
                 '+FLAGS',
-                '(\\SEEN)',
+                '(\\Deleted)',
             )
         # Ensure that the imap connection was cleaned up
+        mocked_imap.expunge.assert_called_once()
         mocked_imap.close.assert_called_once()
         mocked_imap.logout.assert_called_once()
 
@@ -192,12 +193,12 @@ class TestMailbox:
             expected_email_message = expected_email_messages[count]
             # Ensure that the messages our mailbox retrieves are those that we expect
             assert message == expected_email_message['message_content']
-            # Ensure that a call was made to mark each message retrieved as SEEN
+            # Ensure that a call was made to mark each message retrieved as Deleted
             mocked_imap.uid.assert_any_call(
                 'store',
                 expected_email_message['uid'],
                 '+FLAGS',
-                '(\\SEEN)',
+                '(\\Deleted)',
             )
 
     @patch_imap(EXPECTED_EMAIL_MESSAGES)
@@ -235,12 +236,12 @@ class TestMailbox:
             expected_email_message = expected_email_messages[count]
             # Ensure that the messages our mailbox retrieves are those that we expect
             assert message == expected_email_message['message_content']
-            # Ensure that a call was made to mark each message retrieved as SEEN
+            # Ensure that a call was made to mark each message retrieved as Deleted
             mocked_imap.uid.assert_any_call(
                 'store',
                 expected_email_message['uid'],
                 '+FLAGS',
-                '(\\SEEN)',
+                '(\\Deleted)',
             )
         # Ensure that the imap connection was cleaned up
         mocked_imap.close.assert_called_once()
