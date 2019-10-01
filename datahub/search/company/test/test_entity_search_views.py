@@ -859,14 +859,31 @@ class TestAutocompleteSearch(APITestMixin):
     @pytest.mark.parametrize(
         'limit,expected_companies',
         (
-            (10, ['abc defg ltd', 'abc defg us ltd']),  # only 2 found
-            (2, ['abc defg ltd', 'abc defg us ltd']),
-            (1, ['abc defg ltd']),
+            (10, ['abc abc defg ltd', 'abc defg us ltd']),  # only 2 found
+            (2, ['abc abc defg ltd', 'abc defg us ltd']),
+            (1, ['abc abc defg ltd']),
         ),
     )
-    def test_searching_with_limit(self, setup_data, limit, expected_companies):
+    def test_searching_with_limit(self, setup_es, limit, expected_companies):
         """Tests case where search limit is provided."""
         url = reverse('api-v4:search:company-autocomplete')
+
+        country_uk = constants.Country.united_kingdom.value.id
+        country_us = constants.Country.united_states.value.id
+        CompanyFactory(
+            name='abc abc defg ltd',
+            trading_names=['helm', 'nop'],
+            address_country_id=country_uk,
+            registered_address_country_id=country_uk,
+        )
+        CompanyFactory(
+            name='abc defg us ltd',
+            trading_names=['helm', 'nop', 'qrs'],
+            address_country_id=country_us,
+            registered_address_country_id=country_us,
+        )
+
+        setup_es.indices.refresh()
 
         response = self.api_client.get(
             url,
