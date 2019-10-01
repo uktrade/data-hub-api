@@ -1,9 +1,10 @@
 [tool.towncrier]
     package_dir = "datahub"
-    filename = "CHANGELOG.rst"
+    filename = "CHANGELOG.md"
     directory = "changelog/"
-    title_format = "Data Hub API {version} ({project_date})"
-    template = "changelog/_template.rst"
+    title_format = "# Data Hub API {version} ({project_date})"
+    underlines = [""]
+    template = "changelog/_template.md.jinja2"
 
     [[tool.towncrier.type]]
         directory = "removal"

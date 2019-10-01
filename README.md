@@ -260,6 +260,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. | 
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
