@@ -1,3 +1,25 @@
+# Data Hub API 15.3.0 (2019-10-01)
+
+
+## Features
+
+- **Companies** A tool was added to django admin to allow administrators to "unarchive" archived
+  companies.
+- A configurable blacklist was added so that we can specifically prohibit certain
+  email addresses from the email ingestion feature.
+- Email ingestion was adjusted so that emails are deleted after they are ingested.
+  Previously, email ingestion would mark the emails as "seen" but now that we are
+  out of the pilot for meeting invite ingestion we have switched to deletes as this
+  is safer for data retention/protection reasons.
+- The email ingestion whitelist was removed so that email ingestion is open to
+  all DIT advisers.  
+  The email domain that a DIT adviser uses to send an email to Data Hub must be 
+  known to Data Hub through a `DIT_EMAIL_DOMAIN_<domain>` django setting -
+  there is no longer a default domain authentication value. This ensures that 
+  email ingestion is locked down to domains that we know the authentication
+  signature for.
+
+
 # Data Hub API 15.2.0 (2019-09-26)
 
 ## Removals
