@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0092_auto_20191001_1520'),
+        ('company', '0091_add_composite_index_to_contact'),
     ]
 
     operations = [
