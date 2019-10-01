@@ -829,23 +829,40 @@ class TestAutocompleteSearch(APITestMixin):
     @pytest.mark.parametrize(
         'query,expected_companies',
         (
-            ('abc', ['abc defg ltd', 'abc defg us ltd']),
+            ('abc', ['abc abc defg ltd', 'abc defg us ltd']),
             ('abv', []),
-            ('ABC', ['abc defg ltd', 'abc defg us ltd']),
+            ('ABC', ['abc abc defg ltd', 'abc defg us ltd']),
             ('hello', []),
             ('', []),
             (1, []),
-            ('abc defg ltd', ['abc defg ltd']),
-            ('defg', ['abc defg ltd', 'abc defg us ltd']),
+            ('abc abc defg ltd', ['abc abc defg ltd']),
+            ('defg', ['abc abc defg ltd', 'abc defg us ltd']),
             ('us', ['abc defg us ltd']),
-            ('hel', ['abc defg ltd', 'abc defg us ltd']),
+            ('hel', ['abc abc defg ltd', 'abc defg us ltd']),
             ('qrs', ['abc defg us ltd']),
             ('help qrs', []),
         ),
     )
-    def test_searching_with_a_query(self, setup_data, query, expected_companies):
+    def test_searching_with_a_query(self, setup_es, query, expected_companies):
         """Tests case where search queries are provided."""
         url = reverse('api-v4:search:company-autocomplete')
+
+        country_uk = constants.Country.united_kingdom.value.id
+        country_us = constants.Country.united_states.value.id
+        CompanyFactory(
+            name='abc abc defg ltd',
+            trading_names=['helm', 'nop'],
+            address_country_id=country_uk,
+            registered_address_country_id=country_uk,
+        )
+        CompanyFactory(
+            name='abc defg us ltd',
+            trading_names=['helm', 'nop', 'qrs'],
+            address_country_id=country_us,
+            registered_address_country_id=country_us,
+        )
+
+        setup_es.indices.refresh()
 
         response = self.api_client.get(url, data={'term': query})
 
