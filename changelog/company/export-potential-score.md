@@ -1,0 +1,1 @@
+`GET /v4/search/company`: A new read-only field was added to company model `export_potential`. Values for this field are imported from Data Science platform, as a seperate exercise. It can have one of the constant values out of `Very High`, `High`, `Medium`, `Low` and `Very Low`.
