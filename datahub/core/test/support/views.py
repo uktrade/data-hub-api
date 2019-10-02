@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
 from datahub.core.admin import max_upload_size
+from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -18,7 +19,6 @@ from datahub.core.test.support.serializers import (
 )
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.test.scopes import TestScope
-
 
 MAX_UPLOAD_SIZE = 50
 
@@ -69,6 +69,17 @@ class HawkViewWithScope(HawkResponseSigningMixin, APIView):
     def get(self, request):
         """Simple test view with fixed response."""
         return Response({'content': 'hawk-test-view-with-scope'})
+
+
+class PaasIPView(APIView):
+    """View using PaaS IP Authentication."""
+
+    authentication_classes = (PaaSIPAuthentication,)
+    permission_classes = ()
+
+    def get(self, request):
+        """Simple test view with fixed response."""
+        return Response({'content': 'paas-ip-test-view'})
 
 
 @max_upload_size(MAX_UPLOAD_SIZE)

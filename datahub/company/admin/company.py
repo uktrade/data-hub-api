@@ -10,6 +10,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
+from datahub.company.admin.archiving.unarchive import unarchive_company
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
@@ -252,6 +253,12 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 self.admin_site.admin_view(partial(confirm_merge, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_merge-confirm',
+            ),
+            path(
+                'archiving/unarchive-company/',
+                self.admin_site.admin_view(partial(unarchive_company, self)),
+                name=f'{model_meta.app_label}_'
+                     f'{model_meta.model_name}_unarchive-company',
             ),
             *super().get_urls(),
         ]

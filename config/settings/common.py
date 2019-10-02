@@ -482,11 +482,11 @@ GOVUK_PAY_TIMEOUT = 15  # in seconds
 GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
 GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 
+PAAS_IP_WHITELIST = env.list('PAAS_IP_WHITELIST', default=[])
+DISABLE_PAAS_IP_CHECK = env.bool('DISABLE_PAAS_IP_CHECK', default=False)
+
 # Hawk
-HAWK_RECEIVER_IP_WHITELIST = env.list('HAWK_RECEIVER_IP_WHITELIST', default=[])
 HAWK_RECEIVER_NONCE_EXPIRY_SECONDS = 60
-
-
 HAWK_RECEIVER_CREDENTIALS = {}
 
 
@@ -568,8 +568,8 @@ MAILBOXES = {
     },
 }
 
-# TODO: Remove this setting once we are past the pilot period for email ingestion
-DIT_EMAIL_INGEST_WHITELIST = env.list('DIT_EMAIL_INGEST_WHITELIST', default=[])
+DIT_EMAIL_INGEST_BLACKLIST = [email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])]
+
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [
     environ_name

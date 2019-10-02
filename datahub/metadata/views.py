@@ -3,6 +3,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
+from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -40,8 +41,8 @@ def _create_metadata_view(mapping, view_set_types=None, auth_attributes=None):
 
 def _get_hawk_auth_attributes():
     return {
-        'authentication_classes': (HawkAuthentication, ),
-        'permission_classes': (HawkScopePermission, ),
+        'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
+        'permission_classes': (HawkScopePermission,),
         'required_hawk_scope': HawkScope.metadata,
     }
 

@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
+from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -21,8 +22,8 @@ class OMISDatasetView(HawkResponseSigningMixin, APIView):
     more meaningful insight.
     """
 
-    authentication_classes = (HawkAuthentication, )
-    permission_classes = (HawkScopePermission, )
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.data_flow_api
     pagination_class = OMISDatasetViewCursorPagination
 

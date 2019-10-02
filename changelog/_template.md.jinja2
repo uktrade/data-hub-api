@@ -5,13 +5,9 @@
 {% endfor %}
 {% endfor %}
 {% set sections_by_category = dict(sections_by_category|groupby('category')) %}
-
-
 {% for category, val in definitions.items() if category in sections_by_category %}
 
-{% set underline = "-" %}
-{{ definitions[category]['name'] }}
-{{ underline * definitions[category]['name']|length }}
+## {{ definitions[category]['name'] }}
 
 {% for item in sections_by_category[category] %}{% set text = item.text %}{% set values = item.issues %}
 {% if definitions[category]['showcontent'] %}
