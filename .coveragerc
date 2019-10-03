@@ -9,6 +9,7 @@ omit =
     *models.py
     *apps.py
     *datahub/core/management/commands/distributed_migrate.py
+    scripts/*.py
 
 [report]
 exclude_lines =
