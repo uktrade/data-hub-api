@@ -1,6 +1,5 @@
 import logging
 
-import sentry_sdk
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
@@ -192,10 +191,12 @@ class DNBCompanyCreateView(APIView):
         try:
             company_serializer.is_valid(raise_exception=True)
         except serializers.ValidationError:
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
-                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
-                sentry_sdk.capture_message('Company data from DNB failed DH serializer validation')
+            message = 'Company data from DNB failed DH serializer validation'
+            extra_data = {
+                'formatted_dnb_company_data': formatted_company_data,
+                'dh_company_serializer_errors': company_serializer.errors,
+            }
+            logger.error(message, extra=extra_data)
             raise
 
         datahub_company = company_serializer.save(
@@ -240,12 +241,12 @@ class DNBCompanyCreateInvestigationView(APIView):
         try:
             company_serializer.is_valid(raise_exception=True)
         except serializers.ValidationError:
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
-                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
-                sentry_sdk.capture_message(
-                    'Company investigation payload failed serializer validation',
-                )
+            message = 'Company investigation payload failed serializer validation'
+            extra_data = {
+                'formatted_dnb_company_data': formatted_company_data,
+                'dh_company_serializer_errors': company_serializer.errors,
+            }
+            logger.error(message, extra=extra_data)
             raise
 
         datahub_company = company_serializer.save(
