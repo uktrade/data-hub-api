@@ -1,3 +1,16 @@
+# Data Hub API 15.4.0 (2019-10-03)
+
+
+## Internal changes
+
+- **Companies** Some intermittently failing company autocomplete tests were corrected so that they now consistently pass.
+
+## API
+
+- **Companies** `POST /v4/search/company`: A filter was added for the `export_to_countries` field. This accepts a list of country IDs. A company will only be returned if it contains one of the specified countries in this field.
+- **Companies** `POST /v4/search/company`: A filter was added for the `future_interest_countries` field. This accepts a list of country IDs. A company will only be returned if it contains one of the specified countries in this field.
+
+
 # Data Hub API 15.3.0 (2019-10-01)
 
 
