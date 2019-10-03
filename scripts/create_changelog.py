@@ -50,6 +50,16 @@ def list_news_fragments():
 
 def create_changelog(release_type):
     """Create and push a changelog."""
+    remote = 'origin'
+
+    if any_uncommitted_changes():
+        raise CommandError(
+            'There are uncommitted changes. Please commit, stash or delete them and try again.',
+        )
+
+    subprocess.run(['git', 'fetch'], check=True)
+    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
+
     current_version = get_current_version()
 
     if not current_version:
@@ -57,16 +67,10 @@ def create_changelog(release_type):
 
     new_version = current_version.increment_component(release_type)
 
-    remote = 'origin'
     branch = f'changelog/{new_version}'
     commit_message = f'Add changelog for version {new_version}'
     pr_title = f'Add changelog for version {new_version}'
     pr_body = f'This adds the changelog for version {new_version}.'
-
-    if any_uncommitted_changes():
-        raise CommandError(
-            'There are uncommitted changes. Please commit, stash or delete them and try again.',
-        )
 
     if local_branch_exists(branch):
         raise CommandError(
@@ -77,9 +81,6 @@ def create_changelog(release_type):
         raise CommandError(
             f'Branch {branch} already exists remotely. Please delete it on GitHub and try again.',
         )
-
-    subprocess.run(['git', 'fetch'], check=True)
-    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
 
     if not list_news_fragments():
         raise CommandError('There are no news fragments.')
