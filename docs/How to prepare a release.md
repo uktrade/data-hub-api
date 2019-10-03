@@ -40,20 +40,22 @@ When ready, merge `changelog/<version>` into `develop` and delete the merged bra
 
 ## Prepare the release
 
-Create a release branch from develop:
+Create and push a release branch from develop by running:
 
-```
-git checkout develop && git pull
-git checkout -b release/<version>
-```
-
-Push the branch:
-
-```
-git push origin release/<version>
+```shell
+scripts/create_release_pr.py
 ```
 
-In GitHub open a PR to merge `release/<version>` into `master` and assign at least two developers for review.
+The command will:
+
+- run `git fetch`
+- create a branch `release/<version>` based on `origin/develop`
+- push this branch
+- open a web browser window to the create PR page for the pushed branch (with `master` as the base branch)
+
+Once your web browser has opened, double-check that the details are correct and that the base branch is set to `master`.
+
+Add at least two developers as reviewers and click 'Create pull request'.
 
 ## Release to staging
 
