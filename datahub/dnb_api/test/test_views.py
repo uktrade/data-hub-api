@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock
 from urllib.parse import urljoin
 
 import pytest
@@ -319,15 +320,17 @@ class TestDNBCompanySearchAPI(APITestMixin):
     )
     def test_monitoring(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         requests_mock,
-        statsd_mock,
         response_status_code,
     ):
         """
         Test that the right counter is incremented for the given status code
         returned by the dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=response_status_code,
@@ -766,15 +769,17 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     )
     def test_monitoring_search(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         requests_mock,
-        statsd_mock,
         response_status_code,
     ):
         """
         Test that the right counter is incremented for the given status code
         returned by the dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=response_status_code,
@@ -792,15 +797,17 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     def test_monitoring_create(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         dnb_response_uk,
         requests_mock,
-        statsd_mock,
     ):
         """
         Test that the right counter is incremented when a company gets
         created using dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=status.HTTP_200_OK,
@@ -960,14 +967,16 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
 
     def test_monitoring_create(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         investigation_payload,
-        statsd_mock,
     ):
         """
         Test that the right counter is incremented when a stub company
         gets created for investigation by DNB.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         self.api_client.post(
             reverse('api-v4:dnb-api:company-create-investigation'),
             data=investigation_payload,

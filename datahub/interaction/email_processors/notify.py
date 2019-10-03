@@ -2,8 +2,8 @@ from enum import Enum
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from statsd.defaults.django import statsd
 
+from datahub.core import statsd
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
 from datahub.notification.notify import notify_adviser_by_email
