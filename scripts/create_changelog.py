@@ -20,12 +20,12 @@ The script will abort if:
 
 import argparse
 import glob
-import re
 import subprocess
 import webbrowser
 from pathlib import Path
 from urllib.parse import quote
 
+from script_utils.current_version import get_current_version
 from script_utils.version import Version
 
 parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
@@ -77,24 +77,6 @@ def list_news_fragments():
     excluded_files = {'.gitignore', '_template.md.jinja2', 'README.md'}
     changelog_files = glob.iglob(f'{root_path}/changelog/**/*')
     return set(changelog_files) - excluded_files
-
-
-def get_current_version():
-    """
-    Gets the current version number from the changelog.
-
-    Note: In future we may want to write and obtain the version number to and from a more
-    authoritative source e.g. a module in the datahub package.
-    """
-    with open('CHANGELOG.md', 'r') as file:
-        changelog = file.read(10_000)
-
-    match = re.search(r' (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+) ', changelog)
-
-    if match:
-        return Version.from_dict(match.groupdict())
-
-    return None
 
 
 def create_changelog(release_type):
