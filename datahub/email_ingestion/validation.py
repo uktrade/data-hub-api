@@ -48,11 +48,9 @@ def _log_unknown_domain(from_domain, message):
         auth_header_contents,
         flags=re.IGNORECASE,
     )
-    authentication_results.sort()
-    authentication_results_str = ' '.join(authentication_results)
-    logger.warning(
-        f'Domain "{from_domain}" not present in DIT_EMAIL_DOMAINS setting. '
-        f'This email had the following authentication results: {authentication_results_str}',
+    logger.error(
+        f'Domain "{from_domain}" not present in DIT_EMAIL_DOMAINS setting.',
+        extra={'authentication_results': authentication_results},
     )
 
 

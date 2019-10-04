@@ -1,1 +1,0 @@
-`POST /v4/search/company`: A filter was added for the `future_interest_countries` field. This accepts a list of country IDs. A company will only be returned if it contains one of the specified countries in this field.
