@@ -7,9 +7,9 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from statsd.defaults.django import statsd
 
 from datahub.company.models import CompanyPermission
+from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
@@ -51,7 +51,6 @@ class DNBCompanySearchView(APIView):
         on Data Hub.
         """
         upstream_response = search_dnb(request.data)
-        statsd.incr(f'dnb.search.{upstream_response.status_code}')
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
@@ -162,7 +161,6 @@ class DNBCompanyCreateView(APIView):
         duns_number = duns_serializer.validated_data['duns_number']
 
         dnb_response = search_dnb({'duns_number': duns_number})
-        statsd.incr(f'dnb.search.{dnb_response.status_code}')
 
         if dnb_response.status_code != status.HTTP_200_OK:
             error_message = f'DNB service returned: {dnb_response.status_code}'
