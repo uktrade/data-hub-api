@@ -1,10 +1,15 @@
+import logging
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from rest_framework import status
 
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.metadata.models import Country
 
+
+logger = logging.getLogger(__name__)
 
 api_client = APIClient(
     settings.DNB_SERVICE_BASE_URL,
@@ -12,6 +17,27 @@ api_client = APIClient(
     raise_for_status=False,
     default_timeout=settings.DNB_SERVICE_TIMEOUT,
 )
+
+
+class DNBServiceError(Exception):
+    """
+    Exception for when DNB service doesn't return
+    a response with a status code of 200.
+    """
+
+
+class DNBServiceInvalidRequest(Exception):
+    """
+    Exception for when the request to DNB service
+    is not valid.
+    """
+
+
+class DNBServiceInvalidResponse(Exception):
+    """
+    Exception for when the response from DNB service
+    is not valid.
+    """
 
 
 def search_dnb(query_params):
@@ -30,6 +56,47 @@ def search_dnb(query_params):
     )
     statsd.incr(f'dnb.search.{response.status_code}')
     return response
+
+
+def get_company(duns_number):
+    """
+    Pull data for the company with the given duns_number from DNB and
+    returns a dict formatted for use with serializer of type CompanySerializer.
+
+    Raises exceptions if the company is not found, if multiple companies are
+    found or if the `duns_number` for the company is not the same as the one
+    we searched for.
+    """
+    dnb_response = search_dnb({'duns_number': duns_number})
+
+    if dnb_response.status_code != status.HTTP_200_OK:
+        error_message = f'DNB service returned: {dnb_response.status_code}'
+        logger.error(error_message)
+        raise DNBServiceError(error_message)
+
+    dnb_companies = dnb_response.json().get('results', [])
+
+    if not dnb_companies:
+        error_message = f'Cannot find a company with duns_number: {duns_number}'
+        logger.error(error_message)
+        raise DNBServiceInvalidRequest(error_message)
+
+    if len(dnb_companies) > 1:
+        error_message = f'Multiple companies found with duns_number: {duns_number}'
+        logger.error(error_message)
+        raise DNBServiceInvalidResponse(error_message)
+
+    dnb_company = dnb_companies[0]
+
+    if dnb_company.get('duns_number') != duns_number:
+        error_message = (
+            f'DUNS number of the company: {dnb_company.get("duns_number")} '
+            f'did not match searched DUNS number: {duns_number}'
+        )
+        logger.error(error_message)
+        raise DNBServiceInvalidResponse(error_message)
+
+    return format_dnb_company(dnb_companies[0])
 
 
 def format_dnb_company(dnb_company):

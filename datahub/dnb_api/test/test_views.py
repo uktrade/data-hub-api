@@ -524,8 +524,22 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     @pytest.mark.parametrize(
         'results, expected_status_code, expected_message',
         (
-            ([], 400, 'Cannot find a company with duns_number: 123456789'),
-            (['foo', 'bar'], 502, 'Multiple companies found with duns_number: 123456789'),
+            (
+                [],
+                400,
+                'Cannot find a company with duns_number: 123456789',
+            ),
+            (
+                ['foo', 'bar'],
+                502,
+                'Multiple companies found with duns_number: 123456789',
+            ),
+            (
+                [{'duns_number': '012345678'}],
+                502,
+                'DUNS number of the company: 012345678 '
+                'did not match searched DUNS number: 123456789',
+            ),
         ),
     )
     def test_post_none_or_multiple_companies_found(
@@ -561,7 +575,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         (
             ('primary_name', {'name': ['This field may not be null.']}),
             ('trading_names', {'trading_names': ['This field may not be null.']}),
-            ('duns_number', {'duns_number': ['This field may not be null.']}),
             ('address_line_1', {'address': {'line_1': ['This field may not be null.']}}),
             ('address_line_2', {'address': {'line_2': ['This field may not be null.']}}),
             ('address_town', {'address': {'town': ['This field may not be null.']}}),
