@@ -23,11 +23,13 @@ import glob
 import subprocess
 import webbrowser
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 from script_utils.current_version import get_current_version
 from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
 from script_utils.version import Version
+
+BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-leeloo'
 
 parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
 parser.add_argument('release_type', choices=Version._fields)
@@ -48,6 +50,16 @@ def list_news_fragments():
 
 def create_changelog(release_type):
     """Create and push a changelog."""
+    remote = 'origin'
+
+    if any_uncommitted_changes():
+        raise CommandError(
+            'There are uncommitted changes. Please commit, stash or delete them and try again.',
+        )
+
+    subprocess.run(['git', 'fetch'], check=True)
+    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
+
     current_version = get_current_version()
 
     if not current_version:
@@ -55,14 +67,10 @@ def create_changelog(release_type):
 
     new_version = current_version.increment_component(release_type)
 
-    remote = 'origin'
     branch = f'changelog/{new_version}'
     commit_message = f'Add changelog for version {new_version}'
-
-    if any_uncommitted_changes():
-        raise CommandError(
-            'There are uncommitted changes. Please commit, stash or delete them and try again.',
-        )
+    pr_title = f'Add changelog for version {new_version}'
+    pr_body = f'This adds the changelog for version {new_version}.'
 
     if local_branch_exists(branch):
         raise CommandError(
@@ -73,9 +81,6 @@ def create_changelog(release_type):
         raise CommandError(
             f'Branch {branch} already exists remotely. Please delete it on GitHub and try again.',
         )
-
-    subprocess.run(['git', 'fetch'], check=True)
-    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
 
     if not list_news_fragments():
         raise CommandError('There are no news fragments.')
@@ -97,7 +102,12 @@ def create_changelog(release_type):
     subprocess.run(['git', 'push', '--set-upstream', remote, branch], check=True)
 
     escaped_branch_name = quote(branch)
-    webbrowser.open(f'https://github.com/uktrade/data-hub-leeloo/pull/new/{escaped_branch_name}')
+    params = {
+        'expand': '1',
+        'title': pr_title,
+        'body': pr_body,
+    }
+    webbrowser.open(f'{BASE_GITHUB_REPO_URL}/compare/{escaped_branch_name}?{urlencode(params)}')
 
     return branch
 
