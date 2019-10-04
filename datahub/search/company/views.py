@@ -175,12 +175,12 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
 
         export_to_countries_list=get_string_agg_subquery(
             DBCompany,
-            Cast('export_to_countries__id', CharField()),
+            Cast('export_to_countries__name', CharField()),
         ),
 
         future_interest_countries_list=get_string_agg_subquery(
             DBCompany,
-            Cast('future_interest_countries__id', CharField()),
+            Cast('future_interest_countries__name', CharField()),
         ),
     )
     field_titles = {
@@ -190,7 +190,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'address_country__name': 'Country',
         'uk_region__name': 'UK region',
         'export_to_countries_list': 'Countries exported to',
-        'future_interest_countries': 'Countries of interest',
+        'future_interest_countries_list': 'Countries of interest',
         'archived': 'Archived',
         'created_on': 'Date created',
         'number_of_employees_value': 'Number of employees',

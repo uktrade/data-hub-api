@@ -573,7 +573,8 @@ class TestCompanyExportView(APITestMixin):
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
-            future_interest_countries=[c.id for c in Country.objects.all()[:2]],
+            future_interest_countries=[c.id for c in Country.objects.all()[:3]],
+
         )
         CompanyFactory.create_batch(
             2,
@@ -584,6 +585,8 @@ class TestCompanyExportView(APITestMixin):
             is_number_of_employees_estimated=True,
             export_to_countries=[c.id for c in Country.objects.all()[:2]],
         )
+
+        setup_es.indices.refresh()
 
         data = {}
         if request_sortby:
@@ -613,10 +616,10 @@ class TestCompanyExportView(APITestMixin):
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Countries exported to': ', '.join(
-                    [str(c.id) for c in company.export_to_countries.all()],
+                    [c.name for c in company.export_to_countries.all()],
                 ),
                 'Countries of interest': ', '.join(
-                    [str(c.id) for c in company.future_interest_countries.all()],
+                    [c.name for c in company.future_interest_countries.all()],
                 ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
