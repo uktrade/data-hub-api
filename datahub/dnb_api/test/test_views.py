@@ -11,11 +11,16 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+
+REQUIRED_REGISTERED_ADDRESS_FIELDS = [
+    f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
+]
 
 
 @pytest.mark.parametrize(
@@ -357,6 +362,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         country = Country.objects.filter(
             iso_alpha2_code=dnb_company['address_country'],
         ).first()
+        registered_country = Country.objects.filter(
+            iso_alpha2_code=dnb_company['registered_address_country'],
+        ).first() if dnb_company.get('registered_address_country') else None
 
         company_number = (
             dnb_company['registration_numbers'][0].get('registration_number')
@@ -364,6 +372,21 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         [company.pop(k) for k in ('id', 'created_on', 'modified_on')]
+
+        required_registered_address_fields_present = all(
+            field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
+        )
+        registered_address = {
+            'country': {
+                'id': str(registered_country.id),
+                'name': registered_country.name,
+            },
+            'line_1': dnb_company.get('registered_address_line_1', ''),
+            'line_2': dnb_company.get('registered_address_line_2', ''),
+            'town': dnb_company.get('registered_address_town', ''),
+            'county': dnb_company.get('registered_address_county', ''),
+            'postcode': dnb_company.get('registered_address_postcode', ''),
+        } if required_registered_address_fields_present else None
 
         assert company == {
             'name': dnb_company['primary_name'],
@@ -379,7 +402,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'county': dnb_company['address_county'],
                 'postcode': dnb_company['address_postcode'],
             },
-            'registered_address': None,
+            'registered_address': registered_address,
             'reference_code': '',
             'uk_based': (dnb_company['address_country'] == 'GB'),
             'duns_number': dnb_company['duns_number'],
@@ -581,7 +604,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             ('address_town', {'address': {'town': ['This field may not be null.']}}),
             ('address_county', {'address': {'county': ['This field may not be null.']}}),
             ('address_postcode', {'address': {'postcode': ['This field may not be null.']}}),
-            ('address_country', {'address': {'country': ['Must be a valid UUID.']}}),
+            ('address_country', {'address': {'country': ['This field is required.']}}),
         ),
     )
     def test_post_missing_required_fields(
@@ -620,6 +643,12 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             {'annual_sales': None},
             {'employee_number': None},
             {'is_employee_number_estimated': None},
+            {'registered_address_line_1': ''},
+            {'registered_address_line_2': ''},
+            {'registered_address_town': ''},
+            {'registered_address_county': ''},
+            {'registered_address_postcode': ''},
+            {'registered_address_country': ''},
         ),
     )
     def test_post_missing_optional_fields(
@@ -650,6 +679,14 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         created_company = Company.objects.first()
         assert created_company.name == dnb_response_uk['results'][0]['primary_name']
+        overridden_fields = field_overrides.keys()
+        if any(field in overridden_fields for field in REQUIRED_REGISTERED_ADDRESS_FIELDS):
+            assert created_company.registered_address_1 == ''
+            assert created_company.registered_address_2 == ''
+            assert created_company.registered_address_town == ''
+            assert created_company.registered_address_county == ''
+            assert created_company.registered_address_country is None
+            assert created_company.registered_address_postcode == ''
 
     def test_post_existing(
         self,
