@@ -612,8 +612,12 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
-                'Countries exported to': ', '.join([str(c.id) for c in company.export_to_countries.all()]),
-                'Countries of interest': ', '.join([str(c.id) for c in company.future_interest_countries.all()]),
+                'Countries exported to': ', '.join(
+                    [str(c.id) for c in company.export_to_countries.all()]
+                ),
+                'Countries of interest': ', '.join(
+                    [str(c.id) for c in company.future_interest_countries.all()]
+                ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (

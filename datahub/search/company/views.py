@@ -11,8 +11,8 @@ from datahub.core.hawk_receiver import (
     HawkScopePermission,
 )
 from datahub.core.query_utils import (
-    get_string_agg_subquery,
     get_front_end_url_expression,
+    get_string_agg_subquery,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
