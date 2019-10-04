@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.metadata.models import Country
 
@@ -22,11 +23,13 @@ def search_dnb(query_params):
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
-    return api_client.request(
+    response = api_client.request(
         'POST',
         'companies/search/',
         json=query_params,
     )
+    statsd.incr(f'dnb.search.{response.status_code}')
+    return response
 
 
 def format_dnb_company(dnb_company):

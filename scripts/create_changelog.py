@@ -20,13 +20,16 @@ The script will abort if:
 
 import argparse
 import glob
-import re
 import subprocess
 import webbrowser
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
+from script_utils.current_version import get_current_version
+from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
 from script_utils.version import Version
+
+BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-leeloo'
 
 parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
 parser.add_argument('release_type', choices=Version._fields)
@@ -34,40 +37,6 @@ parser.add_argument('release_type', choices=Version._fields)
 
 class CommandError(Exception):
     """A fatal error when running the script."""
-
-
-def any_uncommitted_changes():
-    """Checks if there are any uncommitted changes."""
-    result = subprocess.run(
-        ['git', 'status', '--porcelain'],
-        check=True,
-        capture_output=True,
-    )
-    return bool(result.stdout)
-
-
-def local_branch_exists(branch):
-    """Checks if a local branch exists."""
-    try:
-        subprocess.run(['git', 'show-ref', '--quiet', '--heads', '--', branch], check=True)
-    except subprocess.CalledProcessError:
-        return False
-
-    return True
-
-
-def remote_branch_exists(branch):
-    """Checks if a remote branch exists."""
-    try:
-        subprocess.run(
-            ['git', 'ls-remote', '--quiet', '--exit-code', 'origin', branch],
-            check=True,
-            stdout=subprocess.DEVNULL,
-        )
-    except subprocess.CalledProcessError:
-        return False
-
-    return True
 
 
 def list_news_fragments():
@@ -79,26 +48,18 @@ def list_news_fragments():
     return set(changelog_files) - excluded_files
 
 
-def get_current_version():
-    """
-    Gets the current version number from the changelog.
-
-    Note: In future we may want to write and obtain the version number to and from a more
-    authoritative source e.g. a module in the datahub package.
-    """
-    with open('CHANGELOG.md', 'r') as file:
-        changelog = file.read(10_000)
-
-    match = re.search(r' (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+) ', changelog)
-
-    if match:
-        return Version.from_dict(match.groupdict())
-
-    return None
-
-
 def create_changelog(release_type):
     """Create and push a changelog."""
+    remote = 'origin'
+
+    if any_uncommitted_changes():
+        raise CommandError(
+            'There are uncommitted changes. Please commit, stash or delete them and try again.',
+        )
+
+    subprocess.run(['git', 'fetch'], check=True)
+    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
+
     current_version = get_current_version()
 
     if not current_version:
@@ -106,14 +67,10 @@ def create_changelog(release_type):
 
     new_version = current_version.increment_component(release_type)
 
-    remote = 'origin'
     branch = f'changelog/{new_version}'
     commit_message = f'Add changelog for version {new_version}'
-
-    if any_uncommitted_changes():
-        raise CommandError(
-            'There are uncommitted changes. Please commit, stash or delete them and try again.',
-        )
+    pr_title = f'Add changelog for version {new_version}'
+    pr_body = f'This adds the changelog for version {new_version}.'
 
     if local_branch_exists(branch):
         raise CommandError(
@@ -124,9 +81,6 @@ def create_changelog(release_type):
         raise CommandError(
             f'Branch {branch} already exists remotely. Please delete it on GitHub and try again.',
         )
-
-    subprocess.run(['git', 'fetch'], check=True)
-    subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
 
     if not list_news_fragments():
         raise CommandError('There are no news fragments.')
@@ -148,7 +102,12 @@ def create_changelog(release_type):
     subprocess.run(['git', 'push', '--set-upstream', remote, branch], check=True)
 
     escaped_branch_name = quote(branch)
-    webbrowser.open(f'https://github.com/uktrade/data-hub-leeloo/pull/new/{escaped_branch_name}')
+    params = {
+        'expand': '1',
+        'title': pr_title,
+        'body': pr_body,
+    }
+    webbrowser.open(f'{BASE_GITHUB_REPO_URL}/compare/{escaped_branch_name}?{urlencode(params)}')
 
     return branch
 
