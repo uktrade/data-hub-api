@@ -48,7 +48,7 @@ elasticsearch-dsl==6.3.1
 # Celery
 celery[redis]==4.3
 billiard==3.6.1.0  # Not used directly, but pinned as it has been a source of breakage in the past
-kombu==4.6.3  # Not used directly, but pinned as it has been a source of breakage in the past
+kombu==4.6.5  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
 pytest==5.2.0
