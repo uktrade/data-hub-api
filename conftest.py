@@ -146,6 +146,21 @@ def synchronous_on_commit(monkeypatch):
     monkeypatch.setattr('django.db.transaction.on_commit', _synchronous_on_commit)
 
 
+@pytest.fixture(scope='class')
+def monkeyclass():
+    """Monkeypatch fixture which works in the class scope"""
+    from _pytest.monkeypatch import MonkeyPatch
+    mpatch = MonkeyPatch()
+    yield mpatch
+    mpatch.undo()
+
+
+@pytest.fixture(scope='class')
+def synchronous_on_commit_for_class(monkeyclass):
+    """synchronous_on_commit fixture which works in the class scope"""
+    monkeyclass.setattr('django.db.transaction.on_commit', _synchronous_on_commit)
+
+
 def _synchronous_submit_to_thread_pool(fn, *args, **kwargs):
     fn(*args, **kwargs)
 
@@ -219,7 +234,23 @@ def _setup_es_indexes(_es_client):
 
 @pytest.fixture
 def setup_es(_setup_es_indexes, synchronous_on_commit):
-    """Sets up ES and deletes all the records after each run."""
+    """
+    Function scope fixture which
+    sets up ES and deletes all the records after each run.
+    """
+    yield from _setup_es_helper(_setup_es_indexes)
+
+
+@pytest.fixture(scope='class')
+def setup_es_for_class(_setup_es_indexes, synchronous_on_commit_for_class):
+    """
+    Class scope fixture which
+    sets up ES and deletes all the records after each run.
+    """
+    yield from _setup_es_helper(_setup_es_indexes)
+
+
+def _setup_es_helper(_setup_es_indexes):
     for search_app in get_search_apps():
         search_app.connect_signals()
 

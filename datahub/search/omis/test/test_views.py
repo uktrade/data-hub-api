@@ -515,8 +515,8 @@ class TestSearchOrder(APITestMixin):
         assert response.json()['results'][0]['reference'] == 'efgh'
 
 
-class TestOrderExportView(APITestMixin):
-    """Tests the OMIS order export view."""
+class TestOrderExportViewPermissions(APITestMixin):
+    """Tests the permissions for the OMIS order export view"""
 
     @pytest.mark.parametrize(
         'permissions', (
@@ -534,24 +534,24 @@ class TestOrderExportView(APITestMixin):
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
-            ('created_on', 'created_on'),
-            ('created_on:desc', '-created_on'),
-            ('modified_on', 'modified_on'),
-            ('modified_on:desc', '-modified_on'),
-            ('delivery_date', 'delivery_date'),
-            ('delivery_date:desc', '-delivery_date'),
-        ),
-    )
-    def test_export(
-        self,
-        setup_es,
-        request_sortby,
-        orm_ordering,
+
+class TestOrderExportView(APITestMixin):
+    """Tests the OMIS order export view."""
+
+    @classmethod
+    @pytest.fixture(scope='class', autouse=True)
+    def one_time_setup(
+        self, request, setup_es_for_class, django_db_setup, django_db_blocker,  # noqa: N804
     ):
-        """Test export of interaction search results."""
+        """
+        One time data setup for the class. No tests will modify data so can be re-used.
+        """
+        django_db_blocker.unblock()
+        request.addfinalizer(django_db_blocker.restore)
+        from django.test import TestCase
+        test_case = TestCase(methodName='__init__')
+        test_case._pre_setup()
+        request.addfinalizer(test_case._post_teardown)
         factories = (
             OrderCancelledFactory,
             OrderCompleteFactory,
@@ -585,8 +585,25 @@ class TestOrderExportView(APITestMixin):
         for factory_ in factories:
             factory_.create_batch(2)
 
-        setup_es.indices.refresh()
+        setup_es_for_class.indices.refresh()
 
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('created_on', 'created_on'),
+            ('created_on:desc', '-created_on'),
+            ('modified_on', 'modified_on'),
+            ('modified_on:desc', '-modified_on'),
+            ('delivery_date', 'delivery_date'),
+            ('delivery_date:desc', '-delivery_date'),
+        ),
+    )
+    def test_export(
+        self,
+        request_sortby,
+        orm_ordering,
+    ):
+        """Test export of interaction search results."""
         data = {}
         if request_sortby:
             data['sortby'] = request_sortby
