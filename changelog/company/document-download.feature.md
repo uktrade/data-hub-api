@@ -1,0 +1,1 @@
+New fields for `Countries exported to` and `Countries of interest` have been added to the csv file resulting from document download.
