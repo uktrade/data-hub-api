@@ -381,11 +381,11 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'id': str(registered_country.id),
                 'name': registered_country.name,
             },
-            'line_1': dnb_company.get('registered_address_line_1', ''),
-            'line_2': dnb_company.get('registered_address_line_2', ''),
-            'town': dnb_company.get('registered_address_town', ''),
-            'county': dnb_company.get('registered_address_county', ''),
-            'postcode': dnb_company.get('registered_address_postcode', ''),
+            'line_1': dnb_company.get('registered_address_line_1') or '',
+            'line_2': dnb_company.get('registered_address_line_2') or '',
+            'town': dnb_company.get('registered_address_town') or '',
+            'county': dnb_company.get('registered_address_county') or '',
+            'postcode': dnb_company.get('registered_address_postcode') or '',
         } if required_registered_address_fields_present else None
 
         assert company == {
