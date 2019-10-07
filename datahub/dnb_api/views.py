@@ -21,7 +21,14 @@ from datahub.dnb_api.serializers import (
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
 )
-from datahub.dnb_api.utils import format_dnb_company, format_dnb_company_investigation, search_dnb
+from datahub.dnb_api.utils import (
+    DNBServiceError,
+    DNBServiceInvalidRequest,
+    DNBServiceInvalidResponse,
+    format_dnb_company_investigation,
+    get_company,
+    search_dnb,
+)
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
 
@@ -160,30 +167,17 @@ class DNBCompanyCreateView(APIView):
         duns_serializer.is_valid(raise_exception=True)
         duns_number = duns_serializer.validated_data['duns_number']
 
-        dnb_response = search_dnb({'duns_number': duns_number})
+        try:
+            dnb_company = get_company(duns_number)
 
-        if dnb_response.status_code != status.HTTP_200_OK:
-            error_message = f'DNB service returned: {dnb_response.status_code}'
-            logger.error(error_message)
-            raise APIUpstreamException(error_message)
+        except (DNBServiceError, DNBServiceInvalidResponse) as exc:
+            raise APIUpstreamException(str(exc))
 
-        dnb_companies = dnb_response.json().get('results', [])
+        except DNBServiceInvalidRequest as exc:
+            raise APIBadRequestException(str(exc))
 
-        if not dnb_companies:
-            error_message = f'Cannot find a company with duns_number: {duns_number}'
-            logger.error(error_message)
-            raise APIBadRequestException(error_message)
-
-        if len(dnb_companies) > 1:
-            error_message = f'Multiple companies found with duns_number: {duns_number}'
-            logger.error(error_message)
-            raise APIUpstreamException(error_message)
-
-        formatted_company_data = format_dnb_company(
-            dnb_companies[0],
-        )
         company_serializer = DNBCompanySerializer(
-            data=formatted_company_data,
+            data=dnb_company,
         )
 
         try:
@@ -191,7 +185,7 @@ class DNBCompanyCreateView(APIView):
         except serializers.ValidationError:
             message = 'Company data from DNB failed DH serializer validation'
             extra_data = {
-                'formatted_dnb_company_data': formatted_company_data,
+                'formatted_dnb_company_data': dnb_company,
                 'dh_company_serializer_errors': company_serializer.errors,
             }
             logger.error(message, extra=extra_data)
