@@ -67,6 +67,12 @@ class Company(ArchivableModel, BaseModel):
         ('very_low', 'Very Low'),
     )
 
+    GREAT_PROFILE_STATUSES = Choices(
+        ('published', 'Published'),
+        ('unpublished', 'Unpublished'),
+        (None, 'No profile or not known'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -237,6 +243,12 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         choices=EXPORT_POTENTIAL_SCORES,
         help_text='Score that signifies export potential, imported from Data Science',
+    )
+    great_profile = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        choices=GREAT_PROFILE_STATUSES,
+        help_text='Whether this company has a profile and agreed to be published or not',
     )
 
     def __str__(self):
