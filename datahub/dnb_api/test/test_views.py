@@ -599,11 +599,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         (
             ('primary_name', {'name': ['This field may not be null.']}),
             ('trading_names', {'trading_names': ['This field may not be null.']}),
-            ('address_line_1', {'address': {'line_1': ['This field may not be null.']}}),
-            ('address_line_2', {'address': {'line_2': ['This field may not be null.']}}),
-            ('address_town', {'address': {'town': ['This field may not be null.']}}),
-            ('address_county', {'address': {'county': ['This field may not be null.']}}),
-            ('address_postcode', {'address': {'postcode': ['This field may not be null.']}}),
+            ('duns_number', {'duns_number': ['This field may not be null.']}),
+            ('address_line_1', {'address': {'line_1': ['This field is required.']}}),
+            ('address_town', {'address': {'town': ['This field is required.']}}),
             ('address_country', {'address': {'country': ['This field is required.']}}),
         ),
     )
@@ -649,6 +647,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             {'registered_address_county': ''},
             {'registered_address_postcode': ''},
             {'registered_address_country': ''},
+            {'address_line_2': ''},
+            {'address_county': ''},
+            {'address_postcode': ''},
         ),
     )
     def test_post_missing_optional_fields(

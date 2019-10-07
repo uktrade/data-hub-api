@@ -100,24 +100,21 @@ def get_company(duns_number):
     return format_dnb_company(dnb_companies[0])
 
 
-def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=None):
+def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
     """
     Extract address from dnb company data.  This takes a `prefix` string to
     extract address fields that start with a certain prefix.
     """
-    if not ignore_when_missing:
-        ignore_when_missing = tuple()
-
     country = Country.objects.filter(
         iso_alpha2_code=dnb_company[f'{prefix}_country'],
     ).first() if dnb_company.get(f'{prefix}_country') else None
 
     extracted_address = {
-        'line_1': dnb_company.get(f'{prefix}_line_1'),
-        'line_2': dnb_company.get(f'{prefix}_line_2'),
-        'town': dnb_company.get(f'{prefix}_town'),
-        'county': dnb_company.get(f'{prefix}_county'),
-        'postcode': dnb_company.get(f'{prefix}_postcode'),
+        'line_1': dnb_company.get(f'{prefix}_line_1') or '',
+        'line_2': dnb_company.get(f'{prefix}_line_2') or '',
+        'town': dnb_company.get(f'{prefix}_town') or '',
+        'county': dnb_company.get(f'{prefix}_county') or '',
+        'postcode': dnb_company.get(f'{prefix}_postcode') or '',
         'country': country.id if country else None,
     }
 
