@@ -10,7 +10,10 @@ from datahub.core.hawk_receiver import (
     HawkResponseSigningMixin,
     HawkScopePermission,
 )
-from datahub.core.query_utils import get_front_end_url_expression
+from datahub.core.query_utils import (
+    get_front_end_url_expression,
+    get_string_agg_subquery,
+)
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.company import CompanySearchApp
@@ -169,6 +172,16 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             default='employee_range__name',
             output_field=CharField(),
         ),
+
+        export_to_countries_list=get_string_agg_subquery(
+            DBCompany,
+            'export_to_countries__name',
+        ),
+
+        future_interest_countries_list=get_string_agg_subquery(
+            DBCompany,
+            'future_interest_countries__name',
+        ),
     )
     field_titles = {
         'name': 'Name',
@@ -176,6 +189,8 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'sector_name': 'Sector',
         'address_country__name': 'Country',
         'uk_region__name': 'UK region',
+        'export_to_countries_list': 'Countries exported to',
+        'future_interest_countries_list': 'Countries of interest',
         'archived': 'Archived',
         'created_on': 'Date created',
         'number_of_employees_value': 'Number of employees',

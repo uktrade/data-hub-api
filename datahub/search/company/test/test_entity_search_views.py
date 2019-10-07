@@ -21,9 +21,10 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
+    join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.metadata.models import Sector
+from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.models import get_suggestions
 from datahub.search.company.views import SearchCompanyExportAPIView
@@ -573,6 +574,7 @@ class TestCompanyExportView(APITestMixin):
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
+            future_interest_countries=Country.objects.order_by('?')[:3],
         )
         CompanyFactory.create_batch(
             2,
@@ -581,6 +583,7 @@ class TestCompanyExportView(APITestMixin):
             is_turnover_estimated=True,
             number_of_employees=95,
             is_number_of_employees_estimated=True,
+            export_to_countries=Country.objects.order_by('?')[:2],
         )
 
         setup_es.indices.refresh()
@@ -612,6 +615,12 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
+                'Countries exported to': join_attr_values(
+                    company.export_to_countries.order_by('name'),
+                ),
+                'Countries of interest': join_attr_values(
+                    company.future_interest_countries.order_by('name'),
+                ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (
