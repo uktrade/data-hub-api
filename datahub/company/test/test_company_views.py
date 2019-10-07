@@ -708,7 +708,7 @@ class TestUpdateCompany(APITestMixin):
                 'is_number_of_employees_estimated': True,
                 'pending_dnb_investigation': False,
                 'export_potential': Company.EXPORT_POTENTIAL_SCORES.very_low,
-                'great_profile':Company.GREAT_PROFILE_STATUSES.unpublished,
+                'great_profile': Company.GREAT_PROFILE_STATUSES.unpublished,
             },
         )
 
