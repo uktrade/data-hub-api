@@ -404,6 +404,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'export_experience_category': None,
+            'export_potential': None,
             'export_to_countries': [],
             'future_interest_countries': [],
             'one_list_group_global_account_manager': None,
