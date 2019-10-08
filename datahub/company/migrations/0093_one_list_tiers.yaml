@@ -1,0 +1,48 @@
+- model: company.onelisttier
+  pk: b91bf800-8d53-e311-aef3-441ea13961e2
+  fields:
+    disabled_on: null
+    name: Tier A - SRM Programme Accounts
+    order: 100.0
+- model: company.onelisttier
+  pk: 7e0c261a-d447-e411-985c-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tier A - SRM Commercial Partner Accounts
+    order: 200.0
+- model: company.onelisttier
+  pk: bb1bf800-8d53-e311-aef3-441ea13961e2
+  fields:
+    disabled_on: null
+    name: Tier B - Sector Team Accounts
+    order: 300.0
+- model: company.onelisttier
+  pk: 23ef2218-37f7-4abf-aacb-7c49f65ee1e3
+  fields:
+    disabled_on: null
+    name: Tier B - Capital Investment Team Accounts
+    order: 400.0
+- model: company.onelisttier
+  pk: bd1bf800-8d53-e311-aef3-441ea13961e2
+  fields:
+    disabled_on: null
+    name: Tier C - Investment Services Team Accounts
+    order: 500.0
+- model: company.onelisttier
+  pk: 572dfefe-cd1d-e611-9bdc-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tier D - Overseas Post Accounts
+    order: 600.0
+- model: company.onelisttier
+  pk: 12798372-8eb4-e511-88b6-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tier D - Local Enterprise Partnership Accounts
+    order: 700.0
+- model: company.onelisttier
+  pk: 1929c808-99b4-4abf-a891-45f2e187b410
+  fields:
+    disabled_on: null
+    name: Tier D - International Trade Adviser Accounts
+    order: 800.0
