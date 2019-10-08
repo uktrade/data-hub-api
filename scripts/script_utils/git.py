@@ -1,8 +1,9 @@
 import subprocess
+from enum import Enum
 
 
 def any_uncommitted_changes():
-    """Checks if there are any uncommitted changes."""
+    """Check if there are any uncommitted changes."""
     result = subprocess.run(
         ['git', 'status', '--porcelain'],
         check=True,
@@ -12,7 +13,7 @@ def any_uncommitted_changes():
 
 
 def local_branch_exists(branch):
-    """Checks if a local branch exists."""
+    """Check if a local branch exists."""
     try:
         subprocess.run(['git', 'show-ref', '--quiet', '--heads', '--', branch], check=True)
     except subprocess.CalledProcessError:
@@ -22,10 +23,25 @@ def local_branch_exists(branch):
 
 
 def remote_branch_exists(branch):
-    """Checks if a remote branch exists."""
+    """Check if a remote branch exists."""
+    return _remote_ref_exists(branch, _RefTypeArg.head)
+
+
+def remote_tag_exists(tag):
+    """Check if a remote tag exists."""
+    return _remote_ref_exists(tag, _RefTypeArg.tag)
+
+
+class _RefTypeArg(Enum):
+    head = '--heads'
+    tag = '--tags'
+
+
+def _remote_ref_exists(ref, ref_type_arg):
+    """Checks if a remote reference exists."""
     try:
         subprocess.run(
-            ['git', 'ls-remote', '--quiet', '--exit-code', 'origin', branch],
+            ['git', 'ls-remote', '--quiet', '--exit-code', ref_type_arg.value, 'origin', ref],
             check=True,
             stdout=subprocess.DEVNULL,
         )

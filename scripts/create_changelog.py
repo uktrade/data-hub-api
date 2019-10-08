@@ -19,14 +19,13 @@ The script will abort if:
 """
 
 import argparse
-import glob
 import subprocess
 import webbrowser
-from pathlib import Path
 from urllib.parse import quote, urlencode
 
 from script_utils.current_version import get_current_version
 from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
+from script_utils.news_fragments import list_news_fragments
 from script_utils.version import Version
 
 BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-leeloo'
@@ -37,15 +36,6 @@ parser.add_argument('release_type', choices=Version._fields)
 
 class CommandError(Exception):
     """A fatal error when running the script."""
-
-
-def list_news_fragments():
-    """Return a list of files that are probable news fragments."""
-    path = Path(__file__)
-    root_path = path.resolve().parents[1]
-    excluded_files = {'.gitignore', '_template.md.jinja2', 'README.md'}
-    changelog_files = glob.iglob(f'{root_path}/changelog/**/*')
-    return set(changelog_files) - excluded_files
 
 
 def create_changelog(release_type):
