@@ -599,7 +599,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         (
             ('primary_name', {'name': ['This field may not be null.']}),
             ('trading_names', {'trading_names': ['This field may not be null.']}),
-            ('duns_number', {'duns_number': ['This field may not be null.']}),
             ('address_line_1', {'address': {'line_1': ['This field is required.']}}),
             ('address_town', {'address': {'town': ['This field is required.']}}),
             ('address_country', {'address': {'country': ['This field is required.']}}),
