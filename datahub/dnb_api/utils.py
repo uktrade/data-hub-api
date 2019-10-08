@@ -1,9 +1,16 @@
+import logging
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from rest_framework import status
 
+from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
+from datahub.core.serializers import AddressSerializer
 from datahub.metadata.models import Country
 
+
+logger = logging.getLogger(__name__)
 
 api_client = APIClient(
     settings.DNB_SERVICE_BASE_URL,
@@ -11,6 +18,27 @@ api_client = APIClient(
     raise_for_status=False,
     default_timeout=settings.DNB_SERVICE_TIMEOUT,
 )
+
+
+class DNBServiceError(Exception):
+    """
+    Exception for when DNB service doesn't return
+    a response with a status code of 200.
+    """
+
+
+class DNBServiceInvalidRequest(Exception):
+    """
+    Exception for when the request to DNB service
+    is not valid.
+    """
+
+
+class DNBServiceInvalidResponse(Exception):
+    """
+    Exception for when the response from DNB service
+    is not valid.
+    """
 
 
 def search_dnb(query_params):
@@ -22,11 +50,79 @@ def search_dnb(query_params):
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
-    return api_client.request(
+    response = api_client.request(
         'POST',
         'companies/search/',
         json=query_params,
     )
+    statsd.incr(f'dnb.search.{response.status_code}')
+    return response
+
+
+def get_company(duns_number):
+    """
+    Pull data for the company with the given duns_number from DNB and
+    returns a dict formatted for use with serializer of type CompanySerializer.
+
+    Raises exceptions if the company is not found, if multiple companies are
+    found or if the `duns_number` for the company is not the same as the one
+    we searched for.
+    """
+    dnb_response = search_dnb({'duns_number': duns_number})
+
+    if dnb_response.status_code != status.HTTP_200_OK:
+        error_message = f'DNB service returned: {dnb_response.status_code}'
+        logger.error(error_message)
+        raise DNBServiceError(error_message)
+
+    dnb_companies = dnb_response.json().get('results', [])
+
+    if not dnb_companies:
+        error_message = f'Cannot find a company with duns_number: {duns_number}'
+        logger.error(error_message)
+        raise DNBServiceInvalidRequest(error_message)
+
+    if len(dnb_companies) > 1:
+        error_message = f'Multiple companies found with duns_number: {duns_number}'
+        logger.error(error_message)
+        raise DNBServiceInvalidResponse(error_message)
+
+    dnb_company = dnb_companies[0]
+
+    if dnb_company.get('duns_number') != duns_number:
+        error_message = (
+            f'DUNS number of the company: {dnb_company.get("duns_number")} '
+            f'did not match searched DUNS number: {duns_number}'
+        )
+        logger.error(error_message)
+        raise DNBServiceInvalidResponse(error_message)
+
+    return format_dnb_company(dnb_companies[0])
+
+
+def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
+    """
+    Extract address from dnb company data.  This takes a `prefix` string to
+    extract address fields that start with a certain prefix.
+    """
+    country = Country.objects.filter(
+        iso_alpha2_code=dnb_company[f'{prefix}_country'],
+    ).first() if dnb_company.get(f'{prefix}_country') else None
+
+    extracted_address = {
+        'line_1': dnb_company.get(f'{prefix}_line_1') or '',
+        'line_2': dnb_company.get(f'{prefix}_line_2') or '',
+        'town': dnb_company.get(f'{prefix}_town') or '',
+        'county': dnb_company.get(f'{prefix}_county') or '',
+        'postcode': dnb_company.get(f'{prefix}_postcode') or '',
+        'country': country.id if country else None,
+    }
+
+    for field in ignore_when_missing:
+        if not extracted_address[field]:
+            return None
+
+    return extracted_address
 
 
 def format_dnb_company(dnb_company):
@@ -34,11 +130,6 @@ def format_dnb_company(dnb_company):
     Format DNB response to something that our Serializer
     can work with.
     """
-    # Extract country
-    country = Country.objects.filter(
-        iso_alpha2_code=dnb_company.get('address_country'),
-    ).first()
-
     # Extract companies house number for UK Companies
     registration_numbers = {
         reg['registration_type']: reg.get('registration_number')
@@ -52,16 +143,12 @@ def format_dnb_company(dnb_company):
         'name': dnb_company.get('primary_name'),
         'trading_names': dnb_company.get('trading_names'),
         'duns_number': dnb_company.get('duns_number'),
-        'address': {
-            'line_1': dnb_company.get('address_line_1'),
-            'line_2': dnb_company.get('address_line_2'),
-            'town': dnb_company.get('address_town'),
-            'county': dnb_company.get('address_county'),
-            'postcode': dnb_company.get('address_postcode'),
-            'country': {
-                'id': None if country is None else country.id,
-            },
-        },
+        'address': extract_address_from_dnb_company(dnb_company, 'address'),
+        'registered_address': extract_address_from_dnb_company(
+            dnb_company,
+            'registered_address',
+            ignore_when_missing=AddressSerializer.REQUIRED_FIELDS,
+        ),
         'uk_based': dnb_company.get('address_country') == 'GB',
         'company_number': registration_numbers.get('uk_companies_house_number'),
         # Optional fields

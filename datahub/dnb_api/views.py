@@ -1,6 +1,5 @@
 import logging
 
-import sentry_sdk
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
@@ -8,9 +7,9 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from statsd.defaults.django import statsd
 
 from datahub.company.models import CompanyPermission
+from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
@@ -22,7 +21,14 @@ from datahub.dnb_api.serializers import (
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
 )
-from datahub.dnb_api.utils import format_dnb_company, format_dnb_company_investigation, search_dnb
+from datahub.dnb_api.utils import (
+    DNBServiceError,
+    DNBServiceInvalidRequest,
+    DNBServiceInvalidResponse,
+    format_dnb_company_investigation,
+    get_company,
+    search_dnb,
+)
 from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
 
@@ -52,7 +58,6 @@ class DNBCompanySearchView(APIView):
         on Data Hub.
         """
         upstream_response = search_dnb(request.data)
-        statsd.incr(f'dnb.search.{upstream_response.status_code}')
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
@@ -162,40 +167,28 @@ class DNBCompanyCreateView(APIView):
         duns_serializer.is_valid(raise_exception=True)
         duns_number = duns_serializer.validated_data['duns_number']
 
-        dnb_response = search_dnb({'duns_number': duns_number})
-        statsd.incr(f'dnb.search.{dnb_response.status_code}')
+        try:
+            dnb_company = get_company(duns_number)
 
-        if dnb_response.status_code != status.HTTP_200_OK:
-            error_message = f'DNB service returned: {dnb_response.status_code}'
-            logger.error(error_message)
-            raise APIUpstreamException(error_message)
+        except (DNBServiceError, DNBServiceInvalidResponse) as exc:
+            raise APIUpstreamException(str(exc))
 
-        dnb_companies = dnb_response.json().get('results', [])
+        except DNBServiceInvalidRequest as exc:
+            raise APIBadRequestException(str(exc))
 
-        if not dnb_companies:
-            error_message = f'Cannot find a company with duns_number: {duns_number}'
-            logger.error(error_message)
-            raise APIBadRequestException(error_message)
-
-        if len(dnb_companies) > 1:
-            error_message = f'Multiple companies found with duns_number: {duns_number}'
-            logger.error(error_message)
-            raise APIUpstreamException(error_message)
-
-        formatted_company_data = format_dnb_company(
-            dnb_companies[0],
-        )
         company_serializer = DNBCompanySerializer(
-            data=formatted_company_data,
+            data=dnb_company,
         )
 
         try:
             company_serializer.is_valid(raise_exception=True)
         except serializers.ValidationError:
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
-                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
-                sentry_sdk.capture_message('Company data from DNB failed DH serializer validation')
+            message = 'Company data from DNB failed DH serializer validation'
+            extra_data = {
+                'formatted_dnb_company_data': dnb_company,
+                'dh_company_serializer_errors': company_serializer.errors,
+            }
+            logger.error(message, extra=extra_data)
             raise
 
         datahub_company = company_serializer.save(
@@ -240,12 +233,12 @@ class DNBCompanyCreateInvestigationView(APIView):
         try:
             company_serializer.is_valid(raise_exception=True)
         except serializers.ValidationError:
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra('formatted_dnb_company_data', formatted_company_data)
-                scope.set_extra('dh_company_serializer_errors', company_serializer.errors)
-                sentry_sdk.capture_message(
-                    'Company investigation payload failed serializer validation',
-                )
+            message = 'Company investigation payload failed serializer validation'
+            extra_data = {
+                'formatted_dnb_company_data': formatted_company_data,
+                'dh_company_serializer_errors': company_serializer.errors,
+            }
+            logger.error(message, extra=extra_data)
             raise
 
         datahub_company = company_serializer.save(

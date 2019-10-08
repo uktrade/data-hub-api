@@ -127,9 +127,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             ]),
             False,
             (
-                'Domain "other.trade.gov.uk" not present in DIT_EMAIL_DOMAINS setting. '
-                'This email had the following authentication results: compauth=pass dkim=pass '
-                'dmarc=pass spf=pass'
+                'Domain "other.trade.gov.uk" not present in DIT_EMAIL_DOMAINS setting.'
             ),
         ),
         # Domain which is not on DIT_EMAIL_DOMAINS setting, fails validation
@@ -145,9 +143,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             ]),
             False,
             (
-                'Domain "gmail.com" not present in DIT_EMAIL_DOMAINS setting. '
-                'This email had the following authentication results: dkim=pass '
-                'dmarc=pass spf=pass'
+                'Domain "gmail.com" not present in DIT_EMAIL_DOMAINS setting.'
             ),
         ),
         # Blacklisted email
@@ -169,7 +165,7 @@ def test_email_sent_by_dit(
     """
     Tests for was_email_sent_by_dit validator.
     """
-    caplog.set_level(logging.WARNING)
+    caplog.set_level(logging.ERROR)
     message = mock.Mock()
     message.from_ = [['Bill Adama', email]]
     message.authentication_results = authentication_results
@@ -178,7 +174,7 @@ def test_email_sent_by_dit(
     if expected_warning:
         expected_log = (
             'datahub.email_ingestion.validation',
-            30,
+            40,
             expected_warning,
         )
         assert expected_log in caplog.record_tuples

@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock
 from urllib.parse import urljoin
 
 import pytest
@@ -10,11 +11,16 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+
+REQUIRED_REGISTERED_ADDRESS_FIELDS = [
+    f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
+]
 
 
 @pytest.mark.parametrize(
@@ -319,15 +325,17 @@ class TestDNBCompanySearchAPI(APITestMixin):
     )
     def test_monitoring(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         requests_mock,
-        statsd_mock,
         response_status_code,
     ):
         """
         Test that the right counter is incremented for the given status code
         returned by the dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=response_status_code,
@@ -354,6 +362,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         country = Country.objects.filter(
             iso_alpha2_code=dnb_company['address_country'],
         ).first()
+        registered_country = Country.objects.filter(
+            iso_alpha2_code=dnb_company['registered_address_country'],
+        ).first() if dnb_company.get('registered_address_country') else None
 
         company_number = (
             dnb_company['registration_numbers'][0].get('registration_number')
@@ -361,6 +372,21 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         [company.pop(k) for k in ('id', 'created_on', 'modified_on')]
+
+        required_registered_address_fields_present = all(
+            field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
+        )
+        registered_address = {
+            'country': {
+                'id': str(registered_country.id),
+                'name': registered_country.name,
+            },
+            'line_1': dnb_company.get('registered_address_line_1') or '',
+            'line_2': dnb_company.get('registered_address_line_2') or '',
+            'town': dnb_company.get('registered_address_town') or '',
+            'county': dnb_company.get('registered_address_county') or '',
+            'postcode': dnb_company.get('registered_address_postcode') or '',
+        } if required_registered_address_fields_present else None
 
         assert company == {
             'name': dnb_company['primary_name'],
@@ -376,7 +402,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'county': dnb_company['address_county'],
                 'postcode': dnb_company['address_postcode'],
             },
-            'registered_address': None,
+            'registered_address': registered_address,
             'reference_code': '',
             'uk_based': (dnb_company['address_country'] == 'GB'),
             'duns_number': dnb_company['duns_number'],
@@ -401,6 +427,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'export_experience_category': None,
+            'export_potential': None,
             'export_to_countries': [],
             'future_interest_countries': [],
             'one_list_group_global_account_manager': None,
@@ -521,8 +548,22 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     @pytest.mark.parametrize(
         'results, expected_status_code, expected_message',
         (
-            ([], 400, 'Cannot find a company with duns_number: 123456789'),
-            (['foo', 'bar'], 502, 'Multiple companies found with duns_number: 123456789'),
+            (
+                [],
+                400,
+                'Cannot find a company with duns_number: 123456789',
+            ),
+            (
+                ['foo', 'bar'],
+                502,
+                'Multiple companies found with duns_number: 123456789',
+            ),
+            (
+                [{'duns_number': '012345678'}],
+                502,
+                'DUNS number of the company: 012345678 '
+                'did not match searched DUNS number: 123456789',
+            ),
         ),
     )
     def test_post_none_or_multiple_companies_found(
@@ -558,13 +599,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         (
             ('primary_name', {'name': ['This field may not be null.']}),
             ('trading_names', {'trading_names': ['This field may not be null.']}),
-            ('duns_number', {'duns_number': ['This field may not be null.']}),
-            ('address_line_1', {'address': {'line_1': ['This field may not be null.']}}),
-            ('address_line_2', {'address': {'line_2': ['This field may not be null.']}}),
-            ('address_town', {'address': {'town': ['This field may not be null.']}}),
-            ('address_county', {'address': {'county': ['This field may not be null.']}}),
-            ('address_postcode', {'address': {'postcode': ['This field may not be null.']}}),
-            ('address_country', {'address': {'country': ['Must be a valid UUID.']}}),
+            ('address_line_1', {'address': {'line_1': ['This field is required.']}}),
+            ('address_town', {'address': {'town': ['This field is required.']}}),
+            ('address_country', {'address': {'country': ['This field is required.']}}),
         ),
     )
     def test_post_missing_required_fields(
@@ -603,6 +640,15 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             {'annual_sales': None},
             {'employee_number': None},
             {'is_employee_number_estimated': None},
+            {'registered_address_line_1': ''},
+            {'registered_address_line_2': ''},
+            {'registered_address_town': ''},
+            {'registered_address_county': ''},
+            {'registered_address_postcode': ''},
+            {'registered_address_country': ''},
+            {'address_line_2': ''},
+            {'address_county': ''},
+            {'address_postcode': ''},
         ),
     )
     def test_post_missing_optional_fields(
@@ -633,6 +679,14 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         created_company = Company.objects.first()
         assert created_company.name == dnb_response_uk['results'][0]['primary_name']
+        overridden_fields = field_overrides.keys()
+        if any(field in overridden_fields for field in REQUIRED_REGISTERED_ADDRESS_FIELDS):
+            assert created_company.registered_address_1 == ''
+            assert created_company.registered_address_2 == ''
+            assert created_company.registered_address_town == ''
+            assert created_company.registered_address_county == ''
+            assert created_company.registered_address_country is None
+            assert created_company.registered_address_postcode == ''
 
     def test_post_existing(
         self,
@@ -766,15 +820,17 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     )
     def test_monitoring_search(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         requests_mock,
-        statsd_mock,
         response_status_code,
     ):
         """
         Test that the right counter is incremented for the given status code
         returned by the dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=response_status_code,
@@ -792,15 +848,17 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     def test_monitoring_create(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         dnb_response_uk,
         requests_mock,
-        statsd_mock,
     ):
         """
         Test that the right counter is incremented when a company gets
         created using dnb-service.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=status.HTTP_200_OK,
@@ -960,14 +1018,16 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
 
     def test_monitoring_create(
         self,
+        monkeypatch,
         dnb_company_search_feature_flag,
         investigation_payload,
-        statsd_mock,
     ):
         """
         Test that the right counter is incremented when a stub company
         gets created for investigation by DNB.
         """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         self.api_client.post(
             reverse('api-v4:dnb-api:company-create-investigation'),
             data=investigation_payload,

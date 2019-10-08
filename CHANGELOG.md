@@ -1,3 +1,19 @@
+# Data Hub API 15.5.0 (2019-10-08)
+
+
+## Features
+
+- **Companies** New fields for `Countries exported to` and `Countries of interest` have been added to the csv file resulting from document download.
+
+## API
+
+- **Companies** `GET /v4/dataset/companies-dataset`: Added companies dataset endpoint to be consumed by data-flow and used in data-workspace.
+- **Companies** `GET /v4/company/<id>`: A new read-only field was added to company model `export_potential`. Values for this field are imported from Data Science platform, as a seperate exercise. It can have one of the constant values out of `very_higb`, `high`, `medium`, `low`,`very_low` and `null`.
+- The `POST /v4/dnb/company-create` API endpoint will now save `registered_address_*`
+  fields on Data Hub companies that it creates. Registered address fields will not be
+  saved at all unless a minimum of `line_1`, `town` and `country` fields are provided.
+
+
 # Data Hub API 15.4.0 (2019-10-03)
 
 
