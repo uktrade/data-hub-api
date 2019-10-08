@@ -122,11 +122,17 @@ def test_get_company_valid(
         'duns_number': '123456789',
         'trading_names': [],
         'address': {
-            'country': {
-                'id': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
-            },
+            'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
             'county': '',
             'line_1': 'Unit 10, Ockham Drive',
+            'line_2': '',
+            'postcode': 'UB6 0F2',
+            'town': 'GREENFORD',
+        },
+        'registered_address': {
+            'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
+            'county': '',
+            'line_1': 'C/O LONE VARY',
             'line_2': '',
             'postcode': 'UB6 0F2',
             'town': 'GREENFORD',
