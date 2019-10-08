@@ -6,6 +6,7 @@ from rest_framework import status
 
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
+from datahub.core.serializers import AddressSerializer
 from datahub.metadata.models import Country
 
 
@@ -99,16 +100,36 @@ def get_company(duns_number):
     return format_dnb_company(dnb_companies[0])
 
 
+def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
+    """
+    Extract address from dnb company data.  This takes a `prefix` string to
+    extract address fields that start with a certain prefix.
+    """
+    country = Country.objects.filter(
+        iso_alpha2_code=dnb_company[f'{prefix}_country'],
+    ).first() if dnb_company.get(f'{prefix}_country') else None
+
+    extracted_address = {
+        'line_1': dnb_company.get(f'{prefix}_line_1') or '',
+        'line_2': dnb_company.get(f'{prefix}_line_2') or '',
+        'town': dnb_company.get(f'{prefix}_town') or '',
+        'county': dnb_company.get(f'{prefix}_county') or '',
+        'postcode': dnb_company.get(f'{prefix}_postcode') or '',
+        'country': country.id if country else None,
+    }
+
+    for field in ignore_when_missing:
+        if not extracted_address[field]:
+            return None
+
+    return extracted_address
+
+
 def format_dnb_company(dnb_company):
     """
     Format DNB response to something that our Serializer
     can work with.
     """
-    # Extract country
-    country = Country.objects.filter(
-        iso_alpha2_code=dnb_company.get('address_country'),
-    ).first()
-
     # Extract companies house number for UK Companies
     registration_numbers = {
         reg['registration_type']: reg.get('registration_number')
@@ -122,16 +143,12 @@ def format_dnb_company(dnb_company):
         'name': dnb_company.get('primary_name'),
         'trading_names': dnb_company.get('trading_names'),
         'duns_number': dnb_company.get('duns_number'),
-        'address': {
-            'line_1': dnb_company.get('address_line_1'),
-            'line_2': dnb_company.get('address_line_2'),
-            'town': dnb_company.get('address_town'),
-            'county': dnb_company.get('address_county'),
-            'postcode': dnb_company.get('address_postcode'),
-            'country': {
-                'id': None if country is None else country.id,
-            },
-        },
+        'address': extract_address_from_dnb_company(dnb_company, 'address'),
+        'registered_address': extract_address_from_dnb_company(
+            dnb_company,
+            'registered_address',
+            ignore_when_missing=AddressSerializer.REQUIRED_FIELDS,
+        ),
         'uk_based': dnb_company.get('address_country') == 'GB',
         'company_number': registration_numbers.get('uk_companies_house_number'),
         # Optional fields
