@@ -21,9 +21,10 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
+    join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.metadata.models import Sector
+from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.models import get_suggestions
 from datahub.search.company.views import SearchCompanyExportAPIView
@@ -573,6 +574,7 @@ class TestCompanyExportView(APITestMixin):
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
+            future_interest_countries=Country.objects.order_by('?')[:3],
         )
         CompanyFactory.create_batch(
             2,
@@ -581,6 +583,7 @@ class TestCompanyExportView(APITestMixin):
             is_turnover_estimated=True,
             number_of_employees=95,
             is_number_of_employees_estimated=True,
+            export_to_countries=Country.objects.order_by('?')[:2],
         )
 
         setup_es.indices.refresh()
@@ -612,6 +615,12 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
+                'Countries exported to': join_attr_values(
+                    company.export_to_countries.order_by('name'),
+                ),
+                'Countries of interest': join_attr_values(
+                    company.future_interest_countries.order_by('name'),
+                ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (
@@ -667,17 +676,17 @@ class TestAutocompleteSearch(APITestMixin):
             (
                 {'term': 'abc', 'country': ''},
                 True,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc', 'country': constants.Country.united_kingdom.value.id},
                 True,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc'},
                 True,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'one', 'country': constants.Country.canada.value.id},
@@ -687,32 +696,32 @@ class TestAutocompleteSearch(APITestMixin):
             (
                 {'term': 'abc', 'country': constants.UKRegion.north_east.value.id},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc', 'country': constants.Country.canada.value.id},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc', 'country': constants.Country.ireland.value.id},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc', 'country': ''},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc', 'country': constants.Country.united_kingdom.value.id},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'abc'},
                 False,
-                ['abc', 'abc 2'],
+                ['abc', 'abc2'],
             ),
             (
                 {'term': 'one', 'country': constants.Country.canada.value.id},
@@ -747,8 +756,8 @@ class TestAutocompleteSearch(APITestMixin):
         )
 
         CompanyFactory(
-            name='abc 2',
-            trading_names=['Xyz trading 2', 'Abc trading 2'],
+            name='abc2',
+            trading_names=['Xyz trading 2', 'Abc2 trading'],
             registered_address_country_id=constants.Country.united_kingdom.value.id,
         )
 
@@ -762,6 +771,7 @@ class TestAutocompleteSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
+        # Note: Results are ordered by the term they matched on
         results = [
             self._get_company_search_result(Company.objects.get(name=company_name))
             for company_name in expected_companies
@@ -829,17 +839,17 @@ class TestAutocompleteSearch(APITestMixin):
     @pytest.mark.parametrize(
         'query,expected_companies',
         (
-            ('abc', ['abc defg ltd', 'abc defg us ltd']),
+            ('abc', ['abc defg ltd', 'abc2 defg2 us ltd']),
             ('abv', []),
-            ('ABC', ['abc defg ltd', 'abc defg us ltd']),
+            ('ABC', ['abc defg ltd', 'abc2 defg2 us ltd']),
             ('hello', []),
             ('', []),
             (1, []),
             ('abc defg ltd', ['abc defg ltd']),
-            ('defg', ['abc defg ltd', 'abc defg us ltd']),
-            ('us', ['abc defg us ltd']),
-            ('hel', ['abc defg ltd', 'abc defg us ltd']),
-            ('qrs', ['abc defg us ltd']),
+            ('defg', ['abc defg ltd', 'abc2 defg2 us ltd']),
+            ('us', ['abc2 defg2 us ltd']),
+            ('hel', ['abc defg ltd', 'abc2 defg2 us ltd']),
+            ('qrs', ['abc2 defg2 us ltd']),
             ('help qrs', []),
         ),
     )
@@ -851,13 +861,13 @@ class TestAutocompleteSearch(APITestMixin):
         country_us = constants.Country.united_states.value.id
         CompanyFactory(
             name='abc defg ltd',
-            trading_names=['abc', 'helm', 'nop'],
+            trading_names=['helm', 'nop'],
             address_country_id=country_uk,
             registered_address_country_id=country_uk,
         )
         CompanyFactory(
-            name='abc defg us ltd',
-            trading_names=['helm', 'nop', 'qrs'],
+            name='abc2 defg2 us ltd',
+            trading_names=['helm2', 'nop', 'qrs'],
             address_country_id=country_us,
             registered_address_country_id=country_us,
         )
@@ -870,14 +880,15 @@ class TestAutocompleteSearch(APITestMixin):
         assert response.data['count'] == len(expected_companies)
 
         if expected_companies:
+            # Note: Results are ordered by the term they matched on
             companies = [result['name'] for result in response.data['results']]
             assert companies == expected_companies
 
     @pytest.mark.parametrize(
         'limit,expected_companies',
         (
-            (10, ['abc defg ltd', 'abc defg us ltd']),  # only 2 found
-            (2, ['abc defg ltd', 'abc defg us ltd']),
+            (10, ['abc defg ltd', 'abc2 defg2 us ltd']),  # only 2 found
+            (2, ['abc defg ltd', 'abc2 defg2 us ltd']),
             (1, ['abc defg ltd']),
         ),
     )
@@ -889,12 +900,12 @@ class TestAutocompleteSearch(APITestMixin):
         country_us = constants.Country.united_states.value.id
         CompanyFactory(
             name='abc defg ltd',
-            trading_names=['abc', 'helm', 'nop'],
+            trading_names=['helm', 'nop'],
             address_country_id=country_uk,
             registered_address_country_id=country_uk,
         )
         CompanyFactory(
-            name='abc defg us ltd',
+            name='abc2 defg2 us ltd',
             trading_names=['helm', 'nop', 'qrs'],
             address_country_id=country_us,
             registered_address_country_id=country_us,
@@ -914,6 +925,7 @@ class TestAutocompleteSearch(APITestMixin):
         assert response.data['count'] == len(expected_companies)
 
         if expected_companies:
+            # Note: Results are ordered by the term they matched on
             companies = [result['name'] for result in response.data['results']]
             assert companies == expected_companies
 

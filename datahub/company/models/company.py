@@ -59,6 +59,14 @@ class Company(ArchivableModel, BaseModel):
         ('duplicate', 'Duplicate record'),
     )
 
+    EXPORT_POTENTIAL_SCORES = Choices(
+        ('very_high', 'Very High'),
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'Low'),
+        ('very_low', 'Very Low'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -223,6 +231,13 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         blank=True,
     )
+    export_potential = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        choices=EXPORT_POTENTIAL_SCORES,
+        help_text='Score that signifies export potential, imported from Data Science',
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -239,6 +254,10 @@ class Company(ArchivableModel, BaseModel):
             (CompanyPermission.view_company_timeline.value, 'Can view company timeline'),
             (CompanyPermission.export_company.value, 'Can export company'),
         )
+        indexes = [
+            # For datasets app which includes API endpoints to be consumed by data-flow
+            models.Index(fields=('created_on', 'id')),
+        ]
 
     @property
     def uk_based(self):

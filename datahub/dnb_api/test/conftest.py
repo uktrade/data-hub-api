@@ -1,5 +1,4 @@
 import datetime
-from unittest.mock import Mock
 
 import pytest
 from django.utils.timezone import utc
@@ -29,7 +28,7 @@ def dnb_response_non_uk():
     return {
         'results': [
             {
-                'duns_number': '157270606',
+                'duns_number': '123456789',
                 'primary_name': 'Acme Corporation',
                 'trading_names': [
                     'Acme',
@@ -103,7 +102,7 @@ def dnb_response_uk():
                 'annual_sales': 50651895.0,
                 'annual_sales_currency': 'USD',
                 'domain': 'foo.com',
-                'duns_number': '291332174',
+                'duns_number': '123456789',
                 'employee_number': 260,
                 'global_ultimate_duns_number': '291332174',
                 'global_ultimate_primary_name': 'FOO BICYCLE LIMITED',
@@ -204,16 +203,3 @@ def investigation_payload():
         'sector': Sector.renewable_energy_wind.value.id,
         'uk_region': UKRegion.east_midlands.value.id,
     }
-
-
-@pytest.fixture
-def statsd_mock(monkeypatch):
-    """
-    Returns a mock statsd client instance.
-    """
-    mock_statsd = Mock()
-    monkeypatch.setattr(
-        'datahub.dnb_api.views.statsd',
-        mock_statsd,
-    )
-    return mock_statsd
