@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='company',
-            name='great_profile',
+            name='great_profile_status',
             field=models.CharField(choices=[('published', 'Published'), ('unpublished', 'Unpublished'), (None, 'No profile or not known')], help_text='Whether this company has a profile and agreed to be published or not', max_length=255, null=True),
         ),
     ]

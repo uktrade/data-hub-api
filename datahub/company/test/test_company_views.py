@@ -278,7 +278,7 @@ class TestGetCompany(APITestMixin):
                 'name': company.export_experience_category.name,
             },
             'export_potential': None,
-            'great_profile': None,
+            'great_profile_status': None,
             'export_to_countries': [],
             'future_interest_countries': [],
             'headquarter_type': company.headquarter_type,
@@ -690,7 +690,7 @@ class TestUpdateCompany(APITestMixin):
             is_number_of_employees_estimated=False,
             pending_dnb_investigation=True,
             export_potential=Company.EXPORT_POTENTIAL_SCORES.very_high,
-            great_profile=Company.GREAT_PROFILE_STATUSES.published,
+            great_profile_status=Company.GREAT_PROFILE_STATUSES.published,
         )
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
@@ -708,7 +708,7 @@ class TestUpdateCompany(APITestMixin):
                 'is_number_of_employees_estimated': True,
                 'pending_dnb_investigation': False,
                 'export_potential': Company.EXPORT_POTENTIAL_SCORES.very_low,
-                'great_profile': Company.GREAT_PROFILE_STATUSES.unpublished,
+                'great_profile_status': Company.GREAT_PROFILE_STATUSES.unpublished,
             },
         )
 
@@ -728,7 +728,7 @@ class TestUpdateCompany(APITestMixin):
         assert not response_data['is_number_of_employees_estimated']
         assert response_data['pending_dnb_investigation']
         assert response_data['export_potential'] == Company.EXPORT_POTENTIAL_SCORES.very_high
-        assert response_data['great_profile'] == Company.GREAT_PROFILE_STATUSES.published
+        assert response_data['great_profile_status'] == Company.GREAT_PROFILE_STATUSES.published
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -1128,18 +1128,18 @@ class TestUpdateCompany(APITestMixin):
             None,
         ),
     )
-    def test_get_company_with_great_profile(self, profile_status):
+    def test_get_company_with_great_profile_status(self, profile_status):
         """
-        Test imported great_profile field on a company appears as is
+        Test imported `great_profile_status` field on a company appears as is
         """
         company = CompanyFactory(
-            great_profile=profile_status,
+            great_profile_status=profile_status,
         )
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['great_profile'] == profile_status
+        assert response.json()['great_profile_status'] == profile_status
 
 
 class TestAddCompany(APITestMixin):

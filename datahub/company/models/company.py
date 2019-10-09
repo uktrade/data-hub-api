@@ -244,9 +244,10 @@ class Company(ArchivableModel, BaseModel):
         choices=EXPORT_POTENTIAL_SCORES,
         help_text='Score that signifies export potential, imported from Data Science',
     )
-    great_profile = models.CharField(
+    great_profile_status = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
+        blank=True,
         choices=GREAT_PROFILE_STATUSES,
         help_text='Whether this company has a profile and agreed to be published or not',
     )
