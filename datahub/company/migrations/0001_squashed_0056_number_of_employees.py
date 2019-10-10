@@ -12,15 +12,6 @@ import mptt.fields
 from django.conf import settings
 from django.db import migrations, models
 
-from datahub.core.migration_utils import load_yaml_data_in_migration
-
-
-def load_one_list_tiers(apps, schema_editor):
-    load_yaml_data_in_migration(
-        apps,
-        PurePath(__file__).parent / '0001_one_list_tiers.yaml',
-    )
-
 
 class Migration(migrations.Migration):
 
@@ -47,10 +38,6 @@ class Migration(migrations.Migration):
                 'ordering': ('order',),
                 'abstract': False,
             },
-        ),
-        migrations.RunPython(
-            code=load_one_list_tiers,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.CreateModel(
             name='ExportExperienceCategory',
