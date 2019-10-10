@@ -318,6 +318,8 @@ class Interaction(ArchivableModel, BaseModel):
             models.Index(fields=['modified_on', 'id']),
             # For meeting update lookups
             GinIndex(fields=['source']),
+            # For datasets app which includes API endpoints to be consumed by data-flow
+            models.Index(fields=('created_on', 'id')),
         ]
         permissions = (
             (
