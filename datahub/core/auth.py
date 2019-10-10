@@ -6,7 +6,6 @@ from django.contrib.auth.models import Permission
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -62,14 +61,20 @@ class PaaSIPAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         """
-        Blocks incoming connections based on IP in X-Forwarded-For
+        Blocks incoming connections based on IP in X-Forwarded-For.
+
         Ideally, this would be done at the network level. However, this is
-        not possible in PaaS. However, they do always add two IPs, with
-        the first one being the IP connection are made from, so we can
-        check the second-from-the-end with some confidence it hasn't been
-        spoofed.
-        This wouldn't be able to be trusted in other environments, but we're
-        not running in non-PaaS environments in production.
+        not possible in PaaS.
+
+        Given that production environments run on PaaS, the following rules are
+        being implemented:
+
+        - requests coming through Go Router or PaaS have the X-Forwarded-For header
+          that contains at least two IP addresses, with the first one being the
+          IP connection are made from, so we can check the second-from-the-end
+          with some confidence it hasn't been spoofed.
+
+        - requests originating from the internal network will not have X-Forwarded-For header
 
         If the IP address not allowed, AuthenticationFailed is raised.
         """
@@ -78,17 +83,17 @@ class PaaSIPAuthentication(BaseAuthentication):
             return None
 
         if 'HTTP_X_FORWARDED_FOR' not in request.META:
-            logger.warning(
-                'Failed access requirement: no X-Forwarded-For header passed',
-            )
-            raise AuthenticationFailed()
+            # We assume that absence of the header indicates connection originating
+            # in the internal network
+            return None
 
         x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR']
         ip_addresses = x_forwarded_for.split(',')
+
         if len(ip_addresses) < PAAS_ADDED_X_FORWARDED_FOR_IPS:
             logger.warning(
                 'Failed access requirement: the X-Forwarded-For header does not '
-                'contain enough IP addresses',
+                'contain enough IP addresses for external traffic',
             )
             raise AuthenticationFailed()
 
