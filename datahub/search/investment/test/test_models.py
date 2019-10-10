@@ -179,7 +179,7 @@ def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
     foreign_equity_investment_value = 9999999999999999999
     less_accurate_expected_foreign_equity_investment_value = 10000000000000000000
 
-    expected_gross_value_added_value = 99999989999999999990
+    expected_gross_value_added_value = 99999989999999999991
     less_accurate_expected_gross_value_added = 99999989999999991808
 
     project = project_with_max_gross_value_added
