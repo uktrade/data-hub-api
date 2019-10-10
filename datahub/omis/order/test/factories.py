@@ -22,7 +22,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(
         ContactFactory,
