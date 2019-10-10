@@ -472,7 +472,7 @@ class TestCreateView(APITestMixin):
             == str(project_manager_request_status_id)
         )
         # GVA Multiplier for Retail & wholesale trade - 2019 - 0.0581 * 1000
-        assert response_data['gross_value_added'] == '58'
+        assert response_data['gross_value_added'] == '59'
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
