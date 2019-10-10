@@ -1,3 +1,33 @@
+# Data Hub API 15.6.0 (2019-10-10)
+
+
+## Features
+
+- **Companies** A new One List tier was added:
+ 
+  | ID | Name |
+  | --- | --- |
+  | `1929c808-99b4-4abf-a891-45f2e187b410` | Tier D - International Trade Adviser Accounts |
+
+  This tier currently contains no companies; it will be used as part of upcoming functionality.
+- **Companies** Various superfluous unused One List tiers were manually removed from all environments.
+- **Companies** All One List tiers were renamed:
+
+  | Old name | New name |
+  | --- | --- |
+  | Tier A - Strategic Account | Tier A - SRM Programme Accounts |
+  | Tier A2 - Global Partners | Tier A - SRM Commercial Partner Accounts |
+  | Tier B - Global Accounts | Tier B - Sector Team Accounts |
+  | Tier B - Global Accounts (Capital Investment) | Tier B - Capital Investment Team Accounts |
+  | Tier C - Local Accounts (UKTI Managed) | Tier C - Investment Services Team Accounts |
+  | Tier D - POST Identified/Managed | Tier D - Overseas Post Accounts |
+  | Tier D - LEP Managed Branch (not IST) | Tier D - Local Enterprise Partnership Accounts |
+
+## API
+
+- **Interactions** `GET /v4/dataset/interactions-dataset`: Added interactions dataset endpoint to be consumed by data-flow and used in data-workspace.
+
+
 # Data Hub API 15.5.0 (2019-10-08)
 
 
