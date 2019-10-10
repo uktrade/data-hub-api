@@ -1,6 +1,11 @@
+from copy import copy
+from datetime import timedelta
+from unittest import mock
+
 import factory
 import pytest
 from django.conf import settings
+from django.utils import timezone as tz
 
 from datahub.company.models import Company, CompanyExportCountry, OneListTier
 from datahub.company.test.factories import (
@@ -534,6 +539,306 @@ class TestCompany:
             else:
                 assert export_country.sources == [EXTERNAL_SOURCE]
 
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    def test_set_external_source_export_countries_all_new(self):
+        """
+        The simple case where we are just creating some brand new
+        CompanyExportCountry objects
+        """
+        company_1 = CompanyFactory()
+        countries = list(Country.objects.order_by('?')[:2])
+        company_1.set_external_source_export_countries([
+            {'country': country, 'source_time': tz.now()}
+            for country in countries
+        ])
+        export_countries = list(company_1.unfiltered_export_countries.all())
+        assert len(export_countries) == 2
+        assert set(
+            export_country.country for export_country in export_countries
+        ) == set(countries)
+        for export_country in export_countries:
+            assert export_country.sources == [EXTERNAL_SOURCE]
+            assert export_country.disabled is False
+            assert (
+                export_country.created_by
+                is export_country.modified_by
+                is export_country.disabled_by
+                is None
+            )
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    @pytest.mark.parametrize('disabled_by_user,new_source_time_later,expected_disabled', [
+        [True, False, True],
+        [True, True, False],
+        [False, False, False],
+        [False, True, False],
+    ])
+    def test_set_external_source_export_countries_undeletion(
+        self, disabled_by_user, new_source_time_later, expected_disabled,
+    ):
+        """
+        External sources should not be able to un-delete CompanyExportCountrys,
+        but on the other-hand *will* be created even if a user-source disabled cec
+        exists.
+        """
+        disabled_on = tz.now()
+        if new_source_time_later:
+            new_source_time = disabled_on + timedelta(microseconds=1)
+        else:
+            new_source_time = disabled_on
+
+        company_1 = CompanyFactory()
+        user = AdviserFactory()
+        # Both of these two CECs should only be un-deleted if either:
+        # disabled_by_user is False, or new_source_time_later is True.
+        cec1 = CompanyExportCountryFactory(
+            company=company_1,
+            sources=[EXTERNAL_SOURCE],
+            disabled_by=user if disabled_by_user else None,
+            disabled_on=disabled_on,
+        )
+        cec2 = CompanyExportCountryFactory(
+            company=company_1,
+            sources=[USER_SOURCE],
+            disabled_by=user if disabled_by_user else None,
+            disabled_on=disabled_on,
+        )
+        cec3 = CompanyExportCountryFactory(
+            company=company_1,
+            sources=[],
+            disabled_by=user if disabled_by_user else None,
+            disabled_on=disabled_on,
+        )
+        new_data = [
+            {'country': cec.country, 'source_time': new_source_time}
+            for cec in [cec1, cec2, cec3]
+        ]
+        company_1.set_external_source_export_countries(new_data)
+        export_countries = company_1.unfiltered_export_countries.all()
+        assert set(export_countries) == {cec1, cec2, cec3}
+        cec1.refresh_from_db()
+        cec2.refresh_from_db()
+        cec3.refresh_from_db()
+        assert cec1.sources == cec3.sources == [EXTERNAL_SOURCE]
+        assert cec2.sources == [USER_SOURCE, EXTERNAL_SOURCE]
+        for cec in export_countries:
+            if disabled_by_user and not new_source_time_later:
+                assert cec.disabled
+                assert cec.disabled_by == user
+            elif disabled_by_user and new_source_time_later:
+                assert not cec.disabled
+                assert cec.disabled_by is None
+            elif not disabled_by_user:
+                assert not cec.disabled
+                assert cec.disabled_by is None
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    def test_set_external_source_export_countries_delete_countries(self):
+        """
+        In this test we remove all external-source countries (set it to []),
+        and see what happens to existing countries.
+
+        External sources import should only be able to delete external-source
+        countries.
+        """
+        company_1 = CompanyFactory()
+        user = AdviserFactory()
+        countries = list(Country.objects.order_by('?')[:6])
+        # This one has been disabled (deleted) by a user,
+        # that should remain, but we should also lose the external source.
+        user_disabled_external_cec = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[0],
+            sources=[EXTERNAL_SOURCE],
+            disabled=True,
+            disabled_by=user,
+        )
+        # This one has been disabled but not by a user.
+        # Again, no change to that, but we lose the external source.
+        CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[1],
+            sources=[USER_SOURCE, EXTERNAL_SOURCE],
+            disabled=True,
+            disabled_by=None,
+        )
+
+        # These two are user source, so cannot be deleted, but the second
+        # one will lose its external source.
+        user_source_cec_1 = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[2],
+            sources=[USER_SOURCE],
+            disabled=False,
+        )
+        user_source_cec_2 = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[3],
+            sources=[USER_SOURCE, EXTERNAL_SOURCE],
+            disabled=False,
+        )
+        # These two are not user source, so will be deleted and lose their
+        # external source.
+        CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[4],
+            sources=[EXTERNAL_SOURCE],
+            disabled=False,
+        )
+        CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[5],
+            sources=[],
+            disabled=False,
+        )
+        company_1.set_external_source_export_countries([])
+        export_countries = company_1.unfiltered_export_countries.all()
+        assert (
+            set(export_country.country for export_country in export_countries)
+            == set(countries)
+        )
+        for export_country in export_countries:
+            assert EXTERNAL_SOURCE not in export_country.sources
+            if export_country in {user_source_cec_1, user_source_cec_2}:
+                assert export_country.disabled is False
+            else:
+                assert export_country.disabled is True
+            if export_country == user_disabled_external_cec:
+                assert export_country.disabled_by == user
+            else:
+                assert export_country.disabled_by is None
+
+    @pytest.mark.export_countries
+    @pytest.mark.external_export_countries
+    @pytest.mark.parametrize('prefetch', [True, False, 'partial'])
+    def test_set_external_source_export_countries_some_added_some_removed(self, prefetch):
+        """
+        Test adding some new countries, removing some countries, undeleting some,
+        leaving some alone.
+        """
+        company_1 = CompanyFactory()
+        user = AdviserFactory()
+        countries = list(Country.objects.order_by('?')[:9])
+
+        # This one unmentioned, but it is untouched because not external source.
+        user_source_removed = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[0],
+            sources=[USER_SOURCE],
+            disabled=False,
+        )
+        # This one unmentioned, and so it will be disabled.
+        external_source_removed = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[1],
+            sources=[EXTERNAL_SOURCE],
+            disabled=False,
+        )
+        # This one unmentioned, it will lose its external source
+        both_source_removed = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[2],
+            sources=[USER_SOURCE, EXTERNAL_SOURCE],
+            disabled=False,
+        )
+        # This one included, will gain an external source
+        no_source_added = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[3],
+            sources=[],
+            disabled=False,
+        )
+        # This one included, will gain an external source
+        user_source_added = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[4],
+            sources=[USER_SOURCE],
+            disabled=False,
+        )
+        # This one included, no effect
+        external_source_readded = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[5],
+            sources=[EXTERNAL_SOURCE],
+            disabled=False,
+        )
+        # This one included, will be undeleted and gain external source
+        undelete = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[6],
+            sources=[],
+            disabled=True,
+        )
+        # This one included, can't be undeleted but will gain external source
+        disabled_on = tz.now()
+        cant_undelete = CompanyExportCountryFactory(
+            company=company_1,
+            country=countries[7],
+            sources=[],
+            disabled=True,
+            disabled_by=user,
+            disabled_on=disabled_on,
+        )
+        # countries[8] is brand new.
+        new_set = countries[3:9]
+
+        companies = Company.objects.filter(id=company_1.id)
+        # Should work regardless of prefetches
+        if prefetch:
+            companies = companies.prefetch_related('unfiltered_export_countries')
+            if prefetch is True:
+                companies = companies.prefetch_related('unfiltered_export_countries__country')
+        companies.first().set_external_source_export_countries([
+            {'country': country, 'source_time': disabled_on}
+            for country in new_set
+        ])
+        export_countries = company_1.unfiltered_export_countries.all()
+        assert set(
+            export_country.country for export_country in export_countries
+        ) == set(countries)
+
+        # No change at all
+        user_source_removed.refresh_from_db()
+        assert user_source_removed.sources == [USER_SOURCE]
+        assert not user_source_removed.disabled
+
+        external_source_removed.refresh_from_db()
+        assert external_source_removed.sources == []
+        assert external_source_removed.disabled
+        assert external_source_removed.disabled_by is None
+
+        # external source removed, but not disabled
+        both_source_removed.refresh_from_db()
+        assert both_source_removed.sources == [USER_SOURCE]
+        assert not both_source_removed.disabled
+
+        no_source_added.refresh_from_db()
+        assert no_source_added.sources == [EXTERNAL_SOURCE]
+        assert not no_source_added.disabled
+
+        user_source_added.refresh_from_db()
+        assert user_source_added.sources == [USER_SOURCE, EXTERNAL_SOURCE]
+        assert not user_source_added.disabled
+
+        external_source_readded.refresh_from_db()
+        assert external_source_readded.sources == [EXTERNAL_SOURCE]
+        assert not external_source_readded.disabled
+
+        undelete.refresh_from_db()
+        assert not undelete.disabled
+        assert undelete.sources == [EXTERNAL_SOURCE]
+
+        cant_undelete.refresh_from_db()
+        assert cant_undelete.disabled
+        assert cant_undelete.sources == [EXTERNAL_SOURCE]
+
+        brand_new = [ec for ec in export_countries if ec.country == countries[8]][0]
+        assert not brand_new.disabled
+        assert brand_new.sources == [EXTERNAL_SOURCE]
+
 
 class TestContact:
     """Tests for the contact model."""
@@ -583,3 +888,146 @@ class TestCompanyExportCountry:
         assert str(cec) == (
             """Acme Corp. interested in Anguilla; Sources: ['user']; Disabled: False"""
         )
+
+    def test_enable_no_user(self):
+        """Test the enable method called with no user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build(disabled=True, disabled_by=user)
+        cec.enable()
+        assert cec.disabled_on is None
+        assert cec.disabled_by is None
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    def test_enable_by_user(self):
+        """Test the enable method called with a user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build(disabled=True, disabled_by=user)
+        cec.enable(user)
+        assert cec.disabled_on is None
+        assert cec.disabled_by is None
+        assert cec.modified_by == user
+        assert cec._dirty
+
+    def test_disable_no_user(self):
+        """Test the disable method called with no user argument"""
+        cec = CompanyExportCountryFactory.build()
+        cec.disable()
+        assert cec.disabled_on is not None
+        assert cec.disabled_by is None
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    def test_disable_by_user(self):
+        """Test the disable method called with a user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build()
+        cec.disable(user)
+        assert cec.disabled_on is not None
+        assert cec.disabled_by == user
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    @pytest.mark.parametrize('existing_sources', [
+        [],
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
+    ])
+    @pytest.mark.parametrize('new_source', [
+        USER_SOURCE,
+        EXTERNAL_SOURCE,
+    ])
+    @pytest.mark.parametrize('disabled,disabled_by_user,source_time_later', [
+        [False, False, False],
+        [True, False, False],
+        [True, False, True],
+        [True, True, False],
+        [True, True, True],
+    ])
+    def test_add_source(
+        self, existing_sources, new_source, disabled, disabled_by_user, source_time_later,
+    ):
+        """Test the add_source method in a variety of circumstances"""
+        cec = CompanyExportCountryFactory.build(
+            sources=copy(existing_sources),
+            disabled=disabled,
+            disabled_by=AdviserFactory.build() if disabled_by_user else None,
+        )
+        source_time = cec.disabled_on
+        if source_time_later:
+            source_time += timedelta(microseconds=1)
+        user = AdviserFactory.build() if new_source == USER_SOURCE else None
+
+        with mock.patch.object(cec, 'enable') as mocked_enable:
+            cec.add_source(new_source, source_time, user=user)
+            if new_source not in existing_sources:
+                assert cec.sources == existing_sources + [new_source]
+                assert cec._dirty
+            else:
+                assert cec.sources == existing_sources
+                assert not hasattr(cec, '_dirty')
+            if disabled and (user or not disabled_by_user or source_time_later):
+                mocked_enable.assert_called_once_with(user)
+            else:
+                mocked_enable.assert_not_called()
+
+    def test_add_user_source_user_required(self):
+        """
+        Test that the user argument is required for the add_source method when the source
+        you are adding is the user source.
+        """
+        cec = CompanyExportCountryFactory.build()
+        with pytest.raises(ValueError):
+            cec.add_source(CompanyExportCountry.SOURCES.user, tz.now())
+
+    @pytest.mark.parametrize('existing_sources', [
+        [],
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
+    ])
+    @pytest.mark.parametrize('remove_source', [
+        USER_SOURCE,
+        EXTERNAL_SOURCE,
+    ])
+    @pytest.mark.parametrize('disabled,disabled_by_user', [
+        [False, False],
+        [True, False],
+        [True, True],
+    ])
+    def test_remove_source(
+        self, existing_sources, remove_source, disabled, disabled_by_user,
+    ):
+        """Test the remove_source method in a variety of circumstances"""
+        cec = CompanyExportCountryFactory.build(
+            sources=copy(existing_sources),
+            disabled=disabled,
+            disabled_by=AdviserFactory.build() if disabled_by_user else None,
+        )
+        user = AdviserFactory.build() if remove_source == USER_SOURCE else None
+        expected_sources = copy(existing_sources)
+        if remove_source in expected_sources:
+            expected_sources.remove(remove_source)
+        with mock.patch.object(cec, 'disable') as mocked_disable:
+            cec.remove_source(remove_source, user=user)
+            assert cec.sources == expected_sources
+            if remove_source in existing_sources:
+                assert cec._dirty
+            else:
+                assert not hasattr(cec, '_dirty')
+            if not disabled and (user or expected_sources == []):
+                mocked_disable.assert_called_once_with(user)
+            else:
+                mocked_disable.assert_not_called()
+
+    def test_remove_user_source_user_required(self):
+        """
+        Test that the user argument is required for the remove_source method when the source
+        you are removing is the user source.
+        """
+        cec = CompanyExportCountryFactory.build()
+        with pytest.raises(ValueError):
+            cec.remove_source(CompanyExportCountry.SOURCES.user)
