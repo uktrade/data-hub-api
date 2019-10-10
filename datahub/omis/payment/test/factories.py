@@ -43,7 +43,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     order = factory.SubFactory(OrderPaidFactory)
     reference = factory.Faker('pystr')
     status = RefundStatus.requested
@@ -64,11 +64,11 @@ class ApprovedRefundFactory(RequestedRefundFactory):
     status = RefundStatus.approved
 
     level1_approved_on = factory.Faker('date_time', tzinfo=utc)
-    level1_approved_by = factory.SubFactory(AdviserFactory)
+    level1_approved_by = factory.SelfAttribute('created_by')
     level1_approval_notes = factory.Faker('text')
 
     level2_approved_on = factory.Faker('date_time', tzinfo=utc)
-    level2_approved_by = factory.SubFactory(AdviserFactory)
+    level2_approved_by = factory.SelfAttribute('created_by')
     level2_approval_notes = factory.Faker('text')
 
     method = constants.PaymentMethod.bacs

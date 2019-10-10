@@ -36,7 +36,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('company')
     trading_names = factory.List([
         factory.Faker('company'),
@@ -155,7 +155,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     title_id = constants.Title.wing_commander.value.id
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
