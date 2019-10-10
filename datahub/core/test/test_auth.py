@@ -16,11 +16,6 @@ class TestPaaSIPAuthentication:
         'get_kwargs,expected_json',
         (
             (
-                # If no X-Forwarded-For header
-                {},
-                {'detail': 'Incorrect authentication credentials.'},
-            ),
-            (
                 # If second-to-last X-Forwarded-For header isn't whitelisted
                 {
                     'HTTP_X_FORWARDED_FOR': '9.9.9.9, 123.123.123.123',
@@ -83,10 +78,15 @@ class TestPaaSIPAuthentication:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {'content': 'paas-ip-test-view'}
 
-    def test_empty_object_returned_with_authentication(self, api_client):
-        """If the Authorization and X-Forwarded-For headers are correct, then
-        the correct data is returned
-        """
+    def test_empty_object_returned_with_no_xff_header(self, api_client):
+        """If the X-Forwarded-For header is missing the correct data is returned."""
+        response = api_client.get(_url())
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {'content': 'paas-ip-test-view'}
+
+    def test_empty_object_returned_with_whitelisted_ip(self, api_client):
+        """If X-Forwarded-For header contains whitelisted IP, then the correct data is returned."""
         response = api_client.get(
             _url(),
             HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
@@ -97,7 +97,7 @@ class TestPaaSIPAuthentication:
 
     def test_paas_ip_check_disabled(self, api_client, settings, caplog):
         """If PaaS IP check is disabled and X-Forwarded-For headers are incorrect, then
-        the correct data is returned
+        the correct data is returned.
         """
         caplog.set_level('WARNING')
 
