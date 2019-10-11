@@ -1,3 +1,16 @@
+# Data Hub API 15.7.0 (2019-10-11)
+
+
+## Features
+
+- **Investment** The rounding of `gross value added` now always rounds up rather than using bankers' rounding where it would round to the nearest even number.
+
+## Internal changes
+
+- The IP check that is being used with Hawk authenticated endpoints was enhanced with additional rules to allow traffic 
+  originating from an internal network.
+
+
 # Data Hub API 15.6.0 (2019-10-10)
 
 
