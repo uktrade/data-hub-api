@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
 from datahub.company.admin.archiving.unarchive import unarchive_company
+from datahub.company.admin.dnb import update_from_dnb
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
@@ -259,6 +260,12 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 self.admin_site.admin_view(partial(unarchive_company, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_unarchive-company',
+            ),
+            path(
+                '<path:object_id>/update-from-dnb/',
+                self.admin_site.admin_view(partial(update_from_dnb, self)),
+                name=f'{model_meta.app_label}_'
+                     f'{model_meta.model_name}_update-from-dnb',
             ),
             *super().get_urls(),
         ]
