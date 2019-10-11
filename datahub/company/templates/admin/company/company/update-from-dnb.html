@@ -30,10 +30,7 @@
       </thead>
       {% for field, value in diff.items %}
       <tr>
-        <td>{{field.verbose_name|capfirst}}</td>
-        {% comment %}
         <td>{{field.verbose_name | capfirst}}</td>
-        {% endcomment %}
         <td>{{value.0}}</td>
         <td>{{value.1}}</td>
       </tr>
