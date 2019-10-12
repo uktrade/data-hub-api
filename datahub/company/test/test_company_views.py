@@ -1123,8 +1123,8 @@ class TestUpdateCompany(APITestMixin):
     @pytest.mark.parametrize(
         'profile_status',
         (
-            'published',
-            'unpublished',
+            Company.GREAT_PROFILE_STATUSES.published,
+            Company.GREAT_PROFILE_STATUSES.unpublished,
             None,
         ),
     )
