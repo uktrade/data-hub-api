@@ -1,3 +1,20 @@
+# Data Hub API 15.8.0 (2019-10-14)
+
+
+## Features
+
+- **Companies** A new permission, `change_regional_account_manager`, was added. This permission currently has no effect and will be used as part of upcoming functionality.
+
+  In the test data, this permission is assigned to teams with the `International Trade Team` role.
+- **Companies** A tool was added to django admin to allow administrators to pull fresh data from DNB for a company with a `duns_number`.
+
+  This allows administrators to resolve the unhappy-path for the new add-a-company journey by adding a `duns_number` to a company record followed by pulling data from DNB for the given company.
+
+## Internal changes
+
+- Migrations for the `mi` database are now applied automatically during deployments.
+
+
 # Data Hub API 15.7.0 (2019-10-11)
 
 
