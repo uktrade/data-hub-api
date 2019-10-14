@@ -211,7 +211,7 @@ class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
         will be generated and saved to the disabled_on field.
         """
         if self.disabled:
-            return factory.Faker('past_date').generate()
+            return factory.Faker('past_datetime', tzinfo=utc).generate()
         else:
             return None
 

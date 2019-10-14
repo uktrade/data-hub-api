@@ -1,5 +1,4 @@
 """Company models."""
-import datetime
 import uuid
 
 from django.conf import settings
@@ -587,7 +586,7 @@ class CompanyExportCountry(BaseModel, DisableableModel):
         Disable by setting disabled_on to current time and disabled_by to `user`.
         `user` should be None if this is not the result of user action.
         """
-        self.disabled_on = datetime.datetime.now()
+        self.disabled_on = now()
         self.disabled_by = user
 
     def enable(self, user=None):
