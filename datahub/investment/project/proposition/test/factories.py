@@ -24,8 +24,8 @@ class PropositionFactory(factory.django.DjangoModelFactory):
     scope = factory.Faker('text')
 
     created_on = now()
-    created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    created_by = factory.SelfAttribute('adviser')
+    modified_by = factory.SelfAttribute('adviser')
 
     class Meta:
         model = Proposition
