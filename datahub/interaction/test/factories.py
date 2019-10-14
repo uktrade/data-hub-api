@@ -55,7 +55,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     """Factory for creating an interaction relating to a company."""
 
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     company = factory.SubFactory(CompanyFactory)
     subject = factory.Faker('sentence', nb_words=8)
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)

@@ -36,7 +36,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     name = factory.Sequence(lambda n: f'name {n}')
     description = factory.Sequence(lambda n: f'desc {n}')
     comments = factory.Faker('text')
