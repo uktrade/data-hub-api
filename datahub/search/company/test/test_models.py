@@ -4,6 +4,7 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country as CountryConstant
+from datahub.search.apps import get_search_app
 from datahub.search.company.models import Company as ESCompany, get_suggestions
 
 pytestmark = pytest.mark.django_db
@@ -15,8 +16,10 @@ class TestCompanyElasticModel:
     def test_company_dbmodel_to_dict(self, es):
         """Tests conversion of db model to dict."""
         company = CompanyFactory()
+        app = get_search_app('company')
+        company_qs = app.queryset.get(pk=company.pk)
 
-        result = ESCompany.db_object_to_dict(company)
+        result = ESCompany.db_object_to_dict(company_qs)
 
         keys = {
             'archived',
@@ -39,6 +42,7 @@ class TestCompanyElasticModel:
             'reference_code',
             'sector',
             'suggest',
+            'latest_interaction_date',
 
             'address',
             'registered_address',
@@ -59,8 +63,10 @@ class TestCompanyElasticModel:
     def test_company_dbmodels_to_es_documents(self, es):
         """Tests conversion of db models to Elasticsearch documents."""
         companies = CompanyFactory.create_batch(2)
+        app = get_search_app('company')
+        companies_qs = app.queryset.all()
 
-        result = ESCompany.db_objects_to_es_documents(companies)
+        result = ESCompany.db_objects_to_es_documents(companies_qs)
 
         assert len(list(result)) == len(companies)
 
