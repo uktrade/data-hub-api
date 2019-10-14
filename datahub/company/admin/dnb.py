@@ -34,86 +34,93 @@ def _format_company_diff(dh_company, dnb_company):
     def get_field(name):
         return dh_company._meta.get_field(name)
 
+    def get_country(address):
+        country = address.get('country')
+        return None if country is None else Country.objects.get(id=country)
+
+    address = dnb_company.get('address') or {}
+    registered_address = dnb_company.get('registered_address') or {}
+
     return {
         get_field('name'): (
             dh_company.name,
-            dnb_company['name'],
+            dnb_company.get('name'),
         ),
         get_field('address_1'): (
             dh_company.address_1,
-            dnb_company['address']['line_1'],
+            address.get('line_1'),
         ),
         get_field('address_2'): (
             dh_company.address_2,
-            dnb_company['address']['line_2'],
+            address.get('line_2'),
         ),
         get_field('address_town'): (
             dh_company.address_town,
-            dnb_company['address']['town'],
+            address.get('town'),
         ),
         get_field('address_county'): (
             dh_company.address_county,
-            dnb_company['address']['county'],
+            address.get('county'),
         ),
         get_field('address_postcode'): (
             dh_company.address_postcode,
-            dnb_company['address']['postcode'],
+            address.get('postcode'),
         ),
         get_field('address_country'): (
             dh_company.address_country,
-            Country.objects.get(id=dnb_company['address']['country']),
+            get_country(address),
         ),
         get_field('registered_address_1'): (
             dh_company.registered_address_1,
-            dnb_company['registered_address']['line_1'],
+            registered_address.get('line_1'),
         ),
         get_field('registered_address_2'): (
             dh_company.registered_address_2,
-            dnb_company['registered_address']['line_2'],
+            registered_address.get('line_2'),
         ),
         get_field('registered_address_town'): (
             dh_company.registered_address_town,
-            dnb_company['registered_address']['town'],
+            registered_address.get('town'),
         ),
         get_field('registered_address_county'): (
             dh_company.registered_address_county,
-            dnb_company['registered_address']['county'],
+            registered_address.get('county'),
         ),
         get_field('registered_address_postcode'): (
             dh_company.registered_address_postcode,
-            dnb_company['registered_address']['postcode'],
+            registered_address.get('postcode'),
         ),
         get_field('registered_address_country'): (
             dh_company.registered_address_country,
-            Country.objects.get(id=dnb_company['registered_address']['country']),
+            get_country(registered_address),
         ),
         get_field('company_number'): (
             dh_company.company_number,
-            dnb_company['company_number'],
+            dnb_company.get('company_number'),
         ),
         get_field('trading_names'): (
             ', '.join(dh_company.trading_names),
-            ', '.join(dnb_company['trading_names']),
+            ', '.join(dnb_company.get('trading_names', [])),
         ),
         get_field('website'): (
             dh_company.website,
-            dnb_company['website'],
+            dnb_company.get('website'),
         ),
         get_field('number_of_employees'): (
             dh_company.number_of_employees,
-            dnb_company['number_of_employees'],
+            dnb_company.get('number_of_employees'),
         ),
         get_field('is_number_of_employees_estimated'): (
             dh_company.is_number_of_employees_estimated,
-            dnb_company['is_number_of_employees_estimated'],
+            dnb_company.get('is_number_of_employees_estimated'),
         ),
         get_field('turnover'): (
             dh_company.turnover,
-            dnb_company['turnover'],
+            dnb_company.get('turnover'),
         ),
         get_field('is_turnover_estimated'): (
             dh_company.is_turnover_estimated,
-            dnb_company['is_turnover_estimated'],
+            dnb_company.get('is_turnover_estimated'),
         ),
     }
 
