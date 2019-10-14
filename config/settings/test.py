@@ -42,6 +42,12 @@ GOVUK_PAY_URL = 'https://payments.example.com/'
 
 INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE = 5 * 1024
 
+# The default password hasher is intentionally slow and slows downs tests
+# See https://docs.djangoproject.com/en/2.2/topics/testing/overview/#password-hashing
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache'

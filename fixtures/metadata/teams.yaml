@@ -458,6 +458,13 @@
       - investor_profile
       - largecapitalinvestorprofile
   model: auth.group
+- fields:
+    name: Regional account managers
+    permissions:
+    - - change_regional_account_manager
+      - company
+      - company
+  model: auth.group
 
 
 # metadata.teamrole
@@ -507,6 +514,7 @@
     disabled_on: null
     groups:
     - - DIT_staff
+    - - Regional account managers
     name: International Trade Team
   model: metadata.teamrole
   pk: 5e329c18-6095-e211-a939-e4115bead28a

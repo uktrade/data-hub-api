@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% trans 'Update from D&B' %}
+</div>
+{% endblock %}
+
+{% block content %}
+  {% if diff %}
+  <p>{% blocktrans %}Please review the changes and confirm if you are happy to proceed:{% endblocktrans %}</p>
+  <br>
+  <table>
+      <thead>
+        <th>Field</th>
+        <th>Current Values</th>
+        <th>New Values</th>
+      </thead>
+      {% for field, value in diff.items %}
+      <tr>
+        <td>{{field.verbose_name | capfirst}}</td>
+        <td>{{value.0}}</td>
+        <td>{{value.1}}</td>
+      </tr>
+      {% endfor %}
+  </table>
+  <br>
+  <form action="" method="post">
+    {% csrf_token %}
+    <div>
+      <input type="submit" value="{% trans 'Confirm' %}">
+    </div>
+  </form>
+  {% else %}
+  <p>Something went wrong. The engineers have been notified. Please contact support if this does not get resolved.</p>
+  {% endif %}
+{% endblock %}
