@@ -38,6 +38,7 @@ class CompanyPermission(StrEnum):
     view_company_timeline = 'view_company_timeline'
     export_company = 'export_company'
     add_company = 'add_company'
+    change_regional_account_manager = 'change_regional_account_manager'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -253,6 +254,10 @@ class Company(ArchivableModel, BaseModel):
             (CompanyPermission.view_company_document.value, 'Can view company document'),
             (CompanyPermission.view_company_timeline.value, 'Can view company timeline'),
             (CompanyPermission.export_company.value, 'Can export company'),
+            (
+                CompanyPermission.change_regional_account_manager.value,
+                'Can change regional account manager',
+            ),
         )
         indexes = [
             # For datasets app which includes API endpoints to be consumed by data-flow
