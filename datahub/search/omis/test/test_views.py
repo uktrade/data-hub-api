@@ -541,17 +541,11 @@ class TestOrderExportView(APITestMixin):
     @classmethod
     @pytest.fixture(scope='class', autouse=True)
     def one_time_setup(
-        self, request, setup_es_for_class, django_db_setup, django_db_blocker,  # noqa: N804
+        cls, request, setup_es_for_class, django_db_for_class,
     ):
         """
-        One time data setup for the class. No tests will modify data so can be re-used.
+        One time data setup for the class. No tests will modify data so can be class-scoped.
         """
-        django_db_blocker.unblock()
-        request.addfinalizer(django_db_blocker.restore)
-        from django.test import TestCase
-        test_case = TestCase(methodName='__init__')
-        test_case._pre_setup()
-        request.addfinalizer(test_case._post_teardown)
         factories = (
             OrderCancelledFactory,
             OrderCompleteFactory,

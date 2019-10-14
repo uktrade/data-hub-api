@@ -161,6 +161,19 @@ def synchronous_on_commit_for_class(monkeyclass):
     monkeyclass.setattr('django.db.transaction.on_commit', _synchronous_on_commit)
 
 
+@pytest.fixture(scope='class')
+def django_db_for_class(request, django_db_setup, django_db_blocker):
+    """
+    Make the db available for use in a class-scoped fixture.
+    """
+    django_db_blocker.unblock()
+    request.addfinalizer(django_db_blocker.restore)
+    from django.test import TestCase
+    test_case = TestCase(methodName='__init__')
+    test_case._pre_setup()
+    request.addfinalizer(test_case._post_teardown)
+
+
 def _synchronous_submit_to_thread_pool(fn, *args, **kwargs):
     fn(*args, **kwargs)
 
