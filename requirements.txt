@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via flake8-bugbear, packaging, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.9.243
-botocore==1.12.243        # via boto3, s3transfer
+boto3==1.9.248
+botocore==1.12.248        # via boto3, s3transfer
 celery[redis]==4.3
 certifi==2019.6.16        # via requests, sentry-sdk
 chardet==3.0.4
@@ -50,7 +50,7 @@ flake8-debugger==3.1.0
 flake8-docstrings==1.5.0
 flake8-import-order==0.18.1
 flake8-polyfill==1.0.2    # via pep8-naming
-flake8-print==3.1.0
+flake8-print==3.1.1
 flake8-quotes==2.1.0
 flake8-string-format==0.2.3
 flake8==3.7.8
@@ -85,7 +85,7 @@ pathtools==0.1.2          # via watchdog
 pep8-naming==0.8.2
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pip-tools==4.1.0
+pip-tools==4.2.0
 piprot==0.9.10
 pluggy==0.12.0            # via pytest
 prompt-toolkit==2.0.9     # via ipython
@@ -108,7 +108,7 @@ pytest==5.2.1
 python-dateutil==2.8.0
 pytz==2019.2              # via celery, django, icalendar
 pyyaml==5.1.2
-redis==3.3.8
+redis==3.3.11
 requests-futures==1.0.0   # via piprot
 requests-mock==1.7.0
 requests==2.22.0

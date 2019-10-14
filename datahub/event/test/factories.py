@@ -14,7 +14,7 @@ class EventFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('text')
     event_type_id = EventType.seminar.value.id
     start_date = factory.Faker('date_object')

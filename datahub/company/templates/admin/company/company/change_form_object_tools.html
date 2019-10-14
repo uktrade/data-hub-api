@@ -16,5 +16,12 @@
     </li>
     {% endif %}
   {% endif %}
+  {% if has_change_permission and original.duns_number %}
+  <li>
+    <a href="{% url opts|admin_urlname:'update-from-dnb' original.pk %}">
+      Update from D&B
+    </a>
+  </li>
+  {% endif %}
 {{block.super}}
 {% endblock %}

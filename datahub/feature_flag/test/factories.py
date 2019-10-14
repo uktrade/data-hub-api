@@ -16,7 +16,7 @@ class FeatureFlagFactory(factory.django.DjangoModelFactory):
 
     created_on = now()
     created_by = factory.SubFactory(AdviserFactory)
-    modified_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
 
     class Meta:
         model = 'feature_flag.FeatureFlag'
