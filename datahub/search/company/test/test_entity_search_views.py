@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 
 import factory
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
@@ -25,6 +26,7 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.models import get_suggestions
@@ -102,6 +104,60 @@ def setup_headquarters_data(es_with_collector):
         name='none',
         headquarter_type_id=None,
     )
+    es_with_collector.flush_and_refresh()
+
+
+@pytest.fixture
+def setup_interactions_data(es_with_collector):
+    """Sets up data for interaction related tests"""
+    company_1 = CompanyFactory(
+        name='abc',
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-04-05T00:00:00Z'),
+        company=company_1,
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-04-06T00:00:00Z'),
+        company=company_1,
+    )
+
+    company_2 = CompanyFactory(
+        name='def',
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-04-05T00:00:00Z'),
+        company=company_2,
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2018-04-10T00:00:00Z'),
+        company=company_2,
+    )
+
+    CompanyFactory(
+        name='ghi',
+    )
+
+    company_4 = CompanyFactory(
+        name='jkl',
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-04-05T00:00:00Z'),
+        company=company_4,
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-12-10T00:00:00Z'),
+        company=company_4,
+    )
+
+    company_5 = CompanyFactory(
+        name='mno',
+    )
+    CompanyInteractionFactory(
+        date=dateutil_parse('2017-04-05T00:00:00Z'),
+        company=company_5,
+    )
+
     es_with_collector.flush_and_refresh()
 
 
@@ -217,6 +273,7 @@ class TestSearch(APITestMixin):
                     'archived_on': None,
                     'archived_reason': None,
                     'suggest': get_suggestions(company),
+                    'latest_interaction_date': None,
                 },
             ],
         }
@@ -605,6 +662,142 @@ class TestSearch(APITestMixin):
             assert [
                 UUID(company['id']) for company in response.data['results']
             ] == ids[start:end]
+
+    @pytest.mark.parametrize(
+        'filters,expected_companies,expected_dates',
+        (
+            # no filter, sort by name
+            (
+                {},
+                ['abc', 'def', 'ghi', 'jkl', 'mno'],
+                [
+                    '2017-04-06T00:00:00+00:00',
+                    '2018-04-10T00:00:00+00:00',
+                    None,
+                    '2017-12-10T00:00:00+00:00',
+                    '2017-04-05T00:00:00+00:00',
+                ],
+            ),
+            # before
+            (
+                {'latest_interaction_date_before': '2017-04-10'},
+                ['abc', 'mno'],
+                [
+                    '2017-04-06T00:00:00+00:00',
+                    '2017-04-05T00:00:00+00:00',
+                ],
+            ),
+            # after
+            (
+                {'latest_interaction_date_after': '2017-05-10'},
+                ['def', 'jkl'],
+                [
+                    '2018-04-10T00:00:00+00:00',
+                    '2017-12-10T00:00:00+00:00',
+                ],
+            ),
+            # between
+            (
+                {
+                    'latest_interaction_date_after': '2017-04-10',
+                    'latest_interaction_date_before': '2018-01-10',
+                },
+                ['jkl'],
+                [
+                    '2017-12-10T00:00:00+00:00',
+                ],
+            ),
+        ),
+    )
+    def test_latest_interaction_filters(
+        self,
+        setup_interactions_data,
+        filters,
+        expected_companies,
+        expected_dates,
+    ):
+        """Tests the response body of a search query."""
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(
+            url,
+            data={
+                **filters,
+                'sortby': 'name',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(expected_companies)
+
+        assert [
+            result['name']
+            for result in response_data['results']
+        ] == expected_companies
+
+        assert [
+            result['latest_interaction_date']
+            for result in response_data['results']
+        ] == expected_dates
+
+    @pytest.mark.parametrize(
+        'sort_by,expected_companies,expected_dates',
+        (
+            # no filter, sort by interaction date
+            (
+                {'sortby': 'latest_interaction_date'},
+                ['ghi', 'mno', 'abc', 'jkl', 'def'],
+                [
+                    None,
+                    '2017-04-05T00:00:00+00:00',
+                    '2017-04-06T00:00:00+00:00',
+                    '2017-12-10T00:00:00+00:00',
+                    '2018-04-10T00:00:00+00:00',
+                ],
+            ),
+            # no filter, sort by interaction date (desc)
+            (
+                {'sortby': 'latest_interaction_date:desc'},
+                ['def', 'jkl', 'abc', 'mno', 'ghi'],
+                [
+                    '2018-04-10T00:00:00+00:00',
+                    '2017-12-10T00:00:00+00:00',
+                    '2017-04-06T00:00:00+00:00',
+                    '2017-04-05T00:00:00+00:00',
+                    None,
+                ],
+            ),
+        ),
+    )
+    def test_latest_interaction_date_sort(
+        self,
+        setup_interactions_data,
+        sort_by,
+        expected_companies,
+        expected_dates,
+    ):
+        """Tests the response body of a search query."""
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(
+            url,
+            data={
+                **sort_by,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(expected_companies)
+
+        assert [
+            result['name']
+            for result in response_data['results']
+        ] == expected_companies
+
+        assert [
+            result['latest_interaction_date']
+            for result in response_data['results']
+        ] == expected_dates
 
 
 class TestCompanyExportView(APITestMixin):

@@ -2,7 +2,6 @@ import pytest
 from elasticsearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.search import elasticsearch
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.models import Company as ESCompany
 from datahub.search.query_builder import (
@@ -10,6 +9,7 @@ from datahub.search.query_builder import (
     get_search_by_entity_query,
     limit_search_query,
 )
+from datahub.search.sync_object import sync_object
 
 
 def test_mapping(es):
@@ -297,6 +297,7 @@ def test_mapping(es):
                     'type': 'keyword',
                 },
                 'website': {'type': 'text'},
+                'latest_interaction_date': {'type': 'date'},
             },
         },
     }
@@ -517,9 +518,7 @@ def test_indexed_doc(es):
     company = CompanyFactory(
         trading_names=['a', 'b'],
     )
-
-    doc = ESCompany.es_document(company)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+    sync_object(CompanySearchApp, company.pk)
 
     es.indices.refresh()
 
@@ -561,4 +560,5 @@ def test_indexed_doc(es):
         'vat_number',
         'duns_number',
         'website',
+        'latest_interaction_date',
     }
