@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -314,6 +314,40 @@ class Company(ArchivableModel, BaseModel):
                 ).values_list('country_id'),
             ).order_by('id'))
 
+    @transaction.atomic
+    def set_user_edited_export_countries(self, user, countries):
+        """
+        Given a list of countries of interest *supplied by the user*,
+        update and delete CompanyExportCountry objects, as necessary.
+
+        Any existing CompanyExportCountries not in countries will be marked as disabled,
+        and have the 'user' source removed.
+        """
+        # Set to keep track of which input countries have been dealt with
+        countries = set(countries)
+
+        for export_country in self.unfiltered_export_countries.select_related('country'):
+            if export_country.country in countries:
+                countries.remove(export_country.country)
+                if export_country.disabled:
+                    # If a list submitted by the user includes a country that was just
+                    # external-source, we don't want to automatically promote that to
+                    # user-source. So we only add_source if the country was previously disabled.
+                    export_country.add_source(CompanyExportCountry.SOURCES.user, user=user)
+            else:
+                export_country.remove_source(CompanyExportCountry.SOURCES.user, user=user)
+
+        for undiscovered_country in countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.user],
+                modified_by=user,
+                created_by=user,
+            )
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
@@ -554,14 +588,20 @@ class CompanyExportCountry(BaseModel, DisableableModel):
         self.disabled_by = None
         self.modified_by = user
 
-    def add_source(self, source, source_time, user=None):
+    def add_source(self, source, source_time=None, user=None):
         """
-        Add a source to the sources list.
-        Conditionally re-enable if disabled.
+        Add a source to the sources list.Conditionally re-enable if disabled.
+        The user argument is required if source is 'user', and the source_time
+        argument is required if the source is NOT 'user'.
         """
         if source == CompanyExportCountry.SOURCES.user and user is None:
             raise ValueError(
                 f'user argument is required if source is {CompanyExportCountry.SOURCES.user}',
+            )
+        if source != CompanyExportCountry.SOURCES.user and source_time is None:
+            raise ValueError(
+                f'source_time argument is required if source is not'
+                f'{CompanyExportCountry.SOURCES.user}',
             )
         _dirty = False
         if source not in self.sources:
