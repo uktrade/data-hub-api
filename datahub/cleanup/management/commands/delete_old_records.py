@@ -69,6 +69,7 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
                 Company._meta.get_field('dnbmatchingresult'),
+                Company._meta.get_field('unfiltered_export_countries'),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just

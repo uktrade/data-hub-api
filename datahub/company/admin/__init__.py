@@ -10,5 +10,6 @@ from importlib import import_module
 import_module('datahub.company.admin.adviser')
 import_module('datahub.company.admin.ch_company')
 import_module('datahub.company.admin.company')
+import_module('datahub.company.admin.company_export_country')
 import_module('datahub.company.admin.contact')
 import_module('datahub.company.admin.metadata')
