@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -22,6 +22,7 @@ from datahub.core.models import (
     BaseConstantModel,
     BaseModel,
     BaseOrderedConstantModel,
+    DisableableModel,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
@@ -284,6 +285,78 @@ class Company(ArchivableModel, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
+    def get_active_future_export_countries(self):
+        """
+        Get a list of unique countries for which there are active (non-deleted)
+        CompanyExportCountr
+        y Objects
+        """
+        if (
+            hasattr(self, '_prefetched_objects_cache')
+            and 'unfiltered_export_countries' in self._prefetched_objects_cache
+        ):
+            # If unfiltered_export_countries has been prefetched, we assume
+            # that unfiltered_export_countries__country has been as well.
+            # If it hasn't then the below will cause N queries to get each country.
+            return sorted([
+                cec.country
+                for cec
+                in self.unfiltered_export_countries.all()
+                if not cec.disabled
+            ], key=lambda c: c.id)
+        else:
+            # An optimised query to get the countries in the case where
+            # the necessary prefetches have not been made.
+            return list(metadata_models.Country.objects.filter(
+                id__in=self.unfiltered_export_countries.filter(
+                    disabled_on=None,
+                ).values_list('country_id'),
+            ).order_by('id'))
+
+    @transaction.atomic
+    def set_user_edited_export_countries(self, user, countries):
+        """
+        Given a list of countries of interest *supplied by the user*,
+        update and delete CompanyExportCountry objects, as necessary.
+
+        Any existing CompanyExportCountries not in countries will be marked as deleted,
+        and have the 'user' source removed. If 'user' is the only source,
+        then the object will be completely removed from DB.
+        """
+        # Set to keep track of which input countries have been dealt with
+        countries = set(countries)
+
+        for cec in self.unfiltered_export_countries.select_related('country'):
+            changed = False
+            if cec.country in countries:
+                countries.remove(cec.country)
+                if cec.disabled:
+                    changed = True
+                    cec.enable()
+                    # Only add user to sources if the user is un-deleting it.
+                    if CompanyExportCountry.SOURCES.user not in cec.sources:
+                        cec.sources.append(CompanyExportCountry.SOURCES.user)
+            else:
+                if not cec.disabled:
+                    cec.disable(user)
+                    changed = True
+                if CompanyExportCountry.SOURCES.user in cec.sources:
+                    cec.sources.remove(CompanyExportCountry.SOURCES.user)
+                    changed = True
+            if changed:
+                cec.modified_by = user
+                cec.save()
+        for undiscovered_country in countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.user],
+                modified_by=user,
+                created_by=user,
+            )
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
@@ -459,3 +532,84 @@ class CompaniesHouseCompany(models.Model):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
+
+
+@reversion.register_base_model()
+class CompanyExportCountry(BaseModel, DisableableModel):
+    """
+    Record that a Company is interested in exporting to a Country.
+    Source can be either 'user', indicating that the country was entered manually
+    by a user on the frontend,
+    or 'external', indicating that the country came in via an import from data science.
+    Data science imports should not be able to remove any user-entered countries,
+    only add to them.
+    On the other hand, the user should be able to override and delete countries that
+    came from data science. When this happens, the 'deleted' field is set to True.
+    """
+
+    SOURCES = Choices(
+        ('user', 'User entered'),
+        ('external', 'External'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.CASCADE,
+        related_name='companies_with_interest',
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='unfiltered_export_countries',
+    )
+    sources = ArrayField(
+        models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=SOURCES),
+    )
+    disabled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+
+    @property
+    def disabled(self):
+        """
+        Return boolean indicating whether country is disabled.
+        """
+        return bool(self.disabled_on)
+
+    def disable(self, user=None):
+        """
+        Disable by setting disabled_on to current time and disabled_by to `user`.
+        `user` should be None if this is not the result of user action.
+        """
+        self.disabled_on = now()
+        self.disabled_by = user
+
+    def enable(self, user=None):
+        """
+        Enable by setting disabled_on and disabled_by to None,
+        and setting modified_by to `user`.
+        """
+        self.disabled_on = None
+        self.disabled_by = None
+        self.modified_by = user
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['country', 'company'],
+                name='unique_country_company',
+            ),
+        ]
+        verbose_name_plural = 'company export countries'
+
+    def __str__(self):
+        """
+        Human readable name
+        """
+        return (
+            f'{self.company} interested in {self.country}; '
+            f'Sources: {self.sources}; Disabled: {self.disabled}'
+        )

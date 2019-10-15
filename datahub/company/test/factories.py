@@ -6,11 +6,21 @@ from django.utils.timezone import now, utc
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Advisor, Company, ExportExperienceCategory
+from datahub.company.models import (
+    Advisor,
+    Company,
+    CompanyExportCountry,
+    ExportExperienceCategory,
+)
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
-from datahub.metadata.models import EmployeeRange, HeadquarterType, TurnoverRange
+from datahub.metadata.models import (
+    Country,
+    EmployeeRange,
+    HeadquarterType,
+    TurnoverRange,
+)
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -190,3 +200,28 @@ class ArchivedContactFactory(ContactFactory):
     archived_on = factory.Faker('past_datetime', tzinfo=utc)
     archived_by = factory.LazyFunction(lambda: random_obj_for_model(Advisor))
     archived_reason = factory.Faker('sentence')
+
+
+class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
+    """CompanyExportCountry Factory"""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    company = factory.SubFactory(CompanyFactory)
+    country = factory.Iterator(Country.objects.all())  # Avoid non-unique errors
+    sources = [CompanyExportCountry.SOURCES.user]
+    disabled = False
+
+    @factory.lazy_attribute
+    def disabled_on(self):
+        """
+        If you pass disabled=True to the factory, then a date in the past
+        will be generated and saved to the disabled_on field.
+        """
+        if self.disabled:
+            return factory.Faker('past_datetime', tzinfo=utc).generate()
+        else:
+            return None
+
+    class Meta:
+        model = 'company.CompanyExportCountry'
+        exclude = ('disabled',)
