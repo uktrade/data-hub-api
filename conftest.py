@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import factory
 import pytest
@@ -6,6 +6,7 @@ from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import CacheHandler
 from django.core.management import call_command
+from django.db import transaction
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
@@ -147,18 +148,10 @@ def synchronous_on_commit(monkeypatch):
 
 
 @pytest.fixture(scope='class')
-def monkeyclass():
-    """Monkeypatch fixture which works in the class scope"""
-    from _pytest.monkeypatch import MonkeyPatch
-    mpatch = MonkeyPatch()
-    yield mpatch
-    mpatch.undo()
-
-
-@pytest.fixture(scope='class')
-def synchronous_on_commit_for_class(monkeyclass):
+def synchronous_on_commit_for_class():
     """synchronous_on_commit fixture which works in the class scope"""
-    monkeyclass.setattr('django.db.transaction.on_commit', _synchronous_on_commit)
+    with patch.object(transaction, 'on_commit', side_effect=_synchronous_on_commit):
+        yield
 
 
 @pytest.fixture(scope='class')
