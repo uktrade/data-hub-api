@@ -14,7 +14,7 @@ from datahub.search.large_investor_profile.models import (
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es_with_signals):
+def test_mapping(es):
     """Test the ES mapping for a large capital investor profile."""
     mapping = Mapping.from_es(
         LargeInvestorProfileSearchApp.es_model.get_write_index(),
@@ -302,7 +302,7 @@ def test_mapping(es_with_signals):
 
 
 @freezegun.freeze_time('2019-01-01')
-def test_indexed_doc(es_with_signals):
+def test_indexed_doc(es):
     """Test the ES data of an Large investor profile."""
     investor_company = CompanyFactory()
 
@@ -313,9 +313,9 @@ def test_indexed_doc(es_with_signals):
     doc = ESLargeInvestorProfile.es_document(large_investor_profile)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
 
-    es_with_signals.indices.refresh()
+    es.indices.refresh()
 
-    indexed_large_investor_profile = es_with_signals.get(
+    indexed_large_investor_profile = es.get(
         index=ESLargeInvestorProfile.get_write_index(),
         doc_type=LargeInvestorProfileSearchApp.name,
         id=large_investor_profile.pk,

@@ -221,7 +221,26 @@ def _es_session(_es_client):
 
 
 @pytest.fixture
-def es_with_signals(_es_session, synchronous_on_commit):
+def es(_es_session):
+    """
+    Function-scoped pytest fixture that:
+
+    - ensures Elasticsearch is available for the test
+    - deletes all documents from Elasticsearch at the end of the test.
+    """
+    yield _es_session
+
+    _es_session.indices.refresh()
+    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
+    _es_session.delete_by_query(
+        indices,
+        body={'query': {'match_all': {}}},
+    )
+    _es_session.indices.refresh()
+
+
+@pytest.fixture
+def es_with_signals(es, synchronous_on_commit):
     """
     Function-scoped pytest fixture that:
 
@@ -233,18 +252,10 @@ def es_with_signals(_es_session, synchronous_on_commit):
     for search_app in get_search_apps():
         search_app.connect_signals()
 
-    yield _es_session
+    yield es
 
     for search_app in get_search_apps():
         search_app.disconnect_signals()
-
-    _es_session.indices.refresh()
-    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
-    _es_session.delete_by_query(
-        indices,
-        body={'query': {'match_all': {}}},
-    )
-    _es_session.indices.refresh()
 
 
 @pytest.fixture
