@@ -189,8 +189,11 @@ def _es_client(worker_id):
 
 
 @pytest.fixture(scope='session')
-def _setup_es_indexes(_es_client):
-    """Sets up ES and makes the client available."""
+def _es_session(_es_client):
+    """
+    Session-scoped fixture that creates Elasticsearch indexes that persist for the entire test
+    session.
+    """
     # Create models in the test index
     for search_app in get_search_apps():
         # Clean up in case of any aborted test runs
@@ -218,23 +221,23 @@ def _setup_es_indexes(_es_client):
 
 
 @pytest.fixture
-def setup_es(_setup_es_indexes, synchronous_on_commit):
+def setup_es(_es_session, synchronous_on_commit):
     """Sets up ES and deletes all the records after each run."""
     for search_app in get_search_apps():
         search_app.connect_signals()
 
-    yield _setup_es_indexes
+    yield _es_session
 
     for search_app in get_search_apps():
         search_app.disconnect_signals()
 
-    _setup_es_indexes.indices.refresh()
+    _es_session.indices.refresh()
     indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
-    _setup_es_indexes.delete_by_query(
+    _es_session.delete_by_query(
         indices,
         body={'query': {'match_all': {}}},
     )
-    _setup_es_indexes.indices.refresh()
+    _es_session.indices.refresh()
 
 
 @pytest.fixture
