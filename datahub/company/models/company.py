@@ -348,6 +348,66 @@ class Company(ArchivableModel, BaseModel):
                 created_by=user,
             )
 
+    def set_external_source_export_countries(self, records):
+        """
+        Given a list of countries *imported from external sources*,
+        their source, and their source time, update and delete CompanyExportCountry objects
+        accordingly.
+
+        The `records` argument should be a list of dictionaries with the following keys:
+            `country`: a metadata.models.Country object
+            `source_time`: a datetime object indicating the time of the source of information.
+        For each country in the input records the following logic will be applied:
+        - If the country doesn't exist already, it will be created with source
+        CompanyExportCountry.SOURCES.external.
+        - If the country does exist already and it doesn't have the external source in `sources`,
+        then that will be added.
+        - If a country does exist already and has been disabled by a user,
+        then disabled_by will be non-null. We only override re-enable the country
+        if the `source_time` is greater than the disabled_on time.
+        - If the country exists and has been disabled but not by a user,
+        then this is just a soft-delete resulting from an external source import that
+        remove a previously present country. The country will be enabled.
+
+        For any countries that exist already but are not present in `records`, then
+        the 'external' source will be removed. If there are no sources left, then the record
+        will be marked as disabled, with disabled_by = None.
+        """
+        input_countries = {}
+        for record in records:
+            if record['country'] not in input_countries:
+                input_countries[record['country']] = record['source_time']
+            else:
+                input_countries[record['country']] = max(
+                    record['source_time'],
+                    input_countries[record['country']],
+                )
+        if (
+            hasattr(self, '_prefetched_objects_cache')
+            and 'unfiltered_export_countries' in self._prefetched_objects_cache
+        ):
+            # If unfiltered_export_countries has been prefetched, we assume
+            # that unfiltered_export_countries__country has been as well.
+            # If it hasn't then the below will cause N queries to get each country.
+            export_countries = self.unfiltered_export_countries.all()
+        else:
+            export_countries = self.unfiltered_export_countries.select_related('country')
+        for export_country in export_countries:
+            if export_country.country in input_countries:
+                source_time = input_countries.pop(export_country.country)
+                export_country.add_source(CompanyExportCountry.SOURCES.external, source_time)
+            else:
+                export_country.remove_source(CompanyExportCountry.SOURCES.external)
+
+        for undiscovered_country in input_countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.external],
+            )
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
