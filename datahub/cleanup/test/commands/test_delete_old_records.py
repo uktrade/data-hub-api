@@ -634,7 +634,7 @@ def test_run(
     relation_factory_kwargs,
     is_expired,
     track_return_values,
-    setup_es,
+    es_with_signals,
 ):
     """Tests the delete_old_records commands for various cases specified by MAPPING above."""
     mapping = MAPPING[model_label]
@@ -666,16 +666,16 @@ def test_run(
     doc_type = search_app.name
     read_alias = search_app.es_model.get_read_alias()
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
     assert model.objects.count() == total_model_records
-    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == total_model_records
+    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
     management.call_command(command, model_label)
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     # Check if the object has been deleted
     assert model.objects.count() == total_model_records - num_expired_records
-    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == (
+    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == (
         total_model_records
         - num_expired_records
     )
@@ -701,7 +701,7 @@ def test_run(
 @pytest.mark.parametrize('model_name,config', delete_old_records.Command.CONFIGS.items())
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
-def test_simulate(model_name, config, track_return_values, setup_es):
+def test_simulate(model_name, config, track_return_values, es_with_signals):
     """
     Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
@@ -715,17 +715,17 @@ def test_simulate(model_name, config, track_return_values, setup_es):
     for _ in range(3):
         _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
     read_alias = search_app.es_model.get_read_alias()
 
     assert model.objects.count() == 3
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
+    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
     management.call_command(command, model_name, simulate=True)
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     # Check which models were deleted prior to the rollback
     return_values = delete_return_value_tracker.return_values
@@ -742,7 +742,7 @@ def test_simulate(model_name, config, track_return_values, setup_es):
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
+    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)

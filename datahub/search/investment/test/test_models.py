@@ -52,7 +52,7 @@ def project_with_max_gross_value_added():
         )
 
 
-def test_investment_project_to_dict(setup_es):
+def test_investment_project_to_dict(es_with_signals):
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
     result = ESInvestmentProject.db_object_to_dict(project)
@@ -149,7 +149,7 @@ def test_investment_project_to_dict(setup_es):
     assert set(result.keys()) == keys
 
 
-def test_investment_project_dbmodels_to_es_documents(setup_es):
+def test_investment_project_dbmodels_to_es_documents(es_with_signals):
     """Tests conversion of db models to Elasticsearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 
@@ -159,7 +159,7 @@ def test_investment_project_dbmodels_to_es_documents(setup_es):
 
 
 def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
-    setup_es,
+    es_with_signals,
     project_with_max_gross_value_added,
 ):
     """

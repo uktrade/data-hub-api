@@ -75,13 +75,13 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
-def test_collector(monkeypatch, setup_es):
+def test_collector(monkeypatch, es_with_signals):
     """
     Test that the collector collects and deletes all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     es_doc = ESSimpleModel.es_document(obj, include_index=False, include_source=False)
 
@@ -126,17 +126,17 @@ def test_collector(monkeypatch, setup_es):
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 0
-    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
+    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
 
     collector.delete_from_es()
 
-    setup_es.indices.refresh()
-    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
+    es_with_signals.indices.refresh()
+    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
-def test_update_es_after_deletions(setup_es):
+def test_update_es_after_deletions(es_with_signals):
     """
     Test that the context manager update_es_after_deletions collects and deletes
     all the django objects deleted.
@@ -145,14 +145,14 @@ def test_update_es_after_deletions(setup_es):
 
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 1
-    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
+    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
 
     with update_es_after_deletions():
         obj.delete()
 
-    setup_es.indices.refresh()
-    assert setup_es.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
+    es_with_signals.indices.refresh()
+    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0

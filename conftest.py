@@ -221,8 +221,15 @@ def _es_session(_es_client):
 
 
 @pytest.fixture
-def setup_es(_es_session, synchronous_on_commit):
-    """Sets up ES and deletes all the records after each run."""
+def es_with_signals(_es_session, synchronous_on_commit):
+    """
+    Function-scoped pytest fixture that:
+
+    - ensures Elasticsearch is available for the test
+    - connects search signal receivers so that Elasticsearch documents are automatically
+    created for model instances saved during the test
+    - deletes all documents from Elasticsearch at the end of the test
+    """
     for search_app in get_search_apps():
         search_app.connect_signals()
 

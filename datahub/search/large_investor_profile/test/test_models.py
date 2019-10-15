@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 class TestLargeInvestorProfileElasticModel:
     """Test for the large investor profile elasticsearch model"""
 
-    def test_large_investor_profile_dbmodel_to_dict(self, setup_es):
+    def test_large_investor_profile_dbmodel_to_dict(self, es_with_signals):
         """Tests conversion of db model to dict."""
         large_investor_profile = LargeCapitalInvestorProfileFactory()
 
@@ -43,7 +43,7 @@ class TestLargeInvestorProfileElasticModel:
         }
         assert set(result.keys()) == keys
 
-    def test_investment_project_dbmodels_to_es_documents(self, setup_es):
+    def test_investment_project_dbmodels_to_es_documents(self, es_with_signals):
         """Tests conversion of db models to Elasticsearch documents."""
         large_profiles = LargeCapitalInvestorProfileFactory.create_batch(2)
 
