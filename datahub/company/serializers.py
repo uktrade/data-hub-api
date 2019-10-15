@@ -272,6 +272,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     future_interest_countries = NestedRelatedField(
         meta_models.Country, many=True, required=False,
+        source='get_active_future_export_countries',
     )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
@@ -395,6 +396,42 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
         field = NestedAdviserWithTeamGeographyField()
         return field.to_representation(global_account_manager)
+
+    def update(self, instance, validated_data):
+        """
+        Updates the Company instance.
+        This override calls the set_user_edited_export_countries method on
+        the instance, after it has been updated with all other fields.
+        """
+        active_future_export_countries = validated_data.pop(
+            'get_active_future_export_countries',
+            None,
+        )
+        super().update(instance, validated_data)
+        if active_future_export_countries is not None:
+            instance.set_user_edited_export_countries(
+                validated_data['modified_by'],
+                active_future_export_countries,
+            )
+        return instance
+
+    def create(self, validated_data):
+        """
+        Creates the Company instance.
+        This override calls the set_user_edited_export_countries method on
+        the instance, after it has been created.
+        """
+        active_future_export_countries = validated_data.pop(
+            'get_active_future_export_countries',
+            None,
+        )
+        instance = super().create(validated_data)
+        if active_future_export_countries is not None:
+            instance.set_user_edited_export_countries(
+                validated_data['created_by'],
+                active_future_export_countries,
+            )
+        return instance
 
     class Meta:
         model = Company

@@ -1,9 +1,11 @@
+from django.contrib.postgres.aggregates import StringAgg
+from django.db.models import OuterRef, Subquery
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
 from config.settings.types import HawkScope
-from datahub.company.models import Company as DBCompany
+from datahub.company.models import Company as DBCompany, CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
@@ -172,15 +174,20 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             default='employee_range__name',
             output_field=CharField(),
         ),
-
         export_to_countries_list=get_string_agg_subquery(
             DBCompany,
             'export_to_countries__name',
         ),
-
-        future_interest_countries_list=get_string_agg_subquery(
-            DBCompany,
-            'future_interest_countries__name',
+        future_interest_countries_list=Subquery(
+            CompanyExportCountry.objects.values(
+                'company_id',
+            ).annotate(
+                names=StringAgg('country__name', ', ', ordering='country__name'),
+            ).filter(
+                company_id=OuterRef('pk'),
+                disabled_on=None,
+            ).values('names'),
+            output_field=CharField(),
         ),
     )
     field_titles = {

@@ -1,7 +1,10 @@
 import pytest
 from elasticsearch_dsl import Mapping
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import (
+    CompanyExportCountryFactory,
+    CompanyFactory,
+)
 from datahub.search import elasticsearch
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.models import Company as ESCompany
@@ -497,6 +500,11 @@ def test_indexed_doc(setup_es):
     company = CompanyFactory(
         trading_names=['a', 'b'],
     )
+    # Need a CompanyExportCountry to show that future_interest_countries
+    # field can be serialized.
+    CompanyExportCountryFactory(
+        company=company,
+    )
 
     doc = ESCompany.es_document(company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
@@ -508,7 +516,6 @@ def test_indexed_doc(setup_es):
         doc_type=CompanySearchApp.name,
         id=company.pk,
     )
-
     assert indexed_company['_id'] == str(company.pk)
     assert indexed_company['_source'].keys() == {
         'archived',
