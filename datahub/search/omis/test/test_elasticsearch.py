@@ -15,7 +15,7 @@ from datahub.search.omis.models import Order as ESOrder
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es_with_signals):
+def test_mapping(es):
     """Test the ES mapping for an order."""
     mapping = Mapping.from_es(OrderSearchApp.es_model.get_write_index(), OrderSearchApp.name)
 
@@ -492,7 +492,7 @@ def test_mapping(es_with_signals):
         OrderPaidFactory,
     ),
 )
-def test_indexed_doc(order_factory, es_with_signals):
+def test_indexed_doc(order_factory, es):
     """Test the ES data of an indexed order."""
     order = order_factory()
     invoice = order.invoice
@@ -500,9 +500,9 @@ def test_indexed_doc(order_factory, es_with_signals):
     doc = ESOrder.es_document(order)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
 
-    es_with_signals.indices.refresh()
+    es.indices.refresh()
 
-    indexed_order = es_with_signals.get(
+    indexed_order = es.get(
         index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk,

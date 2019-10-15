@@ -8,7 +8,7 @@ from datahub.search.query_builder import (
 )
 
 
-def test_mapping(es_with_signals):
+def test_mapping(es):
     """Test the ES mapping for an investment project."""
     mapping = Mapping.from_es(
         ESInvestmentProject.get_write_index(),

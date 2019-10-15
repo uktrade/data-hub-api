@@ -3,7 +3,7 @@ from elasticsearch_dsl import Mapping
 from datahub.search.event import EventSearchApp
 
 
-def test_mapping(es_with_signals):
+def test_mapping(es):
     """Test the ES mapping for an event."""
     mapping = Mapping.from_es(
         EventSearchApp.es_model.get_write_index(),

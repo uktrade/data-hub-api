@@ -12,7 +12,7 @@ from datahub.search.companieshousecompany.models import (
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es_with_signals):
+def test_mapping(es):
     """Test the ES mapping for a companies house company."""
     mapping = Mapping.from_es(
         CompaniesHouseCompanySearchApp.es_model.get_target_index_name(),
@@ -127,16 +127,16 @@ def test_mapping(es_with_signals):
     }
 
 
-def test_indexed_doc(es_with_signals):
+def test_indexed_doc(es):
     """Test the ES data of an indexed companies house company."""
     ch_company = CompaniesHouseCompanyFactory()
 
     doc = ESCompaniesHouseCompany.es_document(ch_company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
 
-    es_with_signals.indices.refresh()
+    es.indices.refresh()
 
-    indexed_ch_company = es_with_signals.get(
+    indexed_ch_company = es.get(
         index=ESCompaniesHouseCompany.get_write_index(),
         doc_type=CompaniesHouseCompanySearchApp.name,
         id=ch_company.pk,
