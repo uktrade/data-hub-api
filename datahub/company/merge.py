@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Company, CompanyExportCountry, Contact
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
@@ -18,6 +18,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
     Order.company.field,
+    CompanyExportCountry.company.field,
 }
 
 

@@ -1,18 +1,30 @@
+from copy import copy
+from datetime import timedelta
+from unittest import mock
+
 import factory
 import pytest
 from django.conf import settings
+from django.utils import timezone as tz
 
-from datahub.company.models import OneListTier
+from datahub.company.models import Company, CompanyExportCountry, OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
+    CompanyExportCountryFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
 )
+from datahub.core import constants
+from datahub.metadata.models import Country
 
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
+
+
+EXTERNAL_SOURCE = CompanyExportCountry.SOURCES.external
+USER_SOURCE = CompanyExportCountry.SOURCES.user
 
 
 class TestCompany:
@@ -201,6 +213,70 @@ class TestCompany:
         actual_global_account_manager = company.get_one_list_group_global_account_manager()
         assert group_global_headquarters.one_list_account_owner == actual_global_account_manager
 
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_empty(self):
+        """
+        Test the get_active_company_export_countries method when there are no
+        CompanyExportCountry objects at all.
+        """
+        company = CompanyFactory()
+        assert list(company.get_active_future_export_countries()) == []
+
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_all_disabled(self):
+        """
+        Test the get_active_company_export_countries method when all of the company's
+        countries of interest are disabled.
+        """
+        company = CompanyFactory()
+        CompanyExportCountryFactory.create_batch(3, company=company, disabled=True)
+        assert list(company.get_active_future_export_countries()) == []
+
+    @pytest.mark.export_countries
+    def test_get_active_company_export_countries_all_for_other_companies(self):
+        """
+        Test the get_active_company_export_countries method when all countries
+        of interest are for another company.
+        """
+        company = CompanyFactory()
+        company_2 = CompanyFactory()
+        CompanyExportCountryFactory.create_batch(3, company=company_2)
+        assert list(company.get_active_future_export_countries()) == []
+
+    @pytest.mark.export_countries
+    @pytest.mark.parametrize('prefetch', [True, False, 'partial'])
+    def test_get_active_company_export_countries_mix(self, prefetch):
+        """
+        Test the get_active_company_export_countries method when there is a mix
+        of sources for the company's countries of interest. (It should have no effect
+        on the output of this method.)
+        """
+        company = CompanyFactory()
+        company_2 = CompanyFactory()
+        cec1 = CompanyExportCountryFactory(
+            company=company, sources=[USER_SOURCE], disabled=False,
+        )
+        cec2 = CompanyExportCountryFactory(
+            company=company, sources=[EXTERNAL_SOURCE], disabled=False,
+        )
+        cec3 = CompanyExportCountryFactory(
+            company=company, sources=[USER_SOURCE, EXTERNAL_SOURCE], disabled=False,
+        )
+        _ = CompanyExportCountryFactory(company=company_2)
+        _ = CompanyExportCountryFactory(company=company, disabled=True)
+        CompanyExportCountryFactory.create_batch(3, company=company, disabled=True)
+
+        companies = Company.objects.filter(id=company.id)
+        # Should work regardless of prefetches
+        if prefetch:
+            companies = companies.prefetch_related('unfiltered_export_countries')
+            if prefetch is True:
+                companies = companies.prefetch_related('unfiltered_export_countries__country')
+
+        assert list(companies[0].get_active_future_export_countries()) == sorted(
+            [cec1.country, cec2.country, cec3.country], key=lambda c: c.name,
+        )
+
 
 class TestContact:
     """Tests for the contact model."""
@@ -232,3 +308,164 @@ class TestContact:
             company=company_factory(),
         )
         assert str(contact) == expected_output
+
+
+@pytest.mark.export_countries
+class TestCompanyExportCountry:
+    """Tests for the CompanyExportCountry model."""
+
+    def test_str(self):
+        """Test the human-friendly string representation of a CompanyExportCountry object."""
+        company = CompanyFactory(name='Acme Corp.')
+        cec = CompanyExportCountryFactory.build(
+            country=Country.objects.get(id=constants.Country.anguilla.value.id),
+            company=company,
+            sources=[USER_SOURCE],
+            disabled=False,
+        )
+        assert str(cec) == (
+            """Acme Corp. interested in Anguilla; Sources: ['user']; Disabled: False"""
+        )
+
+    def test_enable_no_user(self):
+        """Test the enable method called with no user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build(disabled=True, disabled_by=user)
+        cec.enable()
+        assert cec.disabled_on is None
+        assert cec.disabled_by is None
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    def test_enable_by_user(self):
+        """Test the enable method called with a user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build(disabled=True, disabled_by=user)
+        cec.enable(user)
+        assert cec.disabled_on is None
+        assert cec.disabled_by is None
+        assert cec.modified_by == user
+        assert cec._dirty
+
+    def test_disable_no_user(self):
+        """Test the disable method called with no user argument"""
+        cec = CompanyExportCountryFactory.build()
+        cec.disable()
+        assert cec.disabled_on is not None
+        assert cec.disabled_by is None
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    def test_disable_by_user(self):
+        """Test the disable method called with a user argument"""
+        user = AdviserFactory()
+        cec = CompanyExportCountryFactory.build()
+        cec.disable(user)
+        assert cec.disabled_on is not None
+        assert cec.disabled_by == user
+        assert cec.modified_by is None
+        assert cec._dirty
+
+    @pytest.mark.parametrize('existing_sources', [
+        [],
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
+    ])
+    @pytest.mark.parametrize('new_source', [
+        USER_SOURCE,
+        EXTERNAL_SOURCE,
+    ])
+    @pytest.mark.parametrize('disabled,disabled_by_user,source_time_later', [
+        [False, False, False],
+        [True, False, False],
+        [True, False, True],
+        [True, True, False],
+        [True, True, True],
+    ])
+    def test_add_source(
+        self, existing_sources, new_source, disabled, disabled_by_user, source_time_later,
+    ):
+        """Test the add_source method in a variety of circumstances"""
+        cec = CompanyExportCountryFactory.build(
+            sources=copy(existing_sources),
+            disabled=disabled,
+            disabled_by=AdviserFactory.build() if disabled_by_user else None,
+        )
+        source_time = cec.disabled_on
+        if source_time_later:
+            source_time += timedelta(microseconds=1)
+        user = AdviserFactory.build() if new_source == USER_SOURCE else None
+
+        with mock.patch.object(cec, 'enable') as mocked_enable:
+            cec.add_source(new_source, source_time, user=user)
+            if new_source not in existing_sources:
+                assert cec.sources == existing_sources + [new_source]
+                assert cec._dirty
+            else:
+                assert cec.sources == existing_sources
+                assert not hasattr(cec, '_dirty')
+            if disabled and (user or not disabled_by_user or source_time_later):
+                mocked_enable.assert_called_once_with(user)
+            else:
+                mocked_enable.assert_not_called()
+
+    def test_add_user_source_user_required(self):
+        """
+        Test that the user argument is required for the add_source method when the source
+        you are adding is the user source.
+        """
+        cec = CompanyExportCountryFactory.build()
+        with pytest.raises(ValueError):
+            cec.add_source(CompanyExportCountry.SOURCES.user, tz.now())
+
+    @pytest.mark.parametrize('existing_sources', [
+        [],
+        [USER_SOURCE],
+        [EXTERNAL_SOURCE],
+        [USER_SOURCE, EXTERNAL_SOURCE],
+        [EXTERNAL_SOURCE, USER_SOURCE],
+    ])
+    @pytest.mark.parametrize('remove_source', [
+        USER_SOURCE,
+        EXTERNAL_SOURCE,
+    ])
+    @pytest.mark.parametrize('disabled,disabled_by_user', [
+        [False, False],
+        [True, False],
+        [True, True],
+    ])
+    def test_remove_source(
+        self, existing_sources, remove_source, disabled, disabled_by_user,
+    ):
+        """Test the remove_source method in a variety of circumstances"""
+        cec = CompanyExportCountryFactory.build(
+            sources=copy(existing_sources),
+            disabled=disabled,
+            disabled_by=AdviserFactory.build() if disabled_by_user else None,
+        )
+        user = AdviserFactory.build() if remove_source == USER_SOURCE else None
+        expected_sources = copy(existing_sources)
+        if remove_source in expected_sources:
+            expected_sources.remove(remove_source)
+        with mock.patch.object(cec, 'disable') as mocked_disable:
+            cec.remove_source(remove_source, user=user)
+            assert cec.sources == expected_sources
+            if remove_source in existing_sources:
+                assert cec._dirty
+            else:
+                assert not hasattr(cec, '_dirty')
+            if not disabled and (user or expected_sources == []):
+                mocked_disable.assert_called_once_with(user)
+            else:
+                mocked_disable.assert_not_called()
+
+    def test_remove_user_source_user_required(self):
+        """
+        Test that the user argument is required for the remove_source method when the source
+        you are removing is the user source.
+        """
+        cec = CompanyExportCountryFactory.build()
+        with pytest.raises(ValueError):
+            cec.remove_source(CompanyExportCountry.SOURCES.user)
