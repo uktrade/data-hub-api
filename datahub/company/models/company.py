@@ -9,7 +9,7 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
@@ -312,6 +312,97 @@ class Company(ArchivableModel, BaseModel):
                 ).values_list('country_id'),
             ).order_by('id'))
 
+    @transaction.atomic
+    def set_user_edited_export_countries(self, user, countries):
+        """
+        Given a list of countries of interest *supplied by the user*,
+        update and delete CompanyExportCountry objects, as necessary.
+
+        Any existing CompanyExportCountries not in countries will be marked as disabled,
+        and have the 'user' source removed.
+        """
+        # Set to keep track of which input countries have been dealt with
+        countries = set(countries)
+
+        for export_country in self.unfiltered_export_countries.select_related('country'):
+            if export_country.country in countries:
+                countries.remove(export_country.country)
+                if export_country.disabled:
+                    # If a list submitted by the user includes a country that was just
+                    # external-source, we don't want to automatically promote that to
+                    # user-source. So we only add_source if the country was previously disabled.
+                    export_country.add_source(CompanyExportCountry.SOURCES.user, user=user)
+            else:
+                export_country.remove_source(CompanyExportCountry.SOURCES.user, user=user)
+            export_country.save_if_dirty()
+        for undiscovered_country in countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.user],
+                modified_by=user,
+                created_by=user,
+            )
+
+    def set_external_source_export_countries(self, records):
+        """
+        Given a list of countries *imported from external sources*,
+        their source, and their source time, update and delete CompanyExportCountry objects
+        accordingly.
+
+        The `records` argument should be a list of dictionaries with the following keys:
+            `country`: a metadata.models.Country object
+            `source_time`: a datetime object indicating the time of the source of information.
+        For each country in the input records the following logic will be applied:
+        - If the country doesn't exist already, it will be created with source
+        CompanyExportCountry.SOURCES.external.
+        - If the country does exist already and it doesn't have the external source in `sources`,
+        then that will be added.
+        - If a country does exist already and has been disabled by a user,
+        then disabled_by will be non-null. We only override re-enable the country
+        if the `source_time` is greater than the disabled_on time.
+        - If the country exists and has been disabled but not by a user,
+        then this is just a soft-delete resulting from an external source import that
+        remove a previously present country. The country will be enabled.
+
+        For any countries that exist already but are not present in `records`, then
+        the 'external' source will be removed. If there are no sources left, then the record
+        will be marked as disabled, with disabled_by = None.
+        """
+        input_countries = {
+            record['country']: record['source_time']
+            for record
+            in records
+        }
+        if (
+            hasattr(self, '_prefetched_objects_cache')
+            and 'unfiltered_export_countries' in self._prefetched_objects_cache
+        ):
+            # If unfiltered_export_countries has been prefetched, we assume
+            # that unfiltered_export_countries__country has been as well.
+            # If it hasn't then the below will cause N queries to get each country.
+            export_countries = self.unfiltered_export_countries.all()
+        else:
+            export_countries = self.unfiltered_export_countries.select_related('country')
+        for export_country in export_countries:
+            if export_country.country in input_countries:
+                source_time = input_countries.pop(export_country.country)
+                export_country.add_source(CompanyExportCountry.SOURCES.external, source_time)
+            else:
+                export_country.remove_source(CompanyExportCountry.SOURCES.external)
+            export_country.save_if_dirty()
+
+        for undiscovered_country in input_countries:
+            # Country was not discovered in self.unfiltered_export_countries,
+            # so we need to create it now.
+            CompanyExportCountry.objects.create(
+                company=self,
+                country=undiscovered_country,
+                sources=[CompanyExportCountry.SOURCES.external],
+            )
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
@@ -553,14 +644,33 @@ class CompanyExportCountry(BaseModel, DisableableModel):
         self.disabled_by = None
         self.modified_by = user
 
-    def add_source(self, source, source_time, user=None):
+    def add_by_user(self, user):
         """
-        Add a source to the sources list.
-        Conditionally re-enable if disabled.
+        What to do if the user has submitted a form with this country
+        as one of the export countries.
+        1. Enable the country if it was disabled
+        2. Add 'user' to `sources`, only if 1.Z
+        """
+        if self.disabled:
+            self.enable(user)
+            if CompanyExportCountry.SOURCES.user not in self.sources:
+                self.sources.append(CompanyExportCountry.SOURCES.user)
+                self._dirty = True
+
+    def add_source(self, source, source_time=None, user=None):
+        """
+        Add a source to the sources list.Conditionally re-enable if disabled.
+        The user argument is required if source is 'user', and the source_time
+        argument is required if the source is NOT 'user'.
         """
         if source == CompanyExportCountry.SOURCES.user and user is None:
             raise ValueError(
                 f'user argument is required if source is {CompanyExportCountry.SOURCES.user}',
+            )
+        if source != CompanyExportCountry.SOURCES.user and source_time is None:
+            raise ValueError(
+                f'source_time argument is required if source is not'
+                f'{CompanyExportCountry.SOURCES.user}',
             )
         if source not in self.sources:
             self.sources.append(source)
