@@ -21,7 +21,7 @@ pytestmark = pytest.mark.django_db
         CompanyInteractionFactoryWithPolicyFeedback,
     ),
 )
-def test_interaction_to_dict(setup_es, factory_cls):
+def test_interaction_to_dict(es_with_signals, factory_cls):
     """Test converting an interaction to a dict."""
     interaction = factory_cls()
 
@@ -119,7 +119,7 @@ def test_interaction_to_dict(setup_es, factory_cls):
     }
 
 
-def test_service_delivery_to_dict(setup_es):
+def test_service_delivery_to_dict(es_with_signals):
     """Test converting an interaction to a dict."""
     interaction = ServiceDeliveryFactory()
 
@@ -196,7 +196,7 @@ def test_service_delivery_to_dict(setup_es):
     }
 
 
-def test_interactions_to_es_documents(setup_es):
+def test_interactions_to_es_documents(es_with_signals):
     """Test converting 2 orders to Elasticsearch documents."""
     interactions = CompanyInteractionFactory.create_batch(2)
 

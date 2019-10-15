@@ -193,7 +193,7 @@ def test_run(
     dep_factory,
     dep_field_name,
     track_return_values,
-    setup_es,
+    es_with_signals,
 ):
     """
     Test that:
@@ -231,7 +231,7 @@ def test_run(
     # 3 + 1 in case of self-references
     total_model_records = 3 + (1 if dep_factory == model_factory else 0)
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
@@ -239,14 +239,14 @@ def test_run(
     read_alias = search_app.es_model.get_read_alias()
 
     assert model.objects.count() == total_model_records
-    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == total_model_records
+    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
     management.call_command(command, model_name)
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     # Check that the records have been deleted
     assert model.objects.count() == total_model_records - 1
-    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == total_model_records - 1
+    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records - 1
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -265,7 +265,7 @@ def test_run(
 @freeze_time(FROZEN_TIME)
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
-def test_simulate(cleanup_configs, track_return_values, setup_es):
+def test_simulate(cleanup_configs, track_return_values, es_with_signals):
     """
     Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
@@ -281,17 +281,17 @@ def test_simulate(cleanup_configs, track_return_values, setup_es):
     for _ in range(3):
         create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
     read_alias = search_app.es_model.get_read_alias()
 
     assert model.objects.count() == 3
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
+    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
     management.call_command(command, model_name, simulate=True)
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -308,7 +308,7 @@ def test_simulate(cleanup_configs, track_return_values, setup_es):
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
+    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
