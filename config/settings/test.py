@@ -29,6 +29,16 @@ ES_INDEX_SETTINGS = {
     **ES_INDEX_SETTINGS,
     'number_of_shards': 1,
     'number_of_replicas': 0,
+    # Refresh is the process in Elasticsearch that makes newly-indexed documents available for
+    # querying (see
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
+    # for more details).
+    #
+    # Relying on automatic refreshing in tests leads to flakiness, and so all tests that use
+    # Elasticsearch explicitly refresh indices after documents have been added to Elasticsearch.
+    #
+    # This disables automatic refresh in tests to avoid inadvertently relying on it.
+    'refresh_interval': -1,
 }
 DOCUMENT_BUCKET = 'test-bucket'
 AV_V2_SERVICE_URL = 'http://av-service/'
