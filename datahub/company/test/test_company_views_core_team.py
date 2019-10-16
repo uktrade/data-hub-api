@@ -84,6 +84,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
                     'name': global_account_manager.name,
                     'first_name': global_account_manager.first_name,
                     'last_name': global_account_manager.last_name,
+                    'contact_email': global_account_manager.contact_email,
                     'dit_team': {
                         'id': str(global_account_manager.dit_team.pk),
                         'name': global_account_manager.dit_team.name,
@@ -156,6 +157,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
                     'name': adviser.name,
                     'first_name': adviser.first_name,
                     'last_name': adviser.last_name,
+                    'contact_email': adviser.contact_email,
                     'dit_team': {
                         'id': str(adviser.dit_team.pk),
                         'name': adviser.dit_team.name,
