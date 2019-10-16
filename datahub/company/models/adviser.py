@@ -135,5 +135,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     class Meta:
         indexes = [
             models.Index(fields=['first_name', 'last_name']),
+            models.Index(fields=['date_joined', 'id']),
         ]
         verbose_name = 'adviser'
