@@ -305,6 +305,7 @@ class TestGetCompany(APITestMixin):
                 'name': ghq.one_list_account_owner.name,
                 'first_name': ghq.one_list_account_owner.first_name,
                 'last_name': ghq.one_list_account_owner.last_name,
+                'contact_email': ghq.one_list_account_owner.contact_email,
                 'dit_team': {
                     'id': str(ghq.one_list_account_owner.dit_team.id),
                     'name': ghq.one_list_account_owner.dit_team.name,
@@ -511,6 +512,7 @@ class TestGetCompany(APITestMixin):
                 'name': global_account_manager.name,
                 'first_name': global_account_manager.first_name,
                 'last_name': global_account_manager.last_name,
+                'contact_email': global_account_manager.contact_email,
                 'dit_team': {
                     'id': str(global_account_manager.dit_team.id),
                     'name': global_account_manager.dit_team.name,
