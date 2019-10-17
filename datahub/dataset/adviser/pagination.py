@@ -1,7 +1,7 @@
-from rest_framework.pagination import CursorPagination
+from datahub.dataset.core.pagination import DatasetCursorPagination
 
 
-class AdvisersDatasetViewCursorPagination(CursorPagination):
+class AdvisersDatasetViewCursorPagination(DatasetCursorPagination):
     """
     Cursor Pagination for AdvisersDatasetView
     """

@@ -71,6 +71,13 @@ class TestAdviserDatasetViewSet:
         response = api_client.get(self.view_url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_without_whitelisted_ip(self, data_flow_api_client):
+        """Test that making a request without the whitelisted IP returns an error."""
+        data_flow_api_client.set_http_x_forwarded_for('1.1.1.1')
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     def test_success(self, data_flow_api_client):
         """Test that endpoint returns with expected data for a single company"""
         adviser = AdviserFactory()
