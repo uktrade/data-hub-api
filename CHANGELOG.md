@@ -1,3 +1,11 @@
+# Data Hub API 15.9.0 (2019-10-17)
+
+
+## Internal changes
+
+- **Interactions** Various search model fields that were not being used in search queries (i.e. searched, filtered or sorted) are no longer indexed. This improves indexing performance.
+
+
 # Data Hub API 15.8.0 (2019-10-14)
 
 

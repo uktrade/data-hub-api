@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock
 
 import pytest
-from django.db import close_old_connections
+from django.db import close_old_connections, transaction
 
 from datahub.search.apps import get_search_apps
 from datahub.search.signals import disable_search_signal_receivers
@@ -64,10 +64,18 @@ class TestDisableSignalsForModel:
         Test that signal receivers are not disabled for other threads.
 
         This is important when using gevent (e.g. via Gunicorn).
+
+        Note that as this test uses another thread, the usual test transaction and clean-up
+        logic does not kick in. Hence, cleaning up has to be manually handled.
         """
         def _task():
             try:
-                SimpleModel().save()
+                # Ensure a transaction is used
+                transaction.set_autocommit(False)
+                try:
+                    SimpleModel.objects.create()
+                finally:
+                    transaction.rollback()
             finally:
                 close_old_connections()
 
