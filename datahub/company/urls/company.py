@@ -26,6 +26,10 @@ company_archive = CompanyViewSet.as_action_view('archive')
 
 company_unarchive = CompanyViewSet.as_action_view('unarchive')
 
+company_self_assign_account_manager = CompanyViewSet.as_action_view(
+    'self_assign_account_manager',
+)
+
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
@@ -40,6 +44,11 @@ urls = [
     path('company/<uuid:pk>/archive', company_archive, name='archive'),
     path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
     path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
+    path(
+        'company/<uuid:pk>/self-assign-account-manager',
+        company_self_assign_account_manager,
+        name='self-assign-account-manager',
+    ),
     path(
         'company/<uuid:pk>/one-list-group-core-team',
         one_list_group_core_team,

@@ -1,7 +1,8 @@
 """Company and related resources view sets."""
 from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -12,6 +13,7 @@ from datahub.company.models import (
     Advisor,
     CompaniesHouseCompany,
     Company,
+    CompanyPermission,
     Contact,
 )
 from datahub.company.queryset import get_contact_queryset
@@ -22,6 +24,7 @@ from datahub.company.serializers import (
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
+    SelfAssignAccountManagerSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
@@ -32,6 +35,8 @@ from datahub.core.hawk_receiver import (
     HawkScopePermission,
 )
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.permissions import HasPermissions
+from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
@@ -77,6 +82,41 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
     )
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_regional_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def self_assign_account_manager(self, request, *args, **kwargs):
+        """
+        Sets the company to be an international trade adviser-managed One List company, and
+        assigns the authenticated user as the account manager.
+
+        This means:
+
+        - setting the One List tier to 'Tier D - Interaction Trade Adviser Accounts' (using the
+        tier ID, not the name)
+        - setting the authenticated user as the One List account manager (overwriting the
+        existing value)
+
+        The operation is not allowed if:
+
+        - the company is a subsidiary of a One List company
+        - the company is already a One List company on a different tier (i.e. not 'Tier D -
+        Interaction Trade Adviser Accounts')
+        """
+        instance = self.get_object()
+        serializer = SelfAssignAccountManagerSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):
