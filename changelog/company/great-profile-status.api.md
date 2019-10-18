@@ -1,0 +1,1 @@
+`GET /v4/company/<id>`: A new read-only field was added to company model `great_profile_status`. Values for this field are imported from Data Science platform, as a separate exercise. It can have one of the constant values out of `published`, `unpublished` and `null`.
