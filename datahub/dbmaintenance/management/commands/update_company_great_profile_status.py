@@ -14,12 +14,14 @@ class Command(CSVBaseCommand):
     """Command to update Company.great_profile_status."""
 
     def _process_row(self, row, simulate=False, **options):
-        """Process one single row."""
-
+        """
+        Process one single row.
+        """
         pk = parse_uuid(row['datahub_company_id'])
         company = Company.objects.get(pk=pk)
         has_profile = parse_bool(row['has_find_a_supplier_profile'])
         is_published = parse_bool(row['is_published_find_a_supplier'])
+
         profile_status = None
         if has_profile and is_published:
             profile_status = Company.GREAT_PROFILE_STATUSES.published

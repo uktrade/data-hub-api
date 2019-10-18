@@ -1,0 +1,1 @@
+A new dbmaintenance Django command was added to import data from csv format, with three fields `datahub_company_id`, `is_published_find_a_supplier` and `has_find_a_supplier_profile` provided by Data Science platform, into Data Hub comapany model's field, `great_profile_status`.
