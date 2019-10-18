@@ -252,6 +252,17 @@ class Company(ArchivableModel, BaseModel):
         choices=GREAT_PROFILE_STATUSES,
         help_text='Whether this company has a profile and agreed to be published or not',
     )
+    global_ultimate_duns_number = models.CharField(
+        blank=True,
+        help_text='Dun & Bradstreet unique identifier for global ultimate.',
+        max_length=9,
+        validators=[
+            MinLengthValidator(9),
+            MaxLengthValidator(9),
+            integer_validator,
+        ],
+        db_index=True,
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""

@@ -1,0 +1,1 @@
+The `company_company` table now contains `global_ultimate_duns_number` field. This field will be populated by the `duns_number` for the global ultimate of a company. This data is included in the D&B payload.
