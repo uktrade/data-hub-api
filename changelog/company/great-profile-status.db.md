@@ -1,1 +1,0 @@
-A nullable `great_profile_status` varchar(255) column was added to the company_company table with possible values 'published', 'unpublished' and NULL.
