@@ -46,6 +46,7 @@ def dnb_response():
                         'registration_type': 'uk_companies_house_number',
                     },
                 ],
+                'global_ultimate_duns_number': '987654321',
             },
         ],
     }
