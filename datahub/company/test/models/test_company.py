@@ -122,6 +122,7 @@ class TestDNBInvestigationData:
     'duns_number,global_ultimate_duns_number,expected_is_global_ultimate',
     (
         ('', '', False),
+        (None, '', False),
         ('123456789', '123456789', True),
         ('999999999', '123456789', False),
     ),
