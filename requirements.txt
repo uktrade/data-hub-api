@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via flake8-bugbear, packaging, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.9.248
-botocore==1.12.248        # via boto3, s3transfer
+boto3==1.9.253
+botocore==1.12.253        # via boto3, s3transfer
 celery[redis]==4.3
 certifi==2019.6.16        # via requests, sentry-sdk
 chardet==3.0.4
