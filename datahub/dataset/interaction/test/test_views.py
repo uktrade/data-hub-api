@@ -55,6 +55,7 @@ def get_expected_data_from_interaction(interaction):
             if interaction.grant_amount_offered is not None
             else None
         ),
+        'id': str(interaction.id),
         'interaction_link': interaction.get_absolute_url(),
         'investment_project_id': (
             str(interaction.investment_project_id)
