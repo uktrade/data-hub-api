@@ -1,35 +1,15 @@
-from rest_framework.views import APIView
-
-from config.settings.types import HawkScope
 from datahub.company.models import Company
-from datahub.core.hawk_receiver import (
-    HawkAuthentication,
-    HawkResponseSigningMixin,
-    HawkScopePermission,
-)
-from datahub.dataset.company.pagination import CompaniesDatasetViewCursorPagination
+from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
-class CompaniesDatasetView(HawkResponseSigningMixin, APIView):
+class CompaniesDatasetView(BaseDatasetView):
     """
     A GET API view to return the data for all companies as required
     for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.
     """
-
-    authentication_classes = (HawkAuthentication, )
-    permission_classes = (HawkScopePermission, )
-    required_hawk_scope = HawkScope.data_flow_api
-    pagination_class = CompaniesDatasetViewCursorPagination
-
-    def get(self, request):
-        """Endpoint which serves all records for the Companies Dataset"""
-        dataset = self.get_dataset()
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self):
         """Returns list of Company records"""
