@@ -387,6 +387,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'county': dnb_company.get('registered_address_county') or '',
             'postcode': dnb_company.get('registered_address_postcode') or '',
         } if required_registered_address_fields_present else None
+        is_global_ultimate = True if (
+            dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
+        ) else False
 
         assert company == {
             'name': dnb_company['primary_name'],
@@ -440,6 +443,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'contacts': [],
             'pending_dnb_investigation': False,
             'global_ultimate_duns_number': dnb_company['global_ultimate_duns_number'],
+            'is_global_ultimate': is_global_ultimate,
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)

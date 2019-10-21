@@ -443,6 +443,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'pending_dnb_investigation',
             'export_potential',
             'great_profile_status',
+            'is_global_ultimate',
         )
         read_only_fields = (
             'archived',
@@ -459,6 +460,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'pending_dnb_investigation',
             'export_potential',
             'great_profile_status',
+            'is_global_ultimate',
         )
         dnb_read_only_fields = (
             'name',
