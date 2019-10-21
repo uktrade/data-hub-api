@@ -55,7 +55,7 @@ def pytest_generate_tests(metafunc):
         for view_id, mapping in registry.mappings.items():
             with suppress(FieldDoesNotExist):
                 mapping.model._meta.get_field('order')  # check if model has field order
-                view_data.append((view_id, mapping.queryset))
+                view_data.append((f'api-v4:metadata:{view_id}', mapping.queryset))
 
         metafunc.parametrize(
             'ordered_mapping',
@@ -236,7 +236,7 @@ def test_team_view(metadata_client):
 
 
 class TestServiceView:
-    """Tests for the /metadata/service/ view."""
+    """Tests for the /v4/metadata/service view."""
 
     def test_list(self, metadata_client):
         """
