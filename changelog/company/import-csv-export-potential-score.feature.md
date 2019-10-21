@@ -1,1 +1,0 @@
-A new dbmaintenance Django command was added to import data from csv format, with two fields `datahub_company_id` and `export_propensity` provided by Data Science platform, into Data Hub comapany model.
