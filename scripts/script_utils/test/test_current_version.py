@@ -1,4 +1,4 @@
-import builtins  # noqa: T100
+import builtins
 import io
 from unittest.mock import Mock
 
