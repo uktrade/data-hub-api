@@ -13,43 +13,38 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(es_with_signals):
+def setup_data(es_with_collector):
     """Sets up data for the tests."""
-    companies = (
-        CompaniesHouseCompanyFactory(
-            name='Pallas',
-            company_number='111',
-            incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
-            registered_address_postcode='SW1A 1AA',
-            company_status='jumping',
-        ),
-        CompaniesHouseCompanyFactory(
-            name='Jaguarundi',
-            company_number='222',
-            incorporation_date=dateutil_parse('2015-09-12T00:00:00Z'),
-            registered_address_postcode='E1 6JE',
-            company_status='sleeping',
-        ),
-        CompaniesHouseCompanyFactory(
-            name='Cheetah',
-            company_number='333',
-            incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
-            registered_address_postcode='SW1A 0PW',
-            company_status='purring',
-        ),
-        CompaniesHouseCompanyFactory(
-            name='Pallas Second',
-            company_number='444',
-            incorporation_date=dateutil_parse('2019-09-12T00:00:00Z'),
-            registered_address_postcode='WC1B 3DG',
-            company_status='crying',
-        ),
+    CompaniesHouseCompanyFactory(
+        name='Pallas',
+        company_number='111',
+        incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
+        registered_address_postcode='SW1A 1AA',
+        company_status='jumping',
+    )
+    CompaniesHouseCompanyFactory(
+        name='Jaguarundi',
+        company_number='222',
+        incorporation_date=dateutil_parse('2015-09-12T00:00:00Z'),
+        registered_address_postcode='E1 6JE',
+        company_status='sleeping',
+    )
+    CompaniesHouseCompanyFactory(
+        name='Cheetah',
+        company_number='333',
+        incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
+        registered_address_postcode='SW1A 0PW',
+        company_status='purring',
+    )
+    CompaniesHouseCompanyFactory(
+        name='Pallas Second',
+        company_number='444',
+        incorporation_date=dateutil_parse('2019-09-12T00:00:00Z'),
+        registered_address_postcode='WC1B 3DG',
+        company_status='crying',
     )
 
-    for company in companies:
-        sync_object(CompaniesHouseCompanySearchApp, company.pk)
-
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 class TestSearchCompaniesHouseCompany(APITestMixin):
@@ -113,7 +108,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         assert len(response_data['results']) == len(expected_results)
         assert actual_results == expected_results
 
-    def test_response_body(self, es_with_signals):
+    def test_response_body(self, es):
         """Tests the response body of a search query."""
         company = CompaniesHouseCompanyFactory(
             name='Pallas',
@@ -122,7 +117,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
             company_status='jumping',
         )
         sync_object(CompaniesHouseCompanySearchApp, company.pk)
-        es_with_signals.indices.refresh()
+        es.indices.refresh()
 
         url = reverse('api-v4:search:companieshousecompany')
         response = self.api_client.post(url)

@@ -16,7 +16,7 @@ from datahub.interaction.test.factories import (
 class TestDashboard(APITestMixin):
     """Dashboard test case."""
 
-    def test_intelligent_homepage(self, es_with_signals):
+    def test_intelligent_homepage(self, es_with_collector):
         """Intelligent homepage."""
         datetimes = [datetime(year, 1, 1) for year in range(2015, 2030)]
         interactions = []
@@ -30,7 +30,7 @@ class TestDashboard(APITestMixin):
                 interactions.append(interaction)
                 contacts.append(ContactFactory(created_by=self.user))
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('dashboard:intelligent-homepage')
         response = self.api_client.get(url)
@@ -58,12 +58,12 @@ class TestDashboard(APITestMixin):
         assert isinstance(actual_first_interaction['company'], dict)
         assert actual_first_interaction['company']['name'] == interactions[-1].company.name
 
-    def test_intelligent_homepage_limit(self, es_with_signals):
+    def test_intelligent_homepage_limit(self, es_with_collector):
         """Test the limit param."""
         CompanyInteractionFactory.create_batch(15, dit_participants__adviser=self.user)
         ContactFactory.create_batch(15, created_by=self.user)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('dashboard:intelligent-homepage')
         response = self.api_client.get(
@@ -78,7 +78,7 @@ class TestDashboard(APITestMixin):
         assert len(response_data['contacts']) == 10
         assert len(response_data['interactions']) == 10
 
-    def test_contact_permission(self, es_with_signals):
+    def test_contact_permission(self, es_with_collector):
         """Test that the contact view permission is enforced."""
         requester = create_test_user(
             permission_codenames=(InteractionPermission.view_all,),
@@ -86,7 +86,7 @@ class TestDashboard(APITestMixin):
         CompanyInteractionFactory.create_batch(5, dit_participants__adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         api_client = self.create_api_client(user=requester)
 
@@ -103,7 +103,7 @@ class TestDashboard(APITestMixin):
         assert response_data['contacts'] == []
         assert len(response_data['interactions']) == 5
 
-    def test_interaction_permission(self, es_with_signals):
+    def test_interaction_permission(self, es_with_collector):
         """Test that the interaction view permission is enforced."""
         requester = create_test_user(
             permission_codenames=('view_contact',),
@@ -111,7 +111,7 @@ class TestDashboard(APITestMixin):
         InteractionDITParticipantFactory.create_batch(5, adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         api_client = self.create_api_client(user=requester)
 
