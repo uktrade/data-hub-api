@@ -1,3 +1,4 @@
+from django.db.models import F
 from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
@@ -9,11 +10,11 @@ from datahub.core.hawk_receiver import (
 )
 from datahub.dataset.company_future_interest_countries.pagination import \
     CompanyFutureInterestCountriesDatasetViewCursorPagination
-from django.db.models import F
+
 
 class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIView):
     """
-    A GET API view to return the data for all company future countries of interest 
+    A GET API view to return the data for all company future countries of interest
     as required for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.
@@ -33,12 +34,11 @@ class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIVie
 
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
-
         return Company.objects.annotate(
             country_name=F('future_interest_countries__name'),
-            iso_alpha2_code=F('future_interest_countries__iso_alpha2_code')
+            iso_alpha2_code=F('future_interest_countries__iso_alpha2_code'),
         ).values(
             'id',
             'country_name',
-            'iso_alpha2_code'
+            'iso_alpha2_code',
         )

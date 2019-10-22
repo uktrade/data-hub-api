@@ -15,7 +15,7 @@ urlpatterns = [
     path(
         'companies-future-interest-countries-dataset',
         CompanyFutureInterestCountriesDatasetView.as_view(),
-        name='companies-dataset'
+        name='companies-dataset',
     ),
     path('interactions-dataset', InteractionsDatasetView.as_view(), name='interactions-dataset'),
 ]
