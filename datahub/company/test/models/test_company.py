@@ -14,7 +14,9 @@ from datahub.core.constants import (
 from datahub.core.test_utils import APITestMixin
 
 
-@pytest.mark.django_db
+pytestmark = pytest.mark.django_db
+
+
 class TestPendingDNBInvestigation(APITestMixin):
     """
     Test if the `pending_dnb_investigation` field is set to False
@@ -80,7 +82,6 @@ class TestPendingDNBInvestigation(APITestMixin):
         assert not company.pending_dnb_investigation
 
 
-@pytest.mark.django_db
 class TestDNBInvestigationData:
     """
     Test `dnb_investigation_data`.
@@ -115,3 +116,24 @@ class TestDNBInvestigationData:
         company = CompanyFactory(dnb_investigation_data=investigation_data)
         db_company = Company.objects.get(id=company.id)
         assert db_company.dnb_investigation_data == investigation_data
+
+
+@pytest.mark.parametrize(
+    'duns_number,global_ultimate_duns_number,expected_is_global_ultimate',
+    (
+        ('', '', False),
+        (None, '', False),
+        ('123456789', '123456789', True),
+        ('999999999', '123456789', False),
+    ),
+)
+def test_is_global_ultimate(duns_number, global_ultimate_duns_number, expected_is_global_ultimate):
+    """
+    Test that the `Company.is_global_ultimate` property returns the correct response
+    for a variety of scenarios.
+    """
+    company = CompanyFactory(
+        duns_number=duns_number,
+        global_ultimate_duns_number=global_ultimate_duns_number,
+    )
+    assert company.is_global_ultimate == expected_is_global_ultimate
