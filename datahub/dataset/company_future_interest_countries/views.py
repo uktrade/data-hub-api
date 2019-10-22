@@ -9,7 +9,7 @@ from datahub.core.hawk_receiver import (
 )
 from datahub.dataset.company_future_interest_countries.pagination import \
     CompanyFutureInterestCountriesDatasetViewCursorPagination
-
+from django.db.models import F
 
 class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIView):
     """
@@ -25,48 +25,20 @@ class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIVie
     pagination_class = CompanyFutureInterestCountriesDatasetViewCursorPagination
 
     def get(self, request):
-        """Endpoint which serves all records for the Companies Dataset"""
+        """Endpoint which serves all records for the Company Future Interest Countries dataset"""
         dataset = self.get_dataset()
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(dataset, request, view=self)
         return paginator.get_paginated_response(page)
 
     def get_dataset(self):
-        """Returns list of Company records"""
-        return Company.objects.values('id', 'future_interest_countries')
+        """Returns list of Company Future Interest Countries  records"""
 
-    
-        # return Company.objects.annotate(
-        #     sector_name=get_sector_name_subquery('sector'),
-        # ).values(
-        #     'address_1',
-        #     'address_2',
-        #     'address_county',
-        #     'address_postcode',
-        #     'address_town',
-        #     'business_type__name',
-        #     'company_number',
-        #     'created_on',
-        #     'description',
-        #     'duns_number',
-        #     'export_experience_category__name',
-        #     'id',
-        #     'is_number_of_employees_estimated',
-        #     'is_turnover_estimated',
-        #     'name',
-        #     'number_of_employees',
-        #     'one_list_tier__name',
-        #     'reference_code',
-        #     'registered_address_1',
-        #     'registered_address_2',
-        #     'registered_address_country__name',
-        #     'registered_address_county',
-        #     'registered_address_postcode',
-        #     'registered_address_town',
-        #     'sector_name',
-        #     'trading_names',
-        #     'turnover',
-        #     'uk_region__name',
-        #     'vat_number',
-        #     'website',
-        # )
+        return Company.objects.annotate(
+            country_name=F('future_interest_countries__name'),
+            iso_alpha2_code=F('future_interest_countries__iso_alpha2_code')
+        ).values(
+            'id',
+            'country_name',
+            'iso_alpha2_code'
+        )
