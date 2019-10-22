@@ -308,6 +308,15 @@ class Company(ArchivableModel, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
+    @property
+    def is_global_ultimate(self):
+        """
+        Whether this company is the global ultimate or not.
+        """
+        if not self.duns_number:
+            return False
+        return self.duns_number == self.global_ultimate_duns_number
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
