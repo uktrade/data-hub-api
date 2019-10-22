@@ -10,5 +10,10 @@ urlpatterns = [
     path('omis-dataset', OMISDatasetView.as_view(), name='omis-dataset'),
     path('contacts-dataset', ContactsDatasetView.as_view(), name='contacts-dataset'),
     path('companies-dataset', CompaniesDatasetView.as_view(), name='companies-dataset'),
+    path(
+        'companies-future-interest-countries-dataset',
+        CompaniesDatasetView.as_view(),
+        name='companies-dataset'
+    ),
     path('interactions-dataset', InteractionsDatasetView.as_view(), name='interactions-dataset'),
 ]
