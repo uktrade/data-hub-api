@@ -330,7 +330,7 @@ class TestGetCompany(APITestMixin):
             'transferred_to': None,
             'transfer_reason': '',
             'pending_dnb_investigation': False,
-            'is_global_ultimate': False,
+            'is_global_ultimate': company.is_global_ultimate,
         }
 
     def test_get_company_without_country(self):
