@@ -14,13 +14,13 @@ from datahub.search.query_builder import (
 pytestmark = pytest.mark.django_db
 
 
-def test_investment_project_auto_sync_to_es(setup_es):
+def test_investment_project_auto_sync_to_es(es_with_signals):
     """Tests if investment project gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_project'
     InvestmentProjectFactory(
         name=test_name,
     )
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     result = get_search_by_entity_query(
         InvestmentProject,
@@ -31,13 +31,13 @@ def test_investment_project_auto_sync_to_es(setup_es):
     assert result.hits.total == 1
 
 
-def test_investment_project_auto_updates_to_es(setup_es):
+def test_investment_project_auto_updates_to_es(es_with_signals):
     """Tests if investment project gets synced to Elasticsearch."""
     project = InvestmentProjectFactory()
     new_test_name = 'even_harder_to_find_investment_project'
     project.name = new_test_name
     project.save()
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     result = get_search_by_entity_query(
         InvestmentProject,
@@ -54,9 +54,9 @@ def team_member():
     yield InvestmentProjectTeamMemberFactory(role='Co-ordinator')
 
 
-def test_investment_project_team_member_added_sync_to_es(setup_es, team_member):
+def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_member):
     """Tests if investment project gets synced to Elasticsearch when a team member is added."""
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     results = get_search_by_entity_query(
         InvestmentProject,
@@ -71,12 +71,12 @@ def test_investment_project_team_member_added_sync_to_es(setup_es, team_member):
     assert result['team_members'][0]['id'] == str(team_member.adviser.id)
 
 
-def test_investment_project_team_member_updated_sync_to_es(setup_es, team_member):
+def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team_member):
     """Tests if investment project gets synced to Elasticsearch when a team member is updated."""
     new_adviser = AdviserFactory()
     team_member.adviser = new_adviser
     team_member.save()
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     results = get_search_by_entity_query(
         InvestmentProject,
@@ -91,10 +91,10 @@ def test_investment_project_team_member_updated_sync_to_es(setup_es, team_member
     assert result['team_members'][0]['id'] == str(new_adviser.id)
 
 
-def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member):
+def test_investment_project_team_member_deleted_sync_to_es(es_with_signals, team_member):
     """Tests if investment project gets synced to Elasticsearch when a team member is deleted."""
     team_member.delete()
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     results = get_search_by_entity_query(
         InvestmentProject,
@@ -117,7 +117,7 @@ def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member
         'project_assurance_adviser',
     ),
 )
-def test_investment_project_syncs_when_adviser_changes(setup_es, field):
+def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
     """
     Tests that when an adviser is updated, investment projects related to that adviser are
     resynced.
@@ -128,7 +128,7 @@ def test_investment_project_syncs_when_adviser_changes(setup_es, field):
     adviser.dit_team = TeamFactory()
     adviser.save()
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     result = get_search_by_entity_query(
         InvestmentProject,
@@ -141,7 +141,7 @@ def test_investment_project_syncs_when_adviser_changes(setup_es, field):
     assert result.hits[0][field]['dit_team']['name'] == adviser.dit_team.name
 
 
-def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, team_member):
+def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signals, team_member):
     """
     Tests that when an adviser that is a team member of an investment project is updated,
     the related investment project is resynced.
@@ -151,7 +151,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, tea
     adviser.dit_team = TeamFactory()
     adviser.save()
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     result = get_search_by_entity_query(
         InvestmentProject,

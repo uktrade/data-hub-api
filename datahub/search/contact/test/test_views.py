@@ -66,9 +66,9 @@ class TestSearch(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_search_contact(self, setup_es, setup_data):
+    def test_search_contact(self, es_with_signals, setup_data):
         """Tests detailed contact search."""
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         term = 'abc defg'
 
@@ -89,7 +89,7 @@ class TestSearch(APITestMixin):
         contact = response.data['results'][0]
         assert contact['address_country']['id'] == united_kingdom_id
 
-    def test_filter_contact(self, setup_es):
+    def test_filter_contact(self, es_with_signals):
         """Tests matching contact using multiple filters."""
         contact = ContactFactory(
             address_same_as_company=True,
@@ -100,7 +100,7 @@ class TestSearch(APITestMixin):
                 sector_id=Sector.renewable_energy_wind.value.id,
             ),
         )
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -122,7 +122,7 @@ class TestSearch(APITestMixin):
         assert result['company_uk_region']['id'] == contact.company.uk_region_id
         assert result['company_sector']['id'] == contact.company.sector_id
 
-    def test_filter_without_uk_region(self, setup_es):
+    def test_filter_without_uk_region(self, es_with_signals):
         """Tests matching contact without uk_region using multiple filters."""
         company = CompanyFactory(
             registered_address_country_id=Country.united_states.value.id,
@@ -135,7 +135,7 @@ class TestSearch(APITestMixin):
             company=company,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -160,7 +160,12 @@ class TestSearch(APITestMixin):
         'sector_level',
         (0, 1, 2),
     )
-    def test_company_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+    def test_company_sector_descends_filter(
+        self,
+        hierarchical_sectors,
+        es_with_signals,
+        sector_level,
+    ):
         """Test the company_sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -185,7 +190,7 @@ class TestSearch(APITestMixin):
             company=factory.Iterator(other_companies),
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
         body = {
@@ -228,7 +233,7 @@ class TestSearch(APITestMixin):
             ('moine', None),
         ),
     )
-    def test_filter_by_company_name(self, setup_es, name_term, matched_company_name):
+    def test_filter_by_company_name(self, es_with_signals, name_term, matched_company_name):
         """Tests filtering contact by company name."""
         matching_company1 = CompanyFactory(
             name='whiskers and tabby',
@@ -246,7 +251,7 @@ class TestSearch(APITestMixin):
         ContactFactory(company=matching_company2)
         ContactFactory(company=non_matching_company)
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -267,11 +272,11 @@ class TestSearch(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    def test_search_contact_by_partial_name(self, setup_es, setup_data):
+    def test_search_contact_by_partial_name(self, es_with_signals, setup_data):
         """Tests filtering by partially matching name."""
         contact = ContactFactory(first_name='xyzxyz')
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -293,11 +298,11 @@ class TestSearch(APITestMixin):
             False,
         ),
     )
-    def test_search_contact_by_archived(self, setup_es, setup_data, archived):
+    def test_search_contact_by_archived(self, es_with_signals, setup_data, archived):
         """Tests filtering by archived."""
         ContactFactory.create_batch(5, archived=True)
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -316,7 +321,7 @@ class TestSearch(APITestMixin):
         'created_on_exists',
         (True, False),
     )
-    def test_filter_by_created_on_exists(self, setup_es, created_on_exists):
+    def test_filter_by_created_on_exists(self, es_with_signals, created_on_exists):
         """Tests filtering contact by created_on exists."""
         ContactFactory.create_batch(3)
         no_created_on = ContactFactory.create_batch(3)
@@ -324,7 +329,7 @@ class TestSearch(APITestMixin):
             contact.created_on = None
             contact.save()
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
         request_data = {
@@ -342,12 +347,12 @@ class TestSearch(APITestMixin):
             for result in results
         )
 
-    def test_search_contact_by_company_id(self, setup_es, setup_data):
+    def test_search_contact_by_company_id(self, es_with_signals, setup_data):
         """Tests filtering by company id."""
         company = CompanyFactory()
         ContactFactory(company=company)
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -363,12 +368,12 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['company']['id'] == str(company.id)
 
-    def test_search_contact_by_created_by(self, setup_es, setup_data):
+    def test_search_contact_by_created_by(self, es_with_signals, setup_data):
         """Tests filtering by created_by."""
         adviser = AdviserFactory()
         ContactFactory(created_by=adviser)
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -384,12 +389,12 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['created_by']['id'] == str(adviser.id)
 
-    def test_company_name_trigram_filter(self, setup_es):
+    def test_company_name_trigram_filter(self, es_with_signals):
         """Tests edge case of partially matching company name."""
         ContactFactory(
             company=CompanyFactory(name='United States'),
         )
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
@@ -404,9 +409,9 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 0
         assert len(response.data['results']) == 0
 
-    def test_search_contact_no_filters(self, setup_es, setup_data):
+    def test_search_contact_no_filters(self, es_with_signals, setup_data):
         """Tests case where there is no filters provided."""
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
         response = self.api_client.post(url, {})
@@ -414,14 +419,14 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
 
-    def test_search_contact_sort_by_last_name_desc(self, setup_es):
+    def test_search_contact_sort_by_last_name_desc(self, es_with_signals):
         """Tests sorting in descending order."""
         ContactFactory(first_name='test_name', last_name='abcdef')
         ContactFactory(first_name='test_name', last_name='bcdefg')
         ContactFactory(first_name='test_name', last_name='cdefgh')
         ContactFactory(first_name='test_name', last_name='defghi')
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         term = 'test_name'
 
@@ -455,7 +460,7 @@ class TestContactExportView(APITestMixin):
             (ContactPermission.export_contact,),
         ),
     )
-    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+    def test_user_without_permission_cannot_export(self, es_with_signals, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -478,7 +483,7 @@ class TestContactExportView(APITestMixin):
     )
     def test_export(
         self,
-        setup_es,
+        es_with_signals,
         request_sortby,
         orm_ordering,
     ):
@@ -498,7 +503,7 @@ class TestContactExportView(APITestMixin):
             interaction=interaction_with_multiple_teams,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         data = {}
         if request_sortby:
@@ -583,9 +588,9 @@ def _format_interaction_team_names(interaction):
 class TestBasicSearch(APITestMixin):
     """Tests basic search view."""
 
-    def test_basic_search_contacts(self, setup_es, setup_data):
+    def test_basic_search_contacts(self, es_with_signals, setup_data):
         """Tests basic aggregate contacts query."""
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         term = 'abc defg'
 
@@ -604,11 +609,11 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['last_name'] in term
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
 
-    def test_search_contact_has_sector(self, setup_es, setup_data):
+    def test_search_contact_has_sector(self, es_with_signals, setup_data):
         """Tests if contact has a sector."""
         ContactFactory(first_name='sector_testing')
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         term = 'sector_testing'
 
@@ -626,7 +631,7 @@ class TestBasicSearch(APITestMixin):
         sector_name = Sector.aerospace_assembly_aircraft.value.name
         assert sector_name == response.data['results'][0]['company_sector']['name']
 
-    def test_search_contact_has_sector_updated(self, setup_es):
+    def test_search_contact_has_sector_updated(self, es_with_signals):
         """Tests if contact has a correct sector after company update."""
         contact = ContactFactory(first_name='sector_update')
 
@@ -635,7 +640,7 @@ class TestBasicSearch(APITestMixin):
         company.sector_id = Sector.renewable_energy_wind.value.id
         company.save()
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         term = 'sector_update'
 
@@ -653,7 +658,7 @@ class TestBasicSearch(APITestMixin):
         sector_name = Sector.renewable_energy_wind.value.name
         assert sector_name == response.data['results'][0]['company_sector']['name']
 
-    def test_search_contact_has_company_address_updated(self, setup_es):
+    def test_search_contact_has_company_address_updated(self, es_with_signals):
         """Tests if contact has a correct address after company address update."""
         contact = ContactFactory(
             address_same_as_company=True,
@@ -673,7 +678,7 @@ class TestBasicSearch(APITestMixin):
         company.address_country.id = Country.united_kingdom.value.id
         company.save()
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
         response = self.api_client.post(
@@ -694,7 +699,7 @@ class TestBasicSearch(APITestMixin):
         country = contact.company.address_country.name
         assert country == result['address_country']['name']
 
-    def test_search_contact_has_own_address(self, setup_es):
+    def test_search_contact_has_own_address(self, es_with_signals):
         """Tests if contact can have its own address."""
         address = {
             'address_same_as_company': False,
@@ -708,7 +713,7 @@ class TestBasicSearch(APITestMixin):
             **address,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v3:search:contact')
         response = self.api_client.post(
