@@ -7,4 +7,4 @@ class CompanyFutureInterestCountriesDatasetViewCursorPagination(CursorPagination
     """
 
     # ordering = ('company_id', 'country_id')
-    ordering = ('id', 'future_interest_countries', )
+    ordering = ('id', 'future_interest_countries__iso_alpha2_code', )
