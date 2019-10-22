@@ -63,6 +63,27 @@ class TestListCompanies(APITestMixin):
         actual_ids = {result['id'] for result in response_data['results']}
         assert expected_ids == actual_ids
 
+    def test_filter_by_global_ultimate_duns_number(self):
+        """Test filtering by global_ultimat_duns_number."""
+        ultimate_duns = '123456789'
+        subsidiaries = CompanyFactory.create_batch(2, global_ultimate_duns_number=ultimate_duns)
+        CompanyFactory.create_batch(2)
+
+        url = reverse('api-v4:company:collection')
+        response = self.api_client.get(
+            url,
+            data={
+                'global_ultimate_duns_number': ultimate_duns,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(subsidiaries)
+        expected_ids = {str(subsidiary.pk) for subsidiary in subsidiaries}
+        actual_ids = {result['id'] for result in response_data['results']}
+        assert expected_ids == actual_ids
+
     def test_sort_by_name(self):
         """Test sorting by name."""
         companies = CompanyFactory.create_batch(
