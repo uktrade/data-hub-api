@@ -77,7 +77,6 @@ class DNBCompanySerializer(CompanySerializer):
     class Meta(CompanySerializer.Meta):
         read_only_fields = []
         dnb_read_only_fields = []
-        fields = CompanySerializer.Meta.fields + ('global_ultimate_duns_number', )
         validators = (
             RulesBasedValidator(
                 ValidationRule(
