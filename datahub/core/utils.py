@@ -1,6 +1,7 @@
 from enum import Enum
 from itertools import islice
 from logging import getLogger
+from uuid import UUID
 
 import requests
 from django.conf import settings
@@ -44,6 +45,25 @@ class EchoUTF8:
         if isinstance(value, str):
             return value.encode('utf-8')
         return value
+
+
+def force_uuid(value):
+    """
+    Convert value to a UUID if it isn't already and isn't None.
+
+    Useful if you have a value that could be a UUID object or a UUID as a string, but
+    want it to be a UUID in all cases.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, UUID):
+        return value
+
+    if isinstance(value, str):
+        return UUID(value)
+
+    raise TypeError('The value must be None or an instance of str or UUID.')
 
 
 def join_truthy_strings(*args, sep=' '):
