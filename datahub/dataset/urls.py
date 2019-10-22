@@ -13,7 +13,7 @@ urlpatterns = [
     path('contacts-dataset', ContactsDatasetView.as_view(), name='contacts-dataset'),
     path('companies-dataset', CompaniesDatasetView.as_view(), name='companies-dataset'),
     path(
-        'companies-future-interest-countries-dataset',
+        'company-future-interest-countries-dataset',
         CompanyFutureInterestCountriesDatasetView.as_view(),
         name='companies-dataset',
     ),
