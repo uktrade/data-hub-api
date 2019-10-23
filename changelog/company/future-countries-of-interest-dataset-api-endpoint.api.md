@@ -1,1 +1,1 @@
-`GET /v4/dataset/companies-future-interest-countries-dataset`: Added future interest countries dataset endpoint to be consumed by data-flow and used in data-workspace.
+`GET /v4/dataset/companies-future-interest-countries-dataset`: An API endpoint for a dataset of future interest countries was added for consumption by data-flow and data-workspace.
