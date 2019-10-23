@@ -444,6 +444,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_potential',
             'great_profile_status',
             'is_global_ultimate',
+            'global_ultimate_duns_number',
         )
         read_only_fields = (
             'archived',
@@ -461,6 +462,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_potential',
             'great_profile_status',
             'is_global_ultimate',
+            'global_ultimate_duns_number',
         )
         dnb_read_only_fields = (
             'name',
