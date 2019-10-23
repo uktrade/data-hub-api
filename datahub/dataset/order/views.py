@@ -1,19 +1,10 @@
-from rest_framework.views import APIView
-
-from config.settings.types import HawkScope
-from datahub.core.auth import PaaSIPAuthentication
-from datahub.core.hawk_receiver import (
-    HawkAuthentication,
-    HawkResponseSigningMixin,
-    HawkScopePermission,
-)
 from datahub.core.query_utils import get_string_agg_subquery
-from datahub.dataset.order.pagination import OMISDatasetViewCursorPagination
+from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.omis.order.models import Order
 
 
-class OMISDatasetView(HawkResponseSigningMixin, APIView):
+class OMISDatasetView(BaseDatasetView):
     """
     An APIView that provides 'get' action which queries and returns desired fields for OMIS Dataset
     to be consumed by Data-flow periodically. Data-flow uses response result to insert data into
@@ -21,18 +12,6 @@ class OMISDatasetView(HawkResponseSigningMixin, APIView):
     users out of flattened table and let analyst to work on denormalized table to get
     more meaningful insight.
     """
-
-    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission,)
-    required_hawk_scope = HawkScope.data_flow_api
-    pagination_class = OMISDatasetViewCursorPagination
-
-    def get(self, request):
-        """Endpoint which serves all records for OMIS Dataset"""
-        dataset = self.get_dataset()
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self):
         """Returns list of OMIS Dataset records"""

@@ -72,13 +72,14 @@ NestedAdviserWithTeamField = partial(
 )
 
 # like NestedAdviserField but includes dit_team with uk_region and country
-NestedAdviserWithTeamGeographyField = partial(
+NestedAdviserWithEmailAndTeamGeographyField = partial(
     NestedRelatedField,
     'company.Advisor',
     extra_fields=(
         'name',
         'first_name',
         'last_name',
+        'contact_email',
         ('dit_team', TeamWithGeographyField()),
     ),
 )
@@ -393,7 +394,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         global_account_manager = obj.get_one_list_group_global_account_manager()
 
-        field = NestedAdviserWithTeamGeographyField()
+        field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
     class Meta:
@@ -441,6 +442,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'registered_address',
             'pending_dnb_investigation',
             'export_potential',
+            'great_profile_status',
         )
         read_only_fields = (
             'archived',
@@ -456,6 +458,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_number_of_employees_estimated',
             'pending_dnb_investigation',
             'export_potential',
+            'great_profile_status',
         )
         dnb_read_only_fields = (
             'name',
@@ -574,5 +577,5 @@ class PublicCompanySerializer(CompanySerializer):
 class OneListCoreTeamMemberSerializer(serializers.Serializer):
     """One List Core Team Member Serializer."""
 
-    adviser = NestedAdviserWithTeamGeographyField()
+    adviser = NestedAdviserWithEmailAndTeamGeographyField()
     is_global_account_manager = serializers.BooleanField()

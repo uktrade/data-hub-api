@@ -1,3 +1,37 @@
+# Data Hub API 16.0.0 (2019-10-21)
+
+
+## Removals
+
+- The legacy `GET /metadata/*` endpoints were removed. Please use Hawk authenticated `GET /v4/metadata/*` endpoints instead.
+
+## Features
+
+- **Companies** A new dbmaintenance Django command was added to import data from csv format, with two fields `datahub_company_id` and `export_propensity` provided by Data Science platform, into Data Hub comapany model.
+
+## Bug fixes
+
+- Unset cursor pagination `offset_cutoff` on dataset endpoints to fix issue when duplicate `created_on` dates are encountered.
+
+## API
+
+- **Companies** The `GET /company/<uuid:pk>` endpoint's read-only field `one_list_group_global_account_manager` now includes the account manager's contact email address under the `contact_email` field.
+- **Companies** `GET /v4/company/<id>`: A new read-only field was added to company model `great_profile_status`. Values for this field are imported from Data Science platform, as a separate exercise. It can have one of the constant values out of `published`, `unpublished` and `null`.
+- **Companies** Each adviser object returned by `/v4/company/<uuid:pk>/one-list-group-core-team` endpoint now includes a contact email address under the `contact_email` field.
+
+## Database schema
+
+- **Companies** A nullable `great_profile_status` varchar(255) column was added to the company_company table with possible values 'published', 'unpublished' and NULL.
+
+
+# Data Hub API 15.9.0 (2019-10-17)
+
+
+## Internal changes
+
+- **Interactions** Various search model fields that were not being used in search queries (i.e. searched, filtered or sorted) are no longer indexed. This improves indexing performance.
+
+
 # Data Hub API 15.8.0 (2019-10-14)
 
 
