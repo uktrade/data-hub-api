@@ -330,6 +330,7 @@ class TestGetCompany(APITestMixin):
             'transferred_to': None,
             'transfer_reason': '',
             'pending_dnb_investigation': False,
+            'is_global_ultimate': company.is_global_ultimate,
         }
 
     def test_get_company_without_country(self):
@@ -393,6 +394,29 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['pending_dnb_investigation'] == pending_dnb_investigation
+
+    @pytest.mark.parametrize(
+        'is_global_ultimate',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_get_company_global_ultimate(self, is_global_ultimate):
+        """
+        Test that `is_global_ultimate` is set for a company API result
+        as expected.
+        """
+        kwargs = {}
+        if is_global_ultimate:
+            kwargs['duns_number'] = 123456789
+            kwargs['global_ultimate_duns_number'] = 123456789
+        company = CompanyFactory(**kwargs)
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['is_global_ultimate'] == is_global_ultimate
 
     @pytest.mark.parametrize(
         'build_company',
