@@ -49,7 +49,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     required_scopes = (Scope.internal_front_end,)
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ('global_headquarters_id',)
+    filterset_fields = ('global_headquarters_id', 'global_ultimate_duns_number')
     ordering_fields = ('name', 'created_on')
     queryset = Company.objects.select_related(
         'address_country',
