@@ -440,6 +440,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'contacts': [],
             'pending_dnb_investigation': False,
             'global_ultimate_duns_number': dnb_company['global_ultimate_duns_number'],
+            'is_global_ultimate': (
+                dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
+            ),
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
