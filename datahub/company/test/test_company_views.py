@@ -64,9 +64,14 @@ class TestListCompanies(APITestMixin):
         assert expected_ids == actual_ids
 
     def test_filter_by_global_ultimate_duns_number(self):
-        """Test filtering by global_ultimat_duns_number."""
+        """Test filtering by global_ultimate_duns_number."""
         ultimate_duns = '123456789'
+        ultimate_company = CompanyFactory(
+            duns_number=ultimate_duns,
+            global_ultimate_duns_number=ultimate_duns,
+        )
         subsidiaries = CompanyFactory.create_batch(2, global_ultimate_duns_number=ultimate_duns)
+        all_companies = [ultimate_company] + subsidiaries
         CompanyFactory.create_batch(2)
 
         url = reverse('api-v4:company:collection')
@@ -79,10 +84,13 @@ class TestListCompanies(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == len(subsidiaries)
-        expected_ids = {str(subsidiary.pk) for subsidiary in subsidiaries}
-        actual_ids = {result['id'] for result in response_data['results']}
-        assert expected_ids == actual_ids
+        assert response_data['count'] == len(all_companies)
+        expected_ids = {str(company.pk) for company in all_companies}
+        for result_company in response_data['results']:
+            assert result_company['id'] in expected_ids
+            # Ensure that global ultimates are marked correctly
+            if result_company['is_global_ultimate']:
+                assert result_company['id'] == str(ultimate_company.id)
 
     def test_sort_by_name(self):
         """Test sorting by name."""
