@@ -1,18 +1,12 @@
 from django.db.models import F
-from rest_framework.views import APIView
 
-from config.settings.types import HawkScope
 from datahub.company.models import Company
-from datahub.core.hawk_receiver import (
-    HawkAuthentication,
-    HawkResponseSigningMixin,
-    HawkScopePermission,
-)
 from datahub.dataset.company_future_interest_countries.pagination import \
     CompanyFutureInterestCountriesDatasetViewCursorPagination
+from datahub.dataset.core.views import BaseDatasetView
 
 
-class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIView):
+class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
     """
     A GET API view to return the data for all company future countries of interest
     as required for syncing by Data-flow periodically.
@@ -20,17 +14,7 @@ class CompanyFutureInterestCountriesDatasetView(HawkResponseSigningMixin, APIVie
     then be queried to create custom reports for users.
     """
 
-    authentication_classes = (HawkAuthentication, )
-    permission_classes = (HawkScopePermission, )
-    required_hawk_scope = HawkScope.data_flow_api
     pagination_class = CompanyFutureInterestCountriesDatasetViewCursorPagination
-
-    def get(self, request):
-        """Endpoint which serves all records for the Company Future Interest Countries dataset"""
-        dataset = self.get_dataset()
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
