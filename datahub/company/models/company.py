@@ -38,6 +38,8 @@ class CompanyPermission(StrEnum):
     view_company_timeline = 'view_company_timeline'
     export_company = 'export_company'
     add_company = 'add_company'
+    change_company = 'change_company'
+    # Indicates that the user can assign regional One List account managers to companies
     change_regional_account_manager = 'change_regional_account_manager'
 
 
@@ -401,6 +403,12 @@ class Company(ArchivableModel, BaseModel):
         """
         group_global_headquarters = self.get_group_global_headquarters()
         return group_global_headquarters.one_list_account_owner
+
+    def assign_one_list_account_manager_and_tier(self, adviser, one_list_tier_id):
+        """Update the company's One List account manager and tier."""
+        self.one_list_account_owner = adviser
+        self.one_list_tier_id = one_list_tier_id
+        self.save()
 
 
 class OneListCoreTeamMember(models.Model):
