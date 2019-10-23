@@ -122,6 +122,10 @@ def _format_company_diff(dh_company, dnb_company):
             dh_company.is_turnover_estimated,
             dnb_company.get('is_turnover_estimated'),
         ),
+        get_field('global_ultimate_duns_number'): (
+            dh_company.global_ultimate_duns_number,
+            dnb_company.get('global_ultimate_duns_number'),
+        ),
     }
 
 
