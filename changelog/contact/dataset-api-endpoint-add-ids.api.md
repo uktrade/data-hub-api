@@ -1,0 +1,2 @@
+`GET /v4/dataset/contacts-dataset`: Company and contact id fields were added to the contacts dataset endpoint 
+`GET /v4/dataset/contacts-dataset`: Superfluous company detail fields were removed from the contacts dataset endpoint
