@@ -39,6 +39,7 @@ class InteractionsDatasetView(BaseDatasetView):
             'date',
             'event_id',
             'grant_amount_offered',
+            'id',
             'interaction_link',
             'investment_project_id',
             'kind',
