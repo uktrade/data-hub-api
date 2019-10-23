@@ -101,23 +101,23 @@ def test_collector(monkeypatch, es_with_signals):
 
     # mock the receiver methods so that we can check they are called
     for receiver in collector.signal_receivers_to_disable:
-        monkeypatch.setattr(receiver, 'connect', mock.Mock())
-        monkeypatch.setattr(receiver, 'disconnect', mock.Mock())
+        monkeypatch.setattr(receiver, 'enable', mock.Mock())
+        monkeypatch.setattr(receiver, 'disable', mock.Mock())
 
     collector.connect()
 
-    # check that the existing signal receivers are disconnected
+    # check that the existing signal receivers are disabled
     for receiver in collector.signal_receivers_to_disable:
-        assert receiver.disconnect.called
-        assert not receiver.connect.called
+        assert receiver.disable.called
+        assert not receiver.enable.called
 
     obj.delete()
 
     collector.disconnect()
 
-    # check that the existing signal receivers are connected back
+    # check that the existing signal receivers are re-enabled
     for receiver in collector.signal_receivers_to_disable:
-        assert receiver.connect.called
+        assert receiver.enable.called
 
     assert collector.deletions == {
         SimpleModel: [es_doc],
