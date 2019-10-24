@@ -32,10 +32,6 @@ def _random_non_ita_one_list_tier():
     return random_obj_for_queryset(queryset)
 
 
-def _get_url(company):
-    return reverse('api-v4:company:self-assign-account-manager', kwargs={'pk': company.pk})
-
-
 class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     """
     Tests for the self-assign company account manager view.
@@ -43,10 +39,14 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     (Implemented in CompanyViewSet.self_assign_account_manager().)
     """
 
+    @staticmethod
+    def _get_url(company):
+        return reverse('api-v4:company:self-assign-account-manager', kwargs={'pk': company.pk})
+
     def test_returns_401_if_unauthenticated(self, api_client):
         """Test that a 401 is returned if no credentials are provided."""
         company = CompanyFactory()
-        url = _get_url(company)
+        url = self._get_url(company)
         response = api_client.post(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -66,7 +66,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         company = CompanyFactory()
         user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
         api_client = self.create_api_client(user=user)
-        url = _get_url(company)
+        url = self._get_url(company)
 
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -97,7 +97,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         """
         company = company_factory()
         api_client = self.create_api_client(user=international_trade_adviser)
-        url = _get_url(company)
+        url = self._get_url(company)
 
         response = api_client.post(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -145,7 +145,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         """
         company = company_factory()
         api_client = self.create_api_client(user=international_trade_adviser)
-        url = _get_url(company)
+        url = self._get_url(company)
 
         response = api_client.post(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
