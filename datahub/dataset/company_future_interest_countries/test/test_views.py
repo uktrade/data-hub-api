@@ -34,8 +34,8 @@ def get_expected_data_from_company(company):
         return [
             {
                 'id': str(company.id),
-                'country_name': None,
-                'iso_alpha2_code': None,
+                'future_interest_countries__name': None,
+                'future_interest_countries__iso_alpha2_code': None,
             },
         ]
     else:
@@ -43,8 +43,9 @@ def get_expected_data_from_company(company):
         for future_interest_country in future_interest_countries:
             x = {
                 'id': str(company.id),
-                'country_name': future_interest_country.name,
-                'iso_alpha2_code': future_interest_country.iso_alpha2_code,
+                'future_interest_countries__name': future_interest_country.name,
+                'future_interest_countries__iso_alpha2_code':
+                future_interest_country.iso_alpha2_code,
             }
             expected.append(x)
         return expected

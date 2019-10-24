@@ -1,5 +1,3 @@
-from django.db.models import F
-
 from datahub.company.models import Company
 from datahub.dataset.company_future_interest_countries.pagination import \
     CompanyFutureInterestCountriesDatasetViewCursorPagination
@@ -18,11 +16,8 @@ class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
-        return Company.objects.annotate(
-            country_name=F('future_interest_countries__name'),
-            iso_alpha2_code=F('future_interest_countries__iso_alpha2_code'),
-        ).values(
+        return Company.objects.values(
             'id',
-            'country_name',
-            'iso_alpha2_code',
+            'future_interest_countries__name',
+            'future_interest_countries__iso_alpha2_code',
         )
