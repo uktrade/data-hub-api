@@ -1,1 +1,0 @@
-The dbmaintenance command `update_company_export_potential` is fixed to disable search signal receivers for company, to avoid queuing huge number of Celery tasks for syncing companies to Elasticsearch.
