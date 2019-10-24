@@ -1,4 +1,5 @@
 from enum import Enum
+from uuid import UUID
 
 from datahub.core.constants import Constant
 
@@ -47,3 +48,9 @@ class BusinessTypeConstant(Enum):
     community_interest_company = Constant(
         'Community interest company', '34e4cb83-e5e1-421e-ac90-8a52edcc209c',
     )
+
+
+class OneListTierID(Enum):
+    """One List tier IDs."""
+
+    tier_d_international_trade_advisers = UUID('1929c808-99b4-4abf-a891-45f2e187b410')

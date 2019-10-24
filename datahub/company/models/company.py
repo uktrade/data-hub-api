@@ -38,6 +38,8 @@ class CompanyPermission(StrEnum):
     view_company_timeline = 'view_company_timeline'
     export_company = 'export_company'
     add_company = 'add_company'
+    change_company = 'change_company'
+    # Indicates that the user can assign regional One List account managers to companies
     change_regional_account_manager = 'change_regional_account_manager'
 
 
@@ -252,6 +254,17 @@ class Company(ArchivableModel, BaseModel):
         choices=GREAT_PROFILE_STATUSES,
         help_text='Whether this company has a profile and agreed to be published or not',
     )
+    global_ultimate_duns_number = models.CharField(
+        blank=True,
+        help_text='Dun & Bradstreet unique identifier for global ultimate.',
+        max_length=9,
+        validators=[
+            MinLengthValidator(9),
+            MaxLengthValidator(9),
+            integer_validator,
+        ],
+        db_index=True,
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -296,6 +309,15 @@ class Company(ArchivableModel, BaseModel):
                 )
             except CompaniesHouseCompany.DoesNotExist:
                 return None
+
+    @property
+    def is_global_ultimate(self):
+        """
+        Whether this company is the global ultimate or not.
+        """
+        if not self.duns_number:
+            return False
+        return self.duns_number == self.global_ultimate_duns_number
 
     def mark_as_transferred(self, to, reason, user):
         """
@@ -381,6 +403,12 @@ class Company(ArchivableModel, BaseModel):
         """
         group_global_headquarters = self.get_group_global_headquarters()
         return group_global_headquarters.one_list_account_owner
+
+    def assign_one_list_account_manager_and_tier(self, adviser, one_list_tier_id):
+        """Update the company's One List account manager and tier."""
+        self.one_list_account_owner = adviser
+        self.one_list_tier_id = one_list_tier_id
+        self.save()
 
 
 class OneListCoreTeamMember(models.Model):

@@ -5,7 +5,7 @@ from datahub.search.apps import get_search_apps
 
 
 @pytest.fixture
-def disconnect_delete_search_signal_receivers(setup_es):
+def disconnect_delete_search_signal_receivers(es_with_signals):
     """
     Fixture that disables signal receivers that delete documents in Elasticsearch.
 
@@ -27,8 +27,8 @@ def disconnect_delete_search_signal_receivers(setup_es):
 
     yield
 
-    # We reconnect the receivers for completeness, though in theory it's not necessary as setup_es
-    # will disconnect them anyway
+    # We reconnect the receivers for completeness, though in theory it's not necessary as
+    # es_with_signals will disconnect them anyway
 
     for receiver in disconnected_signal_receivers:
         receiver.connect()

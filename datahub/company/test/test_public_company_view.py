@@ -70,7 +70,7 @@ class TestPublicCompanyViewSet:
 
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    def test_response_is_signed(self, setup_es, public_company_api_client):
+    def test_response_is_signed(self, es_with_signals, public_company_api_client):
         """Test that responses are signed."""
         company = CompanyFactory()
         url = reverse('api-v4:company:public-item', kwargs={'pk': company.pk})

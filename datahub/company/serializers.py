@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.constants import BusinessTypeConstant
+from datahub.company.constants import BusinessTypeConstant, OneListTierID
 from datahub.company.models import (
     Advisor,
     CompaniesHouseCompany,
@@ -443,6 +443,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'pending_dnb_investigation',
             'export_potential',
             'great_profile_status',
+            'is_global_ultimate',
+            'global_ultimate_duns_number',
         )
         read_only_fields = (
             'archived',
@@ -459,6 +461,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'pending_dnb_investigation',
             'export_potential',
             'great_profile_status',
+            'is_global_ultimate',
+            'global_ultimate_duns_number',
         )
         dnb_read_only_fields = (
             'name',
@@ -522,6 +526,48 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{CompanyPermission.view_company_document}': 'archived_documents_url_path',
         }
+
+
+class SelfAssignAccountManagerSerializer(serializers.Serializer):
+    """
+    Serialiser for assigning an interaction trade adviser as the account manager of a
+    company.
+    """
+
+    target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
+    default_error_messages = {
+        'cannot_change_account_manager_of_one_list_subsidiary':
+            gettext_lazy("A lead adviser can't be set on a subsidiary of a One List company."),
+        'cannot_change_account_manager_for_other_one_list_tiers':
+            gettext_lazy("A lead adviser can't be set for companies on this One List tier."),
+    }
+
+    def validate(self, attrs):
+        """Validate that the change of One List account manager and tier is allowed."""
+        attrs = super().validate(attrs)
+        global_headquarters = self.instance.global_headquarters
+
+        if global_headquarters and global_headquarters.one_list_tier_id:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_account_manager_of_one_list_subsidiary'],
+                code='cannot_change_account_manager_of_one_list_subsidiary',
+            )
+
+        if self.instance.one_list_tier_id not in (None, self.target_one_list_tier_id):
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_account_manager_for_other_one_list_tiers'],
+                code='cannot_change_account_manager_for_other_one_list_tiers',
+            )
+
+        return attrs
+
+    def save(self, adviser):
+        """Update the company's One List account manager and tier."""
+        self.instance.assign_one_list_account_manager_and_tier(
+            adviser,
+            self.target_one_list_tier_id,
+        )
+        return self.instance
 
 
 class PublicCompanySerializer(CompanySerializer):

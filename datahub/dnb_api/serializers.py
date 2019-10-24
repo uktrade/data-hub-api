@@ -67,6 +67,13 @@ class DNBCompanySerializer(CompanySerializer):
         validators=(integer_validator,),
     )
 
+    global_ultimate_duns_number = serializers.CharField(
+        allow_blank=True,
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator, ),
+    )
+
     class Meta(CompanySerializer.Meta):
         read_only_fields = []
         dnb_read_only_fields = []

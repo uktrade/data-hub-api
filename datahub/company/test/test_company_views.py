@@ -63,6 +63,35 @@ class TestListCompanies(APITestMixin):
         actual_ids = {result['id'] for result in response_data['results']}
         assert expected_ids == actual_ids
 
+    def test_filter_by_global_ultimate_duns_number(self):
+        """Test filtering by global_ultimate_duns_number."""
+        ultimate_duns = '123456789'
+        ultimate_company = CompanyFactory(
+            duns_number=ultimate_duns,
+            global_ultimate_duns_number=ultimate_duns,
+        )
+        subsidiaries = CompanyFactory.create_batch(2, global_ultimate_duns_number=ultimate_duns)
+        all_companies = [ultimate_company] + subsidiaries
+        CompanyFactory.create_batch(2)
+
+        url = reverse('api-v4:company:collection')
+        response = self.api_client.get(
+            url,
+            data={
+                'global_ultimate_duns_number': ultimate_duns,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(all_companies)
+        expected_ids = {str(company.pk) for company in all_companies}
+        for result_company in response_data['results']:
+            assert result_company['id'] in expected_ids
+            # Ensure that global ultimates are marked correctly
+            if result_company['is_global_ultimate']:
+                assert result_company['id'] == str(ultimate_company.id)
+
     def test_sort_by_name(self):
         """Test sorting by name."""
         companies = CompanyFactory.create_batch(
@@ -330,6 +359,8 @@ class TestGetCompany(APITestMixin):
             'transferred_to': None,
             'transfer_reason': '',
             'pending_dnb_investigation': False,
+            'is_global_ultimate': company.is_global_ultimate,
+            'global_ultimate_duns_number': company.global_ultimate_duns_number,
         }
 
     def test_get_company_without_country(self):
@@ -393,6 +424,52 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['pending_dnb_investigation'] == pending_dnb_investigation
+
+    @pytest.mark.parametrize(
+        'is_global_ultimate',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_get_company_is_global_ultimate(self, is_global_ultimate):
+        """
+        Test that `is_global_ultimate` is set for a company API result
+        as expected.
+        """
+        kwargs = {}
+        if is_global_ultimate:
+            kwargs['duns_number'] = 123456789
+            kwargs['global_ultimate_duns_number'] = 123456789
+        company = CompanyFactory(**kwargs)
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['is_global_ultimate'] == is_global_ultimate
+
+    @pytest.mark.parametrize(
+        'global_ultimate_overrides',
+        (
+            {'global_ultimate_duns_number': ''},
+            {'global_ultimate_duns_number': '123456789'},
+            {'global_ultimate_duns_number': '123456789', 'duns_number': '123456789'},
+        ),
+    )
+    def test_get_company_global_ultimate_duns_number(self, global_ultimate_overrides):
+        """
+        Test that `global_ultimate_duns_number` is set for a company API result
+        as expected.
+        """
+        company = CompanyFactory(
+            **global_ultimate_overrides,
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        global_ultimate_duns_number = global_ultimate_overrides['global_ultimate_duns_number']
+        assert response.json()['global_ultimate_duns_number'] == global_ultimate_duns_number
 
     @pytest.mark.parametrize(
         'build_company',

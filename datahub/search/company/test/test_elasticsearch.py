@@ -12,7 +12,7 @@ from datahub.search.query_builder import (
 )
 
 
-def test_mapping(setup_es):
+def test_mapping(es):
     """Test the ES mapping for a company."""
     mapping = Mapping.from_es(
         CompanySearchApp.es_model.get_write_index(),
@@ -492,7 +492,7 @@ def test_limited_get_search_by_entity_query():
 
 
 @pytest.mark.django_db
-def test_indexed_doc(setup_es):
+def test_indexed_doc(es):
     """Test the ES data of an indexed company."""
     company = CompanyFactory(
         trading_names=['a', 'b'],
@@ -501,9 +501,9 @@ def test_indexed_doc(setup_es):
     doc = ESCompany.es_document(company)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
 
-    setup_es.indices.refresh()
+    es.indices.refresh()
 
-    indexed_company = setup_es.get(
+    indexed_company = es.get(
         index=CompanySearchApp.es_model.get_write_index(),
         doc_type=CompanySearchApp.name,
         id=company.pk,

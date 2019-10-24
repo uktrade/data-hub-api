@@ -33,7 +33,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(setup_es):
+def setup_data(es_with_signals):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -79,11 +79,11 @@ def setup_data(setup_es):
         registered_address_country_id=country_anguilla,
         archived=True,
     )
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
 
 @pytest.fixture
-def setup_headquarters_data(setup_es):
+def setup_headquarters_data(es_with_signals):
     """Sets up data for headquarter type tests."""
     CompanyFactory(
         name='ghq',
@@ -101,7 +101,7 @@ def setup_headquarters_data(setup_es):
         name='none',
         headquarter_type_id=None,
     )
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
 
 class TestSearch(APITestMixin):
@@ -115,7 +115,7 @@ class TestSearch(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_response_body(self, setup_es):
+    def test_response_body(self, es_with_signals):
         """Tests the response body of a search query."""
         company = CompanyFactory(
             company_number='123',
@@ -124,7 +124,7 @@ class TestSearch(APITestMixin):
             one_list_tier=None,
             one_list_account_owner=None,
         )
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company')
         response = self.api_client.post(url)
@@ -365,7 +365,7 @@ class TestSearch(APITestMixin):
         'sector_level',
         (0, 1, 2),
     )
-    def test_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+    def test_sector_descends_filter(self, hierarchical_sectors, es_with_signals, sector_level):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -381,7 +381,7 @@ class TestSearch(APITestMixin):
             )),
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company')
         body = {
@@ -406,13 +406,13 @@ class TestSearch(APITestMixin):
             (constants.Country.anguilla.value.id, False),
         ),
     )
-    def test_composite_country_filter(self, setup_es, country, match):
+    def test_composite_country_filter(self, es_with_signals, country, match):
         """Tests composite country filter."""
         company = CompanyFactory(
             address_country_id=constants.Country.cayman_islands.value.id,
             registered_address_country_id=constants.Country.montserrat.value.id,
         )
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company')
 
@@ -459,7 +459,7 @@ class TestSearch(APITestMixin):
             ('moine', None),
         ),
     )
-    def test_composite_name_filter(self, setup_es, name_term, matched_company_name):
+    def test_composite_name_filter(self, es_with_signals, name_term, matched_company_name):
         """Tests composite name filter."""
         CompanyFactory(
             name='whiskers and tabby',
@@ -469,7 +469,7 @@ class TestSearch(APITestMixin):
             name='1a',
             trading_names=['3a', '4a'],
         )
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company')
 
@@ -491,7 +491,7 @@ class TestSearch(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    def test_company_search_paging(self, setup_es):
+    def test_company_search_paging(self, es_with_signals):
         """
         Tests the pagination.
 
@@ -511,7 +511,7 @@ class TestSearch(APITestMixin):
             trading_names=[],
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company')
         for page in range((len(ids) + page_size - 1) // page_size):
@@ -544,7 +544,7 @@ class TestCompanyExportView(APITestMixin):
             (CompanyPermission.export_company,),
         ),
     )
-    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+    def test_user_without_permission_cannot_export(self, es_with_signals, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -563,7 +563,7 @@ class TestCompanyExportView(APITestMixin):
     )
     def test_export(
         self,
-        setup_es,
+        es_with_signals,
         request_sortby,
         orm_ordering,
     ):
@@ -586,7 +586,7 @@ class TestCompanyExportView(APITestMixin):
             export_to_countries=Country.objects.order_by('?')[:2],
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         data = {}
         if request_sortby:
@@ -732,7 +732,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_response_body(
         self,
-        setup_es,
+        es_with_signals,
         monkeypatch,
         search,
         use_context_serializer,
@@ -761,7 +761,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=constants.Country.united_kingdom.value.id,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:company-autocomplete')
         response = self.api_client.get(
@@ -853,7 +853,7 @@ class TestAutocompleteSearch(APITestMixin):
             ('help qrs', []),
         ),
     )
-    def test_searching_with_a_query(self, setup_es, query, expected_companies):
+    def test_searching_with_a_query(self, es_with_signals, query, expected_companies):
         """Tests case where search queries are provided."""
         url = reverse('api-v4:search:company-autocomplete')
 
@@ -872,7 +872,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=country_us,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         response = self.api_client.get(url, data={'term': query})
 
@@ -892,7 +892,7 @@ class TestAutocompleteSearch(APITestMixin):
             (1, ['abc defg ltd']),
         ),
     )
-    def test_searching_with_limit(self, setup_es, limit, expected_companies):
+    def test_searching_with_limit(self, es_with_signals, limit, expected_companies):
         """Tests case where search limit is provided."""
         url = reverse('api-v4:search:company-autocomplete')
 
@@ -911,7 +911,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=country_us,
         )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         response = self.api_client.get(
             url,
