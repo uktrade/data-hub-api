@@ -150,3 +150,99 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         response = api_client.post(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_errors
+
+
+class TestRemoveCompanyAccountManagerView(APITestMixin):
+    """
+    Tests for the remove company account manager view.
+
+    (Implemented in CompanyViewSet.remove_account_manager().)
+    """
+
+    @staticmethod
+    def _get_url(company):
+        return reverse('api-v4:company:remove-account-manager', kwargs={'pk': company.pk})
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if no credentials are provided."""
+        company = CompanyFactory()
+        url = self._get_url(company)
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames',
+        (
+            (),
+            (CompanyPermission.change_company,),
+            (CompanyPermission.change_regional_account_manager,),
+        ),
+    )
+    def test_returns_403_if_without_permission(self, permission_codenames):
+        """
+        Test that a 403 is returned if the user does not have all of the required
+        permissions.
+        """
+        company = CompanyFactory()
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        api_client = self.create_api_client(user=user)
+        url = self._get_url(company)
+
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'company_factory',
+        (
+            pytest.param(
+                lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
+                id='no-existing-account-manager',
+            ),
+            pytest.param(
+                lambda: CompanyFactory(
+                    one_list_account_owner=AdviserFactory(),
+                    one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+                ),
+                id='existing-international-trade-adviser-account-manager',
+            ),
+        ),
+    )
+    @pytest.mark.django_db
+    def test_removes_account_manager_and_tier(self, company_factory, international_trade_adviser):
+        """
+        Test that an account manager can be removed from:
+
+        - a company not on the One List
+        - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
+        """
+        company = company_factory()
+        api_client = self.create_api_client(user=international_trade_adviser)
+        url = self._get_url(company)
+
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        company.refresh_from_db()
+        assert company.one_list_account_owner is None
+        assert company.one_list_tier is None
+
+    @pytest.mark.django_db
+    def test_cannot_remove_account_manager_for_other_tiers(self, international_trade_adviser):
+        """
+        Test that an account manager can't be removed from a company on a One List tier other
+        than 'Tier D - International Trade Adviser Accounts'.
+        """
+        company = CompanyFactory(
+            one_list_tier=_random_non_ita_one_list_tier(),
+            one_list_account_owner=AdviserFactory(),
+        )
+        api_client = self.create_api_client(user=international_trade_adviser)
+        url = self._get_url(company)
+
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            api_settings.NON_FIELD_ERRORS_KEY: [
+                "A lead adviser can't be removed from companies on this One List tier.",
+            ],
+        }

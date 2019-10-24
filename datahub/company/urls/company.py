@@ -30,6 +30,10 @@ company_self_assign_account_manager = CompanyViewSet.as_action_view(
     'self_assign_account_manager',
 )
 
+company_remove_account_manager = CompanyViewSet.as_action_view(
+    'remove_account_manager',
+)
+
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
@@ -48,6 +52,11 @@ urls = [
         'company/<uuid:pk>/self-assign-account-manager',
         company_self_assign_account_manager,
         name='self-assign-account-manager',
+    ),
+    path(
+        'company/<uuid:pk>/remove-account-manager',
+        company_remove_account_manager,
+        name='remove-account-manager',
     ),
     path(
         'company/<uuid:pk>/one-list-group-core-team',
