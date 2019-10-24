@@ -1,15 +1,25 @@
 import itertools
 from functools import partial
 
-from elasticsearch_dsl import Boolean, Completion, Date, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
+from elasticsearch_dsl import Completion
 
-from datahub.search import dict_utils
-from datahub.search import fields
+from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
 
-
 DOC_TYPE = 'company'
+
+
+def _adviser_field_with_indexed_id():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'first_name': Text(index=False),
+            'last_name': Text(index=False),
+            'name': Text(index=False),
+        },
+    )
 
 
 def get_suggestions(db_company):
@@ -94,6 +104,7 @@ class Company(BaseESModel):
     sector = fields.sector_field()
     address = fields.address_field()
     registered_address = fields.address_field()
+    one_list_group_global_account_manager = _adviser_field_with_indexed_id()
     trading_names = fields.TextWithTrigram()
     turnover_range = fields.id_name_field()
     uk_region = fields.id_name_field()
@@ -114,6 +125,10 @@ class Company(BaseESModel):
         'suggest': get_suggestions,
         'address': partial(dict_utils.address_dict, prefix='address'),
         'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
+        'one_list_group_global_account_manager': dict_utils.computed_field_function(
+            'get_one_list_group_global_account_manager',
+            dict_utils.contact_or_adviser_dict,
+        ),
     }
 
     MAPPINGS = {

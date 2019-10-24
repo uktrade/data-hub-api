@@ -218,6 +218,26 @@ def test_mapping(es):
                         },
                     },
                 },
+                'one_list_group_global_account_manager': {
+                    'properties': {
+                        'first_name': {
+                            'index': False,
+                            'type': 'text',
+                        },
+                        'id': {
+                            'type': 'keyword',
+                        },
+                        'last_name': {
+                            'index': False,
+                            'type': 'text',
+                        },
+                        'name': {
+                            'index': False,
+                            'type': 'text',
+                        },
+                    },
+                    'type': 'object',
+                },
                 'sector': {
                     'properties': {
                         'ancestors': {
@@ -531,6 +551,7 @@ def test_indexed_doc(es):
         'reference_code',
         'address',
         'registered_address',
+        'one_list_group_global_account_manager',
         'sector',
         'suggest',
         'trading_names',

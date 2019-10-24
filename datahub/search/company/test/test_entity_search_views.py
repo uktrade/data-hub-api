@@ -1,3 +1,4 @@
+import random
 import uuid
 from cgi import parse_header
 from csv import DictReader
@@ -13,7 +14,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
@@ -117,12 +118,13 @@ class TestSearch(APITestMixin):
 
     def test_response_body(self, es_with_collector):
         """Tests the response body of a search query."""
+        one_list_account_owner = AdviserFactory()
         company = CompanyFactory(
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
             global_headquarters=None,
             one_list_tier=None,
-            one_list_account_owner=None,
+            one_list_account_owner=one_list_account_owner,
         )
         es_with_collector.flush_and_refresh()
 
@@ -164,6 +166,12 @@ class TestSearch(APITestMixin):
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
                         },
+                    },
+                    'one_list_group_global_account_manager': {
+                        'id': str(one_list_account_owner.id),
+                        'first_name': one_list_account_owner.first_name,
+                        'last_name': one_list_account_owner.last_name,
+                        'name': one_list_account_owner.name,
                     },
                     'uk_based': (
                         company.address_country.id == uuid.UUID(
@@ -360,6 +368,72 @@ class TestSearch(APITestMixin):
 
         search_results = {company['name'] for company in response.data['results']}
         assert search_results == results
+
+    @pytest.mark.parametrize(
+        'num_account_managers',
+        (1, 2, 3),
+    )
+    def test_one_list_account_manager_filter(self, num_account_managers, es_with_collector):
+        """Test one list account manager filter."""
+        account_managers = AdviserFactory.create_batch(3)
+
+        selected_account_managers = random.sample(account_managers, num_account_managers)
+
+        CompanyFactory.create_batch(2)
+        CompanyFactory.create_batch(3, one_list_account_owner=factory.Iterator(account_managers))
+
+        es_with_collector.flush_and_refresh()
+
+        query = {
+            'one_list_group_global_account_manager':
+            [account_manager.id for account_manager in selected_account_managers],
+        }
+
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        search_results = {
+            company['one_list_group_global_account_manager']['id']
+            for company in response.data['results']
+        }
+        expected_results = {
+            str(account_manager.id) for account_manager in selected_account_managers
+        }
+        assert response.data['count'] == len(selected_account_managers)
+        assert len(response.data['results']) == len(selected_account_managers)
+        assert search_results == expected_results
+
+    def test_one_list_account_manager_with_global_headquarters_filter(self, es_with_collector):
+        """
+        Tests that one list account manager filter searches for inherited one list account manager.
+        """
+        account_manager = AdviserFactory()
+        CompanyFactory.create_batch(2)
+
+        global_headquarters = CompanyFactory(
+            one_list_account_owner=account_manager,
+        )
+        target_companies = CompanyFactory.create_batch(2, global_headquarters=global_headquarters)
+
+        es_with_collector.flush_and_refresh()
+
+        query = {'one_list_group_global_account_manager': account_manager.pk}
+
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        search_results = {company['id'] for company in response.data['results']}
+        expected_results = {
+            str(global_headquarters.id),
+            *{str(target_company.id) for target_company in target_companies},
+        }
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert search_results == expected_results
 
     @pytest.mark.parametrize(
         'sector_level',

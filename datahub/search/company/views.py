@@ -51,6 +51,7 @@ class SearchCompanyAPIViewMixin:
         'uk_region',
         'export_to_countries',
         'future_interest_countries',
+        'one_list_group_global_account_manager',
     )
 
     REMAP_FIELDS = {
@@ -58,6 +59,7 @@ class SearchCompanyAPIViewMixin:
         'uk_region': 'uk_region.id',
         'export_to_countries': 'export_to_countries.id',
         'future_interest_countries': 'future_interest_countries.id',
+        'one_list_group_global_account_manager': 'one_list_group_global_account_manager.id',
     }
 
     COMPOSITE_FILTERS = {

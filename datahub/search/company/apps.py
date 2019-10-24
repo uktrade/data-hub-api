@@ -17,6 +17,7 @@ class CompanySearchApp(SearchApp):
         'export_experience_category',
         'headquarter_type',
         'one_list_account_owner',
+        'global_headquarters__one_list_account_owner',
         'global_headquarters',
         'address_country',
         'registered_address_country',
