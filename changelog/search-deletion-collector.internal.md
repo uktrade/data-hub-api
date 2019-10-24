@@ -1,0 +1,1 @@
+A correction was made to the deleted object collector (used to delete objects from Elasticsearch in bulk) to make it safe to use in web processes. This change has no current effect as the collector has only been used in management commands to date. 
