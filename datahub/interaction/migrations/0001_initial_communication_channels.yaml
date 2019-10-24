@@ -1,0 +1,34 @@
+# Interaction communication channel
+- model: interaction.communicationchannel
+  pk: 70c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Email/Website}
+- model: interaction.communicationchannel
+  pk: 72c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Telephone}
+- model: interaction.communicationchannel
+  pk: 74c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Letter/Fax}
+- model: interaction.communicationchannel
+  pk: a5d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Face to Face}
+- model: interaction.communicationchannel
+  pk: a7d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Video/Teleconf.}
+- model: interaction.communicationchannel
+  pk: a8d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Social Media}
+- model: interaction.communicationchannel
+  pk: 71c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2013-03-25T14:08:00Z', name: Fax}
+- model: interaction.communicationchannel
+  pk: 73c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2013-03-25T14:08:00Z', name: Telex}
+- model: interaction.communicationchannel
+  pk: 75c226d7-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2013-03-25T14:08:00Z', name: UKTI Website}
+- model: interaction.communicationchannel
+  pk: a4d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2013-03-25T14:08:00Z', name: SMS}
+- model: interaction.communicationchannel
+  pk: a6d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2013-03-25T14:08:00Z', name: Business Card}
