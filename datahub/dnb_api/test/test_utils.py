@@ -143,4 +143,5 @@ def test_get_company_valid(
         'is_turnover_estimated': None,
         'uk_based': True,
         'website': 'http://foo.com',
+        'global_ultimate_duns_number': '291332174',
     }

@@ -38,13 +38,11 @@ def get_expected_data_from_contact(contact):
         'accepts_dit_email_marketing': contact.accepts_dit_email_marketing,
         'address_country__name': get_attr_or_none(contact, 'address_country.name'),
         'address_postcode': contact.address_postcode,
-        'company__company_number': get_attr_or_none(contact, 'company.company_number'),
-        'company__name': get_attr_or_none(contact, 'company.name'),
-        'company__uk_region__name': get_attr_or_none(contact, 'company.uk_region.name'),
-        'company_sector': get_attr_or_none(contact, 'company.sector.name'),
+        'company_id': str(contact.company_id) if contact.company_id is not None else None,
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
         'email_alternative': contact.email_alternative,
+        'id': str(contact.id),
         'job_title': contact.job_title,
         'name': contact.name,
         'notes': contact.notes,
@@ -83,6 +81,13 @@ class TestContactsDatasetViewSet:
     def test_without_credentials(self, api_client):
         """Test that making a request without credentials returns an error."""
         response = api_client.get(self.contacts_dataset_view_url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_without_whitelisted_ip(self, data_flow_api_client):
+        """Test that making a request without the whitelisted IP returns an error."""
+        data_flow_api_client.set_http_x_forwarded_for('1.1.1.1')
+        response = data_flow_api_client.get(self.contacts_dataset_view_url)
+
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(

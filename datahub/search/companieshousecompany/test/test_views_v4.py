@@ -13,7 +13,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(setup_es):
+def setup_data(es_with_signals):
     """Sets up data for the tests."""
     companies = (
         CompaniesHouseCompanyFactory(
@@ -49,7 +49,7 @@ def setup_data(setup_es):
     for company in companies:
         sync_object(CompaniesHouseCompanySearchApp, company.pk)
 
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
 
 class TestSearchCompaniesHouseCompany(APITestMixin):
@@ -113,7 +113,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         assert len(response_data['results']) == len(expected_results)
         assert actual_results == expected_results
 
-    def test_response_body(self, setup_es):
+    def test_response_body(self, es_with_signals):
         """Tests the response body of a search query."""
         company = CompaniesHouseCompanyFactory(
             name='Pallas',
@@ -122,7 +122,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
             company_status='jumping',
         )
         sync_object(CompaniesHouseCompanySearchApp, company.pk)
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         url = reverse('api-v4:search:companieshousecompany')
         response = self.api_client.post(url)

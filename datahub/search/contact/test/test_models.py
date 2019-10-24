@@ -7,7 +7,7 @@ from datahub.search.contact.models import Contact as ESContact
 pytestmark = pytest.mark.django_db
 
 
-def test_contact_dbmodel_to_dict(setup_es):
+def test_contact_dbmodel_to_dict(es_with_signals):
     """Tests conversion of db model to dict."""
     contact = ContactFactory()
 
@@ -51,7 +51,7 @@ def test_contact_dbmodel_to_dict(setup_es):
     assert set(result.keys()) == keys
 
 
-def test_contact_dbmodels_to_es_documents(setup_es):
+def test_contact_dbmodels_to_es_documents(es_with_signals):
     """Tests conversion of db models to Elasticsearch documents."""
     contacts = ContactFactory.create_batch(2)
 
@@ -60,7 +60,7 @@ def test_contact_dbmodels_to_es_documents(setup_es):
     assert len(list(result)) == len(contacts)
 
 
-def test_contact_dbmodels_to_es_documents_without_country(setup_es):
+def test_contact_dbmodels_to_es_documents_without_country(es_with_signals):
     """
     Tests conversion of db models to Elasticsearch documents when
     country is None.

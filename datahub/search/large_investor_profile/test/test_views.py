@@ -44,7 +44,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(setup_es):
+def setup_data(es_with_signals):
     """Sets up data for the tests."""
     investor_company = CompanyFactory(name='large abcdef')
     argentina_investor_company = CompanyFactory(
@@ -175,7 +175,7 @@ def setup_data(setup_es):
             north_project,
             south_project,
         ]
-    setup_es.indices.refresh()
+    es_with_signals.indices.refresh()
 
     yield investor_profiles
 
@@ -609,7 +609,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         ),
     )
     def test_user_needs_correct_permissions_to_export_data(
-        self, setup_es, permissions, expected_status_code,
+        self, es_with_signals, permissions, expected_status_code,
     ):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
@@ -629,7 +629,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
             ('investor_company.name', 'investor_company__name'),
         ),
     )
-    def test_export(self, setup_es, request_sortby, orm_ordering):
+    def test_export(self, es_with_signals, request_sortby, orm_ordering):
         """Test export large capital investor profile search results."""
         url = reverse('api-v4:search:large-investor-profile-export')
 
@@ -643,7 +643,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                 global_assets_under_management=200,
             )
 
-        setup_es.indices.refresh()
+        es_with_signals.indices.refresh()
 
         data = {}
         if request_sortby:

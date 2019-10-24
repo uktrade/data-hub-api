@@ -162,7 +162,7 @@ class SearchConfig(AppConfig):
 
         for app in get_search_apps():
             # For tests we disable automatic connection of signal receivers on app ready.
-            # They are instead only enabled for tests that use the setup_es pytest fixture
+            # They are instead only enabled for tests that use the es_with_signals pytest fixture
             if settings.SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY:
                 app.connect_signals()
 

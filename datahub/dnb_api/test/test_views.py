@@ -439,6 +439,10 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'transferred_on': None,
             'contacts': [],
             'pending_dnb_investigation': False,
+            'global_ultimate_duns_number': dnb_company['global_ultimate_duns_number'],
+            'is_global_ultimate': (
+                dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
+            ),
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
@@ -650,6 +654,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             {'address_line_2': ''},
             {'address_county': ''},
             {'address_postcode': ''},
+            {'global_ultimate_duns_number': None},
         ),
     )
     def test_post_missing_optional_fields(
@@ -724,6 +729,40 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         that does not exist in DataHub.
         """
         dnb_response_uk['results'][0]['address_country'] = 'FOO'
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            json=dnb_response_uk,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.parametrize(
+        'global_ultimate_override',
+        (
+            {'global_ultimate_duns_number': 'foobarbaz'},
+            {'global_ultimate_duns_number': '12345678'},
+            {'global_ultimate_duns_number': '1234567890'},
+        ),
+    )
+    def test_post_invalid_global_ultimate(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+        dnb_response_uk,
+        global_ultimate_override,
+    ):
+        """
+        Test if create-company endpoint returns 400 if the global_ultimate_duns_number
+        returned from D&B is invalid.
+        """
+        dnb_response_uk['results'][0]['global_ultimate_duns_number'] = global_ultimate_override
         requests_mock.post(
             DNB_SEARCH_URL,
             json=dnb_response_uk,

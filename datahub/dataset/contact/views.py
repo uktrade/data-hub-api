@@ -1,7 +1,6 @@
 from datahub.company.models.contact import Contact
 from datahub.core.query_utils import get_full_name_expression
 from datahub.dataset.core.views import BaseDatasetView
-from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class ContactsDatasetView(BaseDatasetView):
@@ -17,18 +16,15 @@ class ContactsDatasetView(BaseDatasetView):
         """Returns list of Contacts Dataset records"""
         return Contact.objects.annotate(
             name=get_full_name_expression(),
-            company_sector=get_sector_name_subquery('company__sector'),
         ).values(
             'accepts_dit_email_marketing',
             'address_country__name',
             'address_postcode',
-            'company__company_number',
-            'company__name',
-            'company__uk_region__name',
-            'company_sector',
+            'company_id',
             'created_on',
             'email',
             'email_alternative',
+            'id',
             'job_title',
             'name',
             'notes',

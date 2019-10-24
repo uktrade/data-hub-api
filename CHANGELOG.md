@@ -1,3 +1,66 @@
+# Data Hub API 17.0.0 (2019-10-24)
+
+
+## Features
+
+- **Companies** A new dbmaintenance Django command was added to import data from csv format, with three fields `datahub_company_id`, `is_published_find_a_supplier` and `has_find_a_supplier_profile` provided by Data Science platform, into Data Hub company model's field, `great_profile_status`.
+
+## Bug fixes
+
+- **Companies** The dbmaintenance command `update_company_export_potential` is fixed to disable search signal receivers for company, to avoid queuing huge number of Celery tasks for syncing companies to Elasticsearch.
+
+## Internal changes
+
+- **Companies** A property `is_global_ultimate` was added to the `Company` model - this exposes
+  whether or not a company is the global ultimate.
+
+## API
+
+- **Advisers** A new dataset endpoint (`GET /v4/dataset/advisers-dataset`) was added to be consumed by data-flow and used in data-workspace.
+- **Advisers** A new teams dataset endpoint (`GET /v4/dataset/teams-dataset`) was added to be consumed by data-flow and used in data-workspace.
+- **Companies** The property `is_global_ultimate` (a boolean) was added as a field to the following company API
+  endpoints as a read-only field:
+
+  - `GET /v4/company`
+  - `POST /v4/company` - returned in the result
+  - `GET /v4/company/<pk>`
+  - `POST /v4/dnb/company-create`
+- **Companies** The field `global_ultimate_duns_number` was added to the `DNBCompanySerializer`.
+
+  This means that the `global_ultimate_duns_number` returned in the D&B responses will now be saved
+  to the `global_ultimate_duns_number` field on the `Company` model.
+- **Companies** A new endpoint, `POST /v4/company/<ID>/self-assign-account-manager`, was added. It:
+
+  - sets the authenticated user as the One List account manager
+  - sets the One List tier of the company to 'Tier D - Interaction Trade Adviser Accounts'
+
+  The operation is not allowed if:
+
+  - the company is a subsidiary of a One List company (on any tier)
+  - the company is already a One List company on a different tier (i.e. not 'Tier D - Interaction Trade Adviser Accounts')
+
+  The `company.change_company` and `company.change_regional_account_manager` permissions are required to use this endpoint.
+- **Companies** A filter was added to the company collection API to allow callers to filter by
+  `global_ultimate_duns_number` - e.g. `GET /v4/company?global_ultimate_duns_number=123456789`.
+- **Companies** The field `global_ultimate_duns_number` was added to the response of the following company API
+   endpoints:
+
+  - `GET /v4/company`
+  - `GET /v4/company/<pk>`
+  - `POST /v4/dnb/company-create`
+- **Contacts** `GET /v4/dataset/contacts-dataset`: Company and contact id fields were added to the contacts dataset endpoint 
+  `GET /v4/dataset/contacts-dataset`: Superfluous company detail fields were removed from the contacts dataset endpoint
+- **Interactions** `GET /v4/dataset/interactions-dataset`: Interaction id was added to the interaction dataset endpoint
+- **OMIS** `GET /v4/dataset/omis-dataset`: Join between order and company was removed from the omis dataset endpoint
+  `GET /v4/dataset/omis-dataset`: Join between order and contact was removed from the omis dataset endpoint
+  `GET /v4/dataset/omis-dataset`: Order id, company id and contact id were added to the omis dataset endpoint
+  `GET /v4/dataset/omis-dataset`: Team name was replaced with team id on the omis dataset endpoint
+
+## Database schema
+
+- **Companies** The `company_company` table now contains `global_ultimate_duns_number` field. This field will be populated by the `duns_number` for the global ultimate of a company. This data is included in the D&B payload.
+
+
 # Data Hub API 16.0.0 (2019-10-21)
 
 
