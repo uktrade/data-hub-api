@@ -7,12 +7,38 @@ import pytest
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
+    force_uuid,
     get_financial_year,
     join_truthy_strings,
     load_constants_to_database,
     reverse_with_query_string,
     slice_iterable_into_chunks,
 )
+
+
+class TestForceUUID:
+    """Tests for force_uuid()."""
+
+    @pytest.mark.parametrize(
+        'value,expected_result',
+        (
+            (None, None),
+            ('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660', UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660')),
+            (
+                UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660'),
+                UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660'),
+            ),
+        ),
+    )
+    def test_converts_values(self, value, expected_result):
+        """Test that values are converted to UUIDs as necessary."""
+        assert force_uuid(value) == expected_result
+
+    @pytest.mark.parametrize('value', (b'', []))
+    def test_raises_error_on_unexpected_type(self, value):
+        """Test that an error is raised on unexpected types."""
+        with pytest.raises(TypeError):
+            force_uuid(value)
 
 
 @pytest.mark.parametrize(

@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 class TestCompanyElasticModel:
     """Test for the company elasticsearch model"""
 
-    def test_company_dbmodel_to_dict(self, es_with_signals):
+    def test_company_dbmodel_to_dict(self, es):
         """Tests conversion of db model to dict."""
         company = CompanyFactory()
 
@@ -54,7 +54,7 @@ class TestCompanyElasticModel:
 
         assert set(result.keys()) == keys
 
-    def test_company_dbmodels_to_es_documents(self, es_with_signals):
+    def test_company_dbmodels_to_es_documents(self, es):
         """Tests conversion of db models to Elasticsearch documents."""
         companies = CompanyFactory.create_batch(2)
 

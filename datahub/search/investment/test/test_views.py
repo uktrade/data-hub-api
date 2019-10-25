@@ -79,7 +79,7 @@ def project_with_max_gross_value_added():
 
 
 @pytest.fixture
-def setup_data(es_with_signals, project_with_max_gross_value_added):
+def setup_data(es_with_collector, project_with_max_gross_value_added):
     """Sets up data for the tests."""
     investment_projects = [
         InvestmentProjectFactory(
@@ -130,13 +130,13 @@ def setup_data(es_with_signals, project_with_max_gross_value_added):
             likelihood_to_land_id=LikelihoodToLand.low.value.id,
         ),
     ]
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
     yield investment_projects
 
 
 @pytest.fixture
-def created_on_data(es_with_signals):
+def created_on_data(es_with_collector):
     """Setup data for created_on date filter test."""
     investment_projects = []
     dates = (
@@ -149,7 +149,7 @@ def created_on_data(es_with_signals):
                 InvestmentProjectFactory(),
             )
 
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
     yield investment_projects
 
@@ -233,7 +233,7 @@ class TestSearch(APITestMixin):
             == Counter(expected_project_name)
         ), expected_project_name
 
-    def test_search_adviser_filter(self, es_with_signals):
+    def test_search_adviser_filter(self, es_with_collector):
         """Tests the adviser filter."""
         adviser = AdviserFactory()
 
@@ -261,7 +261,7 @@ class TestSearch(APITestMixin):
         )
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_6)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:investment_project')
 
@@ -726,7 +726,7 @@ class TestSearch(APITestMixin):
         'sector_level',
         (0, 1, 2),
     )
-    def test_sector_descends_filter(self, hierarchical_sectors, es_with_signals, sector_level):
+    def test_sector_descends_filter(self, hierarchical_sectors, es_with_collector, sector_level):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -742,7 +742,7 @@ class TestSearch(APITestMixin):
             )),
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:investment_project')
         body = {
@@ -766,7 +766,7 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
 
-    def test_search_investment_project_multiple_filters(self, es_with_signals):
+    def test_search_investment_project_multiple_filters(self, es_with_collector):
         """Tests multiple filters in investment project search.
         We make sure that out of provided investment projects, we will
         receive only those that match our filter.
@@ -795,7 +795,7 @@ class TestSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -842,7 +842,7 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
-    def test_search_sort_nested_desc(self, es_with_signals, setup_data):
+    def test_search_sort_nested_desc(self, es_with_collector, setup_data):
         """Tests sorting by nested field."""
         InvestmentProjectFactory(
             name='Potato 1',
@@ -861,7 +861,7 @@ class TestSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.won.value.id,
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'Potato'
 
@@ -904,7 +904,7 @@ class TestSearchPermissions(APITestMixin):
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
         ),
     )
-    def test_non_restricted_user_can_see_all_projects(self, es_with_signals, permissions):
+    def test_non_restricted_user_can_see_all_projects(self, es_with_collector, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
         team_others = TeamFactory()
@@ -923,7 +923,7 @@ class TestSearchPermissions(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
         InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:investment_project')
         response = api_client.post(url, {})
@@ -935,7 +935,7 @@ class TestSearchPermissions(APITestMixin):
             result['id'] for result in response_data['results']
         }
 
-    def test_restricted_user_with_no_team_cannot_see_projects(self, es_with_signals):
+    def test_restricted_user_with_no_team_cannot_see_projects(self, es_with_collector):
         """
         Checks that a restricted user that doesn't have a team cannot view any projects (in
         particular projects associated with other advisers that don't have teams).
@@ -951,7 +951,7 @@ class TestSearchPermissions(APITestMixin):
         InvestmentProjectFactory()
         InvestmentProjectFactory(created_by=adviser_other)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         response = api_client.post(url, {})
 
@@ -959,7 +959,7 @@ class TestSearchPermissions(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 0
 
-    def test_restricted_users_cannot_see_other_teams_projects(self, es_with_signals):
+    def test_restricted_users_cannot_see_other_teams_projects(self, es_with_collector):
         """Test that restricted users cannot see other teams' projects."""
         url = reverse('api-v3:search:investment_project')
 
@@ -983,7 +983,7 @@ class TestSearchPermissions(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
         InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         response = api_client.post(url, {})
 
@@ -1011,7 +1011,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             (InvestmentProjectPermission.export,),
         ),
     )
-    def test_user_without_permission_cannot_export(self, es_with_signals, permissions):
+    def test_user_without_permission_cannot_export(self, es, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1020,7 +1020,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_restricted_users_cannot_see_other_teams_projects(self, es_with_signals):
+    def test_restricted_users_cannot_see_other_teams_projects(self, es_with_collector):
         """Test that restricted users cannot see other teams' projects in the export."""
         team = TeamFactory()
         team_other = TeamFactory()
@@ -1050,7 +1050,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             investment_project=team_projects[0],
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:investment_project-export')
         response = api_client.post(url, {})
@@ -1078,7 +1078,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             ('stage.name', 'stage__name'),
         ),
     )
-    def test_export(self, es_with_signals, request_sortby, orm_ordering):
+    def test_export(self, es_with_collector, request_sortby, orm_ordering):
         """Test export of investment project search results."""
         url = reverse('api-v3:search:investment_project-export')
 
@@ -1098,7 +1098,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             ),
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:
@@ -1243,7 +1243,7 @@ class TestBasicSearchPermissions(APITestMixin):
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
         ),
     )
-    def test_global_non_restricted_user_can_see_all_projects(self, es_with_signals, permissions):
+    def test_global_non_restricted_user_can_see_all_projects(self, es_with_collector, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
         team_others = TeamFactory()
@@ -1262,7 +1262,7 @@ class TestBasicSearchPermissions(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
         InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -1280,7 +1280,7 @@ class TestBasicSearchPermissions(APITestMixin):
             result['id'] for result in response_data['results']
         }
 
-    def test_global_restricted_users_cannot_see_other_teams_projects(self, es_with_signals):
+    def test_global_restricted_users_cannot_see_other_teams_projects(self, es_with_collector):
         """
         Automatic filter to see only associated IP for a specific (leps) user
         """
@@ -1304,7 +1304,7 @@ class TestBasicSearchPermissions(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
         InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -1327,7 +1327,7 @@ class TestBasicSearchPermissions(APITestMixin):
 
         assert {result['id'] for result in results} == expected_ids
 
-    def test_global_restricted_user_with_no_team_cannot_see_projects(self, es_with_signals):
+    def test_global_restricted_user_with_no_team_cannot_see_projects(self, es_with_collector):
         """
         Checks that a restricted user that doesn't have a team cannot view projects associated
         with other advisers that don't have teams.
@@ -1341,7 +1341,7 @@ class TestBasicSearchPermissions(APITestMixin):
         InvestmentProjectFactory()
         InvestmentProjectFactory(created_by=adviser_other)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
