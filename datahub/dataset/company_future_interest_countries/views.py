@@ -16,8 +16,9 @@ class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
-        return Company.objects.values(
+        return Company.future_interest_countries.through.objects.values(
             'id',
-            'future_interest_countries__name',
-            'future_interest_countries__iso_alpha2_code',
+            'company_id',
+            'country__name',
+            'country__iso_alpha2_code',
         )
