@@ -184,7 +184,7 @@ class TestBasicSearch(APITestMixin):
     search apps.
     """
 
-    def test_pagination(self, es_with_signals):
+    def test_pagination(self, es_with_collector):
         """Tests the pagination."""
         total_records = 9
         page_size = 2
@@ -200,7 +200,7 @@ class TestBasicSearch(APITestMixin):
             trading_names=[],
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         for page in range((len(ids) + page_size - 1) // page_size):
@@ -221,7 +221,7 @@ class TestBasicSearch(APITestMixin):
             assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
     @pytest.mark.parametrize('entity', ('sloth', 'companieshousecompany'))
-    def test_400_with_invalid_entity(self, es_with_signals, entity):
+    def test_400_with_invalid_entity(self, es_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -237,14 +237,14 @@ class TestBasicSearch(APITestMixin):
             'entity': [f'"{entity}" is not a valid choice.'],
         }
 
-    def test_quality(self, es_with_signals, setup_data):
+    def test_quality(self, es_with_collector, setup_data):
         """Tests quality of results."""
         CompanyFactory(name='The Risk Advisory Group', trading_names=[])
         CompanyFactory(name='The Advisory Group', trading_names=[])
         CompanyFactory(name='The Advisory', trading_names=[])
         CompanyFactory(name='The Advisories', trading_names=[])
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'The Advisory'
 
@@ -267,14 +267,14 @@ class TestBasicSearch(APITestMixin):
             'The Risk Advisory Group',
         ] == [company['name'] for company in response.data['results']]
 
-    def test_partial_match(self, es_with_signals, setup_data):
+    def test_partial_match(self, es_with_collector, setup_data):
         """Tests partial matching."""
         CompanyFactory(name='Veryuniquename1', trading_names=[])
         CompanyFactory(name='Veryuniquename2', trading_names=[])
         CompanyFactory(name='Veryuniquename3', trading_names=[])
         CompanyFactory(name='Veryuniquename4', trading_names=[])
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'Veryuniquenam'
 
@@ -298,14 +298,14 @@ class TestBasicSearch(APITestMixin):
             'Veryuniquename4',
         } == {company['name'] for company in response.data['results']}
 
-    def test_hyphen_match(self, es_with_signals, setup_data):
+    def test_hyphen_match(self, es_with_collector, setup_data):
         """Tests hyphen query."""
         CompanyFactory(name='t-shirt', trading_names=[])
         CompanyFactory(name='tshirt', trading_names=[])
         CompanyFactory(name='electronic shirt', trading_names=[])
         CompanyFactory(name='t and e and a', trading_names=[])
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 't-shirt'
 
@@ -327,14 +327,14 @@ class TestBasicSearch(APITestMixin):
             'tshirt',
         ] == [company['name'] for company in response.data['results']]
 
-    def test_search_by_id(self, es_with_signals, setup_data):
+    def test_search_by_id(self, es_with_collector, setup_data):
         """Tests exact id matching."""
         CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
         CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
         CompanyFactory(id='0fb4379c-341c-4dc4-b325-bf8d47b26baa')
         CompanyFactory(id='0fb5379c-341c-4dc4-b425-bf8d47b26baa')
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = '0fb4379c-341c-4dc4-b325-bf8d47b26baa'
 
@@ -351,7 +351,7 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['results'][0]['id']
 
-    def test_400_with_invalid_sortby(self, es_with_signals, setup_data):
+    def test_400_with_invalid_sortby(self, es):
         """Tests attempt to sort by non existent field."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -365,13 +365,13 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_aggregations(self, es_with_signals, setup_data):
+    def test_aggregations(self, es_with_collector, setup_data):
         """Tests basic aggregate query."""
         company = CompanyFactory(name='very_unique_company')
         ContactFactory(company=company)
         InvestmentProjectFactory(investor_company=company)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'very_unique_company'
 
@@ -395,12 +395,12 @@ class TestBasicSearch(APITestMixin):
         ]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
 
-    def test_ignored_models_excluded_from_aggregations(self, es_with_signals):
+    def test_ignored_models_excluded_from_aggregations(self, es_with_collector):
         """That that companieshousecompany is not included in aggregations."""
         ch_company = CompaniesHouseCompanyFactory()
         sync_object(CompaniesHouseCompanySearchApp, ch_company.pk)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -438,7 +438,7 @@ class TestBasicSearch(APITestMixin):
             'order',
         ),
     )
-    def test_permissions(self, es_with_signals, permission, permission_entity, entity):
+    def test_permissions(self, es_with_collector, permission, permission_entity, entity):
         """Tests model permissions enforcement in basic search."""
         user = create_test_user(permission_codenames=[permission], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -450,7 +450,7 @@ class TestBasicSearch(APITestMixin):
         CompanyInteractionFactory()
         OrderFactory()
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -468,7 +468,7 @@ class TestBasicSearch(APITestMixin):
         assert len(response_data['aggregations']) == 1
         assert response_data['aggregations'][0]['entity'] == permission_entity
 
-    def test_basic_search_no_permissions(self, es_with_signals):
+    def test_basic_search_no_permissions(self, es_with_collector):
         """Tests model permissions enforcement in basic search for a user with no permissions."""
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -480,7 +480,7 @@ class TestBasicSearch(APITestMixin):
         CompanyInteractionFactory()
         OrderFactory()
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -506,12 +506,12 @@ class TestFilteredSearch(APITestMixin):
     search apps.
     """
 
-    def test_search_sort_asc_with_null_values(self, es_with_signals, setup_data):
+    def test_search_sort_asc_with_null_values(self, es_with_collector, setup_data):
         """Tests placement of null values in sorted results when order is ascending."""
         InvestmentProjectFactory(name='Earth 1', estimated_land_date=datetime.date(2010, 1, 1))
         InvestmentProjectFactory(name='Earth 2', estimated_land_date=None)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'Earth'
 
@@ -534,12 +534,12 @@ class TestFilteredSearch(APITestMixin):
             for investment in response.data['results']
         ]
 
-    def test_search_sort_desc_with_null_values(self, es_with_signals, setup_data):
+    def test_search_sort_desc_with_null_values(self, es_with_collector, setup_data):
         """Tests placement of null values in sorted results when order is descending."""
         InvestmentProjectFactory(name='Ether 1', estimated_land_date=datetime.date(2010, 1, 1))
         InvestmentProjectFactory(name='Ether 2', estimated_land_date=None)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         term = 'Ether'
 
@@ -566,7 +566,7 @@ class TestFilteredSearch(APITestMixin):
 class TestSearchExportAPIView(APITestMixin):
     """Tests for SearchExportAPIView."""
 
-    def test_creates_user_event_log_entries(self, es_with_signals):
+    def test_creates_user_event_log_entries(self, es_with_collector):
         """Tests that when an export is performed, a user event is recorded."""
         user = create_test_user(permission_codenames=['view_simplemodel'])
         api_client = self.create_api_client(user=user)
@@ -577,7 +577,7 @@ class TestSearchExportAPIView(APITestMixin):
         simple_obj.save()
         sync_object(SimpleModelSearchApp, simple_obj.pk)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
         with freeze_time(frozen_time):

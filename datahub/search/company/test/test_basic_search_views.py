@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(es_with_signals):
+def setup_data(es_with_collector):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -32,7 +32,7 @@ def setup_data(es_with_signals):
         address_country_id=country_us,
         registered_address_country_id=country_us,
     )
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 class TestBasicSearch(APITestMixin):
@@ -97,7 +97,7 @@ class TestBasicSearch(APITestMixin):
             ('moine', None),
         ),
     )
-    def test_search_in_name(self, es_with_signals, name_term, matched_company_name):
+    def test_search_in_name(self, es_with_collector, name_term, matched_company_name):
         """Tests basic aggregate companies query."""
         CompanyFactory(
             name='whiskers and tabby',
@@ -107,7 +107,7 @@ class TestBasicSearch(APITestMixin):
             name='1a',
             trading_names=['3a', '4a'],
         )
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -139,7 +139,7 @@ class TestBasicSearch(APITestMixin):
     )
     def test_search_in_field(
         self,
-        es_with_signals,
+        es_with_collector,
         model_field,
         model_value,
         search_term,
@@ -153,7 +153,7 @@ class TestBasicSearch(APITestMixin):
                 model_field: model_value,
             },
         )
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(

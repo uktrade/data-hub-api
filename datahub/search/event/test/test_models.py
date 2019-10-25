@@ -6,7 +6,7 @@ from datahub.search.event.models import Event as ESEvent
 pytestmark = pytest.mark.django_db
 
 
-def test_event_dbmodel_to_dict(es_with_signals):
+def test_event_dbmodel_to_dict(es):
     """Tests conversion of db model to dict."""
     event = EventFactory()
 
@@ -40,7 +40,7 @@ def test_event_dbmodel_to_dict(es_with_signals):
     assert result.keys() == keys
 
 
-def test_event_dbmodels_to_es_documents(es_with_signals):
+def test_event_dbmodels_to_es_documents(es):
     """Tests conversion of db models to Elasticsearch documents."""
     events = EventFactory.create_batch(2)
 
