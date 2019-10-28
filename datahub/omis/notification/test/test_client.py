@@ -23,6 +23,7 @@ from datahub.omis.region.models import UKRegionalSettings
 pytestmark = pytest.mark.django_db
 
 
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestSendEmail:
     """Tests for errors with the internal send_email function."""
 
