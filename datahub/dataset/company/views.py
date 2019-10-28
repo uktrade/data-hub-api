@@ -19,6 +19,7 @@ class CompaniesDatasetView(BaseDatasetView):
             'address_1',
             'address_2',
             'address_county',
+            'address_country__name',
             'address_postcode',
             'address_town',
             'business_type__name',

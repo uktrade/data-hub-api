@@ -34,6 +34,7 @@ def get_expected_data_from_company(company):
         'address_1': company.address_1,
         'address_2': company.address_2,
         'address_county': company.address_county,
+        'address_country__name': company.address_country.name,
         'address_postcode': company.address_postcode,
         'address_town': company.address_town,
         'business_type__name': get_attr_or_none(company, 'business_type.name'),
