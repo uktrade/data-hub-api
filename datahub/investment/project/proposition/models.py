@@ -11,11 +11,7 @@ from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
-from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.investment.project.proposition.constants import (
-    FEATURE_FLAG_PROPOSITION_DOCUMENT,
-    PropositionStatus,
-)
+from datahub.investment.project.proposition.constants import PropositionStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -150,11 +146,10 @@ class Proposition(BaseModel):
         :raises ValidationError: when trying to complete proposition without uploaded documents
         :raises APIConflictException: when proposition status is not ongoing
         """
-        if is_feature_flag_active(FEATURE_FLAG_PROPOSITION_DOCUMENT):
-            if self.documents.filter(document__status=UPLOAD_STATUSES.virus_scanned).count() == 0:
-                raise ValidationError({
-                    'non_field_errors': ['Proposition has no documents uploaded.'],
-                })
+        if self.documents.filter(document__status=UPLOAD_STATUSES.virus_scanned).count() == 0:
+            raise ValidationError({
+                'non_field_errors': ['Proposition has no documents uploaded.'],
+            })
         self._change_status(PropositionStatus.completed, by, details)
 
     def abandon(self, by, details):
