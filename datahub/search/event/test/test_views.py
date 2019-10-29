@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from django.utils.timezone import now, utc
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -410,10 +411,13 @@ class TestSearch(APITestMixin):
     def test_search_event_sortby_modified_on(self, es_with_collector, setup_data):
         """Tests sort by modified_on desc."""
         start_date = datetime.date(2001, 9, 29)
-        event_a = EventFactory(start_date=start_date)
-        event_b = EventFactory(start_date=start_date)
-        event_a.name = 'testing'
-        event_a.save()
+
+        with freeze_time('2018-03-05 16:00:00'):
+            event_a = EventFactory(start_date=start_date)
+
+        with freeze_time('2016-01-02 11:00:00'):
+            event_b = EventFactory(start_date=start_date)
+
         es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
