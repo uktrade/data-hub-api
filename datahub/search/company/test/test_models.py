@@ -43,6 +43,8 @@ class TestCompanyElasticModel:
             'address',
             'registered_address',
 
+            'one_list_group_global_account_manager',
+
             'trading_names',
             'turnover_range',
             'uk_based',

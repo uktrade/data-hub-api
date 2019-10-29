@@ -366,3 +366,31 @@ def test_nested_id_name_dict_raises_exception_on_invalid_argument():
 
     with raises(ValueError):
         dict_utils.computed_nested_id_name_dict('company')(obj)
+
+
+def test_computed_field_function():
+    """Tests if provided function is being called and dictionary created."""
+    obj = construct_mock(
+        get_cats_name=lambda: construct_mock(id='cat-01', name='Mittens'),
+    )
+
+    result = dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
+    assert result == {'id': 'cat-01', 'name': 'Mittens'}
+
+
+def test_computed_field_function_missing_function():
+    """Tests when provided function is missing, ValueError is raised."""
+    obj = construct_mock()
+
+    with raises(ValueError):
+        dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
+
+
+def test_computed_field_function_not_a_function():
+    """Tests when provided function is missing, ValueError is raised."""
+    obj = construct_mock(
+        get_cats_name='tabby',
+    )
+
+    with raises(ValueError):
+        dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
