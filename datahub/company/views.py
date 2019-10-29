@@ -24,6 +24,7 @@ from datahub.company.serializers import (
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
+    RemoveAccountManagerSerializer,
     SelfAssignAccountManagerSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
@@ -114,6 +115,31 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         instance = self.get_object()
         serializer = SelfAssignAccountManagerSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_regional_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def remove_account_manager(self, request, *args, **kwargs):
+        """
+        Remove the One List account manager and tier from a company if it is an international
+        trade adviser-managed One List company.
+
+        The operation is not allowed if the company is a One List company that isn't on
+        'Tier D - Interaction Trade Adviser Accounts'.
+        """
+        instance = self.get_object()
+        serializer = RemoveAccountManagerSerializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
