@@ -410,6 +410,16 @@ class Company(ArchivableModel, BaseModel):
         self.one_list_tier_id = one_list_tier_id
         self.save()
 
+    def remove_from_one_list(self):
+        """
+        Remove the company from the One List.
+
+        This is done by unsetting the company's One List account manager and tier.
+        """
+        self.one_list_account_owner = None
+        self.one_list_tier = None
+        self.save()
+
 
 class OneListCoreTeamMember(models.Model):
     """
