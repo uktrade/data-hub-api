@@ -62,3 +62,14 @@ def _create_mock_es_model(
         get_write_alias=Mock(return_value='test-write-alias'),
         get_target_index_name=Mock(return_value=f'test-index-{target_mapping_hash}'),
     )
+
+
+def get_documents_by_ids(es_client, app, ids):
+    """Get given search app documents by supplied ids."""
+    return es_client.mget(
+        index=app.es_model.get_read_alias(),
+        doc_type=app.name,
+        body={
+            'ids': ids,
+        },
+    )
