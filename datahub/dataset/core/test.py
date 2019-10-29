@@ -1,5 +1,6 @@
+from unittest import mock
+
 import pytest
-from django.conf import settings
 from rest_framework import status
 
 
@@ -50,9 +51,10 @@ class BaseDatasetViewTest:
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
 
+    @mock.patch('datahub.dataset.core.pagination.DatasetCursorPagination.page_size', 2)
     def test_pagination(self, data_flow_api_client):
         """Test that when page size higher than threshold response returns with next page url"""
-        self.factory.create_batch(settings.REST_FRAMEWORK['PAGE_SIZE'] + 1)
+        self.factory.create_batch(2 + 1)
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['next'] is not None
