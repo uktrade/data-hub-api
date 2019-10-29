@@ -37,10 +37,10 @@ def unrelated_objects():
     This is used in tests below to make sure objects unrelated to the company being merged
     do not affect the counts of objects that will be affected by the merge.
     """
-    ContactFactory.create_batch(5)
-    CompanyInteractionFactory.create_batch(5)
-    OrderFactory.create_batch(5)
-    InvestmentProjectFactory.create_batch(5)
+    ContactFactory.create_batch(2)
+    CompanyInteractionFactory.create_batch(2)
+    OrderFactory.create_batch(2)
+    InvestmentProjectFactory.create_batch(2)
 
 
 def company_with_interactions_and_contacts_factory():
@@ -48,7 +48,7 @@ def company_with_interactions_and_contacts_factory():
     Factory for a company with interactions (and hence contacts, as interactions have contacts).
     """
     company = CompanyFactory()
-    CompanyInteractionFactory.create_batch(4, company=company)
+    CompanyInteractionFactory.create_batch(3, company=company)
     return company
 
 
@@ -105,8 +105,8 @@ class TestDuplicateCompanyMerger:
                 company_with_interactions_and_contacts_factory,
                 {
                     CompanyListItem: {'company': 0},
-                    Contact: {'company': 4},
-                    Interaction: {'company': 4},
+                    Contact: {'company': 3},
+                    Interaction: {'company': 3},
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
@@ -198,17 +198,22 @@ class TestDuplicateCompanyMerger:
         expected_planned_merge_results = (expected_result, expected_should_archive)
         assert merge_results == expected_planned_merge_results
 
-    @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_orders', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_company_list_items', (0, 1, 3))
+    @pytest.mark.parametrize(
+        'factory_relation_kwarg,creates_contacts',
+        (
+            ('num_company_list_items', False),
+            ('num_contacts', True),
+            ('num_interactions', True),
+            ('num_orders', True),
+        ),
+    )
+    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_interactions_contacts_succeeds(
             self,
-            source_num_interactions,
-            source_num_contacts,
-            source_num_orders,
-            source_num_company_list_items,
+            factory_relation_kwarg,
+            creates_contacts,
+            num_related_objects,
     ):
         """
         Tests that perform_merge() moves contacts and interactions to the target company,
@@ -217,10 +222,7 @@ class TestDuplicateCompanyMerger:
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
         with freeze_time(creation_time):
             source_company = _company_factory(
-                source_num_interactions,
-                source_num_contacts,
-                source_num_orders,
-                source_num_company_list_items,
+                **{factory_relation_kwarg: num_related_objects},
             )
         target_company = CompanyFactory()
         user = AdviserFactory()
@@ -232,9 +234,7 @@ class TestDuplicateCompanyMerger:
 
         # Each interaction and order has a contact, so actual number of contacts is
         # source_num_interactions + source_num_contacts + source_num_orders
-        assert len(source_contacts) == (
-            source_num_interactions + source_num_contacts + source_num_orders
-        )
+        assert len(source_contacts) == (num_related_objects if creates_contacts else 0)
 
         merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
 
@@ -386,7 +386,7 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
 
-def _company_factory(num_interactions, num_contacts, num_orders, num_company_list_items):
+def _company_factory(num_interactions=0, num_contacts=0, num_orders=0, num_company_list_items=0):
     """Factory for a company that has companies, interactions and OMIS orders."""
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)

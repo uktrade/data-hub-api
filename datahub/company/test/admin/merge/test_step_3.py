@@ -100,18 +100,22 @@ class TestConfirmMergeViewGet(AdminTestMixin):
 class TestConfirmMergeViewPost(AdminTestMixin):
     """Tests form submission in the 'Confirm merge' view."""
 
-    @pytest.mark.parametrize('source_num_interactions', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_contacts', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_investment_projects', (0, 1, 3))
-    @pytest.mark.parametrize('source_num_orders', (0, 3))
-    @pytest.mark.parametrize('source_num_company_list_items', (0, 1, 3))
+    @pytest.mark.parametrize(
+        'factory_relation_kwarg,creates_contacts',
+        (
+            ('num_company_list_items', False),
+            ('num_contacts', True),
+            ('num_interactions', True),
+            ('num_investment_projects', False),
+            ('num_orders', True),
+        ),
+    )
+    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
     def test_merge_succeeds(
         self,
-        source_num_interactions,
-        source_num_contacts,
-        source_num_investment_projects,
-        source_num_orders,
-        source_num_company_list_items,
+        factory_relation_kwarg,
+        creates_contacts,
+        num_related_objects,
     ):
         """
         Test that the merge succeeds and the source company is marked as a duplicate when the
@@ -121,11 +125,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
         with freeze_time(creation_time):
             source_company = _company_factory(
-                source_num_interactions,
-                source_num_contacts,
-                source_num_investment_projects,
-                source_num_orders,
-                source_num_company_list_items,
+                **{factory_relation_kwarg: num_related_objects},
             )
         target_company = CompanyFactory()
         source_interactions = list(source_company.interactions.all())
@@ -141,11 +141,9 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ) for investment_project_field in INVESTMENT_PROJECT_COMPANY_FIELDS
         }
 
-        # Each interaction and order has a contact, so actual number of contacts is
+        # Note that the interaction and order factories also create contacts
         # source_num_interactions + source_num_contacts + source_num_orders
-        assert len(source_contacts) == (
-            source_num_interactions + source_num_contacts + source_num_orders
-        )
+        assert len(source_contacts) == (num_related_objects if creates_contacts else 0)
 
         confirm_merge_url = _make_confirm_merge_url(source_company, target_company)
 
@@ -337,11 +335,11 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
 
 def _company_factory(
-        num_interactions,
-        num_contacts,
-        num_investment_projects,
-        num_orders,
-        num_company_list_items,
+        num_interactions=0,
+        num_contacts=0,
+        num_investment_projects=0,
+        num_orders=0,
+        num_company_list_items=0,
 ):
     """
     Factory for a company that has companies, interactions, investment projects and OMIS orders.
