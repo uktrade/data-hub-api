@@ -1,0 +1,30 @@
+- model: interaction.servicedeliverystatus
+  pk: 45329c18-6095-e211-a939-e4115bead28a
+  fields:
+    name: Offered
+    disabled_on:
+    order: 100.0
+- model: interaction.servicedeliverystatus
+  pk: 46329c18-6095-e211-a939-e4115bead28a
+  fields:
+    name: Current
+    disabled_on:
+    order: 200.0
+- model: interaction.servicedeliverystatus
+  pk: 47329c18-6095-e211-a939-e4115bead28a
+  fields:
+    name: Completed
+    disabled_on:
+    order: 300.0
+- model: interaction.servicedeliverystatus
+  pk: 48329c18-6095-e211-a939-e4115bead28a
+  fields:
+    name: Withdrawn
+    disabled_on:
+    order: 400.0
+- model: interaction.servicedeliverystatus
+  pk: 49329c18-6095-e211-a939-e4115bead28a
+  fields:
+    name: On hold
+    disabled_on:
+    order: 500.0
