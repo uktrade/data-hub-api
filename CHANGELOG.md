@@ -1,3 +1,50 @@
+# Data Hub API 17.1.0 (2019-10-30)
+
+
+## Deprecations
+
+- **Advisers** The following legacy company list endpoints are deprecated and will be removed on or after 6 November 2019:
+
+  - `GET /v4/user/company-list`
+  - `GET /v4/user/company-list/<company ID>`
+  - `PUT /v4/user/company-list/<company ID>`
+  - `DELETE /v4/user/company-list/<company ID>`
+
+  Please use the new multi-list endpoints starting with `/v4/company-list` instead.
+- **Companies** The following Comapnies House endpoints are deprecated and will be removed on or after 6 November 2019:
+
+  - `GET /v4/ch-company`
+  - `GET /v4/ch-company/<company_number>`
+- **Companies** The following Comapnies House endpoints are deprecated and will be removed on or after 6 November 2019:
+
+  - `GET /v3/search/companieshousecompany`
+  - `GET /v4/search/companieshousecompany`
+
+## Features
+
+- **Companies** The `update-from-dnb` admin tool now shows changes to `global_ultimate_duns_number` field in the "review changes" table.
+- **Investment** The proposition documents feature is now always active and is no longer behind a feature flag. (This feature was introduced in September 2018.)
+
+## Internal changes
+
+- **Interactions** Database migrations up to 0068 were squashed in order to reduce build times. The old migrations will be removed once the squashed migration has been applied to all environments.
+- A correction was made to the deleted object collector (used to delete objects from Elasticsearch in bulk) to make it safe to use in web processes. This change has no current effect as the collector has only been used in management commands to date.
+- The speed of search tests was improved by using more efficient test set-up. The reduction in running time of the search tests is approximately 65%.
+- Various indirect dependencies were updated.
+
+## API
+
+- **Companies** `POST /v4/search/company`: new filter `one_list_group_global_account_manager` was added.
+- **Companies** `GET /v4/dataset/companies-dataset`: The field `address_country__name` was added to the companies dataset endpoint
+- **Companies** A new endpoint, `POST /v4/company/<ID>/remove-account-manager`, was added. 
+
+  The endpoint removes the assigned tier and account manager for a One List company on tier 'Tier D - Interaction Trade Adviser Accounts'.
+
+  If the company is on a One List tier other than 'Tier D - Interaction Trade Adviser Accounts', the operation is not allowed.
+
+  The `company.change_company` and `company.change_regional_account_manager` permissions are required to use this endpoint.
+
+
 # Data Hub API 17.0.0 (2019-10-24)
 
 
