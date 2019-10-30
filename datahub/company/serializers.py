@@ -570,6 +570,36 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
         return self.instance
 
 
+class RemoveAccountManagerSerializer(serializers.Serializer):
+    """
+    Serialiser for removing an interaction trade adviser as the account manager of a
+    company.
+    """
+
+    allowed_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
+    default_error_messages = {
+        'cannot_change_account_manager_for_other_one_list_tiers':
+            gettext_lazy("A lead adviser can't be removed from companies on this One List tier."),
+    }
+
+    def validate(self, attrs):
+        """Validate that the change of One List account manager and tier is allowed."""
+        attrs = super().validate(attrs)
+
+        if self.instance.one_list_tier_id not in (None, self.allowed_one_list_tier_id):
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_account_manager_for_other_one_list_tiers'],
+                code='cannot_change_account_manager_for_other_one_list_tiers',
+            )
+
+        return attrs
+
+    def save(self, adviser):
+        """Unset the company's One List account manager and tier."""
+        self.instance.remove_from_one_list()
+        return self.instance
+
+
 class PublicCompanySerializer(CompanySerializer):
     """
     Read-only serialiser for the Hawk-authenticated company view.

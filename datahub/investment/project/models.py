@@ -20,7 +20,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import force_uuid, get_front_end_url, StrEnum
 from datahub.investment.project import constants
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -252,8 +252,8 @@ class IProjectAbstract(models.Model):
         if self.level_of_involvement_id is None:
             return self.INVOLVEMENT.unspecified
 
-        not_involved = uuid.UUID(constants.Involvement.no_involvement.value.id)
-        if self.level_of_involvement_id == not_involved:
+        not_involved_id = constants.Involvement.no_involvement.value.id
+        if force_uuid(self.level_of_involvement_id) == force_uuid(not_involved_id):
             return self.INVOLVEMENT.not_involved
 
         return self.INVOLVEMENT.involved
