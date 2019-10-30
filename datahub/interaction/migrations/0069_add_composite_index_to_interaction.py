@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('interaction', '0068_remove_interaction_location_from_database'),
+        ('interaction', '0001_squashed_0068_remove_interaction_location_from_database'),
     ]
 
     operations = [
