@@ -1,0 +1,1 @@
+`POST /v4/search/company`: A filter was added for the `latest_interaction_date` field, in the form of `latest_interaction_date_before` and `latest_interaction_date_after`. Both the fields are optional. A company will only be returned if its latest interaction date falls between those dates.
