@@ -120,6 +120,7 @@ class Company(BaseESModel):
             },
         ],
     )
+    latest_interaction_date = Date()
 
     COMPUTED_MAPPINGS = {
         'suggest': get_suggestions,
@@ -129,6 +130,7 @@ class Company(BaseESModel):
             'get_one_list_group_global_account_manager',
             dict_utils.contact_or_adviser_dict,
         ),
+        'latest_interaction_date': lambda obj: obj.latest_interaction_date,
     }
 
     MAPPINGS = {
