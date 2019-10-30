@@ -138,6 +138,20 @@ def _computed_nested_dict(nested_field, dict_func):
     return get_dict
 
 
+def computed_field_function(function_name, dict_func):
+    """Create a dictionary from a result of provided function call."""
+    def get_dict(obj):
+        field = getattr(obj, function_name, None)
+        if field is None:
+            raise ValueError(f'The object function "{function_name}" does not exist.')
+        if not callable(field):
+            raise ValueError(f'"{function_name}" is not callable.')
+
+        return dict_func(field())
+
+    return get_dict
+
+
 def computed_nested_id_name_dict(nested_field):
     """Creates a dictionary with id and name from a nested field."""
     return _computed_nested_dict(nested_field, id_name_dict)

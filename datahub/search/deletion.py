@@ -100,7 +100,7 @@ class Collector:
             receiver.connect()
 
         for receiver in self.signal_receivers_to_disable:
-            receiver.disconnect()
+            receiver.disable()
 
     def disconnect(self):
         """Starts listening to post_delete signals on all search models."""
@@ -108,7 +108,7 @@ class Collector:
             receiver.disconnect()
 
         for receiver in self.signal_receivers_to_disable:
-            receiver.connect()
+            receiver.enable()
 
     def _collect(self, instance):
         """Logic that gets run on post_delete."""

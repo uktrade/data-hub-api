@@ -1,3 +1,4 @@
+import random
 import uuid
 from cgi import parse_header
 from csv import DictReader
@@ -13,7 +14,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
@@ -33,7 +34,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(es_with_signals):
+def setup_data(es_with_collector):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -79,11 +80,11 @@ def setup_data(es_with_signals):
         registered_address_country_id=country_anguilla,
         archived=True,
     )
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 @pytest.fixture
-def setup_headquarters_data(es_with_signals):
+def setup_headquarters_data(es_with_collector):
     """Sets up data for headquarter type tests."""
     CompanyFactory(
         name='ghq',
@@ -101,7 +102,7 @@ def setup_headquarters_data(es_with_signals):
         name='none',
         headquarter_type_id=None,
     )
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 class TestSearch(APITestMixin):
@@ -115,16 +116,17 @@ class TestSearch(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_response_body(self, es_with_signals):
+    def test_response_body(self, es_with_collector):
         """Tests the response body of a search query."""
+        one_list_account_owner = AdviserFactory()
         company = CompanyFactory(
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
             global_headquarters=None,
             one_list_tier=None,
-            one_list_account_owner=None,
+            one_list_account_owner=one_list_account_owner,
         )
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
         response = self.api_client.post(url)
@@ -164,6 +166,12 @@ class TestSearch(APITestMixin):
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
                         },
+                    },
+                    'one_list_group_global_account_manager': {
+                        'id': str(one_list_account_owner.id),
+                        'first_name': one_list_account_owner.first_name,
+                        'last_name': one_list_account_owner.last_name,
+                        'name': one_list_account_owner.name,
                     },
                     'uk_based': (
                         company.address_country.id == uuid.UUID(
@@ -362,10 +370,76 @@ class TestSearch(APITestMixin):
         assert search_results == results
 
     @pytest.mark.parametrize(
+        'num_account_managers',
+        (1, 2, 3),
+    )
+    def test_one_list_account_manager_filter(self, num_account_managers, es_with_collector):
+        """Test one list account manager filter."""
+        account_managers = AdviserFactory.create_batch(3)
+
+        selected_account_managers = random.sample(account_managers, num_account_managers)
+
+        CompanyFactory.create_batch(2)
+        CompanyFactory.create_batch(3, one_list_account_owner=factory.Iterator(account_managers))
+
+        es_with_collector.flush_and_refresh()
+
+        query = {
+            'one_list_group_global_account_manager':
+            [account_manager.id for account_manager in selected_account_managers],
+        }
+
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        search_results = {
+            company['one_list_group_global_account_manager']['id']
+            for company in response.data['results']
+        }
+        expected_results = {
+            str(account_manager.id) for account_manager in selected_account_managers
+        }
+        assert response.data['count'] == len(selected_account_managers)
+        assert len(response.data['results']) == len(selected_account_managers)
+        assert search_results == expected_results
+
+    def test_one_list_account_manager_with_global_headquarters_filter(self, es_with_collector):
+        """
+        Tests that one list account manager filter searches for inherited one list account manager.
+        """
+        account_manager = AdviserFactory()
+        CompanyFactory.create_batch(2)
+
+        global_headquarters = CompanyFactory(
+            one_list_account_owner=account_manager,
+        )
+        target_companies = CompanyFactory.create_batch(2, global_headquarters=global_headquarters)
+
+        es_with_collector.flush_and_refresh()
+
+        query = {'one_list_group_global_account_manager': account_manager.pk}
+
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        search_results = {company['id'] for company in response.data['results']}
+        expected_results = {
+            str(global_headquarters.id),
+            *{str(target_company.id) for target_company in target_companies},
+        }
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert search_results == expected_results
+
+    @pytest.mark.parametrize(
         'sector_level',
         (0, 1, 2),
     )
-    def test_sector_descends_filter(self, hierarchical_sectors, es_with_signals, sector_level):
+    def test_sector_descends_filter(self, hierarchical_sectors, es_with_collector, sector_level):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -381,7 +455,7 @@ class TestSearch(APITestMixin):
             )),
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
         body = {
@@ -406,13 +480,13 @@ class TestSearch(APITestMixin):
             (constants.Country.anguilla.value.id, False),
         ),
     )
-    def test_composite_country_filter(self, es_with_signals, country, match):
+    def test_composite_country_filter(self, es_with_collector, country, match):
         """Tests composite country filter."""
         company = CompanyFactory(
             address_country_id=constants.Country.cayman_islands.value.id,
             registered_address_country_id=constants.Country.montserrat.value.id,
         )
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
 
@@ -459,7 +533,7 @@ class TestSearch(APITestMixin):
             ('moine', None),
         ),
     )
-    def test_composite_name_filter(self, es_with_signals, name_term, matched_company_name):
+    def test_composite_name_filter(self, es_with_collector, name_term, matched_company_name):
         """Tests composite name filter."""
         CompanyFactory(
             name='whiskers and tabby',
@@ -469,7 +543,7 @@ class TestSearch(APITestMixin):
             name='1a',
             trading_names=['3a', '4a'],
         )
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
 
@@ -491,7 +565,7 @@ class TestSearch(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    def test_company_search_paging(self, es_with_signals):
+    def test_company_search_paging(self, es_with_collector):
         """
         Tests the pagination.
 
@@ -511,7 +585,7 @@ class TestSearch(APITestMixin):
             trading_names=[],
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
         for page in range((len(ids) + page_size - 1) // page_size):
@@ -544,7 +618,7 @@ class TestCompanyExportView(APITestMixin):
             (CompanyPermission.export_company,),
         ),
     )
-    def test_user_without_permission_cannot_export(self, es_with_signals, permissions):
+    def test_user_without_permission_cannot_export(self, es, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -563,7 +637,7 @@ class TestCompanyExportView(APITestMixin):
     )
     def test_export(
         self,
-        es_with_signals,
+        es_with_collector,
         request_sortby,
         orm_ordering,
     ):
@@ -586,7 +660,7 @@ class TestCompanyExportView(APITestMixin):
             export_to_countries=Country.objects.order_by('?')[:2],
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:
@@ -732,7 +806,7 @@ class TestAutocompleteSearch(APITestMixin):
     )
     def test_response_body(
         self,
-        es_with_signals,
+        es_with_collector,
         monkeypatch,
         search,
         use_context_serializer,
@@ -761,7 +835,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=constants.Country.united_kingdom.value.id,
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company-autocomplete')
         response = self.api_client.get(
@@ -853,7 +927,7 @@ class TestAutocompleteSearch(APITestMixin):
             ('help qrs', []),
         ),
     )
-    def test_searching_with_a_query(self, es_with_signals, query, expected_companies):
+    def test_searching_with_a_query(self, es_with_collector, query, expected_companies):
         """Tests case where search queries are provided."""
         url = reverse('api-v4:search:company-autocomplete')
 
@@ -872,7 +946,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=country_us,
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         response = self.api_client.get(url, data={'term': query})
 
@@ -892,7 +966,7 @@ class TestAutocompleteSearch(APITestMixin):
             (1, ['abc defg ltd']),
         ),
     )
-    def test_searching_with_limit(self, es_with_signals, limit, expected_companies):
+    def test_searching_with_limit(self, es_with_collector, limit, expected_companies):
         """Tests case where search limit is provided."""
         url = reverse('api-v4:search:company-autocomplete')
 
@@ -911,7 +985,7 @@ class TestAutocompleteSearch(APITestMixin):
             registered_address_country_id=country_us,
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         response = self.api_client.get(
             url,

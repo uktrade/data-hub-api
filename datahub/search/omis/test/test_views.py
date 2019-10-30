@@ -50,7 +50,7 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data(es_with_signals):
+def setup_data(es_with_collector):
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
         company = CompanyFactory(
@@ -110,11 +110,11 @@ def setup_data(es_with_signals):
             estimated_time=120,
         )
 
-        es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 @pytest.fixture
-def setup_subtotal_cost_data(es_with_signals):
+def setup_subtotal_cost_data(es_with_collector):
     """
     Setup Order data for total subtotal cost test.
 
@@ -136,7 +136,7 @@ def setup_subtotal_cost_data(es_with_signals):
             estimated_time=subtotal_cost * 60 // order.hourly_rate.rate_value,
         )
 
-    es_with_signals.indices.refresh()
+    es_with_collector.flush_and_refresh()
 
 
 class TestSearchOrder(APITestMixin):
@@ -448,7 +448,7 @@ class TestSearchOrder(APITestMixin):
         'sector_level',
         (0, 1, 2),
     )
-    def test_sector_descends_filter(self, hierarchical_sectors, es_with_signals, sector_level):
+    def test_sector_descends_filter(self, hierarchical_sectors, es_with_collector, sector_level):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -464,7 +464,7 @@ class TestSearchOrder(APITestMixin):
             )),
         )
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:order')
         body = {
@@ -525,7 +525,7 @@ class TestOrderExportView(APITestMixin):
             (f'order.{OrderPermission.export}',),
         ),
     )
-    def test_user_without_permission_cannot_export(self, es_with_signals, permissions):
+    def test_user_without_permission_cannot_export(self, es, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -547,7 +547,7 @@ class TestOrderExportView(APITestMixin):
     )
     def test_export(
         self,
-        es_with_signals,
+        es_with_collector,
         request_sortby,
         orm_ordering,
     ):
@@ -585,7 +585,7 @@ class TestOrderExportView(APITestMixin):
         for factory_ in factories:
             factory_.create_batch(2)
 
-        es_with_signals.indices.refresh()
+        es_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:

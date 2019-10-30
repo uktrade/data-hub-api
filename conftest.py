@@ -6,12 +6,14 @@ from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import CacheHandler
 from django.core.management import call_command
+from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.metadata.test.factories import SectorFactory
-from datahub.search.apps import get_search_apps
+from datahub.search.apps import get_search_app_by_model, get_search_apps
+from datahub.search.bulk_sync import sync_objects
 from datahub.search.elasticsearch import (
     alias_exists,
     create_index,
@@ -19,6 +21,7 @@ from datahub.search.elasticsearch import (
     delete_index,
     index_exists,
 )
+from datahub.search.signals import SignalReceiver
 
 
 def pytest_sessionstart(session):
@@ -248,6 +251,11 @@ def es_with_signals(es, synchronous_on_commit):
     - connects search signal receivers so that Elasticsearch documents are automatically
     created for model instances saved during the test
     - deletes all documents from Elasticsearch at the end of the test
+
+    Use this fixture when specifically testing search signal receivers.
+
+    Call es_with_signals.indices.refresh() after creating objects to refresh all search indices
+    and ensure synced objects are available for querying.
     """
     for search_app in get_search_apps():
         search_app.connect_signals()
@@ -256,6 +264,93 @@ def es_with_signals(es, synchronous_on_commit):
 
     for search_app in get_search_apps():
         search_app.disconnect_signals()
+
+
+class SavedObjectCollector:
+    """
+    Collects the search apps of saved search objects and indexes those apps in bulk in
+    Elasticsearch.
+
+    (A possible future optimisation would be to further restrict the synced apps to the app
+    being tested i.e. in tests for the interaction search app, only sync interaction objects
+    and not companies, contacts etc.)
+    """
+
+    def __init__(self, es_client):
+        """Initialises the collector."""
+        self.apps_to_sync = set()
+        self.es_client = es_client
+
+        self.signal_receivers_to_connect = [
+            SignalReceiver(post_save, search_app.queryset.model, self._collect)
+            for search_app in get_search_apps()
+        ]
+
+        # Disconnect any existing search post_save signal receivers for safety
+        self.signal_receivers_to_disable = [
+            receiver
+            for search_app in get_search_apps()
+            for receiver in search_app.get_signal_receivers()
+            if receiver.signal is post_save
+        ]
+
+    def __enter__(self):
+        """Enable the collector by connecting our post_save signals."""
+        for receiver in self.signal_receivers_to_connect:
+            receiver.connect()
+
+        for receiver in self.signal_receivers_to_disable:
+            receiver.disable()
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Disable the collector by disconnecting our post_save signals."""
+        for receiver in self.signal_receivers_to_connect:
+            receiver.disconnect()
+
+        for receiver in self.signal_receivers_to_disable:
+            receiver.enable()
+
+    def flush_and_refresh(self):
+        """Sync objects of all collected apps to Elasticsearch and refresh search indices."""
+        for search_app in self.apps_to_sync:
+            es_model = search_app.es_model
+            read_indices, write_index = es_model.get_read_and_write_indices()
+            sync_objects(es_model, search_app.queryset.all(), read_indices, write_index)
+
+        self.apps_to_sync.clear()
+        self.es_client.indices.refresh()
+
+    def _collect(self, obj):
+        """
+        Logic run on post_save for models of all search apps.
+
+        Note: This does not use transaction.on_commit(), because transactions in tests
+        are not committed. Be careful if reusing this logic in production code (as you would
+        usually want to delay syncing until the transaction is committed).
+        """
+        model = obj.__class__
+        search_app = get_search_app_by_model(model)
+        self.apps_to_sync.add(search_app)
+
+
+@pytest.fixture
+def es_with_collector(es, synchronous_on_commit):
+    """
+    Function-scoped pytest fixture that:
+
+    - ensures Elasticsearch is available for the test
+    - collects all model objects saved so they can be synced to Elasticsearch in bulk
+    - deletes all documents from Elasticsearch at the end of the test
+
+    Use this fixture for search tests that don't specifically test signal receivers.
+
+    Call es_with_collector.flush_and_refresh() to sync collected objects to Elasticsearch and
+    refresh all indices.
+    """
+    with SavedObjectCollector(es) as collector:
+        yield collector
 
 
 @pytest.fixture
