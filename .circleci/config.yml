@@ -68,7 +68,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Install dependencies
-        command: python -m pip install --cache-dir ~/cache/pip -r requirements.txt
+        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
 
     - save_cache:
         name: Save pip cache
