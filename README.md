@@ -1,9 +1,9 @@
 # Data Hub API
 
-[![image](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master)
-[![image](https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-leeloo)
-[![image](https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-leeloo)
-[![Updates](https://pyup.io/repos/github/uktrade/data-hub-leeloo/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-leeloo/)
+[![image](https://circleci.com/gh/uktrade/data-hub-api/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api/tree/master)
+[![image](https://codecov.io/gh/uktrade/data-hub-api/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
+[![image](https://codeclimate.com/github/uktrade/data-hub-api/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-api)
+[![Updates](https://pyup.io/repos/github/uktrade/data-hub-api/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-api/)
 
 Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub API you can search for entities and manage companies, contacts and interactions.
 
@@ -16,8 +16,8 @@ This project uses Docker compose to setup and run all the necessary components. 
 1.  Clone the repository:
 
     ```shell
-    git clone https://github.com/uktrade/data-hub-leeloo
-    cd data-hub-leeloo
+    git clone https://github.com/uktrade/data-hub-api
+    cd data-hub-api
     ```
 
 2.  Create a `.env` file from `sample.env`
@@ -72,8 +72,8 @@ Dependencies:
 1.  Clone the repository:
 
     ```shell
-    git clone https://github.com/uktrade/data-hub-leeloo
-    cd data-hub-leeloo
+    git clone https://github.com/uktrade/data-hub-api
+    cd data-hub-api
     ```
 
 2.  Install Python 3.7.
@@ -223,7 +223,7 @@ page with these details:
     * Application: The application just created
     * Scope: The required scopes
 
-The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-leeloo/tree/develop/datahub/oauth/scopes.py).
+The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-api/tree/develop/datahub/oauth/scopes.py).
 
 [Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
 
