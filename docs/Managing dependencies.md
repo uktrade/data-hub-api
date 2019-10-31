@@ -62,4 +62,4 @@ have been removed which can cause problems.)
 6. Create a PR. Include links to the change logs for dependencies in `requirements.in` that 
 were updated to make it easier for other developers to have a look at them. 
 
-   [Example of such a PR.](https://github.com/uktrade/data-hub-leeloo/pull/1171)
+   [Example of such a PR.](https://github.com/uktrade/data-hub-api/pull/1171)

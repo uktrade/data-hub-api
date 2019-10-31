@@ -1,23 +1,22 @@
-# Data Hub Leeloo
+# Data Hub API
 
-[![image](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master)
-[![image](https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-leeloo)
-[![image](https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-leeloo)
-[![Updates](https://pyup.io/repos/github/uktrade/data-hub-leeloo/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-leeloo/)
+[![CircleCI](https://circleci.com/gh/uktrade/data-hub-api.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api)
+[![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/develop/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
+[![Maintainability](https://api.codeclimate.com/v1/badges/853f041744da17eb32bf/maintainability)](https://codeclimate.com/github/uktrade/data-hub-api/maintainability)
 
-Leeloo provides an API into Data Hub for Data Hub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
+Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub API you can search for entities and manage companies, contacts and interactions.
 
 More guides can be found in the [docs](./docs/) folder.
 
 ## Installation with Docker
 
-Leeloo uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
+This project uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
 
 1.  Clone the repository:
 
     ```shell
-    git clone https://github.com/uktrade/data-hub-leeloo
-    cd data-hub-leeloo
+    git clone https://github.com/uktrade/data-hub-api
+    cd data-hub-api
     ```
 
 2.  Create a `.env` file from `sample.env`
@@ -32,7 +31,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose up
     ```
 
-    * It will take time for the leeloo API container to come up - it will run
+    * It will take time for the API container to come up - it will run
       migrations on both DBs, load initial data, sync elasticsearch etc. Watch
       along in the api container's logs.
     * **NOTE:**
@@ -57,7 +56,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
       For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
-    By default, you can run both leeloo and the frontend under one docker-compose
+    By default, you can run both the API and the frontend under one docker-compose
     project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#setting-up-with-docker-compose).
 
 ## Native installation (without Docker)
@@ -72,8 +71,8 @@ Dependencies:
 1.  Clone the repository:
 
     ```shell
-    git clone https://github.com/uktrade/data-hub-leeloo
-    cd data-hub-leeloo
+    git clone https://github.com/uktrade/data-hub-api
+    cd data-hub-api
     ```
 
 2.  Install Python 3.7.
@@ -200,7 +199,7 @@ flake8
 
 ## Granting access to the front end
 
-The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure Leeloo as follows to use with the front end:
+The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure the API as follows to use with the front end:
 
 * `SSO_ENABLED`: `True`
 * `RESOURCE_SERVER_INTROSPECTION_URL`: URL of the [RFC 7662](https://tools.ietf.org/html/rfc7662) introspection endpoint (should be the same server the front end is using). This is provided by a [Staff SSO](https://github.com/uktrade/staff-sso) instance.
@@ -223,13 +222,13 @@ page with these details:
     * Application: The application just created
     * Scope: The required scopes
 
-The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-leeloo/tree/develop/datahub/oauth/scopes.py).
+The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-api/tree/develop/datahub/oauth/scopes.py).
 
 [Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
 
 ## Deployment
 
-Leeloo can run on any Heroku-style platform. Configuration is performed via the following environment variables:
+Data Hub API can run on any Heroku-style platform. Configuration is performed via the following environment variables:
 
 
 | Variable name | Required | Description |

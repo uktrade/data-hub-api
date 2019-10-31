@@ -3681,11 +3681,11 @@
 
 ## Internal changes
 
-  - Moved to one Elasticsearch index per mapping type, and added a command (`./manage.py migrate_es`) to migrate Elasticsearch index mappings. See [docs/Elasticsearch migrations.md](https://github.com/uktrade/data-hub-leeloo/blob/master/docs/Elasticsearch%20migrations.md) for more detail. (After upgrading, `./manage.py init_es` must be run to update index aliases.)
+  - Moved to one Elasticsearch index per mapping type, and added a command (`./manage.py migrate_es`) to migrate Elasticsearch index mappings. See [docs/Elasticsearch migrations.md](https://github.com/uktrade/data-hub-api/blob/master/docs/Elasticsearch%20migrations.md) for more detail. (After upgrading, `./manage.py init_es` must be run to update index aliases.)
   - Fixed a random failure in the `TestListCompanies.test_sort_by_name` test
   - Added a contact for an archived company to the test data
   - Updated various dependencies
 
 # Data Hub \< 5.0.0
 
-Please check the [previous releases on GitHub](https://github.com/uktrade/data-hub-leeloo/releases).
+Please check the [previous releases on GitHub](https://github.com/uktrade/data-hub-api/releases).
