@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
@@ -9,23 +8,8 @@ from datahub.company.test.factories import (
     CompanyFactory,
     SubsidiaryFactory,
 )
-from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none, HawkAPITestClient
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
-
-@pytest.fixture
-def data_flow_api_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the data_flow_api scope."""
-    hawk_api_client.set_credentials(
-        'data-flow-api-id',
-        'data-flow-api-key',
-    )
-    yield hawk_api_client
+from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
+from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_company(company):
@@ -74,43 +58,13 @@ def get_expected_data_from_company(company):
 
 
 @pytest.mark.django_db
-class TestCompaniesDatasetViewSet:
+class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
     """
     Tests for CompaniesDatasetView
     """
 
     view_url = reverse('api-v4:dataset:companies-dataset')
-
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
-    def test_other_methods_not_allowed(
-        self,
-        data_flow_api_client,
-        method,
-    ):
-        """Test that various HTTP methods are not allowed."""
-        response = data_flow_api_client.request(method, self.view_url)
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-
-    def test_without_scope(self, hawk_api_client):
-        """Test that making a request without the correct Hawk scope returns an error."""
-        hawk_api_client.set_credentials(
-            'test-id-without-scope',
-            'test-key-without-scope',
-        )
-        response = hawk_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_without_credentials(self, api_client):
-        """Test that making a request without credentials returns an error."""
-        response = api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_without_whitelisted_ip(self, data_flow_api_client):
-        """Test that making a request without the whitelisted IP returns an error."""
-        data_flow_api_client.set_http_x_forwarded_for('1.1.1.1')
-        response = data_flow_api_client.get(self.view_url)
-
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    factory = CompanyFactory
 
     @pytest.mark.parametrize(
         'company_factory', (
@@ -154,15 +108,3 @@ class TestCompaniesDatasetViewSet:
         expected_list = sorted([company3, company4], key=lambda x: x.pk) + [company1, company2]
         for index, company in enumerate(expected_list):
             assert str(company.id) == response_results[index]['id']
-
-    def test_pagination(self, data_flow_api_client):
-        """Test that when page size higher than threshold response returns with next page url"""
-        CompanyFactory.create_batch(settings.REST_FRAMEWORK['PAGE_SIZE'] + 1)
-        response = data_flow_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['next'] is not None
-
-    def test_no_data(self, data_flow_api_client):
-        """Test that without any data available, endpoint completes the request successfully"""
-        response = data_flow_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_200_OK
