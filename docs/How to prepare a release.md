@@ -69,7 +69,7 @@ Releasing to production happens manually but after it has been announced and app
 Post in the `#data-hub` slack channel the following (replace `<version>` with the version number and `<service-manager>` with the person resposible for approvals):
 
 ```
-@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-leeloo/blob/master/CHANGELOG.md. @<service-manager> Are you happy for us to release?
+@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-api/blob/master/CHANGELOG.md. @<service-manager> Are you happy for us to release?
 ```
 
 After the approval, the release can be deployed.
@@ -84,7 +84,7 @@ Click on `build`, follow the deployment and check that everything looks fine aft
 
 ## Formalise the release
 
-In GitHub, [create a release](https://github.com/uktrade/data-hub-leeloo/releases/new) with the following values:
+In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/new) with the following values:
 
 * **Tag version**: `v<version>` e.g. `v6.3.0`
 * **Target**: `master`

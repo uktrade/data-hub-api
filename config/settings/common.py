@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Django settings for Leeloo project.
+Django settings for the project.
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
@@ -306,7 +306,6 @@ SEARCH_APPS = [
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 
-# Leeloo stuff
 if 'elasticsearch' in VCAP_SERVICES:
     ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
 else:

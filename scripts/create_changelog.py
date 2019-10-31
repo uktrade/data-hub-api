@@ -28,7 +28,7 @@ from script_utils.git import any_uncommitted_changes, local_branch_exists, remot
 from script_utils.news_fragments import list_news_fragments
 from script_utils.version import Version
 
-BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-leeloo'
+BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-api'
 
 parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
 parser.add_argument('release_type', choices=Version._fields)
