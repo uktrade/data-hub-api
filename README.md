@@ -36,7 +36,7 @@ This project uses Docker compose to setup and run all the necessary components. 
       along in the api container's logs.
     * **NOTE:**
       If you are using a linux system, the elasticsearch container may not
-      come up successfully (`data-hub-leeloo_es_1`) - it might be perpetually
+      come up successfully (`data-hub-api_es_1`) - it might be perpetually
       restarting.
       If the logs for that container mention something like
       `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
@@ -175,7 +175,7 @@ Automatically-generated API documentation is served at `/docs` (requires admin s
 
 ## Local development
 
-If using Docker, prefix these commands with `docker-compose run leeloo`.
+If using Docker, prefix these commands with `docker-compose run api`.
 
 To run the tests:
 
@@ -328,7 +328,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 
 ## Management commands
 
-If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run leeloo`.
+If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run api`.
 
 ### Database
 
