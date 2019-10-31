@@ -3,7 +3,6 @@
 [![image](https://circleci.com/gh/uktrade/data-hub-api/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api/tree/master)
 [![image](https://codecov.io/gh/uktrade/data-hub-api/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
 [![image](https://codeclimate.com/github/uktrade/data-hub-api/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-api)
-[![Updates](https://pyup.io/repos/github/uktrade/data-hub-api/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-api/)
 
 Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub API you can search for entities and manage companies, contacts and interactions.
 
