@@ -1,7 +1,6 @@
 import functools
 import logging
 
-import reversion
 from django.contrib import messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
@@ -14,12 +13,12 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
 from rest_framework import serializers
 
-from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     get_company,
+    update_company_from_dnb,
 )
 from datahub.metadata.models import Country
 
@@ -152,36 +151,21 @@ class AdminException(Exception):
     """
 
 
-def _update_from_dnb(dh_company, dnb_company, user):
+def handle_dnb_error(func, error_url):
     """
-    Updates `dh_company` with `dnb_company` while setting
-    `modified_by` to the given user and creating a revision.
-
-    Raises serializers.ValidationError if data is invalid.
+    Call a callable and handle DNB-related errors by transposing them in to
+    AdminExceptions.
     """
-    company_serializer = DNBCompanySerializer(
-        dh_company,
-        data=dnb_company,
-        partial=True,
-    )
-
     try:
-        company_serializer.is_valid(raise_exception=True)
+        return func()
 
-    except serializers.ValidationError:
-        logger.error(
-            'Data from D&B did not pass the Data Hub validation checks.',
-            extra={'dnb_company': dnb_company, 'errors': company_serializer.errors},
-        )
-        raise
+    except (DNBServiceError, DNBServiceInvalidResponse):
+        message = 'Something went wrong in an upstream service.'
+        raise AdminException(message, error_url)
 
-    with reversion.create_revision():
-        company_serializer.save(
-            modified_by=user,
-            pending_dnb_investigation=False,
-        )
-        reversion.set_user(user)
-        reversion.set_comment('Updated from D&B')
+    except DNBServiceInvalidRequest:
+        message = 'No matching company found in D&B database.'
+        raise AdminException(message, error_url)
 
 
 @redirect_with_message
@@ -211,18 +195,12 @@ def update_from_dnb(model_admin, request, object_id):
     if dh_company is None or dh_company.duns_number is None:
         raise SuspiciousOperation()
 
-    try:
-        dnb_company = get_company(dh_company.duns_number)
-
-    except (DNBServiceError, DNBServiceInvalidResponse):
-        message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, company_change_page)
-
-    except DNBServiceInvalidRequest:
-        message = 'No matching company found in D&B database.'
-        raise AdminException(message, company_change_page)
-
     if request.method == 'GET':
+        dnb_company = handle_dnb_error(
+            lambda: get_company(dh_company.duns_number),
+            company_change_page,
+        )
+
         return TemplateResponse(
             request,
             'admin/company/company/update-from-dnb.html',
@@ -237,7 +215,10 @@ def update_from_dnb(model_admin, request, object_id):
         )
 
     try:
-        _update_from_dnb(dh_company, dnb_company, request.user)
+        handle_dnb_error(
+            lambda: update_company_from_dnb(dh_company, request.user),
+            company_change_page,
+        )
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
