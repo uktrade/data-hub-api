@@ -432,3 +432,8 @@ def construct_mock(**props):
     obj = mock.Mock(spec_set=tuple(props))
     obj.configure_mock(**props)
     return obj
+
+
+def str_or_none(value):
+    """Returns string casted value if given value is not None"""
+    return str(value) if value is not None else value

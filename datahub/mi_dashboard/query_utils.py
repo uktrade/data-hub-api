@@ -82,11 +82,6 @@ def get_collapse_status_name_expression():
     )
 
 
-def get_empty_string_if_null_expression(field):
-    """Get empty string if field is None."""
-    return Coalesce(field, Value(''))
-
-
 def get_other_field_if_null_or_empty_expression(field_a, field_b, default=None):
     """
     Get other field_b value if field_a is null or empty.
