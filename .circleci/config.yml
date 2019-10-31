@@ -62,8 +62,7 @@ job_defaults: &job_defaults
     - restore_cache:
         name: Restore pip cache
         keys:
-          - v1-leeloo-{{ checksum "requirements.txt" }}
-          - v1-leeloo-
+          - v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
           - ~/cache/pip
 
@@ -73,7 +72,7 @@ job_defaults: &job_defaults
 
     - save_cache:
         name: Save pip cache
-        key: v1-leeloo-{{ checksum "requirements.txt" }}
+        key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
           - ~/cache/pip
     - run:
