@@ -18,7 +18,6 @@ from datahub.mi_dashboard.constants import NO_SECTOR_CLUSTER_ASSIGNED
 from datahub.mi_dashboard.query_utils import (
     get_collapse_status_name_expression,
     get_country_url,
-    get_empty_string_if_null_expression,
     get_financial_year_from_land_date_expression,
     get_level_of_involvement_simplified_expression,
     get_other_field_if_null_or_empty_expression,
@@ -112,25 +111,6 @@ def test_get_collapse_project_status_expression(status, expected):
 
     investment_project = query.first()
     assert investment_project['project_status'] == expected
-
-
-@pytest.mark.parametrize(
-    'value,expected',
-    (
-        ('what', 'what'),
-        (None, ''),
-    ),
-)
-def test_get_empty_string_if_null_expression(value, expected):
-    """Tests if None can be replaced with an empty string."""
-    InvestmentProjectFactory()
-    query = InvestmentProject.objects.annotate(
-        possibly_null_value=Value(value, output_field=CharField(null=True)),
-        some_property=get_empty_string_if_null_expression('possibly_null_value'),
-    ).values('some_property')
-
-    investment_project = query.first()
-    assert investment_project['some_property'] == expected
 
 
 @pytest.mark.parametrize(

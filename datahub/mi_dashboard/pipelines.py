@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 
 from datahub.core.query_utils import (
     get_choices_as_case_expression,
+    get_empty_string_if_null_expression,
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
@@ -21,7 +22,6 @@ from datahub.mi_dashboard.models import MIInvestmentProject
 from datahub.mi_dashboard.query_utils import (
     get_collapse_status_name_expression,
     get_country_url,
-    get_empty_string_if_null_expression,
     get_financial_year_from_land_date_expression,
     get_level_of_involvement_simplified_expression,
     get_other_field_if_null_or_empty_expression,

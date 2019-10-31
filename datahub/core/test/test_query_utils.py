@@ -4,13 +4,14 @@ from random import sample, shuffle
 import factory
 import pytest
 from django.conf import settings
-from django.db.models import F, Max
+from django.db.models import CharField, F, Max, Value
 from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_bracketed_concat_expression,
     get_choices_as_case_expression,
+    get_empty_string_if_null_expression,
     get_front_end_url_expression,
     get_full_name_expression,
     get_queryset_object,
@@ -371,3 +372,21 @@ class TestGetQuerysetObject:
 
         book = get_queryset_object(Book.objects.all(), name='Summer')
         assert book == expected_book
+
+
+@pytest.mark.parametrize(
+    'value,expected',
+    (
+        ('what', 'what'),
+        (None, ''),
+    ),
+)
+def test_get_empty_string_if_null_expression(value, expected):
+    """Tests if None can be replaced with an empty string."""
+    PersonFactory()
+    query = Person.objects.annotate(
+        possibly_null_value=Value(value, output_field=CharField(null=True)),
+        some_property=get_empty_string_if_null_expression('possibly_null_value'),
+    ).values('some_property')
+    person = query.first()
+    assert person['some_property'] == expected
