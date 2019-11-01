@@ -3,6 +3,7 @@ from django.urls import path
 from datahub.dataset.adviser.views import AdvisersDatasetView
 from datahub.dataset.company.views import CompaniesDatasetView
 from datahub.dataset.contact.views import ContactsDatasetView
+from datahub.dataset.event.views import EventsDatasetView
 from datahub.dataset.interaction.views import InteractionsDatasetView
 from datahub.dataset.investment_project.views import InvestmentProjectsDatasetView
 from datahub.dataset.order.views import OMISDatasetView
@@ -21,4 +22,5 @@ urlpatterns = [
         InvestmentProjectsDatasetView.as_view(),
         name='investment-projects-dataset',
     ),
+    path('events-dataset', EventsDatasetView.as_view(), name='events-dataset'),
 ]
