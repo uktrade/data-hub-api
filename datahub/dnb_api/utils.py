@@ -182,10 +182,13 @@ def format_dnb_company_investigation(data):
     return data
 
 
-def update_company_from_dnb(company, user):
+def update_company_from_dnb(company, fields_to_update=None, user=None):
     """
     Updates `company` with new data from dnb while setting `modified_by` to the
     given user and creating a revision.
+    If `fields_to_update` is specified, only the fields specified will be synced
+    with DNB.  `fields_to_update` should be an iterable of strings representing
+    DNBCompanySerializer field names.
 
     Raises serializers.ValidationError if data is invalid.
     Raises DNBServiceError/DNBServiceInvalidResponse if there are problems
@@ -193,6 +196,10 @@ def update_company_from_dnb(company, user):
     Raises DNBServiceInvalidRequest if the request to DNB was invalid.
     """
     dnb_company = get_company(company.duns_number)
+
+    if fields_to_update:
+        # Set dnb_company data to only include the fields in fields_to_update
+        dnb_company = {field: dnb_company[field] for field in fields_to_update}
 
     company_serializer = DNBCompanySerializer(
         company,
@@ -211,9 +218,9 @@ def update_company_from_dnb(company, user):
         raise
 
     with reversion.create_revision():
-        company_serializer.save(
-            modified_by=user,
-            pending_dnb_investigation=False,
-        )
-        reversion.set_user(user)
+        company_kwargs = {'pending_dnb_investigation': False}
+        if user:
+            company_kwargs['modified_by'] = user
+            reversion.set_user(user)
+        company_serializer.save(**company_kwargs)
         reversion.set_comment('Updated from D&B')

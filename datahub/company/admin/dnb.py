@@ -216,7 +216,7 @@ def update_from_dnb(model_admin, request, object_id):
 
     try:
         handle_dnb_error(
-            lambda: update_company_from_dnb(dh_company, request.user),
+            lambda: update_company_from_dnb(dh_company, user=request.user),
             company_change_page,
         )
         return HttpResponseRedirect(company_change_page)
