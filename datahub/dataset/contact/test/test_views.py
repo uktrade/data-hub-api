@@ -19,8 +19,13 @@ def get_expected_data_from_contact(contact):
     """Returns expected dictionary based on given contact"""
     return {
         'accepts_dit_email_marketing': contact.accepts_dit_email_marketing,
+        'address_1': contact.address_1,
+        'address_2': contact.address_2,
         'address_country__name': get_attr_or_none(contact, 'address_country.name'),
+        'address_county': contact.address_county,
         'address_postcode': contact.address_postcode,
+        'address_same_as_company': contact.address_same_as_company,
+        'address_town': contact.address_town,
         'company_id': str(contact.company_id) if contact.company_id is not None else None,
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
@@ -29,6 +34,7 @@ def get_expected_data_from_contact(contact):
         'job_title': contact.job_title,
         'name': contact.name,
         'notes': contact.notes,
+        'primary': contact.primary,
         'telephone_alternative': contact.telephone_alternative,
         'telephone_number': contact.telephone_number,
     }
