@@ -566,6 +566,7 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
         self.instance.assign_one_list_account_manager_and_tier(
             adviser,
             self.target_one_list_tier_id,
+            adviser,
         )
         return self.instance
 
@@ -594,9 +595,9 @@ class RemoveAccountManagerSerializer(serializers.Serializer):
 
         return attrs
 
-    def save(self, adviser):
+    def save(self, by):
         """Unset the company's One List account manager and tier."""
-        self.instance.remove_from_one_list()
+        self.instance.remove_from_one_list(by)
         return self.instance
 
 
