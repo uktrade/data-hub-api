@@ -1,0 +1,1 @@
+The `POST /v4/company/<ID>/self-assign-account-manager` and `POST /v4/company/<ID>/remove-account-manager` endpoints now correctly update the `modified_by` field of the company (instead of leaving it unchanged).
