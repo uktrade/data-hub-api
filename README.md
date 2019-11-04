@@ -315,6 +315,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
+| `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
 | `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
 | `STATSD_HOST` | No | StatsD host url. |
