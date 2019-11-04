@@ -74,7 +74,7 @@ lxml==4.4.1
 mail-parser==3.9.3
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
-mohawk==1.0.0
+mohawk==1.1.0
 monotonic==1.5            # via notifications-python-client
 more-itertools==7.2.0     # via pytest, zipp
 notifications-python-client==5.3.0
