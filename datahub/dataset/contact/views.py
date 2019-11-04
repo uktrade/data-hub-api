@@ -18,8 +18,13 @@ class ContactsDatasetView(BaseDatasetView):
             name=get_full_name_expression(),
         ).values(
             'accepts_dit_email_marketing',
+            'address_1',
+            'address_2',
             'address_country__name',
+            'address_county',
             'address_postcode',
+            'address_same_as_company',
+            'address_town',
             'company_id',
             'created_on',
             'email',
@@ -28,6 +33,7 @@ class ContactsDatasetView(BaseDatasetView):
             'job_title',
             'name',
             'notes',
+            'primary',
             'telephone_alternative',
             'telephone_number',
         )
