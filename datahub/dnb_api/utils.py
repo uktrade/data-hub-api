@@ -182,27 +182,22 @@ def format_dnb_company_investigation(data):
     return data
 
 
-def update_company_from_dnb(company, fields_to_update=None, user=None):
+def update_company_from_dnb(dh_company, dnb_company, fields_to_update=None, user=None):
     """
-    Updates `company` with new data from dnb while setting `modified_by` to the
+    Updates `dh_company` with new data from `dnb_company` while setting `modified_by` to the
     given user and creating a revision.
     If `fields_to_update` is specified, only the fields specified will be synced
     with DNB.  `fields_to_update` should be an iterable of strings representing
     DNBCompanySerializer field names.
 
     Raises serializers.ValidationError if data is invalid.
-    Raises DNBServiceError/DNBServiceInvalidResponse if there are problems
-    communicating with DNB.
-    Raises DNBServiceInvalidRequest if the request to DNB was invalid.
     """
-    dnb_company = get_company(company.duns_number)
-
     if fields_to_update:
         # Set dnb_company data to only include the fields in fields_to_update
         dnb_company = {field: dnb_company[field] for field in fields_to_update}
 
     company_serializer = DNBCompanySerializer(
-        company,
+        dh_company,
         data=dnb_company,
         partial=True,
     )

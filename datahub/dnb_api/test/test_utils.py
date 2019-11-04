@@ -13,6 +13,7 @@ from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
+    format_dnb_company,
     get_company,
     update_company_from_dnb,
 )
@@ -63,6 +64,14 @@ ALL_DNB_UPDATED_FIELDS = [
     'global_ultimate_duns_number',
     'company_number',
 ]
+
+
+@pytest.fixture
+def formatted_dnb_company(dnb_response_uk):
+    """
+    Get formatted DNB company data.
+    """
+    return format_dnb_company(dnb_response_uk['results'][0])
 
 
 @pytest.mark.parametrize(
@@ -201,7 +210,29 @@ class TestUpdateCompanyFromDNB:
     Test update_company_from_dnb utility function.
     """
 
-    def _assert_company_synced_with_dnb(self, company, dnb_company, fields=None):  # NOQA: C901
+    def _assert_address_synced(self, company, dnb_company, prefix):
+        country = Country.objects.filter(
+            id=dnb_company[prefix]['country'],
+        ).first()
+
+        if prefix == 'registered_address':
+            required_registered_address_fields_present = all(
+                field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
+            )
+            if not required_registered_address_fields_present:
+                # Return without any assertions when we check registered_address
+                # fields and the DNB response does not contain enough data for
+                # Data Hub to save them
+                return
+
+        assert getattr(company, f'{prefix}_1') == dnb_company[prefix]['line_1']
+        assert getattr(company, f'{prefix}_2') == dnb_company[prefix]['line_2']
+        assert getattr(company, f'{prefix}_country') == country
+        assert getattr(company, f'{prefix}_town') == dnb_company[prefix]['town']
+        assert getattr(company, f'{prefix}_county') == dnb_company[prefix]['county']
+        assert getattr(company, f'{prefix}_postcode') == dnb_company[prefix]['postcode']
+
+    def _assert_company_synced_with_dnb(self, company, dnb_company, fields=None):
         """
         Check whether the given DataHub company has been synced with the given
         DNB company.
@@ -210,71 +241,21 @@ class TestUpdateCompanyFromDNB:
             fields = ALL_DNB_UPDATED_SERIALIZER_FIELDS
 
         country = Country.objects.filter(
-            iso_alpha2_code=dnb_company['address_country'],
+            id=dnb_company['address']['country'],
         ).first()
 
-        registered_country = Country.objects.filter(
-            iso_alpha2_code=dnb_company['registered_address_country'],
-        ).first() if dnb_company.get('registered_address_country') else None
-
         company_number = (
-            dnb_company['registration_numbers'][0].get('registration_number')
+            dnb_company['company_number']
             if country.iso_alpha2_code == 'GB' else None
         )
 
-        required_registered_address_fields_present = all(
-            field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
-        )
-
-        if 'name' in fields:
-            assert company.name == dnb_company['primary_name']
-
-        if 'trading_names' in fields:
-            assert company.trading_names == dnb_company['trading_names']
-
-        if 'address' in fields:
-            assert company.address_1 == dnb_company['address_line_1']
-            assert company.address_2 == dnb_company['address_line_2']
-            assert company.address_country == country
-            assert company.address_town == dnb_company['address_town']
-            assert company.address_county == dnb_company['address_county']
-            assert company.address_postcode == dnb_company['address_postcode']
-
-        if 'registered_address' in fields and required_registered_address_fields_present:
-            assert company.registered_address_1 == dnb_company['registered_address_line_1']
-            assert company.registered_address_2 == dnb_company['registered_address_line_2']
-            assert company.registered_address_country == registered_country
-            assert company.registered_address_town == dnb_company['registered_address_town']
-            assert company.registered_address_county == dnb_company['registered_address_county']
-            assert (
-                company.registered_address_postcode == dnb_company['registered_address_postcode']
-            )
-
-        if 'company_number' in fields:
-            assert company.company_number == company_number
-
-        if 'number_of_employees' in fields:
-            assert company.number_of_employees == dnb_company['employee_number']
-
-        if 'is_number_of_employees_estimated' in fields:
-            is_employees_number_estimated = dnb_company['is_employees_number_estimated']
-            assert (
-                company.is_number_of_employees_estimated == is_employees_number_estimated
-            )
-
-        if 'turnover' in fields:
-            assert company.turnover == float(dnb_company['annual_sales'])
-
-        if 'is_turnover_estimated' in fields:
-            assert company.is_turnover_estimated == dnb_company['is_annual_sales_estimated']
-
-        if 'website' in fields:
-            assert company.website == f'http://{dnb_company["domain"]}'
-
-        if 'global_ultimate_duns_number' in fields:
-            assert (
-                company.global_ultimate_duns_number == dnb_company['global_ultimate_duns_number']
-            )
+        for field in fields:
+            if field == 'registered_address' or field == 'address':
+                self._assert_address_synced(company, dnb_company, field)
+            elif field == 'company_number':
+                assert company.company_number == company_number
+            else:
+                assert getattr(company, field) == dnb_company[field]
 
     def _add_address_model_fields(self, fields_set, prefix):
         fields_set.add(f'{prefix}_1')
@@ -292,9 +273,8 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_all_fields(
         self,
-        requests_mock,
         dnb_company_search_feature_flag,
-        dnb_response_uk,
+        formatted_dnb_company,
         adviser_callable,
     ):
         """
@@ -304,15 +284,9 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
         adviser = adviser_callable()
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            json=dnb_response_uk,
-        )
-
-        update_company_from_dnb(company, user=adviser)
+        update_company_from_dnb(company, formatted_dnb_company, user=adviser)
         company.refresh_from_db()
-        dnb_company = dnb_response_uk['results'][0]
-        self._assert_company_synced_with_dnb(company, dnb_company)
+        self._assert_company_synced_with_dnb(company, formatted_dnb_company)
         assert company.pending_dnb_investigation is False
 
         versions = list(Version.objects.get_for_object(company))
@@ -333,9 +307,8 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_partial_fields(
         self,
-        requests_mock,
         dnb_company_search_feature_flag,
-        dnb_response_uk,
+        formatted_dnb_company,
         fields_to_update,
     ):
         """
@@ -344,15 +317,14 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            json=dnb_response_uk,
-        )
 
-        update_company_from_dnb(company, fields_to_update=fields_to_update)
+        update_company_from_dnb(company, formatted_dnb_company, fields_to_update=fields_to_update)
         company.refresh_from_db()
-        dnb_company = dnb_response_uk['results'][0]
-        self._assert_company_synced_with_dnb(company, dnb_company, fields=fields_to_update)
+        self._assert_company_synced_with_dnb(
+            company,
+            formatted_dnb_company,
+            fields=fields_to_update,
+        )
         updated_model_fields = set(fields_to_update)
 
         if 'address' in fields_to_update:
@@ -369,92 +341,16 @@ class TestUpdateCompanyFromDNB:
             current_value = getattr(company, field)
             assert current_value == original_value
 
-    @pytest.mark.parametrize(
-        'dnb_response_code',
-        (
-            status.HTTP_400_BAD_REQUEST,
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-            status.HTTP_404_NOT_FOUND,
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
-    )
-    def test_post_dnb_error(self, requests_mock, dnb_response_code):
-        """
-        Tests that DNBServiceError is raised when calling the DNB API returns a non-200
-        status.
-        """
-        company = CompanyFactory(duns_number='123456789')
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            status_code=dnb_response_code,
-        )
-        with pytest.raises(DNBServiceError):
-            update_company_from_dnb(company)
-
-    @pytest.mark.parametrize(
-        'search_results, expected_message',
-        (
-            (
-                ['foo', 'bar'],
-                'Something went wrong in an upstream service.',
-            ),
-            (
-                [{'duns_number': '012345678'}],
-                'Something went wrong in an upstream service.',
-            ),
-        ),
-    )
-    def test_post_dnb_response_invalid(
-        self,
-        requests_mock,
-        search_results,
-        expected_message,
-    ):
-        """
-        Tests that DNBServiceInvalidResponse is raised when DNB responds with an unexpected
-        response format.
-        """
-        company = CompanyFactory(duns_number='12345678')
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            json={'results': search_results},
-        )
-        with pytest.raises(DNBServiceInvalidResponse) as exc:
-            update_company_from_dnb(company)
-            assert str(exc) == expected_message
-
-    def test_post_dnb_request_invalid(
-        self,
-        requests_mock,
-    ):
-        """
-        Tests that DNBServiceInvalidRequest is raised when DNB yields no results.
-        """
-        company = CompanyFactory(duns_number='12345678')
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            json={'results': []},
-        )
-        with pytest.raises(DNBServiceInvalidRequest) as exc:
-            update_company_from_dnb(company)
-            assert str(exc) == 'Cannot find a company with duns_number: 12345678'
-
     def test_post_dnb_data_invalid(
         self,
-        requests_mock,
-        dnb_response_uk,
+        formatted_dnb_company,
     ):
         """
         Tests that ValidationError is raised when data returned by DNB is not valid for saving to a
         Data Hub Company.
         """
         company = CompanyFactory(duns_number='123456789')
-        dnb_response_uk['results'][0]['primary_name'] = None
-        requests_mock.post(
-            DNB_SEARCH_URL,
-            json=dnb_response_uk,
-        )
+        formatted_dnb_company['name'] = None
         with pytest.raises(serializers.ValidationError) as exc:
-            update_company_from_dnb(company)
+            update_company_from_dnb(company, formatted_dnb_company)
             assert str(exc) == 'Data from D&B did not pass the Data Hub validation checks.'

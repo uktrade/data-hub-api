@@ -151,23 +151,6 @@ class AdminException(Exception):
     """
 
 
-def handle_dnb_error(func, error_url):
-    """
-    Call a callable and handle DNB-related errors by transposing them in to
-    AdminExceptions.
-    """
-    try:
-        return func()
-
-    except (DNBServiceError, DNBServiceInvalidResponse):
-        message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, error_url)
-
-    except DNBServiceInvalidRequest:
-        message = 'No matching company found in D&B database.'
-        raise AdminException(message, error_url)
-
-
 @redirect_with_message
 @method_decorator(require_http_methods(['GET', 'POST']))
 @method_decorator(csrf_protect)
@@ -195,12 +178,18 @@ def update_from_dnb(model_admin, request, object_id):
     if dh_company is None or dh_company.duns_number is None:
         raise SuspiciousOperation()
 
-    if request.method == 'GET':
-        dnb_company = handle_dnb_error(
-            lambda: get_company(dh_company.duns_number),
-            company_change_page,
-        )
+    try:
+        dnb_company = get_company(dh_company.duns_number)
 
+    except (DNBServiceError, DNBServiceInvalidResponse):
+        message = 'Something went wrong in an upstream service.'
+        raise AdminException(message, company_change_page)
+
+    except DNBServiceInvalidRequest:
+        message = 'No matching company found in D&B database.'
+        raise AdminException(message, company_change_page)
+
+    if request.method == 'GET':
         return TemplateResponse(
             request,
             'admin/company/company/update-from-dnb.html',
@@ -215,10 +204,7 @@ def update_from_dnb(model_admin, request, object_id):
         )
 
     try:
-        handle_dnb_error(
-            lambda: update_company_from_dnb(dh_company, user=request.user),
-            company_change_page,
-        )
+        update_company_from_dnb(dh_company, dnb_company, user=request.user)
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
