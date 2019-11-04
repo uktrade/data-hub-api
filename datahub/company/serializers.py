@@ -10,7 +10,6 @@ from rest_framework import serializers
 from datahub.company.constants import BusinessTypeConstant, OneListTierID
 from datahub.company.models import (
     Advisor,
-    CompaniesHouseCompany,
     Company,
     CompanyPermission,
     Contact,
@@ -105,35 +104,6 @@ class AdviserSerializer(serializers.ModelSerializer):
             'dit_team',
         )
         depth = 1
-
-
-class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
-    """Companies House company serializer V4."""
-
-    registered_address = AddressSerializer(
-        source_model=CompaniesHouseCompany,
-        address_source_prefix='registered_address',
-    )
-    business_type = NestedRelatedField('metadata.BusinessType')
-
-    class Meta:
-        model = CompaniesHouseCompany
-        fields = (
-            'id',
-            'business_type',
-            'company_category',
-            'company_number',
-            'company_status',
-            'incorporation_date',
-            'name',
-            'registered_address',
-            'sic_code_1',
-            'sic_code_2',
-            'sic_code_3',
-            'sic_code_4',
-            'uri',
-        )
-        read_only_fields = fields
 
 
 class ContactSerializer(PermittedFieldsModelSerializer):
