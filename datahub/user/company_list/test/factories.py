@@ -16,7 +16,6 @@ class CompanyListFactory(factory.django.DjangoModelFactory):
 class CompanyListItemFactory(factory.django.DjangoModelFactory):
     """Factory for an item on a user's company list."""
 
-    adviser = factory.SelfAttribute('list.adviser')
     company = factory.SubFactory(CompanyFactory)
     list = factory.SubFactory(CompanyListFactory)
 
