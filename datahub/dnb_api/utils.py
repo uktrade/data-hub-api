@@ -1,12 +1,14 @@
 import logging
 
+import reversion
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from rest_framework import status
+from rest_framework import serializers, status
 
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.core.serializers import AddressSerializer
+from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import Country
 
 
@@ -178,3 +180,42 @@ def format_dnb_company_investigation(data):
         'telephone_number': data.pop('telephone_number', None),
     }
     return data
+
+
+def update_company_from_dnb(dh_company, dnb_company, user, fields_to_update=None):
+    """
+    Updates `dh_company` with new data from `dnb_company` while setting `modified_by` to the
+    given user and creating a revision.
+    If `fields_to_update` is specified, only the fields specified will be synced
+    with DNB.  `fields_to_update` should be an iterable of strings representing
+    DNBCompanySerializer field names.
+
+    Raises serializers.ValidationError if data is invalid.
+    """
+    if fields_to_update is not None:
+        # Set dnb_company data to only include the fields in fields_to_update
+        dnb_company = {field: dnb_company[field] for field in fields_to_update}
+
+    company_serializer = DNBCompanySerializer(
+        dh_company,
+        data=dnb_company,
+        partial=True,
+    )
+
+    try:
+        company_serializer.is_valid(raise_exception=True)
+
+    except serializers.ValidationError:
+        logger.error(
+            'Data from D&B did not pass the Data Hub validation checks.',
+            extra={'dnb_company': dnb_company, 'errors': company_serializer.errors},
+        )
+        raise
+
+    with reversion.create_revision():
+        company_serializer.save(
+            modified_by=user,
+            pending_dnb_investigation=False,
+        )
+        reversion.set_user(user)
+        reversion.set_comment('Updated from D&B')
