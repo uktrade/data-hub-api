@@ -264,18 +264,10 @@ class TestUpdateCompanyFromDNB:
         fields_set.add(f'{prefix}_county')
         fields_set.add(f'{prefix}_country')
 
-    @pytest.mark.parametrize(
-        'adviser_callable',
-        (
-            lambda: None,
-            lambda: AdviserFactory(),
-        ),
-    )
     def test_update_company_from_dnb_all_fields(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
-        adviser_callable,
     ):
         """
         Test that update_company_from_dnb will update all fields when the fields
@@ -283,8 +275,8 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
-        adviser = adviser_callable()
-        update_company_from_dnb(company, formatted_dnb_company, user=adviser)
+        adviser = AdviserFactory()
+        update_company_from_dnb(company, formatted_dnb_company, adviser)
         company.refresh_from_db()
         self._assert_company_synced_with_dnb(company, formatted_dnb_company)
         assert company.pending_dnb_investigation is False
@@ -294,9 +286,8 @@ class TestUpdateCompanyFromDNB:
         version = versions[0]
         assert version.revision.comment == 'Updated from D&B'
 
-        if adviser:
-            assert company.modified_by == adviser
-            assert version.revision.user == adviser
+        assert company.modified_by == adviser
+        assert version.revision.user == adviser
 
     @pytest.mark.parametrize(
         'fields_to_update',
@@ -317,8 +308,14 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
+        adviser = AdviserFactory()
 
-        update_company_from_dnb(company, formatted_dnb_company, fields_to_update=fields_to_update)
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            adviser,
+            fields_to_update=fields_to_update,
+        )
         company.refresh_from_db()
         self._assert_company_synced_with_dnb(
             company,
@@ -350,7 +347,8 @@ class TestUpdateCompanyFromDNB:
         Data Hub Company.
         """
         company = CompanyFactory(duns_number='123456789')
+        adviser = AdviserFactory()
         formatted_dnb_company['name'] = None
         with pytest.raises(serializers.ValidationError) as exc:
-            update_company_from_dnb(company, formatted_dnb_company)
+            update_company_from_dnb(company, formatted_dnb_company, adviser)
             assert str(exc) == 'Data from D&B did not pass the Data Hub validation checks.'

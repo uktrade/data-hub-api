@@ -182,7 +182,7 @@ def format_dnb_company_investigation(data):
     return data
 
 
-def update_company_from_dnb(dh_company, dnb_company, fields_to_update=None, user=None):
+def update_company_from_dnb(dh_company, dnb_company, user, fields_to_update=None):
     """
     Updates `dh_company` with new data from `dnb_company` while setting `modified_by` to the
     given user and creating a revision.
@@ -213,9 +213,9 @@ def update_company_from_dnb(dh_company, dnb_company, fields_to_update=None, user
         raise
 
     with reversion.create_revision():
-        company_kwargs = {'pending_dnb_investigation': False}
-        if user:
-            company_kwargs['modified_by'] = user
-            reversion.set_user(user)
-        company_serializer.save(**company_kwargs)
+        company_serializer.save(
+            modified_by=user,
+            pending_dnb_investigation=False,
+        )
+        reversion.set_user(user)
         reversion.set_comment('Updated from D&B')

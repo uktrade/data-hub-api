@@ -204,7 +204,7 @@ def update_from_dnb(model_admin, request, object_id):
         )
 
     try:
-        update_company_from_dnb(dh_company, dnb_company, user=request.user)
+        update_company_from_dnb(dh_company, dnb_company, request.user)
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
