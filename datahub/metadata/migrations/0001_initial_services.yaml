@@ -1,0 +1,2124 @@
+- model: metadata.service
+  pk: 0396b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:25:20Z'
+    order: 100.0
+    segment: Gateway to Global Growth
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 24
+    level: 0
+- model: metadata.service
+  pk: fee6779d-e127-4e1e-89f6-d614b4df3581
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Enquiry or Referral Received
+    parent:
+    contexts: []
+    lft: 1
+    rght: 14
+    tree_id: 8
+    level: 0
+- model: metadata.service
+  pk: 041e7ce1-9d5a-4ce6-b77c-088aef9d816b
+  fields:
+    disabled_on:
+    order: 200.0
+    segment: General Export Enquiry
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["event", "export_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: 0496b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:39Z'
+    order: 300.0
+    segment: SG Special Reports
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 77
+    level: 0
+- model: metadata.service
+  pk: 0596b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 400.0
+    segment: Investment - Services
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 53
+    level: 0
+- model: metadata.service
+  pk: 05c8175a-abf5-4cc6-af34-bcee8699fd4b
+  fields:
+    disabled_on:
+    order: 500.0
+    segment: Investment Enquiry – Transferred to DA (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 40
+    level: 0
+- model: metadata.service
+  pk: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Events
+    parent:
+    contexts: []
+    lft: 1
+    rght: 14
+    tree_id: 11
+    level: 0
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 690.0
+    segment: Outward Mission
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 6
+    rght: 7
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: A Specific DIT Export Service or Funding
+    parent:
+    contexts: []
+    lft: 1
+    rght: 26
+    tree_id: 2
+    level: 0
+- model: metadata.service
+  pk: 0796b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 610.0
+    segment: DSO Interaction
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 0896b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:04Z'
+    order: 800.0
+    segment: New Products from Britain (NPFB)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 62
+    level: 0
+- model: metadata.service
+  pk: f9dd5fc3-a33a-4024-b512-f345a51d295f
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Account Management
+    parent:
+    contexts: []
+    lft: 1
+    rght: 10
+    tree_id: 1
+    level: 0
+- model: metadata.service
+  pk: 09073992-2476-481d-8341-ee575d1f541e
+  fields:
+    disabled_on:
+    order: 511.0
+    segment: Healthcare UK
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["export_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 1
+    level: 1
+- model: metadata.service
+  pk: 0996b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 1000.0
+    segment: Trade - P2E (04) - Action Plan
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 104
+    level: 0
+- model: metadata.service
+  pk: 0a96b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 1100.0
+    segment: Trade - G3 (03) - ITR
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 90
+    level: 0
+- model: metadata.service
+  pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on:
+    order: 611.0
+    segment: Overseas Business Network Chargeable Services (OBN)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 16
+    rght: 17
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 125c80b4-1209-4e24-9bf8-4f350fe13ed7
+  fields:
+    disabled_on: '2018-05-21T14:53:51Z'
+    order: 1300.0
+    segment: Investment - IST Project Manager Notification (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 49
+    level: 0
+- model: metadata.service
+  pk: 12907483-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:26.999000Z'
+    order: 1400.0
+    segment: Overseas Business Network Advisers One-to-One
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 65
+    level: 0
+- model: metadata.service
+  pk: 552f4ba8-b993-498f-a640-c1b9a888f83e
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: A Specific Service
+    parent:
+    contexts: []
+    lft: 1
+    rght: 12
+    tree_id: 3
+    level: 0
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    disabled_on:
+    order: 660.0
+    segment: Great International Trade Campaign
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["event", "other_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 310.0
+    segment: Making Export Introductions
+    parent:
+    contexts: ["export_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 55
+    level: 0
+- model: metadata.service
+  pk: 1632b942-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999000Z'
+    order: 1700.0
+    segment: UKEF - Export Insurance Policy
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 119
+    level: 0
+- model: metadata.service
+  pk: 1e36073d-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50Z'
+    order: 1800.0
+    segment: Trade - P2E (09) - Exit Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 109
+    level: 0
+- model: metadata.service
+  pk: 1ec4e4b9-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 1900.0
+    segment: Trade - G3 (09) - Exit Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 96
+    level: 0
+- model: metadata.service
+  pk: 1ec5548f-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 2000.0
+    segment: Trade - G3 (07) - Revised Action Plans
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 94
+    level: 0
+- model: metadata.service
+  pk: 1f7de16b-b7ce-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:10Z'
+    order: 2100.0
+    segment: TPU - Opportunity Status
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 83
+    level: 0
+- model: metadata.service
+  pk: 21c3d5d2-9c8f-4dc0-bfd1-aa3ef8769a91
+  fields:
+    disabled_on: '2019-02-14T10:53:20Z'
+    order: 2200.0
+    segment: Global Growth Pilot (2017) – Diagnostic completed
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 26
+    level: 0
+- model: metadata.service
+  pk: 21f2c8c2-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13Z'
+    order: 2300.0
+    segment: Investment - IST Research Request (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 50
+    level: 0
+- model: metadata.service
+  pk: 2591b204-8a31-4824-a93b-d7a03dca8cb5
+  fields:
+    disabled_on:
+    order: 2400.0
+    segment: Investment Enquiry – Assigned to IST-CMC (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 36
+    level: 0
+- model: metadata.service
+  pk: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Making Export Introductions
+    parent:
+    contexts: []
+    lft: 1
+    rght: 14
+    tree_id: 56
+    level: 0
+- model: metadata.service
+  pk: 273132d7-de50-41a7-a994-ff7d93302092
+  fields:
+    disabled_on:
+    order: 311.0
+    segment: Someone else in DIT
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: 330bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 2600.0
+    segment: Trade - Enquiry
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 87
+    level: 0
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 691.0
+    segment: Market Visit
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 4
+    rght: 5
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: dfc1577f-217c-49a7-987d-a6f8a1c61698
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Enquiry received
+    parent:
+    contexts: []
+    lft: 1
+    rght: 10
+    tree_id: 9
+    level: 0
+- model: metadata.service
+  pk: 34f583c0-6ac8-4981-9954-859c0e568204
+  fields:
+    disabled_on:
+    order: 230.0
+    segment: Other Inbound Investment Referral
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 9
+    level: 1
+- model: metadata.service
+  pk: 350bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 710.0
+    segment: Export Win
+    parent:
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 18
+    level: 0
+- model: metadata.service
+  pk: 360bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 612.0
+    segment: Overseas Market Introduction Service (OMIS)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 18
+    rght: 19
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 692.0
+    segment: Inward Mission
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 2
+    rght: 3
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 380bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 613.0
+    segment: Tradeshow Access Programme (TAP)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 24
+    rght: 25
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 38a67092-f485-4ea1-8a1a-402b949d2d13
+  fields:
+    disabled_on:
+    order: 3300.0
+    segment: Investment Enquiry – Assigned to HQ (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 35
+    level: 0
+- model: metadata.service
+  pk: 390bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:31:48Z'
+    order: 3400.0
+    segment: Trade - G3 - Actions Record
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 98
+    level: 0
+- model: metadata.service
+  pk: 394b3f03-67ee-4a1a-b7bb-c2a249ab879c
+  fields:
+    disabled_on:
+    order: 312.0
+    segment: UK Export Finance (UKEF)
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: 3a0bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 231.0
+    segment: General Investment Enquiry
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 9
+    level: 1
+- model: metadata.service
+  pk: 3a812c0a-62ee-e411-bbc1-e4115bead28a
+  fields:
+    disabled_on: '2015-10-15T11:38:32Z'
+    order: 3700.0
+    segment: First Time Exporters – Other
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 22
+    level: 0
+- model: metadata.service
+  pk: 3b679865-ea99-e711-ba5d-e4115bead28a
+  fields:
+    disabled_on: '2019-02-14T10:53:08Z'
+    order: 3900.0
+    segment: Global Growth Pilot (2017)
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 25
+    level: 0
+- model: metadata.service
+  pk: 3b848e75-49fd-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37Z'
+    order: 4000.0
+    segment: Postgraduates for Interrnational Business - Placement
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 69
+    level: 0
+- model: metadata.service
+  pk: 3d6d5ad0-4492-466f-a0d7-1e13f20f8528
+  fields:
+    disabled_on: '2019-02-14T10:53:48Z'
+    order: 4100.0
+    segment: Global Growth Pilot (2017) – GGP process complete
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 30
+    level: 0
+- model: metadata.service
+  pk: 3ef6d80b-609a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999000Z'
+    order: 4200.0
+    segment: Trade - ECR Web Exit Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 85
+    level: 0
+- model: metadata.service
+  pk: 3f5a2216-8cb1-4fb7-9c6b-06ba77d7405b
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 360.0
+    segment: Making Other Introductions
+    parent:
+    contexts: ["other_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 60
+    level: 0
+- model: metadata.service
+  pk: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: IST Specific Service
+    parent:
+    contexts: []
+    lft: 1
+    rght: 4
+    tree_id: 54
+    level: 0
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on:
+    order: 830.0
+    segment: IST Visit
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ["investment_interaction", "investment_project_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 43dd37db-325f-4cd4-9418-a62ab9c53dda
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 4500.0
+    segment: Referral to UKEF
+    parent:
+    contexts: ["export_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 75
+    level: 0
+- model: metadata.service
+  pk: 44345a68-49fd-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30Z'
+    order: 4700.0
+    segment: Postgraduates for Interrnational Business - Referral
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 70
+    level: 0
+- model: metadata.service
+  pk: 4664f856-166f-4f48-9865-653250f84086
+  fields:
+    disabled_on:
+    order: 614.0
+    segment: 'Global Growth Service: Diagnostic and Output Report Completed by DIT'
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 46cd2e66-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999000Z'
+    order: 4900.0
+    segment: UKEF - EFA Advice
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 118
+    level: 0
+- model: metadata.service
+  pk: 47513afa-8313-4ec9-931e-849d4cdd4959
+  fields:
+    disabled_on:
+    order: 232.0
+    segment: HPO High Potential Opportunity Investment Enquiry via IST Target Company
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 9
+    level: 1
+- model: metadata.service
+  pk: 482fca2e-3bfa-4c4f-8649-17d292aad87f
+  fields:
+    disabled_on:
+    order: 615.0
+    segment: 'Global Growth Service: Signed Export Growth Plan Received from Company'
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_service_delivery"]
+    lft: 14
+    rght: 15
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 4840b339-ddc9-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:40Z'
+    order: 5200.0
+    segment: TPU - Opportunity Interest
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 82
+    level: 0
+- model: metadata.service
+  pk: 48e6bc3e-56c5-4bdc-a718-093614547d73
+  fields:
+    disabled_on:
+    order: 5300.0
+    segment: Investment Enquiry – Transferred to LEP (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 41
+    level: 0
+- model: metadata.service
+  pk: 496f0ce8-dcc9-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:44:56Z'
+    order: 5400.0
+    segment: TPU - Opportunity
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 81
+    level: 0
+- model: metadata.service
+  pk: 4d74b1e4-8d16-e611-9bdc-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:12Z'
+    order: 5500.0
+    segment: Investment – IST Business Development Multiplier (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 45
+    level: 0
+- model: metadata.service
+  pk: 4f142041-2b9d-4776-ace8-22612260eae6
+  fields:
+    disabled_on:
+    order: 5600.0
+    segment: Investment Enquiry – Confirmed prospect project status (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 38
+    level: 0
+- model: metadata.service
+  pk: 50db464c-ea17-4d24-b0f7-75e6a452f82c
+  fields:
+    disabled_on: '2019-02-14T10:53:34Z'
+    order: 5700.0
+    segment: Global Growth Pilot (2017) – Eligible GGP customer
+    parent:
+    contexts: ["other_service_delivery", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 28
+    level: 0
+- model: metadata.service
+  pk: 510a4016-4bb9-e211-a646-e4115bead28a
+  fields:
+    disabled_on:
+    order: 693.0
+    segment: Webinar
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 12
+    rght: 13
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 5359ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999000Z'
+    order: 5900.0
+    segment: Exhibitions (Not TAP)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 14
+    level: 0
+- model: metadata.service
+  pk: 5459ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37Z'
+    order: 6000.0
+    segment: Passport Aftercare
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 66
+    level: 0
+- model: metadata.service
+  pk: 549d657d-6930-413d-a14e-18a6427467be
+  fields:
+    disabled_on:
+    order: 313.0
+    segment: Financial and Professional Service Providers
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: 5559ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:21Z'
+    order: 6200.0
+    segment: Open to Export Assist (OtE)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 64
+    level: 0
+- model: metadata.service
+  pk: 561c6040-db21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999000Z'
+    order: 6300.0
+    segment: UKEF - Bond Support Scheme
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 117
+    level: 0
+- model: metadata.service
+  pk: 5659ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19Z'
+    order: 6400.0
+    segment: BIS Interaction
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 5
+    level: 0
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    order: 661.0
+    segment: Digital Trade Advisers One-to-One
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_service_delivery", "interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 5759ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2016-05-04T10:56:10Z'
+    order: 6600.0
+    segment: XXX
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 122
+    level: 0
+- model: metadata.service
+  pk: 5859ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999000Z'
+    order: 6700.0
+    segment: Trade - OMIS/MSS
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 99
+    level: 0
+- model: metadata.service
+  pk: 58da3eec-a906-48eb-b258-bd3fb0717e7a
+  fields:
+    disabled_on:
+    order: 662.0
+    segment: Significant Assistance
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_service_delivery", "interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 5959ba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 6900.0
+    segment: Investment - Aftercare Company Visit
+    parent:
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 32
+    level: 0
+- model: metadata.service
+  pk: 5befb468-3173-e511-9d3c-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19Z'
+    order: 7000.0
+    segment: First Time Exporters - Export Insight Visits
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 20
+    level: 0
+- model: metadata.service
+  pk: 5e7ca186-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 7100.0
+    segment: Trade - P2E (05) - Combined 2 & 3
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 105
+    level: 0
+- model: metadata.service
+  pk: 60986f5c-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 7200.0
+    segment: Trade - G3 (05) - Combined 2 & 3
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 92
+    level: 0
+- model: metadata.service
+  pk: ad243962-db79-4e40-ab53-4616f017118b
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Making Investment Introductions
+    parent:
+    contexts: []
+    lft: 1
+    rght: 14
+    tree_id: 57
+    level: 0
+- model: metadata.service
+  pk: 630a242e-c8b9-403d-b9a8-fcddada25051
+  fields:
+    disabled_on:
+    order: 330.0
+    segment: Financial and Professional Service Providers
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: 632b8708-28b6-e611-984a-e4115bead28a
+  fields:
+    disabled_on:
+    order: 210.0
+    segment: Local Partner Referral
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["event", "export_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: 64fc348f-137d-4cc1-8685-6ca15fd3206a
+  fields:
+    disabled_on:
+    order: 331.0
+    segment: Investment Opportunities
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: 65dc115c-dcd8-4441-9d3a-76285a979aa4
+  fields:
+    disabled_on:
+    order: 220.0
+    segment: Other Inbound Referral
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["other_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: 66b76d45-be8f-4828-81fb-9ca9e4b29642
+  fields:
+    disabled_on:
+    order: 233.0
+    segment: HPO High Potential Opportunity Investment Enquiry via IIGB
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 9
+    level: 1
+- model: metadata.service
+  pk: 6a27f71a-6b4b-4e8f-83b8-35615c13fdc8
+  fields:
+    disabled_on:
+    order: 616.0
+    segment: 'Global Growth Service: Engagement Letter Signed by Company'
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 6e3db1a1-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 7900.0
+    segment: Trade - G3 (08) - Evaluation Form
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 95
+    level: 0
+- model: metadata.service
+  pk: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Making Other Introductions
+    parent:
+    contexts: []
+    lft: 1
+    rght: 12
+    tree_id: 59
+    level: 0
+- model: metadata.service
+  pk: 735da232-8058-44a5-be69-5c0e2bec0b7e
+  fields:
+    disabled_on:
+    order: 361.0
+    segment: Financial and Professional Service Providers
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: 73ceedc1-c139-4bdf-9e47-17b1bae488da
+  fields:
+    disabled_on:
+    order: 8100.0
+    segment: Investment Enquiry – Requested more information from source (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 39
+    level: 0
+- model: metadata.service
+  pk: 760b46e5-cb86-4e7d-8a31-1b44c18d1614
+  fields:
+    disabled_on: '2019-02-14T10:53:28Z'
+    order: 8200.0
+    segment: Global Growth Pilot (2017) – Diagnostic Output Report completed
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 27
+    level: 0
+- model: metadata.service
+  pk: 76d912d6-e9da-4963-80ae-d07f8f6feed7
+  fields:
+    disabled_on:
+    order: 410.0
+    segment: Providing Export Advice & Information
+    parent:
+    contexts: ["export_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 72
+    level: 0
+- model: metadata.service
+  pk: 79824229-fd87-483f-b929-8f2b9531492b
+  fields:
+    disabled_on:
+    order: 8400.0
+    segment: Investment - IST Aftercare Offered (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 44
+    level: 0
+- model: metadata.service
+  pk: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 332.0
+    segment: Making Investment Introductions
+    parent:
+    contexts: ["investment_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 58
+    level: 0
+- model: metadata.service
+  pk: 83834540-88d7-4f7c-a2d3-9af9192ad340
+  fields:
+    disabled_on:
+    order: 333.0
+    segment: Someone else in DIT
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: 88efd448-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13Z'
+    order: 8700.0
+    segment: Investment - IST Commercial Partner Introduction (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 48
+    level: 0
+- model: metadata.service
+  pk: 8c8fbb61-9a25-e611-9bdc-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13Z'
+    order: 8800.0
+    segment: Investment - IST Business Development Target (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 46
+    level: 0
+- model: metadata.service
+  pk: 8cb7deb7-7618-4eb7-b248-4686ae0634ea
+  fields:
+    disabled_on:
+    order: 314.0
+    segment: Another Government Department
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: 90f5533d-6acf-4aff-9528-75da9af9b851
+  fields:
+    disabled_on:
+    order: 460.0
+    segment: Providing Other Advice & Information
+    parent:
+    contexts: ["other_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 74
+    level: 0
+- model: metadata.service
+  pk: 9384b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 9100.0
+    segment: Investment - Business Proposition
+    parent:
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 33
+    level: 0
+- model: metadata.service
+  pk: 9484b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 510.0
+    segment: General
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["export_interaction", "export_service_delivery", "investment_interaction", "investment_project_interaction", "other_interaction", "other_service_delivery", "interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 1
+    level: 1
+- model: metadata.service
+  pk: 94a2473d-e898-4e1c-a082-ddfde8f297ff
+  fields:
+    disabled_on:
+    order: 617.0
+    segment: European Regional Development Fund (ERDF)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 4
+    rght: 5
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 952a72f3-5f9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999000Z'
+    order: 9400.0
+    segment: Trade - ECR Web Offer Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 86
+    level: 0
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 694.0
+    segment: UK Based
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 10
+    rght: 11
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 9684b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:32:46Z'
+    order: 9600.0
+    segment: Market Selection Service (MSS)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 61
+    level: 0
+- model: metadata.service
+  pk: 9784b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:40.999000Z'
+    order: 9700.0
+    segment: Trade - G3 (10) - Other
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 97
+    level: 0
+- model: metadata.service
+  pk: 9884b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19Z'
+    order: 513.0
+    segment: High Growth
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 6
+    rght: 7
+    tree_id: 1
+    level: 1
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 230.0
+    segment: Other Inbound Export Referral
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["export_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 663.0
+    segment: UK Region Local
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["event", "other_service_delivery"]
+    lft: 10
+    rght: 11
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 9b84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:08:14Z'
+    order: 10100.0
+    segment: UK Trade and Investment Website
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 121
+    level: 0
+- model: metadata.service
+  pk: 9c84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:29Z'
+    order: 10200.0
+    segment: Post Local
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 71
+    level: 0
+- model: metadata.service
+  pk: 9d84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 10300.0
+    segment: Trade - G3 (04) - Action Plan
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 91
+    level: 0
+- model: metadata.service
+  pk: 9e8a641f-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50Z'
+    order: 10400.0
+    segment: Trade - P2E (08) - Evaluation Form
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 108
+    level: 0
+- model: metadata.service
+  pk: 9efb937b-c23f-4248-aab3-986ede3e655d
+  fields:
+    disabled_on:
+    order: 315.0
+    segment: Business Partners (e.g. distributors or manufacturers)
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: a222c657-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:34:50Z'
+    order: 10600.0
+    segment: Trade - P2E (10) - Other
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 110
+    level: 0
+- model: metadata.service
+  pk: a41c2fac-92c7-44cc-9f33-56fd63bd86db
+  fields:
+    disabled_on:
+    order: 334.0
+    segment: Customers
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: a4a733b6-eb95-e611-be23-e4115bead28a
+  fields:
+    disabled_on:
+    order: 512.0
+    segment: Northern Powerhouse
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 8
+    rght: 9
+    tree_id: 1
+    level: 1
+- model: metadata.service
+  pk: acd20042-84a5-466e-b27a-fc3726052b59
+  fields:
+    disabled_on:
+    order: 335.0
+    segment: Another Government Department
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: ad7a7746-2ad5-e311-8a2b-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30Z'
+    order: 11000.0
+    segment: Trade - ECR Web Action Plan
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 84
+    level: 0
+- model: metadata.service
+  pk: ade9836c-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:40:13Z'
+    order: 11100.0
+    segment: Investment - IST Specialist Introduction (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 51
+    level: 0
+- model: metadata.service
+  pk: ae59b1bf-5dc1-48d7-bb4b-49264fe8feea
+  fields:
+    disabled_on:
+    order: 316.0
+    segment: Customers
+    parent: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+    contexts: ["export_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 56
+    level: 1
+- model: metadata.service
+  pk: b2455298-5ccb-4ecb-96f6-86cf61aab4d2
+  fields:
+    disabled_on:
+    order: 362.0
+    segment: Business Partners (e.g. distributors or manufacturers)
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: bbee73f1-8eee-443e-8e07-c406bd8e696c
+  fields:
+    disabled_on:
+    order: 336.0
+    segment: Business Partners (e.g. distributors or manufacturers)
+    parent: ad243962-db79-4e40-ab53-4616f017118b
+    contexts: ["investment_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 57
+    level: 1
+- model: metadata.service
+  pk: bc005d16-48f2-4769-8f63-272226f84dc8
+  fields:
+    disabled_on:
+    order: 618.0
+    segment: 'Global Growth Service: Project Closed'
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: bd3d1be3-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2018-05-21T14:59:14Z'
+    order: 11600.0
+    segment: Investment - IST Aftercare (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 43
+    level: 0
+- model: metadata.service
+  pk: be3d8979-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 11700.0
+    segment: Trade - G3 (06) - 2, 3 & 4
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 93
+    level: 0
+- model: metadata.service
+  pk: be8b6c03-83cf-e211-a646-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999000Z'
+    order: 695.0
+    segment: Events - Open to Export Webinars
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 13
+    level: 0
+- model: metadata.service
+  pk: c24f53ed-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 11900.0
+    segment: Trade - P2E (06) - Combined 2, 3 & 4
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 106
+    level: 0
+- model: metadata.service
+  pk: c3f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:39Z'
+    order: 12000.0
+    segment: Researching Export Markets Training (REMs)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 76
+    level: 0
+- model: metadata.service
+  pk: c4f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 12100.0
+    segment: Onward Referral
+    parent:
+    contexts: ["other_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 63
+    level: 0
+- model: metadata.service
+  pk: c579b89b-d49d-4926-a6a4-0a1459cd25cb
+  fields:
+    disabled_on:
+    order: 12200.0
+    segment: Investment Enquiry – Assigned to IST-SAS (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 37
+    level: 0
+- model: metadata.service
+  pk: c5f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:01.999000Z'
+    order: 696.0
+    segment: Events - E-Delivery
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 12
+    level: 0
+- model: metadata.service
+  pk: c6f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999000Z'
+    order: 12400.0
+    segment: Business Visitor
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 7
+    level: 0
+- model: metadata.service
+  pk: c707f81d-ae66-490a-98f5-575438944c43
+  fields:
+    disabled_on:
+    order: 12500.0
+    segment: Investment Enquiry – Transferred to L&P (IST use only)
+    parent:
+    contexts: ["investment_project_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 42
+    level: 0
+- model: metadata.service
+  pk: c7dc4f0b-dc21-e311-a78e-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999000Z'
+    order: 12600.0
+    segment: UKEF - Export Working Capital Scheme
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 120
+    level: 0
+- model: metadata.service
+  pk: c7f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999000Z'
+    order: 12700.0
+    segment: Trade - Passport to Export - Other
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 112
+    level: 0
+- model: metadata.service
+  pk: c8f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999000Z'
+    order: 12800.0
+    segment: BERR - Enquiry
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 4
+    level: 0
+- model: metadata.service
+  pk: c9f9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-11-06T13:29:04.999000Z'
+    order: 12900.0
+    segment: Passport to Export
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 67
+    level: 0
+- model: metadata.service
+  pk: caf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:29.999000Z'
+    order: 13000.0
+    segment: Export Market Research Scheme (EMRS)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 17
+    level: 0
+- model: metadata.service
+  pk: cbf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2015-11-03T10:35:41Z'
+    order: 13100.0
+    segment: Export Insight Visit
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 16
+    level: 0
+- model: metadata.service
+  pk: ccf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 697.0
+    segment: Overseas
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery"]
+    lft: 8
+    rght: 9
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: cd5ebe29-d5d2-4bf8-836d-7c0d3ea019d0
+  fields:
+    disabled_on:
+    order: 363.0
+    segment: Customers
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: cdf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 13400.0
+    segment: Trade - P2E (02) - Stage 1
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 102
+    level: 0
+- model: metadata.service
+  pk: ce7de007-5e9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 13500.0
+    segment: Trade - P2E (07) - Revised Action Plans
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 107
+    level: 0
+- model: metadata.service
+  pk: cef9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 13600.0
+    segment: Trade - P2E (03) - ITR
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 103
+    level: 0
+- model: metadata.service
+  pk: cff9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 13700.0
+    segment: Trade - P2E - Actions Record
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 111
+    level: 0
+- model: metadata.service
+  pk: d03cce05-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on: '2018-05-21T14:54:16Z'
+    order: 13800.0
+    segment: Investment - IST Client Proposal (IST use only)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 47
+    level: 0
+- model: metadata.service
+  pk: d1516466-5e62-4c1a-9831-7b1e7e536514
+  fields:
+    disabled_on:
+    order: 619.0
+    segment: Trade Development Fund (TDF)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 22
+    rght: 23
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: d320b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 14000.0
+    segment: Investment - Company Visit
+    parent:
+    contexts: ["investment_interaction", "investment_project_interaction", "other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 34
+    level: 0
+- model: metadata.service
+  pk: d420b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:30:03Z'
+    order: 14100.0
+    segment: Investment - Regional Tour
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 52
+    level: 0
+- model: metadata.service
+  pk: d44c334c-0ac7-4151-890e-4a3a5aa47aed
+  fields:
+    disabled_on:
+    order: 364.0
+    segment: Someone else in DIT
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 620.0
+    segment: Export Opportunities
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_service_delivery"]
+    lft: 6
+    rght: 7
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: d620b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999000Z'
+    order: 14400.0
+    segment: Trade - Open to Export
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 100
+    level: 0
+- model: metadata.service
+  pk: d6d19f54-5d9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999000Z'
+    order: 14500.0
+    segment: Trade - P2E (01) - Offer Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 101
+    level: 0
+- model: metadata.service
+  pk: d720b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999000Z'
+    order: 14600.0
+    segment: FDI Target
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 19
+    level: 0
+- model: metadata.service
+  pk: d820b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:42:25Z'
+    order: 14700.0
+    segment: Significant Assistance Development Aid (PIMS)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 78
+    level: 0
+- model: metadata.service
+  pk: d920b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:29Z'
+    order: 14800.0
+    segment: Passport to Export R & D
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 68
+    level: 0
+- model: metadata.service
+  pk: da20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:29Z'
+    order: 14900.0
+    segment: Export Communication Review Scheme (ECR)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 15
+    level: 0
+- model: metadata.service
+  pk: db20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:37Z'
+    order: 15000.0
+    segment: Global Partnerships
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 31
+    level: 0
+- model: metadata.service
+  pk: dc20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:43:51Z'
+    order: 15100.0
+    segment: Support for New Inward Investors
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 80
+    level: 0
+- model: metadata.service
+  pk: dd20b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 15200.0
+    segment: Trade - G3 (02) - Stage 1 Information
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 89
+    level: 0
+- model: metadata.service
+  pk: e50fb46c-16a8-4b36-98e0-fea3284011d4
+  fields:
+    disabled_on: '2019-02-14T10:53:42Z'
+    order: 15300.0
+    segment: Global Growth Pilot (2017) – Export Growth Plan agreed with customer
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 29
+    level: 0
+- model: metadata.service
+  pk: e7238b26-653c-e711-8a1f-e4115bead28a
+  fields:
+    disabled_on:
+    order: 240.0
+    segment: EiG National Referral
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["event", "export_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    order: 664.0
+    segment: Language and Culture Advisers One-to-One
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: e9dd3bfe-0c1e-427b-a91a-31e60ca580e5
+  fields:
+    disabled_on:
+    order: 365.0
+    segment: Another Government Department
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: ef3218c1-bed6-4ad8-b8d5-8af2430d32ff
+  fields:
+    disabled_on:
+    order: 430.0
+    segment: Providing Investment Advice & Information
+    parent:
+    contexts: ["investment_interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 73
+    level: 0
+- model: metadata.service
+  pk: f1ed6742-5c9a-e411-a839-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:50:42Z'
+    order: 15800.0
+    segment: Trade - G3 (01) - Offer Letter
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 88
+    level: 0
+- model: metadata.service
+  pk: f36eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2019-07-04T00:00:00Z'
+    order: 15900.0
+    segment: Trade - Services
+    parent:
+    contexts: ["other_interaction", "interaction"]
+    lft: 1
+    rght: 2
+    tree_id: 113
+    level: 0
+- model: metadata.service
+  pk: f46eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:54:56Z'
+    order: 16000.0
+    segment: Tradeshow Access Programme (TAP) Non Funded
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 114
+    level: 0
+- model: metadata.service
+  pk: f56eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 621.0
+    segment: Significant Assistance
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_service_delivery"]
+    lft: 20
+    rght: 21
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: f66eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:30.999000Z'
+    order: 16200.0
+    segment: FTSE 100 Programme
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 23
+    level: 0
+- model: metadata.service
+  pk: f76eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-04-25T15:05:19Z'
+    order: 16300.0
+    segment: Trade - Tradeshow Access Programme (TAP)
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 116
+    level: 0
+- model: metadata.service
+  pk: f86eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2017-01-19T15:07:21Z'
+    order: 16400.0
+    segment: Entrepreneurial Inward Investment
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 10
+    level: 0
+- model: metadata.service
+  pk: f96eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2014-09-17T10:15:04Z'
+    order: 16500.0
+    segment: BR Proactive Management
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 6
+    level: 0
+- model: metadata.service
+  pk: fa6eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:55:10Z'
+    order: 16600.0
+    segment: Tradeshow Access Programme (TAP) - Solo
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 115
+    level: 0
+- model: metadata.service
+  pk: fb6eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-06-28T13:43:09Z'
+    order: 16700.0
+    segment: Support for Current Inward Investors
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 79
+    level: 0
+- model: metadata.service
+  pk: fc142e9b-b9eb-47fc-9c58-3b3186457ab1
+  fields:
+    disabled_on:
+    order: 250.0
+    segment: General Enquiry
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["other_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
+  fields:
+    disabled_on: '2017-06-27T13:43:19.999000Z'
+    order: 16900.0
+    segment: First Time Exporters – Export Savvy
+    parent:
+    contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 21
+    level: 0

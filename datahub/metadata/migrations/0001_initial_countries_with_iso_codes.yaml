@@ -1,0 +1,1526 @@
+- model: metadata.country
+  pk: 0350bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Madagascar
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MG
+- model: metadata.country
+  pk: 0450bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Malawi
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MW
+- model: metadata.country
+  pk: 0550bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Malaysia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: MY
+- model: metadata.country
+  pk: 0650bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Maldives
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: MV
+- model: metadata.country
+  pk: 0750bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mali
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ML
+- model: metadata.country
+  pk: 0850bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Malta
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: MT
+- model: metadata.country
+  pk: 0950bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Marshall Islands
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: MH
+- model: metadata.country
+  pk: 0b50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mauritania
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MR
+- model: metadata.country
+  pk: 0c50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mauritius
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MU
+- model: metadata.country
+  pk: 0e50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mexico
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: MX
+- model: metadata.country
+  pk: 0f50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Micronesia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: FM
+- model: metadata.country
+  pk: 1050bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Moldova
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: MD
+- model: metadata.country
+  pk: 1150bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Monaco
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: MC
+- model: metadata.country
+  pk: 1250bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mongolia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: MN
+- model: metadata.country
+  pk: 1350bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Montserrat
+    overseas_region: null
+    iso_alpha2_code: MS
+- model: metadata.country
+  pk: 1450bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Morocco
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MA
+- model: metadata.country
+  pk: 1550bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Mozambique
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: MZ
+- model: metadata.country
+  pk: 1650bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Namibia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: NA
+- model: metadata.country
+  pk: 1750bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Nauru
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: NR
+- model: metadata.country
+  pk: 1850bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Nepal
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: NP
+- model: metadata.country
+  pk: 1950bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Netherlands
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: NL
+- model: metadata.country
+  pk: 1a0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Saudi Arabia
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: SA
+- model: metadata.country
+  pk: 1a50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Netherlands Antilles
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: ''
+- model: metadata.country
+  pk: 1b0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Senegal
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SN
+- model: metadata.country
+  pk: 1c0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Serbia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: RS
+- model: metadata.country
+  pk: 1c50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: New Zealand
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: NZ
+- model: metadata.country
+  pk: 1d0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Seychelles
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SC
+- model: metadata.country
+  pk: 1d50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Nicaragua
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: NI
+- model: metadata.country
+  pk: 1e0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sierra Leone
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SL
+- model: metadata.country
+  pk: 1f0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Singapore
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: SG
+- model: metadata.country
+  pk: 200be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Slovakia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: SK
+- model: metadata.country
+  pk: 210be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Slovenia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: SI
+- model: metadata.country
+  pk: 220be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Solomon Islands
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: SB
+- model: metadata.country
+  pk: 230be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Somalia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SO
+- model: metadata.country
+  pk: 240be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: South Africa
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ZA
+- model: metadata.country
+  pk: 260be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sri Lanka
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: LK
+- model: metadata.country
+  pk: 280be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: St Kitts and Nevis
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: KN
+- model: metadata.country
+  pk: 290be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: St Lucia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: LC
+- model: metadata.country
+  pk: 2b0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: St Vincent
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: VC
+- model: metadata.country
+  pk: 2c0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sudan
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SD
+- model: metadata.country
+  pk: 2d0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Suriname
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: SR
+- model: metadata.country
+  pk: 2f0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Eswatini
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SZ
+- model: metadata.country
+  pk: 300be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sweden
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: SE
+- model: metadata.country
+  pk: 310be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Switzerland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: CH
+- model: metadata.country
+  pk: 35afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Occupied Palestinian Territories
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: PS
+- model: metadata.country
+  pk: 36afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Western Sahara
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ''
+- model: metadata.country
+  pk: 37afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Yemen
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: YE
+- model: metadata.country
+  pk: 38afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Zambia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ZM
+- model: metadata.country
+  pk: 39afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Zimbabwe
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ZW
+- model: metadata.country
+  pk: 4461b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Niger
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: NE
+- model: metadata.country
+  pk: 4561b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Nigeria
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: NG
+- model: metadata.country
+  pk: 4961b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Norway
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: 'NO'
+- model: metadata.country
+  pk: 4a61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Oman
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: OM
+- model: metadata.country
+  pk: 4b61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Pakistan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: PK
+- model: metadata.country
+  pk: 4c61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Palau
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: PW
+- model: metadata.country
+  pk: 4d61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Panama
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: PA
+- model: metadata.country
+  pk: 4e61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Papua New Guinea
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: PG
+- model: metadata.country
+  pk: 4f61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Paraguay
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: PY
+- model: metadata.country
+  pk: 5061b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Peru
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: PE
+- model: metadata.country
+  pk: 5161b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Philippines
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: PH
+- model: metadata.country
+  pk: 5361b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Poland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: PL
+- model: metadata.country
+  pk: 5461b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Portugal
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: PT
+- model: metadata.country
+  pk: 5561b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Puerto Rico
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: PR
+- model: metadata.country
+  pk: 5661b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Qatar
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: QA
+- model: metadata.country
+  pk: 56af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Brunei
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: BN
+- model: metadata.country
+  pk: 5761b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Réunion
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: RE
+- model: metadata.country
+  pk: 57af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bulgaria
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: BG
+- model: metadata.country
+  pk: 5861b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Romania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: RO
+- model: metadata.country
+  pk: 58af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Burkina Faso
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: BF
+- model: metadata.country
+  pk: 5961b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Russia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: RU
+- model: metadata.country
+  pk: 59af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Myanmar (Burma)
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: MM
+- model: metadata.country
+  pk: 5a61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Rwanda
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: RW
+- model: metadata.country
+  pk: 5aaf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Burundi
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: BI
+- model: metadata.country
+  pk: 5b61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Samoa
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: WS
+- model: metadata.country
+  pk: 5baf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cambodia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: KH
+- model: metadata.country
+  pk: 5c61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: San Marino
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: SM
+- model: metadata.country
+  pk: 5caf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cameroon
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CM
+- model: metadata.country
+  pk: 5d61b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sao Tome and Principe
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ST
+- model: metadata.country
+  pk: 5daf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Canada
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: CA
+- model: metadata.country
+  pk: 5eaf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cape Verde
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CV
+- model: metadata.country
+  pk: 5faf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cayman Islands
+    overseas_region: null
+    iso_alpha2_code: KY
+- model: metadata.country
+  pk: 60af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Central African Republic
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CF
+- model: metadata.country
+  pk: 61af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Chad
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: TD
+- model: metadata.country
+  pk: 62af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Chile
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: CL
+- model: metadata.country
+  pk: 63af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: China
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
+    iso_alpha2_code: CN
+- model: metadata.country
+  pk: 66af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Colombia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: CO
+- model: metadata.country
+  pk: 67af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Comoros
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: KM
+- model: metadata.country
+  pk: 68af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Congo (Democratic Republic)
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CD
+- model: metadata.country
+  pk: 69af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Congo
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CG
+- model: metadata.country
+  pk: 6baf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Costa Rica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: CR
+- model: metadata.country
+  pk: 6caf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Croatia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: HR
+- model: metadata.country
+  pk: 6d6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Hungary
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: HU
+- model: metadata.country
+  pk: 6daf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cuba
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: CU
+- model: metadata.country
+  pk: 6e6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Iceland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: IS
+- model: metadata.country
+  pk: 6eaf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Cyprus
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: CY
+- model: metadata.country
+  pk: 6f6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: India
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: IN
+- model: metadata.country
+  pk: 6faf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Czechia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: CZ
+- model: metadata.country
+  pk: 706a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Indonesia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: ID
+- model: metadata.country
+  pk: 70af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Denmark
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: DK
+- model: metadata.country
+  pk: 716a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Iran
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: IR
+- model: metadata.country
+  pk: 71af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Djibouti
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: DJ
+- model: metadata.country
+  pk: 726a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Iraq
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: IQ
+- model: metadata.country
+  pk: 72af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Dominica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: DM
+- model: metadata.country
+  pk: 736a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ireland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: IE
+- model: metadata.country
+  pk: 73af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Dominican Republic
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: DO
+- model: metadata.country
+  pk: 746a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Israel
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: IL
+- model: metadata.country
+  pk: 74af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: East Timor
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TL
+- model: metadata.country
+  pk: 756a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ivory Coast
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: CI
+- model: metadata.country
+  pk: 75af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ecuador
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: EC
+- model: metadata.country
+  pk: 766a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Jamaica
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: JM
+- model: metadata.country
+  pk: 76af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Egypt
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: EG
+- model: metadata.country
+  pk: 776a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Jordan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: JO
+- model: metadata.country
+  pk: 77756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Guernsey
+    overseas_region: null
+    iso_alpha2_code: GG
+- model: metadata.country
+  pk: 786a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Kazakhstan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: KZ
+- model: metadata.country
+  pk: 78756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Jersey
+    overseas_region: null
+    iso_alpha2_code: JE
+- model: metadata.country
+  pk: 796a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Kenya
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: KE
+- model: metadata.country
+  pk: 79756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Isle of Man
+    overseas_region: null
+    iso_alpha2_code: IM
+- model: metadata.country
+  pk: 7a6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2018-11-05T17:00:00Z'
+    name: Kiribati
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: KI
+- model: metadata.country
+  pk: 7a756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Kosovo
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: XK
+- model: metadata.country
+  pk: 7b6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: North Korea
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: KP
+- model: metadata.country
+  pk: 7c6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: South Korea
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: KR
+- model: metadata.country
+  pk: 7c756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: St Martin
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: MF
+- model: metadata.country
+  pk: 7d6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Kuwait
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: KW
+- model: metadata.country
+  pk: 7e6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Kyrgyzstan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: KG
+- model: metadata.country
+  pk: 7e756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: South Sudan
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SS
+- model: metadata.country
+  pk: 7f6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Laos
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: LA
+- model: metadata.country
+  pk: 7f756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Montenegro
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: ME
+- model: metadata.country
+  pk: 806a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Latvia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: LV
+- model: metadata.country
+  pk: 80756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: United Kingdom
+    overseas_region: null
+    iso_alpha2_code: GB
+- model: metadata.country
+  pk: 816a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Lebanon
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: LB
+- model: metadata.country
+  pk: 81756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: United States
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: US
+- model: metadata.country
+  pk: 826a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Lesotho
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: LS
+- model: metadata.country
+  pk: 82756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: France
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: FR
+- model: metadata.country
+  pk: 836a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Liberia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: LR
+- model: metadata.country
+  pk: 83756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Germany
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: DE
+- model: metadata.country
+  pk: 846a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Libya
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: LY
+- model: metadata.country
+  pk: 84756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Italy
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: IT
+- model: metadata.country
+  pk: 856a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Liechtenstein
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: LI
+- model: metadata.country
+  pk: 85756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Japan
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: JP
+- model: metadata.country
+  pk: 866a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Lithuania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: LT
+- model: metadata.country
+  pk: 86756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Spain
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: ES
+- model: metadata.country
+  pk: 876a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Luxembourg
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: LU
+- model: metadata.country
+  pk: 87756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Afghanistan
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AF
+- model: metadata.country
+  pk: 886a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Macao
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
+    iso_alpha2_code: MO
+- model: metadata.country
+  pk: 896a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: North Macedonia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: MK
+- model: metadata.country
+  pk: 945f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Albania
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: AL
+- model: metadata.country
+  pk: 955f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Algeria
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: DZ
+- model: metadata.country
+  pk: 975f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Andorra
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: AD
+- model: metadata.country
+  pk: 985f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Angola
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: AO
+- model: metadata.country
+  pk: 995f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Anguilla
+    overseas_region: null
+    iso_alpha2_code: AI
+- model: metadata.country
+  pk: 9b5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Antigua and Barbuda
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: AG
+- model: metadata.country
+  pk: 9c5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Argentina
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: AR
+- model: metadata.country
+  pk: 9d5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Armenia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: AM
+- model: metadata.country
+  pk: 9f5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Australia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: AU
+- model: metadata.country
+  pk: a05f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Austria
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: AT
+- model: metadata.country
+  pk: a15f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Azerbaijan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: AZ
+- model: metadata.country
+  pk: a25f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: The Bahamas
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BS
+- model: metadata.country
+  pk: a35f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bahrain
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: BH
+- model: metadata.country
+  pk: a45f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bangladesh
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: BD
+- model: metadata.country
+  pk: a46ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Syria
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: SY
+- model: metadata.country
+  pk: a55f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Barbados
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BB
+- model: metadata.country
+  pk: a56ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Taiwan
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TW
+- model: metadata.country
+  pk: a65f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Belarus
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: BY
+- model: metadata.country
+  pk: a66ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tajikistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: TJ
+- model: metadata.country
+  pk: a75f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Belgium
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: BE
+- model: metadata.country
+  pk: a76ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tanzania
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: TZ
+- model: metadata.country
+  pk: a85f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Belize
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BZ
+- model: metadata.country
+  pk: a86ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Thailand
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TH
+- model: metadata.country
+  pk: a95f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Benin
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: BJ
+- model: metadata.country
+  pk: a96ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Togo
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: TG
+- model: metadata.country
+  pk: aa5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bermuda
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BM
+- model: metadata.country
+  pk: ab5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bhutan
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: BT
+- model: metadata.country
+  pk: ab6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tonga
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TO
+- model: metadata.country
+  pk: ac5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bolivia
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BO
+- model: metadata.country
+  pk: ac6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Trinidad and Tobago
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: TT
+- model: metadata.country
+  pk: ad5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Bosnia and Herzegovina
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: BA
+- model: metadata.country
+  pk: ad6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tunisia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: TN
+- model: metadata.country
+  pk: ae5f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Botswana
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: BW
+- model: metadata.country
+  pk: ae6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Turkey
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: TR
+- model: metadata.country
+  pk: af6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Turkmenistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: TM
+- model: metadata.country
+  pk: b05f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Brazil
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BR
+- model: metadata.country
+  pk: b06ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Turks and Caicos Islands
+    overseas_region: null
+    iso_alpha2_code: TC
+- model: metadata.country
+  pk: b16ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Tuvalu
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TV
+- model: metadata.country
+  pk: b25f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: British Virgin Islands
+    overseas_region: null
+    iso_alpha2_code: VG
+- model: metadata.country
+  pk: b26ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Uganda
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: UG
+- model: metadata.country
+  pk: b36ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ukraine
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: UA
+- model: metadata.country
+  pk: b46ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: United Arab Emirates
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE
+- model: metadata.country
+  pk: b66ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Uruguay
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: UY
+- model: metadata.country
+  pk: b76ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Uzbekistan
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: UZ
+- model: metadata.country
+  pk: b86ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Vanuatu
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: VU
+- model: metadata.country
+  pk: b96ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Venezuela
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: VE
+- model: metadata.country
+  pk: ba6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Vietnam
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: VN
+- model: metadata.country
+  pk: bb6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: United States Virgin Islands
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: VI
+- model: metadata.country
+  pk: d2f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: El Salvador
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: SV
+- model: metadata.country
+  pk: d3f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Equatorial Guinea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GQ
+- model: metadata.country
+  pk: d4f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Eritrea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ER
+- model: metadata.country
+  pk: d5f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Estonia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: EE
+- model: metadata.country
+  pk: d6f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ethiopia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ET
+- model: metadata.country
+  pk: d7f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Falkland Islands
+    overseas_region: null
+    iso_alpha2_code: FK
+- model: metadata.country
+  pk: d8f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Faroe Islands
+    overseas_region: null
+    iso_alpha2_code: FO
+- model: metadata.country
+  pk: d9f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Fiji
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: FJ
+- model: metadata.country
+  pk: daf682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Finland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: FI
+- model: metadata.country
+  pk: def682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Gabon
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GA
+- model: metadata.country
+  pk: dff682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: The Gambia
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GM
+- model: metadata.country
+  pk: e0f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Georgia
+    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+    iso_alpha2_code: GE
+- model: metadata.country
+  pk: e1f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Ghana
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GH
+- model: metadata.country
+  pk: e2f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Gibraltar
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: GI
+- model: metadata.country
+  pk: e3f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Greece
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: GR
+- model: metadata.country
+  pk: e4f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Greenland
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: GL
+- model: metadata.country
+  pk: e5f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Grenada
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GD
+- model: metadata.country
+  pk: e8f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Guatemala
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GT
+- model: metadata.country
+  pk: e9f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Guinea
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GN
+- model: metadata.country
+  pk: eaf682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Guinea-Bissau
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: GW
+- model: metadata.country
+  pk: ebf682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Guyana
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GY
+- model: metadata.country
+  pk: ecf682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Haiti
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: HT
+- model: metadata.country
+  pk: eef682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Vatican City
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: VA
+- model: metadata.country
+  pk: eff682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Honduras
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: ''
+- model: metadata.country
+  pk: f0f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Hong Kong
+    overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
+    iso_alpha2_code: HK
