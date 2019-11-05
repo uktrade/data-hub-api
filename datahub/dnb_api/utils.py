@@ -192,7 +192,7 @@ def update_company_from_dnb(dh_company, dnb_company, user, fields_to_update=None
 
     Raises serializers.ValidationError if data is invalid.
     """
-    if fields_to_update:
+    if fields_to_update is not None:
         # Set dnb_company data to only include the fields in fields_to_update
         dnb_company = {field: dnb_company[field] for field in fields_to_update}
 

@@ -313,6 +313,6 @@ class TestUpdateCompanyFromDNB:
         company = CompanyFactory(duns_number='123456789')
         adviser = AdviserFactory()
         formatted_dnb_company['name'] = None
-        with pytest.raises(serializers.ValidationError) as exc:
+        with pytest.raises(serializers.ValidationError) as excinfo:
             update_company_from_dnb(company, formatted_dnb_company, adviser)
-            assert str(exc) == 'Data from D&B did not pass the Data Hub validation checks.'
+            assert str(excinfo) == 'Data from D&B did not pass the Data Hub validation checks.'
