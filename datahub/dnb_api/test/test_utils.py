@@ -3,12 +3,11 @@ from uuid import UUID
 
 import pytest
 from django.conf import settings
+from django.forms.models import model_to_dict
 from rest_framework import serializers, status
 from reversion.models import Version
 
-from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
@@ -23,47 +22,6 @@ pytestmark = pytest.mark.django_db
 
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
-
-REQUIRED_REGISTERED_ADDRESS_FIELDS = [
-    f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
-]
-# TODO: base these on a DRY list of fields when we add it
-ALL_DNB_UPDATED_SERIALIZER_FIELDS = [
-    'name',
-    'trading_names',
-    'address',
-    'registered_address',
-    'website',
-    'number_of_employees',
-    'is_number_of_employees_estimated',
-    'turnover',
-    'is_turnover_estimated',
-    'website',
-    'global_ultimate_duns_number',
-    'company_number',
-]
-ALL_DNB_UPDATED_FIELDS = [
-    'name',
-    'trading_names',
-    'address_1',
-    'address_2',
-    'address_county',
-    'address_country',
-    'address_postcode',
-    'registered_address_1',
-    'registered_address_2',
-    'registered_address_county',
-    'registered_address_country',
-    'registered_address_postcode',
-    'website',
-    'number_of_employees',
-    'is_number_of_employees_estimated',
-    'turnover',
-    'is_turnover_estimated',
-    'website',
-    'global_ultimate_duns_number',
-    'company_number',
-]
 
 
 @pytest.fixture
@@ -210,60 +168,6 @@ class TestUpdateCompanyFromDNB:
     Test update_company_from_dnb utility function.
     """
 
-    def _assert_address_synced(self, company, dnb_company, prefix):
-        country = Country.objects.filter(
-            id=dnb_company[prefix]['country'],
-        ).first()
-
-        if prefix == 'registered_address':
-            required_registered_address_fields_present = all(
-                field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
-            )
-            if not required_registered_address_fields_present:
-                # Return without any assertions when we check registered_address
-                # fields and the DNB response does not contain enough data for
-                # Data Hub to save them
-                return
-
-        assert getattr(company, f'{prefix}_1') == dnb_company[prefix]['line_1']
-        assert getattr(company, f'{prefix}_2') == dnb_company[prefix]['line_2']
-        assert getattr(company, f'{prefix}_country') == country
-        assert getattr(company, f'{prefix}_town') == dnb_company[prefix]['town']
-        assert getattr(company, f'{prefix}_county') == dnb_company[prefix]['county']
-        assert getattr(company, f'{prefix}_postcode') == dnb_company[prefix]['postcode']
-
-    def _assert_company_synced_with_dnb(self, company, dnb_company, fields=None):
-        """
-        Check whether the given DataHub company has been synced with the given
-        DNB company.
-        """
-        if not fields:
-            fields = ALL_DNB_UPDATED_SERIALIZER_FIELDS
-
-        country = Country.objects.filter(
-            id=dnb_company['address']['country'],
-        ).first()
-
-        company_number = (
-            dnb_company['company_number']
-            if country.iso_alpha2_code == 'GB' else None
-        )
-
-        for field in fields:
-            if field == 'registered_address' or field == 'address':
-                self._assert_address_synced(company, dnb_company, field)
-            elif field == 'company_number':
-                assert company.company_number == company_number
-            else:
-                assert getattr(company, field) == dnb_company[field]
-
-    def _add_address_model_fields(self, fields_set, prefix):
-        fields_set.add(f'{prefix}_1')
-        fields_set.add(f'{prefix}_2')
-        fields_set.add(f'{prefix}_postcode')
-        fields_set.add(f'{prefix}_county')
-        fields_set.add(f'{prefix}_country')
-
     def test_update_company_from_dnb_all_fields(
         self,
         dnb_company_search_feature_flag,
@@ -275,68 +179,128 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
+        original_company = company
         adviser = AdviserFactory()
         update_company_from_dnb(company, formatted_dnb_company, adviser)
         company.refresh_from_db()
-        self._assert_company_synced_with_dnb(company, formatted_dnb_company)
-        assert company.pending_dnb_investigation is False
+        uk_country = Country.objects.get(iso_alpha2_code='GB')
+        assert model_to_dict(company) == {
+            'address_1': 'Unit 10, Ockham Drive',
+            'address_2': '',
+            'address_country': uk_country.id,
+            'address_county': '',
+            'address_postcode': 'UB6 0F2',
+            'address_town': 'GREENFORD',
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': original_company.archived_documents_url_path,
+            'archived_on': None,
+            'archived_reason': None,
+            'business_type': original_company.business_type.id,
+            'company_number': '01261539',
+            'created_by': original_company.created_by.id,
+            'description': None,
+            'dnb_investigation_data': None,
+            'duns_number': '123456789',
+            'employee_range': original_company.employee_range.id,
+            'export_experience_category': original_company.export_experience_category.id,
+            'export_potential': None,
+            'export_to_countries': [],
+            'future_interest_countries': [],
+            'global_headquarters': None,
+            'global_ultimate_duns_number': '291332174',
+            'great_profile_status': None,
+            'headquarter_type': None,
+            'id': original_company.id,
+            'is_number_of_employees_estimated': True,
+            'is_turnover_estimated': None,
+            'modified_by': adviser.id,
+            'name': 'FOO BICYCLE LIMITED',
+            'number_of_employees': 260,
+            'one_list_account_owner': None,
+            'one_list_tier': None,
+            'pending_dnb_investigation': False,
+            'reference_code': '',
+            'registered_address_1': 'C/O LONE VARY',
+            'registered_address_2': '',
+            'registered_address_country': uk_country.id,
+            'registered_address_county': '',
+            'registered_address_postcode': 'UB6 0F2',
+            'registered_address_town': 'GREENFORD',
+            'sector': original_company.sector.id,
+            'trading_names': [],
+            'transfer_reason': '',
+            'transferred_by': None,
+            'transferred_on': None,
+            'transferred_to': None,
+            'turnover': 50651895,
+            'turnover_range': original_company.turnover_range.id,
+            'uk_region': original_company.uk_region.id,
+            'vat_number': '',
+            'website': 'http://foo.com',
+        }
 
         versions = list(Version.objects.get_for_object(company))
         assert len(versions) == 1
         version = versions[0]
         assert version.revision.comment == 'Updated from D&B'
-
-        assert company.modified_by == adviser
         assert version.revision.user == adviser
 
-    @pytest.mark.parametrize(
-        'fields_to_update',
-        (
-            ['global_ultimate_duns_number'],
-            ['name', 'address'],
-        ),
-    )
-    def test_update_company_from_dnb_partial_fields(
+    def test_update_company_from_dnb_partial_fields_single(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
-        fields_to_update,
     ):
         """
         Test that update_company_from_dnb can update a subset of fields.
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
-        original_company = Company.objects.get(id=company.id)
+        original_company = company
         adviser = AdviserFactory()
 
         update_company_from_dnb(
             company,
             formatted_dnb_company,
             adviser,
-            fields_to_update=fields_to_update,
+            fields_to_update=['global_ultimate_duns_number'],
         )
         company.refresh_from_db()
-        self._assert_company_synced_with_dnb(
+        dnb_ultimate_duns = formatted_dnb_company['global_ultimate_duns_number']
+
+        assert company.global_ultimate_duns_number == dnb_ultimate_duns
+        assert company.name == original_company.name
+        assert company.number_of_employees == original_company.number_of_employees
+
+    def test_update_company_from_dnb_partial_fields_multiple(
+        self,
+        dnb_company_search_feature_flag,
+        formatted_dnb_company,
+    ):
+        """
+        Test that update_company_from_dnb can update a subset of fields.
+        """
+        duns_number = '123456789'
+        company = CompanyFactory(duns_number=duns_number)
+        original_company = company
+        adviser = AdviserFactory()
+
+        update_company_from_dnb(
             company,
             formatted_dnb_company,
-            fields=fields_to_update,
+            adviser,
+            fields_to_update=['name', 'address'],
         )
-        updated_model_fields = set(fields_to_update)
+        company.refresh_from_db()
 
-        if 'address' in fields_to_update:
-            updated_model_fields.remove('address')
-            self._add_address_model_fields(updated_model_fields, 'address')
-
-        if 'registered_address' in fields_to_update:
-            updated_model_fields.remove('registered_address')
-            self._add_address_model_fields(updated_model_fields, 'registered_address')
-
-        expected_unmodified_fields = set(ALL_DNB_UPDATED_FIELDS) - updated_model_fields
-        for field in expected_unmodified_fields:
-            original_value = getattr(original_company, field)
-            current_value = getattr(company, field)
-            assert current_value == original_value
+        assert company.global_ultimate_duns_number == original_company.global_ultimate_duns_number
+        assert company.number_of_employees == original_company.number_of_employees
+        assert company.name == formatted_dnb_company['name']
+        assert company.address_1 == formatted_dnb_company['address']['line_1']
+        assert company.address_2 == formatted_dnb_company['address']['line_2']
+        assert company.address_town == formatted_dnb_company['address']['town']
+        assert company.address_county == formatted_dnb_company['address']['county']
+        assert company.address_postcode == formatted_dnb_company['address']['postcode']
 
     def test_post_dnb_data_invalid(
         self,
