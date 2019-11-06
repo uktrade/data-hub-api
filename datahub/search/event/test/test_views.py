@@ -11,6 +11,7 @@ from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.event import EventSearchApp
 
 
 @pytest.fixture
@@ -19,7 +20,11 @@ def setup_data():
     EventFactory.create_batch(2)
 
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(EventSearchApp),
+]
 
 
 class TestSearch(APITestMixin):
