@@ -63,14 +63,6 @@ class CompanyListItem(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     list = models.ForeignKey(CompanyList, models.CASCADE, related_name='items')
-    # This field is deprecated (use list.adviser instead)
-    # TODO: Remove this field (using the usual deprecation process)
-    adviser = models.ForeignKey(
-        'company.Advisor',
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='company_list_items',
-    )
     company = models.ForeignKey(
         'company.Company',
         on_delete=models.CASCADE,
