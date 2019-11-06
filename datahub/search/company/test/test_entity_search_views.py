@@ -29,10 +29,15 @@ from datahub.core.test_utils import (
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.company import CompanySearchApp
 from datahub.search.company.models import get_suggestions
 from datahub.search.company.views import SearchCompanyExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(CompanySearchApp),
+]
 
 
 @pytest.fixture
