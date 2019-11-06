@@ -8,7 +8,6 @@ from importlib import import_module
 # creating unreferenced names (as it wouldn't make sense to add them to __all__).
 
 import_module('datahub.company.admin.adviser')
-import_module('datahub.company.admin.ch_company')
 import_module('datahub.company.admin.company')
 import_module('datahub.company.admin.contact')
 import_module('datahub.company.admin.metadata')
