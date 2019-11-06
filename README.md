@@ -171,7 +171,7 @@ Dependencies:
 
 ## API documentation
 
-Automatically-generated API documentation is served at `/docs` (requires admin site credentials). 
+Automatically-generated API documentation is served at `/docs` (requires admin site credentials).
 
 ## Local development
 
@@ -244,7 +244,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
-| `BULK_INSERT_BATCH_SIZE` | No | Used when loading Companies House records (default=5000). |
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
 | `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
@@ -256,7 +255,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
 | `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
 | `DATA_HUB_FRONTEND_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY`. The holder of the secret key can access the metadata endpoints by Hawk authentication. |
-| `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. | 
+| `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. |
 | `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
