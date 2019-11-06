@@ -19,18 +19,6 @@ CAT_INDICES_MOCK_DATA = [
         'store.size': '32.3mb',
         'pri.store.size': '32.3mb',
     },
-    {
-        'health': 'yellow',
-        'status': 'open',
-        'index': 'test-datahub-companieshousecompany-f4c973f676d15e228905d28394b914f2',
-        'uuid': 'PlqfWiw2QIGFmfBOZELhfg',
-        'pri': '5',
-        'rep': '1',
-        'docs.count': '4263083',
-        'docs.deleted': '0',
-        'store.size': '1.8gb',
-        'pri.store.size': '1.8gb',
-    },
 ]
 
 
@@ -52,7 +40,6 @@ def test_deletes_matching_indices(mock_es_client, interactive, monkeypatch):
         format='json',
     )
     mock_es_client.return_value.indices.delete.assert_called_once_with(
-        'test-datahub-companieshousecompany-f4c973f676d15e228905d28394b914f2,'
         'test-datahub-interaction-ec946a2e4301393aa5fdd9f109b60cf6',
     )
     assert mocked_input.call_count == (1 if interactive else 0)
