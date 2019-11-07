@@ -7,6 +7,7 @@ from django.conf import settings
 from django.forms.models import model_to_dict
 from reversion.models import Version
 
+from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.tasks import sync_company_with_dnb
 from datahub.dnb_api.utils import DNBServiceError
@@ -31,7 +32,7 @@ def test_sync_company_with_dnb_all_fields(
         json=dnb_response_uk,
     )
     company = CompanyFactory(duns_number='123456789')
-    original_company = company
+    original_company = Company.objects.get(id=company.id)
     sync_company_with_dnb.apply_async(args=[company.id])
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
@@ -111,7 +112,7 @@ def test_sync_company_with_dnb_partial_fields(
         json=dnb_response_uk,
     )
     company = CompanyFactory(duns_number='123456789')
-    original_company = company
+    original_company = Company.objects.get(id=company.id)
     sync_company_with_dnb.apply_async(
         args=[company.id],
         kwargs={'fields_to_update': ['global_ultimate_duns_number']},

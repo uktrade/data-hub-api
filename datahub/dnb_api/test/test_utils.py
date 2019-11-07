@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from rest_framework import serializers, status
 from reversion.models import Version
 
+from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.dnb_api.utils import (
     DNBServiceError,
@@ -188,7 +189,7 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
-        original_company = company
+        original_company = Company.objects.get(id=company.id)
         adviser = adviser_callable()
         update_company_from_dnb(
             company,
@@ -277,7 +278,7 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
-        original_company = company
+        original_company = Company.objects.get(id=company.id)
         adviser = AdviserFactory()
 
         update_company_from_dnb(
@@ -303,7 +304,7 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
-        original_company = company
+        original_company = Company.objects.get(id=company.id)
         adviser = AdviserFactory()
 
         update_company_from_dnb(
