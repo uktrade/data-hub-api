@@ -168,10 +168,19 @@ class TestUpdateCompanyFromDNB:
     Test update_company_from_dnb utility function.
     """
 
+    @pytest.mark.parametrize(
+        'adviser_callable,update_descriptor',
+        (
+            (lambda: None, None),
+            (lambda: AdviserFactory(), 'automatic'),
+        ),
+    )
     def test_update_company_from_dnb_all_fields(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
+        update_descriptor,
     ):
         """
         Test that update_company_from_dnb will update all fields when the fields
@@ -180,8 +189,13 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
         original_company = company
-        adviser = AdviserFactory()
-        update_company_from_dnb(company, formatted_dnb_company, adviser)
+        adviser = adviser_callable()
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            user=adviser,
+            update_descriptor=update_descriptor,
+        )
         company.refresh_from_db()
         uk_country = Country.objects.get(iso_alpha2_code='GB')
         assert model_to_dict(company) == {
@@ -214,7 +228,7 @@ class TestUpdateCompanyFromDNB:
             'id': original_company.id,
             'is_number_of_employees_estimated': True,
             'is_turnover_estimated': None,
-            'modified_by': adviser.id,
+            'modified_by': adviser.id if adviser else original_company.modified_by.id,
             'name': 'FOO BICYCLE LIMITED',
             'number_of_employees': 260,
             'one_list_account_owner': None,
@@ -243,8 +257,15 @@ class TestUpdateCompanyFromDNB:
         versions = list(Version.objects.get_for_object(company))
         assert len(versions) == 1
         version = versions[0]
-        assert version.revision.comment == 'Updated from D&B'
+
+        if update_descriptor:
+            assert version.revision.comment == f'Updated from D&B [{update_descriptor}]'
+        else:
+            assert version.revision.comment == 'Updated from D&B'
+
         assert version.revision.user == adviser
+        if not adviser:
+            assert company.modified_on == original_company.modified_on
 
     def test_update_company_from_dnb_partial_fields_single(
         self,

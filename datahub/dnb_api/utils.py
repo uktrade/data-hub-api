@@ -24,22 +24,26 @@ api_client = APIClient(
 
 class DNBServiceError(Exception):
     """
-    Exception for when DNB service doesn't return
-    a response with a status code of 200.
+    Exception for when DNB service doesn't return a response with a status code of 200.
     """
+
+    def __init__(self, message, status_code):
+        """
+        Initialise the exception.
+        """
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class DNBServiceInvalidRequest(Exception):
     """
-    Exception for when the request to DNB service
-    is not valid.
+    Exception for when the request to DNB service is not valid.
     """
 
 
 class DNBServiceInvalidResponse(Exception):
     """
-    Exception for when the response from DNB service
-    is not valid.
+    Exception for when the response from DNB service is not valid.
     """
 
 
@@ -75,7 +79,7 @@ def get_company(duns_number):
     if dnb_response.status_code != status.HTTP_200_OK:
         error_message = f'DNB service returned: {dnb_response.status_code}'
         logger.error(error_message)
-        raise DNBServiceError(error_message)
+        raise DNBServiceError(error_message, dnb_response.status_code)
 
     dnb_companies = dnb_response.json().get('results', [])
 
@@ -182,13 +186,21 @@ def format_dnb_company_investigation(data):
     return data
 
 
-def update_company_from_dnb(dh_company, dnb_company, user, fields_to_update=None):
+def update_company_from_dnb(
+    dh_company,
+    dnb_company,
+    user=None,
+    fields_to_update=None,
+    update_descriptor='',
+):
     """
     Updates `dh_company` with new data from `dnb_company` while setting `modified_by` to the
-    given user and creating a revision.
+    given user (if specified) and creating a revision.
     If `fields_to_update` is specified, only the fields specified will be synced
     with DNB.  `fields_to_update` should be an iterable of strings representing
     DNBCompanySerializer field names.
+    If `update_descriptor` is specified, the descriptor will be injected in to
+    the comment for this revision.
 
     Raises serializers.ValidationError if data is invalid.
     """
@@ -213,9 +225,17 @@ def update_company_from_dnb(dh_company, dnb_company, user, fields_to_update=None
         raise
 
     with reversion.create_revision():
-        company_serializer.save(
-            modified_by=user,
-            pending_dnb_investigation=False,
-        )
-        reversion.set_user(user)
-        reversion.set_comment('Updated from D&B')
+        company_kwargs = {'pending_dnb_investigation': False}
+        if user:
+            company_kwargs['modified_by'] = user
+            reversion.set_user(user)
+        else:
+            # When an update is made by an automatic process, keep the modified_on field
+            # unchanged as this field should only be when a change was initiated by a user
+            company_kwargs['modified_on'] = dh_company.modified_on
+
+        company_serializer.save(**company_kwargs)
+        update_comment = 'Updated from D&B'
+        if update_descriptor:
+            update_comment = ' '.join((update_comment, f'[{update_descriptor}]'))
+        reversion.set_comment(update_comment)
