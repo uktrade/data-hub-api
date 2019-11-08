@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Django settings for Leeloo project.
+Django settings for the project.
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
@@ -306,7 +306,6 @@ SEARCH_APPS = [
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 
-# Leeloo stuff
 if 'elasticsearch' in VCAP_SERVICES:
     ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
 else:
@@ -326,7 +325,6 @@ SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
 SEARCH_CONFIGURE_CONNECTION_ON_READY = True
 SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY = True
 CHAR_FIELD_MAX_LENGTH = 255
-BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 
 AV_V2_SERVICE_URL = env('AV_V2_SERVICE_URL', default=None)
 
@@ -417,9 +415,6 @@ if REDIS_BASE_URL:
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
 CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
-
-# COMPANIESHOUSE
-COMPANIESHOUSE_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
 
 MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD = env.int(
     'MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD',

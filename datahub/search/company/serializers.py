@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from datahub.core.serializers import RelaxedDateField
 from datahub.search.serializers import (
     EntitySearchQuerySerializer,
     SingleOrListField,
@@ -27,10 +28,13 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         child=StringUUIDField(),
         required=False,
     )
+    latest_interaction_date_after = RelaxedDateField(required=False)
+    latest_interaction_date_before = RelaxedDateField(required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',
         'name',
+        'latest_interaction_date',
     )
 
 

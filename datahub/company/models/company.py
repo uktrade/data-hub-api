@@ -404,18 +404,25 @@ class Company(ArchivableModel, BaseModel):
         group_global_headquarters = self.get_group_global_headquarters()
         return group_global_headquarters.one_list_account_owner
 
-    def assign_one_list_account_manager_and_tier(self, adviser, one_list_tier_id):
+    def assign_one_list_account_manager_and_tier(
+        self,
+        one_list_account_owner,
+        one_list_tier_id,
+        modified_by,
+    ):
         """Update the company's One List account manager and tier."""
-        self.one_list_account_owner = adviser
+        self.modified_by = modified_by
+        self.one_list_account_owner = one_list_account_owner
         self.one_list_tier_id = one_list_tier_id
         self.save()
 
-    def remove_from_one_list(self):
+    def remove_from_one_list(self, modified_by):
         """
         Remove the company from the One List.
 
         This is done by unsetting the company's One List account manager and tier.
         """
+        self.modified_by = modified_by
         self.one_list_account_owner = None
         self.one_list_tier = None
         self.save()

@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -12,32 +11,21 @@ from datahub.company.test.factories import (
 from datahub.core.test_utils import (
     format_date_or_datetime,
     get_attr_or_none,
-    HawkAPITestClient,
 )
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
-
-@pytest.fixture
-def data_flow_api_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the data_flow_api scope."""
-    hawk_api_client.set_credentials(
-        'data-flow-api-id',
-        'data-flow-api-key',
-    )
-    yield hawk_api_client
+from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_contact(contact):
     """Returns expected dictionary based on given contact"""
     return {
         'accepts_dit_email_marketing': contact.accepts_dit_email_marketing,
+        'address_1': contact.address_1,
+        'address_2': contact.address_2,
         'address_country__name': get_attr_or_none(contact, 'address_country.name'),
+        'address_county': contact.address_county,
         'address_postcode': contact.address_postcode,
+        'address_same_as_company': contact.address_same_as_company,
+        'address_town': contact.address_town,
         'company_id': str(contact.company_id) if contact.company_id is not None else None,
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
@@ -46,49 +34,20 @@ def get_expected_data_from_contact(contact):
         'job_title': contact.job_title,
         'name': contact.name,
         'notes': contact.notes,
+        'primary': contact.primary,
         'telephone_alternative': contact.telephone_alternative,
         'telephone_number': contact.telephone_number,
     }
 
 
 @pytest.mark.django_db
-class TestContactsDatasetViewSet:
+class TestContactsDatasetViewSet(BaseDatasetViewTest):
     """
     Tests for ContactsDatasetView
     """
 
-    contacts_dataset_view_url = reverse('api-v4:dataset:contacts-dataset')
-
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
-    def test_other_methods_not_allowed(
-        self,
-        data_flow_api_client,
-        method,
-    ):
-        """Test that various HTTP methods are not allowed."""
-        response = data_flow_api_client.request(method, self.contacts_dataset_view_url)
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-
-    def test_without_scope(self, hawk_api_client):
-        """Test that making a request without the correct Hawk scope returns an error."""
-        hawk_api_client.set_credentials(
-            'test-id-without-scope',
-            'test-key-without-scope',
-        )
-        response = hawk_api_client.get(self.contacts_dataset_view_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_without_credentials(self, api_client):
-        """Test that making a request without credentials returns an error."""
-        response = api_client.get(self.contacts_dataset_view_url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_without_whitelisted_ip(self, data_flow_api_client):
-        """Test that making a request without the whitelisted IP returns an error."""
-        data_flow_api_client.set_http_x_forwarded_for('1.1.1.1')
-        response = data_flow_api_client.get(self.contacts_dataset_view_url)
-
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    view_url = reverse('api-v4:dataset:contacts-dataset')
+    factory = ContactFactory
 
     @pytest.mark.parametrize(
         'contact_factory', (
@@ -99,7 +58,7 @@ class TestContactsDatasetViewSet:
     def test_success(self, data_flow_api_client, contact_factory):
         """Test that endpoint returns with expected data for a single order"""
         contact = contact_factory()
-        response = data_flow_api_client.get(self.contacts_dataset_view_url)
+        response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 1
@@ -117,7 +76,7 @@ class TestContactsDatasetViewSet:
             contact_3 = ContactFactory()
             contact_4 = ContactFactory()
 
-        response = data_flow_api_client.get(self.contacts_dataset_view_url)
+        response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 4
@@ -125,15 +84,3 @@ class TestContactsDatasetViewSet:
                                        key=lambda item: item.pk) + [contact_1, contact_2]
         for index, contact in enumerate(expected_contact_list):
             assert contact.email == response_results[index]['email']
-
-    def test_pagination(self, data_flow_api_client):
-        """Test that when page size higher than threshold response returns with next page url"""
-        ContactFactory.create_batch(settings.REST_FRAMEWORK['PAGE_SIZE'] + 1)
-        response = data_flow_api_client.get(self.contacts_dataset_view_url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['next'] is not None
-
-    def test_no_data(self, data_flow_api_client):
-        """Test that without any data available, endpoint completes the request successfully"""
-        response = data_flow_api_client.get(self.contacts_dataset_view_url)
-        assert response.status_code == status.HTTP_200_OK

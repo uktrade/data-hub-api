@@ -1,10 +1,10 @@
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
 
-from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none, HawkAPITestClient
+from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
+from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
@@ -12,22 +12,6 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
-
-@pytest.fixture
-def data_flow_api_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the data_flow_api scope."""
-    hawk_api_client.set_credentials(
-        'data-flow-api-id',
-        'data-flow-api-key',
-    )
-    yield hawk_api_client
 
 
 def get_expected_data_from_interaction(interaction):
@@ -80,42 +64,13 @@ def get_expected_data_from_interaction(interaction):
 
 
 @pytest.mark.django_db
-class TestInteractionsDatasetViewSet:
+class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
     """
     Tests for InteractionsDatasetView
     """
 
     view_url = reverse('api-v4:dataset:interactions-dataset')
-
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
-    def test_other_methods_not_allowed(
-        self,
-        data_flow_api_client,
-        method,
-    ):
-        """Test that various HTTP methods are not allowed."""
-        response = data_flow_api_client.request(method, self.view_url)
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-
-    def test_without_scope(self, hawk_api_client):
-        """Test that making a request without the correct Hawk scope returns an error."""
-        hawk_api_client.set_credentials(
-            'test-id-without-scope',
-            'test-key-without-scope',
-        )
-        response = hawk_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_without_credentials(self, api_client):
-        """Test that making a request without credentials returns an error."""
-        response = api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_without_whitelisted_ip(self, data_flow_api_client):
-        """Test that making a request without the whitelisted IP returns an error."""
-        data_flow_api_client.set_http_x_forwarded_for('1.1.1.1')
-        response = data_flow_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    factory = CompanyInteractionFactory
 
     @pytest.mark.parametrize(
         'interaction_factory', (
@@ -157,15 +112,3 @@ class TestInteractionsDatasetViewSet:
         ) + [interaction1, interaction2]
         for index, interaction in enumerate(expected_list):
             assert interaction.get_absolute_url() == response_results[index]['interaction_link']
-
-    def test_pagination(self, data_flow_api_client):
-        """Test that the next page url is populated correctly"""
-        CompanyInteractionFactory.create_batch(settings.REST_FRAMEWORK['PAGE_SIZE'] + 1)
-        response = data_flow_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['next'] is not None
-
-    def test_no_data(self, data_flow_api_client):
-        """Test that an empty dataset is returned successfully"""
-        response = data_flow_api_client.get(self.view_url)
-        assert response.status_code == status.HTTP_200_OK

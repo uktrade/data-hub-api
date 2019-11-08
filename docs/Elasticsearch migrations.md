@@ -26,8 +26,8 @@ mapping it returns.
 
 ## Operation during a migration
 
-A migration is triggered by running `./manage.py migrate_es`. (At the moment, this 
-is _not_ automatically triggered during deployments.)
+A migration is triggered by running `./manage.py migrate_es`. (This 
+is automatically run during deployment.)
 
 This command:
 

@@ -13,7 +13,11 @@ from datahub.search.utils import SearchOrdering, SortDirection
 
 
 class IntelligentHomepageView(APIView):
-    """Return the data for the intelligent homepage."""
+    """
+    Return the data for the intelligent homepage.
+
+    TODO: Remove this view and related logic following the deprecation period.
+    """
 
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 

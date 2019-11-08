@@ -26,7 +26,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.test.factories import LegacyCompanyListItemFactory
+from datahub.user.company_list.test.factories import CompanyListItemFactory
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def company_with_interactions_and_contacts_factory():
 def company_with_company_list_items_factory():
     """Factory for a company that is on users' personal company lists."""
     company = CompanyFactory()
-    LegacyCompanyListItemFactory.create_batch(3, company=company)
+    CompanyListItemFactory.create_batch(3, company=company)
     return company
 
 
@@ -392,5 +392,5 @@ def _company_factory(num_interactions=0, num_contacts=0, num_orders=0, num_compa
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
     OrderFactory.create_batch(num_orders, company=company)
-    LegacyCompanyListItemFactory.create_batch(num_company_list_items, company=company)
+    CompanyListItemFactory.create_batch(num_company_list_items, company=company)
     return company

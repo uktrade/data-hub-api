@@ -14,7 +14,7 @@ This is currently done by creating [newsfragments](../changelog/) with details o
 
 To do that:
 
-* Create an `.api `, `.deprecation` and, if necessary, a `.db` newsfragment announcing the change. See [example](https://github.com/uktrade/data-hub-leeloo/commit/ff5484b4331cd8a42dfd962d00438274d9edc6a6).
+* Create an `.api `, `.deprecation` and, if necessary, a `.db` newsfragment announcing the change. See [example](https://github.com/uktrade/data-hub-api/commit/ff5484b4331cd8a42dfd962d00438274d9edc6a6).
 * Open a PR and merge it into develop after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
@@ -40,7 +40,7 @@ We have weekly releases every Thursday so give at least one week of notice from 
 
 If you are removing a model field you might want to start [removing it from django](#how-to-remove-column) at the same time.
 
-See [example](https://github.com/uktrade/data-hub-leeloo/pull/1107/files).
+See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
 
 ### Migrate elasticsearch
 
@@ -66,27 +66,27 @@ If the field has a NOT NULL constraint you need to create a migration to change 
 
 To do this:
 * Make sure you announced the deprecation in a previous release.
-* Make the field nullable if necessary. See [example](https://github.com/uktrade/data-hub-leeloo/blob/d57e613aad6c4c033131f0b3074e6143bd4fb010/datahub/company/migrations/0036_update_contact_contactable_columns.py):
+* Make the field nullable if necessary. See [example](https://github.com/uktrade/data-hub-api/blob/d57e613aad6c4c033131f0b3074e6143bd4fb010/datahub/company/migrations/0036_update_contact_contactable_columns.py):
     * Change the django field in `models.py`.
     * Create a migration `./manage.py makemigrations <app> --name=remove_<field>_from_django`.
 * Remove the field from the django model.
 * Add the logic that removes the field from django while keeping the column:
     * Open the `xxxx_remove_<field>_from_django.py` file if you made the field nullable or create an empty one with `./manage.py makemigrations <app> --empty --name=remove_<field>_from_django` otherwise.
-    * Add a `migrations.SeparateDatabaseAndState` operation following [this example](https://github.com/uktrade/data-hub-leeloo/blob/d4b7d447cb992f71427ac56b219d4a63c73fbb2b/datahub/company/migrations/0034_remove-account-manager-from-django.py).
+    * Add a `migrations.SeparateDatabaseAndState` operation following [this example](https://github.com/uktrade/data-hub-api/blob/d4b7d447cb992f71427ac56b219d4a63c73fbb2b/datahub/company/migrations/0034_remove-account-manager-from-django.py).
     * `./manage.py migrate`.
 * Remove the field from any other part of the code including factories, admin and tests.
 * Create a `.removal` and, if necessary, a `.db` newsfragment announcing the change.
 * Open a PR and merge it into develop after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
-See [example](https://github.com/uktrade/data-hub-leeloo/pull/1107/files).
+See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
 
 ### Remove the column from the databse
 
 * Make sure you removed the field from the API and from django in a previous release and this has been deployed to production.
 * Remove the column from the database:
     * Create an empty migration `./manage.py makemigrations <app> --empty --name=remove_<field>_from_database`.
-    * Add the field copying the definition from a previous migration file and then immediately after remove it completely. See [example](https://github.com/uktrade/data-hub-leeloo/blob/70eb77d76f5189f9476601ca1a5f118c9b7cbe5f/datahub/company/migrations/0035_remove_account_manager_column.py).
+    * Add the field copying the definition from a previous migration file and then immediately after remove it completely. See [example](https://github.com/uktrade/data-hub-api/blob/70eb77d76f5189f9476601ca1a5f118c9b7cbe5f/datahub/company/migrations/0035_remove_account_manager_column.py).
     * `./manage.py migrate`.
 * Create a `.removal` and a `.db` newsfragment announcing the change.
 * Open a PR and merge it into develop after it's been approved.

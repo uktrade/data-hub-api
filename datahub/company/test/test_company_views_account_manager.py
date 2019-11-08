@@ -105,6 +105,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         company.refresh_from_db()
         assert company.one_list_account_owner == international_trade_adviser
         assert company.one_list_tier_id == OneListTierID.tier_d_international_trade_advisers.value
+        assert company.modified_by == international_trade_adviser
 
     @pytest.mark.parametrize(
         'company_factory,expected_errors',
@@ -225,6 +226,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
         company.refresh_from_db()
         assert company.one_list_account_owner is None
         assert company.one_list_tier is None
+        assert company.modified_by == international_trade_adviser
 
     @pytest.mark.django_db
     def test_cannot_remove_account_manager_for_other_tiers(self, international_trade_adviser):

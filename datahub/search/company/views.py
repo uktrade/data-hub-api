@@ -52,6 +52,8 @@ class SearchCompanyAPIViewMixin:
         'export_to_countries',
         'future_interest_countries',
         'one_list_group_global_account_manager',
+        'latest_interaction_date_after',
+        'latest_interaction_date_before',
     )
 
     REMAP_FIELDS = {
