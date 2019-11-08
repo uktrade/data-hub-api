@@ -121,7 +121,7 @@ def test_sync_company_with_dnb_partial_fields(
     assert model_to_dict(company) == {
         'address_1': original_company.address_1,
         'address_2': original_company.address_2,
-        'address_country': original_company.address_country.id,
+        'address_country': original_company.address_country_id,
         'address_county': original_company.address_county,
         'address_postcode': original_company.address_postcode,
         'address_town': original_company.address_town,
@@ -157,7 +157,7 @@ def test_sync_company_with_dnb_partial_fields(
         'reference_code': original_company.reference_code,
         'registered_address_1': original_company.registered_address_1,
         'registered_address_2': original_company.registered_address_2,
-        'registered_address_country': original_company.registered_address_country.id,
+        'registered_address_country': original_company.registered_address_country_id,
         'registered_address_county': original_company.registered_address_county,
         'registered_address_postcode': original_company.registered_address_postcode,
         'registered_address_town': original_company.registered_address_town,
@@ -199,7 +199,7 @@ def test_sync_company_with_dnb_retries_errors(monkeypatch, error_status_code, ex
     monkeypatch.setattr('datahub.dnb_api.tasks.get_company', mocked_get_company)
 
     # Mock the task's retry method
-    retry_mock = mock.Mock(side_effect=Retry())
+    retry_mock = mock.Mock(side_effect=Retry(exc=error))
     monkeypatch.setattr('datahub.dnb_api.tasks.sync_company_with_dnb.retry', retry_mock)
 
     if expect_retry:

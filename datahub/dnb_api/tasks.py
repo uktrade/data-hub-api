@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.exceptions import Retry
 from celery.utils.log import get_task_logger
-from rest_framework import status
+from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
 from datahub.dnb_api.utils import (
@@ -19,13 +19,7 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
     try:
         dnb_company = get_company(dh_company.duns_number)
     except DNBServiceError as exc:
-        server_error_statuses = (
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            status.HTTP_502_BAD_GATEWAY,
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            status.HTTP_504_GATEWAY_TIMEOUT,
-        )
-        if exc.status_code in server_error_statuses:
+        if is_server_error(exc.status_code):
             raise task.retry(exc=exc, countdown=60)
         raise
 
@@ -52,8 +46,10 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     """
     try:
         _sync_company_with_dnb(company_id, fields_to_update, self)
-    except Retry:
-        raise
-    except Exception:
-        logger.error(f'Encountered an error when syncing Company "{company_id}" with DNB')
+    except Retry as exc:
+        status_code = exc.exc.status_code
+        logger.info(
+            f'DNB service responded with status {status_code}. Retrying '
+            'sync_company_with_dnb celery task',
+        )
         raise
