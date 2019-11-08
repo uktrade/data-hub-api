@@ -81,7 +81,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Run tests
-        command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
+        command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml --durations 25
 
     - store_test_results:
         path: test-reports
