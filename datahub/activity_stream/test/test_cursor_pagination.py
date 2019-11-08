@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from rest_framework import status
 
 from datahub.activity_stream.test import hawk
@@ -18,11 +17,16 @@ from datahub.omis.order.test.factories import OrderFactory
     ),
 )
 @pytest.mark.django_db
-def test_cursor_pagination(api_client, factory, endpoint):
+def test_cursor_pagination(factory, endpoint, api_client, monkeypatch):
     """
     Test if pagination behaves as expected
     """
-    page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+    page_size = 2
+    monkeypatch.setattr(
+        'datahub.activity_stream.pagination.ActivityCursorPagination.page_size',
+        page_size,
+    )
+
     interactions = factory.create_batch(page_size + 1)
     response = hawk.get(api_client, get_url(endpoint))
     assert response.status_code == status.HTTP_200_OK
