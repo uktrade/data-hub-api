@@ -14,6 +14,33 @@ from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidato
 from datahub.interaction.models import InteractionPermission
 
 
+# TODO: Use this as a DRY reference for all code relating to updated DNB fields in the future
+ALL_DNB_UPDATED_FIELDS = [
+    'name',
+    'trading_names',
+    'address_1',
+    'address_2',
+    'address_town',
+    'address_county',
+    'address_country',
+    'address_postcode',
+    'registered_address_1',
+    'registered_address_2',
+    'registered_address_town',
+    'registered_address_county',
+    'registered_address_country',
+    'registered_address_postcode',
+    'website',
+    'number_of_employees',
+    'is_number_of_employees_estimated',
+    'turnover',
+    'is_turnover_estimated',
+    'website',
+    'global_ultimate_duns_number',
+    'company_number',
+]
+
+
 class DNBMatchedCompanySerializer(PermittedFieldsModelSerializer):
     """
     Serialiser for data hub companies matched with a DNB entry.
@@ -115,6 +142,23 @@ class DNBCompanySerializer(CompanySerializer):
                 ),
             ),
         )
+
+    def save_dnb_fields(self, **kwargs):
+        """
+        Method to save the instance - by writing only the fields updated by DNB.
+        Takes kwargs to override the values of specific fields for the model
+        on save - these fields are not subject to the DNB-only restriction.
+
+        Note: modified_on will not be updated by this method.
+        """
+        instance = self.instance
+        validated_data = dict(
+            list(self.validated_data.items()) + list(kwargs.items()),
+        )
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        update_fields = ALL_DNB_UPDATED_FIELDS + list(kwargs.keys())
+        instance.save(update_fields=update_fields)
 
 
 class DUNSNumberSerializer(serializers.Serializer):

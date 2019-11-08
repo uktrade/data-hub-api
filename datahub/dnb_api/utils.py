@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework import serializers, status
 
-from datahub.company.models import Company
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.core.serializers import AddressSerializer
@@ -226,22 +225,15 @@ def update_company_from_dnb(
         raise
 
     with reversion.create_revision():
-        original_modified_on = dh_company.modified_on
-
         company_kwargs = {'pending_dnb_investigation': False}
         if user:
             company_kwargs['modified_by'] = user
             reversion.set_user(user)
-
-        company_serializer.save(**company_kwargs)
-
-        # When an update is made by an automatic process, keep the modified_on field
-        # unchanged as this field should only be when a change was initiated by a user
-        # Unfortunately, we have to do this as a second update call to avoid django's
-        # `auto_now` machinery from triggering - there's no way to avoid this when
-        # saving with a serializer
-        if not user:
-            Company.objects.filter(id=dh_company.id).update(modified_on=original_modified_on)
+            company_serializer.save(**company_kwargs)
+        else:
+            # Call a method to update the DNB fields only; this prevents us from modifying
+            # modified_on - which should only be set through saves initiated by a user
+            company_serializer.save_dnb_fields(**company_kwargs)
 
         update_comment = 'Updated from D&B'
         if update_descriptor:

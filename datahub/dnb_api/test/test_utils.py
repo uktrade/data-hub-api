@@ -268,10 +268,18 @@ class TestUpdateCompanyFromDNB:
         if not adviser:
             assert company.modified_on == original_company.modified_on
 
+    @pytest.mark.parametrize(
+        'adviser_callable',
+        (
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
     def test_update_company_from_dnb_partial_fields_single(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
     ):
         """
         Test that update_company_from_dnb can update a subset of fields.
@@ -279,7 +287,7 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
-        adviser = AdviserFactory()
+        adviser = adviser_callable()
 
         update_company_from_dnb(
             company,
@@ -294,10 +302,18 @@ class TestUpdateCompanyFromDNB:
         assert company.name == original_company.name
         assert company.number_of_employees == original_company.number_of_employees
 
+    @pytest.mark.parametrize(
+        'adviser_callable',
+        (
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
     def test_update_company_from_dnb_partial_fields_multiple(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
     ):
         """
         Test that update_company_from_dnb can update a subset of fields.
@@ -305,7 +321,7 @@ class TestUpdateCompanyFromDNB:
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
-        adviser = AdviserFactory()
+        adviser = adviser_callable()
 
         update_company_from_dnb(
             company,
