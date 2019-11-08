@@ -6,7 +6,6 @@ from datahub.investment.project.evidence.urls import urlpatterns as evidence_url
 from datahub.investment.project.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.project.views import (
     IProjectAuditViewSet,
-    IProjectModifiedSinceViewSet,
     IProjectTeamMembersViewSet,
     IProjectViewSet,
 )
@@ -33,10 +32,6 @@ project_team_member_item = IProjectTeamMembersViewSet.as_view({
     'delete': 'destroy',
 })
 
-project_modified_since_collection = IProjectModifiedSinceViewSet.as_view({
-    'get': 'list',
-})
-
 audit_item = IProjectAuditViewSet.as_view({
     'get': 'list',
 })
@@ -51,11 +46,6 @@ urlpatterns = [
         'investment',
         project_collection,
         name='investment-collection',
-    ),
-    path(
-        'investment/from',
-        project_modified_since_collection,
-        name='investment-modified-since-collection',
     ),
     path(
         'investment/<uuid:pk>',
