@@ -1,3 +1,63 @@
+# Data Hub API 18.0.0 (2019-11-08)
+
+
+## Removals
+
+- **Advisers** The `company_list_companylistitem` column `adviser_id` will be removed in the next release.
+- **Advisers** The following legacy company list endpoints were removed:
+
+    - `GET /v4/user/company-list`
+    - `GET /v4/user/company-list/<company ID>`
+    - `PUT /v4/user/company-list/<company ID>`
+    - `DELETE /v4/user/company-list/<company ID>`
+- **Companies** The Companies House admin view is no longer available in Data Hub.
+- **Companies** The `sync_ch` Django command is no longer available in Data Hub.
+
+  This command was used to sync Companies House data to Data Hub. We have now moved to D&B as the source for company data.
+
+## Deprecations
+
+- **Advisers** A `company_list_companylist` field `"is_legacy_default" boolean NOT NULL` will be removed on or after 20th November.
+- **Companies** The following table will be removed from Data Hub on or after 12 November 2019:
+
+  - `company_companieshousecompany`
+- **Companies** The following Company endpoint is deprecated and will be removed on or after 12 November 2019:
+
+  - `POST /v4/company`
+
+  DataHub has moved to using D&B creating new companies and so instead of the above endpoint, please use:
+
+  - `POST /v4/dnb/company-create`
+- **Investment** The `GET /v3/investment/from` endpoint is deprecated and will be removed on or after 13 November 2019.
+
+  (This was used by the old FDI dashboard which has now been decommissioned.)
+- The `GET /dashboard/homepage/` endpoint is deprecated and will be removed on or after 13 November 2019.
+
+  (This was used for the Data Hub home page before the My companies feature.)
+
+## Bug fixes
+
+- **Companies** The `POST /v4/company/<ID>/self-assign-account-manager` and `POST /v4/company/<ID>/remove-account-manager` endpoints now correctly update the `modified_by` field of the company (instead of leaving it unchanged).
+
+## Internal changes
+
+- **Companies** A helper function for the "Update from DNB" admin feature was refactored as
+  a utility function `datahub.dnb_api.utils.update_company_from_dnb`.  The function
+  can optionally take an iterable of fields to update so that we can partially
+  update companies from DNB.
+- **Interactions** The squashed migration `0001_squashed_0068_remove_interaction_location_from_database` was transitioned to a normal migration and the migrations it replaced were removed.
+- Elasticsearch mapping type migrations are now automatically run during deployments.
+
+## API
+
+- **Companies** `GET /v4/dataset/companies-future-interest-countries-dataset`: An API endpoint for a dataset of future interest countries was added for consumption by data-flow and data-workspace.
+- **Companies** `POST /v4/search/company`: A filter was added for the `latest_interaction_date` field, in the form of `latest_interaction_date_before` and `latest_interaction_date_after`. Both the fields are optional. A company will only be returned if its latest interaction date falls between those dates.
+- **Contacts** `GET /v4/dataset/contacts-dataset`: The primary contact flag and contact address details were added to the contacts dataset response
+- **Events** A new events dataset endpoint (`GET /v4/dataset/events-dataset`) was added to be consumed by data-flow and used in data-workspace.
+- **Investment** The following endpoint was added:
+  - `GET /v4/dataset/investment-projects-dataset`: Present agreed partially denormalized data of all investment projects to be consumed by data-flow and used in data-workspace for reporting and analyst access.
+
+
 # Data Hub API 17.1.0 (2019-10-30)
 
 
@@ -3681,11 +3741,11 @@
 
 ## Internal changes
 
-  - Moved to one Elasticsearch index per mapping type, and added a command (`./manage.py migrate_es`) to migrate Elasticsearch index mappings. See [docs/Elasticsearch migrations.md](https://github.com/uktrade/data-hub-leeloo/blob/master/docs/Elasticsearch%20migrations.md) for more detail. (After upgrading, `./manage.py init_es` must be run to update index aliases.)
+  - Moved to one Elasticsearch index per mapping type, and added a command (`./manage.py migrate_es`) to migrate Elasticsearch index mappings. See [docs/Elasticsearch migrations.md](https://github.com/uktrade/data-hub-api/blob/master/docs/Elasticsearch%20migrations.md) for more detail. (After upgrading, `./manage.py init_es` must be run to update index aliases.)
   - Fixed a random failure in the `TestListCompanies.test_sort_by_name` test
   - Added a contact for an archived company to the test data
   - Updated various dependencies
 
 # Data Hub \< 5.0.0
 
-Please check the [previous releases on GitHub](https://github.com/uktrade/data-hub-leeloo/releases).
+Please check the [previous releases on GitHub](https://github.com/uktrade/data-hub-api/releases).

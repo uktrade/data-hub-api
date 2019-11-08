@@ -70,6 +70,12 @@ class Event(BaseModel, DisableableModel):
         help_text='Legacy field. File browser path to the archived documents for this event.',
     )
 
+    class Meta:
+        indexes = [
+            # For datasets app which includes API endpoints to be consumed by data-flow
+            models.Index(fields=('created_on', 'id')),
+        ]
+
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)

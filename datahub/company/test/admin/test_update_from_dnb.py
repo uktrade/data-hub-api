@@ -206,7 +206,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         expected_message,
     ):
         """
-        Test if we gets anything other than a single company from dnb-service,
+        Test if we get anything other than a single company from dnb-service,
         we return an error message to the user.
         """
         _, update_url = self._create_company(duns_number='123456789')

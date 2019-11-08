@@ -162,7 +162,11 @@ class _SinglePagePaginator(BasePagination):
 
 
 class IProjectModifiedSinceViewSet(IProjectViewSet):
-    """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
+    """
+    View set for the modified-since endpoint (intended for use by Data Hub MI).
+
+    TODO: Remove this view following the deprecation period.
+    """
 
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.mi,)

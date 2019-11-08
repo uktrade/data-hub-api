@@ -40,7 +40,7 @@ repo, here is a concrete example (including work to enforce defaults through the
 API) for adding a boolean field `archived` to the `interaction` model:
 
 Initial nullable PR:
-https://github.com/uktrade/data-hub-leeloo/pull/1627
+https://github.com/uktrade/data-hub-api/pull/1627
 
 Follow-up PR to set as not-nullable:
-https://github.com/uktrade/data-hub-leeloo/pull/1679
+https://github.com/uktrade/data-hub-api/pull/1679

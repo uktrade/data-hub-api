@@ -22,7 +22,7 @@ class CompanyList(BaseModel):
         on_delete=models.CASCADE,
         related_name='company_lists',
     )
-    # TODO: Remove this once the legacy company list functionality has been removed
+    # TODO: This field has been deprecated and should be removed on or after 20th November 2019.
     is_legacy_default = models.BooleanField(
         default=False,
         help_text='Temporary field that designates this as the list that the legacy company list '
@@ -63,14 +63,6 @@ class CompanyListItem(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     list = models.ForeignKey(CompanyList, models.CASCADE, related_name='items')
-    # This field is deprecated (use list.adviser instead)
-    # TODO: Remove this field (using the usual deprecation process)
-    adviser = models.ForeignKey(
-        'company.Advisor',
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='company_list_items',
-    )
     company = models.ForeignKey(
         'company.Company',
         on_delete=models.CASCADE,

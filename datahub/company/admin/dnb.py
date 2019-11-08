@@ -1,7 +1,6 @@
 import functools
 import logging
 
-import reversion
 from django.contrib import messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
@@ -14,12 +13,12 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_http_methods
 from rest_framework import serializers
 
-from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     get_company,
+    update_company_from_dnb,
 )
 from datahub.metadata.models import Country
 
@@ -152,38 +151,6 @@ class AdminException(Exception):
     """
 
 
-def _update_from_dnb(dh_company, dnb_company, user):
-    """
-    Updates `dh_company` with `dnb_company` while setting
-    `modified_by` to the given user and creating a revision.
-
-    Raises serializers.ValidationError if data is invalid.
-    """
-    company_serializer = DNBCompanySerializer(
-        dh_company,
-        data=dnb_company,
-        partial=True,
-    )
-
-    try:
-        company_serializer.is_valid(raise_exception=True)
-
-    except serializers.ValidationError:
-        logger.error(
-            'Data from D&B did not pass the Data Hub validation checks.',
-            extra={'dnb_company': dnb_company, 'errors': company_serializer.errors},
-        )
-        raise
-
-    with reversion.create_revision():
-        company_serializer.save(
-            modified_by=user,
-            pending_dnb_investigation=False,
-        )
-        reversion.set_user(user)
-        reversion.set_comment('Updated from D&B')
-
-
 @redirect_with_message
 @method_decorator(require_http_methods(['GET', 'POST']))
 @method_decorator(csrf_protect)
@@ -237,7 +204,7 @@ def update_from_dnb(model_admin, request, object_id):
         )
 
     try:
-        _update_from_dnb(dh_company, dnb_company, request.user)
+        update_company_from_dnb(dh_company, dnb_company, request.user)
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
