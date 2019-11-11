@@ -396,16 +396,17 @@ class TestImportInteractionsSaveView(AdminTestMixin):
         with pytest.raises(DataHubException):
             self.client.post(url)
 
-    @pytest.mark.parametrize('num_matching', (5, 10))
-    @pytest.mark.parametrize('num_unmatched', (0, 6))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
-    def test_creates_interactions(self, num_matching, num_unmatched, num_multiple_matches):
+    def test_creates_interactions(self):
         """
         Test that interactions are created if a valid token is provided, and that the
         user is redirected to the import complete page.
 
         Note: The full saving logic is tested in the InteractionCSVForm tests.
         """
+        num_matching = 2
+        num_unmatched = 1
+        num_multiple_matches = 1
+
         token = 'test-token'
         matching_rows = _create_file_in_cache(
             token,
@@ -444,11 +445,12 @@ class TestImportInteractionsSaveView(AdminTestMixin):
             interaction.created_by == self.user for interaction in created_interactions
         ])
 
-    @pytest.mark.parametrize('num_matching', (5, 10))
-    @pytest.mark.parametrize('num_unmatched', (0, 6))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
-    def test_saves_results(self, num_matching, num_unmatched, num_multiple_matches):
+    def test_saves_results(self):
         """Test that counts by matching status are saved in the cache."""
+        num_matching = 3
+        num_unmatched = 2
+        num_multiple_matches = 1
+
         token = 'test-token'
         _create_file_in_cache(token, num_matching, num_unmatched, num_multiple_matches)
 
@@ -476,8 +478,9 @@ class TestImportInteractionsSaveView(AdminTestMixin):
     @pytest.mark.parametrize(
         'num_unmatched,num_multiple_matches',
         (
-            (0, 6),
-            (6, 0),
+            (0, 0),
+            (0, 2),
+            (3, 0),
         ),
     )
     def test_stores_unmatched_rows(self, num_unmatched, num_multiple_matches):
@@ -493,13 +496,17 @@ class TestImportInteractionsSaveView(AdminTestMixin):
         assert response.url == expected_redirect_url
 
         unmatched_rows_csv_contents = load_unmatched_rows_csv_contents(token)
-        assert unmatched_rows_csv_contents
 
-        with io.BytesIO(unmatched_rows_csv_contents) as stream:
-            reader = csv.reader(io.TextIOWrapper(stream, encoding='utf-8-sig'))
-            # The content is checked in tests for UnmatchedRowCollector and InteractionCSVForm
-            # Add one for the header
-            assert len(list(reader)) == num_unmatched + num_multiple_matches + 1
+        if num_unmatched + num_multiple_matches == 0:
+            assert unmatched_rows_csv_contents is None
+        else:
+            assert unmatched_rows_csv_contents
+
+            with io.BytesIO(unmatched_rows_csv_contents) as stream:
+                reader = csv.reader(io.TextIOWrapper(stream, encoding='utf-8-sig'))
+                # The content is checked in tests for UnmatchedRowCollector and InteractionCSVForm
+                # Add one for the header
+                assert len(list(reader)) == num_unmatched + num_multiple_matches + 1
 
 
 @pytest.mark.usefixtures('local_memory_cache')
