@@ -564,7 +564,6 @@ class TestOrderExportView(APITestMixin):
             OrderWithoutAssigneesFactory,
             OrderWithoutLeadAssigneeFactory,
             ApprovedRefundFactory,
-            ApprovedRefundFactory,
             RequestedRefundFactory,
         )
 
@@ -583,7 +582,7 @@ class TestOrderExportView(APITestMixin):
         )
 
         for factory_ in factories:
-            factory_.create_batch(2)
+            factory_()
 
         es_with_collector.flush_and_refresh()
 
