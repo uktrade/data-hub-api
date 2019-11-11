@@ -63,7 +63,7 @@ def test_get_company_dnb_service_error(
     with pytest.raises(DNBServiceError) as e:
         get_company('123456789')
 
-    expected_message = f'DNB service returned: {dnb_response_status}'
+    expected_message = f'DNB service returned an error status: {dnb_response_status}'
 
     assert e.value.args[0] == expected_message
     assert len(caplog.records) == 1

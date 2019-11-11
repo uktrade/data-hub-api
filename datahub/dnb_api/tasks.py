@@ -1,5 +1,4 @@
 from celery import shared_task
-from celery.exceptions import Retry
 from celery.utils.log import get_task_logger
 from rest_framework.status import is_server_error
 
@@ -44,12 +43,4 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     company serializer fields that should be updated - if it is None, all fields
     will be synced.
     """
-    try:
-        _sync_company_with_dnb(company_id, fields_to_update, self)
-    except Retry as exc:
-        status_code = exc.exc.status_code
-        logger.info(
-            f'DNB service responded with status {status_code}. Retrying '
-            'sync_company_with_dnb celery task',
-        )
-        raise
+    _sync_company_with_dnb(company_id, fields_to_update, self)

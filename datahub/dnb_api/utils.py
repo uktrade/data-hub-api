@@ -77,7 +77,7 @@ def get_company(duns_number):
     dnb_response = search_dnb({'duns_number': duns_number})
 
     if dnb_response.status_code != status.HTTP_200_OK:
-        error_message = f'DNB service returned: {dnb_response.status_code}'
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
         logger.error(error_message)
         raise DNBServiceError(error_message, dnb_response.status_code)
 
@@ -231,9 +231,10 @@ def update_company_from_dnb(
             reversion.set_user(user)
             company_serializer.save(**company_kwargs)
         else:
-            # Call a method to update the DNB fields only; this prevents us from modifying
-            # modified_on - which should only be set through saves initiated by a user
-            company_serializer.save_dnb_fields(**company_kwargs)
+            # Call a method to update the fields changed on the serializer only; this prevents
+            # us from modifyinh modified_on - which should only be set through saves initiated by
+            # a user
+            company_serializer.partial_save(**company_kwargs)
 
         update_comment = 'Updated from D&B'
         if update_descriptor:
