@@ -299,17 +299,6 @@ class Company(ArchivableModel, BaseModel):
         united_kingdom_id = uuid.UUID(constants.Country.united_kingdom.value.id)
         return self.address_country.id == united_kingdom_id
 
-    @cached_property
-    def companies_house_data(self):
-        """Get the companies house data based on company number."""
-        if self.company_number:
-            try:
-                return CompaniesHouseCompany.objects.get(
-                    company_number=self.company_number,
-                )
-            except CompaniesHouseCompany.DoesNotExist:
-                return None
-
     @property
     def is_global_ultimate(self):
         """
