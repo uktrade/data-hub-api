@@ -6,7 +6,6 @@ from rest_framework import routers
 from datahub.activity_feed import urls as activity_feed_urls
 from datahub.activity_stream import urls as activity_stream_urls
 from datahub.company import views as company_views
-from datahub.company.urls import ch_company as ch_company_urls
 from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
 from datahub.dataset import urls as dataset_urls
@@ -60,7 +59,6 @@ v3_urls = [
 # API V4 - new format for addresses
 
 v4_urls = [
-    path('', include((ch_company_urls.urls, 'ch-company'), namespace='ch-company')),
     path('', include((company_urls.urls, 'company'), namespace='company')),
     path('dnb/', include((dnb_api_urls, 'dnb_api'), namespace='dnb-api')),
     path('dnb-match/', include((dnb_match_urls, 'dnb_match'), namespace='dnb-match')),
