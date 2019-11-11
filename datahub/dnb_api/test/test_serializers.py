@@ -2,7 +2,13 @@ from urllib.parse import urlparse
 
 import pytest
 
-from datahub.dnb_api.serializers import DNBCompanyInvestigationSerializer
+from datahub.company.models import Company
+from datahub.company.test.factories import CompanyFactory
+from datahub.dnb_api.serializers import (
+    DNBCompanyInvestigationSerializer,
+    DNBCompanySerializer,
+    SerializerNotPartial,
+)
 from datahub.dnb_api.utils import format_dnb_company_investigation
 
 
@@ -235,3 +241,37 @@ def test_investigation_serializer_invalid(
     )
     assert not serializer.is_valid()
     assert serializer.errors == expected_error
+
+
+def test_dnb_company_serializer_partial_save(db):
+    """
+    Test DNBCompanySerializer.partial_save() method.
+    """
+    dh_company = CompanyFactory()
+    original_company = Company.objects.get(id=dh_company.id)
+    serializer = DNBCompanySerializer(
+        dh_company,
+        data={'name': 'foobar'},
+        partial=True,
+    )
+    serializer.is_valid()
+    serializer.partial_save(duns_number='123456789')
+    dh_company.refresh_from_db()
+    assert dh_company.name == 'foobar'
+    assert dh_company.duns_number == '123456789'
+    assert dh_company.modified_on == original_company.modified_on
+
+
+def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
+    """
+    Test DNBCompanySerializer.partial_save() method raises an error when the
+    serializer is not partial.
+    """
+    dh_company = CompanyFactory()
+    serializer = DNBCompanySerializer(
+        dh_company,
+        data={'name': 'foobar'},
+    )
+    serializer.is_valid()
+    with pytest.raises(SerializerNotPartial):
+        serializer.partial_save(duns_number='123456789')

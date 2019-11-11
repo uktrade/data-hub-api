@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from rest_framework import serializers, status
 from reversion.models import Version
 
+from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.dnb_api.utils import (
     DNBServiceError,
@@ -62,7 +63,7 @@ def test_get_company_dnb_service_error(
     with pytest.raises(DNBServiceError) as e:
         get_company('123456789')
 
-    expected_message = f'DNB service returned: {dnb_response_status}'
+    expected_message = f'DNB service returned an error status: {dnb_response_status}'
 
     assert e.value.args[0] == expected_message
     assert len(caplog.records) == 1
@@ -168,10 +169,26 @@ class TestUpdateCompanyFromDNB:
     Test update_company_from_dnb utility function.
     """
 
+    @pytest.mark.parametrize(
+        'adviser_callable',
+        (
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
+    @pytest.mark.parametrize(
+        'update_descriptor',
+        (
+            None,
+            'automatic',
+        ),
+    )
     def test_update_company_from_dnb_all_fields(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
+        update_descriptor,
     ):
         """
         Test that update_company_from_dnb will update all fields when the fields
@@ -179,9 +196,14 @@ class TestUpdateCompanyFromDNB:
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
-        original_company = company
-        adviser = AdviserFactory()
-        update_company_from_dnb(company, formatted_dnb_company, adviser)
+        original_company = Company.objects.get(id=company.id)
+        adviser = adviser_callable()
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            user=adviser,
+            update_descriptor=update_descriptor,
+        )
         company.refresh_from_db()
         uk_country = Country.objects.get(iso_alpha2_code='GB')
         assert model_to_dict(company) == {
@@ -214,7 +236,7 @@ class TestUpdateCompanyFromDNB:
             'id': original_company.id,
             'is_number_of_employees_estimated': True,
             'is_turnover_estimated': None,
-            'modified_by': adviser.id,
+            'modified_by': adviser.id if adviser else original_company.modified_by.id,
             'name': 'FOO BICYCLE LIMITED',
             'number_of_employees': 260,
             'one_list_account_owner': None,
@@ -243,21 +265,36 @@ class TestUpdateCompanyFromDNB:
         versions = list(Version.objects.get_for_object(company))
         assert len(versions) == 1
         version = versions[0]
-        assert version.revision.comment == 'Updated from D&B'
-        assert version.revision.user == adviser
 
+        if update_descriptor:
+            assert version.revision.comment == f'Updated from D&B [{update_descriptor}]'
+        else:
+            assert version.revision.comment == 'Updated from D&B'
+
+        assert version.revision.user == adviser
+        if not adviser:
+            assert company.modified_on == original_company.modified_on
+
+    @pytest.mark.parametrize(
+        'adviser_callable',
+        (
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
     def test_update_company_from_dnb_partial_fields_single(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
     ):
         """
         Test that update_company_from_dnb can update a subset of fields.
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
-        original_company = company
-        adviser = AdviserFactory()
+        original_company = Company.objects.get(id=company.id)
+        adviser = adviser_callable()
 
         update_company_from_dnb(
             company,
@@ -272,18 +309,26 @@ class TestUpdateCompanyFromDNB:
         assert company.name == original_company.name
         assert company.number_of_employees == original_company.number_of_employees
 
+    @pytest.mark.parametrize(
+        'adviser_callable',
+        (
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
     def test_update_company_from_dnb_partial_fields_multiple(
         self,
         dnb_company_search_feature_flag,
         formatted_dnb_company,
+        adviser_callable,
     ):
         """
         Test that update_company_from_dnb can update a subset of fields.
         """
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
-        original_company = company
-        adviser = AdviserFactory()
+        original_company = Company.objects.get(id=company.id)
+        adviser = adviser_callable()
 
         update_company_from_dnb(
             company,
