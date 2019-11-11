@@ -232,11 +232,11 @@ def update_company_from_dnb(
             company_serializer.save(**company_kwargs)
         else:
             # Call a method to update the fields changed on the serializer only; this prevents
-            # us from modifyinh modified_on - which should only be set through saves initiated by
+            # us from modifying modified_on - which should only be set through saves initiated by
             # a user
             company_serializer.partial_save(**company_kwargs)
 
         update_comment = 'Updated from D&B'
         if update_descriptor:
-            update_comment = ' '.join((update_comment, f'[{update_descriptor}]'))
+            update_comment = f'{update_comment} [{update_descriptor}]'
         reversion.set_comment(update_comment)

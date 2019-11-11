@@ -170,10 +170,17 @@ class TestUpdateCompanyFromDNB:
     """
 
     @pytest.mark.parametrize(
-        'adviser_callable,update_descriptor',
+        'adviser_callable',
         (
-            (lambda: None, None),
-            (lambda: AdviserFactory(), 'automatic'),
+            lambda: None,
+            lambda: AdviserFactory(),
+        ),
+    )
+    @pytest.mark.parametrize(
+        'update_descriptor',
+        (
+            None,
+            'automatic',
         ),
     )
     def test_update_company_from_dnb_all_fields(
