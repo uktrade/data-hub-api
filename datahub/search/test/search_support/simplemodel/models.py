@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Keyword, Text
+from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import fields
 from datahub.search.models import BaseESModel
@@ -17,6 +17,7 @@ class ESSimpleModel(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    date = Date()
 
     SEARCH_FIELDS = (
         'name',

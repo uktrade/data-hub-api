@@ -18,7 +18,7 @@ class ESRelatedModel(BaseESModel):
         'simpleton': dict_utils.id_name_dict,
     }
 
-    SEARCH_FIELDS = ()
+    SEARCH_FIELDS = ('simpleton.name',)
 
     class Meta:
         """Model configuration."""
