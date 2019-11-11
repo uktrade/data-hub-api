@@ -10,7 +10,6 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompaniesHouseCompanyFactory,
     CompanyFactory,
     ContactFactory,
 )
@@ -21,7 +20,6 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.search.companieshousecompany import CompaniesHouseCompanySearchApp
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
@@ -220,7 +218,7 @@ class TestBasicSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
-    @pytest.mark.parametrize('entity', ('sloth', 'companieshousecompany'))
+    @pytest.mark.parametrize('entity', ('sloth', ))
     def test_400_with_invalid_entity(self, es_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
@@ -394,26 +392,6 @@ class TestBasicSearch(APITestMixin):
             {'count': 1, 'entity': 'investment_project'},
         ]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
-
-    def test_ignored_models_excluded_from_aggregations(self, es_with_collector):
-        """That that companieshousecompany is not included in aggregations."""
-        ch_company = CompaniesHouseCompanyFactory()
-        sync_object(CompaniesHouseCompanySearchApp, ch_company.pk)
-
-        es_with_collector.flush_and_refresh()
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
-            url,
-            data={
-                'term': '',
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 0
-        assert response_data['aggregations'] == []
 
     @pytest.mark.parametrize(
         'permission,permission_entity',
