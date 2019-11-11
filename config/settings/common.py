@@ -294,7 +294,6 @@ APPEND_SLASH = False
 MPTT_ADMIN_LEVEL_INDENT = 30
 
 SEARCH_APPS = [
-    'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
     'datahub.search.company.CompanySearchApp',
     'datahub.search.contact.ContactSearchApp',
     'datahub.search.event.EventSearchApp',

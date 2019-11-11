@@ -14,6 +14,13 @@ from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidato
 from datahub.interaction.models import InteractionPermission
 
 
+class SerializerNotPartial(Exception):
+    """
+    Exception for when some logic was called which expects a serializer object
+    to be self.partial=True.
+    """
+
+
 class DNBMatchedCompanySerializer(PermittedFieldsModelSerializer):
     """
     Serialiser for data hub companies matched with a DNB entry.
@@ -115,6 +122,26 @@ class DNBCompanySerializer(CompanySerializer):
                 ),
             ),
         )
+
+    def partial_save(self, **kwargs):
+        """
+        Method to save the instance - by writing only the fields updated by the serializer.
+        Takes kwargs to override the values of specific fields for the model on save.
+
+        Note: modified_on will not be updated by this method - this is the original
+        reason for this method to exist as modified_on has auto_now=True and which makes it
+        difficult to to prevent updates to this field.
+        """
+        if not self.partial:
+            raise SerializerNotPartial(
+                'partial_save() called, but serializer is not set as partial.',
+            )
+        instance = self.instance
+        validated_data = {**self.validated_data, **kwargs}
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        update_fields = validated_data.keys()
+        instance.save(update_fields=update_fields)
 
 
 class DUNSNumberSerializer(serializers.Serializer):

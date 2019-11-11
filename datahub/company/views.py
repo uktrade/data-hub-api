@@ -11,7 +11,6 @@ from config.settings.types import HawkScope
 from datahub.company.autocomplete import AutocompleteFilter
 from datahub.company.models import (
     Advisor,
-    CompaniesHouseCompany,
     Company,
     CompanyPermission,
     Contact,
@@ -19,7 +18,6 @@ from datahub.company.models import (
 from datahub.company.queryset import get_contact_queryset
 from datahub.company.serializers import (
     AdviserSerializer,
-    CompaniesHouseCompanySerializer,
     CompanySerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
@@ -206,19 +204,6 @@ class CompanyAuditViewSet(AuditViewSet):
 
     required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects.all()
-
-
-class CompaniesHouseCompanyViewSet(
-        mixins.ListModelMixin,
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet,
-):
-    """Companies House company read-only views V4."""
-
-    required_scopes = (Scope.internal_front_end,)
-    serializer_class = CompaniesHouseCompanySerializer
-    queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
-    lookup_field = 'company_number'
 
 
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):

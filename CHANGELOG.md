@@ -1,3 +1,27 @@
+# Data Hub API 19.0.0 (2019-11-11)
+
+
+## Removals
+
+- **Companies** The following deprecated endpoints have been removed:
+
+  - `GET /ch-company`
+  - `GET /ch-company/<ch-company-id>`
+- **Companies** The following deprecated Comapnies House search endpoints have been removed from Data Hub:
+
+  - `GET /v3/search/companieshousecompany`
+  - `GET /v4/search/companieshousecompany`
+- **Companies** The `uppdate_company_registered_address` Django command is no longer available in Data Hub.
+
+  This command was used to sync company registered addresses with Companies House data. We have now moved to D&B as the source for company data.
+
+## Internal changes
+
+- **Companies** A celery task `datahub.dnb_api.tasks.sync_company_from_dnb` was added which gives
+  a mechanism for syncing specified fields for a DNB-matched company with the latest
+  DNB data for that company.
+
+
 # Data Hub API 18.0.0 (2019-11-08)
 
 
