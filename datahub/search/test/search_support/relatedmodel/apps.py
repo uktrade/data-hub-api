@@ -9,4 +9,4 @@ class RelatedModelSearchApp(SearchApp):
     name = 'relatedmodel'
     es_model = ESRelatedModel
     queryset = DBRelatedModel.objects
-    view_permissions = []
+    view_permissions = ['search_support.view_relatedmodel']
