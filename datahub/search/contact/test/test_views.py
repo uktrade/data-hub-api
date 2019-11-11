@@ -34,9 +34,14 @@ from datahub.interaction.test.factories import (
 )
 from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.views import SearchContactExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(ContactSearchApp),
+]
 
 
 @pytest.fixture
