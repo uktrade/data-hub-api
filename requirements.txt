@@ -60,7 +60,7 @@ greenlet==0.4.15          # via gevent
 gunicorn==19.9.0
 icalendar==4.0.3
 idna==2.8                 # via requests
-importlib-metadata==0.23  # via pluggy, pytest
+importlib-metadata==0.23  # via kombu, pluggy, pytest
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
@@ -68,7 +68,7 @@ ipython==7.9.0
 jedi==0.15.1              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.6.3
+kombu==4.6.6
 mail-parser==3.9.3
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
