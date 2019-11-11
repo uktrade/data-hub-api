@@ -38,9 +38,14 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.views import SearchInvestmentExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(InvestmentSearchApp),
+]
 
 
 @pytest.fixture

@@ -270,23 +270,24 @@ class SavedObjectCollector:
     """
     Collects the search apps of saved search objects and indexes those apps in bulk in
     Elasticsearch.
-
-    (A possible future optimisation would be to further restrict the synced apps to the app
-    being tested i.e. in tests for the interaction search app, only sync interaction objects
-    and not companies, contacts etc.)
     """
 
-    def __init__(self, es_client):
-        """Initialises the collector."""
-        self.apps_to_sync = set()
+    def __init__(self, es_client, apps_to_collect):
+        """
+        Initialises the collector.
+
+        :param apps_to_collect: the search apps to monitor the `post_save` signal for (and sync
+            saved objects for when `flush_and_refresh()` is called)
+        """
+        self.collected_apps = set()
         self.es_client = es_client
 
         self.signal_receivers_to_connect = [
             SignalReceiver(post_save, search_app.queryset.model, self._collect)
-            for search_app in get_search_apps()
+            for search_app in set(apps_to_collect)
         ]
 
-        # Disconnect any existing search post_save signal receivers for safety
+        # Disconnect all existing search post_save signal receivers (in case they were connected)
         self.signal_receivers_to_disable = [
             receiver
             for search_app in get_search_apps()
@@ -314,12 +315,12 @@ class SavedObjectCollector:
 
     def flush_and_refresh(self):
         """Sync objects of all collected apps to Elasticsearch and refresh search indices."""
-        for search_app in self.apps_to_sync:
+        for search_app in self.collected_apps:
             es_model = search_app.es_model
             read_indices, write_index = es_model.get_read_and_write_indices()
             sync_objects(es_model, search_app.queryset.all(), read_indices, write_index)
 
-        self.apps_to_sync.clear()
+        self.collected_apps.clear()
         self.es_client.indices.refresh()
 
     def _collect(self, obj):
@@ -332,11 +333,11 @@ class SavedObjectCollector:
         """
         model = obj.__class__
         search_app = get_search_app_by_model(model)
-        self.apps_to_sync.add(search_app)
+        self.collected_apps.add(search_app)
 
 
 @pytest.fixture
-def es_with_collector(es, synchronous_on_commit):
+def es_with_collector(es, synchronous_on_commit, request):
     """
     Function-scoped pytest fixture that:
 
@@ -349,7 +350,14 @@ def es_with_collector(es, synchronous_on_commit):
     Call es_with_collector.flush_and_refresh() to sync collected objects to Elasticsearch and
     refresh all indices.
     """
-    with SavedObjectCollector(es) as collector:
+    marker_apps = {
+        app
+        for marker in request.node.iter_markers('es_collector_apps')
+        for app in marker.args
+    }
+    apps = marker_apps or get_search_apps()
+
+    with SavedObjectCollector(es, apps) as collector:
         yield collector
 
 
