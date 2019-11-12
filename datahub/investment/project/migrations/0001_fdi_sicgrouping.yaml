@@ -1,0 +1,54 @@
+- model: investment.fdisicgrouping
+  pk: c5f4cc63-33e6-414a-a291-19c215bde437
+  fields: {disabled_on: null, name: Administrative and support service activities}
+- model: investment.fdisicgrouping
+  pk: 1f88cae5-5a11-4f9c-8560-98de831b2475
+  fields: {disabled_on: null, name: 'Agriculture, forest & fishing'}
+- model: investment.fdisicgrouping
+  pk: 5e347c9b-252d-4db6-8f98-bb23b2946a8f
+  fields: {disabled_on: null, name: 'Computer, electronic and optical products'}
+- model: investment.fdisicgrouping
+  pk: d5c9899a-069e-4dad-b21b-bc5b9aa56a4a
+  fields: {disabled_on: null, name: Construction}
+- model: investment.fdisicgrouping
+  pk: 3b847399-84a6-4d98-b135-104bfdb9f5fa
+  fields: {disabled_on: null, name: 'Electricity, Gas, Water and waste'}
+- model: investment.fdisicgrouping
+  pk: 54644cc5-3faf-4d5d-a669-569bfb741d7b
+  fields: {disabled_on: null, name: Financial services}
+- model: investment.fdisicgrouping
+  pk: af88a756-7429-4559-912b-ccb68cd6ee96
+  fields: {disabled_on: null, name: 'Food products, beverages & tobacco products'}
+- model: investment.fdisicgrouping
+  pk: b5a7d97c-ba1a-49d0-a517-c251a800e70f
+  fields: {disabled_on: null, name: Information and communication}
+- model: investment.fdisicgrouping
+  pk: 98e7ad45-7374-4c8b-ae64-c854854c1f2e
+  fields: {disabled_on: null, name: Metal and machinery products}
+- model: investment.fdisicgrouping
+  pk: 895d2227-0574-4038-93c6-3c5f375c8892
+  fields: {disabled_on: null, name: Mining & quarrying}
+- model: investment.fdisicgrouping
+  pk: a7dc81af-96c4-4ab9-b7af-5d53029bc058
+  fields: {disabled_on: null, name: Other manufacturing}
+- model: investment.fdisicgrouping
+  pk: 52e05264-be50-4093-acbb-e1a9bbf9ae0c
+  fields: {disabled_on: null, name: Other services}
+- model: investment.fdisicgrouping
+  pk: a7d3c320-6e15-44f6-928a-4d776717b386
+  fields: {disabled_on: null, name: 'Petroleum, chemicals, pharmaceuticals, rubber, plastic products'}
+- model: investment.fdisicgrouping
+  pk: f3d8ced6-df75-45da-8713-4bdcfd2e02a7
+  fields: {disabled_on: null, name: 'Professional, scientific & technical services'}
+- model: investment.fdisicgrouping
+  pk: c7ba3108-5fb3-486c-8d29-e71b1c0e29cd
+  fields: {disabled_on: null, name: 'Retails & wholesale trade, repair of motor vehicles & motor'}
+- model: investment.fdisicgrouping
+  pk: 0811afdc-171d-4580-a915-e72176e656fc
+  fields: {disabled_on: null, name: Textiles & wood activities}
+- model: investment.fdisicgrouping
+  pk: 85599a76-f687-437c-9ab7-306dbc3fd833
+  fields: {disabled_on: null, name: Transport equipment}
+- model: investment.fdisicgrouping
+  pk: c0fc3a4f-d901-4388-8d4a-b2e49f44d6b2
+  fields: {disabled_on: null, name: Transportation & storage}
