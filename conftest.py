@@ -337,7 +337,35 @@ class SavedObjectCollector:
 
 
 @pytest.fixture
-def es_with_collector(es, synchronous_on_commit, request):
+def es_collector_context_manager(es, synchronous_on_commit, request):
+    """
+    Slightly lower-level version of es_with_collector.
+
+    Function-scoped pytest fixture that:
+
+    - ensures Elasticsearch is available for the test
+    - deletes all documents from Elasticsearch at the end of the test
+    - yields a context manager that can be used to collects all model objects saved so
+    they can be synced to Elasticsearch in bulk
+
+    Call es_collector_context_manager.flush_and_refresh() to sync collected objects to
+    Elasticsearch and refresh all indices.
+
+    In most cases, you should not use this fixture directly, but use es_with_collector or
+    es_with_signals instead.
+    """
+    marker_apps = {
+        app
+        for marker in request.node.iter_markers('es_collector_apps')
+        for app in marker.args
+    }
+    apps = marker_apps or get_search_apps()
+
+    yield SavedObjectCollector(es, apps)
+
+
+@pytest.fixture
+def es_with_collector(es_collector_context_manager):
     """
     Function-scoped pytest fixture that:
 
@@ -350,14 +378,7 @@ def es_with_collector(es, synchronous_on_commit, request):
     Call es_with_collector.flush_and_refresh() to sync collected objects to Elasticsearch and
     refresh all indices.
     """
-    marker_apps = {
-        app
-        for marker in request.node.iter_markers('es_collector_apps')
-        for app in marker.args
-    }
-    apps = marker_apps or get_search_apps()
-
-    with SavedObjectCollector(es, apps) as collector:
+    with es_collector_context_manager as collector:
         yield collector
 
 
