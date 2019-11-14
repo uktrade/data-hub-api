@@ -1,3 +1,27 @@
+# Data Hub API 20.0.0 (2019-11-14)
+
+
+## Removals
+
+- **Advisers** The `company_list_companylistitem` column `adviser_id` has been removed from database.
+- **Companies** The following deprecated endpoint has been removed:
+
+   - `POST /v4/company`
+- **Investment** The deprecated `GET /v3/investment/from` endpoint was removed.
+
+## Features
+
+- The names of various countries were updated to match DIT reference data.
+
+## Internal changes
+
+- **Companies** Database migrations up to 0096 were squashed in order to reduce build times. The old migrations will be removed once the squashed migration has been applied to all environments.
+
+## Database schema
+
+- **Advisers** The `company_list_companylistitem` column `adviser_id` has been removed from database.
+
+
 # Data Hub API 19.0.0 (2019-11-11)
 
 
