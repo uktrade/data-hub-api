@@ -92,13 +92,12 @@ See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
 * Open a PR and merge it into develop after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
-## How to rename a field or a column
+## How to rename a field
 
-This has not been done before and needs more documentation but the theoretical process involves the following steps:
-* Add the new field or column while [deprecating the current one](#document-deprecation).
-* Keep both fields and columns and update both at the same time so that people can use either of them.
-* Remove the previous one [from the API](#how-to-remove-from-api) and [from the database](#how-to-remove-column).
+The process is similar to [the process for migrating a foreign key to a many-to-many field](./How&#32;to&#32;change&#32;the&#32;type&#32;of&#32;a&#32;field.md).
 
-You might want to:
-* Use a feature flag to drive logical decisions.
-* Use a django command to move data to the new field instead of a django migration in order to avoid issues when deploying to production.
+Differences include:
+
+* the new field will need to, initially, be nullable (it can be made non-nullable if desired once it has been fully populated with data)
+
+* a different Celery task (or management command) will need to be used for the one-off copy of historical data from the old field to the new field 
