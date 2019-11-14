@@ -1,0 +1,25 @@
+- model: investment.projectmanagerrequeststatus
+  pk: 1fcebb43-244f-47e7-81f8-97790afa6383
+  fields:
+    disabled_on: null
+    name: Requested
+- model: investment.projectmanagerrequeststatus
+  pk: ad60c3ba-03d5-47de-b31f-a9f5ad1bc220
+  fields:
+    disabled_on: null
+    name: Rejected
+- model: investment.projectmanagerrequeststatus
+  pk: 9fc09623-f84f-450e-994b-3234c6d3248c
+  fields:
+    disabled_on: null
+    name: Assigned
+- model: investment.projectmanagerrequeststatus
+  pk: 993f31d9-549d-4c0d-95f0-0f86e62e949d
+  fields:
+    disabled_on: null
+    name: Re-requested
+- model: investment.projectmanagerrequeststatus
+  pk: d50b8f0c-20c1-484e-9018-b98e9631b08b
+  fields:
+    disabled_on: null
+    name: Self assigned

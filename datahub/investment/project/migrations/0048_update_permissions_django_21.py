@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('investment', '0047_remove_iprojectdocument'),
-        ('core', '0003_rename_read_permissions'),
     ]
 
     operations = [
