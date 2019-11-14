@@ -721,6 +721,7 @@ def test_get_basic_search_query():
                                 'registered_address.postcode.trigram',
                                 'related_programmes.name',
                                 'related_programmes.name.trigram',
+                                'simpleton.name',
                                 'subject.english',
                                 'subtotal_cost.keyword',
                                 'teams.name',

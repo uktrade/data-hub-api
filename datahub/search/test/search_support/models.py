@@ -9,6 +9,7 @@ class SimpleModel(BaseModel):
     """
 
     name = models.CharField(max_length=500)
+    date = models.DateField(null=True)
 
 
 class RelatedModel(BaseModel):
