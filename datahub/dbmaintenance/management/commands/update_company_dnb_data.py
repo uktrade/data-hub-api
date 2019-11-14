@@ -9,6 +9,7 @@ from datahub.dnb_api.tasks import sync_company_with_dnb
 
 logger = logging.getLogger(__name__)
 API_CALLS_PER_SECOND = 1
+API_CALL_INTERVAL = 1 / API_CALLS_PER_SECOND
 # TODO: base these on a DRY list of fields when we add it
 ALL_DNB_UPDATED_FIELDS = (
     'name',
@@ -26,7 +27,7 @@ ALL_DNB_UPDATED_FIELDS = (
 )
 
 
-class CompanyNotDunsLinked(Exception):
+class CompanyNotDunsLinkedError(Exception):
     """
     Exception for when a company does not have a duns_number.
     """
@@ -41,8 +42,7 @@ class Command(CSVBaseCommand):
         """
         Set some initial state related to API rate limiting.
         """
-        self.last_called_api_time = time.time()
-        self.api_call_wait = 1 / API_CALLS_PER_SECOND
+        self.last_called_api_time = time.perf_counter()
         super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
@@ -64,24 +64,19 @@ class Command(CSVBaseCommand):
         The method will return once enough time has elapsed to maintain the
         API_CALLS_PER_SECOND rate.
         """
-        next_api_call_time = self.last_called_api_time + self.api_call_wait
-        if time.time() < next_api_call_time:
-            time.sleep(next_api_call_time - time.time())
-        self.last_called_api_time = time.time()
+        next_api_call_time = self.last_called_api_time + API_CALL_INTERVAL
+        time_now = time.perf_counter()
+        if time_now < next_api_call_time:
+            time.sleep(next_api_call_time - time_now)
+        self.last_called_api_time = time.perf_counter()
 
     def _process_row(self, row, simulate=False, fields=None, **options):
         """Process one single row."""
         pk = parse_uuid(row['id'])
-        try:
-            company = Company.objects.get(pk=pk)
-        except Company.DoesNotExist:
-            logger.warning('Company does not exist.')
-            raise
+        company = Company.objects.get(pk=pk)
 
         if not company.duns_number:
-            # TODO: Log this?
-            logger.warning('Company does not have a duns_number.')
-            raise CompanyNotDunsLinked()
+            raise CompanyNotDunsLinkedError()
 
         if simulate:
             return
