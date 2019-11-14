@@ -24,6 +24,7 @@ class TestBaseESModel:
         source = {
             'id': obj.pk,
             'name': 'test-name',
+            'date': None,
         }
 
         expected_doc = {

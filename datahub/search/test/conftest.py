@@ -1,3 +1,6 @@
+import pytest
+
+from datahub.core.test_utils import create_test_user
 from datahub.search.apps import get_search_apps
 from datahub.search.views import v3_view_registry, v4_view_registry
 
@@ -22,3 +25,9 @@ def pytest_generate_tests(metafunc):
             views,
             ids=[view.__class__.__name__ for view in views],
         )
+
+
+@pytest.fixture
+def search_support_user():
+    """A user with permissions for search_support views."""
+    return create_test_user(permission_codenames=['view_simplemodel', 'view_relatedmodel'])

@@ -1,19 +1,12 @@
 import datetime
-from uuid import UUID, uuid4
 
-import factory
 import pytest
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import (
-    AdviserFactory,
-    CompanyFactory,
-    ContactFactory,
-)
-from datahub.core import constants
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -21,68 +14,12 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.sync_object import sync_object
-from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.models import UserEvent
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def setup_data():
-    """Sets up the data and makes the ES client available."""
-    ContactFactory(
-        first_name='abc',
-        last_name='defg',
-        company__name='name0',
-        company__trading_names=['trading0'],
-    )
-    ContactFactory(
-        first_name='first',
-        last_name='last',
-        company__name='name1',
-        company__trading_names=['trading1'],
-    )
-    InvestmentProjectFactory(
-        name='abc defg',
-        description='investmentproject1',
-        estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
-        project_manager=AdviserFactory(first_name='name 0', last_name='surname 0'),
-        project_assurance_adviser=AdviserFactory(first_name='name 1', last_name='surname 1'),
-        investor_company=CompanyFactory(name='name3', trading_names=['trading3']),
-        client_relationship_manager=AdviserFactory(first_name='name 2', last_name='surname 2'),
-        referral_source_adviser=AdviserFactory(first_name='name 3', last_name='surname 3'),
-        client_contacts=[],
-    )
-    InvestmentProjectFactory(
-        description='investmentproject2',
-        estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
-        project_manager=AdviserFactory(first_name='name 4', last_name='surname 4'),
-        project_assurance_adviser=AdviserFactory(first_name='name 5', last_name='surname 5'),
-        investor_company=CompanyFactory(name='name4', trading_names=['trading4']),
-        client_relationship_manager=AdviserFactory(first_name='name 6', last_name='surname 6'),
-        referral_source_adviser=AdviserFactory(first_name='name 7', last_name='surname 7'),
-        client_contacts=[],
-    )
-
-    country_uk = constants.Country.united_kingdom.value.id
-    country_us = constants.Country.united_states.value.id
-    CompanyFactory(
-        name='abc defg ltd',
-        trading_names=['abc defg trading ltd'],
-        address_1='1 Fake Lane',
-        address_town='Downtown',
-        address_country_id=country_uk,
-    )
-    CompanyFactory(
-        name='abc defg us ltd',
-        trading_names=['abc defg us trading ltd'],
-        address_1='1 Fake Lane',
-        address_town='Downtown',
-        address_country_id=country_us,
-        registered_address_country_id=country_us,
-    )
 
 
 class TestValidateViewAttributes:
@@ -175,38 +112,33 @@ class TestValidateExportViewAttributes:
 
 
 class TestBasicSearch(APITestMixin):
-    """
-    Tests for SearchBasicAPIView.
+    """Tests for SearchBasicAPIView."""
 
-    TODO: make these tests generic using `search_support` instead of relying on specific
-    search apps.
-    """
-
-    def test_pagination(self, es_with_collector):
+    def test_pagination(self, es_with_collector, search_support_user):
         """Tests the pagination."""
         total_records = 9
         page_size = 2
 
-        ids = sorted((uuid4() for _ in range(total_records)))
-
         name = 'test record'
 
-        CompanyFactory.create_batch(
-            len(ids),
-            id=factory.Iterator(ids),
-            name=name,
-            trading_names=[],
-        )
+        objects = [SimpleModel(name=name) for _ in range(total_records)]
+
+        for obj in objects:
+            obj.save()
+
+        ids = sorted(obj.id for obj in objects)
 
         es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
-        for page in range((len(ids) + page_size - 1) // page_size):
-            response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        for page in range((total_records + page_size - 1) // page_size):
+            response = api_client.get(
                 url,
                 data={
                     'term': name,
-                    'entity': 'company',
+                    'entity': 'simplemodel',
                     'offset': page * page_size,
                     'limit': page_size,
                 },
@@ -216,7 +148,7 @@ class TestBasicSearch(APITestMixin):
 
             start = page * page_size
             end = start + page_size
-            assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
+            assert ids[start:end] == [result['id'] for result in response.data['results']]
 
     @pytest.mark.parametrize('entity', ('sloth', ))
     def test_400_with_invalid_entity(self, es_with_collector, entity):
@@ -235,23 +167,25 @@ class TestBasicSearch(APITestMixin):
             'entity': [f'"{entity}" is not a valid choice.'],
         }
 
-    def test_quality(self, es_with_collector, setup_data):
+    def test_quality(self, es_with_collector, search_support_user):
         """Tests quality of results."""
-        CompanyFactory(name='The Risk Advisory Group', trading_names=[])
-        CompanyFactory(name='The Advisory Group', trading_names=[])
-        CompanyFactory(name='The Advisory', trading_names=[])
-        CompanyFactory(name='The Advisories', trading_names=[])
+        SimpleModel.objects.create(name='The Risk Advisory Group')
+        SimpleModel.objects.create(name='The Advisory Group')
+        SimpleModel.objects.create(name='The Advisory')
+        SimpleModel.objects.create(name='The Advisories')
 
         es_with_collector.flush_and_refresh()
 
         term = 'The Advisory'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': term,
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
@@ -263,25 +197,28 @@ class TestBasicSearch(APITestMixin):
             'The Advisory',
             'The Advisory Group',
             'The Risk Advisory Group',
-        ] == [company['name'] for company in response.data['results']]
+        ] == [result['name'] for result in response.data['results']]
 
-    def test_partial_match(self, es_with_collector, setup_data):
+    def test_partial_match(self, es_with_collector, search_support_user):
         """Tests partial matching."""
-        CompanyFactory(name='Veryuniquename1', trading_names=[])
-        CompanyFactory(name='Veryuniquename2', trading_names=[])
-        CompanyFactory(name='Veryuniquename3', trading_names=[])
-        CompanyFactory(name='Veryuniquename4', trading_names=[])
+        SimpleModel.objects.create(name='Veryuniquename1')
+        SimpleModel.objects.create(name='Veryuniquename2')
+        SimpleModel.objects.create(name='Veryuniquename3')
+        SimpleModel.objects.create(name='Veryuniquename4')
+        SimpleModel.objects.create(name='Nonmatchingobject')
 
         es_with_collector.flush_and_refresh()
 
         term = 'Veryuniquenam'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': term,
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
@@ -294,25 +231,27 @@ class TestBasicSearch(APITestMixin):
             'Veryuniquename2',
             'Veryuniquename3',
             'Veryuniquename4',
-        } == {company['name'] for company in response.data['results']}
+        } == {result['name'] for result in response.data['results']}
 
-    def test_hyphen_match(self, es_with_collector, setup_data):
+    def test_hyphen_match(self, es_with_collector, search_support_user):
         """Tests hyphen query."""
-        CompanyFactory(name='t-shirt', trading_names=[])
-        CompanyFactory(name='tshirt', trading_names=[])
-        CompanyFactory(name='electronic shirt', trading_names=[])
-        CompanyFactory(name='t and e and a', trading_names=[])
+        SimpleModel.objects.create(name='t-shirt')
+        SimpleModel.objects.create(name='tshirt')
+        SimpleModel.objects.create(name='electronic shirt')
+        SimpleModel.objects.create(name='t and e and a')
 
         es_with_collector.flush_and_refresh()
 
         term = 't-shirt'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': term,
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
@@ -323,73 +262,80 @@ class TestBasicSearch(APITestMixin):
         assert [
             't-shirt',
             'tshirt',
-        ] == [company['name'] for company in response.data['results']]
+        ] == [result['name'] for result in response.data['results']]
 
-    def test_search_by_id(self, es_with_collector, setup_data):
+    def test_search_by_id(self, es_with_collector, search_support_user):
         """Tests exact id matching."""
-        CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
-        CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
-        CompanyFactory(id='0fb4379c-341c-4dc4-b325-bf8d47b26baa')
-        CompanyFactory(id='0fb5379c-341c-4dc4-b425-bf8d47b26baa')
+        SimpleModel.objects.create(id=1000)
+        SimpleModel.objects.create(id=1002)
+        SimpleModel.objects.create(id=1004)
+        SimpleModel.objects.create(id=4560)
 
         es_with_collector.flush_and_refresh()
 
-        term = '0fb4379c-341c-4dc4-b325-bf8d47b26baa'
+        term = '4560'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': term,
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['results'][0]['id']
+        assert 4560 == response.data['results'][0]['id']
 
-    def test_400_with_invalid_sortby(self, es):
+    def test_400_with_invalid_sortby(self, es, search_support_user):
         """Tests attempt to sort by non existent field."""
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': 'Test',
-                'entity': 'company',
+                'entity': 'simplemodel',
                 'sortby': 'some_field_that_doesnt_exist:asc',
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_aggregations(self, es_with_collector, setup_data):
+    def test_aggregations(self, es_with_collector, search_support_user):
         """Tests basic aggregate query."""
-        company = CompanyFactory(name='very_unique_company')
-        ContactFactory(company=company)
-        InvestmentProjectFactory(investor_company=company)
+        simple_obj = SimpleModel.objects.create(name='very_unique_name')
+        RelatedModel.objects.create(simpleton=simple_obj)
+
+        unrelated_obj = SimpleModel.objects.create(name='unmatched_object')
+        RelatedModel.objects.create(simpleton=unrelated_obj)
 
         es_with_collector.flush_and_refresh()
 
-        term = 'very_unique_company'
+        term = 'very_unique_name'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
             url,
             data={
                 'term': term,
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert response.data['results'][0]['name'] == 'very_unique_company'
+        assert response.data['results'][0]['name'] == 'very_unique_name'
 
         aggregations = [
-            {'count': 1, 'entity': 'company'},
-            {'count': 1, 'entity': 'contact'},
-            {'count': 1, 'entity': 'investment_project'},
+            {'count': 1, 'entity': 'simplemodel'},
+            {'count': 1, 'entity': 'relatedmodel'},
         ]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
 
@@ -417,7 +363,12 @@ class TestBasicSearch(APITestMixin):
         ),
     )
     def test_permissions(self, es_with_collector, permission, permission_entity, entity):
-        """Tests model permissions enforcement in basic search."""
+        """
+        Tests model permissions enforcement in basic search.
+
+        TODO: we should test permissions relevant to a specific search app in the tests for that
+            search app, and remove this test.
+        """
         user = create_test_user(permission_codenames=[permission], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
 
@@ -451,12 +402,7 @@ class TestBasicSearch(APITestMixin):
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
 
-        InvestmentProjectFactory(created_by=user)
-        CompanyFactory()
-        ContactFactory()
-        EventFactory()
-        CompanyInteractionFactory()
-        OrderFactory()
+        SimpleModel.objects.create(name='test')
 
         es_with_collector.flush_and_refresh()
 
@@ -465,7 +411,7 @@ class TestBasicSearch(APITestMixin):
             url,
             data={
                 'term': '',
-                'entity': 'company',
+                'entity': 'simplemodel',
             },
         )
 
@@ -476,68 +422,65 @@ class TestBasicSearch(APITestMixin):
         assert len(response_data['aggregations']) == 0
 
 
-class TestFilteredSearch(APITestMixin):
-    """
-    Tests related to `SearchAPIView`.
+class TestEntitySearch(APITestMixin):
+    """Tests for `SearchAPIView`."""
 
-    TODO: make these tests generic using `search_support` instead of relying on specific
-    search apps.
-    """
-
-    def test_search_sort_asc_with_null_values(self, es_with_collector, setup_data):
+    def test_search_sort_asc_with_null_values(self, es_with_collector, search_support_user):
         """Tests placement of null values in sorted results when order is ascending."""
-        InvestmentProjectFactory(name='Earth 1', estimated_land_date=datetime.date(2010, 1, 1))
-        InvestmentProjectFactory(name='Earth 2', estimated_land_date=None)
+        SimpleModel.objects.create(name='Earth 1', date=datetime.date(2010, 1, 1))
+        SimpleModel.objects.create(name='Earth 2', date=None)
 
         es_with_collector.flush_and_refresh()
 
-        term = 'Earth'
+        api_client = self.create_api_client(user=search_support_user)
+        url = reverse('api-v3:search:simplemodel')
 
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
+        response = api_client.post(
             url,
             data={
-                'original_query': term,
-                'sortby': 'estimated_land_date:asc',
+                'original_query': '',
+                'sortby': 'date:asc',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
+        response_data = response.json()
+        assert response_data['count'] == 2
         assert [
             ('Earth 2', None),
             ('Earth 1', '2010-01-01'),
         ] == [
-            (investment['name'], investment['estimated_land_date'])
-            for investment in response.data['results']
+            (obj['name'], obj['date'])
+            for obj in response_data['results']
         ]
 
-    def test_search_sort_desc_with_null_values(self, es_with_collector, setup_data):
+    def test_search_sort_desc_with_null_values(self, es_with_collector, search_support_user):
         """Tests placement of null values in sorted results when order is descending."""
-        InvestmentProjectFactory(name='Ether 1', estimated_land_date=datetime.date(2010, 1, 1))
-        InvestmentProjectFactory(name='Ether 2', estimated_land_date=None)
+        SimpleModel.objects.create(name='Ether 1', date=datetime.date(2010, 1, 1))
+        SimpleModel.objects.create(name='Ether 2', date=None)
 
         es_with_collector.flush_and_refresh()
 
-        term = 'Ether'
+        api_client = self.create_api_client(user=search_support_user)
+        url = reverse('api-v3:search:simplemodel')
 
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
+        response = api_client.post(
             url,
             data={
-                'original_query': term,
-                'sortby': 'estimated_land_date:desc',
+                'original_query': '',
+                'sortby': 'date:desc',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
+        response_data = response.json()
+        assert response_data['count'] == 2
         assert [
             ('Ether 1', '2010-01-01'),
             ('Ether 2', None),
         ] == [
-            (investment['name'], investment['estimated_land_date'])
-            for investment in response.data['results']
+            (obj['name'], obj['date'])
+            for obj in response_data['results']
         ]
 
 
