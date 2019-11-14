@@ -10,7 +10,6 @@ from datahub.company.views import (
 
 company_collection = CompanyViewSet.as_view({
     'get': 'list',
-    'post': 'create',
 })
 
 company_item = CompanyViewSet.as_view({

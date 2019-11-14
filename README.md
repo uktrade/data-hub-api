@@ -66,7 +66,7 @@ Dependencies:
 -   Python 3.7.x
 -   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
--   Elasticsearch 6.7
+-   Elasticsearch 6.8
 
 1.  Clone the repository:
 
@@ -124,7 +124,7 @@ Dependencies:
 9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.8.2
     ```
 
 10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.

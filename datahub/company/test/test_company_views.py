@@ -11,14 +11,12 @@ from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
+from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
     format_date_or_datetime,
-    random_obj_for_model,
 )
-from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -734,6 +732,73 @@ class TestUpdateCompany(APITestMixin):
                     'registered_address': None,
                 },
             ),
+
+            # Add a company number
+            (
+                {'company_number': None},
+                {
+                    'company_number': '1234567890',
+                    'business_type': BusinessTypeConstant.company.value.id,
+                },
+                {
+                    'company_number': '1234567890',
+                    'business_type': {
+                        'id': BusinessTypeConstant.company.value.id,
+                        'name': BusinessTypeConstant.company.value.name,
+                    },
+                },
+            ),
+
+            # Add a company number for UK establishment with correct company_number format
+            (
+                {'company_number': None},
+                {
+                    'company_number': 'BR000006',
+                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+                },
+                {
+                    'company_number': 'BR000006',
+                    'business_type': {
+                        'id': BusinessTypeConstant.uk_establishment.value.id,
+                        'name': BusinessTypeConstant.uk_establishment.value.name,
+                    },
+                },
+            ),
+
+            # http:// is prepended to the website if a scheme is not present
+            (
+                {},
+                {'website': 'www.google.com'},
+                {'website': 'http://www.google.com'},
+            ),
+
+            # website is not converted if it includes an http scheme
+            (
+                {},
+                {'website': 'http://www.google.com'},
+                {'website': 'http://www.google.com'},
+            ),
+
+            # website is not converted if it includes an https scheme
+            (
+                {},
+                {'website': 'https://www.google.com'},
+                {'website': 'https://www.google.com'},
+            ),
+
+            # website is not converted if it's empty
+            (
+                {},
+                {'website': ''},
+                {'website': ''},
+            ),
+
+            # website is not converted if it's None
+            (
+                {},
+                {'website': None},
+                {'website': None},
+            ),
         ),
     )
     def test_update_company(self, initial_model_values, data, expected_response):
@@ -985,6 +1050,46 @@ class TestUpdateCompany(APITestMixin):
                         ['A UK establishment (branch of non-UK company) must be in the UK.'],
                 },
             ),
+
+            # company_number should start with BR if business type == uk establishment
+            (
+                {
+                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+                    'company_number': '123',
+                    'address': {
+                        'line_1': '75 Stramford Road',
+                        'town': 'London',
+                        'country': {
+                            'id': Country.united_kingdom.value.id,
+                        },
+                    },
+                },
+                {
+                    'company_number':
+                        ['This must be a valid UK establishment number, beginning with BR.'],
+                },
+            ),
+            # company_number shouldn't have invalid characters
+            (
+                {
+                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+                    'company_number': 'BR000444é',
+                    'address': {
+                        'line_1': '75 Stramford Road',
+                        'town': 'London',
+                        'country': {
+                            'id': Country.united_kingdom.value.id,
+                        },
+                    },
+                },
+                {
+                    'company_number':
+                        [
+                            'This field can only contain the letters A to Z and numbers '
+                            '(no symbols, punctuation or spaces).',
+                        ],
+                },
+            ),
         ),
     )
     def test_validation_error(self, data, expected_error):
@@ -1219,366 +1324,3 @@ class TestUpdateCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['great_profile_status'] == profile_status
-
-
-class TestAddCompany(APITestMixin):
-    """Tests for adding a company."""
-
-    @pytest.mark.parametrize(
-        'data,expected_response',
-        (
-            # uk company
-            (
-                {
-                    'name': 'Acme',
-                    'trading_names': ['Trading name'],
-                    'business_type': {'id': BusinessTypeConstant.company.value.id},
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'London',
-                        'country': {
-                            'id': Country.united_kingdom.value.id,
-                        },
-                    },
-                    'uk_region': {'id': UKRegion.england.value.id},
-                    'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-                },
-                {
-                    'name': 'Acme',
-                    'trading_names': ['Trading name'],
-                    'business_type': {
-                        'id': BusinessTypeConstant.company.value.id,
-                        'name': BusinessTypeConstant.company.value.name,
-                    },
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'line_2': '',
-                        'town': 'London',
-                        'county': '',
-                        'postcode': '',
-                        'country': {
-                            'id': Country.united_kingdom.value.id,
-                            'name': Country.united_kingdom.value.name,
-                        },
-                    },
-                    'registered_address': None,
-                    'uk_region': {
-                        'id': UKRegion.england.value.id,
-                        'name': UKRegion.england.value.name,
-                    },
-                    'headquarter_type': {
-                        'id': HeadquarterType.ghq.value.id,
-                        'name': HeadquarterType.ghq.value.name,
-                    },
-                },
-            ),
-            # non-UK
-            (
-                {
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'Cordova',
-                        'country': {
-                            'id': Country.united_states.value.id,
-                        },
-                    },
-                },
-                {
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'line_2': '',
-                        'town': 'Cordova',
-                        'county': '',
-                        'postcode': '',
-                        'country': {
-                            'id': Country.united_states.value.id,
-                            'name': Country.united_states.value.name,
-                        },
-                    },
-                    'registered_address': None,
-                },
-            ),
-            # promote a CH company
-            (
-                {
-                    'company_number': '1234567890',
-                    'business_type': BusinessTypeConstant.company.value.id,
-                },
-                {'company_number': '1234567890'},
-            ),
-            # no special validation on company_number is done for non UK establishment companies
-            (
-                {
-                    'business_type': BusinessTypeConstant.company.value.id,
-                    'company_number': 'sc000444é',
-                },
-                {'company_number': 'sc000444é'},
-            ),
-            # UK establishment with correct company_number format
-            (
-                {
-                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
-                    'company_number': 'BR000006',
-                },
-                {'company_number': 'BR000006'},
-            ),
-            # http:// is prepended to the website if a scheme is not present
-            (
-                {'website': 'www.google.com'},
-                {'website': 'http://www.google.com'},
-            ),
-            # website is not converted if it includes an http scheme
-            (
-                {'website': 'http://www.google.com'},
-                {'website': 'http://www.google.com'},
-            ),
-            # website is not converted if it includes an http scheme
-            (
-                {'website': 'https://www.google.com'},
-                {'website': 'https://www.google.com'},
-            ),
-            # website is not converted if it's empty
-            (
-                {'website': ''},
-                {'website': ''},
-            ),
-            # website is not converted if it's None
-            (
-                {'website': None},
-                {'website': None},
-            ),
-            # registered address is saved
-            (
-                {
-                    'registered_address': {
-                        'line_1': '1 Hello st.',
-                        'town': 'Dublin',
-                        'country': {
-                            'id': Country.ireland.value.id,
-                        },
-                    },
-                },
-                {
-                    'registered_address': {
-                        'line_1': '1 Hello st.',
-                        'line_2': '',
-                        'town': 'Dublin',
-                        'county': '',
-                        'postcode': '',
-                        'country': {
-                            'id': Country.ireland.value.id,
-                            'name': Country.ireland.value.name,
-                        },
-                    },
-                },
-            ),
-        ),
-    )
-    def test_success_cases(self, data, expected_response):
-        """Test success scenarios."""
-        post_data = {
-            'name': 'Acme',
-            'business_type': BusinessTypeConstant.company.value.id,
-            'sector': random_obj_for_model(Sector).id,
-            'address': {
-                'line_1': '75 Stramford Road',
-                'town': 'London',
-                'country': Country.united_kingdom.value.id,
-            },
-            'uk_region': UKRegion.england.value.id,
-
-            **data,
-        }
-
-        url = reverse('api-v4:company:collection')
-        response = self.api_client.post(
-            url,
-            data=post_data,
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-        actual_response = {
-            field_name: response_data[field_name]
-            for field_name in expected_response
-        }
-        assert actual_response == expected_response
-
-    def test_required_fields(self):
-        """Test required fields."""
-        url = reverse('api-v4:company:collection')
-        response = self.api_client.post(
-            url,
-            data={},
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'name': ['This field is required.'],
-            'address': ['This field is required.'],
-        }
-
-    @pytest.mark.parametrize(
-        'data,expected_error',
-        (
-            # uk_region is required
-            (
-                {'uk_region': None},
-                {'uk_region': ['This field is required.']},
-            ),
-            # partial registered address, other fields are required
-            (
-                {
-                    'registered_address': {
-                        'line_1': 'test',
-                    },
-                },
-                {
-                    'registered_address': {
-                        'town': ['This field is required.'],
-                        'country': ['This field is required.'],
-                    },
-                },
-            ),
-            # address cannot be null
-            (
-                {
-                    'address': None,
-                },
-                {
-                    'address': ['This field may not be null.'],
-                },
-            ),
-            # address cannot be null
-            (
-                {
-                    'address': {
-                        'line_1': None,
-                        'town': None,
-                        'country': Country.united_kingdom.value.id,
-                    },
-                },
-                {
-                    'address': {
-                        'line_1': ['This field may not be null.'],
-                        'town': ['This field may not be null.'],
-                    },
-                },
-            ),
-            # address cannot be empty
-            (
-                {
-                    'address': {
-                        'line_1': '',
-                        'town': '',
-                        'country': None,
-                    },
-                },
-                {
-                    'address': {
-                        'line_1': ['This field is required.'],
-                        'town': ['This field is required.'],
-                        'country': ['This field is required.'],
-                    },
-                },
-            ),
-            # company_number required if business type == uk establishment
-            (
-                {
-                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
-                    'company_number': '',
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'London',
-                        'country': {
-                            'id': Country.united_kingdom.value.id,
-                        },
-                    },
-                },
-                {
-                    'company_number': ['This field is required.'],
-                },
-            ),
-            # country should be UK if business type == uk establishment
-            (
-                {
-                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
-                    'company_number': 'BR1234',
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'Cordova',
-                        'country': {
-                            'id': Country.united_states.value.id,
-                        },
-                    },
-                },
-                {
-                    'address_country':
-                        ['A UK establishment (branch of non-UK company) must be in the UK.'],
-                },
-            ),
-            # company_number should start with BR if business type == uk establishment
-            (
-                {
-                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
-                    'company_number': '123',
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'London',
-                        'country': {
-                            'id': Country.united_kingdom.value.id,
-                        },
-                    },
-                },
-                {
-                    'company_number':
-                        ['This must be a valid UK establishment number, beginning with BR.'],
-                },
-            ),
-            # company_number shouldn't have invalid characters
-            (
-                {
-                    'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
-                    'company_number': 'BR000444é',
-                    'address': {
-                        'line_1': '75 Stramford Road',
-                        'town': 'London',
-                        'country': {
-                            'id': Country.united_kingdom.value.id,
-                        },
-                    },
-                },
-                {
-                    'company_number':
-                        [
-                            'This field can only contain the letters A to Z and numbers '
-                            '(no symbols, punctuation or spaces).',
-                        ],
-                },
-            ),
-        ),
-    )
-    def test_validation_error(self, data, expected_error):
-        """Test validation scenarios."""
-        post_data = {
-            'name': 'Acme',
-            'business_type': BusinessTypeConstant.company.value.id,
-            'sector': random_obj_for_model(Sector).id,
-            'address': {
-                'line_1': '75 Stramford Road',
-                'town': 'London',
-                'country': Country.united_kingdom.value.id,
-            },
-            'uk_region': UKRegion.england.value.id,
-
-            **data,
-        }
-
-        url = reverse('api-v4:company:collection')
-        response = self.api_client.post(
-            url,
-            data=post_data,
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == expected_error

@@ -8,13 +8,11 @@ from datahub.oauth.models import OAuthApplicationScope
 class Scope(StrEnum):
     """Defined OAuth scopes."""
 
-    mi = 'data-hub:mi'
     internal_front_end = 'data-hub:internal-front-end'
     public_omis_front_end = 'data-hub:public-omis-front-end'
 
 
 SCOPES_DESCS = {
-    Scope.mi.value: 'Endpoints used by Data Hub MI (machine-to-machine)',
     Scope.internal_front_end.value: 'Endpoints used by the internal front end',
     Scope.public_omis_front_end.value: 'Endpoints used by the OMIS public front end',
 }

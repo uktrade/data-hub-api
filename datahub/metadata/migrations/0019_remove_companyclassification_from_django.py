@@ -45,7 +45,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('metadata', '0018_add_sector_cluster_to_sector'),
-        ('company', '0058_remove_classification_from_database'),
     ]
 
     operations = [
