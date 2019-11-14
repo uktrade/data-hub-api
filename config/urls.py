@@ -15,13 +15,6 @@ unversioned_urls = [
     path('ping.xml', ping, name='ping'),
     path('token/', TokenView.as_view(), name='token'),
     path('whoami/', who_am_i, name='who_am_i'),
-    path(
-        'dashboard/',
-        include(
-            ('datahub.search.dashboard.urls', 'dashboard'),
-            namespace='dashboard',
-        ),
-    ),
 ]
 
 if settings.DEBUG:
