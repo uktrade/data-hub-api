@@ -81,7 +81,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Run tests
-        command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
+        command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml --durations 25
 
     - store_test_results:
         path: test-reports
@@ -109,4 +109,4 @@ workflows:
           python_image: python:3.7
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2

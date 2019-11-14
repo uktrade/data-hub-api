@@ -121,12 +121,12 @@ class TestInteractionCSVForm:
     @pytest.mark.parametrize(
         'num_matching,num_unmatched,num_multiple_matches,max_returned_rows',
         (
-            (5, 6, 7, 5),
-            (5, 6, 7, 3),
-            (5, 6, 7, 10),
-            (5, 0, 0, 5),
-            (0, 5, 5, 5),
-            (0, 0, 5, 5),
+            (4, 3, 2, 4),
+            (4, 3, 2, 2),
+            (4, 3, 2, 8),
+            (4, 0, 0, 4),
+            (0, 2, 2, 4),
+            (0, 0, 2, 4),
         ),
     )
     def test_get_matching_summary(
@@ -202,12 +202,13 @@ class TestInteractionCSVForm:
         with pytest.raises(DataHubException):
             form.get_matching_summary(50)
 
-    @pytest.mark.parametrize('num_matching', (5, 10))
-    @pytest.mark.parametrize('num_unmatched', (0, 6))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    @pytest.mark.parametrize('num_unmatched', (0, 2))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
     @pytest.mark.usefixtures('local_memory_cache')
-    def test_save_returns_correct_counts(self, num_matching, num_unmatched, num_multiple_matches):
+    def test_save_returns_correct_counts(self, num_unmatched, num_multiple_matches):
         """Test that save() returns the expected counts for each matching status."""
+        num_matching = 1
+
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
@@ -235,12 +236,13 @@ class TestInteractionCSVForm:
             ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
 
-    @pytest.mark.parametrize('num_matching', (5, 10))
-    @pytest.mark.parametrize('num_unmatched', (0, 6))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
+    @pytest.mark.parametrize('num_unmatched', (0, 2))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
     @pytest.mark.usefixtures('local_memory_cache')
-    def test_save_returns_unmatched_rows(self, num_matching, num_unmatched, num_multiple_matches):
+    def test_save_returns_unmatched_rows(self, num_unmatched, num_multiple_matches):
         """Test that save() returns an UnmatchedRowCollector with the expected rows."""
+        num_matching = 2
+
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)
@@ -267,11 +269,12 @@ class TestInteractionCSVForm:
             *multiple_matches_rows,
         ]
 
-    @pytest.mark.parametrize('num_matching', (5, 10))
-    @pytest.mark.parametrize('num_unmatched', (0, 6))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 6))
-    def test_save_creates_interactions(self, num_matching, num_unmatched, num_multiple_matches):
+    @pytest.mark.parametrize('num_unmatched', (0, 2))
+    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    def test_save_creates_interactions(self, num_unmatched, num_multiple_matches):
         """Test that save() creates interactions."""
+        num_matching = 3
+
         matched_rows = make_matched_rows(num_matching)
         unmatched_rows = make_unmatched_rows(num_unmatched)
         multiple_matches_rows = make_multiple_matches_rows(num_multiple_matches)

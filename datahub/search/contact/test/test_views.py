@@ -34,9 +34,14 @@ from datahub.interaction.test.factories import (
 )
 from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.views import SearchContactExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(ContactSearchApp),
+]
 
 
 @pytest.fixture
@@ -488,18 +493,16 @@ class TestContactExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of contact search results."""
-        ArchivedContactFactory.create_batch(2)
-        ContactWithOwnAddressFactory.create_batch(2)
-        ContactFactory.create_batch(2)
-        # This is to test date of and team of latest interaction a bit more thoroughly
-        CompanyInteractionFactory.create_batch(
-            10,
-            contacts=[ContactFactory(), ContactFactory(), ContactFactory()],
-        )
-        CompanyInteractionFactory.create_batch(10)
+        ArchivedContactFactory()
+        ContactWithOwnAddressFactory()
+        ContactFactory()
+
+        # These are to test date of and team of latest interaction a bit more thoroughly
+        CompanyInteractionFactory.create_batch(2)
+        CompanyInteractionFactory(contacts=ContactFactory.create_batch(2))
         interaction_with_multiple_teams = CompanyInteractionFactory()
         InteractionDITParticipantFactory.create_batch(
-            5,
+            2,
             interaction=interaction_with_multiple_teams,
         )
 

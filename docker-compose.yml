@@ -40,7 +40,7 @@ services:
       - POSTGRES_DB=mi
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
     restart: always
     ports:
       - "9200:9200"

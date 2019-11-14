@@ -194,6 +194,7 @@ def test_run(
     dep_field_name,
     track_return_values,
     es_with_signals,
+    es_collector_context_manager,
 ):
     """
     Test that:
@@ -202,6 +203,7 @@ def test_run(
         - a record without any objects referencing it and old gets deleted
         - a record with another object referencing it doesn't get deleted
     """
+    # Set up the state before running the command
     command = delete_orphans.Command()
     model_factory = mapping['factory']
     filter_config = config.filters[0]
@@ -211,27 +213,28 @@ def test_run(
     datetime_within_threshold = filter_config.cut_off_date
     datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
-    # this orphan should NOT get deleted because not old enough
-    create_orphanable_model(model_factory, filter_config, datetime_within_threshold)
+    with es_collector_context_manager as collector:
+        # this orphan should NOT get deleted because not old enough
+        create_orphanable_model(model_factory, filter_config, datetime_within_threshold)
 
-    # this orphan should get deleted because old
-    create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+        # this orphan should get deleted because old
+        create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
-    # this object should NOT get deleted because it has another object referencing it
-    non_orphan = create_orphanable_model(
-        model_factory,
-        filter_config,
-        datetime_older_than_threshold,
-    )
-    is_m2m = dep_factory._meta.model._meta.get_field(dep_field_name).many_to_many
-    dep_factory(
-        **{dep_field_name: [non_orphan] if is_m2m else non_orphan},
-    )
+        # this object should NOT get deleted because it has another object referencing it
+        non_orphan = create_orphanable_model(
+            model_factory,
+            filter_config,
+            datetime_older_than_threshold,
+        )
+        is_m2m = dep_factory._meta.model._meta.get_field(dep_field_name).many_to_many
+        dep_factory(
+            **{dep_field_name: [non_orphan] if is_m2m else non_orphan},
+        )
+
+        collector.flush_and_refresh()
 
     # 3 + 1 in case of self-references
     total_model_records = 3 + (1 if dep_factory == model_factory else 0)
-
-    es_with_signals.indices.refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
@@ -241,6 +244,7 @@ def test_run(
     assert model.objects.count() == total_model_records
     assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
+    # Run the command
     management.call_command(command, model_name)
     es_with_signals.indices.refresh()
 
@@ -265,11 +269,17 @@ def test_run(
 @freeze_time(FROZEN_TIME)
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
-def test_simulate(cleanup_configs, track_return_values, es_with_signals):
+def test_simulate(
+    cleanup_configs,
+    track_return_values,
+    es_with_signals,
+    es_collector_context_manager,
+):
     """
     Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
+    # Set up the state before running the command
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
     model_name, config = cleanup_configs
     filter_config = config.filters[0]
@@ -278,10 +288,11 @@ def test_simulate(cleanup_configs, track_return_values, es_with_signals):
     model_factory = mapping['factory']
     datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
-    for _ in range(3):
-        create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+    with es_collector_context_manager as collector:
+        for _ in range(3):
+            create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
-    es_with_signals.indices.refresh()
+        collector.flush_and_refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
@@ -289,8 +300,9 @@ def test_simulate(cleanup_configs, track_return_values, es_with_signals):
 
     assert model.objects.count() == 3
     assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
-    management.call_command(command, model_name, simulate=True)
 
+    # Run the command
+    management.call_command(command, model_name, simulate=True)
     es_with_signals.indices.refresh()
 
     # Check which models were actually deleted

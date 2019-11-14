@@ -635,8 +635,10 @@ def test_run(
     is_expired,
     track_return_values,
     es_with_signals,
+    es_collector_context_manager,
 ):
     """Tests the delete_old_records commands for various cases specified by MAPPING above."""
+    # Set up the state before running the command
     mapping = MAPPING[model_label]
     model_factory = mapping['factory']
     command = delete_old_records.Command()
@@ -644,21 +646,24 @@ def test_run(
 
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    obj = _create_model_obj(model_factory, **factory_kwargs)
-    total_model_records = 1
+    with es_collector_context_manager as collector:
+        obj = _create_model_obj(model_factory, **factory_kwargs)
+        total_model_records = 1
 
-    if relation_mapping:
-        relation_model = relation_mapping['factory']._meta.get_model_class()
-        relation_field = relation_model._meta.get_field(relation_mapping['field'])
-        relation_factory_arg = [obj] if relation_field.many_to_many else obj
+        if relation_mapping:
+            relation_model = relation_mapping['factory']._meta.get_model_class()
+            relation_field = relation_model._meta.get_field(relation_mapping['field'])
+            relation_factory_arg = [obj] if relation_field.many_to_many else obj
 
-        _create_model_obj(
-            relation_mapping['factory'],
-            **relation_factory_kwargs,
-            **{relation_mapping['field']: relation_factory_arg},
-        )
-        if relation_mapping['factory']._meta.get_model_class() is model:
-            total_model_records += 1
+            _create_model_obj(
+                relation_mapping['factory'],
+                **relation_factory_kwargs,
+                **{relation_mapping['field']: relation_factory_arg},
+            )
+            if relation_mapping['factory']._meta.get_model_class() is model:
+                total_model_records += 1
+
+        collector.flush_and_refresh()
 
     num_expired_records = 1 if is_expired else 0
 
@@ -666,10 +671,10 @@ def test_run(
     doc_type = search_app.name
     read_alias = search_app.es_model.get_read_alias()
 
-    es_with_signals.indices.refresh()
     assert model.objects.count() == total_model_records
     assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
+    # Run the command
     management.call_command(command, model_label)
     es_with_signals.indices.refresh()
 
@@ -701,21 +706,29 @@ def test_run(
 @pytest.mark.parametrize('model_name,config', delete_old_records.Command.CONFIGS.items())
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
-def test_simulate(model_name, config, track_return_values, es_with_signals):
+def test_simulate(
+    model_name,
+    config,
+    track_return_values,
+    es_with_signals,
+    es_collector_context_manager,
+):
     """
     Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
+    # Set up the state before running the command
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
     command = delete_old_records.Command()
 
     mapping = MAPPING[model_name]
     model_factory = mapping['factory']
 
-    for _ in range(3):
-        _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
+    with es_collector_context_manager as collector:
+        for _ in range(3):
+            _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
-    es_with_signals.indices.refresh()
+        collector.flush_and_refresh()
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
@@ -724,6 +737,7 @@ def test_simulate(model_name, config, track_return_values, es_with_signals):
     assert model.objects.count() == 3
     assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
+    # Run the command
     management.call_command(command, model_name, simulate=True)
     es_with_signals.indices.refresh()
 

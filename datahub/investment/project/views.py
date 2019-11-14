@@ -2,11 +2,10 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, IsoDateTimeFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
-from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
@@ -131,50 +130,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
             **super().get_serializer_context(),
             'current_user': self.request.user if self.request else None,
         }
-
-
-class _ModifiedOnFilter(FilterSet):
-    """Filter set for the modified-since view."""
-
-    modified_on__gte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='gte')
-    modified_on__lte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='lte')
-
-    class Meta:
-        model = InvestmentProject
-        fields = ()
-
-
-class _SinglePagePaginator(BasePagination):
-    """Paginator that returns all items in a single page.
-
-    The purpose of this is to wrap the results in a dict with count and results keys,
-    for consistency with other endpoints.
-    """
-
-    def paginate_queryset(self, queryset, request, view=None):
-        return queryset
-
-    def get_paginated_response(self, data):
-        return Response({
-            'count': len(data),
-            'results': data,
-        })
-
-
-class IProjectModifiedSinceViewSet(IProjectViewSet):
-    """
-    View set for the modified-since endpoint (intended for use by Data Hub MI).
-
-    TODO: Remove this view following the deprecation period.
-    """
-
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (Scope.mi,)
-    pagination_class = _SinglePagePaginator
-
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = None
-    filterset_class = _ModifiedOnFilter
 
 
 class IProjectTeamMembersViewSet(CoreViewSet):

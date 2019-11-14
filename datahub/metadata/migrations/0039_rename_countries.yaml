@@ -1,0 +1,75 @@
+# From Bahamas
+- model: metadata.country
+  pk: a25f66a0-5d95-e211-a939-e4115bead28a
+  fields:
+    name: The Bahamas
+# Burkina
+- model: metadata.country
+  pk: 58af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Burkina Faso
+# Burma
+- model: metadata.country
+  pk: 59af72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Myanmar (Burma)
+# Czech Republic
+- model: metadata.country
+  pk: 6faf72a6-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Czechia
+# Gambia
+- model: metadata.country
+  pk: dff682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    name: The Gambia
+#Hong Kong (SAR)
+- model: metadata.country
+  pk: f0f682ac-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Hong Kong
+#Korea (North)
+- model: metadata.country
+  pk: 7b6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    name: North Korea
+#Korea (South)
+- model: metadata.country
+  pk: 7c6a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    name: South Korea
+#Macao (SAR)
+- model: metadata.country
+  pk: 886a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Macao
+#Macedonia
+- model: metadata.country
+  pk: 896a9ab2-5d95-e211-a939-e4115bead28a
+  fields:
+    name: North Macedonia
+#Reunion
+- model: metadata.country
+  pk: 5761b8be-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Réunion
+#Sudan, South
+- model: metadata.country
+  pk: 7e756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    name: South Sudan
+#Surinam
+- model: metadata.country
+  pk: 2d0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Suriname
+#Swaziland
+- model: metadata.country
+  pk: 2f0be5c4-5d95-e211-a939-e4115bead28a
+  fields:
+    name: Eswatini
+#Virgin Islands (US)
+- model: metadata.country
+  pk: bb6ee1ca-5d95-e211-a939-e4115bead28a
+  fields:
+    name: United States Virgin Islands

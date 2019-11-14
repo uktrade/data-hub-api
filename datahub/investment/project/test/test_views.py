@@ -13,7 +13,6 @@ import pytest
 import reversion
 from django.utils.timezone import now, utc
 from freezegun import freeze_time
-from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -50,7 +49,6 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory
-from datahub.oauth.scopes import Scope
 
 
 class TestListView(APITestMixin):
@@ -2308,101 +2306,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
         version = Version.objects.get_for_object(project).first()
         assert version.revision.user == self.user
         assert not version.field_dict['archived']
-
-
-class TestModifiedSinceView(APITestMixin):
-    """Tests for the modified-since view."""
-
-    def _make_request(self, data=None):
-        url = reverse('api-v3:investment:investment-modified-since-collection')
-        client = self.create_api_client(
-            scope=Scope.mi,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        return client.get(url, data=data)
-
-    @pytest.mark.parametrize(
-        'timestamp,num_results',
-        (
-            (datetime(2017, 12, 31), 5),
-            (datetime(2018, 1, 1), 5),
-            (datetime(2018, 1, 2), 0),
-        ),
-    )
-    def test_get_modified_since_filter(self, timestamp: datetime, num_results: int):
-        """Test the that results are correctly filtered."""
-        with freeze_time(datetime(2017, 1, 1)):
-            InvestmentProjectFactory.create_batch(4)
-        with freeze_time(datetime(2018, 1, 1)):
-            InvestmentProjectFactory.create_batch(5)
-
-        response = self._make_request({
-            'modified_on__gte': timestamp.isoformat(),
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == num_results
-
-    @pytest.mark.parametrize(
-        'timestamp,num_results',
-        (
-            (datetime(2016, 12, 31), 0),
-            (datetime(2017, 1, 2), 4),
-            (datetime(2018, 1, 2), 9),
-        ),
-    )
-    def test_get_modified_until_filter(self, timestamp: datetime, num_results: int):
-        """Test the that results are correctly filtered."""
-        with freeze_time(datetime(2017, 1, 1)):
-            InvestmentProjectFactory.create_batch(4)
-        with freeze_time(datetime(2018, 1, 1)):
-            InvestmentProjectFactory.create_batch(5)
-
-        response = self._make_request({
-            'modified_on__lte': timestamp.isoformat(),
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == num_results
-
-    @pytest.mark.parametrize(
-        'from_,until,num_results',
-        (
-            (datetime(2016, 12, 31), datetime(2017, 1, 3), 4),
-            (datetime(2018, 1, 1), datetime(2018, 1, 2), 5),
-            (datetime(2017, 1, 1), datetime(2018, 1, 1), 9),
-            (datetime(2017, 3, 1), datetime(2017, 3, 2), 0),
-        ),
-    )
-    def test_get_modified_from_and_modified_until_filter(
-            self, from_: datetime, until: datetime, num_results: int,
-    ):
-        """Test the that results are correctly filtered."""
-        with freeze_time(datetime(2017, 1, 1)):
-            InvestmentProjectFactory.create_batch(4)
-        with freeze_time(datetime(2018, 1, 1)):
-            InvestmentProjectFactory.create_batch(5)
-
-        response = self._make_request({
-            'modified_on__gte': from_.isoformat(),
-            'modified_on__lte': until.isoformat(),
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == num_results
-
-    def test_get_all(self):
-        """Test that all results are returned if no filter value is provided."""
-        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1, tzinfo=utc))
-        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1, tzinfo=utc))
-        response = self._make_request()
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 9
 
 
 class TestAddTeamMemberView(APITestMixin):

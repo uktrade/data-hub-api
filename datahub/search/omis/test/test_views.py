@@ -44,9 +44,14 @@ from datahub.omis.payment.test.factories import (
     ApprovedRefundFactory,
     RequestedRefundFactory,
 )
+from datahub.search.omis import OrderSearchApp
 from datahub.search.omis.views import SearchOrderExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(OrderSearchApp),
+]
 
 
 @pytest.fixture
@@ -564,7 +569,6 @@ class TestOrderExportView(APITestMixin):
             OrderWithoutAssigneesFactory,
             OrderWithoutLeadAssigneeFactory,
             ApprovedRefundFactory,
-            ApprovedRefundFactory,
             RequestedRefundFactory,
         )
 
@@ -583,7 +587,7 @@ class TestOrderExportView(APITestMixin):
         )
 
         for factory_ in factories:
-            factory_.create_batch(2)
+            factory_()
 
         es_with_collector.flush_and_refresh()
 

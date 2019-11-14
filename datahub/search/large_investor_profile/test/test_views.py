@@ -38,9 +38,14 @@ from datahub.investment.investor_profile.test.factories import (
     CompleteLargeCapitalInvestorProfileFactory,
     LargeCapitalInvestorProfileFactory,
 )
+from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.views import SearchLargeInvestorProfileExportAPIView
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    # Index objects for this search app only
+    pytest.mark.es_collector_apps.with_args(LargeInvestorProfileSearchApp),
+]
 
 
 @pytest.fixture

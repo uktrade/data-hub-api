@@ -4,104 +4,18 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company
-from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
-from datahub.core.constants import Country, UKRegion
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
-    random_obj_for_model,
 )
-from datahub.metadata.models import Sector
 
 
 class TestCompanyVersioning(APITestMixin):
     """
     Tests for versions created when interacting with the company endpoints.
     """
-
-    def test_add_creates_a_new_version(self):
-        """Test that creating a company creates a new version."""
-        assert Version.objects.count() == 0
-
-        response = self.api_client.post(
-            reverse('api-v4:company:collection'),
-            data={
-                'name': 'Acme',
-                'trading_names': ['Trading name'],
-                'business_type': {'id': BusinessTypeConstant.company.value.id},
-                'sector': {'id': random_obj_for_model(Sector).id},
-                'address': {
-                    'line_1': '75 Stramford Road',
-                    'town': 'London',
-                    'country': {
-                        'id': Country.united_kingdom.value.id,
-                    },
-                },
-                'uk_region': {'id': UKRegion.england.value.id},
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-        assert response_data['name'] == 'Acme'
-        assert response_data['trading_names'] == ['Trading name']
-
-        company = Company.objects.get(pk=response_data['id'])
-
-        # check version created
-        assert Version.objects.get_for_object(company).count() == 1
-        version = Version.objects.get_for_object(company).first()
-        assert version.revision.user == self.user
-        assert version.field_dict['name'] == 'Acme'
-        assert version.field_dict['trading_names'] == ['Trading name']
-        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
-
-    def test_promoting_a_ch_company_creates_a_new_version(self):
-        """Test that promoting a CH company to full company creates a new version."""
-        assert Version.objects.count() == 0
-        CompaniesHouseCompanyFactory(company_number=1234567890)
-
-        response = self.api_client.post(
-            reverse('api-v4:company:collection'),
-            data={
-                'name': 'Acme',
-                'company_number': 1234567890,
-                'business_type': BusinessTypeConstant.company.value.id,
-                'sector': random_obj_for_model(Sector).id,
-                'address': {
-                    'line_1': '75 Stramford Road',
-                    'town': 'London',
-                    'country': {
-                        'id': Country.united_kingdom.value.id,
-                    },
-                },
-                'uk_region': UKRegion.england.value.id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        company = Company.objects.get(pk=response.json()['id'])
-
-        # check version created
-        assert Version.objects.get_for_object(company).count() == 1
-        version = Version.objects.get_for_object(company).first()
-        assert version.field_dict['company_number'] == '1234567890'
-
-    def test_add_400_doesnt_create_a_new_version(self):
-        """Test that if the endpoint returns 400, no version is created."""
-        assert Version.objects.count() == 0
-
-        response = self.api_client.post(
-            reverse('api-v4:company:collection'),
-            data={'name': 'Acme'},
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert Version.objects.count() == 0
 
     def test_update_creates_a_new_version(self):
         """Test that updating a company creates a new version."""
