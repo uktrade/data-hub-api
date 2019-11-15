@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('metadata', '0017_countries_with_iso_data'),
-        ('company', '0001_squashed_0056_number_of_employees'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
         ('reversion', '0001_squashed_0004_auto_20160611_1202'),
         ('documents', '0001_initial'),
     ]
