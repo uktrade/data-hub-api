@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('company', '0058_remove_classification_from_database'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
     ]
 
     operations = [
