@@ -26,48 +26,6 @@ def load_fixtures(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('investment', '0001_squashed_0025_remove_non_fdi_type'),
-        ('investment', '0026_add_archived_documents_url_path'),
-        ('investment', '0027_add_default_id_for_metadata'),
-        ('investment', '0028_add_custom_lep_permission'),
-        ('investment', '0029_add_change_associated_investmentproject_permission'),
-        ('investment', '0030_rename_permissions'),
-        ('investment', '0031_remove_team_member_permissions'),
-        ('investment', '0032_investmentproject_comments'),
-        ('investment', '0033_add_investment_document_permission'),
-        ('investment', '0034_add_actual_uk_regions'),
-        ('investment', '0035_nullable_est_land_date'),
-        ('investment', '0036_allow_blank_poss_uk_regions'),
-        ('investment', '0037_add_delivery_partners'),
-        ('investment', '0038_correct_site_decided'),
-        ('investment', '0039_add_additional_delivery_partners'),
-        ('investment', '0040_add_sector_hierarchy'),
-        ('investment', '0041_add_spi_fields'),
-        ('investment', '0042_correct_spi_stage_log_created_on_and_ordering'),
-        ('investment', '0043_investmentproject_project_manager_first_assigned_on'),
-        ('investment', '0044_add_change_stage_to_won_permission'),
-        ('investment', '0045_correct_migrated_statuses'),
-        ('investment', '0046_updated_iprojectdocument'),
-        ('investment', '0047_remove_iprojectdocument'),
-        ('investment', '0048_update_permissions_django_21'),
-        ('investment', '0049_add_export_permission'),
-        ('investment', '0050_investmentproject_project_manager_first_assigned_by'),
-        ('investment', '0051_switch_to_booleanfield_with_null_kwarg'),
-        ('investment', '0052_investmentproject_country_investment_originates_from'),
-        ('investment', '0053_likelihood_to_land'),
-        ('investment', '0054_investmentproject_likelihood_to_land'),
-        ('investment', '0055_project_manager_request_status'),
-        ('investment', '0056_investment_activity'),
-        ('investment', '0057_remove_investmentproject_likelihood_of_landing'),
-        ('investment', '0058_remove_likelihood_of_landing_from_database'),
-        ('investment', '0059_fdi_sicgrouping_and_investmentsector'),
-        ('investment', '0060_gvamultiplier'),
-        ('investment', '0061_auto_20190405_1135'),
-        ('investment', '0062_auto_20190405_1338'),
-        ('investment', '0063_add_created_on_id_index'),
-    ]
-
     initial = True
 
     dependencies = [

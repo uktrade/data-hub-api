@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('metadata', '0031_update_services'),
         ('metadata', '0030_add_additional_services'),
-        ('investment', '0001_squashed_0025_remove_non_fdi_type'),
+        ('investment', '0001_squashed_0063_add_created_on_id_index'),
         ('metadata', '0037_add_service_hierarchy'),
         ('metadata', '0026_add_index_upper_team_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
