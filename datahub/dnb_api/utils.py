@@ -3,6 +3,7 @@ import logging
 import reversion
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.timezone import now
 from rest_framework import serializers, status
 
 from datahub.core import statsd
@@ -225,7 +226,10 @@ def update_company_from_dnb(
         raise
 
     with reversion.create_revision():
-        company_kwargs = {'pending_dnb_investigation': False}
+        company_kwargs = {
+            'pending_dnb_investigation': False,
+            'dnb_modified_on': now(),
+        }
         if user:
             company_kwargs['modified_by'] = user
             reversion.set_user(user)
