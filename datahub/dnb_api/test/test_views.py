@@ -6,6 +6,7 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -443,6 +444,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'is_global_ultimate': (
                 dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
             ),
+            'dnb_modified_on': '2019-01-01T11:12:13Z',
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
@@ -457,6 +459,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 data={'duns_number': '12345678'},
             )
 
+    @freeze_time('2019-01-01 11:12:13')
     def test_post_non_uk(
         self,
         requests_mock,
@@ -491,6 +494,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert datahub_company.created_by == self.user
         assert datahub_company.modified_by == self.user
 
+    @freeze_time('2019-01-01 11:12:13')
     def test_post_uk(
         self,
         requests_mock,
