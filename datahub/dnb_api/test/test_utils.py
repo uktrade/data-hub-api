@@ -4,6 +4,8 @@ from uuid import UUID
 import pytest
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.utils.timezone import now
+from freezegun import freeze_time
 from rest_framework import serializers, status
 from reversion.models import Version
 
@@ -183,6 +185,7 @@ class TestUpdateCompanyFromDNB:
             'automatic',
         ),
     )
+    @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
         self,
         dnb_company_search_feature_flag,
@@ -260,6 +263,7 @@ class TestUpdateCompanyFromDNB:
             'uk_region': original_company.uk_region.id,
             'vat_number': '',
             'website': 'http://foo.com',
+            'dnb_modified_on': now(),
         }
 
         versions = list(Version.objects.get_for_object(company))
