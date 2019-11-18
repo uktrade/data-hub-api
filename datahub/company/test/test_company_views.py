@@ -359,6 +359,7 @@ class TestGetCompany(APITestMixin):
             'pending_dnb_investigation': False,
             'is_global_ultimate': company.is_global_ultimate,
             'global_ultimate_duns_number': company.global_ultimate_duns_number,
+            'dnb_modified_on': company.dnb_modified_on,
         }
 
     def test_get_company_without_country(self):

@@ -415,6 +415,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'great_profile_status',
             'is_global_ultimate',
             'global_ultimate_duns_number',
+            'dnb_modified_on',
         )
         read_only_fields = (
             'archived',
@@ -433,6 +434,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'great_profile_status',
             'is_global_ultimate',
             'global_ultimate_duns_number',
+            'dnb_modified_on',
         )
         dnb_read_only_fields = (
             'name',
