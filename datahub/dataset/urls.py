@@ -2,6 +2,9 @@ from django.urls import path
 
 from datahub.dataset.adviser.views import AdvisersDatasetView
 from datahub.dataset.company.views import CompaniesDatasetView
+from datahub.dataset.company_export_to_country.views import (
+    CompanyExportToCountriesDatasetView,
+)
 from datahub.dataset.company_future_interest_countries.views import (
     CompanyFutureInterestCountriesDatasetView,
 )
@@ -18,6 +21,11 @@ urlpatterns = [
     path('omis-dataset', OMISDatasetView.as_view(), name='omis-dataset'),
     path('contacts-dataset', ContactsDatasetView.as_view(), name='contacts-dataset'),
     path('companies-dataset', CompaniesDatasetView.as_view(), name='companies-dataset'),
+    path(
+        'company-export-to-countries-dataset',
+        CompanyExportToCountriesDatasetView.as_view(),
+        name='company-export-to-countries-dataset',
+    ),
     path(
         'company-future-interest-countries-dataset',
         CompanyFutureInterestCountriesDatasetView.as_view(),
