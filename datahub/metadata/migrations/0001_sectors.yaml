@@ -1,0 +1,2560 @@
+- model: metadata.sector
+  pk: 355f977b-8ac3-e211-a646-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Retail
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 41
+    level: 0
+- model: metadata.sector
+  pk: 906f43f9-267e-e511-a84e-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Cyber Security
+    parent: a438cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 42
+    level: 1
+- model: metadata.sector
+  pk: 632b6af2-b583-e511-a84e-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Nuclear De-commissiong
+    parent: 70f1690c-6095-e211-a939-e4115bead28a
+    lft: 3
+    rght: 4
+    tree_id: 38
+    level: 2
+- model: metadata.sector
+  pk: 7dbb9fc6-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Defence
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 13
+    level: 0
+- model: metadata.sector
+  pk: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Renewable Energy
+    parent:
+    lft: 1
+    rght: 20
+    tree_id: 40
+    level: 0
+- model: metadata.sector
+  pk: 9538cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Aerospace
+    parent:
+    lft: 1
+    rght: 20
+    tree_id: 2
+    level: 0
+- model: metadata.sector
+  pk: 9638cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Agriculture, Horticulture and Fisheries
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 3
+    level: 0
+- model: metadata.sector
+  pk: 9738cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Airports
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 4
+    level: 0
+- model: metadata.sector
+  pk: 9838cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Automotive
+    parent:
+    lft: 1
+    rght: 42
+    tree_id: 5
+    level: 0
+- model: metadata.sector
+  pk: 9938cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biotechnology and Pharmaceuticals
+    parent:
+    lft: 1
+    rght: 44
+    tree_id: 6
+    level: 0
+- model: metadata.sector
+  pk: 9a38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Business (and Consumer) Services
+    parent:
+    lft: 1
+    rght: 14
+    tree_id: 7
+    level: 0
+- model: metadata.sector
+  pk: 9b38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Chemicals
+    parent:
+    lft: 1
+    rght: 14
+    tree_id: 8
+    level: 0
+- model: metadata.sector
+  pk: 9c38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Clothing, Footwear and Fashion
+    parent:
+    lft: 1
+    rght: 8
+    tree_id: 9
+    level: 0
+- model: metadata.sector
+  pk: 9d38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Communications
+    parent:
+    lft: 1
+    rght: 24
+    tree_id: 10
+    level: 0
+- model: metadata.sector
+  pk: 9e38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Construction
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 11
+    level: 0
+- model: metadata.sector
+  pk: 9f38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Creative and Media
+    parent:
+    lft: 1
+    rght: 64
+    tree_id: 12
+    level: 0
+- model: metadata.sector
+  pk: a038cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Education and Training
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 15
+    level: 0
+- model: metadata.sector
+  pk: a138cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Electronics and IT Hardware
+    parent:
+    lft: 1
+    rght: 18
+    tree_id: 16
+    level: 0
+- model: metadata.sector
+  pk: a238cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Environment
+    parent:
+    lft: 1
+    rght: 24
+    tree_id: 18
+    level: 0
+- model: metadata.sector
+  pk: a338cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Financial Services (including Professional Services)
+    parent:
+    lft: 1
+    rght: 46
+    tree_id: 20
+    level: 0
+- model: metadata.sector
+  pk: a438cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Security
+    parent:
+    lft: 1
+    rght: 4
+    tree_id: 42
+    level: 0
+- model: metadata.sector
+  pk: a538cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Food and Drink
+    parent:
+    lft: 1
+    rght: 26
+    tree_id: 21
+    level: 0
+- model: metadata.sector
+  pk: a638cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Giftware, Jewellery and Tableware
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 22
+    level: 0
+- model: metadata.sector
+  pk: a738cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare and Medical
+    parent:
+    lft: 1
+    rght: 38
+    tree_id: 24
+    level: 0
+- model: metadata.sector
+  pk: a838cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Household Goods, Furniture and Furnishings
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 25
+    level: 0
+- model: metadata.sector
+  pk: a938cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Leisure and Tourism
+    parent:
+    lft: 1
+    rght: 10
+    tree_id: 27
+    level: 0
+- model: metadata.sector
+  pk: aa38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Marine
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 29
+    level: 0
+- model: metadata.sector
+  pk: ab38cecc-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Mechanical Electrical and Process Engineering
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 31
+    level: 0
+- model: metadata.sector
+  pk: a422c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Metallurgical Process Plant
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 32
+    level: 0
+- model: metadata.sector
+  pk: a522c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Metals, Minerals and Materials
+    parent:
+    lft: 1
+    rght: 14
+    tree_id: 33
+    level: 0
+- model: metadata.sector
+  pk: a622c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Mining
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 34
+    level: 0
+- model: metadata.sector
+  pk: a722c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Oil and Gas
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 36
+    level: 0
+- model: metadata.sector
+  pk: a822c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Ports and Logistics
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 37
+    level: 0
+- model: metadata.sector
+  pk: a922c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Power
+    parent:
+    lft: 1
+    rght: 6
+    tree_id: 38
+    level: 0
+- model: metadata.sector
+  pk: aa22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Railways
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 39
+    level: 0
+- model: metadata.sector
+  pk: ab22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Software and Computer Services Business to Business (B2B)
+    parent:
+    lft: 1
+    rght: 22
+    tree_id: 43
+    level: 0
+- model: metadata.sector
+  pk: ac22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Global Sports Projects
+    parent:
+    lft: 1
+    rght: 4
+    tree_id: 23
+    level: 0
+- model: metadata.sector
+  pk: ad22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Textiles, Interior Textiles and Carpets
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 44
+    level: 0
+- model: metadata.sector
+  pk: ae22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Water
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 45
+    level: 0
+- model: metadata.sector
+  pk: af22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Aircraft Design
+    parent: 9538cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 2
+    level: 1
+- model: metadata.sector
+  pk: b022c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Component Manufacturing
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 15
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: b122c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Engines
+    parent: e9e181d2-f6a0-e211-b972-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 2
+    level: 2
+- model: metadata.sector
+  pk: b222c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Manufacturing and Assembly
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 18
+    rght: 39
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: b322c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: UAVs
+    parent: b906a205-f5a0-e211-b972-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 2
+    level: 2
+- model: metadata.sector
+  pk: b422c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Aircraft
+    parent: b906a205-f5a0-e211-b972-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 2
+    level: 2
+- model: metadata.sector
+  pk: b522c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Helicopters
+    parent: b906a205-f5a0-e211-b972-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 2
+    level: 2
+- model: metadata.sector
+  pk: b622c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Space Technology
+    parent: b906a205-f5a0-e211-b972-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 2
+    level: 2
+- model: metadata.sector
+  pk: b722c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Maintenance
+    parent: 9538cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 2
+    level: 1
+- model: metadata.sector
+  pk: b822c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Design Engineering
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 16
+    rght: 17
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: b922c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Motorsport
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 40
+    rght: 41
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: ba22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Engines and Transmission
+    parent: b022c9d2-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: bb22c9d2-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Electronic Components
+    parent: b022c9d2-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a4ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bodies and Coachwork
+    parent: b022c9d2-5f95-e211-a939-e4115bead28a
+    lft: 7
+    rght: 8
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a5ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Tyres
+    parent: b022c9d2-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a6ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Cars
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 25
+    rght: 26
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a7ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Vans
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 37
+    rght: 38
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a8ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Lorries
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 31
+    rght: 32
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: a9ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Caravans
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 23
+    rght: 24
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: aaee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Trailers
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 35
+    rght: 36
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: abee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Containers
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 27
+    rght: 28
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: acee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Motorcycles
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 33
+    rght: 34
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: adee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bicycles
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 21
+    rght: 22
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: aeee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Invalid Carriages
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 29
+    rght: 30
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: afee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Agricultural Machinery
+    parent: b222c9d2-5f95-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 5
+    level: 2
+- model: metadata.sector
+  pk: b0ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Automotive Retail
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: b1ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Automotive Maintenance
+    parent: 9838cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 5
+    level: 1
+- model: metadata.sector
+  pk: b2ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Pharmaceuticals
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 32
+    rght: 41
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: b3ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Drug Discovery
+    parent: b2ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 35
+    rght: 36
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: b4ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Drug Manufacture
+    parent: b2ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 37
+    rght: 38
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: b5ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Basic Pharmaceutical Products
+    parent: b2ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 33
+    rght: 34
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: b6ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Neutraceuticals
+    parent: b2ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 39
+    rght: 40
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: b7ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biotechnology
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 23
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: b8ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biodiagnostics
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: b9ee00d9-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biotherapeutics
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 64f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biomanufacturing
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 65f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Industrialbio
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 66f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bioremediation
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 67f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Agribio
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 68f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Platform Technologies
+    parent: b7ee00d9-5f95-e211-a939-e4115bead28a
+    lft: 21
+    rght: 22
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 69f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Vaccines
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 42
+    rght: 43
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: 6af7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Lab Services
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 26
+    rght: 31
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: 6bf7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Reagents, Consumables and Instruments
+    parent: 6af7ffde-5f95-e211-a939-e4115bead28a
+    lft: 29
+    rght: 30
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 6cf7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Contract Research
+    parent: 6af7ffde-5f95-e211-a939-e4115bead28a
+    lft: 27
+    rght: 28
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 6df7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Clinical Trials
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 24
+    rght: 25
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: 6ef7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bio and Pharma Marketing and Sales
+    parent: 9938cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 7
+    tree_id: 6
+    level: 1
+- model: metadata.sector
+  pk: 6ff7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bio and Pharma Wholesale
+    parent: 6ef7ffde-5f95-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 70f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bio and Pharma Retail
+    parent: 6ef7ffde-5f95-e211-a939-e4115bead28a
+    lft: 3
+    rght: 4
+    tree_id: 6
+    level: 2
+- model: metadata.sector
+  pk: 71f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Commercial Real Estate Services
+    parent: 9a38cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 7
+    level: 1
+- model: metadata.sector
+  pk: 72f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Contact Centres
+    parent: 9a38cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 7
+    level: 1
+- model: metadata.sector
+  pk: 73f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: HR Services
+    parent: 9a38cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 7
+    level: 1
+- model: metadata.sector
+  pk: 74f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Marketing Services
+    parent: 9a38cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 11
+    tree_id: 7
+    level: 1
+- model: metadata.sector
+  pk: 75f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Market Research
+    parent: 74f7ffde-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 7
+    level: 2
+- model: metadata.sector
+  pk: 76f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Shared Service Centres
+    parent: 9a38cecc-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 7
+    level: 1
+- model: metadata.sector
+  pk: 77f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Basic Chemicals
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 78f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Synthetic Materials
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 79f7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Agricultural Chemicals
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 7af7ffde-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Paint, Coating and Adhesive Products
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 549c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Cleaning Preparations
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 559c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Miscellaneous Chemicals
+    parent: 9b38cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 8
+    level: 1
+- model: metadata.sector
+  pk: 569c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Clothing
+    parent: 9c38cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 5
+    tree_id: 9
+    level: 1
+- model: metadata.sector
+  pk: 579c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Workwear
+    parent: 569c37e5-5f95-e211-a939-e4115bead28a
+    lft: 3
+    rght: 4
+    tree_id: 9
+    level: 2
+- model: metadata.sector
+  pk: 589c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Footwear
+    parent: 9c38cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 9
+    level: 1
+- model: metadata.sector
+  pk: 599c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Broadband
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 5a9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Convergent
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 5b9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Fixed Line
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 5c9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Mobile
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 15
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 5d9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: 3G Services
+    parent: 5c9c37e5-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 10
+    level: 2
+- model: metadata.sector
+  pk: 5e9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: GSM
+    parent: 5c9c37e5-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 10
+    level: 2
+- model: metadata.sector
+  pk: 5f9c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Retail
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 16
+    rght: 17
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 609c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Wireless
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 18
+    rght: 23
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 619c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Wi-Fi
+    parent: 609c37e5-5f95-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 10
+    level: 2
+- model: metadata.sector
+  pk: 629c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Wi-Max
+    parent: 609c37e5-5f95-e211-a939-e4115bead28a
+    lft: 21
+    rght: 22
+    tree_id: 10
+    level: 2
+- model: metadata.sector
+  pk: 639c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Communications Wholesale
+    parent: 9d38cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 10
+    level: 1
+- model: metadata.sector
+  pk: 649c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Architecture
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: 659c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Art, Design and Creativity
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 15
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: 669c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Design
+    parent: 659c37e5-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 679c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Fashion
+    parent: 659c37e5-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 66f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Gaming
+    parent: a938cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 7
+    tree_id: 27
+    level: 1
+- model: metadata.sector
+  pk: 689c37e5-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Arts Facilities Operation
+    parent: 659c37e5-5f95-e211-a939-e4115bead28a
+    lft: 7
+    rght: 8
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: e4a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Live Theatrical Presentations
+    parent: 659c37e5-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: e5a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Artistic and Literary Creation
+    parent: 659c37e5-5f95-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: e6a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Events and Attractions
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 42
+    rght: 43
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: e7a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Media
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 44
+    rght: 57
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: e8a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Film, Photography and Animation
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 47
+    rght: 48
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: e9a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Music
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 49
+    rght: 50
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: eaa038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Video Games
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 55
+    rght: 56
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: eba038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: TV and Radio
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 53
+    rght: 54
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: eca038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Publishing
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 51
+    rght: 52
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: eda038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Advertising
+    parent: e7a038eb-5f95-e211-a939-e4115bead28a
+    lft: 45
+    rght: 46
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: eea038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Media Reproduction
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 58
+    rght: 63
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: efa038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Printing
+    parent: eea038eb-5f95-e211-a939-e4115bead28a
+    lft: 59
+    rght: 60
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f0a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Reproduction
+    parent: eea038eb-5f95-e211-a939-e4115bead28a
+    lft: 61
+    rght: 62
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f1a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Creative and Media Equipment
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 20
+    rght: 25
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: f2a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Photo and Cinema Equipment
+    parent: f1a038eb-5f95-e211-a939-e4115bead28a
+    lft: 23
+    rght: 24
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f3a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Musical Instrument Manufacture
+    parent: f1a038eb-5f95-e211-a939-e4115bead28a
+    lft: 21
+    rght: 22
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f4a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Creative and Media Distribution
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 16
+    rght: 19
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: f5a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Film and Video
+    parent: f4a038eb-5f95-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f6a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Creative and Media Wholesaling
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 34
+    rght: 41
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: f7a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Multimedia Sales
+    parent: f6a038eb-5f95-e211-a939-e4115bead28a
+    lft: 35
+    rght: 36
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f8a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Musical Instruments
+    parent: f6a038eb-5f95-e211-a939-e4115bead28a
+    lft: 37
+    rght: 38
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: f9a038eb-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Photographic Goods
+    parent: f6a038eb-5f95-e211-a939-e4115bead28a
+    lft: 39
+    rght: 40
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 941a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Creative and Media Retail
+    parent: 9f38cecc-5f95-e211-a939-e4115bead28a
+    lft: 26
+    rght: 33
+    tree_id: 12
+    level: 1
+- model: metadata.sector
+  pk: 951a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Books, Newspapers and Stationery
+    parent: 941a72f1-5f95-e211-a939-e4115bead28a
+    lft: 31
+    rght: 32
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 961a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Art
+    parent: 941a72f1-5f95-e211-a939-e4115bead28a
+    lft: 29
+    rght: 30
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 971a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Antiques and Antiquities
+    parent: 941a72f1-5f95-e211-a939-e4115bead28a
+    lft: 27
+    rght: 28
+    tree_id: 12
+    level: 2
+- model: metadata.sector
+  pk: 981a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Electronics and IT Technologies
+    parent: a138cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 17
+    tree_id: 16
+    level: 1
+- model: metadata.sector
+  pk: 991a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Network Technologies
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9a1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Display Technologies
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9b1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Component Technologies
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 7
+    rght: 8
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9c1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Security Technologies
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9d1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Broadcasting
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9e1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Computing
+    parent: 981a72f1-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 16
+    level: 2
+- model: metadata.sector
+  pk: 9f1a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Electronic Instruments
+    parent: a138cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 16
+    level: 1
+- model: metadata.sector
+  pk: a01a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Air Pollution and Noise Control
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: a11a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Marine Pollution Control
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: a21a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Sanitation and Remediation
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: a31a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Environmental Monitoring
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: a41a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Water Management
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 22
+    rght: 23
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: a51a72f1-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Waste Management
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 19
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: 94e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Hazardous Waste Management
+    parent: a51a72f1-5f95-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 18
+    level: 2
+- model: metadata.sector
+  pk: 95e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Sewage Collection and Treatment
+    parent: a51a72f1-5f95-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 18
+    level: 2
+- model: metadata.sector
+  pk: 96e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Non-Metal Waste and Scrap Recycling
+    parent: a51a72f1-5f95-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 18
+    level: 2
+- model: metadata.sector
+  pk: 97e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Waste to Energy
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 20
+    rght: 21
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: 98e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Fuel Cells
+    parent: a238cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 18
+    level: 1
+- model: metadata.sector
+  pk: 99e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Asset Management
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: 9ae61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Banking
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 13
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: 9be61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Retail Banking
+    parent: 9ae61afa-5f95-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 9ce61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Private Banking
+    parent: 9ae61afa-5f95-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 9de61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Commercial Banking
+    parent: 9ae61afa-5f95-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 9ee61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Investment Banking
+    parent: 9ae61afa-5f95-e211-a939-e4115bead28a
+    lft: 7
+    rght: 8
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 9fe61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Capital Markets
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 14
+    rght: 21
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: a0e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Private Equity
+    parent: 9fe61afa-5f95-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: a1e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Venture Capital
+    parent: 9fe61afa-5f95-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: a2e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Hedge Funds
+    parent: 9fe61afa-5f95-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: a3e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Foreign Exchange
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 22
+    rght: 23
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: a4e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Insurance
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 24
+    rght: 35
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: a5e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Motor Insurance
+    parent: a4e61afa-5f95-e211-a939-e4115bead28a
+    lft: 31
+    rght: 32
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: a6e61afa-5f95-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Home Insurance
+    parent: a4e61afa-5f95-e211-a939-e4115bead28a
+    lft: 27
+    rght: 28
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 74363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Travel Insurance
+    parent: a4e61afa-5f95-e211-a939-e4115bead28a
+    lft: 33
+    rght: 34
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 75363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Commercial Insurance
+    parent: a4e61afa-5f95-e211-a939-e4115bead28a
+    lft: 25
+    rght: 26
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 76363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Life Insurance
+    parent: a4e61afa-5f95-e211-a939-e4115bead28a
+    lft: 29
+    rght: 30
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 77363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Listings
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 36
+    rght: 37
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: 78363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Professional Services
+    parent: a338cecc-5f95-e211-a939-e4115bead28a
+    lft: 38
+    rght: 45
+    tree_id: 20
+    level: 1
+- model: metadata.sector
+  pk: 79363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Accountancy Services
+    parent: 78363000-6095-e211-a939-e4115bead28a
+    lft: 39
+    rght: 40
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 7a363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Management Consultancy
+    parent: 78363000-6095-e211-a939-e4115bead28a
+    lft: 43
+    rght: 44
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 7b363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Legal Services
+    parent: 78363000-6095-e211-a939-e4115bead28a
+    lft: 41
+    rght: 42
+    tree_id: 20
+    level: 2
+- model: metadata.sector
+  pk: 7c363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Brewing
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 7d363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Bakery Products
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 7e363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Ready Meals
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 20
+    rght: 21
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 7f363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Meat Products
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 16
+    rght: 17
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 80363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Dairy Products
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 81363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Frozen and Chilled Foods
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 82363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Beverages and Alcoholic Drinks
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 83363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Fruit and Vegetables
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 14
+    rght: 15
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 84363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Food and Drink Manufacturing
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 85363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Pet Food
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 18
+    rght: 19
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 86363000-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Secondary Food Processing
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 22
+    rght: 23
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 64535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Tobacco Products
+    parent: a538cecc-5f95-e211-a939-e4115bead28a
+    lft: 24
+    rght: 25
+    tree_id: 21
+    level: 1
+- model: metadata.sector
+  pk: 65535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Major Events
+    parent: ac22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 23
+    level: 1
+- model: metadata.sector
+  pk: 66535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare Services
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 21
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 67535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Public Sector
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 68535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Private Sector
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 69535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Nursing Homes
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 13
+    rght: 14
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 6a535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Medical Practice
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 11
+    rght: 12
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 6b535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Dentists
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 9
+    rght: 10
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 6c535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Vets
+    parent: 66535406-6095-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 6d535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Medical Devices and Systems
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 24
+    rght: 27
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 6e535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Optical Precision Instruments
+    parent: 6d535406-6095-e211-a939-e4115bead28a
+    lft: 25
+    rght: 26
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 6f535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Medical Equipment
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 28
+    rght: 35
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 70535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Dental Aesthetics
+    parent: 6f535406-6095-e211-a939-e4115bead28a
+    lft: 29
+    rght: 30
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 71535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Glass
+    parent: 6f535406-6095-e211-a939-e4115bead28a
+    lft: 31
+    rght: 32
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 72535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Spectacles and Unmounted Lenses
+    parent: 6f535406-6095-e211-a939-e4115bead28a
+    lft: 33
+    rght: 34
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 73535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Medical Consumables
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 22
+    rght: 23
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 74535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Medical Lab Services
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 36
+    rght: 37
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 75535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare Marketing and Sales
+    parent: a738cecc-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 7
+    tree_id: 24
+    level: 1
+- model: metadata.sector
+  pk: 76535406-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare Wholesale
+    parent: 75535406-6095-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 64f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare Retail
+    parent: 75535406-6095-e211-a939-e4115bead28a
+    lft: 3
+    rght: 4
+    tree_id: 24
+    level: 2
+- model: metadata.sector
+  pk: 65f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Sports and Leisure Infrastructure
+    parent: a938cecc-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 27
+    level: 1
+- model: metadata.sector
+  pk: 67f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Casino Gambling
+    parent: 66f1690c-6095-e211-a939-e4115bead28a
+    lft: 3
+    rght: 4
+    tree_id: 27
+    level: 2
+- model: metadata.sector
+  pk: 68f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Mass-Market Gambling
+    parent: 66f1690c-6095-e211-a939-e4115bead28a
+    lft: 5
+    rght: 6
+    tree_id: 27
+    level: 2
+- model: metadata.sector
+  pk: 6af1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Metals
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 6bf1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Minerals
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 6cf1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Plastics
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 6df1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Ceramics
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 6ef1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Composite Materials
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 6ff1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Elastomers and Rubbers
+    parent: a522c9d2-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 33
+    level: 1
+- model: metadata.sector
+  pk: 70f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Nuclear
+    parent: a922c9d2-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 5
+    tree_id: 38
+    level: 1
+- model: metadata.sector
+  pk: 71f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biomass
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: 72f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Geothermal
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: 73f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Hydro
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: 74f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Solar
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: 75f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Tidal
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: 76f1690c-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Wave
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: a4959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Wind
+    parent: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    lft: 14
+    rght: 19
+    tree_id: 40
+    level: 1
+- model: metadata.sector
+  pk: a5959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Industry Applications
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 11
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: a6959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Financial Applications
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 6
+    rght: 7
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: a7959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Healthcare Applications
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 8
+    rght: 9
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: a8959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Security Related Software
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 14
+    rght: 15
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: a9959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Biometrics
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 2
+    rght: 3
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: aa959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Online Retailing
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 12
+    rght: 13
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: ab959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: E-Procurement
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 5
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: ac959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Support Services
+    parent: ab22c9d2-5f95-e211-a939-e4115bead28a
+    lft: 16
+    rght: 21
+    tree_id: 43
+    level: 1
+- model: metadata.sector
+  pk: ad959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Equipment Maintenance and Repair
+    parent: ac959812-6095-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 43
+    level: 2
+- model: metadata.sector
+  pk: ae959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Internet Service Providers
+    parent: ac959812-6095-e211-a939-e4115bead28a
+    lft: 19
+    rght: 20
+    tree_id: 43
+    level: 2
+- model: metadata.sector
+  pk: af959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Advanced Engineering
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 1
+    level: 0
+- model: metadata.sector
+  pk: b0959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Defence and Security
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 14
+    level: 0
+- model: metadata.sector
+  pk: b1959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Energy
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 17
+    level: 0
+- model: metadata.sector
+  pk: b2959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Environment and Water
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 19
+    level: 0
+- model: metadata.sector
+  pk: b3959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: ICT
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 26
+    level: 0
+- model: metadata.sector
+  pk: b4959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Life Sciences
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 28
+    level: 0
+- model: metadata.sector
+  pk: b5959812-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Mass Transport
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 30
+    level: 0
+- model: metadata.sector
+  pk: 44329c18-6095-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2013-08-06T15:51:32Z'
+    segment: More Sectors
+    parent:
+    lft: 1
+    rght: 2
+    tree_id: 35
+    level: 0
+- model: metadata.sector
+  pk: 034be3be-5329-e511-b6bc-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Onshore
+    parent: a4959812-6095-e211-a939-e4115bead28a
+    lft: 17
+    rght: 18
+    tree_id: 40
+    level: 2
+- model: metadata.sector
+  pk: e331b3d4-5329-e511-b6bc-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Offshore
+    parent: a4959812-6095-e211-a939-e4115bead28a
+    lft: 15
+    rght: 16
+    tree_id: 40
+    level: 2
+- model: metadata.sector
+  pk: b906a205-f5a0-e211-b972-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Manufacturing and Assembly
+    parent: 9538cecc-5f95-e211-a939-e4115bead28a
+    lft: 10
+    rght: 19
+    tree_id: 2
+    level: 1
+- model: metadata.sector
+  pk: e9e181d2-f6a0-e211-b972-e4115bead28a
+  fields:
+    disabled_on:
+    segment: Component Manufacturing
+    parent: 9538cecc-5f95-e211-a939-e4115bead28a
+    lft: 4
+    rght: 7
+    tree_id: 2
+    level: 1

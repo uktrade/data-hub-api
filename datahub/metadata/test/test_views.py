@@ -349,7 +349,7 @@ class TestSectorView:
         """
         url = reverse(viewname='api-v4:metadata:sector')
         response = metadata_client.get(url)
-        sector = Sector.objects.order_by('lft')[0]
+        sector = Sector.objects.order_by('tree_id', 'lft')[0]
 
         assert response.status_code == status.HTTP_200_OK
         sectors = response.json()
