@@ -126,7 +126,8 @@ class TestBasicSearch(APITestMixin):
         for obj in objects:
             obj.save()
 
-        ids = sorted(obj.id for obj in objects)
+        # Note: id is a Keyword field, so string sorting must be used
+        ids = sorted((obj.id for obj in objects), key=str)
 
         es_with_collector.flush_and_refresh()
 
