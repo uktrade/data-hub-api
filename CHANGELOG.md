@@ -1,3 +1,27 @@
+# Data Hub API 21.0.0 (2019-11-18)
+
+
+## Removals
+
+- The deprecated `GET /dashboard/homepage/` endpoint was removed.
+
+## Features
+
+- **Companies** A command was added `datahub.dbmaintenance.management.commands.update_companies_dnb_data`
+  which allows us to update the DNB data for a list of company IDs. All Company fields
+  are updated by default, but a subset of fields can be specified if a partial update
+  is preferable.
+
+## Internal changes
+
+- **Investment** All `investment` app database migrations were squashed in order to reduce build times. The old migrations will be removed once the squashed migration has been applied to all environments.
+- All `metadata` app database migrations were squashed in order to reduce build times. The old migrations will be removed once the squashed migration has been applied to all environments.
+
+## API
+
+- **Companies** `GET /v4/dataset/company-export-to-countries-dataset`: An API endpoint for a dataset of export_to_countries was added for consumption by data-flow and data-workspace.
+
+
 # Data Hub API 20.0.0 (2019-11-14)
 
 
