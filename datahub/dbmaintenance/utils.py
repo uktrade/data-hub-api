@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework.fields import (
-    BooleanField, CharField, DateField, DecimalField, EmailField, UUIDField,
+    BooleanField, CharField, ChoiceField, DateField, DecimalField, EmailField, UUIDField,
 )
 
 
@@ -37,6 +37,11 @@ def parse_uuid_list(value):
     field = UUIDField()
 
     return [field.to_internal_value(item) for item in value.split(',')]
+
+
+def parse_choice(value, choices, blank_value=''):
+    """Parses and validates a value from a list of choices."""
+    return _parse_value(value, ChoiceField(choices=choices), blank_value=blank_value)
 
 
 def parse_limited_string(value, max_length=settings.CHAR_FIELD_MAX_LENGTH):
