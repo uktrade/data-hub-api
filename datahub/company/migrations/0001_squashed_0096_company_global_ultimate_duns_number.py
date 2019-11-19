@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0021_delete_companyclassification'),
+        ('metadata', '0001_squashed_0010_auto_20180613_1553'),
         ('auth', '0008_alter_user_username_max_length'),
     ]
 
