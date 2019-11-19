@@ -265,6 +265,12 @@ class Company(ArchivableModel, BaseModel):
         ],
         db_index=True,
     )
+    dnb_modified_on = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='Last updated from D&B',
+        db_index=True,
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""

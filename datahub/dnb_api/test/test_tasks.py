@@ -5,6 +5,8 @@ import pytest
 from celery.exceptions import Retry
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.utils.timezone import now
+from freezegun import freeze_time
 from reversion.models import Version
 
 from datahub.company.models import Company
@@ -19,6 +21,7 @@ pytestmark = pytest.mark.django_db
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 
 
+@freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_all_fields(
     dnb_company_search_feature_flag,
     requests_mock,
@@ -91,6 +94,7 @@ def test_sync_company_with_dnb_all_fields(
         'uk_region': original_company.uk_region_id,
         'vat_number': '',
         'website': 'http://foo.com',
+        'dnb_modified_on': now(),
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -100,6 +104,7 @@ def test_sync_company_with_dnb_all_fields(
     assert version.revision.user is None
 
 
+@freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_partial_fields(
     dnb_company_search_feature_flag,
     requests_mock,
@@ -174,6 +179,7 @@ def test_sync_company_with_dnb_partial_fields(
         'uk_region': original_company.uk_region_id,
         'vat_number': original_company.vat_number,
         'website': original_company.website,
+        'dnb_modified_on': now(),
     }
 
 
