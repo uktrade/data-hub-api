@@ -1,3 +1,26 @@
+# Data Hub API 21.1.0 (2019-11-19)
+
+
+## Features
+
+- **Investment** A management command `update_investment_project_status` was added which can update the statuses of a list of investment projects from a CSV file stored in Amazon S3.
+
+## API
+
+- **Companies** A field called `dnb_modified_on` was added to the response of the following endpoints:
+
+  - `GET /v4/company`
+  - `GET /v4/company/<company_id>`
+
+  This fields tracks the last time a company was updated from D&B.
+
+## Database schema
+
+- **Companies** A field called `dnb_modified_on` was added to the `company_company` table.
+
+  This fields tracks the last time a company was updated from D&B.
+
+
 # Data Hub API 21.0.0 (2019-11-18)
 
 
