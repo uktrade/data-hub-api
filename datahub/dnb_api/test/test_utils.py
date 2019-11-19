@@ -6,12 +6,14 @@ from django.conf import settings
 from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from freezegun import freeze_time
+from requests.exceptions import ConnectionError, ConnectTimeout
 from rest_framework import serializers, status
 from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
@@ -66,6 +68,38 @@ def test_get_company_dnb_service_error(
         get_company('123456789')
 
     expected_message = f'DNB service returned an error status: {dnb_response_status}'
+
+    assert e.value.args[0] == expected_message
+    assert len(caplog.records) == 1
+    assert caplog.records[0].getMessage() == expected_message
+
+
+@pytest.mark.parametrize(
+    'exception',
+    (
+        ConnectionError,
+        ConnectTimeout,
+    ),
+)
+def test_get_company_dnb_service_connection_error(
+    caplog,
+    requests_mock,
+    dnb_company_search_feature_flag,
+    exception,
+):
+    """
+    Test if there is an error connecting to dnb-service, we log it and raise the exception with an
+    appropriate message.
+    """
+    requests_mock.post(
+        DNB_SEARCH_URL,
+        exc=exception,
+    )
+
+    with pytest.raises(DNBServiceConnectionError) as e:
+        get_company('123456789')
+
+    expected_message = f'Encountered an error connecting to DNB service'
 
     assert e.value.args[0] == expected_message
     assert len(caplog.records) == 1

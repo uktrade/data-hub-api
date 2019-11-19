@@ -12,7 +12,7 @@ from reversion.models import Version
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.tasks import sync_company_with_dnb
-from datahub.dnb_api.utils import DNBServiceError
+from datahub.dnb_api.utils import DNBServiceConnectionError, DNBServiceError
 from datahub.metadata.models import Country
 
 pytestmark = pytest.mark.django_db
@@ -184,24 +184,24 @@ def test_sync_company_with_dnb_partial_fields(
 
 
 @pytest.mark.parametrize(
-    'error_status_code,expect_retry',
+    'error,expect_retry',
     (
-        (504, True),
-        (503, True),
-        (502, True),
-        (500, True),
-        (403, False),
-        (400, False),
+        (DNBServiceError('An error occurred', status_code=504), True),
+        (DNBServiceError('An error occurred', status_code=503), True),
+        (DNBServiceError('An error occurred', status_code=502), True),
+        (DNBServiceError('An error occurred', status_code=500), True),
+        (DNBServiceError('An error occurred', status_code=403), False),
+        (DNBServiceError('An error occurred', status_code=400), False),
+        (DNBServiceConnectionError('An error occurred'), True),
     ),
 )
-def test_sync_company_with_dnb_retries_errors(monkeypatch, error_status_code, expect_retry):
+def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
     """
     Test the sync_company_with_dnb task retries server errors.
     """
     company = CompanyFactory(duns_number='123456789')
 
     # Set up a DNBServiceError with the parametrized status code
-    error = DNBServiceError('An error occurred', status_code=error_status_code)
     mocked_get_company = mock.Mock()
     mocked_get_company.side_effect = error
     monkeypatch.setattr('datahub.dnb_api.tasks.get_company', mocked_get_company)
