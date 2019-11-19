@@ -2,6 +2,7 @@ import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import serializers
 from rest_framework import status
@@ -194,6 +195,7 @@ class DNBCompanyCreateView(APIView):
         datahub_company = company_serializer.save(
             created_by=request.user,
             modified_by=request.user,
+            dnb_modified_on=now(),
         )
 
         statsd.incr(f'dnb.create.company')
