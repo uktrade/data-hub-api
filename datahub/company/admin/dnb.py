@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods
 from rest_framework import serializers
 
 from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
@@ -181,7 +182,7 @@ def update_from_dnb(model_admin, request, object_id):
     try:
         dnb_company = get_company(dh_company.duns_number)
 
-    except (DNBServiceError, DNBServiceInvalidResponse):
+    except (DNBServiceError, DNBServiceConnectionError, DNBServiceInvalidResponse):
         message = 'Something went wrong in an upstream service.'
         raise AdminException(message, company_change_page)
 
