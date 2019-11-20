@@ -65,7 +65,6 @@ AccessToken.objects.create(
 )
 " | /app/manage.py shell
 
-python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py sync_es --foreground

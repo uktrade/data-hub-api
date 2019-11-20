@@ -134,22 +134,6 @@ def _get_random_company_category():
     return choice(categories).capitalize()
 
 
-class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
-    """Companies house company factory."""
-
-    name = factory.Sequence(lambda n: f'name{n}')
-    company_number = factory.Sequence(str)
-    company_category = factory.LazyFunction(_get_random_company_category)
-    registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
-    registered_address_town = 'Rome'
-    registered_address_country_id = constants.Country.italy.value.id
-    incorporation_date = factory.Faker('past_date')
-
-    class Meta:
-        model = 'company.CompaniesHouseCompany'
-        django_get_or_create = ('company_number', )
-
-
 class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
