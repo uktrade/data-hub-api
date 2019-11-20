@@ -3,10 +3,16 @@ from unittest import mock
 
 import factory
 import pytest
+from django.apps import apps
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.core.serializers import base
 
-from datahub.core.migration_utils import load_yaml_data_in_migration
+from datahub.core.migration_utils import (
+    DeleteModelWithMetadata,
+    load_yaml_data_in_migration,
+)
 from datahub.core.test.support.factories import BookFactory, PersonFactory
 from datahub.core.test.support.models import Book, Person
 
@@ -257,3 +263,31 @@ class TestLoadYamlInMigration:
             "[\"'invalid' value has an invalid date format. It must be in YYYY-MM-DD format.\"]: "
             "(book:pk=1) field_value was 'invalid'"
         )
+
+
+def test_delete_permissions_contenttypes():
+    """
+    Tests if the delete_permission_contenttypes function deleted the right
+    permissions and contenttypes.
+    """
+    permissions = Permission.objects.filter(
+        content_type__app_label='support',
+        content_type__model='permissionmodel',
+    )
+
+    contents = ContentType.objects.filter(
+        app_label='support',
+        model='permissionmodel',
+    )
+
+    assert permissions.count() > 0
+    assert contents.count() > 0
+
+    DeleteModelWithMetadata.delete_metadata(
+        apps,
+        'support',
+        'permissionmodel',
+    )
+
+    assert permissions.count() == 0
+    assert contents.count() == 0
