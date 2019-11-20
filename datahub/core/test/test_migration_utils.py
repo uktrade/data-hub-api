@@ -14,7 +14,7 @@ from datahub.core.migration_utils import (
     load_yaml_data_in_migration,
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory
-from datahub.core.test.support.models import Book, Person
+from datahub.core.test.support.models import Book, PermissionModel, Person
 
 
 pytestmark = pytest.mark.django_db
@@ -270,14 +270,17 @@ def test_delete_permissions_contenttypes():
     Tests if the delete_permission_contenttypes function deleted the right
     permissions and contenttypes.
     """
+    app_label = PermissionModel._meta.app_label
+    model_name = PermissionModel._meta.model_name
+
     permissions = Permission.objects.filter(
-        content_type__app_label='support',
-        content_type__model='permissionmodel',
+        content_type__app_label=app_label,
+        content_type__model=model_name,
     )
 
     contents = ContentType.objects.filter(
-        app_label='support',
-        model='permissionmodel',
+        app_label=app_label,
+        model=model_name,
     )
 
     assert permissions.count() > 0
@@ -285,8 +288,8 @@ def test_delete_permissions_contenttypes():
 
     DeleteModelWithMetadata.delete_metadata(
         apps,
-        'support',
-        'permissionmodel',
+        app_label,
+        model_name,
     )
 
     assert permissions.count() == 0
