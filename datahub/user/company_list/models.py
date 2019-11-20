@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
 
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
@@ -22,25 +21,10 @@ class CompanyList(BaseModel):
         on_delete=models.CASCADE,
         related_name='company_lists',
     )
-    # TODO: This field has been deprecated and should be removed on or after 20th November 2019.
-    is_legacy_default = models.BooleanField(
-        default=False,
-        help_text='Temporary field that designates this as the list that the legacy company list '
-                  'API endpoints operate on.',
-    )
 
     def __str__(self):
         """Human-friendly representation."""
         return f'{self.name} – {self.adviser}'
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('adviser',),
-                condition=Q(is_legacy_default=True),
-                name='unique_adviser_if_legacy_default',
-            ),
-        ]
 
 
 class CompanyListItemPermissionCode(StrEnum):
