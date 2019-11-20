@@ -49,4 +49,5 @@ class InteractionsDatasetView(BaseDatasetView):
             'service_delivery_status__name',
             'service_delivery',
             'subject',
+            'theme',
         )

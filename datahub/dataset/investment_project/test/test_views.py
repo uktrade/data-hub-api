@@ -27,6 +27,10 @@ def get_expected_data_from_project(project):
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
         'actual_uk_region_names': (join_attr_values(project.actual_uk_regions.order_by('name'))
                                    if project.actual_uk_regions.exists() else None),
+        'address_1': project.address_1,
+        'address_2': project.address_2,
+        'address_town': project.address_town,
+        'address_postcode': project.address_postcode,
         'allow_blank_possible_uk_regions': project.allow_blank_possible_uk_regions,
         'anonymous_description': project.anonymous_description,
         'associated_non_fdi_r_and_d_project_id': str_or_none(
@@ -78,6 +82,7 @@ def get_expected_data_from_project(project):
         'non_fdi_r_and_d_budget': project.non_fdi_r_and_d_budget,
         'number_new_jobs': project.number_new_jobs,
         'number_safeguarded_jobs': project.number_safeguarded_jobs,
+        'other_business_activity': project.other_business_activity,
         'project_arrived_in_triage_on': format_date_or_datetime(
             project.project_arrived_in_triage_on),
         'project_assurance_adviser_id': str_or_none(project.project_assurance_adviser_id),
