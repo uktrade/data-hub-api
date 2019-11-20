@@ -52,6 +52,10 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
         ).values(
             'actual_land_date',
             'actual_uk_region_names',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
             'allow_blank_possible_uk_regions',
             'anonymous_description',
             'associated_non_fdi_r_and_d_project_id',
@@ -86,6 +90,7 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'non_fdi_r_and_d_budget',
             'number_new_jobs',
             'number_safeguarded_jobs',
+            'other_business_activity',
             'project_arrived_in_triage_on',
             'project_assurance_adviser_id',
             'project_manager_id',

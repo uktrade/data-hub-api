@@ -21,6 +21,8 @@ def get_expected_data_from_company(company):
         'address_country__name': company.address_country.name,
         'address_postcode': company.address_postcode,
         'address_town': company.address_town,
+        'archived': company.archived,
+        'archived_on': format_date_or_datetime(company.archived_on),
         'business_type__name': get_attr_or_none(company, 'business_type.name'),
         'company_number': company.company_number,
         'created_on': format_date_or_datetime(company.created_on),
@@ -30,12 +32,18 @@ def get_expected_data_from_company(company):
             company,
             'export_experience_category.name',
         ),
+        'headquarter_type__name': get_attr_or_none(
+            'company',
+            'headquarter_type.name',
+        ),
         'id': str(company.id),
         'is_number_of_employees_estimated': company.is_number_of_employees_estimated,
         'is_turnover_estimated': company.is_turnover_estimated,
+        'modified_on': format_date_or_datetime(company.modified_on),
         'name': company.name,
         'number_of_employees': company.number_of_employees,
         'one_list_tier__name': get_attr_or_none(company, 'one_list_tier.name'),
+        'one_list_account_owner_id': company.one_list_account_owner_id,
         'reference_code': company.reference_code,
         'registered_address_1': company.registered_address_1,
         'registered_address_2': company.registered_address_2,
@@ -52,8 +60,6 @@ def get_expected_data_from_company(company):
         'uk_region__name': get_attr_or_none(company, 'uk_region.name'),
         'vat_number': company.vat_number,
         'website': company.website,
-
-
     }
 
 
