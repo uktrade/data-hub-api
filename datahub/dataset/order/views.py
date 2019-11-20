@@ -1,4 +1,6 @@
-from datahub.core.query_utils import get_string_agg_subquery
+from django.db.models import Max, Sum
+
+from datahub.core.query_utils import get_aggregate_subquery, get_string_agg_subquery
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.omis.order.models import Order
@@ -16,6 +18,8 @@ class OMISDatasetView(BaseDatasetView):
     def get_dataset(self):
         """Returns list of OMIS Dataset records"""
         return Order.objects.annotate(
+            refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
+            refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),
             sector_name=get_sector_name_subquery('sector'),
             services=get_string_agg_subquery(Order, 'service_types__name'),
         ).values(
@@ -31,10 +35,15 @@ class OMISDatasetView(BaseDatasetView):
             'invoice__subtotal_cost',
             'paid_on',
             'primary_market__name',
+            'quote__created_on',
             'reference',
+            'refund_created',
+            'refund_total_amount',
             'sector_name',
             'services',
             'status',
             'subtotal_cost',
+            'total_cost',
             'uk_region__name',
+            'vat_cost',
         )
