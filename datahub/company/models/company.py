@@ -10,12 +10,10 @@ from django.core.validators import (
     MinValueValidator,
 )
 from django.db import models
-from django.utils.functional import cached_property
 from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
-from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
 from datahub.core.models import (
     ArchivableModel,
@@ -25,7 +23,6 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
-from datahub.metadata.models import BusinessType
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -469,46 +466,3 @@ class OneListCoreTeamMember(models.Model):
         unique_together = (
             ('company', 'adviser'),
         )
-
-
-class CompaniesHouseCompany(models.Model):
-    """Representation of Companies House company."""
-
-    name = models.CharField(max_length=MAX_LENGTH)
-    company_number = models.CharField(max_length=MAX_LENGTH, unique=True)
-    company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
-    company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
-    sic_code_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    sic_code_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    sic_code_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    sic_code_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    uri = models.CharField(max_length=MAX_LENGTH, blank=True)
-    incorporation_date = models.DateField(null=True)
-
-    registered_address_1 = models.CharField(max_length=MAX_LENGTH)
-    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_town = models.CharField(max_length=MAX_LENGTH)
-    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_country = models.ForeignKey(
-        metadata_models.Country,
-        related_name='companieshousecompanies_with_country_registered_address',
-        on_delete=models.PROTECT,
-    )
-    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
-
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return self.name
-
-    @cached_property
-    def business_type(self):
-        """The business type associated with the company category provided by Companies House."""
-        business_type = COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.get(
-            self.company_category.lower(),
-        )
-        if business_type:
-            return BusinessType.objects.get(pk=business_type.value.id)
-        return None
-
-    class Meta:
-        verbose_name_plural = 'Companies House companies'

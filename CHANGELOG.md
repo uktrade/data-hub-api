@@ -1,3 +1,43 @@
+# Data Hub API 22.0.0 (2019-11-21)
+
+
+## Removals
+
+- **Companies** The deprecated model `CompaniesHouseCompany` was removed.
+
+## API
+
+- **Companies** `GET /v4/dataset/companies-dataset`: 5 new fields were added to the companies dataset response:
+  - `archived`
+  - `archived_on`
+  - `headquarter_type__name`
+  - `modified_on`
+  - `one_list_account_owner_id`
+- **Contacts** `GET /v4/dataset/contacts-dataset`: 3 new fields were added to the contacts dataset response:
+  - `archived`
+  - `archived_on`
+  - `modified_on`
+- **Interactions** `GET /v4/dataset/interactions-dataset`: The field `theme` was added to the interactions dataset api response
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: 5 new fields were added to the investment projects dataset api response:
+  - `address_1`
+  - `address_2`
+  - `address_town`
+  - `address_postcode`
+  - `other_business_activity`
+- **OMIS** `GET /v4/dataset/omis-dataset`: 5 new fields were added to the OMIS dataset api response:
+  - `quote__created_on`
+  - `refund_created`
+  - `refund_total_amount`
+  - `total_cost`
+  - `vat_cost`
+
+## Database schema
+
+- **Advisers** The `company_list_companylist` column `is_legacy_default` has been made nullable and will be removed 
+  in the next release.
+- **Companies** The deprecated `company_companieshousecompany` table was removed.
+
+
 # Data Hub API 21.1.0 (2019-11-19)
 
 
