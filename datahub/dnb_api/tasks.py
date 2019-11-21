@@ -6,6 +6,7 @@ from datahub.company.models import Company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
+    DNBServiceTimeoutError,
     get_company,
     update_company_from_dnb,
 )
@@ -22,7 +23,7 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
         if is_server_error(exc.status_code):
             raise task.retry(exc=exc, countdown=60)
         raise
-    except DNBServiceConnectionError as exc:
+    except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
         raise task.retry(exc=exc, countdown=60)
 
     update_company_from_dnb(

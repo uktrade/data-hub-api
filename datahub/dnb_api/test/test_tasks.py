@@ -12,7 +12,11 @@ from reversion.models import Version
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.tasks import sync_company_with_dnb
-from datahub.dnb_api.utils import DNBServiceConnectionError, DNBServiceError
+from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
+    DNBServiceError,
+    DNBServiceTimeoutError,
+)
 from datahub.metadata.models import Country
 
 pytestmark = pytest.mark.django_db
@@ -193,6 +197,7 @@ def test_sync_company_with_dnb_partial_fields(
         (DNBServiceError('An error occurred', status_code=403), False),
         (DNBServiceError('An error occurred', status_code=400), False),
         (DNBServiceConnectionError('An error occurred'), True),
+        (DNBServiceTimeoutError('An error occurred'), True),
     ),
 )
 def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
