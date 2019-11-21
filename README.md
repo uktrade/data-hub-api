@@ -396,19 +396,6 @@ Migrate modified mappings:
 
 Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail.
 
-
-### Companies House
-
-Update Companies House records:
-
-```shell
-./manage.py sync_ch
-```
-
-This downloads the latest data from Companies House, updates the Companies House table and triggers an Elasticsearch sync.
-
-(Note that this does not remove any records from the Companies House table.)
-
 ## Dependencies
 
 See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing,

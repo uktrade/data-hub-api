@@ -5,9 +5,6 @@
     - - view_advisor
       - company
       - advisor
-    - - view_companieshousecompany
-      - company
-      - companieshousecompany
     - - add_company
       - company
       - company
@@ -99,9 +96,6 @@
     - - view_advisor
       - company
       - advisor
-    - - view_companieshousecompany
-      - company
-      - companieshousecompany
     - - add_company
       - company
       - company
@@ -244,9 +238,6 @@
     - - view_advisor
       - company
       - advisor
-    - - view_companieshousecompany
-      - company
-      - companieshousecompany
     - - add_company
       - company
       - company

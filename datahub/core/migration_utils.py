@@ -1,6 +1,11 @@
+import logging
+
 import yaml
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, transaction
+from django.db.migrations.operations.models import DeleteModel
+
+logger = logging.getLogger(__name__)
 
 
 def _build_model_data(model, obj_pk, fields_data, using):
@@ -78,3 +83,49 @@ def load_yaml_data_in_migration(apps, fixture_file_path):
     with open(fixture_file_path, 'rb') as fixture:
         object_list = yaml.safe_load(fixture)
         _load_data_in_migration(apps, object_list)
+
+
+class DeleteModelWithMetadata(DeleteModel):
+    """
+    When deleting a model, we have to manually delete the associated
+    django permissions and django contenttypes.
+
+    This adds deletion of associated permissions and contenttypes to
+    the DeleteModel operation.
+    """
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        """
+        Delete permissions and contenttypes before deleting the model
+        """
+        DeleteModelWithMetadata.delete_metadata(
+            from_state.apps,
+            app_label,
+            self.name,
+        )
+        super().database_forwards(app_label, schema_editor, from_state, to_state)
+
+    @staticmethod
+    def delete_metadata(apps, app_label, model_name):
+        """
+        Delete associated permissions and contenttypes for the given model.
+        """
+        permission_model = apps.get_model('auth', 'Permission')
+        _, deletions_by_model = permission_model.objects.filter(
+            content_type__app_label=app_label,
+            content_type__model=model_name,
+        ).delete()
+        logger.info(
+            f'Deleted {app_label}.{model_name} permissions. '
+            f'Breakdown of deleted objects: {deletions_by_model}',
+        )
+
+        content_type_model = apps.get_model('contenttypes', 'ContentType')
+        _, deletions_by_model = content_type_model.objects.filter(
+            app_label=app_label,
+            model=model_name,
+        ).delete()
+        logger.info(
+            f'Deleted {app_label}.{model_name} content types. '
+            f'Breakdown of deleted objects: {deletions_by_model}',
+        )
