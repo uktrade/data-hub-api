@@ -1,0 +1,1 @@
+A new table `company_companyexportcountry` was created to maintain company's export interests. Multiple countries along with a status can be recorded for each company. Status being one of `not_interested`, `future_interest` or `currently_exporting`. This will now allow, for each entry, to record date and adviser that created and modified for audit.

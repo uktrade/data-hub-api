@@ -9,7 +9,12 @@ from django.core.management.base import CommandError
 from reversion.models import Revision, Version
 
 from datahub.cleanup.management.commands import delete_orphaned_versions
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
@@ -21,6 +26,7 @@ from datahub.investment.project.test.factories import (
 MAPPINGS = {
     'company.Advisor': AdviserFactory,
     'company.Company': CompanyFactory,
+    'company.CompanyExportCountry': CompanyExportCountryFactory,
     'company.Contact': ContactFactory,
     'event.Event': EventFactory,
     'interaction.Interaction': CompanyInteractionFactory,
