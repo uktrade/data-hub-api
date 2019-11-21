@@ -9,7 +9,6 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import (
     AdviserFactory,
-    CompaniesHouseCompanyFactory,
     CompanyFactory,
     ContactFactory,
 )
@@ -64,7 +63,7 @@ class TestGenerateQuoteContent:
             registered_address_county='County',
             registered_address_postcode='SW1A 1AA',
             registered_address_country_id=Country.united_kingdom.value.id,
-            company_number=CompaniesHouseCompanyFactory().company_number,
+            company_number='123456789',
         )
         contact = ContactFactory(
             company=company,

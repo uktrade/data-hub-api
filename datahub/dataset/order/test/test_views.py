@@ -20,6 +20,7 @@ from datahub.omis.order.test.factories import (
     OrderWithoutAssigneesFactory,
     OrderWithoutLeadAssigneeFactory,
 )
+from datahub.omis.payment.test.factories import ApprovedRefundFactory
 
 
 def get_expected_data_from_order(order):
@@ -37,12 +38,23 @@ def get_expected_data_from_order(order):
         'invoice__subtotal_cost': get_attr_or_none(order, 'invoice.subtotal_cost'),
         'paid_on': format_date_or_datetime(order.paid_on),
         'primary_market__name': get_attr_or_none(order, 'primary_market.name'),
+        'quote__created_on': format_date_or_datetime(get_attr_or_none(order, 'quote.created_on')),
         'reference': order.reference,
+        'refund_created': (
+            format_date_or_datetime(order.refunds.latest('created_on').created_on)
+            if order.refunds.exists() else None
+        ),
+        'refund_total_amount': (
+            sum([x.total_amount for x in order.refunds.all()])
+            if order.refunds.exists() else None
+        ),
         'sector_name': get_attr_or_none(order, 'sector.name'),
         'services': join_attr_values(order.service_types.order_by('name')),
         'status': order.status,
         'subtotal_cost': order.subtotal_cost,
+        'total_cost': order.total_cost,
         'uk_region__name': order.uk_region.name,
+        'vat_cost': order.vat_cost,
     }
 
 
@@ -96,3 +108,38 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
                                      key=lambda item: item.pk) + [order_1, order_2]
         for index, order in enumerate(expected_order_list):
             assert order.reference == response_results[index]['reference']
+
+    @pytest.mark.parametrize(
+        'order_factory', (
+            OrderFactory,
+            OrderCompleteFactory,
+            OrderCancelledFactory,
+            OrderPaidFactory,
+            OrderWithAcceptedQuoteFactory,
+            OrderWithCancelledQuoteFactory,
+            OrderWithOpenQuoteFactory,
+            OrderWithoutAssigneesFactory,
+            OrderWithoutLeadAssigneeFactory,
+        ))
+    def test_order_with_refund(self, data_flow_api_client, order_factory):
+        """Test that endpoint returns refund data if it exists"""
+        order = order_factory()
+        ApprovedRefundFactory(
+            order=order,
+            requested_amount=order.total_cost / 5,
+        )
+        ApprovedRefundFactory(
+            order=order,
+            requested_amount=order.total_cost / 4,
+        )
+        ApprovedRefundFactory(
+            order=order,
+            requested_amount=order.total_cost / 3,
+        )
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_order(order)
+        assert result == expected_result
