@@ -18,6 +18,7 @@ from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
+    DNBServiceTimeoutError,
     get_company,
     update_company_from_dnb,
 )
@@ -182,7 +183,12 @@ def update_from_dnb(model_admin, request, object_id):
     try:
         dnb_company = get_company(dh_company.duns_number)
 
-    except (DNBServiceError, DNBServiceConnectionError, DNBServiceInvalidResponse):
+    except (
+        DNBServiceError,
+        DNBServiceConnectionError,
+        DNBServiceTimeoutError,
+        DNBServiceInvalidResponse,
+    ):
         message = 'Something went wrong in an upstream service.'
         raise AdminException(message, company_change_page)
 

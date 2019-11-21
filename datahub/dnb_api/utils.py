@@ -4,7 +4,7 @@ import reversion
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
 
 from datahub.core import statsd
@@ -55,6 +55,12 @@ class DNBServiceConnectionError(Exception):
     """
 
 
+class DNBServiceTimeoutError(Exception):
+    """
+    Exception for when a timeout was encountered when connecting to DNB service.
+    """
+
+
 def search_dnb(query_params):
     """
     Queries the dnb-service with the given query_params. E.g.:
@@ -85,9 +91,13 @@ def get_company(duns_number):
     try:
         dnb_response = search_dnb({'duns_number': duns_number})
     except ConnectionError:
-        error_message = f'Encountered an error connecting to DNB service'
+        error_message = 'Encountered an error connecting to DNB service'
         logger.error(error_message)
         raise DNBServiceConnectionError(error_message)
+    except Timeout:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        logger.error(error_message)
+        raise DNBServiceTimeoutError(error_message)
 
     if dnb_response.status_code != status.HTTP_200_OK:
         error_message = f'DNB service returned an error status: {dnb_response.status_code}'
