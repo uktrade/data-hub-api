@@ -128,11 +128,10 @@ def merge_companies(source_company: Company, target_company: Company, user):
     ):
         raise MergeNotAllowedError()
 
-    results = _process_all_objects(
-        _update_objects,
-        source=source_company,
-        target=target_company,
-    )
+    results = {
+        configuration.model: _update_objects(configuration, source_company, target_company)
+        for configuration in MERGE_CONFIGURATION
+    }
 
     source_company.mark_as_transferred(
         target_company,
@@ -145,22 +144,14 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
 def get_planned_changes(company: Company):
     """Gets information about the changes that would be made if merge proceeds."""
-    results = _process_all_objects(
-        _count_objects,
-        source=company,
-    )
+    results = {
+        configuration.model: _count_objects(configuration, company)
+        for configuration in MERGE_CONFIGURATION
+    }
 
     should_archive = not company.archived
 
     return results, should_archive
-
-
-def _process_all_objects(process_objects_fn, **kwargs):
-    """Process all objects defined in the configuration using provided function."""
-    return {
-        configuration.model: process_objects_fn(configuration, **kwargs)
-        for configuration in MERGE_CONFIGURATION
-    }
 
 
 def _update_objects(configuration: MergeConfiguration, source, target):
@@ -175,11 +166,11 @@ def _update_objects(configuration: MergeConfiguration, source, target):
     return objects_updated
 
 
-def _count_objects(configuration: MergeConfiguration, source):
+def _count_objects(configuration: MergeConfiguration, company):
     """Count objects for each field from given model with the target value."""
     objects_updated = {field: 0 for field in configuration.fields}
 
-    for field, filtered_objects in _get_objects_from_configuration(configuration, source):
+    for field, filtered_objects in _get_objects_from_configuration(configuration, company):
         objects_updated[field] = filtered_objects.count()
 
     return objects_updated
