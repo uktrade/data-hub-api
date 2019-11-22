@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from freezegun import freeze_time
+from requests.exceptions import ConnectionError
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -806,6 +807,29 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         requests_mock.post(
             DNB_SEARCH_URL,
             status_code=status_code,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-create'),
+            data={
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def test_post_dnb_service_connection_error(
+        self,
+        requests_mock,
+        dnb_company_search_feature_flag,
+    ):
+        """
+        Test if create-company endpoint returns 400 if the company is based in a country
+        that does not exist in DataHub.
+        """
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            exc=ConnectionError('An error occurred'),
         )
 
         response = self.api_client.post(
