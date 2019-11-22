@@ -2,7 +2,6 @@ import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.cache import cache
 from django.utils.http import url_has_allowed_host_and_scheme
 from requests import HTTPError
 from rest_framework.exceptions import AuthenticationFailed
@@ -11,22 +10,6 @@ from datahub.company.models import Advisor
 from datahub.core.api_client import APIClient, TokenAuth
 
 logger = logging.getLogger(__name__)
-
-
-def store_oauth2_state(state_id, state, timeout):
-    """Store OAuth2 state data in cache."""
-    cache.set(
-        _get_oauth2_state_cache_key_for_state_id(state_id),
-        state,
-        timeout=timeout,
-    )
-
-
-def fetch_oauth2_state(state_id):
-    """Fetch OAuth2 state data from cache."""
-    return cache.get(
-        _get_oauth2_state_cache_key_for_state_id(state_id),
-    )
 
 
 def get_access_token(code, redirect_uri):
@@ -109,10 +92,3 @@ def _get_api_client(token=None):
         raise_for_status=True,
         default_timeout=settings.ADMIN_OAUTH2_REQUEST_TIMEOUT,
     )
-
-
-def _get_oauth2_state_cache_key_for_state_id(state_id):
-    if not state_id:
-        raise ValueError('A state ID is required.')
-
-    return f'oauth2-state:{state_id}'

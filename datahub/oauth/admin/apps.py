@@ -1,9 +1,7 @@
-from django.apps import AppConfig
+from django.contrib.admin.apps import AdminConfig
 
 
-class OAuthAdminConfig(AppConfig):
-    """Required to register the OAuth admin access as Django app"""
+class OAuthAdminConfig(AdminConfig):
+    """Required to override stock Django admin app with OAuth2 admin app."""
 
-    name = 'datahub.oauth.admin'
-
-    label = 'oauth_admin'
+    default_site = 'datahub.oauth.admin.admin.OAuth2AdminSite'

@@ -96,28 +96,22 @@ class TestAccessRestrictions(AdminTestMixin):
     def test_redirects_to_login_page_if_not_logged_in(self, http_method, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
-        # Note: Client.generic() doesn't support follow=True
         request_func = getattr(client, http_method)
-        response = request_func(url, follow=True)
+        response = request_func(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.redirect_chain == [
-            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
-        ]
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_redirects_to_login_page_if_not_staff(self, url, http_method):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
         client = self.create_client(user=user)
-        # Note: Client.generic() doesn't support follow=True
         request_func = getattr(client, http_method)
-        response = request_func(url, follow=True)
+        response = request_func(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.redirect_chain == [
-            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
-        ]
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_permission_denied_if_staff_and_without_change_permission(self, url, http_method):
         """
