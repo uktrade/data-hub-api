@@ -74,6 +74,7 @@ def search_dnb(query_params):
         'POST',
         'companies/search/',
         json=query_params,
+        timeout=3.0,
     )
     statsd.incr(f'dnb.search.{response.status_code}')
     return response
