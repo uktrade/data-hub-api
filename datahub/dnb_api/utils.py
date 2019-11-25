@@ -80,6 +80,35 @@ def search_dnb(query_params):
     return response
 
 
+def get_company_updates(last_updated_after, cursor=None):
+    """
+    Gets company updates from the dnb-service.
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+    try:
+        response = api_client.request(
+            'GET',
+            f'companies?last_updated_after={last_updated_after}&cursor={cursor}',
+            timeout=3.0,
+        )
+    except ConnectionError:
+        error_message = 'Encountered an error connecting to DNB service'
+        logger.error(error_message)
+        raise DNBServiceConnectionError(error_message)
+    except Timeout:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        logger.error(error_message)
+        raise DNBServiceTimeoutError(error_message)
+
+    if response.status_code != status.HTTP_200_OK:
+        error_message = f'DNB service returned an error status: {response.status_code}'
+        logger.error(error_message)
+        raise DNBServiceError(error_message, response.status_code)
+
+    return response.json()
+
+
 def get_company(duns_number):
     """
     Pull data for the company with the given duns_number from DNB and
