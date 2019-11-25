@@ -466,3 +466,58 @@ class OneListCoreTeamMember(models.Model):
         unique_together = (
             ('company', 'adviser'),
         )
+
+
+@reversion.register_base_model()
+class CompanyExportCountry(BaseModel):
+    """
+    Record `Company`'s exporting status to a `Country`.
+    Status is expressed as:
+        - 'currently exporting to'
+        - 'future interest'
+        - 'not interested'
+
+    This will eventually replace company fields:
+        - export_to_countries
+        - future_interest_countries
+    """
+
+    EXPORT_INTEREST_STATUSES = Choices(
+        ('not_interested', 'Not interested'),
+        ('currently_exporting', 'Currently exporting to'),
+        ('future_interest', 'Future country of interest'),
+    )
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.PROTECT,
+        related_name='companies_with_interest',
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='export_countries',
+    )
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=EXPORT_INTEREST_STATUSES,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['country', 'company'],
+                name='unique_country_company',
+            ),
+        ]
+        verbose_name_plural = 'company export countries'
+
+    def __str__(self):
+        """Admin displayed human readable name"""
+        return (
+            f'{self.company} {self.country} {self.status}'
+        )
