@@ -383,6 +383,11 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=0, hour=3, day_of_month=21)
         }
     }
+    if env.bool('ENABLE_DNB_COMPANY_SYNC', False):
+        CELERY_BEAT_SCHEDULE['company_sync'] = {
+            'task': 'datahub.dnb_api.tasks.company_sync',
+            'schedule': crontab(minute=0, hour=1),
+        }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
         CELERY_BEAT_SCHEDULE['sync_es'] = {
             'task': 'datahub.search.tasks.sync_all_models',
