@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.utils.timezone import now
 from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
@@ -8,6 +11,7 @@ from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceTimeoutError,
     get_company,
+    get_company_updates,
     update_company_from_dnb,
 )
 
@@ -48,3 +52,54 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     will be synced.
     """
     _sync_company_with_dnb(company_id, fields_to_update, self)
+
+
+def _company_sync(task, last_updated_after, fields_to_update):
+
+    last_updated_after = last_updated_after or (now() - timedelta(days=1))
+    cursor = None
+
+    while True:
+        try:
+            updates = get_company_updates(last_updated_after, cursor)
+        except DNBServiceError as exc:
+            if is_server_error(exc.status_code):
+                raise task.retry(exc=exc, countdown=60)
+            raise
+        except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
+            raise task.retry(exc=exc, countdown=60)
+        # Queue update tasks
+        for update in updates:
+            company_update.apply_async(
+                update,
+                fields_to_update=fields_to_update,
+            )
+        cursor = updates.next
+        if not cursor:
+            break
+
+
+@shared_task(
+    bind=True,
+    acks_late=True,
+    priority=9,
+    max_retries=3,
+)
+def company_sync(self, last_updated_after=None, fields_to_update=None):
+    """
+    Get the lastest updates for D&B companies from dnb-service.
+    """
+    _company_sync(self, last_updated_after, fields_to_update)
+
+
+@shared_task(
+    bind=True,
+    acks_late=True,
+    priority=9,
+    max_retries=3,
+)
+def company_update(self, update, fields_to_update=None):
+    """
+    Update the company from latest data from dnb-service.
+    """
+    logger.info('Update Data Hub company.')
