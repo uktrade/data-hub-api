@@ -11,6 +11,7 @@ from datahub.company.constants import BusinessTypeConstant, OneListTierID
 from datahub.company.models import (
     Advisor,
     Company,
+    CompanyExportCountry,
     CompanyPermission,
     Contact,
     ContactPermission,
@@ -285,6 +286,52 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         if self.instance and not isinstance(self.instance, list) and self.instance.duns_number:
             for field in self.Meta.dnb_read_only_fields:
                 self.fields[field].read_only = True
+
+    def update(self, instance, validated_data):
+        """
+        Using writable nested representations to copy export country elements
+        from the `Company` model into the `CompanyExportCountry`.
+
+        N.B. Currently 'export_to_countries' and 'future_interest_countries'
+        are the only m2m fields, and due to the how the ManyRelatedManager operates
+        setattr() does not work hence instance.<field>.set(<value>) was used.
+        """
+        for key, value in validated_data.items():
+            if key == 'export_to_countries':
+                self._save_to_company_export_country_model(
+                    instance,
+                    validated_data.get('export_to_countries'),
+                    'currently_exporting',
+                )
+                instance.export_to_countries.set(value)
+            elif key == 'future_interest_countries':
+                self._save_to_company_export_country_model(
+                    instance,
+                    validated_data.get('future_interest_countries'),
+                    'future_interest',
+                )
+                instance.future_interest_countries.set(value)
+            else:
+                setattr(instance, key, value)
+
+        instance.save()
+
+        return instance
+
+    @staticmethod
+    def _save_to_company_export_country_model(instance, data, status):
+        """
+        Clears all entities for a given company with the given status,
+        before creating the new ones
+        """
+        CompanyExportCountry.objects.filter(company=instance, status=status).all().delete()
+
+        for country in data:
+            CompanyExportCountry.objects.create(
+                country=country,
+                company=instance,
+                status=status,
+            ).save()
 
     def validate(self, data):
         """
