@@ -1,3 +1,25 @@
+# Data Hub API 23.0.0 (2019-11-22)
+
+
+## Removals
+
+- **Advisers** The `company_list_companylist` column `is_legacy_default` has been removed from database.
+
+## Features
+
+- **Companies** Error handling was added for when a `ConnectionError` occurs when accessing the
+  DNB company search API endpoint.
+
+## Internal changes
+
+- **Companies** A temporary management command `get_dnb_one_list_tier_companies` was added to enable the running
+  of safe queries to facilitate the rollout of DNB company hierarchies.
+
+## Database schema
+
+- **Advisers** The `company_list_companylist` column `is_legacy_default` has been removed from database.
+
+
 # Data Hub API 22.0.0 (2019-11-21)
 
 
