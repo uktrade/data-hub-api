@@ -8,15 +8,21 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company, OneListTier
+from datahub.company.models import Company, CompanyExportCountry, OneListTier
 from datahub.company.serializers import CompanySerializer
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyFactory,
+)
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
     format_date_or_datetime,
+    random_obj_for_model,
 )
+from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -236,6 +242,13 @@ class TestGetCompany(APITestMixin):
             global_headquarters=ghq,
             one_list_tier=None,
             one_list_account_owner=None,
+            export_to_countries=[
+                Country.france.value.id,
+            ],
+            future_interest_countries=[
+                Country.japan.value.id,
+                Country.united_states.value.id,
+            ],
         )
         user = create_test_user(
             permission_codenames=(
@@ -306,8 +319,20 @@ class TestGetCompany(APITestMixin):
             },
             'export_potential': None,
             'great_profile_status': None,
-            'export_to_countries': [],
-            'future_interest_countries': [],
+            'export_to_countries': [{
+                'id': Country.france.value.id,
+                'name': Country.france.value.name,
+            }],
+            'future_interest_countries': [
+                {
+                    'id': Country.japan.value.id,
+                    'name': Country.japan.value.name,
+                },
+                {
+                    'id': Country.united_states.value.id,
+                    'name': Country.united_states.value.name,
+                },
+            ],
             'headquarter_type': company.headquarter_type,
             'sector': {
                 'id': str(company.sector.id),
@@ -1282,6 +1307,88 @@ class TestUpdateCompany(APITestMixin):
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
+
+    @pytest.mark.parametrize(
+        'export_to_countries,future_interest_countries',
+        (
+            ([Country.cayman_islands.value.id], [Country.canada.value.id]),
+            ([
+                Country.france.value.id,
+                Country.anguilla.value.id,
+                Country.isle_of_man.value.id,
+            ], [
+                Country.argentina.value.id,
+                Country.azerbaijan.value.id,
+                Country.italy.value.id,
+                Country.montserrat.value.id,
+            ]),
+        ),
+    )
+    def test_update_company_export_country_model(
+            self,
+            export_to_countries,
+            future_interest_countries,
+    ):
+        """Test updating export countries to CompanyExportCountry model"""
+        def lists_are_equal(
+                benchmark_list,
+                current_model_list,
+                new_model_list,
+        ):
+            """
+            Utility fn aimed at hiding the list comprehension from the assertion logic.
+            """
+            benchmark_list = benchmark_list.sort()
+            current_ids = [_['id'] for _ in current_model_list].sort()
+            new_ids = [str(_.country.id) for _ in new_model_list].sort()
+
+            if (benchmark_list == current_ids) and (benchmark_list == new_ids):
+                return True
+
+        # initialise the models in scope
+        company = CompanyFactory(
+            export_to_countries=[],
+            future_interest_countries=[],
+        )
+
+        CompanyExportCountryFactory(
+            country=random_obj_for_model(CountryModel),
+            company=company,
+        )
+
+        # now update them
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'export_to_countries': export_to_countries,
+                'future_interest_countries': future_interest_countries,
+            },
+        )
+        response_data = response.json()
+
+        company_export_country_currently_exporting_data = list(CompanyExportCountry.objects.filter(
+            company=company,
+            status='currently_exporting',
+        ))
+
+        company_export_country_future_interest_data = list(CompanyExportCountry.objects.filter(
+            company=company,
+            status='future_interest',
+        ))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert lists_are_equal(
+            export_to_countries,
+            response_data['export_to_countries'],
+            company_export_country_currently_exporting_data,
+        )
+
+        assert lists_are_equal(
+            future_interest_countries,
+            response_data['future_interest_countries'],
+            company_export_country_future_interest_data,
+        )
 
     @pytest.mark.parametrize(
         'score',
