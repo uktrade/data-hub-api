@@ -26,7 +26,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.test.factories import CompanyListItemFactory
+from datahub.user.company_list.test.factories import CompanyListFactory, CompanyListItemFactory
 
 
 @pytest.fixture
@@ -354,6 +354,28 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_by == user
         assert source_company.transferred_on == merge_time
         assert source_company.transferred_to == target_company
+
+    def test_merge_when_both_companies_on_same_company_list(self):
+        """
+        Test that if both the source and target company are on the same company list,
+        the merge is successful and the two list items are also merged.
+        """
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+        company_list = CompanyListFactory()
+
+        CompanyListItemFactory(list=company_list, company=source_company)
+        CompanyListItemFactory(list=company_list, company=target_company)
+
+        user = AdviserFactory()
+
+        merge_companies(source_company, target_company, user)
+
+        assert not CompanyListItem.objects.filter(
+            list=company_list,
+            company=source_company,
+        ).exists()
+        assert CompanyListItem.objects.filter(list=company_list, company=target_company).exists()
 
     @pytest.mark.parametrize(
         'valid_source,valid_target',
