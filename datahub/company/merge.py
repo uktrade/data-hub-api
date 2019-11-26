@@ -1,4 +1,7 @@
 from collections import namedtuple
+from typing import Callable, NamedTuple, Sequence, Type
+
+from django.db import models
 
 from datahub.company.models import Company, Contact
 from datahub.core.exceptions import DataHubException
@@ -43,13 +46,26 @@ MergeEntrySummary = namedtuple(
 )
 
 
-MergeConfiguration = namedtuple(
-    'MergeConfiguration',
-    [
-        'model',
-        'fields',
-    ],
-)
+def _default_object_updater(obj, field, target_company):
+    setattr(obj, field, target_company)
+    obj.save(update_fields=(field,))
+
+
+def _company_list_item_updater(list_item, field, target_company):
+    # If there is already a list item for the target company, delete this list item instead
+    # as duplicates are not allowed
+    if CompanyListItem.objects.filter(list_id=list_item.list_id, company=target_company).exists():
+        list_item.delete()
+    else:
+        _default_object_updater(list_item, field, target_company)
+
+
+class MergeConfiguration(NamedTuple):
+    """Specifies how company merging should be handled for a particular related model."""
+
+    model: Type[models.Model]
+    fields: Sequence[str]
+    object_updater: Callable[[models.Model, str, Company], None] = _default_object_updater
 
 
 MERGE_CONFIGURATION = [
@@ -57,7 +73,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
     MergeConfiguration(Order, ('company',)),
-    MergeConfiguration(CompanyListItem, ('company',)),
+    MergeConfiguration(CompanyListItem, ('company',), _company_list_item_updater),
 ]
 
 
@@ -160,8 +176,7 @@ def _update_objects(configuration: MergeConfiguration, source, target):
 
     for field, filtered_objects in _get_objects_from_configuration(configuration, source):
         for obj in filtered_objects.iterator():
-            setattr(obj, field, target)
-            obj.save(update_fields=(field,))
+            configuration.object_updater(obj, field, target)
             objects_updated[field] += 1
     return objects_updated
 
