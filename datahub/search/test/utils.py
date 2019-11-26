@@ -61,6 +61,7 @@ def _create_mock_es_model(
         get_read_alias=Mock(return_value='test-read-alias'),
         get_write_alias=Mock(return_value='test-write-alias'),
         get_target_index_name=Mock(return_value=f'test-index-{target_mapping_hash}'),
+        set_up_index_and_aliases=Mock(return_value=False),
     )
 
 

@@ -17,7 +17,8 @@ names follow the following pattern: `<prefix>-<model name>-<mapping hash>`.
 
 (The prefix is defined by the `ES_INDEX_PREFIX` setting.)
 
-The `./manage.py init_es` command creates indexes and aliases as described above.
+When run for the first time, the `./manage.py migrate_es` command creates indexes
+and aliases in this pattern.
 
 The mapping hash is calculated by hashing the mapping as defined in the code base
 (rather than the mapping as returned by the Elasticsearch server). This is because
@@ -29,7 +30,7 @@ mapping it returns.
 A migration is triggered by running `./manage.py migrate_es`. (This 
 is automatically run during deployment.)
 
-This command:
+When an index already exists, this command:
 
 1. Creates new indexes (in the `<prefix>-<model name>-<mapping hash>` format) using 
 the new mapping hashes (where the mapping hash has changed).
@@ -88,13 +89,3 @@ fail as they will assume it’s a non-existent field).
 5. Release this, and run `./manage.py migrate_es`.
 6. Remove references to the old field from the attributes mentioned in previous steps 
 (and return composite filters to normal filters if applicable).
-
-## Force-updating an existing mapping
-
-If you’ve only added a field to a mapping, a full migration is technically not 
-required and the existing mapping can be updated in place. (There is no automated
-detection of this in the `migrate_es` command, as it’s not easy to automatically 
-detect for various reasons.)
-
-To do this, run `./manage.py init_es --model=<model name> --force-update-mapping`
-followed by `./manage.py sync_es --model=<model name>`.
