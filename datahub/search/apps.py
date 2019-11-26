@@ -25,16 +25,6 @@ class SearchApp:
     export_permission = None
 
     @classmethod
-    def init_es(cls, force_update_mapping=False):
-        """
-        Creates the index and aliases for this app if they don't already exist.
-
-        If force_update_mapping is True and the write alias already exists, an attempt
-        is made to update the existing mapping in place.
-        """
-        cls.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
-
-    @classmethod
     def load_views(cls):
         """Loads the views submodule for the app to ensure views are registered."""
         cls._load_submodule('views')
@@ -112,7 +102,7 @@ def get_search_app(app_name):
 
 
 def are_apps_initialised(apps):
-    """Determines whether the given apps have been initialised (by init_es)."""
+    """Determines whether the given apps have been initialised (by migrate_es)."""
     return all(index_exists(app.es_model.get_write_alias()) for app in apps)
 
 

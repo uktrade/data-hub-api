@@ -1,11 +1,32 @@
-from unittest.mock import Mock
+from unittest.mock import ANY, call, Mock
 
 import pytest
+from django.conf import settings
 
 from datahub.core.exceptions import DataHubException
-from datahub.search.apps import get_search_apps
+from datahub.search.apps import get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
+from datahub.search.models import BaseESModel
 from datahub.search.test.utils import create_mock_search_app
+
+SAMPLE_APP_NAME = 'sample'
+
+
+class SampleModel(BaseESModel):
+    """Sample (dummy) search model."""
+
+    class Meta:
+        doc_type = SAMPLE_APP_NAME
+
+    class Index:
+        doc_type = SAMPLE_APP_NAME
+
+
+class SampleSearchApp(SearchApp):
+    """Sample (dummy) search app."""
+
+    name = SAMPLE_APP_NAME
+    es_model = SampleModel
 
 
 def test_migrate_apps(monkeypatch):
@@ -15,6 +36,34 @@ def test_migrate_apps(monkeypatch):
     apps = {app.name for app in list(get_search_apps())[:2]}
     migrate_apps(apps)
     assert {args[0][0] for args in migrate_app_mock.call_args_list} == apps
+
+
+def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client):
+    """
+    Test that migrate_app() creates an index and schedules an initial sync for an
+    uninitialised search app.
+    """
+    sync_model_task_mock = Mock()
+    monkeypatch.setattr('datahub.search.migrate.sync_model', sync_model_task_mock)
+    mock_client = mock_es_client.return_value
+    mock_client.indices.exists_alias.side_effect = [
+        # No alias at first attempt
+        False,
+        # Return True once alias created
+        True,
+    ]
+
+    migrate_app(SampleSearchApp)
+
+    expected_index_name = (
+        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-b6f2d7c1a3cf4271b2e8a3ced5862016'
+    )
+    assert mock_client.indices.create.call_args_list == [
+        call(index=expected_index_name, body=ANY),
+    ]
+    assert sync_model_task_mock.apply_async.call_args_list == [
+        call(args=(SampleSearchApp.name,)),
+    ]
 
 
 def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
