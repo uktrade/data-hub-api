@@ -291,47 +291,59 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         Using writable nested representations to copy export country elements
         from the `Company` model into the `CompanyExportCountry`.
-
-        N.B. Currently 'export_to_countries' and 'future_interest_countries'
-        are the only m2m fields, and due to the how the ManyRelatedManager operates
-        setattr() does not work hence instance.<field>.set(<value>) was used.
         """
-        for key, value in validated_data.items():
-            if key == 'export_to_countries':
-                self._save_to_company_export_country_model(
-                    instance,
-                    validated_data.get('export_to_countries'),
-                    'currently_exporting',
-                )
-                instance.export_to_countries.set(value)
-            elif key == 'future_interest_countries':
-                self._save_to_company_export_country_model(
-                    instance,
-                    validated_data.get('future_interest_countries'),
-                    'future_interest',
-                )
-                instance.future_interest_countries.set(value)
-            else:
-                setattr(instance, key, value)
+        export_to_countries = validated_data.get('export_to_countries', None)
+        future_interest_countries = validated_data.get('future_interest_countries', None)
+        adviser = validated_data.get('advisor')
 
-        instance.save()
+        company = super().update(instance, validated_data)
 
-        return instance
+        if export_to_countries is not None:
+            self._save_to_company_export_country_model(
+                company=instance,
+                adviser=adviser,
+                export_countries=export_to_countries,
+                status='currently_exporting',
+            )
+
+        if future_interest_countries is not None:
+            self._save_to_company_export_country_model(
+                company=instance,
+                adviser=adviser,
+                export_countries=future_interest_countries,
+                status='future_interest',
+            )
+
+        return company
 
     @staticmethod
-    def _save_to_company_export_country_model(instance, data, status):
-        """
-        Clears all entities for a given company with the given status,
-        before creating the new ones
-        """
-        CompanyExportCountry.objects.filter(company=instance, status=status).all().delete()
+    def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
+        countries_to_keep = []
 
-        for country in data:
-            CompanyExportCountry.objects.create(
+        for country in export_countries:
+            country_query_string = CompanyExportCountry.objects.filter(
                 country=country,
-                company=instance,
-                status=status,
-            ).save()
+                company=company,
+                status=status)
+
+            if country_query_string.exists():
+                country_query_string.update(
+                    modified_by=adviser,
+                    country=country,
+                    company=company,
+                    status=status,
+                )
+            else:
+                CompanyExportCountry.objects.create(
+                    created_by=adviser,
+                    country=country,
+                    company=company,
+                    status=status,
+                ).save()
+
+            countries_to_keep.append(country)
+
+        CompanyExportCountry.objects.exclude(country__in=countries_to_keep).delete()
 
     def validate(self, data):
         """
