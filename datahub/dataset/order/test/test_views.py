@@ -38,6 +38,9 @@ def get_expected_data_from_order(order):
         'invoice__subtotal_cost': get_attr_or_none(order, 'invoice.subtotal_cost'),
         'paid_on': format_date_or_datetime(order.paid_on),
         'primary_market__name': get_attr_or_none(order, 'primary_market.name'),
+        'quote__accepted_on': format_date_or_datetime(
+            get_attr_or_none(order, 'quote.accepted_on'),
+        ),
         'quote__created_on': format_date_or_datetime(get_attr_or_none(order, 'quote.created_on')),
         'reference': order.reference,
         'refund_created': (
