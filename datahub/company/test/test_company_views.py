@@ -1312,16 +1312,30 @@ class TestUpdateCompany(APITestMixin):
         'export_to_countries,future_interest_countries',
         (
             ([Country.cayman_islands.value.id], [Country.canada.value.id]),
-            ([
-                Country.france.value.id,
-                Country.anguilla.value.id,
-                Country.isle_of_man.value.id,
-            ], [
-                Country.argentina.value.id,
-                Country.azerbaijan.value.id,
-                Country.italy.value.id,
-                Country.montserrat.value.id,
-            ]),
+            (
+                [
+                    Country.france.value.id,
+                    Country.anguilla.value.id,
+                    Country.isle_of_man.value.id,
+                ], [
+                    Country.argentina.value.id,
+                    Country.azerbaijan.value.id,
+                    Country.italy.value.id,
+                    Country.montserrat.value.id,
+                ]),
+            (
+                [
+                    Country.france.value.id,
+                    Country.anguilla.value.id,
+                    Country.isle_of_man.value.id,
+                    Country.montserrat.value.id,
+                ],
+                [
+                    Country.argentina.value.id,
+                    Country.azerbaijan.value.id,
+                    Country.italy.value.id,
+                ],
+            ),
         ),
     )
     def test_update_company_export_country_model(
@@ -1331,25 +1345,61 @@ class TestUpdateCompany(APITestMixin):
     ):
         """Test updating export countries to CompanyExportCountry model"""
         def lists_are_equal(
-                benchmark_list,
+                initial_list,
                 current_model_list,
                 new_model_list,
         ):
             """
             Utility fn aimed at hiding the list comprehension from the assertion logic.
             """
-            benchmark_list = benchmark_list.sort()
+            benchmark_list = initial_list.sort()
             current_ids = [_['id'] for _ in current_model_list].sort()
             new_ids = [str(_.country.id) for _ in new_model_list].sort()
 
             if (benchmark_list == current_ids) and (benchmark_list == new_ids):
                 return True
 
+        # prepare the fixtures
+        export_countries_fixture = [
+            CountryModel.objects.get(name='Ivory Coast'),
+            CountryModel.objects.get(name='Botswana'),
+            CountryModel.objects.get(name='Norway'),
+            CountryModel.objects.get(name='Bermuda'),
+            CountryModel.objects.get(name='Colombia'),
+            CountryModel.objects.get(name='France'),
+            CountryModel.objects.get(name='Sierra Leone'),
+        ]
+
+        future_countries_fixture = [
+            CountryModel.objects.get(name='Congo (Democratic Republic)'),
+            CountryModel.objects.get(name='Italy'),
+            CountryModel.objects.get(name='Thailand'),
+            CountryModel.objects.get(name='Argentina'),
+            CountryModel.objects.get(name='Trinidad and Tobago'),
+        ]
+
+        export_ids_fixture = [country.id for country in export_countries_fixture]
+        future_ids_fixture = [country.id for country in future_countries_fixture]
+
         # initialise the models in scope
         company = CompanyFactory(
-            export_to_countries=[],
-            future_interest_countries=[],
+            export_to_countries=export_ids_fixture,
+            future_interest_countries=future_ids_fixture,
         )
+
+        for country in export_countries_fixture:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status='currently_exporting',
+            )
+
+        for country in future_countries_fixture:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status='future_interest',
+            )
 
         CompanyExportCountryFactory(
             country=random_obj_for_model(CountryModel),

@@ -320,18 +320,31 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
     @staticmethod
     def _save_to_company_export_country_model(instance, data, status):
-        """
-        Clears all entities for a given company with the given status,
-        before creating the new ones
-        """
-        CompanyExportCountry.objects.filter(company=instance, status=status).all().delete()
+        all_countries = [item.country for item in list(
+            CompanyExportCountry.objects.filter(company=instance, status=status).all(),
+        )]
 
+        countries_to_keep = []
         for country in data:
-            CompanyExportCountry.objects.create(
+            obj, created = CompanyExportCountry.objects.update_or_create(
                 country=country,
                 company=instance,
                 status=status,
-            ).save()
+            )
+
+            obj.save()
+            countries_to_keep.append(country)
+
+        countries_to_delete = [
+            country for country in all_countries if country not in countries_to_keep
+        ]
+
+        for country in countries_to_delete:
+            CompanyExportCountry.objects.filter(
+                country=country,
+                company=instance,
+                status=status,
+            ).all().delete()
 
     def validate(self, data):
         """
