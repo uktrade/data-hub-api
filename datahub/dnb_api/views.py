@@ -23,6 +23,7 @@ from datahub.dnb_api.serializers import (
     DUNSNumberSerializer,
 )
 from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
@@ -171,7 +172,7 @@ class DNBCompanyCreateView(APIView):
         try:
             dnb_company = get_company(duns_number)
 
-        except (DNBServiceError, DNBServiceInvalidResponse) as exc:
+        except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponse) as exc:
             raise APIUpstreamException(str(exc))
 
         except DNBServiceInvalidRequest as exc:

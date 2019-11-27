@@ -6,15 +6,23 @@ from django.conf import settings
 from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from freezegun import freeze_time
+from requests.exceptions import (
+    ConnectionError,
+    ConnectTimeout,
+    ReadTimeout,
+    Timeout,
+)
 from rest_framework import serializers, status
 from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
+    DNBServiceTimeoutError,
     format_dnb_company,
     get_company,
     update_company_from_dnb,
@@ -66,6 +74,56 @@ def test_get_company_dnb_service_error(
         get_company('123456789')
 
     expected_message = f'DNB service returned an error status: {dnb_response_status}'
+
+    assert e.value.args[0] == expected_message
+    assert len(caplog.records) == 1
+    assert caplog.records[0].getMessage() == expected_message
+
+
+@pytest.mark.parametrize(
+    'request_exception,expected_exception,expected_message',
+    (
+        (
+            ConnectionError,
+            DNBServiceConnectionError,
+            'Encountered an error connecting to DNB service',
+        ),
+        (
+            ConnectTimeout,
+            DNBServiceConnectionError,
+            'Encountered an error connecting to DNB service',
+        ),
+        (
+            Timeout,
+            DNBServiceTimeoutError,
+            'Encountered a timeout interacting with DNB service',
+        ),
+        (
+            ReadTimeout,
+            DNBServiceTimeoutError,
+            'Encountered a timeout interacting with DNB service',
+        ),
+    ),
+)
+def test_get_company_dnb_service_request_error(
+    caplog,
+    requests_mock,
+    dnb_company_search_feature_flag,
+    request_exception,
+    expected_exception,
+    expected_message,
+):
+    """
+    Test if there is an error connecting to dnb-service, we log it and raise the exception with an
+    appropriate message.
+    """
+    requests_mock.post(
+        DNB_SEARCH_URL,
+        exc=request_exception,
+    )
+
+    with pytest.raises(expected_exception) as e:
+        get_company('123456789')
 
     assert e.value.args[0] == expected_message
     assert len(caplog.records) == 1

@@ -1,14 +1,18 @@
 import factory
 import pytest
 from django.conf import settings
+from django.db.utils import IntegrityError
 
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
+    CompanyExportCountryFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
 )
+from datahub.core.test_utils import random_obj_for_model
+from datahub.metadata.models import Country
 
 
 # mark the whole module for db use
@@ -232,3 +236,32 @@ class TestContact:
             company=company_factory(),
         )
         assert str(contact) == expected_output
+
+
+class TestCompanyExportCountry:
+    """Tests Company export country model"""
+
+    def test_str(self):
+        """Test the human friendly string representation of the object"""
+        export_country = CompanyExportCountryFactory()
+        status = f'{export_country.company} {export_country.country} {export_country.status}'
+        assert str(export_country) == status
+
+    def test_unique_constraint(self):
+        """
+        Test unique constraint
+        a company and country combination can't be added more than once
+        """
+        company_1 = CompanyFactory()
+        country = random_obj_for_model(Country)
+
+        CompanyExportCountryFactory(
+            company=company_1,
+            country=country,
+        )
+
+        with pytest.raises(IntegrityError):
+            CompanyExportCountryFactory(
+                company=company_1,
+                country=country,
+            )

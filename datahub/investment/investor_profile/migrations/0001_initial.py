@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('company', '0068_ch_registered_address_postcode_not_null'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('metadata', '0022_add_administrative_area'),
     ]
