@@ -35,6 +35,7 @@ class OMISDatasetView(BaseDatasetView):
             'invoice__subtotal_cost',
             'paid_on',
             'primary_market__name',
+            'quote__accepted_on',
             'quote__created_on',
             'reference',
             'refund_created',

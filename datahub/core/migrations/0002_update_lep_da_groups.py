@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0001_squashed_0007_auto_20170404_1828'),
-        ('investment', '0030_rename_permissions'),
+        ('investment', '0001_squashed_0063_add_created_on_id_index'),
     ]
 
     operations = [

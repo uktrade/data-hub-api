@@ -30,7 +30,7 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             ),
             competing_countries=get_aggregate_subquery(
                 InvestmentProject,
-                ArrayAgg('competitor_countries__id', ordering=('competitor_countries__id',)),
+                ArrayAgg('competitor_countries__name', ordering=('competitor_countries__name',)),
             ),
             delivery_partner_names=get_investment_project_to_many_string_agg_subquery(
                 'delivery_partners__name',

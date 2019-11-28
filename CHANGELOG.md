@@ -1,3 +1,26 @@
+# Data Hub API 23.1.0 (2019-11-28)
+
+
+## Removals
+
+- The `init_es` management command has been removed. Please use `migrate_es` instead.
+
+## Features
+
+- The `migrate_es` management command was updated to handle the case when indexes don‘t already exist.
+
+  Hence, the `init_es` command is no longer required and has been removed.
+
+## Internal changes
+
+- **Companies** The squashed `company` app migration `0001_squashed_0096_company_global_ultimate_duns_number` was transitioned to a normal migration and the migrations it replaced were removed.
+- **Investment** The squashed `investment` app migration `0001_squashed_0068_remove_interaction_location_from_database` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## Database schema
+
+- **Companies** A new table `company_companyexportcountry` was created to maintain company's export interests. Multiple countries along with a status can be recorded for each company. Status being one of `not_interested`, `future_interest` or `currently_exporting`. This will now allow, for each entry, to record date and adviser that created and modified for audit.
+
+
 # Data Hub API 23.0.0 (2019-11-22)
 
 
