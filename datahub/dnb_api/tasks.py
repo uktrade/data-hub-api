@@ -11,6 +11,7 @@ from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceTimeoutError,
+    format_dnb_company,
     get_company,
     get_company_update_page,
     update_company_from_dnb,
@@ -113,17 +114,18 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
 
 
 @shared_task(
-    bind=True,
     acks_late=True,
     priority=9,
-    max_retries=3,
 )
-def update_company(self, data, fields_to_update=None):
+def update_company(company_data, fields_to_update=None):
     """
-    Get the latest updates for D&B companies from dnb-service. This is a stub at
-    the moment and will become a thin wrapper around `utils.update_company_from_dnb`.
+    Update the company from latest data from dnb-service.
     """
-    raise NotImplementedError(
-        data=data,
+    dnb_company = format_dnb_company(company_data)
+    dh_company = Company.objects.get(duns_number=dnb_company['duns_number'])
+    update_company_from_dnb(
+        dh_company,
+        dnb_company,
         fields_to_update=fields_to_update,
+        update_descriptor='celery:company_update',
     )
