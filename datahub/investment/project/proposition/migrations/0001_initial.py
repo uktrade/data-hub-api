@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('investment', '0042_correct_spi_stage_log_created_on_and_ordering'),
+        ('investment', '0001_squashed_0063_add_created_on_id_index'),
     ]
 
     operations = [

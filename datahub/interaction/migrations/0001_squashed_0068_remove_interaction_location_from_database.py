@@ -54,8 +54,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('metadata', '0031_update_services'),
         ('metadata', '0030_add_additional_services'),
-        ('investment', '0001_squashed_0025_remove_non_fdi_type'),
-        ('company', '0001_squashed_0056_number_of_employees'),
+        ('investment', '0001_squashed_0063_add_created_on_id_index'),
         ('metadata', '0037_add_service_hierarchy'),
         ('metadata', '0026_add_index_upper_team_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -63,7 +62,7 @@ class Migration(migrations.Migration):
         ('core', '0003_rename_read_permissions'),
         ('event', '0008_add_service'),
         ('metadata', '0023_add_chinese_regions'),
-        ('company', '0060_trading_names_not_null'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
     ]
 
     operations = [

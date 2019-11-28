@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0001_squashed_0056_number_of_employees'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
         ('omis-quote', '0003_quote_expires_on'),
     ]
 

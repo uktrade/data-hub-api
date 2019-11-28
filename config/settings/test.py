@@ -23,8 +23,9 @@ SEARCH_APPS += [
     'datahub.search.test.search_support.relatedmodel.RelatedModelSearchApp',
 ]
 
-# The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
-ES_INDEX_PREFIX = None
+# Note that the prefix used for indexes created during tests is set dynamically in
+# datahub/search/conftest.py (so that tests can be parallelised).
+ES_INDEX_PREFIX = 'example-prefix'
 ES_INDEX_SETTINGS = {
     **ES_INDEX_SETTINGS,
     'number_of_shards': 1,
