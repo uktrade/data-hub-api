@@ -41,7 +41,7 @@ def get_expected_data_from_project(project):
         'client_relationship_manager_id': str_or_none(project.client_relationship_manager_id),
         'client_requirements': project.client_requirements,
         'competing_countries': (
-            [str(country.id) for country in project.competitor_countries.order_by('id')]
+            [country.name for country in project.competitor_countries.order_by('name')]
             if project.competitor_countries.exists() else [None]
         ),
         'created_by_id': str_or_none(project.created_by_id),
