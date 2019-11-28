@@ -553,3 +553,25 @@ def test_update_company_partial_fields(dnb_response_uk):
         'website': original_company.website,
         'dnb_modified_on': now(),
     }
+
+
+@freeze_time('2019-01-01 11:12:13')
+def test_update_company_does_not_exist(dnb_response_uk, caplog):
+    """
+    Test the update_company command when the company does not exist in Data Hub.
+    """
+    task_result = update_company.apply_async(args=[dnb_response_uk['results'][0]])
+    assert not task_result.successful()
+    assert 'Company matching duns_number was not found' in caplog.text
+
+
+@freeze_time('2019-01-01 11:12:13')
+def test_update_company_fails_validation(dnb_response_uk, caplog):
+    """
+    Test the update_company command when the company data does not pass validation checks.
+    """
+    CompanyFactory(duns_number='123456789')
+    dnb_response_uk['results'][0]['primary_name'] = 'a' * 9999
+    task_result = update_company.apply_async(args=[dnb_response_uk['results'][0]])
+    assert not task_result.successful()
+    assert 'Data from D&B did not pass the Data Hub validation checks.' in caplog.text
