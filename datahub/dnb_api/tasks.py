@@ -122,7 +122,20 @@ def update_company(company_data, fields_to_update=None):
     Update the company from latest data from dnb-service.
     """
     dnb_company = format_dnb_company(company_data)
-    dh_company = Company.objects.get(duns_number=dnb_company['duns_number'])
+    duns_number = dnb_company['duns_number']
+
+    try:
+        dh_company = Company.objects.get(duns_number=duns_number)
+    except Company.DoesNotExist:
+        logger.error(
+            'Company matching duns_number was not found',
+            extra={
+                'duns_number': duns_number,
+                'dnb_company': dnb_company,
+            },
+        )
+        raise
+
     update_company_from_dnb(
         dh_company,
         dnb_company,
