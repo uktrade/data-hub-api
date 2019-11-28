@@ -10,8 +10,6 @@ if [ -z "$SKIP_MI_DATABASE_MIGRATIONS" ]; then
   ./manage.py distributed_migrate --noinput --database mi
 fi
 
-./manage.py init_es
-
 # This command schedules asynchronous Celery tasks, so this checks the app instance index to
 # avoid tasks being scheduled multiple times unnecessarilly
 # (using a similar approach to https://docs.run.pivotal.io/buildpacks/ruby/rake-config.html)

@@ -6,7 +6,7 @@
 dockerize -wait ${POSTGRES_URL} -wait ${MI_POSTGRES_URL} -wait ${ES5_URL} -timeout 120s
 python /app/manage.py migrate
 python /app/manage.py migrate --database mi
-python /app/manage.py init_es
+python /app/manage.py migrate_es
 python /app/manage.py loadinitialmetadata
 
 # TODO abstract this into a method in ./manage.py
@@ -67,6 +67,5 @@ AccessToken.objects.create(
 
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
-python /app/manage.py sync_es --foreground
 python /app/manage.py collectstatic --noinput
 DEBUG=False gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0

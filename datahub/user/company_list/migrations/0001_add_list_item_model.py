@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('company', '0086_add_adviser_name_index'),
+        ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

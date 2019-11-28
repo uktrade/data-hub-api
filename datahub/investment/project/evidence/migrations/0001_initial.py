@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('documents', '0004_add_bucket_id_status_av_reason_constraint'),
-        ('investment', '0047_remove_iprojectdocument'),
+        ('investment', '0001_squashed_0063_add_created_on_id_index'),
     ]
 
     operations = [

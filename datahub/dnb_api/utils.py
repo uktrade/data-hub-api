@@ -91,14 +91,14 @@ def get_company(duns_number):
     """
     try:
         dnb_response = search_dnb({'duns_number': duns_number})
-    except ConnectionError:
+    except ConnectionError as exc:
         error_message = 'Encountered an error connecting to DNB service'
         logger.error(error_message)
-        raise DNBServiceConnectionError(error_message)
-    except Timeout:
+        raise DNBServiceConnectionError(error_message) from exc
+    except Timeout as exc:
         error_message = 'Encountered a timeout interacting with DNB service'
         logger.error(error_message)
-        raise DNBServiceTimeoutError(error_message)
+        raise DNBServiceTimeoutError(error_message) from exc
 
     if dnb_response.status_code != status.HTTP_200_OK:
         error_message = f'DNB service returned an error status: {dnb_response.status_code}'
@@ -267,3 +267,51 @@ def update_company_from_dnb(
         if update_descriptor:
             update_comment = f'{update_comment} [{update_descriptor}]'
         reversion.set_comment(update_comment)
+
+
+def get_company_update_page(last_updated_after, cursor=None):
+    """
+    Get the given company updates page from the dnb-service.
+
+    The request to the dnb-service would look like:
+
+        GET /companies?last_updated_after=2019-11-11T12:00:00&cursor=3465723323
+
+    Where:
+
+        last_updated_after: datetime filter that ensures that only companies
+        updated after the given datetime are returned.
+
+        cursor: dnb-service users DRF's CursorPagination for this paginated list
+        and cursor is a encoded string that identifies a given page.
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    try:
+        response = api_client.request(
+            'GET',
+            'companies/',
+            params={
+                'last_updated_after': last_updated_after,
+                'cursor': cursor or '',
+            },
+            timeout=3.0,
+        )
+
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        logger.error(error_message)
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        logger.error(error_message)
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if response.status_code != status.HTTP_200_OK:
+        error_message = f'DNB service returned an error status: {response.status_code}'
+        logger.error(error_message)
+        raise DNBServiceError(error_message, response.status_code)
+
+    return response.json()
