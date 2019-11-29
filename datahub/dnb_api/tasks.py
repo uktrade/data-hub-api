@@ -48,10 +48,11 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
 )
 def sync_company_with_dnb(self, company_id, fields_to_update=None):
     """
-    Sync a company record with data sourced from DNB. `company_id` identifies the
-    company record to sync and `fields_to_update` defines an iterable of
-    company serializer fields that should be updated - if it is None, all fields
-    will be synced.
+    Sync a company record with data sourced from DNB. This task will interact with dnb-service to
+    get the latest data for the company.
+
+    `company_id` identifies the company record to sync and `fields_to_update` defines an iterable
+    of company serializer fields that should be updated - if it is None, all fields will be synced.
     """
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
@@ -117,11 +118,13 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
     acks_late=True,
     priority=9,
 )
-def update_company(company_data, fields_to_update=None):
+def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
     """
-    Update the company from latest data from dnb-service.
+    Update the company with the latest data from dnb-service. This task should be called
+    when some other logic interacts with dnb-service to get the company data as the task itself
+    will not interact with dnb-service.
     """
-    dnb_company = format_dnb_company(company_data)
+    dnb_company = format_dnb_company(dnb_company_data)
     duns_number = dnb_company['duns_number']
 
     try:
