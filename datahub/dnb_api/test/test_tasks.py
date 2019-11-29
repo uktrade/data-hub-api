@@ -15,7 +15,7 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.tasks import (
     get_company_updates,
     sync_company_with_dnb,
-    update_company,
+    update_company_from_dnb_data,
 )
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
@@ -416,13 +416,13 @@ class TestGetCompanyUpdates:
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_update_company(dnb_response_uk):
+def test_update_company_from_dnb_data(dnb_response_uk):
     """
-    Test the update_company command when all DNB fields are updated.
+    Test the update_company_from_dnb_data command when all DNB fields are updated.
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = update_company.apply_async(args=[dnb_response_uk['results'][0]])
+    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
     assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
@@ -485,13 +485,13 @@ def test_update_company(dnb_response_uk):
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_update_company_partial_fields(dnb_response_uk):
+def test_update_company_from_dnb_data_partial_fields(dnb_response_uk):
     """
-    Test the update_company command when a subset of DNB fields are updated.
+    Test the update_company_from_dnb_data command when a subset of DNB fields are updated.
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = update_company.apply_async(
+    task_result = update_company_from_dnb_data.apply_async(
         args=[dnb_response_uk['results'][0]],
         kwargs={'fields_to_update': ['global_ultimate_duns_number']},
     )
@@ -556,22 +556,23 @@ def test_update_company_partial_fields(dnb_response_uk):
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_update_company_does_not_exist(dnb_response_uk, caplog):
+def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
     """
-    Test the update_company command when the company does not exist in Data Hub.
+    Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
     """
-    task_result = update_company.apply_async(args=[dnb_response_uk['results'][0]])
+    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
     assert not task_result.successful()
     assert 'Company matching duns_number was not found' in caplog.text
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_update_company_fails_validation(dnb_response_uk, caplog):
+def test_update_company_from_dnb_data_fails_validation(dnb_response_uk, caplog):
     """
-    Test the update_company command when the company data does not pass validation checks.
+    Test the update_company_from_dnb_data command when the company data does not pass validation
+    checks.
     """
     CompanyFactory(duns_number='123456789')
     dnb_response_uk['results'][0]['primary_name'] = 'a' * 9999
-    task_result = update_company.apply_async(args=[dnb_response_uk['results'][0]])
+    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
     assert not task_result.successful()
     assert 'Data from D&B did not pass the Data Hub validation checks.' in caplog.text
