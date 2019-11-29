@@ -357,7 +357,7 @@ class TestGetCompanyUpdates:
         )
         mock_update_company = mock.Mock()
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.update_company',
+            'datahub.dnb_api.tasks.update_company_from_dnb_data',
             mock_update_company,
         )
         get_company_updates(fields_to_update=fields_to_update)
