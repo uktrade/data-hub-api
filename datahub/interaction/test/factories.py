@@ -1,8 +1,9 @@
 from uuid import uuid4
 
 import factory
-from django.utils.timezone import utc
+from django.utils.timezone import now, utc
 
+from datahub.company.models import CompanyExportCountry
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
@@ -16,6 +17,7 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.metadata.models import Country
 from datahub.metadata.test.factories import ServiceFactory
 
 
@@ -181,3 +183,17 @@ class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'interaction.InteractionDITParticipant'
+
+
+class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
+    """Factory for Interaction export country."""
+
+    id = factory.LazyFunction(uuid4)
+    interaction = factory.SubFactory(CompanyInteractionFactory)
+    country = factory.LazyFunction(lambda: random_obj_for_model(Country))
+    status = factory.Iterator(tuple(CompanyExportCountry.EXPORT_INTEREST_STATUSES._db_values))
+    created_on = now()
+    created_by = factory.SubFactory(AdviserFactory)
+
+    class Meta:
+        model = 'interaction.InteractionExportCountry'

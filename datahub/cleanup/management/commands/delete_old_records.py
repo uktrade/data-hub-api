@@ -97,6 +97,7 @@ class Command(BaseCleanupCommand):
             # We want to delete the relations below along with any expired interactions
             excluded_relations=(
                 Interaction._meta.get_field('dit_participants'),
+                Interaction._meta.get_field('export_countries'),
             ),
         ),
         # There are no investment projects in the live system with a modified-on date
