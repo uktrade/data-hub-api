@@ -16,7 +16,10 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionExportCountryFactory,
+)
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.project.test.factories import (
     InvestmentActivityFactory, InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
@@ -30,6 +33,7 @@ MAPPINGS = {
     'company.Contact': ContactFactory,
     'event.Event': EventFactory,
     'interaction.Interaction': CompanyInteractionFactory,
+    'interaction.InteractionExportCountry': InteractionExportCountryFactory,
     'investment.InvestmentProject': InvestmentProjectFactory,
     'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory,
     'investment.InvestmentActivity': InvestmentActivityFactory,
