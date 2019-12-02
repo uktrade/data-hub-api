@@ -153,6 +153,10 @@ def dnb_response_uk():
 
 @pytest.fixture
 def dnb_company_updates_response_uk(dnb_response_uk):
+    """
+    Returns a UK based DNB company in the format of the "company update" API endpoint
+    for dnb-service.
+    """
     return {
         **dnb_response_uk,
         'next': None,
