@@ -433,7 +433,8 @@ class TestGetCompanyUpdates:
 
         company.refresh_from_db()
         assert company.name == update_response_body['results'][0]['primary_name']
-        assert company.global_ultimate_duns_number == update_response_body['results'][0]['global_ultimate_duns_number']
+        expected_gu_number = update_response_body['results'][0]['global_ultimate_duns_number']
+        assert company.global_ultimate_duns_number == expected_gu_number
 
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
