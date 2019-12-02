@@ -294,14 +294,14 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         export_to_countries = validated_data.get('export_to_countries', None)
         future_interest_countries = validated_data.get('future_interest_countries', None)
-        adviser = validated_data.get('advisor')
+        adviser_pk = validated_data.get('modified_by').pk
 
         company = super().update(instance, validated_data)
 
         if export_to_countries is not None:
             self._save_to_company_export_country_model(
                 company=instance,
-                adviser=adviser,
+                adviser_pk=adviser_pk,
                 export_countries=export_to_countries,
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
@@ -309,7 +309,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         if future_interest_countries is not None:
             self._save_to_company_export_country_model(
                 company=instance,
-                adviser=adviser,
+                adviser_pk=adviser_pk,
                 export_countries=future_interest_countries,
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
             )
@@ -317,7 +317,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return company
 
     @staticmethod
-    def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
+    def _save_to_company_export_country_model(*, company, adviser_pk, export_countries, status):
         for country in export_countries:
             country_query_string = CompanyExportCountry.objects.filter(
                 country=country,
@@ -326,20 +326,25 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
             if country_query_string.exists():
                 country_query_string.update(
-                    modified_by=adviser,
+                    modified_by_id=adviser_pk,
                     country=country,
                     company=company,
                     status=status,
                 )
             else:
                 CompanyExportCountry.objects.create(
-                    created_by=adviser,
+                    created_by_id=adviser_pk,
                     country=country,
                     company=company,
                     status=status,
                 ).save()
 
-        CompanyExportCountry.objects.exclude(country__in=export_countries).delete()
+        CompanyExportCountry.objects.filter(
+            company=company,
+            status=status,
+        ).exclude(
+            country__in=export_countries,
+        ).delete()
 
     def validate(self, data):
         """
