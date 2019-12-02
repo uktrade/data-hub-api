@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0021_delete_companyclassification'),
+        ('metadata', '0001_squashed_0010_auto_20180613_1553'),
         ('support', '0008_add_person_country'),
     ]
 

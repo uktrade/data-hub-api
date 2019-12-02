@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('event', '0014_update_permissions_django_21'),
-        ('metadata', '0037_add_service_hierarchy'),
     ]
 
     operations = [

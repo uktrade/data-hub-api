@@ -9,7 +9,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('order', '0005_order_billing_company_name'),
     ]
 

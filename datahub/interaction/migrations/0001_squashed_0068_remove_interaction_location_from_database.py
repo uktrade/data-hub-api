@@ -52,16 +52,11 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0031_update_services'),
-        ('metadata', '0030_add_additional_services'),
+        ('metadata', '0001_squashed_0010_auto_20180613_1553'),
         ('investment', '0001_squashed_0063_add_created_on_id_index'),
-        ('metadata', '0037_add_service_hierarchy'),
-        ('metadata', '0026_add_index_upper_team_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('core', '0003_rename_read_permissions'),
         ('event', '0008_add_service'),
-        ('metadata', '0023_add_chinese_regions'),
         ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
     ]
 
