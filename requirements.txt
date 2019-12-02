@@ -83,7 +83,7 @@ pep8-naming==0.9.1
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
 pip-tools==4.3.0
-piprot==0.9.10
+piprot==0.9.11
 pluggy==0.13.0            # via pytest
 prompt-toolkit==2.0.10    # via ipython
 psycogreen==1.0.1
