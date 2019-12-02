@@ -5,6 +5,7 @@ import pytest
 from celery.exceptions import Retry
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
@@ -412,6 +413,57 @@ class TestGetCompanyUpdates:
         get_company_updates()
 
         assert mock_get_company_updates.call_count == call_count
+
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {
+                'next': None,
+                'results': [
+                    {'foo': 1},
+                    {'bar': 2},
+                    {'baz': 2},
+                ],
+            },
+        ),
+    )
+    @freeze_time('2019-01-02T2:00:00')
+    @override_settings(DNB_AUTOMATIC_UPDATE_LIMIT=2)
+    def test_updates_max_update_limit(self, monkeypatch, data):
+        """
+        Test if the update_company task is called with the
+        right parameters for all the records spread across
+        pages.
+        """
+        mock_get_company_update_page = mock.Mock(
+            return_value=data,
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        mock_update_company = mock.Mock()
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.update_company_from_dnb_data',
+            mock_update_company,
+        )
+        get_company_updates()
+
+        assert mock_get_company_update_page.call_count == 1
+        mock_get_company_update_page.assert_called_with(
+            '2019-01-01T00:00:00',
+            None,
+        )
+
+        assert mock_update_company.apply_async.call_count == 2
+        mock_update_company.apply_async.assert_any_call(
+            args=({'foo': 1},),
+            kwargs={'fields_to_update': None},
+        )
+        mock_update_company.apply_async.assert_any_call(
+            args=({'bar': 2},),
+            kwargs={'fields_to_update': None},
+        )
 
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data(

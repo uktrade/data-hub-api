@@ -2,6 +2,7 @@ from datetime import datetime, time, timedelta
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
@@ -57,11 +58,31 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
 
+class UpdateLimitReachedException(Exception):
+    """
+    Logic-flow exception which is raised when settings.DNB_AUTOMATIC_UPDATE_LIMIT
+    is exceeded.
+    """
+
+
+def _spawn_update_tasks(dnb_updates, fields_to_update, update_count, max_updates):
+    for data in dnb_updates:
+        update_company_from_dnb_data.apply_async(
+            args=(data,),
+            kwargs={'fields_to_update': fields_to_update},
+        )
+        update_count += 1
+        if max_updates is not None and update_count >= max_updates:
+            raise UpdateLimitReachedException()
+
+
 def _get_company_updates(task, last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
     cursor = None
+    max_updates = settings.DNB_AUTOMATIC_UPDATE_LIMIT
+    update_count = 0
 
     # TODO: In a following PR, we will bind this loop to an upper-limit
     # on the number of records that we would like to update in a run.
@@ -78,12 +99,16 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
             raise task.retry(exc=exc, countdown=60)
 
-        # Spawn tasks that updates Data Hub companies
-        for data in response.get('results', []):
-            update_company_from_dnb_data.apply_async(
-                args=(data,),
-                kwargs={'fields_to_update': fields_to_update},
+        # Spawn tasks that update Data Hub companies
+        try:
+            _spawn_update_tasks(
+                response.get('results', []),
+                fields_to_update,
+                update_count,
+                max_updates,
             )
+        except UpdateLimitReachedException:
+            break
 
         cursor = response.get('next')
         if cursor is None:
