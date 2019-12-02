@@ -240,6 +240,13 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ACTIVITY_STREAM_OUTGOING_URL` | No | The URL used to read from activity stream |
 | `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
 | `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY` | No | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ADMIN_OAUTH2_ENABLED` | Yes | Enables Django Admin SSO login when is True. |
+| `ADMIN_OAUTH2_BASE_URL` | If `ADMIN_OAUTH2_ENABLED` is set | A base URL of OAuth provider. |
+| `ADMIN_OAUTH2_TOKEN_FETCH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth fetch token path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_USER_PROFILE_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth user profile path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_AUTH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth auth path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_ID` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client ID for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_SECRET` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client secret for Django Admin SSO login. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
@@ -249,6 +256,8 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
 | `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
+| `CSRF_COOKIE_HTTPONLY` | No | Whether to use HttpOnly flag on the CSRF cookie (default=False). |
+| `CSRF_COOKIE_SECURE` | No | Whether to use a secure cookie for the CSRF cookie (default=False). |
 | `DATA_FLOW_API_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_FLOW_API_SECRET_ACCESS_KEY`. The holder of the secret key can access the omis-dataset endpoint by Hawk authentication. |
 | `DATA_FLOW_API_SECRET_ACCESS_KEY` | If `DATA_FLOW_API_ACCESS_KEY_ID` is set | A secret key, corresponding to `DATA_FLOW_API_ACCESS_KEY_ID`. The holder of this key can access the omis-dataset endpoint by Hawk authentication. |
 | `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |

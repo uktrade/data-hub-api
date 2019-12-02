@@ -1,8 +1,0 @@
----
-- model: metadata.service
-  pk: 79824229-fd87-483f-b929-8f2b9531492b
-  fields:
-    disabled_on:
-    name: Investment - IST Aftercare Offered (IST use only)
-    contexts:
-    - investment_project_interaction
