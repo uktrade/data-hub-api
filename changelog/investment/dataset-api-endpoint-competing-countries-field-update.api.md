@@ -1,1 +1,0 @@
-`GET /v4/dataset/investment-projects-dataset`: The `competing_countries` field was updated to return country names rather than ids
