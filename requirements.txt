@@ -63,7 +63,7 @@ importlib-metadata==0.23  # via kombu, pluggy, pytest
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.9.0
+ipython==7.10.1
 jedi==0.15.1              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
