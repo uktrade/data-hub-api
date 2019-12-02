@@ -303,7 +303,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 company=instance,
                 adviser=adviser,
                 export_countries=export_to_countries,
-                status='currently_exporting',
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
 
         if future_interest_countries is not None:
@@ -311,15 +311,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 company=instance,
                 adviser=adviser,
                 export_countries=future_interest_countries,
-                status='future_interest',
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
             )
 
         return company
 
     @staticmethod
     def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
-        countries_to_keep = []
-
         for country in export_countries:
             country_query_string = CompanyExportCountry.objects.filter(
                 country=country,
@@ -341,9 +339,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     status=status,
                 ).save()
 
-            countries_to_keep.append(country)
-
-        CompanyExportCountry.objects.exclude(country__in=countries_to_keep).delete()
+        CompanyExportCountry.objects.exclude(country__in=export_countries).delete()
 
     def validate(self, data):
         """
