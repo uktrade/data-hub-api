@@ -152,6 +152,14 @@ def dnb_response_uk():
 
 
 @pytest.fixture
+def dnb_company_updates_response_uk(dnb_response_uk):
+    return {
+        **dnb_response_uk,
+        'next': None,
+    }
+
+
+@pytest.fixture
 def dnb_company_search_datahub_companies():
     """
     Creates Data Hub companies for hydrating DNB search results with.

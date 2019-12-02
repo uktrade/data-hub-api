@@ -414,16 +414,18 @@ class TestGetCompanyUpdates:
         assert mock_get_company_updates.call_count == call_count
 
     @freeze_time('2019-01-02T2:00:00')
-    def test_updates_with_update_company_from_dnb_data(self, monkeypatch, dnb_response_uk):
+    def test_updates_with_update_company_from_dnb_data(
+        self,
+        monkeypatch,
+        dnb_company_updates_response_uk,
+    ):
         """
         Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when all fields are updated.
         """
         company = CompanyFactory(duns_number='123456789')
-        update_response_body = dnb_response_uk
-        update_response_body['next'] = None
         mock_get_company_update_page = mock.Mock(
-            return_value=update_response_body,
+            return_value=dnb_company_updates_response_uk,
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
@@ -432,25 +434,24 @@ class TestGetCompanyUpdates:
         get_company_updates()
 
         company.refresh_from_db()
-        assert company.name == update_response_body['results'][0]['primary_name']
-        expected_gu_number = update_response_body['results'][0]['global_ultimate_duns_number']
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
+        expected_gu_number = dnb_company['global_ultimate_duns_number']
         assert company.global_ultimate_duns_number == expected_gu_number
 
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
         monkeypatch,
-        dnb_response_uk,
+        dnb_company_updates_response_uk,
     ):
         """
         Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when the fields are only partially updated.
         """
         company = CompanyFactory(duns_number='123456789')
-        update_response_body = dnb_response_uk
-        update_response_body['next'] = None
         mock_get_company_update_page = mock.Mock(
-            return_value=update_response_body,
+            return_value=dnb_company_updates_response_uk,
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
@@ -459,7 +460,8 @@ class TestGetCompanyUpdates:
         get_company_updates(fields_to_update=['name'])
 
         company.refresh_from_db()
-        assert company.name == update_response_body['results'][0]['primary_name']
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
         assert company.global_ultimate_duns_number == ''
 
 
