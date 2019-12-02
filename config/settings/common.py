@@ -75,6 +75,7 @@ LOCAL_APPS = [
     'datahub.investment.investor_profile',
     'datahub.metadata',
     'datahub.oauth',
+    'datahub.oauth.admin.apps.OAuthAdminConfig',
     'datahub.admin_report',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
@@ -224,6 +225,19 @@ AUTHENTICATION_BACKENDS = [
 RESTRICT_ADMIN = env.bool('RESTRICT_ADMIN', False)
 ALLOWED_ADMIN_IPS = env.list('ALLOWED_ADMIN_IPS', default=[])
 ALLOWED_ADMIN_IP_RANGES = env.list('ALLOWED_ADMIN_IP_RANGES', default=[])
+
+# OAuth2 settings to authenticate Django admin users
+
+ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
+if ADMIN_OAUTH2_ENABLED:
+    ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
+    ADMIN_OAUTH2_BASE_URL = env('ADMIN_OAUTH2_BASE_URL')
+    ADMIN_OAUTH2_TOKEN_FETCH_PATH = env('ADMIN_OAUTH2_TOKEN_FETCH_PATH')
+    ADMIN_OAUTH2_USER_PROFILE_PATH = env('ADMIN_OAUTH2_USER_PROFILE_PATH')
+    ADMIN_OAUTH2_AUTH_PATH = env('ADMIN_OAUTH2_AUTH_PATH')
+    ADMIN_OAUTH2_CLIENT_ID = env('ADMIN_OAUTH2_CLIENT_ID')
+    ADMIN_OAUTH2_CLIENT_SECRET = env('ADMIN_OAUTH2_CLIENT_SECRET')
+    ADMIN_OAUTH2_LOGOUT_PATH = env('ADMIN_OAUTH2_LOGOUT_PATH')
 
 # django-oauth-toolkit settings
 
