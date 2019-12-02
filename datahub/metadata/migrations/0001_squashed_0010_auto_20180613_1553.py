@@ -27,48 +27,6 @@ def load_fixtures(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
-        ('metadata', '0002_add_sector_hierarchy'),
-        ('metadata', '0003_remove_sector_name_from_db'),
-        ('metadata', '0004_remove_sector_model_options'),
-        ('metadata', '0005_add_order_to_headquartertype'),
-        ('metadata', '0006_add_service_contexts'),
-        ('metadata', '0007_remove_role'),
-        ('metadata', '0008_add_policy_feedback_service'),
-        ('metadata', '0009_investment_spi_services'),
-        ('metadata', '0010_auto_20180613_1553'),
-        ('metadata', '0011_add_team_tags'),
-        ('metadata', '0012_investment_spi_service_aftercare_offered'),
-        ('metadata', '0013_add_overseas_region'),
-        ('metadata', '0014_investmentprojectstage_exclude_from_investment_flow'),
-        ('metadata', '0015_add_iso_to_country'),
-        ('metadata', '0016_investmentprojectstage_exclude_from_investment_not_null'),
-        ('metadata', '0017_countries_with_iso_data'),
-        ('metadata', '0018_add_sector_cluster_to_sector'),
-        ('metadata', '0019_remove_companyclassification_from_django'),
-        ('metadata', '0020_remove_policy_feedback_context'),
-        ('metadata', '0021_delete_companyclassification'),
-        ('metadata', '0022_add_administrative_area'),
-        ('metadata', '0023_add_chinese_regions'),
-        ('metadata', '0024_populate_other_contexts'),
-        ('metadata', '0025_update_sector_indexes'),
-        ('metadata', '0026_add_index_upper_team_name'),
-        ('metadata', '0027_add_administrative_areas'),
-        ('metadata', '0028_add_requires_service_answers_flow_feature_flag'),
-        ('metadata', '0029_update_services'),
-        ('metadata', '0030_add_additional_services'),
-        ('metadata', '0031_update_services'),
-        ('metadata', '0032_service_order'),
-        ('metadata', '0033_update_services'),
-        ('metadata', '0034_update_services'),
-        ('metadata', '0035_remove_requires_service_answers_flow_feature_flag_from_state'),
-        ('metadata', '0036_remove_requires_service_answers_flow_feature_flag_from_db'),
-        ('metadata', '0037_add_service_hierarchy'),
-        ('metadata', '0038_remove_service_name_from_db'),
-        ('metadata', '0039_update_countries_to_ref_data'),
-    ]
-
     initial = True
 
     dependencies = [

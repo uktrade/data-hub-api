@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('metadata', '0022_add_administrative_area'),
+        ('metadata', '0001_squashed_0010_auto_20180613_1553'),
     ]
 
     operations = [
