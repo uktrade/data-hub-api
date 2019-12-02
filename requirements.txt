@@ -56,7 +56,7 @@ freezegun==0.3.12
 future==0.18.1            # via notifications-python-client
 gevent==1.4.0
 greenlet==0.4.15          # via gevent
-gunicorn==20.0.2
+gunicorn==20.0.4
 icalendar==4.0.3
 idna==2.8                 # via requests
 importlib-metadata==0.23  # via kombu, pluggy, pytest
