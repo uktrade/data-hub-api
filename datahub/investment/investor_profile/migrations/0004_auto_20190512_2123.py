@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('metadata', '0025_update_sector_indexes'),
         ('investor_profile', '0003_auto_20190412_1437'),
     ]
 

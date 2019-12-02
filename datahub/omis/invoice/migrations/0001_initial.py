@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
+        ('metadata', '0001_squashed_0010_auto_20180613_1553'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
