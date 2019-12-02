@@ -81,8 +81,8 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         # Spawn tasks that updates Data Hub companies
         for data in response.get('results', []):
             update_company_from_dnb_data.apply_async(
-                data,
-                fields_to_update=fields_to_update,
+                args=(data,),
+                kwargs={'fields_to_update': fields_to_update},
             )
 
         cursor = response.get('next')
