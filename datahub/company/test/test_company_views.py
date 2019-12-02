@@ -1318,6 +1318,16 @@ class TestUpdateCompany(APITestMixin):
                     Country.italy.value.id,
                 ],
             ),
+            (  # reverse status test
+                [
+                    Country.argentina.value.id,
+                    Country.italy.value.id,
+                ],
+                [
+                    Country.france.value.id,
+                    Country.montserrat.value.id,
+                ],
+            ),
         ),
     )
     def test_update_company_export_country_model(
@@ -1345,7 +1355,7 @@ class TestUpdateCompany(APITestMixin):
         export_countries_fixture = [
             CountryModel.objects.get(name='Ivory Coast'),
             CountryModel.objects.get(name='Botswana'),
-            CountryModel.objects.get(name='Norway'),
+            CountryModel.objects.get(name='Montserrat'),
             CountryModel.objects.get(name='Bermuda'),
             CountryModel.objects.get(name='Colombia'),
             CountryModel.objects.get(name='France'),
