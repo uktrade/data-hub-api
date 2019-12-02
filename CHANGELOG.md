@@ -1,3 +1,31 @@
+# Data Hub API 23.2.0 (2019-12-02)
+
+
+## Features
+
+- **Companies** A celery task was added which takes a dictionary of company data sourced from
+  dnb-service and updates the company record corresponding to it in Data Hub.
+- A celery task called `get_company_updates` was added.
+
+  This task gets all the available company updates from the dnb-service and spawns downstream tasks to apply these updates to D&B matched company records in Data Hub.
+- The views that will replace stock Django Admin method of authentication with Staff SSO were added.
+
+## Bug fixes
+
+- **Companies** Merging two companies (via the admin site) now works when both companies are on the same company list.
+
+## Internal changes
+
+- We are now exposing  `CSRF_COOKIE_SECURE` and `CSRF_COOKIE_HTTPONLY` Django settings 
+  via environment variables.
+- The squashed `metadata` app migration `0001_squashed_0010_auto_20180613_1553` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## API
+
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: The `competing_countries` field was updated to return country names rather than ids
+- **OMIS** `GET /v4/dataset/omis-dataset`: The field `quote__accepted_on` was added to the omis dataset endpoint
+
+
 # Data Hub API 23.1.0 (2019-11-28)
 
 
