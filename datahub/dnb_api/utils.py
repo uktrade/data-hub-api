@@ -163,7 +163,7 @@ def format_dnb_company(dnb_company):
     # Extract companies house number for UK Companies
     registration_numbers = {
         reg['registration_type']: reg.get('registration_number')
-        for reg in dnb_company['registration_numbers']
+        for reg in dnb_company.get('registration_numbers') or []
     }
 
     domain = dnb_company.get('domain')

@@ -11,6 +11,7 @@ from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceTimeoutError,
+    format_dnb_company,
     get_company,
     get_company_update_page,
     update_company_from_dnb,
@@ -47,10 +48,11 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
 )
 def sync_company_with_dnb(self, company_id, fields_to_update=None):
     """
-    Sync a company record with data sourced from DNB. `company_id` identifies the
-    company record to sync and `fields_to_update` defines an iterable of
-    company serializer fields that should be updated - if it is None, all fields
-    will be synced.
+    Sync a company record with data sourced from DNB. This task will interact with dnb-service to
+    get the latest data for the company.
+
+    `company_id` identifies the company record to sync and `fields_to_update` defines an iterable
+    of company serializer fields that should be updated - if it is None, all fields will be synced.
     """
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
@@ -78,7 +80,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
 
         # Spawn tasks that updates Data Hub companies
         for data in response.get('results', []):
-            update_company.apply_async(
+            update_company_from_dnb_data.apply_async(
                 data,
                 fields_to_update=fields_to_update,
             )
@@ -113,17 +115,33 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
 
 
 @shared_task(
-    bind=True,
     acks_late=True,
     priority=9,
-    max_retries=3,
 )
-def update_company(self, data, fields_to_update=None):
+def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
     """
-    Get the latest updates for D&B companies from dnb-service. This is a stub at
-    the moment and will become a thin wrapper around `utils.update_company_from_dnb`.
+    Update the company with the latest data from dnb-service. This task should be called
+    when some other logic interacts with dnb-service to get the company data as the task itself
+    will not interact with dnb-service.
     """
-    raise NotImplementedError(
-        data=data,
+    dnb_company = format_dnb_company(dnb_company_data)
+    duns_number = dnb_company['duns_number']
+
+    try:
+        dh_company = Company.objects.get(duns_number=duns_number)
+    except Company.DoesNotExist:
+        logger.error(
+            'Company matching duns_number was not found',
+            extra={
+                'duns_number': duns_number,
+                'dnb_company': dnb_company,
+            },
+        )
+        raise
+
+    update_company_from_dnb(
+        dh_company,
+        dnb_company,
         fields_to_update=fields_to_update,
+        update_descriptor='celery:company_update',
     )
