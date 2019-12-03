@@ -292,19 +292,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         Using writable nested representations to copy export country elements
         from the `Company` model into the `CompanyExportCountry`.
         """
-        export_to_countries = validated_data.get('export_to_countries', None)
-        future_interest_countries = validated_data.get('future_interest_countries', None)
+        export_to_countries = validated_data.get('export_to_countries')
+        future_interest_countries = validated_data.get('future_interest_countries')
         adviser_pk = self._get_adviser_primary_key(validated_data.get('modified_by'))
 
         company = super().update(instance, validated_data)
-
-        if export_to_countries is not None:
-            self._save_to_company_export_country_model(
-                company=instance,
-                adviser_pk=adviser_pk,
-                export_countries=export_to_countries,
-                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-            )
 
         if future_interest_countries is not None:
             self._save_to_company_export_country_model(
@@ -312,6 +304,14 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 adviser_pk=adviser_pk,
                 export_countries=future_interest_countries,
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            )
+
+        if export_to_countries is not None:
+            self._save_to_company_export_country_model(
+                company=instance,
+                adviser_pk=adviser_pk,
+                export_countries=export_to_countries,
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
 
         CompanyExportCountry.objects.filter(
