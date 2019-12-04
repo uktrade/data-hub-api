@@ -153,6 +153,8 @@ class TestAddServiceDelivery(APITestMixin):
             'service_answers': None,
             'investment_project': None,
             'archived_documents_url_path': '',
+            'were_countries_discussed': request_data.get('were_countries_discussed'),
+            'export_countries': request_data.get('export_countries', []),
             'created_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,

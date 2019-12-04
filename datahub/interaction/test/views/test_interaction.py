@@ -9,8 +9,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Service
+from datahub.company.models.company import CompanyExportCountry
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    ContactFactory,
+)
+from datahub.core.constants import Country, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
@@ -24,6 +29,8 @@ from datahub.interaction.models import (
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
+    ExportCountriesInteractionFactory,
+    InteractionExportCountryFactory,
     InvestmentProjectInteractionFactory,
 )
 from datahub.interaction.test.permissions import (
@@ -80,6 +87,40 @@ class TestAddInteraction(APITestMixin):
                 ],
                 'policy_feedback_notes': 'Policy feedback notes',
                 'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
+            },
+            # export countries in an interaction (export and other)
+            {
+                'theme': Interaction.THEMES.export,
+                'were_countries_discussed': True,
+                'export_countries': [
+                    {
+                        'country': {
+                            'id': Country.canada.value.id,
+                            'name': Country.canada.value.name,
+                        },
+                        'status':
+                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    },
+                ],
+            },
+            {
+                'theme': Interaction.THEMES.other,
+                'were_countries_discussed': True,
+                'export_countries': [
+                    {
+                        'country': {
+                            'id': Country.canada.value.id,
+                            'name': Country.canada.value.name,
+                        },
+                        'status':
+                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    },
+                ],
+            },
+            # normal interaction with no mention of export countries is valid
+            {
+                'were_countries_discussed': False,
+                'export_countries': [],
             },
         ),
     )
@@ -167,6 +208,8 @@ class TestAddInteraction(APITestMixin):
             'service_answers': None,
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
+            'were_countries_discussed': request_data.get('were_countries_discussed'),
+            'export_countries': request_data.get('export_countries', []),
             'created_by': {
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
@@ -623,6 +666,7 @@ class TestGetInteraction(APITestMixin):
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
             InvestmentProjectInteractionFactory,
+            ExportCountriesInteractionFactory,
         ),
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -710,6 +754,17 @@ class TestGetInteraction(APITestMixin):
                 'project_code': interaction.investment_project.project_code,
             } if interaction.investment_project else None,
             'archived_documents_url_path': interaction.archived_documents_url_path,
+            'were_countries_discussed': interaction.were_countries_discussed,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.id),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.all()
+            ],
             'created_by': {
                 'id': str(interaction.created_by.pk),
                 'first_name': interaction.created_by.first_name,
@@ -729,6 +784,36 @@ class TestGetInteraction(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
         }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_non_restricted_user_can_get_multiple_export_countries_interaction(self, permissions):
+        """Test that a user can get an interaction with multiple export countries."""
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = ExportCountriesInteractionFactory()
+        interaction.export_countries.set([
+            InteractionExportCountryFactory(
+                interaction=interaction,
+            )
+            for _ in range(3)
+        ])
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        response_data['export_countries'].sort(key=lambda item: item['country']['name'])
+        assert response_data['export_countries'] == [
+            {
+                'country': {
+                    'id': str(export_country.country.id),
+                    'name': export_country.country.name,
+                },
+                'status': export_country.status,
+            }
+            for export_country in interaction.export_countries.order_by('country__name')
+        ]
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_restricted_user_can_get_associated_investment_project_interaction(self):
@@ -810,6 +895,17 @@ class TestGetInteraction(APITestMixin):
                 'name': interaction.investment_project.name,
                 'project_code': interaction.investment_project.project_code,
             },
+            'were_countries_discussed': interaction.were_countries_discussed,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.id),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.all()
+            ],
             'archived_documents_url_path': interaction.archived_documents_url_path,
             'created_by': {
                 'id': str(interaction.created_by.pk),
@@ -1040,6 +1136,39 @@ class TestUpdateInteraction(APITestMixin):
 
         assert(response.status_code == status.HTTP_400_BAD_REQUEST)
         assert response.data == error_response
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_cant_update_export_countries(self, permissions):
+        """Test that a user can't update export countries in an interaction."""
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = ExportCountriesInteractionFactory()
+        interaction.export_countries.set([
+            InteractionExportCountryFactory(
+                interaction=interaction,
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+            ),
+        ])
+        export_country = interaction.export_countries.first()
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        with pytest.raises(NotImplementedError):
+            api_client.patch(
+                url,
+                data={
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': export_country.country.id,
+                                'name': export_country.country.name,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+            )
 
 
 class TestListInteractions(APITestMixin):
