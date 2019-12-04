@@ -417,13 +417,32 @@ class TestGetCompanyUpdates:
     @pytest.mark.parametrize(
         'data',
         (
+            # Test limit works correctly on the first page
             {
-                'next': None,
-                'results': [
-                    {'foo': 1},
-                    {'bar': 2},
-                    {'baz': 2},
-                ],
+                None: {
+                    'next': None,
+                    'results': [
+                        {'foo': 1},
+                        {'bar': 2},
+                        {'baz': 3},
+                    ],
+                },
+            },
+            # Test limit works correctly on the second page
+            {
+                None: {
+                    'next': 'page2',
+                    'results': [
+                        {'foo': 1},
+                    ],
+                },
+                'page2': {
+                    'next': None,
+                    'results': [
+                        {'bar': 2},
+                        {'baz': 3},
+                    ],
+                },
             },
         ),
     )
@@ -436,7 +455,7 @@ class TestGetCompanyUpdates:
         pages.
         """
         mock_get_company_update_page = mock.Mock(
-            return_value=data,
+            side_effect=lambda _, cursor: data[cursor],
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
@@ -448,12 +467,6 @@ class TestGetCompanyUpdates:
             mock_update_company,
         )
         get_company_updates()
-
-        assert mock_get_company_update_page.call_count == 1
-        mock_get_company_update_page.assert_called_with(
-            '2019-01-01T00:00:00',
-            None,
-        )
 
         assert mock_update_company.apply_async.call_count == 2
         mock_update_company.apply_async.assert_any_call(

@@ -74,6 +74,7 @@ def _spawn_update_tasks(dnb_updates, fields_to_update, update_count, max_updates
         update_count += 1
         if max_updates is not None and update_count >= max_updates:
             raise UpdateLimitReachedException()
+    return update_count
 
 
 def _get_company_updates(task, last_updated_after, fields_to_update):
@@ -101,7 +102,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
 
         # Spawn tasks that update Data Hub companies
         try:
-            _spawn_update_tasks(
+            update_count = _spawn_update_tasks(
                 response.get('results', []),
                 fields_to_update,
                 update_count,
