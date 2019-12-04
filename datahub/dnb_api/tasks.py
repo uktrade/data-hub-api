@@ -83,8 +83,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         response = _get_company_updates_from_api(last_updated_after, cursor, task)
         dnb_company_updates = response.get('results', [])
 
-        if updates_remaining and len(dnb_company_updates) > updates_remaining:
-            dnb_company_updates = dnb_company_updates[:updates_remaining]
+        dnb_company_updates = dnb_company_updates[:updates_remaining]
 
         # Spawn tasks that update Data Hub companies
         for data in dnb_company_updates:
