@@ -58,23 +58,17 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
 
-class UpdateLimitReachedException(Exception):
-    """
-    Logic-flow exception which is raised when settings.DNB_AUTOMATIC_UPDATE_LIMIT
-    is exceeded.
-    """
+def _get_company_updates_from_api(last_updated_after, cursor, task):
+    try:
+        return get_company_update_page(last_updated_after, cursor)
 
+    except DNBServiceError as exc:
+        if is_server_error(exc.status_code):
+            raise task.retry(exc=exc, countdown=60)
+        raise
 
-def _spawn_update_tasks(dnb_updates, fields_to_update, update_count, max_updates):
-    for data in dnb_updates:
-        update_company_from_dnb_data.apply_async(
-            args=(data,),
-            kwargs={'fields_to_update': fields_to_update},
-        )
-        update_count += 1
-        if max_updates is not None and update_count >= max_updates:
-            raise UpdateLimitReachedException()
-    return update_count
+    except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
+        raise task.retry(exc=exc, countdown=60)
 
 
 def _get_company_updates(task, last_updated_after, fields_to_update):
@@ -82,34 +76,27 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
     midnight_yesterday = datetime.combine(yesterday, time.min)
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
     cursor = None
-    max_updates = settings.DNB_AUTOMATIC_UPDATE_LIMIT
-    update_count = 0
+    updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
 
-    # TODO: In a following PR, we will bind this loop to an upper-limit
-    # on the number of records that we would like to update in a run.
     while True:
 
-        try:
-            response = get_company_update_page(last_updated_after, cursor)
+        response = _get_company_updates_from_api(last_updated_after, cursor, task)
+        dnb_company_updates = response.get('results', [])
 
-        except DNBServiceError as exc:
-            if is_server_error(exc.status_code):
-                raise task.retry(exc=exc, countdown=60)
-            raise
-
-        except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
-            raise task.retry(exc=exc, countdown=60)
+        if updates_remaining and len(dnb_company_updates) > updates_remaining:
+            dnb_company_updates = dnb_company_updates[:updates_remaining]
 
         # Spawn tasks that update Data Hub companies
-        try:
-            update_count = _spawn_update_tasks(
-                response.get('results', []),
-                fields_to_update,
-                update_count,
-                max_updates,
+        for data in dnb_company_updates:
+            update_company_from_dnb_data.apply_async(
+                args=(data,),
+                kwargs={'fields_to_update': fields_to_update},
             )
-        except UpdateLimitReachedException:
-            break
+
+        if updates_remaining is not None:
+            updates_remaining -= len(dnb_company_updates)
+            if updates_remaining <= 0:
+                break
 
         cursor = response.get('next')
         if cursor is None:
