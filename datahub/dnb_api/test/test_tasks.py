@@ -294,7 +294,7 @@ class TestGetCompanyUpdates:
             ),
         ),
     )
-    def test_errors(self, monkeypatch, error, expect_retry):
+    def test_errors(self, monkeypatch, error, expect_retry, dnb_company_updates_feature_flag):
         """
         Test the get_company_updates task retries server errors.
         """
@@ -342,7 +342,7 @@ class TestGetCompanyUpdates:
         ),
     )
     @freeze_time('2019-01-02T2:00:00')
-    def test_updates(self, monkeypatch, data, fields_to_update):
+    def test_updates(self, monkeypatch, dnb_company_updates_feature_flag, data, fields_to_update):
         """
         Test if the update_company task is called with the
         right parameters for all the records spread across
@@ -393,7 +393,7 @@ class TestGetCompanyUpdates:
             (True, 1),
         ),
     )
-    def test_lock(self, monkeypatch, lock_acquired, call_count):
+    def test_lock(self, monkeypatch, dnb_company_updates_feature_flag, lock_acquired, call_count):
         """
         Test that the task doesn't run if it cannot acquire
         the advisory_lock.
@@ -482,6 +482,7 @@ class TestGetCompanyUpdates:
     def test_updates_with_update_company_from_dnb_data(
         self,
         monkeypatch,
+        dnb_company_updates_feature_flag,
         dnb_company_updates_response_uk,
     ):
         """
@@ -508,6 +509,7 @@ class TestGetCompanyUpdates:
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
         monkeypatch,
+        dnb_company_updates_feature_flag,
         dnb_company_updates_response_uk,
     ):
         """
@@ -528,6 +530,21 @@ class TestGetCompanyUpdates:
         dnb_company = dnb_company_updates_response_uk['results'][0]
         assert company.name == dnb_company['primary_name']
         assert company.global_ultimate_duns_number == ''
+
+    def test_feature_flag_inactive_no_updates(
+        self,
+        monkeypatch,
+    ):
+        """
+        Test that when the DNB company updates feature flag is inactive, the task does not proceed.
+        """
+        mocked_get_company_update_page = mock.Mock()
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mocked_get_company_update_page,
+        )
+        get_company_updates()
+        assert mocked_get_company_update_page.call_count == 0
 
 
 @freeze_time('2019-01-01 11:12:13')

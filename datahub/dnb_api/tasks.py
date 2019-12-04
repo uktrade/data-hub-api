@@ -8,6 +8,7 @@ from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
+from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_UPDATES
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
@@ -17,6 +18,7 @@ from datahub.dnb_api.utils import (
     get_company_update_page,
     update_company_from_dnb,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 
 logger = get_task_logger(__name__)
 
@@ -117,6 +119,14 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
     task goes through the pages and spawns tasks that update the records in
     Data Hub.
     """
+    # TODO: remove this feature flag after a reasonable period after going live
+    # with unlimited company updates
+    if not is_feature_flag_active(FEATURE_FLAG_DNB_COMPANY_UPDATES):
+        logger.info(
+            f'Feature flag "{FEATURE_FLAG_DNB_COMPANY_UPDATES}" is not active, exiting.',
+        )
+        return
+
     with advisory_lock('get_company_updates', wait=False) as acquired:
 
         if not acquired:
