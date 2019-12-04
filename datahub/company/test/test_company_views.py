@@ -1,5 +1,7 @@
+import random
 import uuid
 from datetime import datetime
+from operator import attrgetter, itemgetter
 
 import factory
 import pytest
@@ -1291,21 +1293,8 @@ class TestUpdateCompany(APITestMixin):
             assert response_data['headquarter_type'] == error
 
     @pytest.mark.parametrize(
-        'export_to_countries,future_interest_countries',
+        'export_to_countries,future_interest_countries,duplicate_data_entry',
         (
-            ([Country.cayman_islands.value.id], [Country.canada.value.id]),
-            (
-                [
-                    Country.france.value.id,
-                    Country.anguilla.value.id,
-                    Country.isle_of_man.value.id,
-                ], [
-                    Country.argentina.value.id,
-                    Country.azerbaijan.value.id,
-                    Country.italy.value.id,
-                    Country.montserrat.value.id,
-                ],
-            ),
             (  # reverse status test
                 [
                     Country.argentina.value.id,
@@ -1315,6 +1304,19 @@ class TestUpdateCompany(APITestMixin):
                     Country.france.value.id,
                     Country.montserrat.value.id,
                 ],
+                False,
+            ),
+            (  # same status test
+                [
+                    Country.argentina.value.id,
+                    Country.france.value.id,
+                    Country.montserrat.value.id,
+                ],
+                [
+                    Country.argentina.value.id,
+                    Country.france.value.id,
+                ],
+                True,
             ),
         ),
     )
@@ -1322,9 +1324,39 @@ class TestUpdateCompany(APITestMixin):
             self,
             export_to_countries,
             future_interest_countries,
+            duplicate_data_entry,
     ):
         """Test updating export countries to CompanyExportCountry model"""
-        company = self.before_each_company_export_country_assertion()
+        # prepare the fixtures
+
+        export_countries_fixture = list(set(CountryModel.objects.all().order_by('?')[:7]))
+        future_countries_fixture = list(set(CountryModel.objects.all().order_by('?')[:5]))
+
+        export_ids_fixture = [country.id for country in export_countries_fixture]
+        future_ids_fixture = [country.id for country in future_countries_fixture]
+
+        export_to_countries = set(export_to_countries)
+        future_interest_countries = set(future_interest_countries)
+
+        # initialise the models in scope
+        company = CompanyFactory(
+            export_to_countries=export_ids_fixture,
+            future_interest_countries=future_ids_fixture,
+        )
+
+        for country in export_countries_fixture:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            )
+
+        for country in future_countries_fixture:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            )
 
         # now update them
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
@@ -1349,154 +1381,245 @@ class TestUpdateCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        assert self.company_export_country_lists_are_equal(
-            export_to_countries,
-            response_data['export_to_countries'],
-            company_export_country_currently_exporting_data,
+        assert sorted(export_to_countries) == sorted(
+            [country['id'] for country in response_data['export_to_countries']],
         )
+        assert sorted(export_to_countries) == sorted([
+            str(_.country.id) for _ in company_export_country_currently_exporting_data
+        ])
 
-        assert self.company_export_country_lists_are_equal(
-            future_interest_countries,
-            response_data['future_interest_countries'],
-            company_export_country_future_interest_data,
-        )
+        if not duplicate_data_entry:
+            assert sorted(future_interest_countries) == sorted(
+                [country['id'] for country in response_data['future_interest_countries']])
+            assert sorted(future_interest_countries) == sorted([
+                str(_.country.id) for _ in company_export_country_future_interest_data
+            ])
+        else:
+            duplicates = set(export_to_countries) & set(future_interest_countries)
 
-    @pytest.mark.parametrize(
-        'export_to_countries,future_interest_countries,duplicate_data_entry',
-        (
-            (  # same status test
-                [
-                    Country.argentina.value.id,
-                    Country.france.value.id,
-                    Country.montserrat.value.id,
-                ],
-                [
-                    Country.argentina.value.id,
-                    Country.france.value.id,
-                ],
-                True,
-            ),
-        ),
-    )
-    def test_update_company_export_country_model_duplicates(
-            self,
-            export_to_countries,
-            future_interest_countries,
-            duplicate_data_entry,
-    ):
+            new_ids = [str(_.country.id) for _ in company_export_country_future_interest_data]
+
+            assert len(new_ids) == len(future_interest_countries) - len(duplicates)
+
+    @staticmethod
+    def update_company_export_country_model(*, self, new_countries, field, company, model_status):
         """
-        Test updating export countries to CompanyExportCountry model
-        when duplicate status is submitted
+        Standard action for updating the model with
+        the given data and returning the actual response
         """
-        def duplicates_are_handled_correctly(
-                initial_list,
-                current_model_list,
-                new_model_list,
-        ):
-            duplicates = []
-            for i in export_to_countries:
-                for j in future_interest_countries:
-                    if i == j:
-                        duplicates.append(i)
-
-            benchmark_list = sorted(initial_list)
-            # current_ids = sorted([_['id'] for _ in current_model_list])
-            new_ids = sorted([str(_.country.id) for _ in new_model_list])
-
-            if len(new_ids) == len(benchmark_list) - len(duplicates):
-                return True
-
-        company = self.before_each_company_export_country_assertion()
-
-        # now update them
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
-                'export_to_countries': export_to_countries,
-                'future_interest_countries': future_interest_countries,
+                field: [country.id for country in new_countries],
             },
         )
         response_data = response.json()
 
-        company_export_country_future_interest_data = list(CompanyExportCountry.objects.filter(
+        response_data[field].sort(key=itemgetter('id'))
+        new_countries.sort(key=attrgetter('pk'))
+
+        actual_response_country_ids = [
+            country['id'] for country in response_data[field]
+        ]
+
+        actual_export_countries = CompanyExportCountry.objects.filter(
             company=company,
-            status='future_interest',
-        ))
+            status=model_status,
+        ).order_by(
+            'country__pk',
+        )
 
-        assert response.status_code == status.HTTP_200_OK
+        return response, actual_export_countries, actual_response_country_ids
 
-        if duplicate_data_entry:
-            assert duplicates_are_handled_correctly(
-                future_interest_countries,
-                response_data['future_interest_countries'],
-                company_export_country_future_interest_data,
+    @pytest.mark.parametrize(
+        'field,model_status',
+        (
+            ('export_to_countries',
+             CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting),
+            ('future_interest_countries',
+             CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest),
+        ),
+    )
+    def test_adding_to_empty_company_export_to_country_model(
+            self,
+            field,
+            model_status,
+    ):
+        """Test adding export countries to an empty CompanyExportCountry model"""
+        company = CompanyFactory(
+            **{field: []},
+        )
+        new_countries = list(CountryModel.objects.order_by('?')[:2])
+
+        # now update them
+        response, actual_export_countries, actual_response_country_ids = \
+            self.update_company_export_country_model(
+                self=self,
+                new_countries=new_countries,
+                field=field,
+                company=company,
+                model_status=model_status,
             )
 
-    @staticmethod
-    def before_each_company_export_country_assertion():
-        """
-        Used to prepare the company data for CompanyExportCountry tests
-        :return: company
-        """
-        # prepare the fixtures
-        export_countries_fixture = [
-            CountryModel.objects.get(name='Ivory Coast'),
-            CountryModel.objects.get(name='Botswana'),
-            CountryModel.objects.get(name='Montserrat'),
-            CountryModel.objects.get(name='Bermuda'),
-            CountryModel.objects.get(name='Colombia'),
-            CountryModel.objects.get(name='France'),
-            CountryModel.objects.get(name='Sierra Leone'),
-        ]
+        assert response.status_code == status.HTTP_200_OK
+        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert [export_country.country for export_country in actual_export_countries]\
+            == new_countries
 
-        future_countries_fixture = [
-            CountryModel.objects.get(name='Congo (Democratic Republic)'),
-            CountryModel.objects.get(name='Italy'),
-            CountryModel.objects.get(name='Thailand'),
-            CountryModel.objects.get(name='Argentina'),
-            CountryModel.objects.get(name='Trinidad and Tobago'),
-        ]
+    @pytest.mark.parametrize(
+        'field,model_status',
+        (
+            ('export_to_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+             ),
+            ('future_interest_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+             ),
+        ),
+    )
+    def test_changing_company_export_to_country_model(
+            self,
+            field,
+            model_status,
+    ):
+        """Test changing export countries to completely new ones on CompanyExportCountry model"""
+        existing_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
+        # initialise the models in scope
+        company = CompanyFactory(
+            **{
+                field: existing_countries,
+            },
+        )
 
-        export_ids_fixture = [country.id for country in export_countries_fixture]
-        future_ids_fixture = [country.id for country in future_countries_fixture]
+        for country in existing_countries:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status=model_status,
+            )
+
+        random_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
+        new_countries = [country for country in random_countries
+                         if country not in existing_countries]
+
+        # now update them
+        response, actual_export_countries, actual_response_country_ids = \
+            self.update_company_export_country_model(
+                self=self,
+                new_countries=new_countries,
+                field=field,
+                company=company,
+                model_status=model_status,
+            )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert [export_country.country for export_country in actual_export_countries] \
+            == new_countries
+
+    @pytest.mark.parametrize(
+        'field,model_status',
+        (
+            ('export_to_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+             ),
+            ('future_interest_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+             ),
+        ),
+    )
+    def test_appending_new_items_to_existing_ones_in_company_export_to_country_model(
+            self,
+            field,
+            model_status,
+    ):
+        """
+        Test appending new export countries to
+        an existing items in CompanyExportCountry model
+        """
+        existing_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
+        # initialise the models in scope
+        company = CompanyFactory(
+            **{
+                field: existing_countries,
+            },
+        )
+
+        for country in existing_countries:
+            CompanyExportCountryFactory(
+                country=country,
+                company=company,
+                status=model_status,
+            )
+
+        new_countries = existing_countries + list(CountryModel.objects.order_by('?')[:0])
+
+        # now update them
+        response, actual_export_countries, actual_response_country_ids =\
+            self.update_company_export_country_model(
+                self=self,
+                new_countries=new_countries,
+                field=field,
+                company=company,
+                model_status=model_status,
+            )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert [export_country.country for export_country in actual_export_countries] \
+            == new_countries
+
+    @pytest.mark.parametrize(
+        'field,model_status',
+        (
+            ('export_to_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+             ),
+            ('future_interest_countries',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+             ),
+        ),
+    )
+    def test_adding_overlapping_countries_in_company_export_to_country_model(
+            self,
+            field,
+            model_status,
+    ):
+        """Test adding overlapping countries to an existing items in CompanyExportCountry model"""
+        countries = list(CountryModel.objects.order_by('?')[:10])
+
+        existing_countries = countries[:4]
+        new_countries = countries[:6]
 
         # initialise the models in scope
         company = CompanyFactory(
-            export_to_countries=export_ids_fixture,
-            future_interest_countries=future_ids_fixture,
+            **{
+                field: existing_countries,
+            },
         )
 
-        for country in export_countries_fixture:
+        for country in existing_countries:
             CompanyExportCountryFactory(
                 country=country,
                 company=company,
-                status='currently_exporting',
+                status=model_status,
             )
 
-        for country in future_countries_fixture:
-            CompanyExportCountryFactory(
-                country=country,
+        # now update them
+        response, actual_export_countries, actual_response_country_ids =\
+            self.update_company_export_country_model(
+                self=self,
+                new_countries=new_countries,
+                field=field,
                 company=company,
-                status='future_interest',
+                model_status=model_status,
             )
-        return company
 
-    @staticmethod
-    def company_export_country_lists_are_equal(
-            initial_list,
-            current_model_list,
-            new_model_list,
-    ):
-        """
-        Utility fn aimed at hiding the list comprehension from the assertion logic.
-        """
-        benchmark_list = sorted(initial_list)
-        current_ids = sorted([_['id'] for _ in current_model_list])
-        new_ids = sorted([str(_.country.id) for _ in new_model_list])
-
-        if (benchmark_list == current_ids) and (benchmark_list == new_ids):
-            return True
+        assert response.status_code == status.HTTP_200_OK
+        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert [export_country.country for export_country in actual_export_countries]\
+            == new_countries
 
     @pytest.mark.parametrize(
         'score',
