@@ -1,4 +1,6 @@
+import urllib.parse as urlparse
 from datetime import datetime, time, timedelta
+from urllib.parse import parse_qs
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -73,6 +75,16 @@ def _get_company_updates_from_api(last_updated_after, cursor, task):
         raise task.retry(exc=exc, countdown=60)
 
 
+def _get_cursor(url):
+    if not url:
+        return None
+    parsed = urlparse.urlparse(url)
+    try:
+        return parse_qs(parsed.query).get('cursor')[0]
+    except IndexError:
+        return None
+
+
 def _get_company_updates(task, last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
@@ -99,7 +111,8 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             if updates_remaining <= 0:
                 break
 
-        cursor = response.get('next')
+        next_page = response.get('next')
+        cursor = _get_cursor(next_page)
         if cursor is None:
             break
 

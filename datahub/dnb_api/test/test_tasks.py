@@ -320,7 +320,7 @@ class TestGetCompanyUpdates:
         (
             {
                 None: {
-                    'next': 'page2',
+                    'next': 'http://foo.bar/companies?cursor=page2',
                     'results': [
                         {'foo': 1},
                         {'bar': 2},
@@ -432,7 +432,7 @@ class TestGetCompanyUpdates:
             # Test limit works correctly on the second page
             {
                 None: {
-                    'next': 'page2',
+                    'next': 'http://foo.bar/companies?cursor=page2',
                     'results': [
                         {'foo': 1},
                     ],
