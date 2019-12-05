@@ -230,6 +230,7 @@ def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
         sync_company_with_dnb(company.id)
 
 
+@pytest.mark.usefixtures('dnb_company_updates_feature_flag')
 class TestGetCompanyUpdates:
     """
     Tests for the get_company_updates task and the associated _get_company_updates function.
@@ -528,6 +529,21 @@ class TestGetCompanyUpdates:
         dnb_company = dnb_company_updates_response_uk['results'][0]
         assert company.name == dnb_company['primary_name']
         assert company.global_ultimate_duns_number == ''
+
+
+def test_get_company_updates_feature_flag_inactive_no_updates(
+    monkeypatch,
+):
+    """
+    Test that when the DNB company updates feature flag is inactive, the task does not proceed.
+    """
+    mocked_get_company_update_page = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.dnb_api.tasks.get_company_update_page',
+        mocked_get_company_update_page,
+    )
+    get_company_updates()
+    assert mocked_get_company_update_page.call_count == 0
 
 
 @freeze_time('2019-01-01 11:12:13')
