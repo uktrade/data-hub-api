@@ -4,6 +4,7 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models
+from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -19,6 +20,7 @@ from datahub.company.models import (
     OneListTier,
 )
 from datahub.company.validators import (
+    DuplicateExportCountryValidator,
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
 )
@@ -195,6 +197,18 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
+class CompanyExportCountrySerializer(serializers.ModelSerializer):
+    """
+    CompanyExportCountry serializer.
+    """
+
+    country = NestedRelatedField(meta_models.Country)
+
+    class Meta:
+        model = CompanyExportCountry
+        fields = ('country', 'status')
+
+
 class CompanySerializer(PermittedFieldsModelSerializer):
     """
     Base Company read/write serializer
@@ -269,6 +283,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         allow_null=True,
     )
     address = AddressSerializer(source_model=Company, address_source_prefix='address')
+
+    export_countries = CompanyExportCountrySerializer(many=True, required=False)
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
     serializer_field_mapping = {
@@ -425,6 +441,66 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
+    @atomic
+    def create(self, validated_data):
+        """
+        Create a company.
+
+        Overridden to handle updating of export_countries.
+        """
+        export_countries = validated_data.pop('export_countries', None)
+        adviser = validated_data.get('created_by')
+
+        company = super().create(validated_data)
+        if export_countries is not None:
+            self._update_export_countries(company, export_countries, adviser)
+
+        return company
+
+    @atomic
+    def update(self, instance, validated_data):
+        """
+        Using writable nested representations to copy export country elements
+        from the `Company` model into the `CompanyExportCountry`.
+        """
+        validated_export_countries = validated_data.pop('export_countries', None)
+        adviser = validated_data.get('modified_by')
+
+        company = super().update(instance, validated_data)
+
+        if validated_export_countries is not None:
+            self._update_export_countries(instance, validated_export_countries, adviser)
+
+        return company
+
+    def _update_export_countries(self, company, validated_export_countries, adviser):
+        """
+        Adds/updates export countries related to a company within validated_export_countries.
+        And removes existing ones that are not in the list.
+        """
+        for item in validated_export_countries:
+            country = meta_models.Country.objects.get(id=item['country'].id)
+            status = item['status']
+            company.add_export_country(
+                country=country,
+                status=status,
+                record_date=company.modified_on,
+                adviser=adviser,
+            )
+
+        existing_countries = [item.country for item in CompanyExportCountry.objects.all()]
+        new_countries = [
+            meta_models.Country.objects.get(id=item['country'].id)
+            for item in validated_export_countries
+        ]
+        countries_delta = list(set(existing_countries) - set(new_countries))
+
+        if countries_delta:
+            CompanyExportCountry.objects.filter(
+                company=company,
+                country__in=countries_delta,
+            ).delete()
+
     class Meta:
         model = Company
         fields = (
@@ -474,6 +550,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_global_ultimate',
             'global_ultimate_duns_number',
             'dnb_modified_on',
+            'export_countries',
         )
         read_only_fields = (
             'archived',
@@ -507,6 +584,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'registered_address',
         )
         validators = (
+            DuplicateExportCountryValidator(),
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
             RulesBasedValidator(
                 ValidationRule(

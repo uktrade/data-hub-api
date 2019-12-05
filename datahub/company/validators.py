@@ -1,5 +1,6 @@
 import re
 
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 _INVALID_COMPANY_NUMBER_RE = re.compile(r'[^A-Z0-9]')
@@ -31,3 +32,35 @@ def has_uk_establishment_number_prefix(value):
 def has_no_invalid_company_number_characters(value):
     """Checks if a UK establishment number only has valid characters."""
     return not value or not _INVALID_COMPANY_NUMBER_RE.search(value)
+
+
+class DuplicateExportCountryValidator:
+    """
+    Validates that same country is not supplied more than once
+    within list of export_countries.
+    """
+
+    def __init__(self):
+        """Initialises the validator."""
+        self.instance = None
+
+    def set_context(self, serializer):
+        """Saves a reference to the model object."""
+        self.instance = serializer.instance
+
+    def __call__(self, data):
+        """Performs validation."""
+        export_countries = data.get('export_countries', None)
+
+        if not export_countries:
+            return
+
+        deduped = set()
+        for item in export_countries:
+            country = item['country']
+            if country in deduped:
+                raise serializers.ValidationError(
+                    "Same country can't be added more than once to export_countries.",
+                    code='duplicate_export_country',
+                )
+            deduped.add(country)
