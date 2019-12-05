@@ -1,6 +1,4 @@
-import urllib.parse as urlparse
 from datetime import datetime, time, timedelta
-from urllib.parse import parse_qs
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
