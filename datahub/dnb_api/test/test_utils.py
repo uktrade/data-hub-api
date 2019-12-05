@@ -439,12 +439,12 @@ class TestGetCompanyUpdatePage:
         ),
     )
     @pytest.mark.parametrize(
-        'cursor', (
+        'next_page', (
             None,
-            'some-cursor',
+            'http://some.url/endpoint?cursor=some-cursor',
         ),
     )
-    def test_valid(self, requests_mock, last_updated_after, cursor):
+    def test_valid(self, requests_mock, last_updated_after, next_page):
         """
         Test if `get_company_update_page` returns the right response
         on the happy-path.
@@ -457,14 +457,16 @@ class TestGetCompanyUpdatePage:
             ],
         }
         mocker = requests_mock.get(
-            DNB_UPDATES_URL,
+            next_page if next_page else DNB_UPDATES_URL,
             status_code=status.HTTP_200_OK,
             json=expected_response,
         )
-        response = get_company_update_page(last_updated_after, cursor)
+        response = get_company_update_page(last_updated_after, next_page)
 
-        assert mocker.last_request.qs.get('last_updated_after') == [last_updated_after]
-        assert mocker.last_request.qs.get('cursor') == [cursor or '']
+        if next_page:
+            assert mocker.last_request.url == next_page
+        else:
+            assert mocker.last_request.qs.get('last_updated_after') == [last_updated_after]
 
         assert response == expected_response
 

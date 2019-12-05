@@ -326,7 +326,7 @@ class TestGetCompanyUpdates:
                         {'bar': 2},
                     ],
                 },
-                'page2': {
+                'http://foo.bar/companies?cursor=page2': {
                     'next': None,
                     'results': [
                         {'baz': 3},
@@ -350,7 +350,7 @@ class TestGetCompanyUpdates:
         pages.
         """
         mock_get_company_update_page = mock.Mock(
-            side_effect=lambda _, cursor: data[cursor],
+            side_effect=lambda _, next_page: data[next_page],
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
@@ -370,7 +370,7 @@ class TestGetCompanyUpdates:
         )
         mock_get_company_update_page.assert_any_call(
             '2019-01-01T00:00:00',
-            'page2',
+            'http://foo.bar/companies?cursor=page2',
         )
 
         assert mock_update_company.apply_async.call_count == 3
@@ -437,7 +437,7 @@ class TestGetCompanyUpdates:
                         {'foo': 1},
                     ],
                 },
-                'page2': {
+                'http://foo.bar/companies?cursor=page2': {
                     'next': None,
                     'results': [
                         {'bar': 2},
@@ -456,7 +456,7 @@ class TestGetCompanyUpdates:
         pages.
         """
         mock_get_company_update_page = mock.Mock(
-            side_effect=lambda _, cursor: data[cursor],
+            side_effect=lambda _, next_page: data[next_page],
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
