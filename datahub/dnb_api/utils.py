@@ -269,7 +269,7 @@ def update_company_from_dnb(
         reversion.set_comment(update_comment)
 
 
-def get_company_update_page(last_updated_after, cursor=None):
+def get_company_update_page(last_updated_after, next_page=None):
     """
     Get the given company updates page from the dnb-service.
 
@@ -288,15 +288,19 @@ def get_company_update_page(last_updated_after, cursor=None):
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
+    request_kwargs = {'timeout': 3.0}
+    url = next_page
+    if not next_page:
+        request_kwargs['params'] = {
+            'last_updated_after': last_updated_after,
+        }
+        url = 'companies/'
+
     try:
         response = api_client.request(
             'GET',
-            'companies/',
-            params={
-                'last_updated_after': last_updated_after,
-                'cursor': cursor or '',
-            },
-            timeout=3.0,
+            url,
+            **request_kwargs,
         )
 
     except ConnectionError as exc:

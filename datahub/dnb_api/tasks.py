@@ -60,9 +60,9 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
 
-def _get_company_updates_from_api(last_updated_after, cursor, task):
+def _get_company_updates_from_api(last_updated_after, next_page, task):
     try:
-        return get_company_update_page(last_updated_after, cursor)
+        return get_company_update_page(last_updated_after, next_page)
 
     except DNBServiceError as exc:
         if is_server_error(exc.status_code):
@@ -77,12 +77,12 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
-    cursor = None
+    next_page = None
     updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
 
     while True:
 
-        response = _get_company_updates_from_api(last_updated_after, cursor, task)
+        response = _get_company_updates_from_api(last_updated_after, next_page, task)
         dnb_company_updates = response.get('results', [])
 
         dnb_company_updates = dnb_company_updates[:updates_remaining]
@@ -99,8 +99,8 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             if updates_remaining <= 0:
                 break
 
-        cursor = response.get('next')
-        if cursor is None:
+        next_page = response.get('next')
+        if next_page is None:
             break
 
 
