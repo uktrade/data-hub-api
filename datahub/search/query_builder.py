@@ -132,7 +132,7 @@ def build_autocomplete_query(es_model, keyword_search, limit, fields_to_include,
     }
 
     if context:
-        completion_dict['context'] = context
+        completion_dict['contexts'] = context
 
     return autocomplete_search.suggest(
         'autocomplete',

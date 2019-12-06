@@ -341,7 +341,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                         'completion': {
                             'field': 'suggest',
                             'size': 1,
-                            'context': {'country': [CountryConstant.canada.value.id]},
+                            'contexts': {'country': [CountryConstant.canada.value.id]},
                         },
                         'text': 'goodbye',
                     },
@@ -360,7 +360,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                         'completion': {
                             'field': 'suggest',
                             'size': 1,
-                            'context': {'country': 'hello'},
+                            'contexts': {'country': 'hello'},
                         },
                         'text': 'goodbye',
                     },
