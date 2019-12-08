@@ -479,9 +479,11 @@ class TestGetCompanyUpdates:
             kwargs={'fields_to_update': None},
         )
 
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data(
         self,
+        mocked_write_audit_log,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -497,17 +499,29 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.get_company_update_page',
             mock_get_company_update_page,
         )
-        get_company_updates()
+        task_result = get_company_updates.apply()
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
         assert company.name == dnb_company['primary_name']
         expected_gu_number = dnb_company['global_ultimate_duns_number']
         assert company.global_ultimate_duns_number == expected_gu_number
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 0,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
 
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
+        mocked_write_audit_log,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -523,12 +537,67 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.get_company_update_page',
             mock_get_company_update_page,
         )
-        get_company_updates(fields_to_update=['name'])
+        task_result = get_company_updates.apply(kwargs={'fields_to_update': ['name']})
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
         assert company.name == dnb_company['primary_name']
         assert company.global_ultimate_duns_number == ''
+
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 0,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
+
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @freeze_time('2019-01-02T2:00:00')
+    def test_updates_with_update_company_from_dnb_data_with_failure(
+        self,
+        mocked_write_audit_log,
+        monkeypatch,
+        dnb_company_updates_response_uk,
+    ):
+        """
+        Test full integration for the `get_company_updates` task with the
+        `update_company_from_dnb_data` task when all fields are updated and one company in the
+        dnb-service result does not exist in Data Hub.
+        """
+        company = CompanyFactory(duns_number='123456789')
+        missing_dnb_company = {
+            **dnb_company_updates_response_uk['results'][0],
+            'duns_number': '999999999',
+        }
+        dnb_company_updates_response_uk['results'].append(missing_dnb_company)
+        mock_get_company_update_page = mock.Mock(
+            return_value=dnb_company_updates_response_uk,
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        task_result = get_company_updates.apply()
+
+        company.refresh_from_db()
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
+        expected_gu_number = dnb_company['global_ultimate_duns_number']
+        assert company.global_ultimate_duns_number == expected_gu_number
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 1,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
 
 
 def test_get_company_updates_feature_flag_inactive_no_updates(

@@ -1,5 +1,6 @@
 from datetime import datetime, time, timedelta
 
+import sentry_sdk
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -60,6 +61,39 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
 
+def _write_audit_log(audit):
+    """
+    Push out an audit log to sentry as an info level message.
+    """
+    with sentry_sdk.push_scope() as scope:
+        for key, value in audit.items():
+            scope.set_extra(key, value)
+        sentry_sdk.capture_message('get_company_updates task completed.')
+
+
+def _record_audit(update_results, producer_task, start_time):
+    """
+    Record an audit log for the get_company_updates task which expresses the number
+    of companies successfully updates, failures, ids of companies updated, celery
+    task info and start/end times.
+    """
+    audit = {
+        'success_count': 0,
+        'failure_count': 0,
+        'updated_company_ids': [],
+        'producer_task_id': producer_task.request.id,
+        'start_time': start_time.isoformat(),
+        'end_time': now().isoformat(),
+    }
+    for result in update_results:
+        if result.successful():
+            audit['success_count'] += 1
+            audit['updated_company_ids'].append(result.result)
+        else:
+            audit['failure_count'] += 1
+    _write_audit_log(audit)
+
+
 def _get_company_updates_from_api(last_updated_after, next_page, task):
     try:
         return get_company_update_page(last_updated_after, next_page)
@@ -79,6 +113,8 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
     next_page = None
     updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
+    update_results = []
+    start_time = now()
 
     while True:
 
@@ -89,10 +125,11 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
 
         # Spawn tasks that update Data Hub companies
         for data in dnb_company_updates:
-            update_company_from_dnb_data.apply_async(
+            result = update_company_from_dnb_data.apply_async(
                 args=(data,),
                 kwargs={'fields_to_update': fields_to_update},
             )
+            update_results.append(result)
 
         if updates_remaining is not None:
             updates_remaining -= len(dnb_company_updates)
@@ -102,6 +139,8 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         next_page = response.get('next')
         if next_page is None:
             break
+
+    _record_audit(update_results, task, start_time)
 
 
 @shared_task(
@@ -167,3 +206,4 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
         fields_to_update=fields_to_update,
         update_descriptor='celery:company_update',
     )
+    return str(dh_company.pk)
