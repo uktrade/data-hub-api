@@ -115,6 +115,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
     updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
     update_results = []
     start_time = now()
+    logger.info('Started get_company_updates task')
 
     while True:
 
@@ -141,6 +142,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             break
 
     _record_audit(update_results, task, start_time)
+    logger.info('Finished get_company_updates task')
 
 
 @shared_task(
@@ -187,6 +189,7 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
     """
     dnb_company = format_dnb_company(dnb_company_data)
     duns_number = dnb_company['duns_number']
+    logger.info(f'Updating company with duns_number: {duns_number}')
 
     try:
         dh_company = Company.objects.get(duns_number=duns_number)
