@@ -169,3 +169,24 @@ class StatusChangeValidator:
                 'The status of a complete interaction cannot change.',
                 code='complete_interaction_status_cannot_change',
             )
+
+
+class DuplicateExportCountryValidator:
+    """
+    Validates that same country is not supplied more than once
+    within list of export_countries.
+    """
+
+    def __call__(self, data):
+        """Performs validation."""
+        export_countries = data.get('export_countries', None)
+
+        if not export_countries:
+            return
+
+        countries = [item['country'] for item in export_countries]
+        if len(countries) > len(set(countries)):
+            raise serializers.ValidationError(
+                'A country that was discussed cannot be entered in multiple fields.',
+                code='duplicate_export_country',
+            )
