@@ -111,6 +111,7 @@ requests-mock==1.7.0
 requests==2.22.0
 requests_toolbelt==0.9.1
 s3transfer==0.2.1         # via boto3
+semantic_version==2.8.3
 sentry_sdk==0.13.5
 simplejson==3.16.0        # via mail-parser
 six==1.12.0               # via django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, prompt-toolkit, pytest-xdist, python-dateutil, requests-mock, traitlets
