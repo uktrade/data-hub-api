@@ -23,15 +23,14 @@ import subprocess
 import webbrowser
 from urllib.parse import quote, urlencode
 
-from script_utils.current_version import get_current_version
 from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
 from script_utils.news_fragments import list_news_fragments
-from script_utils.version import Version
+from script_utils.versioning import get_current_version, get_next_version, ReleaseType
 
 BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-api'
 
 parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
-parser.add_argument('release_type', choices=Version._fields)
+parser.add_argument('release_type', type=ReleaseType, choices=ReleaseType.__members__.values())
 
 
 class CommandError(Exception):
@@ -55,7 +54,7 @@ def create_changelog(release_type):
     if not current_version:
         raise CommandError('Failed to extract the current version number from the changelog.')
 
-    new_version = current_version.increment_component(release_type)
+    new_version = get_next_version(current_version, release_type)
 
     branch = f'changelog/{new_version}'
     commit_message = f'Add changelog for version {new_version}'
