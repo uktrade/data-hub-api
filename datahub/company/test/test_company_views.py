@@ -1297,6 +1297,17 @@ class TestUpdateCompany(APITestMixin):
         """
         Standard action for updating the model with
         the given data and returning the actual response
+
+        :param self: current class scope
+        :param new_countries: countries to be added to the model
+        :param field: model field to update
+        :param company:
+        :param model_status: status of the field (currently_exporting || future_interest)
+        :return: {
+            'status_code': http response code type (200, 404 etc),
+            'countries': countries recorded in the model against the current company,
+            'country_ids': and their corresponding id's
+        }
         """
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
@@ -1321,7 +1332,12 @@ class TestUpdateCompany(APITestMixin):
             'country__pk',
         )
 
-        return response, actual_export_countries, actual_response_country_ids
+        # return response, actual_export_countries, actual_response_country_ids
+        return {
+            'status_code': response.status_code,
+            'countries': actual_export_countries,
+            'country_ids': actual_response_country_ids,
+        }
 
     @pytest.mark.parametrize(
         'field,model_status',
@@ -1348,19 +1364,18 @@ class TestUpdateCompany(APITestMixin):
         new_countries = list(CountryModel.objects.order_by('?')[:2])
 
         # now update them
-        response, actual_export_countries, actual_response_country_ids = \
-            self.update_company_export_country_model(
-                self=self,
-                new_countries=new_countries,
-                field=field,
-                company=company,
-                model_status=model_status,
-            )
+        response_data = self.update_company_export_country_model(
+            self=self,
+            new_countries=new_countries,
+            field=field,
+            company=company,
+            model_status=model_status,
+        )
 
-        assert response.status_code == status.HTTP_200_OK
-        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert response_data['status_code'] == status.HTTP_200_OK
+        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
         assert [
-            export_country.country for export_country in actual_export_countries
+            export_country.country for export_country in response_data['countries']
         ] == new_countries
 
     @pytest.mark.parametrize(
@@ -1402,19 +1417,18 @@ class TestUpdateCompany(APITestMixin):
                          if country not in existing_countries]
 
         # now update them
-        response, actual_export_countries, actual_response_country_ids = \
-            self.update_company_export_country_model(
-                self=self,
-                new_countries=new_countries,
-                field=field,
-                company=company,
-                model_status=model_status,
-            )
+        response_data = self.update_company_export_country_model(
+            self=self,
+            new_countries=new_countries,
+            field=field,
+            company=company,
+            model_status=model_status,
+        )
 
-        assert response.status_code == status.HTTP_200_OK
-        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert response_data['status_code'] == status.HTTP_200_OK
+        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
         assert [
-            export_country.country for export_country in actual_export_countries
+            export_country.country for export_country in response_data['countries']
         ] == new_countries
 
     @pytest.mark.parametrize(
@@ -1457,19 +1471,18 @@ class TestUpdateCompany(APITestMixin):
         new_countries = existing_countries + list(CountryModel.objects.order_by('?')[:0])
 
         # now update them
-        response, actual_export_countries, actual_response_country_ids =\
-            self.update_company_export_country_model(
-                self=self,
-                new_countries=new_countries,
-                field=field,
-                company=company,
-                model_status=model_status,
-            )
+        response_data = self.update_company_export_country_model(
+            self=self,
+            new_countries=new_countries,
+            field=field,
+            company=company,
+            model_status=model_status,
+        )
 
-        assert response.status_code == status.HTTP_200_OK
-        assert actual_response_country_ids == [str(country.pk) for country in new_countries]
+        assert response_data['status_code'] == status.HTTP_200_OK
+        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
         assert [
-            export_country.country for export_country in actual_export_countries
+            export_country.country for export_country in response_data['countries']
         ] == new_countries
 
     def test_adding_overlapping_countries_in_company_export_to_country_model(self):

@@ -327,11 +327,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return company
 
     @staticmethod
-    def _get_adviser_primary_key(adviser=None):
-        if adviser is not None and hasattr(adviser, 'pk'):
-            return adviser.pk
-
-    @staticmethod
     def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
         for country in export_countries:
             export_country, created = CompanyExportCountry.objects.get_or_create(
