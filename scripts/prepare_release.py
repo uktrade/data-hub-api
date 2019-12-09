@@ -6,8 +6,9 @@ This is a script that does the following:
 - takes a release type (major, minor or patch) as input and determines the new version number
 - runs `git fetch`
 - creates a local branch based on origin/develop
+- bumps the version number
 - generates a changelog for the release
-- commits and pushes the changelog
+- commits and pushes these changes
 - opens your web browser to the create PR page for the pushed branch
 
 The script will abort if:
@@ -25,11 +26,18 @@ from urllib.parse import quote, urlencode
 
 from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
 from script_utils.news_fragments import list_news_fragments
-from script_utils.versioning import get_current_version, get_next_version, ReleaseType
+from script_utils.versioning import (
+    get_next_version,
+    ReleaseType,
+    set_current_version,
+    VERSION_FILE_PATH,
+)
 
 BASE_GITHUB_REPO_URL = 'https://github.com/uktrade/data-hub-api'
 
-parser = argparse.ArgumentParser(description='Create and push a changelog for a new version.')
+parser = argparse.ArgumentParser(
+    description='Bump the version, update the changelog and open a PR.',
+)
 parser.add_argument('release_type', type=ReleaseType, choices=ReleaseType.__members__.values())
 
 
@@ -37,8 +45,8 @@ class CommandError(Exception):
     """A fatal error when running the script."""
 
 
-def create_changelog(release_type):
-    """Create and push a changelog."""
+def prepare_release(release_type):
+    """Bump the version, update the changelog and open a PR."""
     remote = 'origin'
 
     if any_uncommitted_changes():
@@ -49,17 +57,12 @@ def create_changelog(release_type):
     subprocess.run(['git', 'fetch'], check=True)
     subprocess.run(['git', 'checkout', f'{remote}/develop'], check=True, capture_output=True)
 
-    current_version = get_current_version()
-
-    if not current_version:
-        raise CommandError('Failed to extract the current version number from the changelog.')
-
-    new_version = get_next_version(current_version, release_type)
+    new_version = get_next_version(release_type)
 
     branch = f'changelog/{new_version}'
-    commit_message = f'Add changelog for version {new_version}'
-    pr_title = f'Add changelog for version {new_version}'
-    pr_body = f'This adds the changelog for version {new_version}.'
+    pr_title = f'Prepare for release {new_version}'
+    pr_body = f'This bumps the version and adds the changelog for version {new_version}.'
+    commit_message = f"""{pr_title}\n\n{pr_body}"""
 
     if local_branch_exists(branch):
         raise CommandError(
@@ -87,6 +90,9 @@ def create_changelog(release_type):
             'They may be misnamed. Please investigate.',
         )
 
+    set_current_version(new_version)
+
+    subprocess.run(['git', 'add', VERSION_FILE_PATH], check=True)
     subprocess.run(['git', 'commit', '-m', commit_message], check=True)
     subprocess.run(['git', 'push', '--set-upstream', remote, branch], check=True)
 
@@ -106,7 +112,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        branch_name = create_changelog(args.release_type)
+        branch_name = prepare_release(args.release_type)
     except (CommandError, subprocess.CalledProcessError) as exc:
         print(f'ERROR: {exc}')  # noqa: T001
         return
