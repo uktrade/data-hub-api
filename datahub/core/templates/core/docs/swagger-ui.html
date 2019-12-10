@@ -27,7 +27,11 @@
           SwaggerUIBundle.presets.apis,
           SwaggerUIBundle.SwaggerUIStandalonePreset
         ],
-        layout: "BaseLayout"
+        layout: "BaseLayout",
+        requestInterceptor: (req) => {
+            req.headers['X-CSRFToken'] = "{{csrf_token}}";
+            return req;
+        }
       })
     </script>
   </body>
