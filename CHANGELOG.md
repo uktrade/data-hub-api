@@ -1,3 +1,61 @@
+# Data Hub API 24.0.0 (2019-12-10)
+
+
+## Removals
+
+- **Investment** The following deprecated investor profile tables were removed:
+
+  - `investor_profile_investorprofile_asset_classes_of_interest`
+  - `investor_profile_investorprofile_construction_risks`
+  - `investor_profile_investorprofile_deal_ticket_sizes`
+  - `investor_profile_investorprofile_desired_deal_roles`
+  - `investor_profile_investorprofile_investment_types`
+  - `investor_profile_investorprofile_other_countries_being_cons84de`
+  - `investor_profile_investorprofile_restrictions`
+  - `investor_profile_investorprofile_time_horizons`
+  - `investor_profile_investorprofile_uk_region_locations`
+  - `investor_profile_investorprofile`
+  - `investor_profile_profiletype`
+
+## Features
+
+- **Companies** A setting `DNB_AUTOMATIC_UPDATE_LIMIT` was added which can be used to limit the
+  number of companies updated by the `datahub.dnb_api.tasks.get_company_updates`
+  task.
+- **Companies** Info log messages and a sentry-based audit log were added to the DNB company
+  updates tasks to help provide better visibility for task runs.
+- **Companies** A feature flag was added `"dnb-company-updates"` which governs whether or not to
+  run the logic within the `datahub.dnb_api.tasks.get_company_updates` celery task.
+  This affords us the ability to easily switch on/off DNB company updates as needed 
+  during the rollout of this feature.
+
+## Bug fixes
+
+- **Companies** A bug was fixed to ensure that DNB company updates can be ingested over multiple
+  pages from dnb-service.  Previously, the cursor value was not being extracted
+  from the URL for the next page correctly.
+
+## Internal changes
+
+- **Companies** Integration tests were added for the `datahub.dnb_api.tasks.get_company_updates` task.
+  These were not added as part of the original development as the task and it's dependent
+  task (`datahub.dnb_api.tasks.update_company_from_dnb_data`) were developed in parallel.
+
+  Additionally, the calls that `datahub.dnb_api.tasks.get_company_updates` makes to
+  `datahub.dnb_api.tasks.update_company_from_dnb_data` were fixed to be the correct
+  signature.
+- Python was updated from version 3.7.4 to 3.7.5 in deployed environments.
+
+## Database schema
+
+- **Interactions** A new table `interaction_interactionexportcountry` was created.
+  It has foreign key fields `interaction_id` and `country_id`
+  with status, value is expressed as:
+  * 'currently exporting to'
+  * 'future interest'
+  * 'not interested'
+
+
 # Data Hub API 23.2.0 (2019-12-02)
 
 

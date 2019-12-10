@@ -5,6 +5,7 @@ import pytest
 from celery.exceptions import Retry
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
@@ -229,10 +230,10 @@ def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
         sync_company_with_dnb(company.id)
 
 
+@pytest.mark.usefixtures('dnb_company_updates_feature_flag')
 class TestGetCompanyUpdates:
     """
-    Tests for the get_company_updates task and the
-    associated _get_company_updates function.
+    Tests for the get_company_updates task and the associated _get_company_updates function.
     """
 
     @pytest.mark.parametrize(
@@ -319,13 +320,13 @@ class TestGetCompanyUpdates:
         (
             {
                 None: {
-                    'next': 'page2',
+                    'next': 'http://foo.bar/companies?cursor=page2',
                     'results': [
                         {'foo': 1},
                         {'bar': 2},
                     ],
                 },
-                'page2': {
+                'http://foo.bar/companies?cursor=page2': {
                     'next': None,
                     'results': [
                         {'baz': 3},
@@ -349,7 +350,7 @@ class TestGetCompanyUpdates:
         pages.
         """
         mock_get_company_update_page = mock.Mock(
-            side_effect=lambda _, cursor: data[cursor],
+            side_effect=lambda _, next_page: data[next_page],
         )
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.get_company_update_page',
@@ -369,21 +370,21 @@ class TestGetCompanyUpdates:
         )
         mock_get_company_update_page.assert_any_call(
             '2019-01-01T00:00:00',
-            'page2',
+            'http://foo.bar/companies?cursor=page2',
         )
 
         assert mock_update_company.apply_async.call_count == 3
         mock_update_company.apply_async.assert_any_call(
-            {'foo': 1},
-            fields_to_update=fields_to_update,
+            args=({'foo': 1},),
+            kwargs={'fields_to_update': fields_to_update},
         )
         mock_update_company.apply_async.assert_any_call(
-            {'bar': 2},
-            fields_to_update=fields_to_update,
+            args=({'bar': 2},),
+            kwargs={'fields_to_update': fields_to_update},
         )
         mock_update_company.apply_async.assert_any_call(
-            {'baz': 3},
-            fields_to_update=fields_to_update,
+            args=({'baz': 3},),
+            kwargs={'fields_to_update': fields_to_update},
         )
 
     @pytest.mark.parametrize(
@@ -413,6 +414,205 @@ class TestGetCompanyUpdates:
         get_company_updates()
 
         assert mock_get_company_updates.call_count == call_count
+
+    @pytest.mark.parametrize(
+        'data',
+        (
+            # Test limit works correctly on the first page
+            {
+                None: {
+                    'next': None,
+                    'results': [
+                        {'foo': 1},
+                        {'bar': 2},
+                        {'baz': 3},
+                    ],
+                },
+            },
+            # Test limit works correctly on the second page
+            {
+                None: {
+                    'next': 'http://foo.bar/companies?cursor=page2',
+                    'results': [
+                        {'foo': 1},
+                    ],
+                },
+                'http://foo.bar/companies?cursor=page2': {
+                    'next': None,
+                    'results': [
+                        {'bar': 2},
+                        {'baz': 3},
+                    ],
+                },
+            },
+        ),
+    )
+    @freeze_time('2019-01-02T2:00:00')
+    @override_settings(DNB_AUTOMATIC_UPDATE_LIMIT=2)
+    def test_updates_max_update_limit(self, monkeypatch, data):
+        """
+        Test if the update_company task is called with the
+        right parameters for all the records spread across
+        pages.
+        """
+        mock_get_company_update_page = mock.Mock(
+            side_effect=lambda _, next_page: data[next_page],
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        mock_update_company = mock.Mock()
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.update_company_from_dnb_data',
+            mock_update_company,
+        )
+        get_company_updates()
+
+        assert mock_update_company.apply_async.call_count == 2
+        mock_update_company.apply_async.assert_any_call(
+            args=({'foo': 1},),
+            kwargs={'fields_to_update': None},
+        )
+        mock_update_company.apply_async.assert_any_call(
+            args=({'bar': 2},),
+            kwargs={'fields_to_update': None},
+        )
+
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @freeze_time('2019-01-02T2:00:00')
+    def test_updates_with_update_company_from_dnb_data(
+        self,
+        mocked_write_audit_log,
+        monkeypatch,
+        dnb_company_updates_response_uk,
+    ):
+        """
+        Test full integration for the `get_company_updates` task with the
+        `update_company_from_dnb_data` task when all fields are updated.
+        """
+        company = CompanyFactory(duns_number='123456789')
+        mock_get_company_update_page = mock.Mock(
+            return_value=dnb_company_updates_response_uk,
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        task_result = get_company_updates.apply()
+
+        company.refresh_from_db()
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
+        expected_gu_number = dnb_company['global_ultimate_duns_number']
+        assert company.global_ultimate_duns_number == expected_gu_number
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 0,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
+
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @freeze_time('2019-01-02T2:00:00')
+    def test_updates_with_update_company_from_dnb_data_partial_fields(
+        self,
+        mocked_write_audit_log,
+        monkeypatch,
+        dnb_company_updates_response_uk,
+    ):
+        """
+        Test full integration for the `get_company_updates` task with the
+        `update_company_from_dnb_data` task when the fields are only partially updated.
+        """
+        company = CompanyFactory(duns_number='123456789')
+        mock_get_company_update_page = mock.Mock(
+            return_value=dnb_company_updates_response_uk,
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        task_result = get_company_updates.apply(kwargs={'fields_to_update': ['name']})
+
+        company.refresh_from_db()
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
+        assert company.global_ultimate_duns_number == ''
+
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 0,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
+
+    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @freeze_time('2019-01-02T2:00:00')
+    def test_updates_with_update_company_from_dnb_data_with_failure(
+        self,
+        mocked_write_audit_log,
+        monkeypatch,
+        dnb_company_updates_response_uk,
+    ):
+        """
+        Test full integration for the `get_company_updates` task with the
+        `update_company_from_dnb_data` task when all fields are updated and one company in the
+        dnb-service result does not exist in Data Hub.
+        """
+        company = CompanyFactory(duns_number='123456789')
+        missing_dnb_company = {
+            **dnb_company_updates_response_uk['results'][0],
+            'duns_number': '999999999',
+        }
+        dnb_company_updates_response_uk['results'].append(missing_dnb_company)
+        mock_get_company_update_page = mock.Mock(
+            return_value=dnb_company_updates_response_uk,
+        )
+        monkeypatch.setattr(
+            'datahub.dnb_api.tasks.get_company_update_page',
+            mock_get_company_update_page,
+        )
+        task_result = get_company_updates.apply()
+
+        company.refresh_from_db()
+        dnb_company = dnb_company_updates_response_uk['results'][0]
+        assert company.name == dnb_company['primary_name']
+        expected_gu_number = dnb_company['global_ultimate_duns_number']
+        assert company.global_ultimate_duns_number == expected_gu_number
+        mocked_write_audit_log.assert_called_with(
+            {
+                'success_count': 1,
+                'failure_count': 1,
+                'updated_company_ids': [str(company.pk)],
+                'producer_task_id': task_result.id,
+                'start_time': '2019-01-02T02:00:00+00:00',
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
+        )
+
+
+def test_get_company_updates_feature_flag_inactive_no_updates(
+    monkeypatch,
+):
+    """
+    Test that when the DNB company updates feature flag is inactive, the task does not proceed.
+    """
+    mocked_get_company_update_page = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.dnb_api.tasks.get_company_update_page',
+        mocked_get_company_update_page,
+    )
+    get_company_updates()
+    assert mocked_get_company_update_page.call_count == 0
 
 
 @freeze_time('2019-01-01 11:12:13')

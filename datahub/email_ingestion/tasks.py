@@ -15,8 +15,8 @@ def ingest_emails():
     Ingest and process new emails for all mailboxes in the application - i.e.
     those in the MAILBOXES django setting.
     """
-    # TODO: remove feature flag check once we are happy with meeting invite
-    # email processing
+    # NOTE: This is a long-lived feature flag which allows us to quickly switch off email
+    # ingestion in case of any problems with third party (SMTP) services or security issues
     if not is_feature_flag_active(INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME):
         logger.info(
             f'Feature flag "{INTERACTION_EMAIL_INGESTION_FEATURE_FLAG_NAME}" is not active, '
