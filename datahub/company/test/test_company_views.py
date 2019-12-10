@@ -1292,6 +1292,53 @@ class TestUpdateCompany(APITestMixin):
             error = ['Subsidiaries have to be unlinked before changing headquarter type.']
             assert response_data['headquarter_type'] == error
 
+    @pytest.mark.parametrize(
+        'score',
+        (
+            'very_high',
+            'medium',
+            'low',
+            None,
+        ),
+    )
+    def test_get_company_with_export_potential(self, score):
+        """
+        Test imported export_potential field on a company appears as is
+        """
+        company = CompanyFactory(
+            export_potential=score,
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['export_potential'] == score
+
+    @pytest.mark.parametrize(
+        'profile_status',
+        (
+            Company.GREAT_PROFILE_STATUSES.published,
+            Company.GREAT_PROFILE_STATUSES.unpublished,
+            None,
+        ),
+    )
+    def test_get_company_with_great_profile_status(self, profile_status):
+        """
+        Test imported `great_profile_status` field on a company appears as is
+        """
+        company = CompanyFactory(
+            great_profile_status=profile_status,
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['great_profile_status'] == profile_status
+
+
+class TestCompaniesToCompanyExportCountryModel(APITestMixin):
+    """Tests for copying export countries from company model to CompanyExportCountry model"""
+
     @staticmethod
     def update_company_export_country_model(*, self, new_countries, field, company, model_status):
         """
@@ -1562,52 +1609,6 @@ class TestUpdateCompany(APITestMixin):
         assert [
             export_country.country for export_country in actual_export_to_countries
         ] == new_export_to_countries
-
-        duplicates = set(new_export_to_countries) & set(new_future_interest_countries)
-
-        assert len(
-            list(actual_future_interest_countries),
-        ) == len(new_future_interest_countries) - len(duplicates)
-
-    @pytest.mark.parametrize(
-        'score',
-        (
-            'very_high',
-            'medium',
-            'low',
-            None,
-        ),
-    )
-    def test_get_company_with_export_potential(self, score):
-        """
-        Test imported export_potential field on a company appears as is
-        """
-        company = CompanyFactory(
-            export_potential=score,
-        )
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['export_potential'] == score
-
-    @pytest.mark.parametrize(
-        'profile_status',
-        (
-            Company.GREAT_PROFILE_STATUSES.published,
-            Company.GREAT_PROFILE_STATUSES.unpublished,
-            None,
-        ),
-    )
-    def test_get_company_with_great_profile_status(self, profile_status):
-        """
-        Test imported `great_profile_status` field on a company appears as is
-        """
-        company = CompanyFactory(
-            great_profile_status=profile_status,
-        )
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['great_profile_status'] == profile_status
+        assert [
+            list(actual_future_interest_countries)[0].country,
+        ] == list(set(new_future_interest_countries) - set(new_export_to_countries))
