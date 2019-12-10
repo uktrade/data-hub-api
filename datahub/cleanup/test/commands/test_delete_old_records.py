@@ -35,6 +35,7 @@ from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    InteractionExportCountryFactory,
     InvestmentProjectInteractionFactory,
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
@@ -284,6 +285,7 @@ MAPPING = {
         'implicitly_deletable_models': {
             'interaction.Interaction_contacts',
             'interaction.InteractionDITParticipant',
+            'interaction.InteractionExportCountry',
         },
         'expired_objects_kwargs': [
             {
@@ -295,7 +297,17 @@ MAPPING = {
                 'date': INTERACTION_DELETE_BEFORE_DATETIME,
             },
         ],
-        'relations': [],
+        'relations': [
+            {
+                'factory': InteractionExportCountryFactory,
+                'field': 'interaction',
+                # No interaction export country factory arguments affect
+                # whether the interaction has expired
+                # hence expired_objects_kwargs is left as an single empty dict
+                'expired_objects_kwargs': [{}],
+                'unexpired_objects_kwargs': [],
+            },
+        ],
     },
     'investment.InvestmentProject': {
         'factory': InvestmentProjectFactory,

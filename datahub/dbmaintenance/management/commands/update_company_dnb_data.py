@@ -4,27 +4,13 @@ import time
 from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_FIELDS
 from datahub.dnb_api.tasks import sync_company_with_dnb
 
 
 logger = logging.getLogger(__name__)
 API_CALLS_PER_SECOND = 1
 API_CALL_INTERVAL = 1 / API_CALLS_PER_SECOND
-# TODO: base these on a DRY list of fields when we add it
-ALL_DNB_UPDATED_FIELDS = (
-    'name',
-    'trading_names',
-    'address',
-    'registered_address',
-    'website',
-    'number_of_employees',
-    'is_number_of_employees_estimated',
-    'turnover',
-    'is_turnover_estimated',
-    'website',
-    'global_ultimate_duns_number',
-    'company_number',
-)
 
 
 class CompanyNotDunsLinkedError(Exception):

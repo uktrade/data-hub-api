@@ -7,7 +7,10 @@ from freezegun import freeze_time
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, Sector, UKRegion
-from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
+from datahub.dnb_api.constants import (
+    FEATURE_FLAG_DNB_COMPANY_SEARCH,
+    FEATURE_FLAG_DNB_COMPANY_UPDATES,
+)
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
@@ -18,6 +21,14 @@ def dnb_company_search_feature_flag(db):
     Creates the dnb company search feature flag.
     """
     yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
+
+
+@pytest.fixture()
+def dnb_company_updates_feature_flag():
+    """
+    Creates the DNB company updates feature flag.
+    """
+    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_UPDATES)
 
 
 @pytest.fixture
@@ -148,6 +159,18 @@ def dnb_response_uk():
                 'trading_names': [],
             },
         ],
+    }
+
+
+@pytest.fixture
+def dnb_company_updates_response_uk(dnb_response_uk):
+    """
+    Returns a UK based DNB company in the format of the "company update" API endpoint
+    for dnb-service.
+    """
+    return {
+        **dnb_response_uk,
+        'next': None,
     }
 
 

@@ -1,12 +1,16 @@
 from datetime import datetime, time, timedelta
 
+import sentry_sdk
 from celery import shared_task
+from celery.result import ResultSet
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
+from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_UPDATES
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
@@ -16,6 +20,7 @@ from datahub.dnb_api.utils import (
     get_company_update_page,
     update_company_from_dnb,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 
 logger = get_task_logger(__name__)
 
@@ -57,37 +62,90 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None):
     _sync_company_with_dnb(company_id, fields_to_update, self)
 
 
+def _write_audit_log(audit):
+    """
+    Push out an audit log to sentry as an info level message.
+    """
+    with sentry_sdk.push_scope() as scope:
+        for key, value in audit.items():
+            scope.set_extra(key, value)
+        sentry_sdk.capture_message('get_company_updates task completed.')
+
+
+def _record_audit(update_results, producer_task, start_time):
+    """
+    Record an audit log for the get_company_updates task which expresses the number
+    of companies successfully updates, failures, ids of companies updated, celery
+    task info and start/end times.
+    """
+    audit = {
+        'success_count': 0,
+        'failure_count': 0,
+        'updated_company_ids': [],
+        'producer_task_id': producer_task.request.id,
+        'start_time': start_time.isoformat(),
+        'end_time': now().isoformat(),
+    }
+    for result in update_results:
+        if result.successful():
+            audit['success_count'] += 1
+            audit['updated_company_ids'].append(result.result)
+        else:
+            audit['failure_count'] += 1
+    _write_audit_log(audit)
+
+
+def _get_company_updates_from_api(last_updated_after, next_page, task):
+    try:
+        return get_company_update_page(last_updated_after, next_page)
+
+    except DNBServiceError as exc:
+        if is_server_error(exc.status_code):
+            raise task.retry(exc=exc, countdown=60)
+        raise
+
+    except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
+        raise task.retry(exc=exc, countdown=60)
+
+
 def _get_company_updates(task, last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
-    cursor = None
+    next_page = None
+    updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
+    update_results = []
+    start_time = now()
+    logger.info('Started get_company_updates task')
 
-    # TODO: In a following PR, we will bind this loop to an upper-limit
-    # on the number of records that we would like to update in a run.
     while True:
 
-        try:
-            response = get_company_update_page(last_updated_after, cursor)
+        response = _get_company_updates_from_api(last_updated_after, next_page, task)
+        dnb_company_updates = response.get('results', [])
 
-        except DNBServiceError as exc:
-            if is_server_error(exc.status_code):
-                raise task.retry(exc=exc, countdown=60)
-            raise
+        dnb_company_updates = dnb_company_updates[:updates_remaining]
 
-        except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
-            raise task.retry(exc=exc, countdown=60)
-
-        # Spawn tasks that updates Data Hub companies
-        for data in response.get('results', []):
-            update_company_from_dnb_data.apply_async(
-                data,
-                fields_to_update=fields_to_update,
+        # Spawn tasks that update Data Hub companies
+        for data in dnb_company_updates:
+            result = update_company_from_dnb_data.apply_async(
+                args=(data,),
+                kwargs={'fields_to_update': fields_to_update},
             )
+            update_results.append(result)
 
-        cursor = response.get('next')
-        if cursor is None:
+        if updates_remaining is not None:
+            updates_remaining -= len(dnb_company_updates)
+            if updates_remaining <= 0:
+                break
+
+        next_page = response.get('next')
+        if next_page is None:
             break
+
+    # Wait for all update tasks to finish...
+    ResultSet(results=update_results).join(propagate=False)
+    _record_audit(update_results, task, start_time)
+    logger.info('Finished get_company_updates task')
 
 
 @shared_task(
@@ -105,6 +163,14 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
     task goes through the pages and spawns tasks that update the records in
     Data Hub.
     """
+    # TODO: remove this feature flag after a reasonable period after going live
+    # with unlimited company updates
+    if not is_feature_flag_active(FEATURE_FLAG_DNB_COMPANY_UPDATES):
+        logger.info(
+            f'Feature flag "{FEATURE_FLAG_DNB_COMPANY_UPDATES}" is not active, exiting.',
+        )
+        return
+
     with advisory_lock('get_company_updates', wait=False) as acquired:
 
         if not acquired:
@@ -126,6 +192,7 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
     """
     dnb_company = format_dnb_company(dnb_company_data)
     duns_number = dnb_company['duns_number']
+    logger.info(f'Updating company with duns_number: {duns_number}')
 
     try:
         dh_company = Company.objects.get(duns_number=duns_number)
@@ -145,3 +212,4 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
         fields_to_update=fields_to_update,
         update_descriptor='celery:company_update',
     )
+    return str(dh_company.pk)
