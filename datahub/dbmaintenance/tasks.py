@@ -174,3 +174,105 @@ def _copy_foreign_key_to_m2m_field(
     )
 
     return len(objects_to_create)
+
+
+@shared_task(acks_late=True)
+def copy_export_countries_from_company_model_to_company_export_country_model(
+    batch_size=5000,
+):
+    """
+    Task that copies all export countries from Company model to CompanyExportCountry
+    """
+    num_future_interest_created, num_curently_exported_created = _copy_export_countries(apps)
+
+    # If there are definitely no more rows needing processing, return
+    if num_future_interest_created < batch_size and num_curently_exported_created < batch_size:
+        return
+
+    copy_export_countries_from_company_model_to_company_export_country_model.apply_async(
+        kwargs={'batch_size': batch_size},
+    )
+
+
+@atomic
+def _copy_export_countries(apps):
+    """
+    Main logic for copying export companies from Company model to
+    CompanyExportCountry one
+    """
+    company_model = apps.get_model('company', 'Company')
+    company_export_country_model = apps.get_model('company', 'CompanyExportCountry')
+
+    def get_company_countries(key, status):
+        any_company_country_subquery = Exists(
+            company_export_country_model.objects.filter(**{
+                'company_id': OuterRef('pk'),
+                'status': status,
+            },
+            ),
+        )
+
+        batch_queryset = company_model.objects.select_for_update().annotate(**{
+            'has_' + key: any_company_country_subquery,
+        }).filter(**{
+            key + '__isnull': False,
+            'has_' + key: False,
+        }).only(
+            'pk',
+            key,
+        )
+
+        return batch_queryset
+
+    def copy_company_countries(key, company_with_uncopied_countries, status):
+        num_updated = 0
+
+        for company in company_with_uncopied_countries:
+            for country in getattr(company, key).all():
+                adviser = company.created_by
+                export_country, created = company_export_country_model.objects.get_or_create(
+                    company=company,
+                    country=country,
+                    defaults={
+                        'status': status,
+                        'created_by': adviser,
+                        'modified_by': adviser,
+                    },
+                )
+                if not created and export_country.status != status:
+                    export_country.status = status
+                    export_country.modified_by = adviser
+                    export_country.save()
+
+                num_updated += 1
+
+        return num_updated
+
+    future_interest_countries = get_company_countries(
+        'future_interest_countries',
+        'future_interest',
+    )
+    num_future_interest_created = copy_company_countries(
+        'future_interest_countries',
+        future_interest_countries,
+        'future_interest',
+    )
+
+    logger.info(
+        f'Company.future_interest_countries copied to CompanyExportCountry '
+        f'for {num_future_interest_created} Company export countries',
+    )
+
+    export_countries = get_company_countries('export_to_countries', 'currently_exporting')
+    num_currently_exported_created = copy_company_countries(
+        'export_to_countries',
+        export_countries,
+        'currently_exporting',
+    )
+
+    logger.info(
+        f'Company.export_to_countries copied to CompanyExportCountry '
+        f'for {num_currently_exported_created} Company export countries',
+    )
+
+    return num_future_interest_created, num_currently_exported_created
