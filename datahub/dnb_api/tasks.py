@@ -58,6 +58,8 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None, update_descri
 
     `company_id` identifies the company record to sync and `fields_to_update` defines an iterable
     of company serializer fields that should be updated - if it is None, all fields will be synced.
+    `update_descriptor` can be specified and will be embedded within the reversion comment for
+    the new company version.
     """
     if not update_descriptor:
         update_descriptor = f'celery:sync_company_with_dnb:{self.request.id}'
