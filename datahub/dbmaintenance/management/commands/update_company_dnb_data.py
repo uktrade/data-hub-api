@@ -1,6 +1,8 @@
 import logging
 import time
 
+from django.utils.timezone import now
+
 from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
@@ -29,6 +31,8 @@ class Command(CSVBaseCommand):
         Set some initial state related to API rate limiting.
         """
         self.last_called_api_time = time.perf_counter()
+        timestamp = now().isoformat(timespec='seconds')
+        self.update_descriptor = f'command:update_company_dnb_data:{timestamp}'
         super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
@@ -70,5 +74,5 @@ class Command(CSVBaseCommand):
         self._limit_call_rate()
 
         sync_company_with_dnb.apply(
-            args=(pk, fields),
+            args=(pk, fields, self.update_descriptor),
         )
