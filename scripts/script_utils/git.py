@@ -12,6 +12,16 @@ def any_uncommitted_changes():
     return bool(result.stdout)
 
 
+def get_file_contents(branch, path):
+    """Get the contents of a file on a particular branch."""
+    result = subprocess.run(
+        ['git', 'show', f'{branch}:{path}'],
+        check=True,
+        capture_output=True,
+    )
+    return result.stdout.decode('utf-8')
+
+
 def local_branch_exists(branch):
     """Check if a local branch exists."""
     try:
