@@ -1,8 +1,8 @@
 from logging import getLogger
 
-import sentry_sdk
 from django.conf import settings
 
+from datahub.core.utils import log_to_sentry
 from datahub.search.query_builder import build_autocomplete_query
 
 
@@ -34,11 +34,11 @@ def execute_search_query(query):
     if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
         logger.warning(f'Elasticsearch query took a long time ({response.took/1000:.2f} seconds)')
 
-        with sentry_sdk.push_scope() as scope:
-            scope.set_extra('query', query.to_dict())
-            scope.set_extra('took', response.took)
-            scope.set_extra('timed_out', response.timed_out)
-
-            sentry_sdk.capture_message('Elasticsearch query took a long time')
+        log_data = {
+            'query': query.to_dict(),
+            'took': response.took,
+            'timed_out': response.timed_out,
+        }
+        log_to_sentry('Elasticsearch query took a long time', extra=log_data)
 
     return response
