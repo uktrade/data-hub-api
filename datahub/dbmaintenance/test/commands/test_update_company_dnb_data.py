@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from django.core.management import call_command
+from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.dbmaintenance.management.commands.update_company_dnb_data import (
@@ -64,6 +65,7 @@ def mock_sync_company_with_dnb(monkeypatch):
         ['global_ultimate_duns_number', 'name'],
     ),
 )
+@freeze_time('2019-01-01 11:12:13')
 def test_run(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb, fields):
     """
     Test that the command updates the specified records (ignoring ones with errors).
@@ -110,7 +112,13 @@ def test_run(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb, fields):
     assert mock_sync_company_with_dnb.call_count == 4
     for company in companies:
         if company.duns_number:
-            mock_sync_company_with_dnb.assert_any_call(args=(company.id, fields))
+            mock_sync_company_with_dnb.assert_any_call(
+                args=(
+                    company.id,
+                    fields,
+                    'command:update_company_dnb_data:2019-01-01T11:12:13+00:00',
+                ),
+            )
 
 
 def test_simulate(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb):
