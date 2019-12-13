@@ -83,7 +83,25 @@ Type the following:
 
 Click on `build`, follow the deployment and check that everything looks fine after it finishes.
 
-## Formalise the release
+## Publish the release on GitHub
+
+The final step is to publish the release on GitHub. To do this, you will need to [generate a GitHub personal access 
+token](https://github.com/settings/tokens) with the `public_repo` scope.
+
+Once you have this, you can either set it in the `GITHUB_TOKEN` environment variable, or enter it when prompted.
+
+When you have a token, run:
+
+```shell
+scripts/publish_release.py
+```
+
+This will create and publish the release on GitHub and open it in your web browser. 
+
+<details>
+<summary>If you are unable to use the script</summary>
+
+If you can‘t use the script for some reason, you can still manually create and publish the release.
 
 In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/new) with the following values:
 
@@ -95,3 +113,5 @@ In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/n
 And click on _Publish release_.
 
 For more information see the [GitHub documentation](https://help.github.com/articles/creating-releases/).
+
+</details>
