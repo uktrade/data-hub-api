@@ -13,19 +13,20 @@ As a general guide:
 
 You can run `towncrier --draft --version draft` to generate a draft changelog and help you decide.
 
-## Update the changelog
+## Bump the version and update the changelog
 
 Once you've reviewed the draft changelog and decided on the release type, you can create the changelog by running:
 
 ```shell
-scripts/create_changelog.py <major|minor|patch>
+scripts/prepare_release.py <major|minor|patch>
 ```
 
 The command will:
 
 - determine the new version number
 - create a branch named `changelog/<version>`
-- commit the changelog to it
+- bump the version and update the changelog
+- commit the changes
 - push the branch
 - open your browser window ready to create a PR
 
