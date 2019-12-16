@@ -33,7 +33,7 @@ from datahub.omis.order.signals import (
 )
 from datahub.omis.order.utils import populate_billing_data
 from datahub.omis.payment.models import Payment
-from datahub.omis.payment.validators import ReconcilablePaymentsValidator
+from datahub.omis.payment.validators import ReconcilablePaymentsSubValidator
 from datahub.omis.quote.models import Quote
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -387,14 +387,13 @@ class Order(BaseModel):
             valid value for the quote reference
         """
         for validator in [
-            validators.OrderDetailsFilledInValidator(),
-            validators.NoOtherActiveQuoteExistsValidator(),
-            validators.OrderInStatusValidator(
+            validators.OrderDetailsFilledInSubValidator(),
+            validators.NoOtherActiveQuoteExistsSubValidator(),
+            validators.OrderInStatusSubValidator(
                 allowed_statuses=(OrderStatus.draft,),
             ),
         ]:
-            validator.set_instance(self)
-            validator()
+            validator(order=self)
 
         self.quote = Quote.objects.create_from_order(order=self, by=by, commit=commit)
         self.status = OrderStatus.quote_awaiting_acceptance
@@ -417,15 +416,14 @@ class Order(BaseModel):
         :param by: the adviser who is cancelling the quote
         """
         for validator in [
-            validators.OrderInStatusValidator(
+            validators.OrderInStatusSubValidator(
                 allowed_statuses=(
                     OrderStatus.quote_awaiting_acceptance,
                     OrderStatus.quote_accepted,
                 ),
             ),
         ]:
-            validator.set_instance(self)
-            validator()
+            validator(order=self)
 
         if self.quote:
             self.quote.cancel(by)
@@ -439,10 +437,9 @@ class Order(BaseModel):
     def update_invoice_details(self):
         """Generate a new invoice and link it to this order."""
         for validator in [
-            validators.OrderInStatusValidator(allowed_statuses=(OrderStatus.quote_accepted,)),
+            validators.OrderInStatusSubValidator(allowed_statuses=(OrderStatus.quote_accepted,)),
         ]:
-            validator.set_instance(self)
-            validator()
+            validator(order=self)
 
         self.invoice = Invoice.objects.create_from_order(self)
         self.save(update_fields=('invoice',))
@@ -455,14 +452,13 @@ class Order(BaseModel):
         :param by: the contact who is accepting the quote
         """
         for validator in [
-            validators.OrderInStatusValidator(
+            validators.OrderInStatusSubValidator(
                 allowed_statuses=(
                     OrderStatus.quote_awaiting_acceptance,
                 ),
             ),
         ]:
-            validator.set_instance(self)
-            validator()
+            validator(order=self)
 
         self.quote.accept(by)
 
@@ -497,18 +493,16 @@ class Order(BaseModel):
             ]
         """
         for order_validator in [
-            validators.OrderInStatusValidator(
+            validators.OrderInStatusSubValidator(
                 allowed_statuses=(
                     OrderStatus.quote_accepted,
                 ),
             ),
         ]:
-            order_validator.set_instance(self)
-            order_validator()
+            order_validator(order=self)
 
-        for payment_validator in [ReconcilablePaymentsValidator()]:
-            payment_validator.set_order(self)
-            payment_validator(data=payments_data)
+        for payment_validator in [ReconcilablePaymentsSubValidator()]:
+            payment_validator(payments_data, self)
 
         for data in payments_data:
             Payment.objects.create_from_order(self, by, data)
@@ -529,18 +523,16 @@ class Order(BaseModel):
         :param by: the adviser who marked the order as complete
         """
         for order_validator in [
-            validators.OrderInStatusValidator(
+            validators.OrderInStatusSubValidator(
                 allowed_statuses=(
                     OrderStatus.paid,
                 ),
             ),
         ]:
-            order_validator.set_instance(self)
-            order_validator()
+            order_validator(order=self)
 
-        for complete_validator in [validators.CompletableOrderValidator()]:
-            complete_validator.set_order(self)
-            complete_validator()
+        for complete_validator in [validators.CompletableOrderSubValidator()]:
+            complete_validator(order=self)
 
         self.status = OrderStatus.complete
         self.completed_on = now()
@@ -560,9 +552,8 @@ class Order(BaseModel):
         :param force: if True, cancelling an order in quote accepted or paid
             is allowed.
         """
-        for order_validator in [validators.CancellableOrderValidator(force=force)]:
-            order_validator.set_instance(self)
-            order_validator()
+        for order_validator in [validators.CancellableOrderSubValidator(force=force)]:
+            order_validator(order=self)
 
         self.status = OrderStatus.cancelled
         self.cancelled_on = now()

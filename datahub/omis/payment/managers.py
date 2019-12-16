@@ -5,7 +5,7 @@ from django.db import models
 
 from datahub.omis.core.utils import generate_datetime_based_reference
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.validators import OrderInStatusValidator
+from datahub.omis.order.validators import OrderInStatusSubValidator
 from datahub.omis.payment.constants import PaymentGatewaySessionStatus
 from datahub.omis.payment.govukpay import PayClient
 
@@ -28,11 +28,10 @@ class BasePaymentGatewaySessionManager(models.Manager):
 
         # validate that the order is in `quote_accepted`
         order.refresh_from_db()
-        validator = OrderInStatusValidator(
+        validator = OrderInStatusSubValidator(
             allowed_statuses=(OrderStatus.quote_accepted,),
         )
-        validator.set_instance(order)
-        validator()
+        validator(order=order)
 
         # lock order to avoid race conditions
         order.__class__.objects.select_for_update().get(pk=order.pk)
