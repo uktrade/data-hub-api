@@ -91,7 +91,7 @@ psycopg2==2.8.4
 ptyprocess==0.6.0         # via pexpect
 py==1.8.0                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
-pydocstyle==4.0.1
+pydocstyle==5.0.1
 pyflakes==2.1.1           # via flake8
 pygments==2.4.2           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
