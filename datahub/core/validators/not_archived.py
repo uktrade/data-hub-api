@@ -4,6 +4,7 @@ from rest_framework import serializers
 class NotArchivedValidator:
     """Class-level DRF validator that checks that the object has not been archived."""
 
+    requires_context = True
     archived_message = 'This record has been {has_been_word} and cannot be edited.'
 
     def __init__(self, archived_field='archived', error_has_been_word='archived'):
@@ -14,11 +15,10 @@ class NotArchivedValidator:
 
         This validator only has an effect on updates.
         """
-        self.instance = None
         self.archived_field = archived_field
         self.error_has_been_word = error_has_been_word
 
-    def __call__(self, attrs):
+    def __call__(self, attrs, serializer):
         """
         Performs validation (called by DRF).
 
@@ -26,17 +26,10 @@ class NotArchivedValidator:
         instance) as the archived status is changed via separate endpoints (and is read-only in
         the main update endpoints).
         """
-        if self.instance and getattr(self.instance, self.archived_field):
+        instance = serializer.instance
+        if instance and getattr(instance, self.archived_field):
             error_message = self.archived_message.format(has_been_word=self.error_has_been_word)
             raise serializers.ValidationError(detail=error_message, code='archived')
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the model instance.
-
-        Called by DRF.
-        """
-        self.instance = serializer.instance
 
     def __repr__(self):
         """Returns the string representation of this object."""
