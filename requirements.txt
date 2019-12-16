@@ -74,7 +74,7 @@ mccabe==0.6.1             # via flake8
 mohawk==1.1.0
 monotonic==1.5            # via notifications-python-client
 more-itertools==7.2.0     # via pytest, zipp
-notifications-python-client==5.4.0
+notifications-python-client==5.4.1
 oauthlib==2.1.0
 packaging==19.2           # via pytest, pytest-sugar
 parso==0.5.1              # via jedi
