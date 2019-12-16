@@ -1,0 +1,18 @@
+- model: investor_profile.dealticketsize
+  pk: 56492c50-aa12-404d-a14e-1eaae24ac6ee
+  fields: {disabled_on: null, name: "Up to \xA349 million", order: 100}
+- model: investor_profile.dealticketsize
+  pk: 54df4ffb-5787-49b8-a7d2-ba33040fa32f
+  fields: {disabled_on: null, name: "\xA350-99 million", order: 200}
+- model: investor_profile.dealticketsize
+  pk: 359f4183-5617-47a9-a2ac-39e2c60d5088
+  fields: {disabled_on: null, name: "\xA3100-249 million", order: 300}
+- model: investor_profile.dealticketsize
+  pk: e5ae2715-aa2c-4aa2-b047-f247625322a3
+  fields: {disabled_on: null, name: "\xA3250-499 million", order: 400}
+- model: investor_profile.dealticketsize
+  pk: 01eb55d6-167f-4c2f-b482-b0356605d3e1
+  fields: {disabled_on: null, name: "\xA3500-999 million", order: 500}
+- model: investor_profile.dealticketsize
+  pk: 5e7601b5-becd-42ea-b885-1bbd88b85e4b
+  fields: {disabled_on: null, name: "\xA31 billion +", order: 600}
