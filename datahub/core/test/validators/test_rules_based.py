@@ -207,8 +207,7 @@ class TestRulesBasedValidator:
         instance = Mock()
         serializer = Mock(instance=instance, error_messages={'error': 'test error'})
         validator = RulesBasedValidator(*rules)
-        validator.set_context(serializer)
-        assert validator({}) is None
+        assert validator({}, serializer) is None
 
     @pytest.mark.parametrize(
         'rules,errors',
@@ -252,9 +251,9 @@ class TestRulesBasedValidator:
             },
         )
         validator = RulesBasedValidator(*rules)
-        validator.set_context(serializer)
+
         with pytest.raises(ValidationError) as excinfo:
-            validator({})
+            validator({}, serializer)
         assert excinfo.value.detail == errors
 
 
@@ -283,13 +282,13 @@ class TestRequiredUnlessAlreadyBlankValidator:
         instance = Mock(**create_data)
         serializer = Mock(instance=instance, partial=partial)
         validator = RequiredUnlessAlreadyBlankValidator('field1')
-        validator.set_context(serializer)
+
         if should_raise:
             with pytest.raises(ValidationError) as excinfo:
-                validator(update_data)
+                validator(update_data, serializer)
             assert excinfo.value.detail['field1'] == validator.required_message
         else:
-            validator(update_data)
+            validator(update_data, serializer)
 
     @pytest.mark.parametrize(
         'create_data,should_raise',
@@ -303,10 +302,10 @@ class TestRequiredUnlessAlreadyBlankValidator:
         """Tests validation during instance creation."""
         serializer = Mock(instance=None, partial=False)
         validator = RequiredUnlessAlreadyBlankValidator('field1')
-        validator.set_context(serializer)
+
         if should_raise:
             with pytest.raises(ValidationError) as excinfo:
-                validator(create_data)
+                validator(create_data, serializer)
             assert excinfo.value.detail['field1'] == validator.required_message
         else:
-            validator(create_data)
+            validator(create_data, serializer)

@@ -8,6 +8,7 @@ from datahub.interaction.models import Interaction, ServiceAnswerOption
 class ServiceAnswersValidator:
     """Validates service answers."""
 
+    requires_context = True
     required_message = gettext_lazy('This field is required.')
     question_does_not_exist = gettext_lazy('Question does not exist.')
     question_does_not_relate_message = gettext_lazy(
@@ -22,17 +23,9 @@ class ServiceAnswersValidator:
         'Only one answer can be selected for this question.',
     )
 
-    def __init__(self):
-        """Initialises the validator."""
-        self.instance = None
-
-    def set_context(self, serializer):
-        """Saves a reference to the model object."""
-        self.instance = serializer.instance
-
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Performs validation."""
-        data_combiner = DataCombiner(self.instance, data)
+        data_combiner = DataCombiner(serializer.instance, data)
 
         service = data_combiner.get_value('service')
         service_answers = data_combiner.get_value('service_answers')
@@ -124,28 +117,23 @@ class ServiceAnswersValidator:
 class ContactsBelongToCompanyValidator:
     """Validates that an interaction's contacts belong to the interaction's company."""
 
-    def __init__(self):
-        """Initialises the validator."""
-        self.instance = None
+    requires_context = True
 
-    def set_context(self, serializer):
-        """Saves a reference to the model object."""
-        self.instance = serializer.instance
-
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Performs validation."""
-        company_has_changed = not self.instance or (
-            'company' in data and data['company'] != self.instance.company
+        instance = serializer.instance
+        company_has_changed = not instance or (
+            'company' in data and data['company'] != instance.company
         )
 
-        contacts_have_changed = not self.instance or (
-            'contacts' in data and set(data['contacts']) != set(self.instance.contacts.all())
+        contacts_have_changed = not instance or (
+            'contacts' in data and set(data['contacts']) != set(instance.contacts.all())
         )
 
         if not (company_has_changed or contacts_have_changed):
             return
 
-        combiner = DataCombiner(self.instance, data)
+        combiner = DataCombiner(instance, data)
         company = combiner.get_value('company')
         contacts = combiner.get_value_to_many('contacts')
 
@@ -163,28 +151,19 @@ class StatusChangeValidator:
     occurred successfully and any extra details for it have been logged.
     """
 
-    def __init__(self):
-        """
-        Initialises the validator.
-        """
-        self.instance = None
+    requires_context = True
 
-    def set_context(self, serializer):
-        """
-        Saves a reference to the model object.
-        """
-        self.instance = serializer.instance
-
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """
         Performs validation.
         """
-        if not self.instance:
+        instance = serializer.instance
+        if not instance:
             return
-        existing_interaction_complete = self.instance.status == Interaction.STATUSES.complete
-        combiner = DataCombiner(self.instance, data)
+        existing_interaction_complete = instance.status == Interaction.STATUSES.complete
+        combiner = DataCombiner(instance, data)
         new_status = combiner.get_value('status')
-        update_changes_status = new_status != self.instance.status
+        update_changes_status = new_status != instance.status
         if existing_interaction_complete and update_changes_status:
             raise serializers.ValidationError(
                 'The status of a complete interaction cannot change.',

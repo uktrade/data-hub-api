@@ -74,26 +74,13 @@ class IsAssociatedToInvestmentProjectInteractionFilter(IsAssociatedToInvestmentP
 class HasAssociatedInvestmentProjectValidator:
     """Validator which enforces association permissions when adding interactions."""
 
+    requires_context = True
     required_message = 'This field is required.'
     non_associated_investment_project_message = (
         "You don't have permission to add an interaction for this investment project."
     )
 
-    def __init__(self):
-        """
-        Initialises the validator.
-        """
-        self.serializer = None
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the serializer object.
-
-        Called by DRF.
-        """
-        self.serializer = serializer
-
-    def __call__(self, attrs):
+    def __call__(self, attrs, serializer):
         """
         Performs validation. Called by DRF.
 
@@ -102,15 +89,15 @@ class HasAssociatedInvestmentProjectValidator:
         # If the validator is being called from the admin site import interactions tool
         # do nothing, as the logic below is irrelevant for admin site users, and is only
         # functional for API requests via DRF views
-        if self.serializer.context.get('is_bulk_import'):
+        if serializer.context.get('is_bulk_import'):
             return
 
-        if self.serializer.instance:
+        if serializer.instance:
             return
 
         checker = InvestmentProjectInteractionAssociationChecker()
-        request = self.serializer.context['request']
-        view = self.serializer.context['view']
+        request = serializer.context['request']
+        view = serializer.context['view']
 
         if not checker.should_apply_restrictions(request, view.action):
             return
