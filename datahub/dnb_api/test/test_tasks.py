@@ -31,11 +31,19 @@ pytestmark = pytest.mark.django_db
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 
 
+@pytest.mark.parametrize(
+    'update_descriptor',
+    (
+        None,
+        'command:foo:bar',
+    ),
+)
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_all_fields(
     dnb_company_search_feature_flag,
     requests_mock,
     dnb_response_uk,
+    update_descriptor,
 ):
     """
     Test the sync_company_with_dnb task when all fields should be synced.
@@ -46,7 +54,10 @@ def test_sync_company_with_dnb_all_fields(
     )
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = sync_company_with_dnb.apply_async(args=[company.id])
+    task_result = sync_company_with_dnb.apply_async(
+        args=[company.id],
+        kwargs={'update_descriptor': update_descriptor},
+    )
     assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
@@ -110,7 +121,10 @@ def test_sync_company_with_dnb_all_fields(
     versions = list(Version.objects.get_for_object(company))
     assert len(versions) == 1
     version = versions[0]
-    assert version.revision.comment == 'Updated from D&B [celery:sync_company_with_dnb]'
+    expected_update_descriptor = f'celery:sync_company_with_dnb:{task_result.id}'
+    if update_descriptor:
+        expected_update_descriptor = update_descriptor
+    assert version.revision.comment == f'Updated from D&B [{expected_update_descriptor}]'
     assert version.revision.user is None
 
 
@@ -361,7 +375,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update_company_from_dnb_data',
             mock_update_company,
         )
-        get_company_updates(fields_to_update=fields_to_update)
+        task_result = get_company_updates.apply(kwargs={'fields_to_update': fields_to_update})
 
         assert mock_get_company_update_page.call_count == 2
         mock_get_company_update_page.assert_any_call(
@@ -374,17 +388,21 @@ class TestGetCompanyUpdates:
         )
 
         assert mock_update_company.apply_async.call_count == 3
+        expected_kwargs = {
+            'fields_to_update': fields_to_update,
+            'update_descriptor': f'celery:get_company_updates:{task_result.id}',
+        }
         mock_update_company.apply_async.assert_any_call(
             args=({'foo': 1},),
-            kwargs={'fields_to_update': fields_to_update},
+            kwargs=expected_kwargs,
         )
         mock_update_company.apply_async.assert_any_call(
             args=({'bar': 2},),
-            kwargs={'fields_to_update': fields_to_update},
+            kwargs=expected_kwargs,
         )
         mock_update_company.apply_async.assert_any_call(
             args=({'baz': 3},),
-            kwargs={'fields_to_update': fields_to_update},
+            kwargs=expected_kwargs,
         )
 
     @pytest.mark.parametrize(
@@ -467,16 +485,20 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update_company_from_dnb_data',
             mock_update_company,
         )
-        get_company_updates()
+        task_result = get_company_updates.apply()
 
         assert mock_update_company.apply_async.call_count == 2
+        expected_kwargs = {
+            'fields_to_update': None,
+            'update_descriptor': f'celery:get_company_updates:{task_result.id}',
+        }
         mock_update_company.apply_async.assert_any_call(
             args=({'foo': 1},),
-            kwargs={'fields_to_update': None},
+            kwargs=expected_kwargs,
         )
         mock_update_company.apply_async.assert_any_call(
             args=({'bar': 2},),
-            kwargs={'fields_to_update': None},
+            kwargs=expected_kwargs,
         )
 
     @mock.patch('datahub.dnb_api.tasks._write_audit_log')

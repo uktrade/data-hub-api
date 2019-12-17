@@ -25,7 +25,7 @@ from datahub.feature_flag.utils import is_feature_flag_active
 logger = get_task_logger(__name__)
 
 
-def _sync_company_with_dnb(company_id, fields_to_update, task):
+def _sync_company_with_dnb(company_id, fields_to_update, task, update_descriptor):
     dh_company = Company.objects.get(id=company_id)
 
     try:
@@ -41,7 +41,7 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
         dh_company,
         dnb_company,
         fields_to_update=fields_to_update,
-        update_descriptor='celery:sync_company_with_dnb',
+        update_descriptor=update_descriptor,
     )
 
 
@@ -51,15 +51,19 @@ def _sync_company_with_dnb(company_id, fields_to_update, task):
     priority=9,
     max_retries=3,
 )
-def sync_company_with_dnb(self, company_id, fields_to_update=None):
+def sync_company_with_dnb(self, company_id, fields_to_update=None, update_descriptor=None):
     """
     Sync a company record with data sourced from DNB. This task will interact with dnb-service to
     get the latest data for the company.
 
     `company_id` identifies the company record to sync and `fields_to_update` defines an iterable
     of company serializer fields that should be updated - if it is None, all fields will be synced.
+    `update_descriptor` can be specified and will be embedded within the reversion comment for
+    the new company version.
     """
-    _sync_company_with_dnb(company_id, fields_to_update, self)
+    if not update_descriptor:
+        update_descriptor = f'celery:sync_company_with_dnb:{self.request.id}'
+    _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor)
 
 
 def _write_audit_log(audit):
@@ -117,6 +121,7 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
     update_results = []
     start_time = now()
     logger.info('Started get_company_updates task')
+    update_descriptor = f'celery:get_company_updates:{task.request.id}'
 
     while True:
 
@@ -129,7 +134,10 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         for data in dnb_company_updates:
             result = update_company_from_dnb_data.apply_async(
                 args=(data,),
-                kwargs={'fields_to_update': fields_to_update},
+                kwargs={
+                    'fields_to_update': fields_to_update,
+                    'update_descriptor': update_descriptor,
+                },
             )
             update_results.append(result)
 
@@ -184,7 +192,7 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
     acks_late=True,
     priority=9,
 )
-def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
+def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update_descriptor=None):
     """
     Update the company with the latest data from dnb-service. This task should be called
     when some other logic interacts with dnb-service to get the company data as the task itself
@@ -205,6 +213,9 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None):
             },
         )
         raise
+
+    if not update_descriptor:
+        update_descriptor = 'celery:company_update'
 
     update_company_from_dnb(
         dh_company,

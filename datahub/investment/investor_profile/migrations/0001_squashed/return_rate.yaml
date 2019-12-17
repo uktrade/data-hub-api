@@ -1,0 +1,12 @@
+- model: investor_profile.returnrate
+  pk: 6fec56ba-0be9-4931-bd76-16e11924ec55
+  fields: {disabled_on: null, name: Up to 5% IRR, order: 100}
+- model: investor_profile.returnrate
+  pk: 65c9bc7a-af68-4549-a9c9-70cd73109617
+  fields: {disabled_on: null, name: 5-10%, order: 200}
+- model: investor_profile.returnrate
+  pk: 6ecbd7d2-e16a-4bfd-a4b9-8c9bca947302
+  fields: {disabled_on: null, name: 10-15%, order: 300}
+- model: investor_profile.returnrate
+  pk: 0c55bd5c-82ea-4400-b7fc-7344958ee3a5
+  fields: {disabled_on: null, name: 15%, order: 400}

@@ -1,0 +1,96 @@
+- model: investor_profile.assetclassinterest
+  pk: 66507830-595d-432e-8521-9daf11785265
+  fields: {disabled_on: null, name: Biofuel, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 100}
+- model: investor_profile.assetclassinterest
+  pk: f2b6c1a7-4d4f-4fd9-884b-5e1f5b3525be
+  fields: {disabled_on: null, name: Biomass, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 200}
+- model: investor_profile.assetclassinterest
+  pk: bfab8ff2-e9bb-4fc8-b36c-5adddf8286b0
+  fields: {disabled_on: null, name: Direct heating, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 300}
+- model: investor_profile.assetclassinterest
+  pk: 7fe8bde8-72ef-45ac-8c2d-4627023514b4
+  fields: {disabled_on: null, name: Energy from waste, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 400}
+- model: investor_profile.assetclassinterest
+  pk: f5a134fa-968f-4723-9255-9450d8f98869
+  fields: {disabled_on: null, name: Energy storage, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 500}
+- model: investor_profile.assetclassinterest
+  pk: 0ec0c3b8-6b79-40ae-945a-1a0e1b9a9c46
+  fields: {disabled_on: null, name: Gas fired power, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 600}
+- model: investor_profile.assetclassinterest
+  pk: 9e619e8d-af51-4abf-a83a-5c139851de82
+  fields: {disabled_on: null, name: Nuclear, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 700}
+- model: investor_profile.assetclassinterest
+  pk: c50686e4-9700-4a9b-8ea9-3dac53c934ac
+  fields: {disabled_on: null, name: Regulated assets, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 800}
+- model: investor_profile.assetclassinterest
+  pk: 51d4f291-15ab-441f-b9e5-82b46a1ba145
+  fields: {disabled_on: null, name: Smart energy, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 900}
+- model: investor_profile.assetclassinterest
+  pk: 87d5c012-9f06-49ce-b2a7-a15d4943a976
+  fields: {disabled_on: null, name: Solar power, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1000}
+- model: investor_profile.assetclassinterest
+  pk: 096772cb-bd14-4bdf-bd5a-5b430e651048
+  fields: {disabled_on: null, name: Transport, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1100}
+- model: investor_profile.assetclassinterest
+  pk: ea41c626-5464-484e-81a3-05906917aad6
+  fields: {disabled_on: null, name: Wave and tidal, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1200}
+- model: investor_profile.assetclassinterest
+  pk: 07046d37-60bc-4db4-942c-56c5cd31c3e1
+  fields: {disabled_on: null, name: Windpower (offshore), asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1300}
+- model: investor_profile.assetclassinterest
+  pk: f081c413-0c01-4fc2-9061-3203041c71e2
+  fields: {disabled_on: null, name: Windpower (onshore), asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1400}
+- model: investor_profile.assetclassinterest
+  pk: ce528446-a24d-4f05-b3b8-a033cf5d4720
+  fields: {disabled_on: null, name: Upstream oil and gas, asset_class_interest_sector_id: f3eb86b0-d53c-488d-8d64-47ab3294a6bf, order: 1500}
+- model: investor_profile.assetclassinterest
+  pk: 0fbceb4c-860a-4d1c-9c51-1da6997ba5fd
+  fields: {disabled_on: null, name: Advanced manufacturing, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2000}
+- model: investor_profile.assetclassinterest
+  pk: a8818051-1618-466d-b2b8-7a4992dcd923
+  fields: {disabled_on: null, name: Commercial led, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2100}
+- model: investor_profile.assetclassinterest
+  pk: f84e9340-d975-453e-895b-c63d388b1bf5
+  fields: {disabled_on: null, name: Data centre, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2200}
+- model: investor_profile.assetclassinterest
+  pk: 7df7000e-afd1-4301-8d65-7ab7d8d64fea
+  fields: {disabled_on: null, name: Garden cities, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2300}
+- model: investor_profile.assetclassinterest
+  pk: b4516edf-c151-47d6-9c12-1c2185cacff0
+  fields: {disabled_on: null, name: Hotel, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2400}
+- model: investor_profile.assetclassinterest
+  pk: 1536f225-f755-44d1-8bdd-e89a1964966b
+  fields: {disabled_on: null, name: Leisure, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2500}
+- model: investor_profile.assetclassinterest
+  pk: 38c8d05c-2899-4433-a15c-6598d76dd69b
+  fields: {disabled_on: null, name: Life sciences, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2600}
+- model: investor_profile.assetclassinterest
+  pk: 55bec24e-e107-4bae-9869-9a470dbe1cd7
+  fields: {disabled_on: null, name: Logistics, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2700}
+- model: investor_profile.assetclassinterest
+  pk: 2fcf4687-724b-44af-b6df-65a9cc6e037c
+  fields: {disabled_on: null, name: Mixed use, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2800}
+- model: investor_profile.assetclassinterest
+  pk: 814f4c5b-854b-48f8-80f3-5bd070f9f97e
+  fields: {disabled_on: null, name: Private rented sector, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 2900}
+- model: investor_profile.assetclassinterest
+  pk: 2c2c0d6d-6a10-44fc-bdab-e6a0484394a5
+  fields: {disabled_on: null, name: Regeneration, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3000}
+- model: investor_profile.assetclassinterest
+  pk: a865f307-2f73-43a2-8039-2b906237406c
+  fields: {disabled_on: null, name: Research and development, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3100}
+- model: investor_profile.assetclassinterest
+  pk: 1eae0983-7c94-4d3a-8888-40c84a9ae092
+  fields: {disabled_on: null, name: Residential led, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3200}
+- model: investor_profile.assetclassinterest
+  pk: 17755b4f-0aee-4675-baf5-5e592bd89c7d
+  fields: {disabled_on: null, name: Retail, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3300}
+- model: investor_profile.assetclassinterest
+  pk: e0d2d653-dba4-4be9-9fb8-b91a8fcdbe9e
+  fields: {disabled_on: null, name: Smart cities, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3400}
+- model: investor_profile.assetclassinterest
+  pk: 3b95756d-a905-4abc-81f6-398fe6dc029d
+  fields: {disabled_on: null, name: Student housing, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3500}
+- model: investor_profile.assetclassinterest
+  pk: f86ca55d-4512-4b71-a6fd-60ddc6c3bafe
+  fields: {disabled_on: null, name: Transport hub / rail, asset_class_interest_sector_id: bdd34014-f73f-4a1e-91b6-0ef03b7d7f47, order: 3600}
