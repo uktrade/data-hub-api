@@ -44,6 +44,7 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -303,47 +304,63 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             for field in self.Meta.dnb_read_only_fields:
                 self.fields[field].read_only = True
 
+    @atomic
     def update(self, instance, validated_data):
         """
         Using writable nested representations to copy export country elements
-        from the `Company` model into the `CompanyExportCountry`.
+        from the `Company` model into the `CompanyExportCountry`
+        or vice-versa based on feature flag.
         """
-        export_to_countries = validated_data.get('export_to_countries')
-        future_interest_countries = validated_data.get('future_interest_countries')
         adviser = validated_data.get('modified_by')
-        all_countries = {
-            *(export_to_countries or []),
-            *(future_interest_countries or []),
-        }
+        if is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
+            export_to_countries = validated_data.get('export_to_countries')
+            future_interest_countries = validated_data.get('future_interest_countries')
+            self._update_company_export_country_fields(
+                instance,
+                export_to_countries,
+                future_interest_countries,
+                adviser,
+            )
+        else:
+            export_countries = validated_data.pop('export_countries', None)
+            self._update_export_countries(instance, export_countries, adviser)
 
         company = super().update(instance, validated_data)
+        self._save_and_sync_export_countries(instance, validated_data)
 
-        if future_interest_countries is not None:
-            self._save_to_company_export_country_model(
+        return company
+
+    def _update_company_export_country_fields(self, instance, export_to, future_interest, adviser):
+        """Update export country fields in `Company` model"""
+        all_countries = {
+            *(export_to or []),
+            *(future_interest or []),
+        }
+
+        if future_interest is not None:
+            self._sync_to_company_export_country_model(
                 company=instance,
                 adviser=adviser,
-                export_countries=future_interest_countries,
+                export_countries=future_interest,
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
             )
 
-        if export_to_countries is not None:
-            self._save_to_company_export_country_model(
+        if export_to is not None:
+            self._sync_to_company_export_country_model(
                 company=instance,
                 adviser=adviser,
-                export_countries=export_to_countries,
+                export_countries=export_to,
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
 
         CompanyExportCountry.objects.filter(
             company=instance,
         ).exclude(
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
             country__in=all_countries,
         ).delete()
 
-        return company
-
-    @staticmethod
-    def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
+    def _sync_to_company_export_country_model(self, company, adviser, export_countries, status):
         for country in export_countries:
             export_country, created = CompanyExportCountry.objects.get_or_create(
                 country=country,
@@ -359,6 +376,52 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 export_country.status = status
                 export_country.modified_by = adviser
                 export_country.save()
+
+    def _update_export_countries(self, company, validated_export_countries, adviser):
+        """
+        Adds/updates export countries related to a company within validated_export_countries.
+        And removes existing ones that are not in the list.
+        """
+        for item in validated_export_countries:
+            country = meta_models.Country.objects.get(id=item['country'].id)
+            status = item['status']
+            company.add_export_country(
+                country=country,
+                status=status,
+                record_date=company.modified_on,
+                adviser=adviser,
+            )
+
+        existing_countries = [item.country for item in CompanyExportCountry.objects.all()]
+        new_countries = [
+            meta_models.Country.objects.get(id=item['country'].id)
+            for item in validated_export_countries
+        ]
+        countries_delta = list(set(existing_countries) - set(new_countries))
+
+        if countries_delta:
+            CompanyExportCountry.objects.filter(
+                company=company,
+                country__in=countries_delta,
+            ).delete()
+
+    def _sync_to_company_export_country_fields(self, company, adviser):
+        currently_exporting = CompanyExportCountry.objects.filter(
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        )
+        exporting_to_countries = [country for country in currently_exporting]
+
+        future_interest = CompanyExportCountry.objects.filter(
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        )
+        future_interest_countries = [country for country in future_interest]
+
+        company.export_to_countries = exporting_to_countries
+        company.future_interest_countries = future_interest_countries
+        company.modified_by = adviser
+        company.save()
 
     def validate(self, data):
         """
