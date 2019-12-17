@@ -395,6 +395,10 @@ if REDIS_BASE_URL:
                 'refresh_gross_value_added_value_for_fdi_investment_projects'
             ),
             'schedule': crontab(minute=0, hour=3, day_of_month=21)
+        },
+        'update_companies_from_dnb_service': {
+            'task': 'datahub.dnb_api.tasks.get_company_updates',
+            'schedule': crontab(minute=0, hour=0),
         }
     }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
