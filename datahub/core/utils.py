@@ -150,8 +150,7 @@ def log_to_sentry(message, extra=None, level='info'):
     log info or warning-level messages to sentry; for error messages, a standard python logger can
     be used with the `extra` kwarg.
     """
-    if not extra:
-        extra = {}
+    extra = extra or {}
     with sentry_sdk.push_scope() as scope:
         for key, value in extra.items():
             scope.set_extra(key, value)
