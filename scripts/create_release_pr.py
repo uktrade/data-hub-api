@@ -22,7 +22,6 @@ import subprocess
 import webbrowser
 from urllib.parse import quote, urlencode
 
-from script_utils.current_version import get_current_version
 from script_utils.git import (
     any_uncommitted_changes,
     local_branch_exists,
@@ -30,6 +29,7 @@ from script_utils.git import (
     remote_tag_exists,
 )
 from script_utils.news_fragments import list_news_fragments
+from script_utils.versioning import get_current_version
 
 GITHUB_BASE_REPO_URL = 'https://github.com/uktrade/data-hub-api'
 RELEASE_GUIDE_URL = (
