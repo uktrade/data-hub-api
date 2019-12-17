@@ -14,8 +14,12 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.models import Company, CompanyExportCountry, CompanyPermission
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyFactory,
+)
 from datahub.core import constants
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
@@ -47,7 +51,7 @@ def setup_data(es_with_collector):
     country_us = constants.Country.united_states.value.id
     country_anguilla = constants.Country.anguilla.value.id
     uk_region = constants.UKRegion.south_east.value.id
-    CompanyFactory(
+    company1 = CompanyFactory(
         name='abc defg ltd',
         trading_names=['helm', 'nop'],
         address_1='1 Fake Lane',
@@ -55,29 +59,51 @@ def setup_data(es_with_collector):
         address_country_id=country_uk,
         registered_address_country_id=country_uk,
         uk_region_id=uk_region,
-        export_to_countries=[
-            constants.Country.france.value.id,
-        ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-            constants.Country.united_states.value.id,
-        ],
     )
-    CompanyFactory(
+    CompanyExportCountryFactory(
+        company=company1,
+        country=Country.objects.get(pk=constants.Country.france.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company1,
+        country=Country.objects.get(pk=constants.Country.japan.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+
+    CompanyExportCountryFactory(
+        company=company1,
+        country=Country.objects.get(pk=constants.Country.united_states.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+    company2 = CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
         address_1='1 Fake Lane',
         address_town='Downtown',
         address_country_id=country_us,
         registered_address_country_id=country_us,
-        export_to_countries=[
-            constants.Country.canada.value.id,
-            constants.Country.france.value.id,
-        ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-        ],
     )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country=Country.objects.get(pk=constants.Country.canada.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country=Country.objects.get(pk=constants.Country.france.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country=Country.objects.get(pk=constants.Country.japan.value.id),
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+
     CompanyFactory(
         name='archived',
         trading_names=[],

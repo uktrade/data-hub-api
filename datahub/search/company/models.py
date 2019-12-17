@@ -4,6 +4,7 @@ from functools import partial
 from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
 from elasticsearch_dsl import Completion
 
+from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
@@ -20,6 +21,15 @@ def _adviser_field_with_indexed_id():
             'name': Text(index=False),
         },
     )
+
+
+def _get_country_id_dict(obj):
+    if obj is None:
+        return
+
+    return {
+        'id': str(obj.country_id),
+    }
 
 
 def get_suggestions(db_company):
@@ -130,6 +140,14 @@ class Company(BaseESModel):
             'get_one_list_group_global_account_manager',
             dict_utils.contact_or_adviser_dict,
         ),
+        'export_to_countries': lambda obj: [
+            _get_country_id_dict(o) for o in obj.export_countries.all()
+            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        ],
+        'future_interest_countries': lambda obj: [
+            _get_country_id_dict(o) for o in obj.export_countries.all()
+            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        ],
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
     }
 
@@ -138,8 +156,6 @@ class Company(BaseESModel):
         'business_type': dict_utils.id_name_dict,
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
-        'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
-        'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,

@@ -30,8 +30,7 @@ class CompanySearchApp(SearchApp):
         'turnover_range',
         'uk_region',
     ).prefetch_related(
-        'export_to_countries',
-        'future_interest_countries',
+        'export_countries',
     ).annotate(
         latest_interaction_date=get_aggregate_subquery(
             DBCompany,
