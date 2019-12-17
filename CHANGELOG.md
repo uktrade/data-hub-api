@@ -1,3 +1,24 @@
+# Data Hub API 24.1.0 (2019-12-17)
+
+
+## Features
+
+- **Companies** Companies updated with the `update_company_from_dnb` command and the 
+  `update_companies_from_dnb_service` task are now saved with a reversion version
+  which has a meaningful identifier in the comment. This identifier will help provide
+  the groundwork for an "undo tool" which will allow us to reverse these automatic
+  updates in the event of a problem.
+- The CSRF token is now being added to API Docs request header. It is now possible to try POST requests.
+
+## Internal changes
+
+- **Companies** We are now recording `future_interest_countries` 
+  and `export_to_countries` with both the `Company` model and the new model `CompanyExportCountry` 
+  which we're currently integrating.
+- **Investment** All `investor_profile` app database migrations were squashed. The old migrations will be removed once the squashed migration has been applied to all environments.
+- The Elasticsearch suggester query parameter `contexts` is now used instead of the deprecated `context` parameter.
+
+
 # Data Hub API 24.0.0 (2019-12-10)
 
 
