@@ -419,6 +419,28 @@ class Company(ArchivableModel, BaseModel):
         self.one_list_tier = None
         self.save()
 
+    def add_export_country(self, country, status, record_date, adviser):
+        """
+        Add a company export_country, if it doesn't exist.
+        If the company already exists and incoming status is different
+        check if incoming record is newer and update.
+        """
+        export_country, created = CompanyExportCountry.objects.get_or_create(
+            country=country,
+            company=self,
+            defaults={
+                'status': status,
+                'created_by': adviser,
+                'modified_by': adviser,
+            },
+        )
+
+        if not created:
+            if export_country.status != status and export_country.modified_on < record_date:
+                export_country.status = status
+                export_country.modified_by = adviser
+                export_country.save()
+
 
 class OneListCoreTeamMember(models.Model):
     """

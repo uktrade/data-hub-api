@@ -2,6 +2,7 @@ from collections import Counter
 from operator import not_
 
 from django.db.transaction import atomic
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -164,7 +165,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             "A theme can't be removed once set.",
         ),
         'invalid_when_feature_flag_off': gettext_lazy(
-            'export_countries fields are not valid when feature flag is off.',
+            'export countries related fields are not valid when feature flag is off.',
         ),
         'invalid_when_no_countries_discussed': gettext_lazy(
             'This field is only valid when countries were discussed.',
@@ -229,8 +230,8 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     def validate_were_countries_discussed(self, were_countries_discussed):
         """
-        Make sure `were_countries_discussed` field is not being updated
-        when flag is inactive.
+        Make sure `were_countries_discussed` field is not being updated.
+        Updates are not allowed on this field.
         """
         if self.instance is None:
             return were_countries_discussed
@@ -239,7 +240,8 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     def validate_export_countries(self, export_countries):
         """
-        Make sure `export_countries` field is not being updated
+        Make sure `export_countries` field is not being updated.
+        updates are not allowed on this field.
         """
         if self.instance is None:
             return export_countries
@@ -356,6 +358,8 @@ class InteractionSerializer(serializers.ModelSerializer):
         Adds export countries related to an interaction.
         Update is not allowed yet.
         An attempt to update will result in `NotImplementedError` exception.
+
+        Syncs interaction export countries into company export countries.
         """
         existing_country_mapping = {
             export_country.country: export_country
@@ -376,6 +380,16 @@ class InteractionSerializer(serializers.ModelSerializer):
                 interaction=interaction,
                 status=status,
                 created_by=interaction.created_by,
+            )
+            # Sync company_CompanyExportCountry model
+            # NOTE: current date is preferred over future interaction date
+            current_date = now()
+            record_date = current_date if interaction.date > current_date else interaction.date
+            interaction.company.add_export_country(
+                new_country,
+                status,
+                record_date,
+                interaction.created_by,
             )
 
     class Meta:
