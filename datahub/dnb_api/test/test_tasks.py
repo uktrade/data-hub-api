@@ -521,7 +521,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.get_company_update_page',
             mock_get_company_update_page,
         )
-        task_result = get_company_updates.apply()
+        task_result = get_company_updates.apply_async()
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
