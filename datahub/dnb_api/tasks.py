@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 
 import sentry_sdk
 from celery import shared_task
-from celery.result import ResultSet
+from celery.result import allow_join_result, ResultSet
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.utils.timezone import now
@@ -151,7 +151,9 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             break
 
     # Wait for all update tasks to finish...
-    ResultSet(results=update_results).join(propagate=False)
+    # TODO: Use disable_sync_subtasks after updating to Celery 4.4
+    with allow_join_result():
+        ResultSet(results=update_results).join(propagate=False)
     _record_audit(update_results, task, start_time)
     logger.info('Finished get_company_updates task')
 
