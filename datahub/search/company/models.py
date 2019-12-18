@@ -23,15 +23,6 @@ def _adviser_field_with_indexed_id():
     )
 
 
-def _get_country_id_dict(obj):
-    if obj is None:
-        return
-
-    return {
-        'id': str(obj.country_id),
-    }
-
-
 def get_suggestions(db_company):
     """
     Returns a dictionary with the keys input and context.
@@ -86,7 +77,9 @@ def get_suggestions(db_company):
 
 
 class Company(BaseESModel):
-    """Elasticsearch representation of Company model."""
+    """
+    Elasticsearch representation of Company model.
+    """
 
     id = Keyword()
     archived = Boolean()
@@ -141,11 +134,11 @@ class Company(BaseESModel):
             dict_utils.contact_or_adviser_dict,
         ),
         'export_to_countries': lambda obj: [
-            _get_country_id_dict(o) for o in obj.export_countries.all()
+            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
             if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
         ],
         'future_interest_countries': lambda obj: [
-            _get_country_id_dict(o) for o in obj.export_countries.all()
+            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
             if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
         ],
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
