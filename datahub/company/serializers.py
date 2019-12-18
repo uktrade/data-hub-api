@@ -242,6 +242,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'uk_establishment_not_in_uk': gettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
+        'invalid_field': gettext_lazy(
+            'Invalid field.',
+        ),
     }
 
     archived_by = NestedAdviserField(read_only=True)
@@ -445,6 +448,33 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         combiner = DataCombiner(self.instance, data)
 
         return data
+
+    def validate_export_countries(self, export_countries):
+        """This field is invalid when feature flag is inactive"""
+        if is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
+            return export_countries
+
+        raise serializers.ValidationError(
+            self.error_messages['invalid_field'],
+        )
+
+    def validate_export_to_countries(self, export_to_countries):
+        """This field is invalid when feature flag is active"""
+        if not is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
+            return export_to_countries
+
+        raise serializers.ValidationError(
+            self.error_messages['invalid_field'],
+        )
+
+    def validate_future_interest_countries(self, future_interest_countries):
+        """This field is invalid when feature flag is active"""
+        if not is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
+            return future_interest_countries
+
+        raise serializers.ValidationError(
+            self.error_messages['invalid_field'],
+        )
 
     def validate_headquarter_type(self, headquarter_type):
         """Raises an exception if company is a global hq and has subsidiaries."""
