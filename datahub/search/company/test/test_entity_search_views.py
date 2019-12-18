@@ -60,23 +60,25 @@ def setup_data(es_with_collector):
         registered_address_country_id=country_uk,
         uk_region_id=uk_region,
     )
+
     CompanyExportCountryFactory(
         company=company1,
-        country=Country.objects.get(pk=constants.Country.france.value.id),
+        country_id=constants.Country.france.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
     )
 
     CompanyExportCountryFactory(
         company=company1,
-        country=Country.objects.get(pk=constants.Country.japan.value.id),
+        country_id=constants.Country.japan.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
     )
 
     CompanyExportCountryFactory(
         company=company1,
-        country=Country.objects.get(pk=constants.Country.united_states.value.id),
+        country_id=constants.Country.united_states.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
     )
+
     company2 = CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
@@ -88,19 +90,19 @@ def setup_data(es_with_collector):
 
     CompanyExportCountryFactory(
         company=company2,
-        country=Country.objects.get(pk=constants.Country.canada.value.id),
+        country_id=constants.Country.canada.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
     )
 
     CompanyExportCountryFactory(
         company=company2,
-        country=Country.objects.get(pk=constants.Country.france.value.id),
+        country_id=constants.Country.france.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
     )
 
     CompanyExportCountryFactory(
         company=company2,
-        country=Country.objects.get(pk=constants.Country.japan.value.id),
+        country_id=constants.Country.japan.value.id,
         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
     )
 
