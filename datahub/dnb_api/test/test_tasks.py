@@ -501,11 +501,11 @@ class TestGetCompanyUpdates:
             kwargs=expected_kwargs,
         )
 
-    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data(
         self,
-        mocked_write_audit_log,
+        mocked_log_to_sentry,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -528,8 +528,9 @@ class TestGetCompanyUpdates:
         assert company.name == dnb_company['primary_name']
         expected_gu_number = dnb_company['global_ultimate_duns_number']
         assert company.global_ultimate_duns_number == expected_gu_number
-        mocked_write_audit_log.assert_called_with(
-            {
+        mocked_log_to_sentry.assert_called_with(
+            'get_company_updates task completed.',
+            extra={
                 'success_count': 1,
                 'failure_count': 0,
                 'updated_company_ids': [str(company.pk)],
@@ -539,11 +540,11 @@ class TestGetCompanyUpdates:
             },
         )
 
-    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
-        mocked_write_audit_log,
+        mocked_log_to_sentry,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -566,8 +567,9 @@ class TestGetCompanyUpdates:
         assert company.name == dnb_company['primary_name']
         assert company.global_ultimate_duns_number == ''
 
-        mocked_write_audit_log.assert_called_with(
-            {
+        mocked_log_to_sentry.assert_called_with(
+            'get_company_updates task completed.',
+            extra={
                 'success_count': 1,
                 'failure_count': 0,
                 'updated_company_ids': [str(company.pk)],
@@ -577,11 +579,11 @@ class TestGetCompanyUpdates:
             },
         )
 
-    @mock.patch('datahub.dnb_api.tasks._write_audit_log')
+    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_with_failure(
         self,
-        mocked_write_audit_log,
+        mocked_log_to_sentry,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -610,8 +612,9 @@ class TestGetCompanyUpdates:
         assert company.name == dnb_company['primary_name']
         expected_gu_number = dnb_company['global_ultimate_duns_number']
         assert company.global_ultimate_duns_number == expected_gu_number
-        mocked_write_audit_log.assert_called_with(
-            {
+        mocked_log_to_sentry.assert_called_with(
+            'get_company_updates task completed.',
+            extra={
                 'success_count': 1,
                 'failure_count': 1,
                 'updated_company_ids': [str(company.pk)],

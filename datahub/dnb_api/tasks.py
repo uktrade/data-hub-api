@@ -1,8 +1,7 @@
 from datetime import datetime, time, timedelta
 
-import sentry_sdk
 from celery import shared_task
-from celery.result import allow_join_result, ResultSet
+from celery.result import ResultSet
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.utils.timezone import now
@@ -10,6 +9,7 @@ from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
+from datahub.core.utils import log_to_sentry
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_UPDATES
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
@@ -66,16 +66,6 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None, update_descri
     _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor)
 
 
-def _write_audit_log(audit):
-    """
-    Push out an audit log to sentry as an info level message.
-    """
-    with sentry_sdk.push_scope() as scope:
-        for key, value in audit.items():
-            scope.set_extra(key, value)
-        sentry_sdk.capture_message('get_company_updates task completed.')
-
-
 def _record_audit(update_results, producer_task, start_time):
     """
     Record an audit log for the get_company_updates task which expresses the number
@@ -96,7 +86,7 @@ def _record_audit(update_results, producer_task, start_time):
             audit['updated_company_ids'].append(result.result)
         else:
             audit['failure_count'] += 1
-    _write_audit_log(audit)
+    log_to_sentry('get_company_updates task completed.', extra=audit)
 
 
 def _get_company_updates_from_api(last_updated_after, next_page, task):
@@ -151,9 +141,10 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             break
 
     # Wait for all update tasks to finish...
-    # TODO: Use disable_sync_subtasks after updating to Celery 4.4
-    with allow_join_result():
-        ResultSet(results=update_results).join(propagate=False)
+    ResultSet(results=update_results).join(
+        propagate=False,
+        disable_sync_subtasks=False,
+    )
     _record_audit(update_results, task, start_time)
     logger.info('Finished get_company_updates task')
 
