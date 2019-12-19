@@ -1,3 +1,12 @@
+# Data Hub API 24.3.0 (2019-12-19)
+
+
+## Features
+
+- **Companies** The `update_company_dnb_data` command was adjusted so that an audit log is fired
+  to sentry after a successful run.
+
+
 # Data Hub API 24.2.1 (2019-12-18)
 
 
