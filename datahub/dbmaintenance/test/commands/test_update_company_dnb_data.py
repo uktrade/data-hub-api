@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from django.core.management import call_command
+from django.utils.timezone import now
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory
@@ -65,8 +66,16 @@ def mock_sync_company_with_dnb(monkeypatch):
         ['global_ultimate_duns_number', 'name'],
     ),
 )
+@mock.patch('datahub.dbmaintenance.management.commands.update_company_dnb_data.log_to_sentry')
 @freeze_time('2019-01-01 11:12:13')
-def test_run(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb, fields):
+def test_run(
+    mocked_log_to_sentry,
+    s3_stubber,
+    caplog,
+    mock_time,
+    mock_sync_company_with_dnb,
+    fields,
+):
     """
     Test that the command updates the specified records (ignoring ones with errors).
     """
@@ -110,18 +119,38 @@ def test_run(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb, fields):
     assert mock_sleep.call_count == 4
 
     assert mock_sync_company_with_dnb.call_count == 4
+    expected_ids = []
     for company in companies:
         if company.duns_number:
+            expected_ids.append(company.id)
             mock_sync_company_with_dnb.assert_any_call(
                 args=(
                     company.id,
                     fields,
                     'command:update_company_dnb_data:2019-01-01T11:12:13+00:00',
                 ),
+                throw=True,
             )
+    mocked_log_to_sentry.assert_called_with(
+        'update_company_dnb_data command completed.',
+        extra={
+            'success_count': 4,
+            'failure_count': 2,
+            'updated_company_ids': expected_ids,
+            'start_time': now().isoformat(timespec='seconds'),
+            'end_time': now().isoformat(timespec='seconds'),
+        },
+    )
 
 
-def test_simulate(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb):
+@mock.patch('datahub.dbmaintenance.management.commands.update_company_dnb_data.log_to_sentry')
+def test_simulate(
+    mocked_log_to_sentry,
+    s3_stubber,
+    caplog,
+    mock_time,
+    mock_sync_company_with_dnb,
+):
     """
     Test that the command simulates updates if --simulate is passed in.
     """
@@ -162,6 +191,7 @@ def test_simulate(s3_stubber, caplog, mock_time, mock_sync_company_with_dnb):
     assert len(caplog.records) == 2
 
     assert not mock_sync_company_with_dnb.called
+    assert not mocked_log_to_sentry.called
 
 
 def test_limit_call_rate(mock_time):
