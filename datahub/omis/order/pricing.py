@@ -4,7 +4,7 @@ from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
 from datahub.omis.order.constants import VATStatus
-from datahub.omis.order.validators import VATValidator
+from datahub.omis.order.validators import VATSubValidator
 
 
 OrderPricing = namedtuple(
@@ -38,9 +38,8 @@ def _validate_vat(order):
 
     :raises ValidationError: if not
     """
-    validator = VATValidator()
-    validator.set_instance(order)
-    validator()
+    validator = VATSubValidator()
+    validator(order=order)
 
 
 def can_pricing_be_calculated(order):

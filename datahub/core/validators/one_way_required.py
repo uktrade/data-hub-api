@@ -11,6 +11,7 @@ class RequiredUnlessAlreadyBlankValidator:
     (Because of how validation works in DRF, this cannot be done as a field-level validator.)
     """
 
+    requires_context = True
     required_message = 'This field is required.'
 
     def __init__(self, *fields):
@@ -20,17 +21,18 @@ class RequiredUnlessAlreadyBlankValidator:
         :param fields:  Fields that should be required (when not already null)
         """
         self.fields = fields
-        self.instance = None
-        self.partial = None
 
-    def __call__(self, attrs):
+    def __call__(self, attrs, serializer):
         """Performs validation (called by DRF)."""
+        instance = serializer.instance
+        is_partial = serializer.partial
+
         errors = {}
         for field in self.fields:
-            if self.instance and is_blank(getattr(self.instance, field)):
+            if instance and is_blank(getattr(instance, field)):
                 continue
 
-            if self.partial and field not in attrs:
+            if is_partial and field not in attrs:
                 continue
 
             if is_blank(attrs.get(field)):
@@ -38,15 +40,6 @@ class RequiredUnlessAlreadyBlankValidator:
 
         if errors:
             raise serializers.ValidationError(errors)
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the model instance and whether this is a partial update.
-
-        Called by DRF.
-        """
-        self.instance = serializer.instance
-        self.partial = serializer.partial
 
     def __repr__(self):
         """Returns the string representation of this object."""

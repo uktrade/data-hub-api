@@ -39,11 +39,10 @@ class TestAddressValidator:
                 'town': {'required': True},
             },
         )
-
-        validator.set_context(mock.Mock(instance=instance))
+        serializer = mock.Mock(instance=instance)
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data, serializer)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
             'town': ['This field is required.'],
@@ -79,11 +78,10 @@ class TestAddressValidator:
                 'town': {'required': True},
             },
         )
-
-        validator.set_context(mock.Mock(instance=instance))
+        serializer = mock.Mock(instance=instance)
 
         try:
-            validator(data)
+            validator(data, serializer)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -117,11 +115,10 @@ class TestAddressValidator:
                 'town': {'required': True},
             },
         )
-
-        validator.set_context(mock.Mock(instance=instance))
+        serializer = mock.Mock(instance=instance)
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data, serializer)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
             'town': ['This field is required.'],
