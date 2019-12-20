@@ -1,3 +1,16 @@
+# Data Hub API 24.4.0 (2019-12-20)
+
+
+## Features
+
+- **Companies** A new management command, `update_company_uk_region`, was added.
+
+  This can update the UK regions of companies using a CSV file stored in Amazon S3.
+- **Companies** A new management command, `update_company_sector`, was added.
+
+  This can update the sectors of companies using a CSV file stored in Amazon S3.
+
+
 # Data Hub API 24.3.0 (2019-12-19)
 
 
