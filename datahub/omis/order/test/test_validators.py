@@ -13,16 +13,17 @@ from datahub.omis.order.test.factories import (
     OrderWithOpenQuoteFactory,
 )
 from datahub.omis.order.validators import (
-    AssigneesFilledInValidator,
-    CancellableOrderValidator,
-    CompletableOrderValidator,
+    AssigneesFilledInSubValidator,
+    CancellableOrderSubValidator,
+    CompletableOrderSubValidator,
     ContactWorksAtCompanyValidator,
-    NoOtherActiveQuoteExistsValidator,
-    OrderDetailsFilledInValidator,
+    NoOtherActiveQuoteExistsSubValidator,
+    OrderDetailsFilledInSubValidator,
     OrderEditableFieldsValidator,
     OrderInStatusRule,
+    OrderInStatusSubValidator,
     OrderInStatusValidator,
-    VATValidator,
+    VATSubValidator,
 )
 
 
@@ -39,13 +40,13 @@ class TestContactWorksAtCompanyValidator:
         new_contact = mock.Mock(company=company)
 
         validator = ContactWorksAtCompanyValidator()
-        validator.set_context(serializer)
+        data = {
+            'contact': new_contact,
+            'company': company,
+        }
 
         try:
-            validator({
-                'contact': new_contact,
-                'company': company,
-            })
+            validator(data, serializer)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -59,13 +60,13 @@ class TestContactWorksAtCompanyValidator:
         new_contact = mock.Mock()  # doesn't work at `company`
 
         validator = ContactWorksAtCompanyValidator()
-        validator.set_context(serializer)
+        data = {
+            'contact': new_contact,
+            'company': company,
+        }
 
         with pytest.raises(ValidationError):
-            validator({
-                'contact': new_contact,
-                'company': company,
-            })
+            validator(data, serializer)
 
     def test_with_different_field_names(self):
         """
@@ -79,30 +80,29 @@ class TestContactWorksAtCompanyValidator:
             contact_field='main_contact',
             company_field='main_company',
         )
-        validator.set_context(serializer)
+        data = {
+            'main_contact': new_main_contact,
+            'main_company': company,
+        }
 
         try:
-            validator({
-                'main_contact': new_main_contact,
-                'main_company': company,
-            })
+            validator(data, serializer)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
 
 @pytest.mark.django_db
-class TestAssigneesFilledInValidator:
-    """Tests for the AssigneesFilledInValidator."""
+class TestAssigneesFilledInSubValidator:
+    """Tests for the AssigneesFilledInSubValidator."""
 
     def test_no_assignees_fails(self):
         """Test that the validation fails if the order doesn't have any assignees."""
         order = OrderFactory(assignees=[])
 
-        validator = AssigneesFilledInValidator()
-        validator.set_instance(order)
+        validator = AssigneesFilledInSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator()
+            validator(order=order)
 
         assert exc.value.detail == {
             'assignees': ['You need to add at least one assignee.'],
@@ -113,11 +113,10 @@ class TestAssigneesFilledInValidator:
         order = OrderFactory()
         order.assignees.update(is_lead=False)
 
-        validator = AssigneesFilledInValidator()
-        validator.set_instance(order)
+        validator = AssigneesFilledInSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator()
+            validator(order=order)
 
         assert exc.value.detail == {
             'assignee_lead': ['You need to set a lead assignee.'],
@@ -131,11 +130,10 @@ class TestAssigneesFilledInValidator:
         order = OrderFactory()
         order.assignees.update(estimated_time=0)
 
-        validator = AssigneesFilledInValidator()
-        validator.set_instance(order)
+        validator = AssigneesFilledInSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator()
+            validator(order=order)
 
         assert exc.value.detail == {
             'assignee_time': ['The total estimated time cannot be zero.'],
@@ -149,18 +147,17 @@ class TestAssigneesFilledInValidator:
         order = OrderFactory()
         assert order.assignees.aggregate(sum=Sum('estimated_time'))['sum'] > 0
 
-        validator = AssigneesFilledInValidator()
-        validator.set_instance(order)
+        validator = AssigneesFilledInSubValidator()
 
         try:
-            validator()
+            validator(order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
 
 @pytest.mark.django_db
-class TestOrderDetailsFilledInValidator:
-    """Tests for the OrderDetailsFilledInValidator."""
+class TestOrderDetailsFilledInSubValidator:
+    """Tests for the OrderDetailsFilledInSubValidator."""
 
     @pytest.mark.parametrize('values_as_data', (True, False))
     def test_incomplete_order(self, values_as_data):
@@ -190,11 +187,10 @@ class TestOrderDetailsFilledInValidator:
                 getattr(order, k).set(v)
             data = {}
 
-        validator = OrderDetailsFilledInValidator()
-        validator.set_instance(order)
+        validator = OrderDetailsFilledInSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data=data, order=order)
 
         all_fields = list(order_fields) + list(order_m2m_fields)
         assert exc.value.detail == {
@@ -223,11 +219,10 @@ class TestOrderDetailsFilledInValidator:
         order = OrderFactory(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = OrderDetailsFilledInValidator()
-        validator.set_instance(order)
+        validator = OrderDetailsFilledInSubValidator()
 
         try:
-            validator(data)
+            validator(data=data, order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -239,7 +234,7 @@ class TestOrderDetailsFilledInValidator:
         order = OrderFactory()
 
         with mock.patch.object(
-            OrderDetailsFilledInValidator,
+            OrderDetailsFilledInSubValidator,
             'get_extra_validators',
         ) as get_extra_validators:
 
@@ -252,13 +247,15 @@ class TestOrderDetailsFilledInValidator:
                 ),
             ]
 
-            validator = OrderDetailsFilledInValidator()
-            validator.set_instance(order)
+            validator = OrderDetailsFilledInSubValidator()
 
             with pytest.raises(ValidationError) as exc:
-                validator({
-                    'description': '',
-                })
+                validator(
+                    data={
+                        'description': '',
+                    },
+                    order=order,
+                )
 
             assert exc.value.detail == {
                 'description': [
@@ -269,28 +266,26 @@ class TestOrderDetailsFilledInValidator:
 
 
 @pytest.mark.django_db
-class TestNoOtherActiveQuoteExistsValidator:
-    """Tests for the NoOtherActiveQuoteExistsValidator."""
+class TestNoOtherActiveQuoteExistsSubValidator:
+    """Tests for the NoOtherActiveQuoteExistsSubValidator."""
 
     def test_with_existing_active_quote(self):
         """Test that if there's already an active quote, the validation fails."""
         order = OrderWithOpenQuoteFactory()
 
-        validator = NoOtherActiveQuoteExistsValidator()
-        validator.set_instance(order)
+        validator = NoOtherActiveQuoteExistsSubValidator()
 
         with pytest.raises(APIConflictException):
-            validator()
+            validator(order=order)
 
     def test_without_any_active_quote(self):
         """Test that if there isn't any active quote, the validation passes."""
         order = OrderFactory()
 
-        validator = NoOtherActiveQuoteExistsValidator()
-        validator.set_instance(order)
+        validator = NoOtherActiveQuoteExistsSubValidator()
 
         try:
-            validator()
+            validator(order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -298,8 +293,66 @@ class TestNoOtherActiveQuoteExistsValidator:
         """Test that if there is a cancelled quote, the validation passes."""
         order = OrderWithCancelledQuoteFactory()
 
-        validator = NoOtherActiveQuoteExistsValidator()
-        validator.set_instance(order)
+        validator = NoOtherActiveQuoteExistsSubValidator()
+
+        try:
+            validator(order=order)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+
+@pytest.mark.django_db
+class TestOrderInStatusSubValidator:
+    """Tests for the OrderInStatusSubValidator."""
+
+    def test_validation_passes(self):
+        """
+        Test that the validation passes if order.status is one of the allowed statuses.
+        """
+        order = OrderFactory(status=OrderStatus.complete)
+
+        validator = OrderInStatusSubValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.complete,
+                OrderStatus.cancelled,
+            ),
+        )
+
+        try:
+            validator(order=order)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+    def test_validation_fails(self):
+        """
+        Test that the validation fails if order.status is NOT one of the allowed statuses.
+        """
+        order = OrderFactory(status=OrderStatus.complete)
+
+        validator = OrderInStatusSubValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.cancelled,
+            ),
+        )
+
+        with pytest.raises(APIConflictException):
+            validator(order=order)
+
+    def test_order_not_required(self):
+        """
+        Test that if order_required == False and the order passed in is None,
+        the validation passes.
+        """
+        validator = OrderInStatusSubValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.complete,
+                OrderStatus.cancelled,
+            ),
+            order_required=False,
+        )
 
         try:
             validator()
@@ -311,7 +364,14 @@ class TestNoOtherActiveQuoteExistsValidator:
 class TestOrderInStatusValidator:
     """Tests for the OrderInStatusValidator."""
 
-    def test_validation_passes(self):
+    @pytest.mark.parametrize(
+        'serializer_factory',
+        (
+            lambda order: mock.Mock(instance=order, context={}),
+            lambda order: mock.Mock(context={'order': order}),
+        ),
+    )
+    def test_validation_passes(self, serializer_factory):
         """
         Test that the validation passes if order.status is one of the allowed statuses.
         """
@@ -324,14 +384,21 @@ class TestOrderInStatusValidator:
                 OrderStatus.cancelled,
             ),
         )
-        validator.set_instance(order)
+        serializer = serializer_factory(order)
 
         try:
-            validator()
+            validator({}, serializer)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
-    def test_validation_fails(self):
+    @pytest.mark.parametrize(
+        'serializer_factory',
+        (
+            lambda order: mock.Mock(instance=order, context={}),
+            lambda order: mock.Mock(context={'order': order}),
+        ),
+    )
+    def test_validation_fails(self, serializer_factory):
         """
         Test that the validation fails if order.status is NOT one of the allowed statuses.
         """
@@ -343,32 +410,10 @@ class TestOrderInStatusValidator:
                 OrderStatus.cancelled,
             ),
         )
-        validator.set_instance(order)
+        serializer = serializer_factory(order)
 
         with pytest.raises(APIConflictException):
-            validator()
-
-    def test_set_instance_via_serializer_instance(self):
-        """
-        Test that seriaizer.set_context gets the order from serializer.instance.
-        """
-        order = Order()
-        serializer = mock.Mock(instance=order, context={})
-
-        validator = OrderInStatusValidator(allowed_statuses=())
-        validator.set_context(serializer)
-        assert validator.instance == order
-
-    def test_set_instance_via_serializer_context(self):
-        """
-        Test that seriaizer.set_context gets the order from serializer.context['order'].
-        """
-        order = Order()
-        serializer = mock.Mock(context={'order': order})
-
-        validator = OrderInStatusValidator(allowed_statuses=())
-        validator.set_context(serializer)
-        assert validator.instance == order
+            validator({}, serializer)
 
     def test_order_not_required(self):
         """
@@ -383,16 +428,16 @@ class TestOrderInStatusValidator:
             ),
             order_required=False,
         )
-        validator.set_instance(None)
+        serializer = mock.Mock(instance=None, context={})
 
         try:
-            validator()
+            validator({}, serializer)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
 
-class TestVATValidator:
-    """Tests for the VATValidator."""
+class TestVATSubValidator:
+    """Tests for the VATSubValidator."""
 
     @pytest.mark.parametrize('values_as_data', (True, False))
     def test_nothing_specified_fails(self, values_as_data):
@@ -412,11 +457,10 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data=data, order=order)
         assert exc.value.detail == {'vat_status': ['This field is required.']}
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -438,11 +482,10 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data=data, order=order)
         assert exc.value.detail == {'vat_verified': ['This field is required.']}
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -464,11 +507,10 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator(data)
+            validator(data=data, order=order)
         assert exc.value.detail == {'vat_number': ['This field is required.']}
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -490,11 +532,10 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         try:
-            validator(data)
+            validator(data=data, order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -517,11 +558,10 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         try:
-            validator(data)
+            validator(data=data, order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -545,17 +585,16 @@ class TestVATValidator:
         order = Order(**(order_fields if not values_as_data else {}))
         data = order_fields if values_as_data else {}
 
-        validator = VATValidator()
-        validator.set_instance(order)
+        validator = VATSubValidator()
 
         try:
-            validator(data)
+            validator(data=data, order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
 
-class TestCompletableOrderValidator:
-    """Tests for the CompletableOrderValidator."""
+class TestCompletableOrderSubValidator:
+    """Tests for the CompletableOrderSubValidator."""
 
     def test_ok_with_all_actual_time_fields_set(self):
         """
@@ -565,11 +604,10 @@ class TestCompletableOrderValidator:
         order.assignees.all.return_value = (
             mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=0),
         )
-        validator = CompletableOrderValidator()
-        validator.set_order(order)
+        validator = CompletableOrderSubValidator()
 
         try:
-            validator()
+            validator(order=order)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
@@ -581,11 +619,10 @@ class TestCompletableOrderValidator:
         order.assignees.all.return_value = (
             mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=None),
         )
-        validator = CompletableOrderValidator()
-        validator.set_order(order)
+        validator = CompletableOrderSubValidator()
 
         with pytest.raises(ValidationError) as exc:
-            validator()
+            validator(order=order)
 
         assert exc.value.detail == {
             'non_field_errors': (
@@ -595,8 +632,8 @@ class TestCompletableOrderValidator:
         }
 
 
-class TestCancellableOrderValidator:
-    """Tests for the CancellableOrderValidator."""
+class TestCancellableOrderSubValidator:
+    """Tests for the CancellableOrderSubValidator."""
 
     @pytest.mark.parametrize(
         'order_status,force,should_pass',
@@ -622,14 +659,13 @@ class TestCancellableOrderValidator:
         """Test the validator with different order status and force values."""
         order = Order(status=order_status)
 
-        validator = CancellableOrderValidator(force=force)
-        validator.set_instance(order)
+        validator = CancellableOrderSubValidator(force=force)
 
         if should_pass:
-            validator()
+            validator(order=order)
         else:
             with pytest.raises(APIConflictException):
-                validator()
+                validator(order=order)
 
 
 @pytest.mark.parametrize(
@@ -701,18 +737,16 @@ class TestOrderEditableFieldsValidator:
         serializer = mock.Mock(instance=order)
 
         validator = OrderEditableFieldsValidator(mapping)
-        validator.set_context(serializer)
 
         if should_pass:
-            validator(data)
+            validator(data, serializer)
         else:
             with pytest.raises(ValidationError):
-                validator(data)
+                validator(data, serializer)
 
     def test_validation_passes_on_creation(self):
         """Test that the validation passes if we are creating the order instead of editing it."""
         serializer = mock.Mock(instance=None)
 
         validator = OrderEditableFieldsValidator({OrderStatus.paid: {'contact'}})
-        validator.set_context(serializer)
-        validator({'description': 'lorem ipsum'})
+        validator({'description': 'lorem ipsum'}, serializer)
