@@ -6,10 +6,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
 from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
+from reversion.models import Version
 
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.core.serializers import AddressSerializer
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import Country
 
@@ -58,6 +60,12 @@ class DNBServiceConnectionError(Exception):
 class DNBServiceTimeoutError(Exception):
     """
     Exception for when a timeout was encountered when connecting to DNB service.
+    """
+
+
+class RevisionNotFoundError(Exception):
+    """
+    Exception for when a revision with the specified comment is not found.
     """
 
 
@@ -319,3 +327,42 @@ def get_company_update_page(last_updated_after, next_page=None):
         raise DNBServiceError(error_message, response.status_code)
 
     return response.json()
+
+
+def _get_rollback_version(company, update_comment):
+    versions = Version.objects.get_for_object(company)
+    for i, version in enumerate(versions):
+        if version.revision.comment == update_comment:
+            if (i + 1) < len(versions):
+                return versions[i + 1]
+            raise RevisionNotFoundError(
+                f'Revision with comment: {update_comment} is the base version.',
+            )
+    raise RevisionNotFoundError(
+        f'Revision with comment: {update_comment} not found.',
+    )
+
+
+def rollback_dnb_company_update(
+    company,
+    update_descriptor,
+    fields_to_update=None,
+):
+    """
+    Given a company, an update descriptor that identifies a particular update
+    patch and fields that default to ALL_DNB_UPDATE_FIELDS, rollback the record
+    to the state before the update was applied.
+    """
+    fields_to_update = fields_to_update or ALL_DNB_UPDATED_MODEL_FIELDS
+    update_comment = f'Updated from D&B [{update_descriptor}]'
+    rollback_version = _get_rollback_version(company, update_comment)
+    fields = {
+        name: value
+        for name, value in rollback_version.field_dict.items()
+        if name in fields_to_update
+    }
+    with reversion.create_revision():
+        reversion.set_comment(f'Reverted D&B update from: {update_descriptor}')
+        for field, value in fields.items():
+            setattr(company, field, value)
+        company.save(update_fields=fields)

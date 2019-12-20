@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 from uuid import UUID
 
 import pytest
+import reversion
 from django.conf import settings
 from django.forms.models import model_to_dict
 from django.utils.timezone import now
@@ -17,6 +18,7 @@ from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
@@ -26,6 +28,8 @@ from datahub.dnb_api.utils import (
     format_dnb_company,
     get_company,
     get_company_update_page,
+    RevisionNotFoundError,
+    rollback_dnb_company_update,
     update_company_from_dnb,
 )
 from datahub.metadata.models import Country
@@ -554,3 +558,74 @@ class TestGetCompanyUpdatePage:
         assert str(excinfo.value) == expected_message
         assert len(caplog.records) == 1
         assert caplog.records[0].getMessage() == expected_message
+
+
+class TestRollbackDNBCompanyUpdate:
+    """
+    Test rollback_dnb_company_update utility function.
+    """
+
+    @pytest.mark.parametrize(
+        'fields, expected_fields',
+        (
+            (None, ALL_DNB_UPDATED_MODEL_FIELDS),
+            (['name'], ['name']),
+        ),
+    )
+    def test_rollback(
+        self,
+        formatted_dnb_company,
+        fields,
+        expected_fields,
+    ):
+        """
+        Test that rollback_dnb_company_update will roll back all DNB fields.
+        """
+        with reversion.create_revision():
+            company = CompanyFactory(duns_number=formatted_dnb_company['duns_number'])
+
+        original_company = Company.objects.get(id=company.id)
+
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            update_descriptor='foo',
+        )
+
+        rollback_dnb_company_update(company, 'foo', fields_to_update=fields)
+
+        company.refresh_from_db()
+        for field in expected_fields:
+            assert getattr(company, field) == getattr(original_company, field)
+
+        latest_version = Version.objects.get_for_object(company)[0]
+        assert latest_version.revision.comment == 'Reverted D&B update from: foo'
+
+    @pytest.mark.parametrize(
+        'update_comment, error_message',
+        (
+            ('foo', 'Revision with comment: foo is the base version.'),
+            ('bar', 'Revision with comment: bar not found.'),
+        ),
+    )
+    def test_rollback_error(
+        self,
+        formatted_dnb_company,
+        update_comment,
+        error_message,
+    ):
+        """
+        Test that rollback_dnb_company_update will fail with the given error
+        message when there is an issue in finding the version to revert to.
+        """
+        company = CompanyFactory(duns_number=formatted_dnb_company['duns_number'])
+
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            update_descriptor='foo',
+        )
+
+        with pytest.raises(RevisionNotFoundError) as excinfo:
+            rollback_dnb_company_update(company, update_comment)
+            assert str(excinfo.value) == error_message
