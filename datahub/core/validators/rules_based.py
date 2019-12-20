@@ -294,14 +294,15 @@ class RulesBasedValidator:
     Validation is performed using rules (instances of AbstractValidationRule).
     """
 
+    requires_context = True
+
     def __init__(self, *rules: AbstractValidationRule):
         """
         Initialises the validator with rules.
         """
         self._rules = rules
-        self._serializer = None
 
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """
         Performs validation.
 
@@ -309,27 +310,19 @@ class RulesBasedValidator:
         """
         errors = {}
         combiner = DataCombiner(
-            instance=self._serializer.instance,
+            instance=serializer.instance,
             update_data=data,
-            serializer=self._serializer,
-            model=self._serializer.Meta.model,
+            serializer=serializer,
+            model=serializer.Meta.model,
         )
         for rule in self._rules:
             rule_errors = rule(combiner)
             for error in rule_errors:
                 fields_errors = errors.setdefault(error.field, [])
-                fields_errors.append(self._serializer.error_messages[error.error_key])
+                fields_errors.append(serializer.error_messages[error.error_key])
 
         if errors:
             raise serializers.ValidationError(errors)
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the serializer instance.
-
-        Called by DRF.
-        """
-        self._serializer = serializer
 
     def __repr__(self):
         """Returns the Python representation of this object."""

@@ -49,10 +49,9 @@ class CancelOrderForm(forms.Form):
         """Validate the form."""
         cleaned_data = super().clean()
 
-        validator = validators.CancellableOrderValidator(force=True)
-        validator.set_instance(self.order)
+        validator = validators.CancellableOrderSubValidator(force=True)
         try:
-            validator()
+            validator(order=self.order)
         except APIConflictException as e:
             raise forms.ValidationError(e)
 

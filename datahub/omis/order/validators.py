@@ -13,24 +13,18 @@ from datahub.omis.order.constants import OrderStatus, VATStatus
 class ContactWorksAtCompanyValidator:
     """Validator which checks if contact works at the specified company."""
 
+    requires_context = True
     message = 'The contact does not work at the given company.'
 
     def __init__(self, contact_field='contact', company_field='company'):
         """Set the fields."""
         self.contact_field = contact_field
         self.company_field = company_field
-        self.instance = None
 
-    def set_context(self, serializer):
-        """
-        This hook is called by the serializer instance,
-        prior to the validation call being made.
-        """
-        self.instance = getattr(serializer, 'instance', None)
-
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Validate that contact works at company."""
-        data_combiner = DataCombiner(self.instance, data)
+        instance = getattr(serializer, 'instance', None)
+        data_combiner = DataCombiner(instance, data)
         company = data_combiner.get_value(self.company_field)
         contact = data_combiner.get_value(self.contact_field)
 
@@ -46,6 +40,7 @@ class OrderEditableFieldsValidator:
     depending on the order status.
     """
 
+    requires_context = True
     message = 'This field cannot be changed at this stage.'
 
     def __init__(self, mapping=None):
@@ -55,24 +50,17 @@ class OrderEditableFieldsValidator:
         :param mapping: dict of <order status, editable fields>
         """
         self.mapping = mapping or {}
-        self.instance = None
 
-    def set_context(self, serializer):
-        """
-        This hook is called by the serializer instance,
-        prior to the validation call being made.
-        """
-        self.instance = getattr(serializer, 'instance', None)
-
-    def _has_changed(self, field, combiner):
+    @staticmethod
+    def _has_changed(field, combiner):
         """
         :returns: True if the data value for `field` has changed compared to
             its instance value.
         """
         field_value = combiner.get_value_auto(field)
         instance_value = DataCombiner(
-            self.instance, {},
-            model=self.instance.__class__,
+            combiner.instance, {},
+            model=combiner.instance.__class__,
         ).get_value_auto(field)
 
         # if it's a queryset, evaluate it
@@ -81,33 +69,31 @@ class OrderEditableFieldsValidator:
 
         return field_value != instance_value
 
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Validate editable fields depending on the order status."""
-        if not self.instance or self.instance.status not in self.mapping:
+        instance = getattr(serializer, 'instance', None)
+
+        if not instance or instance.status not in self.mapping:
             return
 
-        combiner = DataCombiner(self.instance, data, model=self.instance.__class__)
+        combiner = DataCombiner(instance, data, model=instance.__class__)
 
-        editable_fields = self.mapping[self.instance.status]
+        editable_fields = self.mapping[instance.status]
         for field in combiner.data:
             if field not in editable_fields and self._has_changed(field, combiner):
                 raise ValidationError({field: self.message})
 
 
-class VATValidator:
-    """Validator for checking VAT fields on the order."""
+class VATSubValidator:
+    """
+    Validator for checking VAT fields on the order.
+
+    This validator is designed for direct use rather than with a DRF serializer.
+    """
 
     message = 'This field is required.'
 
-    def __init__(self):
-        """Constructor."""
-        self.instance = None
-
-    def set_instance(self, instance):
-        """Set the current instance."""
-        self.instance = instance
-
-    def __call__(self, data=None):
+    def __call__(self, data=None, order=None):
         """
         Check that:
         - vat_status is specified
@@ -116,7 +102,7 @@ class VATValidator:
             - if vat_verified == True:
                 - vat_number is specified
         """
-        data_combiner = DataCombiner(self.instance, data)
+        data_combiner = DataCombiner(order, data)
 
         vat_status = data_combiner.get_value('vat_status')
         if not vat_status:
@@ -138,41 +124,41 @@ class VATValidator:
                 })
 
 
-class AssigneesFilledInValidator:
-    """Validator which checks that the order has enough information about assignees."""
+class AssigneesFilledInSubValidator:
+    """
+    Validator which checks that the order has enough information about assignees.
+
+    This validator is designed for direct use rather than with a DRF serializer.
+    """
 
     no_assignees_message = 'You need to add at least one assignee.'
     no_lead_assignee_message = 'You need to set a lead assignee.'
     no_estimated_time_message = 'The total estimated time cannot be zero.'
 
-    def __init__(self):
-        """Constructor."""
-        self.instance = None
-
-    def set_instance(self, instance):
-        """Set the current instance."""
-        self.instance = instance
-
-    def __call__(self, data=None):
+    def __call__(self, data=None, order=None):
         """Validate that the information about the assignees is set."""
-        if not self.instance.assignees.count():
+        if not order.assignees.count():
             raise ValidationError({
                 'assignees': [self.no_assignees_message],
             })
 
-        if not self.instance.assignees.filter(is_lead=True).count():
+        if not order.assignees.filter(is_lead=True).count():
             raise ValidationError({
                 'assignee_lead': [self.no_lead_assignee_message],
             })
 
-        if not self.instance.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
+        if not order.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
             raise ValidationError({
                 'assignee_time': [self.no_estimated_time_message],
             })
 
 
-class OrderDetailsFilledInValidator:
-    """Validator which checks that the order has all detail fields filled in."""
+class OrderDetailsFilledInSubValidator:
+    """
+    Validator which checks that the order has all detail fields filled in.
+
+    This validator is designed for direct use rather than with a DRF serializer.
+    """
 
     REQUIRED_FIELDS = (
         'primary_market',
@@ -182,19 +168,11 @@ class OrderDetailsFilledInValidator:
     )
 
     extra_validators = (
-        VATValidator(),
-        AssigneesFilledInValidator(),
+        VATSubValidator(),
+        AssigneesFilledInSubValidator(),
     )
 
     message = 'This field is required.'
-
-    def __init__(self):
-        """Constructor."""
-        self.instance = None
-
-    def set_instance(self, instance):
-        """Set the current instance."""
-        self.instance = instance
 
     def get_extra_validators(self):
         """
@@ -204,7 +182,7 @@ class OrderDetailsFilledInValidator:
         """
         return self.extra_validators
 
-    def _run_extra_validators(self, data):
+    def _run_extra_validators(self, data, order):
         """
         Run the extra validators against the instance/data.
 
@@ -212,19 +190,18 @@ class OrderDetailsFilledInValidator:
         """
         errors = defaultdict(list)
         for validator in self.get_extra_validators():
-            validator.set_instance(self.instance)
             try:
-                validator(data)
+                validator(data=data, order=order)
             except ValidationError as exc:
                 for field, field_errors in exc.detail.items():
                     errors[field] += field_errors
         return errors
 
-    def __call__(self, data=None):
+    def __call__(self, data=None, order=None):
         """Validate that all the fields required are set."""
-        data_combiner = DataCombiner(self.instance, data)
+        data_combiner = DataCombiner(order, data)
 
-        meta = self.instance._meta
+        meta = order._meta
         errors = defaultdict(list)
 
         # direct required fields
@@ -240,7 +217,7 @@ class OrderDetailsFilledInValidator:
                 errors[field_name] = [self.message]
 
         # extra validators
-        extra_errors = self._run_extra_validators(data)
+        extra_errors = self._run_extra_validators(data, order)
         for field, field_errors in extra_errors.items():
             errors[field] += field_errors
 
@@ -248,32 +225,28 @@ class OrderDetailsFilledInValidator:
             raise ValidationError(errors)
 
 
-class NoOtherActiveQuoteExistsValidator:
+class NoOtherActiveQuoteExistsSubValidator:
     """
     Validator which checks that there's no other active quote.
     Used to check whether a new quote for the specified order can be
     generated.
+
+    This validator is designed for direct use rather than with a DRF serializer.
     """
 
     message = "There's already an active quote."
 
-    def __init__(self):
-        """Constructor."""
-        self.instance = None
-
-    def set_instance(self, instance):
-        """Set the current instance."""
-        self.instance = instance
-
-    def __call__(self, data=None):
+    def __call__(self, data=None, order=None):
         """Validate that no other active quote exists."""
-        if self.instance.quote and not self.instance.quote.is_cancelled():
+        if order.quote and not order.quote.is_cancelled():
             raise APIConflictException(self.message)
 
 
-class OrderInStatusValidator:
+class OrderInStatusSubValidator:
     """
     Validator which checks that the order is in one of the given statuses.
+
+    This validator is designed for direct use rather than with a DRF serializer.
     """
 
     message = 'The action cannot be performed in the current status {0}.'
@@ -286,62 +259,72 @@ class OrderInStatusValidator:
         """
         self.allowed_statuses = allowed_statuses
         self.order_required = order_required
-        self.instance = None
 
-    def set_instance(self, instance):
-        """Set the current instance."""
-        self.instance = instance
-
-    def set_context(self, serializer):
-        """
-        This hook is called by the serializer instance, prior to the validation call being made.
-
-        It sets self.instance searching for an order in the following order:
-            - serializer.context['order]
-            - serializer.instance
-        """
-        if 'order' in serializer.context:
-            self.set_instance(serializer.context['order'])
-        else:
-            self.set_instance(serializer.instance)
-
-    def __call__(self, data=None):
+    def __call__(self, data=None, order=None):
         """Validate that the order is in one of the statuses."""
-        if not self.instance and not self.order_required:
+        if not order and not self.order_required:
             return  # all fine
 
-        if self.instance.status not in self.allowed_statuses:
+        if order.status not in self.allowed_statuses:
             raise APIConflictException(
-                self.message.format(self.instance.get_status_display()),
+                self.message.format(order.get_status_display()),
             )
 
 
-class CompletableOrderValidator:
+class OrderInStatusValidator:
+    """
+    Validator which checks that the order is in one of the given statuses.
+    """
+
+    requires_context = True
+
+    def __init__(self, allowed_statuses, order_required=True):
+        """
+        :param allowed_statuses: list of OrderStatus values allowed
+        :param order_required: if False and the order is None, the validation passes,
+            useful when creating orders
+        """
+        self.sub_validator = OrderInStatusSubValidator(
+            allowed_statuses,
+            order_required=order_required,
+        )
+
+    def __call__(self, data, serializer):
+        """
+        Validate that the order is in one of the statuses.
+
+        An order instance is searched for in the following locations (using the first one found):
+        - serializer.context['order]
+        - serializer.instance
+        """
+        instance = serializer.context.get('order', serializer.instance)
+        self.sub_validator(data=data, order=instance)
+
+
+class CompletableOrderSubValidator:
     """
     Validator which checks that the order can be completed, that is,
     all the assignees have their actual_time field set.
+
+    This validator is designed for direct use rather than with a DRF serializer.
     """
 
     message = 'You must set the actual time for all assignees to complete this order.'
 
-    def __init__(self):
-        """Initialise the object."""
-        self.order = None
-
-    def set_order(self, order):
-        """Set the order attr to the selected one."""
-        self.order = order
-
-    def __call__(self):
+    def __call__(self, data=None, order=None):
         """Validate that the actual_time field for all the assignees is set."""
-        if any(assignee.actual_time is None for assignee in self.order.assignees.all()):
+        if any(assignee.actual_time is None for assignee in order.assignees.all()):
             raise ValidationError({
                 api_settings.NON_FIELD_ERRORS_KEY: self.message,
             })
 
 
-class CancellableOrderValidator(OrderInStatusValidator):
-    """Validator which checks that the order can be cancelled."""
+class CancellableOrderSubValidator(OrderInStatusSubValidator):
+    """
+    Validator which checks that the order can be cancelled.
+
+    This validator is designed for direct use rather than with a DRF serializer.
+    """
 
     def __init__(self, force=False):
         """
