@@ -63,7 +63,7 @@ This project uses Docker compose to setup and run all the necessary components. 
 
 Dependencies:
 
--   Python 3.7.x
+-   Python 3.8.x
 -   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
 -   Elasticsearch 6.8
@@ -75,7 +75,7 @@ Dependencies:
     cd data-hub-api
     ```
 
-2.  Install Python 3.7.
+2.  Install Python 3.8.
 
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
 
@@ -84,7 +84,7 @@ Dependencies:
     On Ubuntu:
 
     ```shell
-    sudo apt install build-essential libpq-dev python3.7-dev python3.7-venv
+    sudo apt install build-essential libpq-dev python3.8-dev python3.8-venv
     ```
 
     On macOS:
@@ -96,7 +96,7 @@ Dependencies:
 4.  Create and activate the virtualenv:
 
     ```shell
-    python3.7 -m venv env
+    python3.8 -m venv env
     source env/bin/activate
     pip install -U pip
     ```
