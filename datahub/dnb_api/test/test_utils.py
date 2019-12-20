@@ -599,7 +599,7 @@ class TestRollbackDNBCompanyUpdate:
             assert getattr(company, field) == getattr(original_company, field)
 
         latest_version = Version.objects.get_for_object(company)[0]
-        latest_version.revision.comment = 'Reverted D&B update from: foo'
+        assert latest_version.revision.comment == 'Reverted D&B update from: foo'
 
     @pytest.mark.parametrize(
         'update_comment, error_message',
@@ -626,6 +626,6 @@ class TestRollbackDNBCompanyUpdate:
             update_descriptor='foo',
         )
 
-        with pytest.raises(RevisionNotFoundError) as e:
+        with pytest.raises(RevisionNotFoundError) as excinfo:
             rollback_dnb_company_update(company, update_comment)
-            assert str(e) == error_message
+            assert str(excinfo.value) == error_message
