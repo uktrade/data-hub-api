@@ -356,7 +356,7 @@ def rollback_dnb_company_update(
     fields_to_update = fields_to_update or ALL_DNB_UPDATED_MODEL_FIELDS
     update_comment = f'Updated from D&B [{update_descriptor}]'
     rollback_version = _get_rollback_version(company, update_comment)
-    fields = rollback_version.field_dict if fields_to_update is None else {
+    fields = {
         name: value
         for name, value in rollback_version.field_dict.items()
         if name in fields_to_update
