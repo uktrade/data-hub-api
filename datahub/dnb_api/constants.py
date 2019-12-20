@@ -1,7 +1,7 @@
 FEATURE_FLAG_DNB_COMPANY_SEARCH = 'dnb-company-search'
 FEATURE_FLAG_DNB_COMPANY_UPDATES = 'dnb-company-updates'
 
-ALL_DNB_UPDATED_FIELDS = (
+ALL_DNB_UPDATED_SERIALIZER_FIELDS = (
     'name',
     'trading_names',
     'address',
