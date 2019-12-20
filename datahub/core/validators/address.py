@@ -6,6 +6,7 @@ from datahub.core.validate_utils import DataCombiner
 class AddressValidator:
     """Validator for addresses."""
 
+    requires_context = True
     message = 'This field is required.'
 
     DEFAULT_FIELDS_MAPPING = {
@@ -32,14 +33,6 @@ class AddressValidator:
             self.fields_mapping = fields_mapping
         else:
             self.fields_mapping = self.DEFAULT_FIELDS_MAPPING
-        self.instance = None
-
-    def set_context(self, serializer):
-        """
-        This hook is called by the serializer instance,
-        prior to the validation call being made.
-        """
-        self.instance = getattr(serializer, 'instance', None)
 
     def _should_validate(self, data_combined):
         """
@@ -63,9 +56,10 @@ class AddressValidator:
                 errors[field_name] = [self.message]
         return errors
 
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Validate the address fields."""
-        data_combiner = DataCombiner(self.instance, data)
+        instance = getattr(serializer, 'instance', None)
+        data_combiner = DataCombiner(instance, data)
 
         data_combined = {
             field_name: data_combiner.get_value(field_name)

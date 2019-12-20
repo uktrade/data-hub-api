@@ -185,7 +185,7 @@ class TestGenerateQuote:
     @mock.patch('datahub.omis.order.models.validators')
     def test_fails_with_incomplete_fields(self, validators):
         """Test raises ValidationError if the order is incomplete."""
-        validators.OrderDetailsFilledInValidator.side_effect = ValidationError('error')
+        validators.OrderDetailsFilledInSubValidator.side_effect = ValidationError('error')
 
         order = OrderFactory()
         with pytest.raises(ValidationError):
@@ -194,7 +194,7 @@ class TestGenerateQuote:
     @mock.patch('datahub.omis.order.models.validators')
     def test_fails_if_theres_already_an_active_quote(self, validators):
         """Test raises APIConflictException if there's already an active quote."""
-        validators.NoOtherActiveQuoteExistsValidator.side_effect = APIConflictException('error')
+        validators.NoOtherActiveQuoteExistsSubValidator.side_effect = APIConflictException('error')
 
         order = OrderFactory()
         with pytest.raises(APIConflictException):

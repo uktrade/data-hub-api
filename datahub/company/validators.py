@@ -8,18 +8,14 @@ _INVALID_COMPANY_NUMBER_RE = re.compile(r'[^A-Z0-9]')
 class NotATransferredCompanyValidator:
     """Validates that a company has not been marked as a duplicate."""
 
-    def __init__(self):
-        """Initialises the validator."""
-        self.instance = None
+    requires_context = True
 
-    def set_context(self, serializer):
-        """Saves a reference to the model object."""
-        self.instance = serializer.instance
-
-    def __call__(self, data):
+    def __call__(self, data, serializer):
         """Performs validation."""
-        if self.instance.transferred_to:
-            transfer_reason = self.instance.get_transfer_reason_display()
+        instance = serializer.instance
+
+        if instance.transferred_to:
+            transfer_reason = instance.get_transfer_reason_display()
             raise ValidationError(
                 f'This record is no longer in use and its data has been transferred to another '
                 f'record for the following reason: {transfer_reason}.',
