@@ -7,7 +7,7 @@ from datahub.company.models import Company
 from datahub.core.utils import log_to_sentry
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
-from datahub.dnb_api.constants import ALL_DNB_UPDATED_FIELDS
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
 from datahub.dnb_api.tasks import sync_company_with_dnb
 
 
@@ -58,7 +58,7 @@ class Command(CSVBaseCommand):
             nargs='+',
             help='The DNBCompanySerializer fields to update.',
             required=False,
-            choices=ALL_DNB_UPDATED_FIELDS,
+            choices=ALL_DNB_UPDATED_SERIALIZER_FIELDS,
         )
 
     def _record_audit_log(self):
