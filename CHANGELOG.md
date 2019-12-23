@@ -1,3 +1,22 @@
+# Data Hub API 24.5.0 (2019-12-23)
+
+
+## Features
+
+- **Companies** Added integration tests for the `rollback_dnb_company_updates` management command.
+  This can now be used as it has been fully tested.
+- **Companies** A management command `rollback_dnb_company_updates` was added to revert updates applied
+  by either the `update_company_dnb_data` command or the `get_company_updates` task. 
+  At present, the rollback command calls a stub function which will be fleshed out later -
+  it is not ready for use.
+
+## Bug fixes
+
+- **Companies** A bugfix was made to ensure that the task id for the overall company updates
+  process is used as an update descriptor in reversion comments.  This will allow the use
+  of a rollback tool in the event that D&B updates need to be undone.
+
+
 # Data Hub API 24.4.0 (2019-12-20)
 
 
