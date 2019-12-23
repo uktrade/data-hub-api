@@ -8,6 +8,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, CompanyExportCountry, OneListTier
@@ -1334,6 +1335,15 @@ class TestUpdateCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['great_profile_status'] == profile_status
+
+    def test_update_company_no_data(self):
+        """Test that we do not update the company if there is no new data."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data={})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(Version.objects.get_for_object(company)) == 0
 
 
 class TestCompaniesToCompanyExportCountryModel(APITestMixin):
