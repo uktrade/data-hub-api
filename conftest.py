@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
+from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
@@ -388,3 +389,77 @@ def mock_es_client(monkeypatch):
     mock_client = Mock()
     monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
     yield mock_client
+
+
+@pytest.fixture
+def dnb_response_uk():
+    """
+    Returns a UK-based DNB company.
+    """
+    return {
+        'results': [
+            {
+                'address_country': 'GB',
+                'address_county': '',
+                'address_line_1': 'Unit 10, Ockham Drive',
+                'address_line_2': '',
+                'address_postcode': 'UB6 0F2',
+                'address_town': 'GREENFORD',
+                'annual_sales': 50651895.0,
+                'annual_sales_currency': 'USD',
+                'domain': 'foo.com',
+                'duns_number': '123456789',
+                'employee_number': 260,
+                'global_ultimate_duns_number': '291332174',
+                'global_ultimate_primary_name': 'FOO BICYCLE LIMITED',
+                'industry_codes': [
+                    {
+                        'code': '336991',
+                        'description': 'Motorcycle, Bicycle, and Parts Manufacturing',
+                        'priority': 1,
+                        'typeDescription': 'North American Industry Classification System 2017',
+                        'typeDnbCode': 30832,
+                    },
+                    {
+                        'code': '1927',
+                        'description': 'Motorcycle Manufacturing',
+                        'priority': 1,
+                        'typeDescription': 'D&B Hoovers Industry Code',
+                        'typeDnbCode': 25838,
+                    },
+                ],
+                'is_annual_sales_estimated': None,
+                'is_employees_number_estimated': True,
+                'is_out_of_business': False,
+                'legal_status': 'corporation',
+                'primary_industry_codes': [
+                    {
+                        'usSicV4': '3751',
+                        'usSicV4Description': 'Mfg motorcycles/bicycles',
+                    },
+                ],
+                'primary_name': 'FOO BICYCLE LIMITED',
+                'registered_address_country': 'GB',
+                'registered_address_county': '',
+                'registered_address_line_1': 'C/O LONE VARY',
+                'registered_address_line_2': '',
+                'registered_address_postcode': 'UB6 0F2',
+                'registered_address_town': 'GREENFORD',
+                'registration_numbers': [
+                    {
+                        'registration_number': '01261539',
+                        'registration_type': 'uk_companies_house_number',
+                    },
+                ],
+                'trading_names': [],
+            },
+        ],
+    }
+
+
+@pytest.fixture
+def formatted_dnb_company(dnb_response_uk):
+    """
+    Get formatted DNB company data.
+    """
+    return format_dnb_company(dnb_response_uk['results'][0])

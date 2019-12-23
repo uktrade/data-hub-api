@@ -25,7 +25,6 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
-    format_dnb_company,
     get_company,
     get_company_update_page,
     RevisionNotFoundError,
@@ -39,14 +38,6 @@ pytestmark = pytest.mark.django_db
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
-
-
-@pytest.fixture
-def formatted_dnb_company(dnb_response_uk):
-    """
-    Get formatted DNB company data.
-    """
-    return format_dnb_company(dnb_response_uk['results'][0])
 
 
 @pytest.mark.parametrize(
