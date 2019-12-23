@@ -214,6 +214,6 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update
         dh_company,
         dnb_company,
         fields_to_update=fields_to_update,
-        update_descriptor='celery:company_update',
+        update_descriptor=update_descriptor,
     )
     return str(dh_company.pk)

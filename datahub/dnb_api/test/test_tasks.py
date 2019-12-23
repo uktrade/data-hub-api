@@ -647,7 +647,11 @@ def test_update_company_from_dnb_data(dnb_response_uk):
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
+    update_descriptor = 'foobar'
+    task_result = update_company_from_dnb_data.apply_async(
+        args=[dnb_response_uk['results'][0]],
+        kwargs={'update_descriptor': update_descriptor},
+    )
     assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
@@ -707,6 +711,11 @@ def test_update_company_from_dnb_data(dnb_response_uk):
         'website': 'http://foo.com',
         'dnb_modified_on': now(),
     }
+
+    versions = list(Version.objects.get_for_object(company))
+    assert len(versions) == 1
+    version = versions[0]
+    assert version.revision.comment == f'Updated from D&B [{update_descriptor}]'
 
 
 @freeze_time('2019-01-01 11:12:13')
