@@ -142,6 +142,11 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    def perform_update(self, serializer):
+        """Custom logic for updating the model instance."""
+        if serializer.validated_data != {}:
+            super().perform_update(serializer)
+
 
 class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):
     """Read-only company view set using Hawk-authentication (with no user context)."""
