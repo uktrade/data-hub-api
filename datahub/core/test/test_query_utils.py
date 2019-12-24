@@ -19,11 +19,27 @@ from datahub.core.query_utils import (
     get_queryset_object,
     get_string_agg_subquery,
     get_top_related_expression_subquery,
+    JSONBBuildObject,
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory, PersonListItemFactory
 from datahub.core.test.support.models import Book, Person, PersonListItem
 
 pytestmark = pytest.mark.django_db
+
+
+class TestJSONBBuildObject:
+    """Tests for JSONBBuildObject."""
+
+    def test_as_annotation(self):
+        """Test that the function can be used as an annotation."""
+        person = PersonFactory()
+        queryset = Person.objects.annotate(
+            data=JSONBBuildObject(first_name='first_name', last_name='last_name'),
+        )
+        assert queryset.first().data == {
+            'first_name': person.first_name,
+            'last_name': person.last_name,
+        }
 
 
 class TestGetStringAggSubquery:
