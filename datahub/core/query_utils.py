@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
+from django.contrib.postgres.fields import JSONField
 from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Concat, NullIf
 
@@ -25,6 +26,40 @@ class PreferNullConcat(Func):
 
     template = '%(expressions)s'
     arg_joiner = ' || '
+
+
+class JSONBBuildObject(Func):
+    """
+    Create a JSONB field from keys and expressions.
+
+    Can be used with subqueries to annotate a query with multiple values from the subquery at
+    once.
+
+    Usage example:
+
+        Interaction.objects.annotate(
+            contact_data=get_array_agg_subquery(
+                Interaction.contacts.through,
+                'interaction',
+                JSONBBuildObject(first_name='first_name', last_name='last_name'),
+            ),
+        )
+    """
+
+    function = 'jsonb_build_object'
+    output_field = JSONField()
+
+    def __init__(self, **kwargs):
+        """
+        Initialise the function with a list of keys and expressions to build the JSON object
+        from.
+        """
+        args = [
+            expression
+            for key, expression in kwargs.items()
+            for expression in [Value(key), expression]
+        ]
+        super().__init__(*args)
 
 
 def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
