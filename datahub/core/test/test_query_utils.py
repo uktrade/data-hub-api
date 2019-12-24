@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import date
 from random import sample, shuffle
 
@@ -9,6 +10,7 @@ from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
+    get_array_agg_subquery,
     get_bracketed_concat_expression,
     get_choices_as_case_expression,
     get_empty_string_if_null_expression,
@@ -62,6 +64,76 @@ class TestGetStringAggSubquery:
         )
         actual_author_names = queryset.first().author_names
         assert actual_author_names == expected_result
+
+
+class TestGetArrayAggSubquery:
+    """Tests for get_array_agg_subquery()."""
+
+    @pytest.mark.parametrize('distinct', (True, False))
+    @pytest.mark.parametrize(
+        'names',
+        (
+            [],
+            ['Barbara'],
+            ['Barbara', 'Claire'],
+            ['Barbara', 'Claire', 'John'],
+            ['Barbara', 'Claire', 'Claire'],
+            ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
+        ),
+    )
+    def test_aggregates_as_array(self, names, distinct):
+        """
+        Test that the first names of all authors for each book can be aggregated into an array
+        for various cases, and with distinct on and off.
+        """
+        authors = PersonFactory.create_batch(
+            len(names),
+            first_name=factory.Iterator(
+                sample(names, len(names)),
+            ),
+        )
+        BookFactory(authors=authors)
+        queryset = Book.objects.annotate(
+            author_names=get_array_agg_subquery(
+                Book.authors.through,
+                'book',
+                'person__first_name',
+                distinct=distinct,
+            ),
+        )
+        actual_author_names = queryset.first().author_names
+        if distinct:
+            assert Counter(actual_author_names) == Counter(set(names))
+        else:
+            assert Counter(actual_author_names) == Counter(names)
+
+    @pytest.mark.parametrize(
+        'ordering,expected_names',
+        (
+            ('person__first_name', ['Barbara', 'Claire', 'Samantha']),
+            ('-person__first_name', ['Samantha', 'Claire', 'Barbara']),
+        ),
+    )
+    def test_orders_results_when_ordering_specified(self, ordering, expected_names):
+        """Test that the values are ordered corrected when an ordering is specified."""
+        names = ['Barbara', 'Claire', 'Samantha']
+        authors = PersonFactory.create_batch(
+            len(names),
+            first_name=factory.Iterator(
+                sample(names, len(names)),
+            ),
+        )
+        BookFactory(authors=authors)
+        queryset = Book.objects.annotate(
+            author_names=get_array_agg_subquery(
+                Book.authors.through,
+                'book',
+                'person__first_name',
+                ordering=ordering,
+            ),
+        )
+        actual_author_names = queryset.first().author_names
+        assert actual_author_names == expected_names
 
 
 class TestGetAggregateSubquery:

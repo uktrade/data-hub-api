@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
 from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Concat, NullIf
 
@@ -46,7 +46,53 @@ def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
     )
 
 
-def get_aggregate_subquery(model, expression):
+def get_array_agg_subquery(
+    model,
+    join_field_name,
+    expression_to_aggregate,
+    distinct=False,
+    ordering=(),
+):
+    """
+    Get a subquery that aggregates values from a to-many relation as an array.
+
+    Can be used with a many-to-many through model, or any other model with a foreign key to the
+    model being annotated.
+
+    Usage examples:
+
+        Interaction.objects.annotate(
+            contact_first_names=get_array_agg_subquery(
+                Interaction.contacts.through,
+                'interaction',
+                'first_name',
+            ),
+        )
+
+        Interaction.objects.annotate(
+            adviser_first_names=get_array_agg_subquery(
+                InteractionDITParticipant,
+                'interaction',
+                'first_name',
+            ),
+        )
+
+    Note: The usage of this function differs from `get_string_agg_subquery()`, as this function
+    omits the outer model from the subquery to avoid unwanted NULL values appearing in the
+    returned arrays when rows don't have any values in the intermediate model being queried.
+
+    For example, this makes sure an annotation on interaction contacts gets a value of [] if
+    the interaction doesn't have any contacts. (If the Interaction model were included in the
+    subquery, the annotation value would instead be [None].)
+    """
+    return get_aggregate_subquery(
+        model,
+        ArrayAgg(expression_to_aggregate, distinct=distinct, ordering=ordering),
+        join_field_name=join_field_name,
+    )
+
+
+def get_aggregate_subquery(model, expression, join_field_name='pk'):
     """
     Gets a subquery that calculates an aggregate value of a to-many field.
 
@@ -63,10 +109,15 @@ def get_aggregate_subquery(model, expression):
     if not getattr(expression, 'contains_aggregate', False):
         raise ValueError('An aggregate expression must be provided.')
 
-    queryset = model.objects.annotate(
+    # For an explanation of the operations here, see
+    # https://docs.djangoproject.com/en/2.2/ref/models/expressions/#using-aggregates-within-a-subquery-expression
+    queryset = model.objects.filter(
+        **{join_field_name: OuterRef('pk')},
+    ).order_by(
+    ).values(
+        join_field_name,
+    ).annotate(
         _annotated_value=expression,
-    ).filter(
-        pk=OuterRef('pk'),
     ).values(
         '_annotated_value',
     )
