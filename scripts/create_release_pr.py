@@ -22,6 +22,7 @@ import subprocess
 import webbrowser
 from urllib.parse import quote, urlencode
 
+from script_utils.command import CommandError, print_error
 from script_utils.git import (
     any_uncommitted_changes,
     local_branch_exists,
@@ -46,10 +47,6 @@ steps.
 parser = argparse.ArgumentParser(
     description='Create and push a release branch for the current version.',
 )
-
-
-class CommandError(Exception):
-    """A fatal error when running the script."""
 
 
 def create_release_branch():
@@ -119,7 +116,7 @@ def main():
     try:
         branch_name = create_release_branch()
     except (CommandError, subprocess.CalledProcessError) as exc:
-        print(f'ERROR: {exc}')  # noqa: T001
+        print_error(exc)
         return
 
     print(  # noqa: T001
