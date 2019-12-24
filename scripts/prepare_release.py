@@ -24,6 +24,7 @@ import subprocess
 import webbrowser
 from urllib.parse import quote, urlencode
 
+from script_utils.command import CommandError, print_error
 from script_utils.git import any_uncommitted_changes, local_branch_exists, remote_branch_exists
 from script_utils.news_fragments import list_news_fragments
 from script_utils.versioning import (
@@ -39,10 +40,6 @@ parser = argparse.ArgumentParser(
     description='Bump the version, update the changelog and open a PR.',
 )
 parser.add_argument('release_type', type=ReleaseType, choices=ReleaseType.__members__.values())
-
-
-class CommandError(Exception):
-    """A fatal error when running the script."""
 
 
 def prepare_release(release_type):
@@ -114,7 +111,7 @@ def main():
     try:
         branch_name = prepare_release(args.release_type)
     except (CommandError, subprocess.CalledProcessError) as exc:
-        print(f'ERROR: {exc}')  # noqa: T001
+        print_error(exc)
         return
 
     print(  # noqa: T001
