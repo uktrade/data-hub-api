@@ -29,6 +29,7 @@ import requests
 from requests import HTTPError
 
 from script_utils.changelog import extract_version_changelog
+from script_utils.command import CommandError, print_error
 from script_utils.git import get_file_contents, remote_tag_exists
 
 GITHUB_RELEASE_API_URL = 'https://api.github.com/repos/uktrade/data-hub-api/releases'
@@ -43,10 +44,6 @@ using the GITHUB_TOKEN environment variable. If that variable is not set, you wi
 for a token.
 """,
 )
-
-
-class CommandError(Exception):
-    """A fatal error when running the script."""
 
 
 def publish_release():
@@ -100,13 +97,7 @@ def main():
     try:
         tag = publish_release()
     except (CommandError, HTTPError, subprocess.CalledProcessError) as exc:
-        messages = [f'ERROR: {exc}']
-
-        if isinstance(exc, HTTPError) and exc.response is not None:
-            response_data = exc.response.json()
-            messages.append(f'Response: {response_data}')
-
-        print(*messages, sep='\n')  # noqa: T001
+        print_error(exc)
         return
 
     print(  # noqa: T001
