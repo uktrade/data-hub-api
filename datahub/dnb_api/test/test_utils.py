@@ -54,7 +54,6 @@ DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
 def test_get_company_dnb_service_error(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     dnb_response_status,
 ):
     """
@@ -105,7 +104,6 @@ def test_get_company_dnb_service_error(
 def test_get_company_dnb_service_request_error(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     request_exception,
     expected_exception,
     expected_message,
@@ -151,7 +149,6 @@ def test_get_company_dnb_service_request_error(
 def test_get_company_invalid_request_response(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     search_results,
     expected_exception,
     expected_message,
@@ -176,7 +173,6 @@ def test_get_company_invalid_request_response(
 def test_get_company_valid(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     dnb_response_uk,
 ):
     """
@@ -243,7 +239,6 @@ class TestUpdateCompanyFromDNB:
     @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
         update_descriptor,
@@ -343,7 +338,6 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_partial_fields_single(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
     ):
@@ -377,7 +371,6 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_partial_fields_multiple(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
     ):
