@@ -39,24 +39,9 @@ class TestDNBAPICommon(APITestMixin):
     as company-create endpoints.
     """
 
-    def test_post_no_feature_flag(self, requests_mock, url):
-        """
-        Test that POST fails with a 404 when the feature flag is unset.
-        """
-        requests_mock.post(DNB_SEARCH_URL)
-
-        response = self.api_client.post(
-            url,
-            content_type='application/json',
-        )
-
-        assert response.status_code == 404
-        assert requests_mock.called is False
-
     def test_unauthenticated_not_authorised(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         url,
     ):
         """
@@ -82,7 +67,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
     """
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
-    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
+    def test_post_no_dnb_setting(self):
         """
         Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
@@ -102,7 +87,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
     )
     def test_content_type(
         self,
-        dnb_company_search_feature_flag,
         requests_mock,
         dnb_response_non_uk,
         content_type,
@@ -188,7 +172,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
     )
     def test_post(
         self,
-        dnb_company_search_feature_flag,
         dnb_company_search_datahub_companies,
         requests_mock,
         request_data,
@@ -287,7 +270,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
     )
     def test_post_permissions(
         self,
-        dnb_company_search_feature_flag,
         dnb_company_search_datahub_companies,
         requests_mock,
         response_status_code,
@@ -328,7 +310,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
     def test_monitoring(
         self,
         monkeypatch,
-        dnb_company_search_feature_flag,
         requests_mock,
         response_status_code,
     ):
@@ -449,7 +430,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
-    def test_post_no_dnb_setting(self, dnb_company_search_feature_flag):
+    def test_post_no_dnb_setting(self):
         """
         Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
@@ -464,7 +445,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_non_uk(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_non_uk,
     ):
         """
@@ -499,7 +479,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_uk(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
     ):
         """
@@ -542,7 +521,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     )
     def test_post_invalid(
         self,
-        dnb_company_search_feature_flag,
         data,
     ):
         """
@@ -579,7 +557,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_none_or_multiple_companies_found(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         results,
         expected_status_code,
         expected_message,
@@ -617,7 +594,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_missing_required_fields(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
         missing_required_field,
         expected_error,
@@ -665,7 +641,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_missing_optional_fields(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
         field_overrides,
     ):
@@ -701,7 +676,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     def test_post_existing(
         self,
-        dnb_company_search_feature_flag,
     ):
         """
         Test if create-company endpoint returns 400 if the company with the given
@@ -726,7 +700,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_invalid_country(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
     ):
         """
@@ -759,7 +732,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_invalid_global_ultimate(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
         global_ultimate_override,
     ):
@@ -797,7 +769,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_dnb_service_error(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         status_code,
     ):
         """
@@ -821,7 +792,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_dnb_service_connection_error(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
     ):
         """
         Test if create-company endpoint returns 400 if the company is based in a country
@@ -852,7 +822,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_no_permission(
         self,
         requests_mock,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
         permissions,
     ):
@@ -889,7 +858,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_monitoring_search(
         self,
         monkeypatch,
-        dnb_company_search_feature_flag,
         requests_mock,
         response_status_code,
     ):
@@ -917,7 +885,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_monitoring_create(
         self,
         monkeypatch,
-        dnb_company_search_feature_flag,
         dnb_response_uk,
         requests_mock,
     ):
@@ -958,7 +925,6 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
     )
     def test_post(
             self,
-            dnb_company_search_feature_flag,
             investigation_payload,
             investigation_override,
     ):
@@ -1037,7 +1003,6 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
     )
     def test_post_invalid(
             self,
-            dnb_company_search_feature_flag,
             investigation_payload,
             investigation_override,
             expected_error,
@@ -1068,7 +1033,6 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
     )
     def test_post_no_permission(
         self,
-        dnb_company_search_feature_flag,
         permissions,
     ):
         """
@@ -1087,7 +1051,6 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
     def test_monitoring_create(
         self,
         monkeypatch,
-        dnb_company_search_feature_flag,
         investigation_payload,
     ):
         """

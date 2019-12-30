@@ -40,7 +40,6 @@ DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/
 )
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_all_fields(
-    dnb_company_search_feature_flag,
     requests_mock,
     dnb_response_uk,
     update_descriptor,
@@ -130,7 +129,6 @@ def test_sync_company_with_dnb_all_fields(
 
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_partial_fields(
-    dnb_company_search_feature_flag,
     requests_mock,
     dnb_response_uk,
 ):

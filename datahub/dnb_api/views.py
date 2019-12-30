@@ -14,7 +14,6 @@ from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
@@ -31,7 +30,6 @@ from datahub.dnb_api.utils import (
     get_company,
     search_dnb,
 )
-from datahub.feature_flag.utils import feature_flagged_view
 from datahub.oauth.scopes import Scope
 
 
@@ -51,7 +49,6 @@ class DNBCompanySearchView(APIView):
         ),
     )
 
-    @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
         """
@@ -159,7 +156,6 @@ class DNBCompanyCreateView(APIView):
         ),
     )
 
-    @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
     def post(self, request):
         """
         Given a duns_number, get the data for the company from dnb-service
@@ -224,7 +220,6 @@ class DNBCompanyCreateInvestigationView(APIView):
         ),
     )
 
-    @method_decorator(feature_flagged_view(FEATURE_FLAG_DNB_COMPANY_SEARCH))
     def post(self, request):
         """
         Given a minimal set of fields that may be necessary for DNB investigation,
