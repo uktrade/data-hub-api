@@ -45,6 +45,7 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
             # See InteractionSerializer for more information
             'date': obj.latest_interaction_date.date(),
             'subject': obj.latest_interaction_subject,
+            'dit_participants': obj.latest_interaction_dit_participants or [],
         }
 
     class Meta:
