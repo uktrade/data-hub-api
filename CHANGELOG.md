@@ -1,3 +1,28 @@
+# Data Hub API 25.0.0 (2020-01-02)
+
+
+## Removals
+
+- **Companies** The feature flag that enabled the new add-a-company journey was removed.
+
+  This makes the new add-a-company journey the default way to add a new company in Data Hub.
+- **Companies** The `get_dnb_one_list_tier_companies` management command was removed from Data Hub.
+
+  This command was put in temporarily to safely run queries required for DNB company hierarchies rollout.
+
+## Deprecations
+
+- The following `dnb-match` endpoints will be deprecated on or after 5 January 2020:
+
+  - `GET v4/dnb-match/<uuid:company_pk>`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-match`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-no-match`
+- The following tables will be removed from Data Hub on or after 5 Jan 2020:
+
+  - `dnb_match_dnbmatchingcsvrecord`
+  - `dnb_match_dnbmatchingresult`
+
+
 # Data Hub API 24.5.0 (2019-12-23)
 
 
