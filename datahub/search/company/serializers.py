@@ -30,6 +30,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     )
     latest_interaction_date_after = RelaxedDateField(required=False)
     latest_interaction_date_before = RelaxedDateField(required=False)
+    uk_postcode = SingleOrListField(child=serializers.CharField(), required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',

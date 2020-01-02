@@ -40,6 +40,10 @@ class SearchCompanyAPIViewMixin:
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }
+    fields_to_exclude = (
+        'uk_address_postcode',
+        'uk_registered_address_postcode',
+    )
 
     FILTER_FIELDS = (
         'archived',
@@ -54,6 +58,7 @@ class SearchCompanyAPIViewMixin:
         'one_list_group_global_account_manager',
         'latest_interaction_date_after',
         'latest_interaction_date_before',
+        'uk_postcode',
     )
 
     REMAP_FIELDS = {
@@ -78,6 +83,10 @@ class SearchCompanyAPIViewMixin:
         'sector_descends': [
             'sector.id',
             'sector.ancestors.id',
+        ],
+        'uk_postcode': [
+            'uk_address_postcode',
+            'uk_registered_address_postcode',
         ],
     }
 
