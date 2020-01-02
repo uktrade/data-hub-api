@@ -10,8 +10,8 @@ argh==0.26.2              # via watchdog
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.10.44
-botocore==1.13.44         # via boto3, s3transfer
+boto3==1.10.45
+botocore==1.13.45         # via boto3, s3transfer
 celery[redis]==4.4
 certifi==2019.9.11        # via requests, sentry-sdk
 chardet==3.0.4
@@ -28,7 +28,7 @@ django-js-asset==1.2.2    # via django-mptt
 django-model-utils==4.0.0
 django-mptt==0.10.0
 django-oauth-toolkit==1.2.0
-django-pglocks==1.0.3
+django-pglocks==1.0.4
 django-redis==4.11.0
 django-reversion==3.0.5
 django==2.2.9
@@ -63,7 +63,7 @@ importlib-metadata==0.23  # via kombu, pluggy, pytest
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.10.2
+ipython==7.11.0
 jedi==0.15.1              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
@@ -114,7 +114,7 @@ s3transfer==0.2.1         # via boto3
 semantic_version==2.8.4
 sentry_sdk==0.13.5
 simplejson==3.16.0        # via mail-parser
-six==1.12.0               # via django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, prompt-toolkit, pytest-xdist, python-dateutil, requests-mock, traitlets
+six==1.12.0               # via django-extensions, django-pglocks, elasticsearch-dsl, faker, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, prompt-toolkit, pytest-xdist, python-dateutil, requests-mock, traitlets
 snowballstemmer==2.0.0    # via pydocstyle
 sqlparse==0.3.0           # via django, django-debug-toolbar
 statsd==3.3.0
