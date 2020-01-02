@@ -8,19 +8,10 @@ from datahub.company.constants import BusinessTypeConstant
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.dnb_api.constants import (
-    FEATURE_FLAG_DNB_COMPANY_SEARCH,
     FEATURE_FLAG_DNB_COMPANY_UPDATES,
 )
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-
-
-@pytest.fixture
-def dnb_company_search_feature_flag(db):
-    """
-    Creates the dnb company search feature flag.
-    """
-    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
 
 
 @pytest.fixture()
