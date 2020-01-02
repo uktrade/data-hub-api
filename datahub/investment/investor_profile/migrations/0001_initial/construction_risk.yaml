@@ -1,9 +1,0 @@
-- model: investor_profile.constructionrisk
-  pk: 79cc3963-9376-4771-9cba-c1b3cc0ade33
-  fields: {disabled_on: null, name: Greenfield (construction risk), order: 100}
-- model: investor_profile.constructionrisk
-  pk: 884deaf6-cb0c-4036-b78c-efd92cb10098
-  fields: {disabled_on: null, name: Brownfield (some construction risk), order: 200}
-- model: investor_profile.constructionrisk
-  pk: 9f554b26-70f2-4cac-89ae-758c2ef71c70
-  fields: {disabled_on: null, name: Operational (no construction risk), order: 300}
