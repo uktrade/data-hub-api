@@ -49,6 +49,9 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
                 ArrayAgg('team_members__adviser_id', ordering=('team_members__id',)),
             ),
             uk_company_sector=get_sector_name_subquery('uk_company__sector'),
+            uk_region_location_names=get_investment_project_to_many_string_agg_subquery(
+                'uk_region_locations__name',
+            ),
         ).values(
             'actual_land_date',
             'actual_uk_region_names',
@@ -56,7 +59,6 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'address_2',
             'address_town',
             'address_postcode',
-            'allow_blank_possible_uk_regions',
             'anonymous_description',
             'associated_non_fdi_r_and_d_project_id',
             'average_salary__name',
@@ -109,4 +111,5 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'total_investment',
             'uk_company_id',
             'uk_company_sector',
+            'uk_region_location_names',
         )
