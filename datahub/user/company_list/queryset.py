@@ -54,6 +54,15 @@ def get_company_list_item_queryset():
         ),
     ).select_related(
         'company',
+    ).only(
+        # Only select the fields we need to reduce data transfer time for large lists
+        # (in particular, companies have a lot of fields which are not needed here)
+        'id',
+        'created_on',
+        'company__id',
+        'company__archived',
+        'company__name',
+        'company__trading_names',
     )
 
 
