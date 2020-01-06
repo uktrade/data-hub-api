@@ -10,8 +10,8 @@ argh==0.26.2              # via watchdog
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.10.45
-botocore==1.13.45         # via boto3, s3transfer
+boto3==1.10.46
+botocore==1.13.46         # via boto3, s3transfer
 celery[redis]==4.4
 certifi==2019.9.11        # via requests, sentry-sdk
 chardet==3.0.4
