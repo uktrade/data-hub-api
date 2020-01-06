@@ -8,6 +8,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion import create_revision
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, CompanyExportCountry, OneListTier
@@ -1612,3 +1613,32 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert [
             list(actual_future_interest_countries)[0].country,
         ] == list(set(new_future_interest_countries) - set(new_export_to_countries))
+
+
+class TestGetCompanyAudit(APITestMixin):
+    """Tests for getting a company's audit history."""
+
+    def test_get_company_audit_history(self):
+        """
+        Tests that the audit history endpoint returns the audit
+        history for the given company.
+        """
+        with create_revision():
+            company = CompanyFactory()
+
+        with create_revision():
+            company.save()
+
+        api_client = self.create_api_client()
+
+        url = reverse('api-v4:company:audit-item', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        # I cannot get the default paginator to put the correct count here
+        # because there is no way to figure out diff={} in ORM
+        assert response.count == 0
+        # We have no revision which should mean the following but doesn't.
+        # It will come across in the FE as the company having a "last updaeted on"
+        # value and no corresponsing version for it which will be weird.
+        assert company.created_on == company.modified_on

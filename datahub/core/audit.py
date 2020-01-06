@@ -46,8 +46,11 @@ class AuditViewSet(ViewSet):
     def _construct_changelog(cls, version_pairs):
         changelog = []
         for v_new, v_old in version_pairs:
-            version_creator = v_new.revision.user
             model_meta_data = v_new.content_type.model_class()._meta
+            changes = diff_versions(model_meta_data, v_old.field_dict, v_new.field_dict)
+            if changes == {}:
+                continue
+            version_creator = v_new.revision.user
             creator_repr = None
             if version_creator:
                 creator_repr = {
@@ -63,9 +66,7 @@ class AuditViewSet(ViewSet):
                 'user': creator_repr,
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.get_comment() or '',
-                'changes': diff_versions(
-                    model_meta_data, v_old.field_dict, v_new.field_dict,
-                ),
+                'changes': changes,
                 **cls._get_additional_change_information(v_new),
             })
         return changelog
