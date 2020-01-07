@@ -27,7 +27,6 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
-    join_attr_values,
     random_obj_for_queryset,
 )
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -967,23 +966,37 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
-        CompanyFactory.create_batch(
+        companies_1 = CompanyFactory.create_batch(
             3,
             turnover=None,
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
-            future_interest_countries=Country.objects.order_by('?')[:3],
         )
-        CompanyFactory.create_batch(
+        companies_2 = CompanyFactory.create_batch(
             2,
             hq=True,
             turnover=100,
             is_turnover_estimated=True,
             number_of_employees=95,
             is_number_of_employees_estimated=True,
-            export_to_countries=Country.objects.order_by('?')[:2],
         )
+
+        for company in (*companies_1, *companies_2):
+            CompanyExportCountryFactory.create_batch(
+                3,
+                company=company,
+                country=factory.Iterator(
+                    Country.objects.order_by('?'),
+                ),
+                status=factory.Iterator(
+                    [
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    ],
+                ),
+            )
 
         es_with_collector.flush_and_refresh()
 
@@ -1014,12 +1027,18 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
-                'Countries exported to': join_attr_values(
-                    company.export_to_countries.order_by('name'),
-                ),
-                'Countries of interest': join_attr_values(
-                    company.future_interest_countries.order_by('name'),
-                ),
+                'Countries exported to': ', '.join([
+                    e.country.name for e in list(CompanyExportCountry.objects.filter(
+                        company=company,
+                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    ).order_by('country__name')) if hasattr(e, 'country')
+                ]),
+                'Countries of interest':', '.join([
+                    e.country.name for e in list(CompanyExportCountry.objects.filter(
+                        company=company,
+                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                    ).order_by('country__name')) if hasattr(e, 'country')
+                ]),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (
