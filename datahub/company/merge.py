@@ -14,7 +14,6 @@ from datahub.user.company_list.models import CompanyListItem
 
 ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('company_list_items').remote_field,
-    Company._meta.get_field('dnbmatchingresult').remote_field,
     Contact.company.field,
     Interaction.company.field,
     InvestmentProject.investor_company.field,

@@ -68,7 +68,6 @@ class Command(BaseCleanupCommand):
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
-                Company._meta.get_field('dnbmatchingresult'),
                 Company._meta.get_field('export_countries'),
             ),
         ),
