@@ -45,6 +45,7 @@ class InteractionsDatasetView(BaseDatasetView):
             'kind',
             'net_company_receipt',
             'notes',
+            'policy_feedback_notes',
             'sector',
             'service_delivery_status__name',
             'service_delivery',
