@@ -18,6 +18,7 @@ from datahub.dnb_api.tasks import (
     sync_company_with_dnb,
     update_company_from_dnb_data,
 )
+from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
@@ -60,7 +61,7 @@ def test_sync_company_with_dnb_all_fields(
     assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
-    assert model_to_dict(company) == {
+    assert model_to_dict_company(company) == {
         'address_1': 'Unit 10, Ockham Drive',
         'address_2': '',
         'address_country': uk_country.id,
@@ -97,12 +98,6 @@ def test_sync_company_with_dnb_all_fields(
         'one_list_tier': None,
         'pending_dnb_investigation': False,
         'reference_code': '',
-        'registered_address_1': 'C/O LONE VARY',
-        'registered_address_2': '',
-        'registered_address_country': uk_country.id,
-        'registered_address_county': '',
-        'registered_address_postcode': 'UB6 0F2',
-        'registered_address_town': 'GREENFORD',
         'sector': original_company.sector_id,
         'trading_names': [],
         'transfer_reason': '',
@@ -113,7 +108,6 @@ def test_sync_company_with_dnb_all_fields(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'vat_number': '',
-        'website': 'http://foo.com',
         'dnb_modified_on': now(),
     }
 
@@ -653,7 +647,7 @@ def test_update_company_from_dnb_data(dnb_response_uk):
     assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
-    assert model_to_dict(company) == {
+    assert model_to_dict_company(company) == {
         'address_1': 'Unit 10, Ockham Drive',
         'address_2': '',
         'address_country': uk_country.id,
@@ -690,12 +684,6 @@ def test_update_company_from_dnb_data(dnb_response_uk):
         'one_list_tier': None,
         'pending_dnb_investigation': False,
         'reference_code': '',
-        'registered_address_1': 'C/O LONE VARY',
-        'registered_address_2': '',
-        'registered_address_country': uk_country.id,
-        'registered_address_county': '',
-        'registered_address_postcode': 'UB6 0F2',
-        'registered_address_town': 'GREENFORD',
         'sector': original_company.sector_id,
         'trading_names': [],
         'transfer_reason': '',
@@ -706,7 +694,6 @@ def test_update_company_from_dnb_data(dnb_response_uk):
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'vat_number': '',
-        'website': 'http://foo.com',
         'dnb_modified_on': now(),
     }
 
