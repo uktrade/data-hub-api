@@ -53,6 +53,7 @@ def get_expected_data_from_interaction(interaction):
             else None
         ),
         'notes': interaction.notes,
+        'policy_feedback_notes': interaction.policy_feedback_notes,
         'sector': get_attr_or_none(interaction, 'company.sector.name'),
         'service_delivery_status__name': get_attr_or_none(
             interaction,
