@@ -4,6 +4,7 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
@@ -319,7 +320,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         or vice-versa based on feature flag.
         """
         adviser = validated_data.get('modified_by')
-        if is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
+        if not is_feature_flag_active(INTERACTION_ADD_COUNTRIES):
             export_to_countries = validated_data.get('export_to_countries')
             future_interest_countries = validated_data.get('future_interest_countries')
             self._update_company_export_country_fields(
@@ -333,7 +334,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             self._update_export_countries(instance, export_countries, adviser)
 
         company = super().update(instance, validated_data)
-        # self._save_and_sync_export_countries(instance, validated_data)
 
         return company
 
@@ -360,11 +360,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
 
+        not_interested_status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested
         CompanyExportCountry.objects.filter(
             company=instance,
         ).exclude(
-            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
-            country__in=all_countries,
+            Q(status=not_interested_status) | Q(country__in=all_countries),
         ).delete()
 
     def _sync_to_company_export_country_model(self, company, adviser, export_countries, status):
@@ -414,21 +414,25 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 country__in=countries_delta,
             ).delete()
 
+        self._sync_to_company_export_country_fields(company, adviser)
+
     def _sync_to_company_export_country_fields(self, company, adviser):
         currently_exporting = CompanyExportCountry.objects.filter(
             company=company,
             status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
         )
-        exporting_to_countries = [country for country in currently_exporting]
+        exporting_to_countries = [item.country for item in currently_exporting]
+        print(exporting_to_countries)
 
         future_interest = CompanyExportCountry.objects.filter(
             company=company,
             status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
         )
-        future_interest_countries = [country for country in future_interest]
+        future_interest_countries = [item.country for item in future_interest]
+        print(future_interest_countries)
 
-        company.export_to_countries = exporting_to_countries
-        company.future_interest_countries = future_interest_countries
+        company.export_to_countries.set(exporting_to_countries)
+        company.future_interest_countries.set(future_interest_countries)
         company.modified_by = adviser
         company.save()
 

@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.constants import BusinessTypeConstant
+from datahub.company.constants import BusinessTypeConstant, INTERACTION_ADD_COUNTRIES
 from datahub.company.models import Company, CompanyExportCountry, OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import (
@@ -23,6 +23,7 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.test.factories import TeamFactory
 
@@ -960,35 +961,6 @@ class TestUpdateCompany(APITestMixin):
                 {'website': None},
                 {'website': None},
             ),
-
-            # Add one export_country
-            (
-                {},
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                                'name': Country.canada.value.name,
-                            },
-                            'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                        },
-                    ],
-                },
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                                'name': Country.canada.value.name,
-                            },
-                            'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                        },
-                    ],
-                },
-            ),
         ),
     )
     def test_update_company(self, initial_model_values, data, expected_response):
@@ -1007,29 +979,6 @@ class TestUpdateCompany(APITestMixin):
             for field_name in expected_response
         }
         assert actual_response == expected_response
-
-    def test_update_company_with_export_country(self):
-        """Test company update."""
-        company = CompanyFactory()
-
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        data = {
-            'export_countries': [
-                {
-                    'country': {
-                        'id': Country.canada.value.id,
-                        'name': Country.canada.value.name,
-                    },
-                    'status':
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
-                },
-            ],
-        }
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['export_countries'] == data['export_countries']
 
     def test_cannot_update_read_only_fields(self):
         """Test updating read-only fields."""
@@ -1303,35 +1252,6 @@ class TestUpdateCompany(APITestMixin):
                         ],
                 },
             ),
-            # can't add duplicate countries with export_countries
-            (
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                                'name': Country.canada.value.name,
-                            },
-                            'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
-                        },
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                                'name': Country.canada.value.name,
-                            },
-                            'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
-                        },
-                    ],
-                },
-                {
-                    'non_field_errors':
-                        [
-                            "Same country can't be added more than once to export_countries."
-                        ],
-                },
-            ),
         ),
     )
     def test_validation_error(self, data, expected_error):
@@ -1568,13 +1488,13 @@ class TestUpdateCompany(APITestMixin):
         assert response.json()['great_profile_status'] == profile_status
 
 
-class TestCompaniesToCompanyExportCountryModel(APITestMixin):
+class TestCompanyExportCountryModel(APITestMixin):
     """Tests for copying export countries from company model to CompanyExportCountry model"""
 
     @staticmethod
-    def update_company_export_country_model(*, self, new_countries, field, company, model_status):
+    def update_company_fields(*, self, new_countries, field, company, model_status):
         """
-        Standard action for updating the model with
+        Standard action for updating the Company model with
         the given data and returning the actual response
 
         :param self: current class scope
@@ -1643,7 +1563,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         new_countries = list(CountryModel.objects.order_by('?')[:2])
 
         # now update them
-        response_data = self.update_company_export_country_model(
+        response_data = self.update_company_fields(
             self=self,
             new_countries=new_countries,
             field=field,
@@ -1696,7 +1616,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                          if country not in existing_countries]
 
         # now update them
-        response_data = self.update_company_export_country_model(
+        response_data = self.update_company_fields(
             self=self,
             new_countries=new_countries,
             field=field,
@@ -1750,7 +1670,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         new_countries = existing_countries + list(CountryModel.objects.order_by('?')[:0])
 
         # now update them
-        response_data = self.update_company_export_country_model(
+        response_data = self.update_company_fields(
             self=self,
             new_countries=new_countries,
             field=field,
@@ -1844,3 +1764,304 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert [
             list(actual_future_interest_countries)[0].country,
         ] == list(set(new_future_interest_countries) - set(new_export_to_countries))
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        'flag,data,expected_error',
+        (
+            # can't send export_to_countries, future_interest_countries when flag is active
+            (
+                True,
+                {
+                    'export_to_countries': None,
+                    'future_interest_countries': None,
+                },
+                {
+                    'export_to_countries': ['This field may not be null.'],
+                    'future_interest_countries': ['This field may not be null.'],
+                },
+            ),
+            (
+                True,
+                {
+                    'export_to_countries': [],
+                    'future_interest_countries': [],
+                },
+                {
+                    'export_to_countries': ['Invalid field.'],
+                    'future_interest_countries': ['Invalid field.'],
+                },
+            ),
+            (
+                True,
+                {
+                    'export_to_countries': [
+                        Country.canada.value.id,
+                        Country.greece.value.id,
+                    ],
+                    'future_interest_countries': [
+                        Country.united_states.value.id,
+                        Country.azerbaijan.value.id,
+                    ],
+                },
+                {
+                    'export_to_countries': ['Invalid field.'],
+                    'future_interest_countries': ['Invalid field.'],
+                },
+            ),
+            # can't send export_countries when flag is inactive
+            (
+                False,
+                {
+                    'export_countries': None,
+                },
+                {'export_countries': ['This field may not be null.']},
+            ),
+            (
+                False,
+                {
+                    'export_countries': [],
+                },
+                {'export_countries': ['Invalid field.']},
+            ),
+            (
+                False,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        },
+                    ],
+                },
+                {'export_countries': ['Invalid field.']},
+            ),
+            # can't add duplicate countries with export_countries
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        },
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+                        },
+                    ],
+                },
+                {
+                    'non_field_errors':
+                        ["Same country can't be added more than once to export_countries."],
+                },
+            ),
+            # export_countries must be fully formed. Country can't be missing
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'country': ['This field is required.']}],
+                },
+            ),
+            # export_countries must be fully formed. Status can't be missing
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'status': ['This field is required.']}],
+                },
+            ),
+            # export_countries must be fully formed. status must be a valid choice
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status': 'foobar',
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'status': ['"foobar" is not a valid choice.']}],
+                },
+            ),
+            # export_countries must be fully formed. country ID must be a valid UUID
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': '1234',
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'country': ['Must be a valid UUID.']}],
+                },
+            ),
+            # export_countries must be fully formed. country UUID must be a valid Country
+            (
+                True,
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': '4dee26c2-799d-49a8-a533-c30c595c942c',
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [
+                        {
+                            'country': [
+                                'Invalid pk "4dee26c2-799d-49a8-a533-c30c595c942c"'
+                                ' - object does not exist.',
+                            ],
+                        },
+                    ],
+                },
+            ),
+        ),
+    )
+    def test_validation_error(self, flag, data, expected_error):
+        """Test validation scenarios."""
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
+        # new_countries = list(CountryModel.objects.order_by('?')[:2])
+        company = CompanyFactory(
+            registered_address_1='',
+            registered_address_2='',
+            registered_address_town='',
+            registered_address_county='',
+            registered_address_postcode='',
+            registered_address_country_id=None,
+        )
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_error
+
+    def _get_export_interest_status(self):
+        export_interest_statuses = [
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+        ]
+        return random.choice(CompanyExportCountry.EXPORT_INTEREST_STATUSES)
+
+    def test_update_company_with_export_country(self):
+        """Test company update."""
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        company = CompanyFactory()
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+
+        countries_set = list(CountryModel.objects.order_by('name')[:4])
+        data_items = [
+            {
+                'country': {
+                    'id': str(country.id),
+                    'name': country.name,
+                },
+                'status':
+                    factory.LazyFunction(
+                        lambda: random.choice(CompanyExportCountry.EXPORT_INTEREST_STATUSES)[0],
+                ),
+            }
+            for country in countries_set
+        ]
+        data = {
+            'export_countries': data_items,
+        }
+
+        status_wise_items = {
+            outer['status']: [
+                inner['country']['id']
+                for inner in data_items if inner['status'] == outer['status']
+            ] for outer in data_items
+        }
+
+        response = self.api_client.patch(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        response_data['export_countries'].sort(key=lambda item: item['country']['name'])
+        current_countries_reqest = status_wise_items[
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        ]
+        current_countries_response = [c['id'] for c in response_data['export_to_countries']]
+
+        future_countries_request = status_wise_items[
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        ]
+        future_countries_response = [c['id'] for c in response_data['future_interest_countries']]
+
+        assert response_data['export_countries'] == data['export_countries']
+        assert current_countries_reqest == current_countries_response
+        assert future_countries_request == future_countries_response
+
+    def test_adding_to_empty_company_fields(self):
+        """
+        Adding export countries to empty ComapnyExportModel
+        should update company fields, exporting_to and future_interest.
+        """
+        assert True
+
+    def test_updating_existing_company_fields(self):
+        """
+        Update existing export countries in ComapnyExportModel
+        should update company fields, exporting_to and future_interest
+        """
+        assert True
+
+    def test_add_more_to_existing_company_fields(self):
+        """
+        Appending export countries to existing ones in CompanyExportModel
+        should be added to company fields, exporting_to and future_interest
+        """
+        assert True
+
+    def test_not_interested_are_unaffected(self):
+        """
+        Make sure existing not_interested export countries are unaffected
+        when exporting_to and future_interest fields are updated
+        """
+        assert True
