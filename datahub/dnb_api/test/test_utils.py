@@ -4,7 +4,6 @@ from uuid import UUID
 import pytest
 import reversion
 from django.conf import settings
-from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import (
@@ -19,6 +18,7 @@ from reversion.models import Version
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
+from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
@@ -259,7 +259,7 @@ class TestUpdateCompanyFromDNB:
         )
         company.refresh_from_db()
         uk_country = Country.objects.get(iso_alpha2_code='GB')
-        assert model_to_dict(company) == {
+        assert model_to_dict_company(company) == {
             'address_1': 'Unit 10, Ockham Drive',
             'address_2': '',
             'address_country': uk_country.id,
@@ -296,12 +296,6 @@ class TestUpdateCompanyFromDNB:
             'one_list_tier': None,
             'pending_dnb_investigation': False,
             'reference_code': '',
-            'registered_address_1': 'C/O LONE VARY',
-            'registered_address_2': '',
-            'registered_address_country': uk_country.id,
-            'registered_address_county': '',
-            'registered_address_postcode': 'UB6 0F2',
-            'registered_address_town': 'GREENFORD',
             'sector': original_company.sector.id,
             'trading_names': [],
             'transfer_reason': '',
@@ -312,7 +306,6 @@ class TestUpdateCompanyFromDNB:
             'turnover_range': original_company.turnover_range.id,
             'uk_region': original_company.uk_region.id,
             'vat_number': '',
-            'website': 'http://foo.com',
             'dnb_modified_on': now(),
         }
 
