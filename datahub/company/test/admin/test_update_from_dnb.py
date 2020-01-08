@@ -137,14 +137,6 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert self.company.address_town == dnb_company['address_town']
         assert self.company.address_county == dnb_company['address_county']
         assert self.company.address_country.iso_alpha2_code == dnb_company['address_country']
-        assert self.company.registered_address_1 == dnb_company['registered_address_line_1']
-        assert self.company.registered_address_2 == dnb_company['registered_address_line_2']
-        assert self.company.registered_address_town == dnb_company['registered_address_town']
-        assert self.company.registered_address_county == dnb_company['registered_address_county']
-        assert (
-            self.company.registered_address_country.iso_alpha2_code
-            == dnb_company['registered_address_country']
-        )
         assert not self.company.pending_dnb_investigation
         assert (
             self.company.global_ultimate_duns_number
