@@ -31,7 +31,6 @@ def get_expected_data_from_project(project):
         'address_2': project.address_2,
         'address_town': project.address_town,
         'address_postcode': project.address_postcode,
-        'allow_blank_possible_uk_regions': project.allow_blank_possible_uk_regions,
         'anonymous_description': project.anonymous_description,
         'associated_non_fdi_r_and_d_project_id': str_or_none(
             project.associated_non_fdi_r_and_d_project_id,
@@ -117,6 +116,10 @@ def get_expected_data_from_project(project):
         'total_investment': float(project.total_investment) if project.total_investment else None,
         'uk_company_id': str_or_none(project.uk_company_id),
         'uk_company_sector': get_attr_or_none(project, 'uk_company.sector.name'),
+        'uk_region_location_names': (
+            join_attr_values(project.uk_region_locations.order_by('name'))
+            if project.uk_region_locations.exists() else None
+        ),
     }
 
 

@@ -11,7 +11,10 @@ from reversion.models import Version
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.core.serializers import AddressSerializer
-from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
+from datahub.dnb_api.constants import (
+    ALL_DNB_UPDATED_MODEL_FIELDS,
+    ALL_DNB_UPDATED_SERIALIZER_FIELDS,
+)
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import Country
 
@@ -236,9 +239,9 @@ def update_company_from_dnb(
 
     Raises serializers.ValidationError if data is invalid.
     """
-    if fields_to_update is not None:
-        # Set dnb_company data to only include the fields in fields_to_update
-        dnb_company = {field: dnb_company[field] for field in fields_to_update}
+    fields_to_update = fields_to_update or ALL_DNB_UPDATED_SERIALIZER_FIELDS
+    # Set dnb_company data to only include the fields in fields_to_update
+    dnb_company = {field: dnb_company[field] for field in fields_to_update}
 
     company_serializer = DNBCompanySerializer(
         dh_company,
