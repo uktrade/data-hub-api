@@ -1,3 +1,36 @@
+# Data Hub API 26.0.0 (2020-01-08)
+
+
+## Removals
+
+- The following deprecated endpoints have been removed from Data Hub API:
+
+  - `GET v4/dnb-match/<uuid:company_pk>`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-match`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-no-match`
+- The following deprecated tables have been removed from Data Hub API:
+
+  - dnb_match_dnbmatchingcsvrecord
+  - dnb_match_dnbmatchingresult
+
+## Features
+
+- **Companies** The `datahub.dnb_api.tasks.get_company_updates` task now run with a specific list of fields to update by default.
+
+  This was introduced to not update `domain` & `registered_address` fields. This is because the data for these fields does not meet Data Hub standards. D&B have been informed of this and are working on a fix.
+
+## Internal changes
+
+- The following internal query utilities were added:
+
+  - `get_array_agg_subquery()`
+  - `JSONBBuildObject`
+
+## API
+
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: The `allow_blank_possible_uk_regions` field was removed and replaced with `uk_region_location_names`.
+
+
 # Data Hub API 25.0.0 (2020-01-02)
 
 
