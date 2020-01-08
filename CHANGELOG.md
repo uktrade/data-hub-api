@@ -19,6 +19,8 @@
 
   This was introduced to not update `domain` & `registered_address` fields. This is because the data for these fields does not meet Data Hub standards. D&B have been informed of this and are working on a fix.
 
+- Python was updated from version 3.7.5 to 3.8.1. This includes updating various indirect dependencies.
+
 ## Internal changes
 
 - The following internal query utilities were added:
