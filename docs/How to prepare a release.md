@@ -11,7 +11,7 @@ As a general guide:
 * if it contains breaking API changes, then it's a major version
 * anything else is a minor version 
 
-You can run `towncrier --draft --version draft` to generate a draft changelog, or [look at the difference between develop and master](https://github.com/uktrade/data-hub-api/compare/develop...master), to help you decide.
+You can run `towncrier --draft --version draft` to generate a draft changelog, or [look at the difference between develop and master](https://github.com/uktrade/data-hub-api/compare/master...develop), to help you decide.
 
 ## Bump the version and update the changelog
 
