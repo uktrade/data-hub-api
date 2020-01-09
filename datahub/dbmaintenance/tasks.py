@@ -6,6 +6,8 @@ from django.db.models import Exists, NOT_PROVIDED, OuterRef, Subquery
 from django.db.transaction import atomic
 from django_pglocks import advisory_lock
 
+from datahub.company.models import Company, CompanyExportCountry
+
 logger = getLogger(__name__)
 
 
@@ -225,41 +227,38 @@ def _copy_export_countries(key, status):
     return num_updated
 
 
-def _get_company_countries(key, status):
-    company_model = apps.get_model('company', 'Company')
-    company_export_country_model = apps.get_model('company', 'CompanyExportCountry')
+def _get_company_countries(source_field, status):
 
     any_company_country_subquery = Exists(
-        company_export_country_model.objects.filter(
-            **{
-                'company_id': OuterRef('pk'),
-                'status': status,
-            },
+        CompanyExportCountry.objects.filter(
+            company_id=OuterRef('pk'),
+            status=status,
         ),
     )
 
-    batch_queryset = company_model.objects.select_for_update().annotate(**{
-        'has_' + key: any_company_country_subquery,
-    }).filter(
+    batch_queryset = Company.objects.select_for_update().annotate(
         **{
-            key + '__isnull': False,
-            'has_' + key: False,
+            f'has_{source_field}': any_company_country_subquery,
+        },
+    ).filter(
+        **{
+            f'{source_field}__isnull': False,
+            f'has_{source_field}': False,
         },
     ).only(
         'pk',
-        key,
     )
 
     return batch_queryset
 
 
-def _copy_company_countries(key, company_with_uncopied_countries, status):
+def _copy_company_countries(source_field, company_with_uncopied_countries, status):
     company_export_country_model = apps.get_model('company', 'CompanyExportCountry')
 
     num_updated = 0
 
     for company in company_with_uncopied_countries:
-        for country in getattr(company, key).all():
+        for country in getattr(company, source_field).all():
             export_country, created = company_export_country_model.objects.get_or_create(
                 company=company,
                 country=country,
