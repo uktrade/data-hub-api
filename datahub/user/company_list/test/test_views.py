@@ -14,7 +14,10 @@ from rest_framework.settings import api_settings
 from datahub.company.models import Company
 from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 from datahub.metadata.test.factories import TeamFactory
 from datahub.user.company_list.models import CompanyList
 from datahub.user.company_list.models import CompanyListItem
@@ -26,10 +29,18 @@ from datahub.user.company_list.views import (
 list_collection_url = reverse('api-v4:company-list:list-collection')
 
 
-def company_with_interactions_factory(num_interactions):
+def company_with_interactions_factory(num_interactions, **interaction_kwargs):
     """Factory for a company with interactions."""
     company = CompanyFactory()
-    CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    CompanyInteractionFactory.create_batch(num_interactions, company=company, **interaction_kwargs)
+    return company
+
+
+def company_with_multiple_participant_interaction_factory():
+    """Factory for a company with an interaction that has multiple participants."""
+    company = CompanyFactory()
+    interaction = CompanyInteractionFactory(company=company, dit_participants=[])
+    InteractionDITParticipantFactory.create_batch(2, interaction=interaction)
     return company
 
 
@@ -817,6 +828,18 @@ class TestCompanyListItemViewSet(APITestMixin):
             ArchivedCompanyFactory,
             partial(company_with_interactions_factory, 1),
             partial(company_with_interactions_factory, 10),
+            company_with_multiple_participant_interaction_factory,
+            # Interaction participant with missing team
+            partial(company_with_interactions_factory, 1, dit_participants__team=None),
+            # Interaction participant with missing adviser
+            partial(
+                company_with_interactions_factory,
+                1,
+                dit_participants__adviser=None,
+                dit_participants__team=factory.SubFactory(TeamFactory),
+            ),
+            # Interaction with no participants
+            partial(company_with_interactions_factory, 1, dit_participants=[]),
         ),
     )
     def test_with_item(self, company_factory):
@@ -845,6 +868,19 @@ class TestCompanyListItemViewSet(APITestMixin):
                     'created_on': format_date_or_datetime(latest_interaction.created_on),
                     'date': format_date_or_datetime(latest_interaction.date.date()),
                     'subject': latest_interaction.subject,
+                    'dit_participants': [
+                        {
+                            'adviser': {
+                                'id': str(dit_participant.adviser.pk),
+                                'name': dit_participant.adviser.name,
+                            } if dit_participant.adviser else None,
+                            'team': {
+                                'id': str(dit_participant.team.pk),
+                                'name': dit_participant.team.name,
+                            } if dit_participant.team else None,
+                        }
+                        for dit_participant in latest_interaction.dit_participants.order_by('pk')
+                    ],
                 } if latest_interaction else None,
             },
         ]
