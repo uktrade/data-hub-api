@@ -163,8 +163,6 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
 class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
-    CURRENTLY_EXPORTING = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
-    FUTURE_INTEREST = CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
     queryset = DBCompany.objects.annotate(
         link=get_front_end_url_expression('company', 'pk'),
         upper_headquarter_type_name=Upper('headquarter_type__name'),
@@ -191,7 +189,8 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             DBCompany,
             Case(
                 When(
-                    export_countries__status=CURRENTLY_EXPORTING,
+                    export_countries__status=CompanyExportCountry
+                    .EXPORT_INTEREST_STATUSES.currently_exporting,
                     then='export_countries__country__name',
                 ),
             ),
@@ -200,7 +199,8 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             DBCompany,
             Case(
                 When(
-                    export_countries__status=FUTURE_INTEREST,
+                    export_countries__status=CompanyExportCountry
+                    .EXPORT_INTEREST_STATUSES.future_interest,
                     then='export_countries__country__name',
                 ),
             ),
