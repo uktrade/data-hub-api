@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, Mock
 
 import factory
 import pytest
+from django.db.models import Q
 
 from datahub.company.models import CompanyExportCountry
 from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
@@ -286,7 +287,7 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             (0, 5, 1),
         ),
     )
-    def test_successfully_copies_from_company_model(
+    def test_successfully_copies_from_company_model_future_interest(
             self,
             monkeypatch,
             num_objects,
@@ -294,7 +295,6 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
-        sample_size = 3
         task_mock = Mock(
             wraps=copy_export_countries_to_company_export_country_model,
         )
@@ -303,24 +303,20 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             task_mock,
         )
 
+        countries = list(Country.objects.order_by('?')[:num_objects + 5])
+        mock_future_interest_countries = countries[:num_objects]
+        other_countries_list = countries[num_objects:]
+
         companies_to_update = CompanyFactory.create_batch(
             num_objects,
-            export_to_countries=Country.objects.order_by('?')[:sample_size],
-            future_interest_countries=Country.objects.order_by('?')[:sample_size],
+            future_interest_countries=mock_future_interest_countries,
         )
 
         future_countries_already_in_the_new_table = CompanyExportCountryFactory.create_batch(
             5,
             company=factory.SubFactory(CompanyFactory),
-            country=Country.objects.order_by('?')[:1][0],
+            country=factory.Iterator(other_countries_list),
             status='future_interest',
-        )
-
-        current_countries_already_in_the_new_table = CompanyExportCountryFactory.create_batch(
-            5,
-            company=factory.SubFactory(CompanyFactory),
-            country=Country.objects.order_by('?')[:1][0],
-            status='currently_exporting',
         )
 
         result_future_interest = task_mock.apply_async(
@@ -330,6 +326,74 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             },
         )
 
+        assert result_future_interest.successful()
+
+        updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
+
+        assert set([
+            export_country.company for export_country in updated_countries
+        ]) == set(companies_to_update)
+
+        assert set(
+            item.country for item in set(updated_countries)
+        ) == set(mock_future_interest_countries)
+
+        # These countries should not have been modified
+        assert all(
+            [
+                set(CompanyExportCountry.objects.filter(
+                    ~Q(
+                        country_id__in=[
+                            export_country.country.pk for export_country in updated_countries
+                        ],
+                        status='future_interest',
+                    ),
+                )) == set(future_countries_already_in_the_new_table),
+            ],
+        )
+
+    @pytest.mark.parametrize(
+        'num_objects,batch_size,expected_batches',
+        (
+            (10, 4, 3),
+            (10, 5, 3),
+            (11, 6, 2),
+            (11, 12, 1),
+            (0, 5, 1),
+        ),
+    )
+    def test_successfully_copies_from_company_model_currently_exporting(
+            self,
+            monkeypatch,
+            num_objects,
+            batch_size,
+            expected_batches,
+    ):
+        """Test that the task copies data for various batch sizes."""
+        task_mock = Mock(
+            wraps=copy_export_countries_to_company_export_country_model,
+        )
+        monkeypatch.setattr(
+            'datahub.dbmaintenance.tasks.copy_export_countries_to_company_export_country_model',
+            task_mock,
+        )
+
+        countries = list(Country.objects.order_by('?')[:num_objects + 5])
+        mock_export_to_countries = countries[:num_objects]
+        other_countries_list = countries[num_objects:]
+
+        companies_to_update = CompanyFactory.create_batch(
+            num_objects,
+            export_to_countries=mock_export_to_countries,
+        )
+
+        current_countries_already_in_the_new_table = CompanyExportCountryFactory.create_batch(
+            5,
+            company=factory.SubFactory(CompanyFactory),
+            country=factory.Iterator(other_countries_list),
+            status='currently_exporting',
+        )
+
         result_currently_exporting = task_mock.apply_async(
             kwargs={
                 'batch_size': batch_size,
@@ -337,7 +401,6 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             },
         )
 
-        assert result_future_interest.successful()
         assert result_currently_exporting.successful()
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
@@ -346,24 +409,20 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             export_country.company for export_country in updated_countries
         ]) == set(companies_to_update)
 
-        # These countries should not have been modified
-        assert all(
-            [
-                set(CompanyExportCountry.objects.filter(
-                    country_id=export_country.country.pk,
-                    status='future_interest',
-                )) == set(future_countries_already_in_the_new_table)
-                for export_country in future_countries_already_in_the_new_table
-            ],
-        )
+        assert set(
+            item.country for item in set(updated_countries)
+        ) == set(mock_export_to_countries)
 
         assert all(
             [
                 set(CompanyExportCountry.objects.filter(
-                    country_id=export_country.country.pk,
-                    status='currently_exporting',
-                )) == set(current_countries_already_in_the_new_table)
-                for export_country in current_countries_already_in_the_new_table
+                    ~Q(
+                        country_id__in=[
+                            export_country.country.pk for export_country in updated_countries
+                        ],
+                        status='currently_exporting',
+                    ),
+                )) == set(current_countries_already_in_the_new_table),
             ],
         )
 
