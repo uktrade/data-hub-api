@@ -1,3 +1,35 @@
+# Data Hub API 26.1.0 (2020-01-09)
+
+
+## API
+
+- **Advisers** `GET /v4/company-list/<pk>/item`: The latest interaction of each list item now includes an array of DIT participants in the `dit_participants` field. In context, the field has the following structure:
+
+  ```json
+  {
+      "results": [
+          {
+              "latest_interaction": {
+                  "dit_participants": [
+                      {
+                         "adviser": {
+                             "id": ...,
+                             "name": ...
+                         },
+                         "team": {
+                             "id": ...,
+                             "name": ...
+                         }
+                      },
+                      ...
+                  ]
+              }
+          }
+      ]
+  }
+  ```
+
+
 # Data Hub API 26.0.0 (2020-01-08)
 
 
@@ -18,6 +50,8 @@
 - **Companies** The `datahub.dnb_api.tasks.get_company_updates` task now run with a specific list of fields to update by default.
 
   This was introduced to not update `domain` & `registered_address` fields. This is because the data for these fields does not meet Data Hub standards. D&B have been informed of this and are working on a fix.
+
+- Python was updated from version 3.7.5 to 3.8.1. This includes updating various indirect dependencies.
 
 ## Internal changes
 

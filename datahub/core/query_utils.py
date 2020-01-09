@@ -116,9 +116,11 @@ def get_array_agg_subquery(
     omits the outer model from the subquery to avoid unwanted NULL values appearing in the
     returned arrays when rows don't have any values in the intermediate model being queried.
 
-    For example, this makes sure an annotation on interaction contacts gets a value of [] if
-    the interaction doesn't have any contacts. (If the Interaction model were included in the
-    subquery, the annotation value would instead be [None].)
+    For example, this makes sure an annotation on interaction contacts doesn't get a value of
+    [None] if the interaction doesn't have any contacts.
+
+    Note, however, if there are no array values, the value of the annotation will be None and
+    not []. (If [] is desired, Coalesce can be used.)
     """
     return get_aggregate_subquery(
         model,

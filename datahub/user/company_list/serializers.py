@@ -26,6 +26,8 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
 
     company = NestedRelatedField(
         Company,
+        # If this list of fields is changed, update the equivalent list in the QuerySet.only()
+        # call in the queryset module
         extra_fields=('archived', 'name', 'trading_names'),
     )
     latest_interaction = serializers.SerializerMethodField()
@@ -45,6 +47,7 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
             # See InteractionSerializer for more information
             'date': obj.latest_interaction_date.date(),
             'subject': obj.latest_interaction_subject,
+            'dit_participants': obj.latest_interaction_dit_participants or [],
         }
 
     class Meta:
