@@ -79,7 +79,7 @@ def prepare_release(release_type):
 
     remaining_news_fragment_paths = list_news_fragments()
     if remaining_news_fragment_paths:
-        joined_paths = '\n'.join(remaining_news_fragment_paths)
+        joined_paths = '\n'.join(str(path) for path in remaining_news_fragment_paths)
 
         raise CommandError(
             'These news fragments were left behind:\n\n'
