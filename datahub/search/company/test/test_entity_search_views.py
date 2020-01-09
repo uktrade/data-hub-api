@@ -1028,16 +1028,14 @@ class TestCompanyExportView(APITestMixin):
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Countries exported to': ', '.join([
-                    e.country.name for e in list(CompanyExportCountry.objects.filter(
-                        company=company,
+                    e.country.name for e in company.export_countries.filter(
                         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                    ).order_by('country__name')) if hasattr(e, 'country')
+                    ).order_by('country__name')
                 ]),
                 'Countries of interest':', '.join([
-                    e.country.name for e in list(CompanyExportCountry.objects.filter(
-                        company=company,
+                    e.country.name for e in company.export_countries.filter(
                         status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
-                    ).order_by('country__name')) if hasattr(e, 'country')
+                    ).order_by('country__name')
                 ]),
                 'Archived': company.archived,
                 'Date created': company.created_on,

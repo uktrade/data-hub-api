@@ -62,7 +62,7 @@ class JSONBBuildObject(Func):
         super().__init__(*args)
 
 
-def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, filter=None):
+def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
     """
     Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
@@ -80,10 +80,8 @@ def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, f
         StringAgg(
             expression,
             delimiter,
-            filter=filter,
             ordering=(expression,),
             distinct=distinct,
-            output_field=CharField(),
         ),
     )
 
