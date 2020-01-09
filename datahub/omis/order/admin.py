@@ -13,7 +13,7 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import format_html, format_html_join
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
@@ -239,7 +239,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
             context = dict(
                 self.admin_site.each_context(request),
                 title=_('Are you sure?'),
-                object_name=force_text(opts.verbose_name),
+                object_name=force_str(opts.verbose_name),
                 object=obj,
                 opts=opts,
                 app_label=opts.app_label,
@@ -259,7 +259,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         opts = self.model._meta
 
         msg_dict = {
-            'name': force_text(opts.verbose_name),
+            'name': force_str(opts.verbose_name),
             'obj': format_html('<a href="{0}">{1}</a>', urlquote(request.path), obj),
         }
         msg = format_html(
