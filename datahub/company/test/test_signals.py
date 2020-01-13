@@ -9,7 +9,8 @@ from datahub.company.constants import (
     BusinessTypeConstant,
     NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG,
 )
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.models import CompanyExportCountry, CompanyExportCountryHistory
+from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import BusinessType
 from datahub.notification.core import notify_gateway
@@ -85,3 +86,79 @@ class TestNotifyDNBInvestigationPostSave:
         company.name = 'foobar'
         company.save()
         client.send_email_notification.assert_not_called()
+
+    def test_company_export_country_history_create(self):
+        """
+        Test that creating new CompanyExportCountry record
+        sets up a corresponding history record.
+        """
+        export_country = CompanyExportCountryFactory()
+        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
+        assert len(history) == 1
+        assert history[0].id == export_country.id
+        assert history[0].company == export_country.company
+        assert history[0].country == export_country.country
+        assert history[0].status == export_country.status
+        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+
+    def test_company_export_country_history_update(self):
+        """
+        Test that updating an existing CompanyExportCountry record
+        sets up a corresponding history record.
+        """
+        export_country = CompanyExportCountryFactory(
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        )
+        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
+        assert len(history) == 1
+        assert history[0].id == export_country.id
+        assert history[0].company == export_country.company
+        assert history[0].country == export_country.country
+        assert history[0].status == export_country.status
+        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+
+        export_country.status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        export_country.save()
+        history = CompanyExportCountryHistory.objects.filter(
+            id=export_country.id,
+        ).order_by('history_date')
+        assert len(history) == 2
+        assert history[0].id == export_country.id
+        assert history[0].company == export_country.company
+        assert history[0].country == export_country.country
+        assert history[0].status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[1].id == export_country.id
+        assert history[1].company == export_country.company
+        assert history[1].country == export_country.country
+        assert history[1].status == export_country.status
+        assert history[1].history_type == CompanyExportCountryHistory.HISTORY_TYPES.update
+
+    def test_company_export_country_history_delete(self):
+        """
+        Test that deleting an existing CompanyExportCountry record
+        sets up a corresponding history record.
+        """
+        export_country = CompanyExportCountryFactory(
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        )
+        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
+        assert len(history) == 1
+        assert history[0].id == export_country.id
+        assert history[0].company == export_country.company
+        assert history[0].country == export_country.country
+        assert history[0].status == export_country.status
+        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+
+        export_country_id = export_country.id
+        export_country.delete()
+        history = CompanyExportCountryHistory.objects.filter(
+            id=export_country_id,
+        ).order_by('history_date')
+        assert len(history) == 2
+        assert history[0].id == export_country_id
+        assert history[0].status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[1].id == export_country_id
+        assert history[1].status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        assert history[1].history_type == CompanyExportCountryHistory.HISTORY_TYPES.delete
