@@ -12,11 +12,16 @@ from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
     AndRule,
     EqualsRule,
+    InRule,
+    IsFeatureFlagActive,
+    IsObjectBeingCreated,
+    NotRule,
     OperatorRule,
     RulesBasedValidator,
     ValidationRule,
 )
 from datahub.event.models import Event
+from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -29,6 +34,7 @@ from datahub.interaction.models import (
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
 from datahub.interaction.validators import (
     ContactsBelongToCompanyValidator,
+    DuplicateExportCountryValidator,
     ServiceAnswersValidator,
     StatusChangeValidator,
 )
@@ -102,9 +108,7 @@ class InteractionDITParticipantSerializer(serializers.ModelSerializer):
 
 
 class InteractionExportCountrySerializer(serializers.ModelSerializer):
-    """
-    InteractionExportCountry serializer.
-    """
+    """InteractionExportCountry serializer."""
 
     country = NestedRelatedField(Country)
 
@@ -159,7 +163,20 @@ class InteractionSerializer(serializers.ModelSerializer):
         'cannot_unset_theme': gettext_lazy(
             "A theme can't be removed once set.",
         ),
+        'invalid_when_feature_flag_off': gettext_lazy(
+            'export_countries fields are not valid when feature flag is off.',
+        ),
+        'invalid_when_no_countries_discussed': gettext_lazy(
+            'This field is only valid when countries were discussed.',
+        ),
+        'invalid_for_update': gettext_lazy(
+            'This field is invalid for interaction updates.',
+        ),
     }
+
+    INVALID_FOR_UPDATE = gettext_lazy(
+        'This field is invalid for interaction updates.',
+    )
 
     company = NestedRelatedField(Company)
     contacts = NestedRelatedField(
@@ -199,6 +216,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         required=False,
     )
     export_countries = InteractionExportCountrySerializer(
+        allow_empty=True,
         many=True,
         required=False,
     )
@@ -208,6 +226,25 @@ class InteractionSerializer(serializers.ModelSerializer):
         if value and value.children.count() > 0:
             raise serializers.ValidationError(SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE)
         return value
+
+    def validate_were_countries_discussed(self, were_countries_discussed):
+        """
+        Make sure `were_countries_discussed` field is not being updated
+        when flag is inactive.
+        """
+        if self.instance is None:
+            return were_countries_discussed
+
+        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
+
+    def validate_export_countries(self, export_countries):
+        """
+        Make sure `export_countries` field is not being updated
+        """
+        if self.instance is None:
+            return export_countries
+
+        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
 
     def validate(self, data):
         """
@@ -316,8 +353,9 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     def _save_export_countries(self, interaction, validated_export_countries):
         """
-        Adds export countries related to an interaction
-        Update is not allowed yet
+        Adds export countries related to an interaction.
+        Update is not allowed yet.
+        An attempt to update will result in `NotImplementedError` exception.
         """
         existing_country_mapping = {
             export_country.country: export_country
@@ -406,6 +444,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             ContactsBelongToCompanyValidator(),
             StatusChangeValidator(),
             ServiceAnswersValidator(),
+            DuplicateExportCountryValidator(),
             RulesBasedValidator(
                 ValidationRule(
                     'required',
@@ -465,6 +504,57 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'too_many_contacts_for_event_service_delivery',
                     OperatorRule('contacts', lambda value: len(value) <= 1),
                     when=OperatorRule('is_event', bool),
+                ),
+                ValidationRule(
+                    'invalid_when_feature_flag_off',
+                    OperatorRule('were_countries_discussed', is_blank),
+                    OperatorRule('export_countries', is_blank),
+                    when=AndRule(
+                        IsObjectBeingCreated(),
+                        NotRule(IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES)),
+                    ),
+                ),
+                ValidationRule(
+                    'invalid_for_investment',
+                    OperatorRule('were_countries_discussed', not_),
+                    OperatorRule('export_countries', not_),
+                    when=EqualsRule('theme', Interaction.THEMES.investment),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('were_countries_discussed', is_not_blank),
+                    when=AndRule(
+                        IsObjectBeingCreated(),
+                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
+                        InRule(
+                            'theme',
+                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                        ),
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('export_countries', is_not_blank),
+                    when=AndRule(
+                        OperatorRule('were_countries_discussed', bool),
+                        InRule(
+                            'theme',
+                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                        ),
+                    ),
+                ),
+                ValidationRule(
+                    'invalid_when_no_countries_discussed',
+                    OperatorRule('export_countries', is_blank),
+                    when=AndRule(
+                        IsObjectBeingCreated(),
+                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
+                        OperatorRule('were_countries_discussed', not_),
+                        InRule(
+                            'theme',
+                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                        ),
+                    ),
                 ),
                 # These two rules are only checked for service deliveries as there's a separate
                 # check that event is blank for interactions above which takes precedence (to

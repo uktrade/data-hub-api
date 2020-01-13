@@ -185,6 +185,20 @@ class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
         model = 'interaction.InteractionDITParticipant'
 
 
+class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
+    """Factory for Interaction export country."""
+
+    id = factory.LazyFunction(uuid4)
+    interaction = factory.SubFactory(CompanyInteractionFactory)
+    country = factory.LazyFunction(lambda: random_obj_for_model(Country))
+    status = factory.Iterator(tuple(CompanyExportCountry.EXPORT_INTEREST_STATUSES._db_values))
+    created_on = now()
+    created_by = factory.SubFactory(AdviserFactory)
+
+    class Meta:
+        model = 'interaction.InteractionExportCountry'
+
+
 class ExportCountriesInteractionFactory(InteractionFactoryBase):
     """Factory for creating an export interaction with export countries."""
 
@@ -207,17 +221,3 @@ class ExportCountriesInteractionFactory(InteractionFactoryBase):
                 **kwargs,
             ),
         ]
-
-
-class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
-    """Factory for Interaction export country."""
-
-    id = factory.LazyFunction(uuid4)
-    interaction = factory.SubFactory(CompanyInteractionFactory)
-    country = factory.LazyFunction(lambda: random_obj_for_model(Country))
-    status = factory.Iterator(tuple(CompanyExportCountry.EXPORT_INTEREST_STATUSES._db_values))
-    created_on = now()
-    created_by = factory.SubFactory(AdviserFactory)
-
-    class Meta:
-        model = 'interaction.InteractionExportCountry'
