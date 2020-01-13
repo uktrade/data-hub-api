@@ -525,10 +525,10 @@ class CompanyExportCountry(BaseModel):
 
 class CompanyExportCountryHistory(models.Model):
     """
-    Historical log of `CompanyExportCountry` model
-     Keeps record of each new status in order to come up with
+    Historical log of `CompanyExportCountry` model.
+    Keeps record of each new status in order to come up with
     accurate consolidated export country history for a given
-    company and/or country
+    company and/or country.
     """
 
     HISTORY_TYPES = Choices(

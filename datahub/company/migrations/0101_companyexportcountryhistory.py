@@ -17,14 +17,61 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CompanyExportCountryHistory',
             fields=[
-                ('history_id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(auto_now_add=True, db_index=True, null=True)),
-                ('history_type', models.CharField(choices=[('insert', 'Inserted'), ('update', 'Updated'), ('delete', 'Deleted')], max_length=255)),
+                (
+                    'history_id',
+                    models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
+                ),
+                (
+                    'history_date',
+                    models.DateTimeField(auto_now_add=True, db_index=True, null=True),
+                ),
+                (
+                    'history_type',
+                    models.CharField(
+                        choices=[('insert', 'Inserted'), ('update', 'Updated'), ('delete', 'Deleted')], 
+                        max_length=255,
+                    ),
+                ),
                 ('id', models.UUIDField(db_index=True)),
-                ('status', models.CharField(blank=True, choices=[('not_interested', 'Not interested'), ('currently_exporting', 'Currently exporting to'), ('future_interest', 'Future country of interest')], max_length=255, null=True)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='export_countries_history', to='company.Company')),
-                ('country', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.Country')),
-                ('history_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    'status',
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ('not_interested', 'Not interested'),
+                            ('currently_exporting', 'Currently exporting to'),
+                            ('future_interest', 'Future country of interest'),
+                        ],
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
+                (
+                    'company',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='export_countries_history',
+                        to='company.Company',
+                    ),
+                ),
+                (
+                    'country',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='+',
+                        to='metadata.Country',
+                    ),
+                ),
+                (
+                    'history_user',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'verbose_name_plural': 'company export country history',

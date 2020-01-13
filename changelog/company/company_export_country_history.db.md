@@ -1,1 +1,1 @@
-A new table `company_companyexportcountryhistory` was created to log all changes made to `company_companyexportcountry` model. This will maintain all inserts, updates and deletions to that model with appropriate `history_type` with values `insert`, `update` and `delete`.
+A new model `company_companyexportcountryhistory` was created to log all changes made to `company_companyexportcountry` model. This will maintain all inserts, updates and deletions to that model with appropriate `history_type` with values `insert`, `update` and `delete`.
