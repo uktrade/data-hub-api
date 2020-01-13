@@ -15,7 +15,7 @@ uritemplate==3.0.1  # required for DRF schema features
 whitenoise==5.0.1
 
 chardet==3.0.4
-pyyaml==5.2
+pyyaml==5.3
 python-dateutil==2.8.1
 
 # Persistency layer
