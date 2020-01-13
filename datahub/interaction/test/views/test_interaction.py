@@ -785,36 +785,6 @@ class TestGetInteraction(APITestMixin):
             'archived_reason': None,
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
-    @freeze_time('2017-04-18 13:25:30.986208')
-    def test_non_restricted_user_can_get_multiple_export_countries_interaction(self, permissions):
-        """Test that a user can get an interaction with multiple export countries."""
-        requester = create_test_user(permission_codenames=permissions)
-        interaction = ExportCountriesInteractionFactory()
-        interaction.export_countries.set([
-            InteractionExportCountryFactory(
-                interaction=interaction,
-            )
-            for _ in range(3)
-        ])
-        api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        response_data['export_countries'].sort(key=lambda item: item['country']['name'])
-        assert response_data['export_countries'] == [
-            {
-                'country': {
-                    'id': str(export_country.country.id),
-                    'name': export_country.country.name,
-                },
-                'status': export_country.status,
-            }
-            for export_country in interaction.export_countries.order_by('country__name')
-        ]
-
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_restricted_user_can_get_associated_investment_project_interaction(self):
         """Test that a restricted user can get an associated investment project interaction."""
