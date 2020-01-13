@@ -1,5 +1,5 @@
 # Django and django related
-Django==2.2.9
+Django==3.0.2
 djangorestframework==3.11.0
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
