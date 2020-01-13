@@ -75,6 +75,7 @@ LOCAL_APPS = [
     'datahub.investment.investor_profile',
     'datahub.metadata',
     'datahub.oauth',
+    'datahub.oauth.admin.apps.OAuthAdminConfig',
     'datahub.admin_report',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
@@ -224,6 +225,19 @@ AUTHENTICATION_BACKENDS = [
 RESTRICT_ADMIN = env.bool('RESTRICT_ADMIN', False)
 ALLOWED_ADMIN_IPS = env.list('ALLOWED_ADMIN_IPS', default=[])
 ALLOWED_ADMIN_IP_RANGES = env.list('ALLOWED_ADMIN_IP_RANGES', default=[])
+
+# OAuth2 settings to authenticate Django admin users
+
+ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
+if ADMIN_OAUTH2_ENABLED:
+    ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
+    ADMIN_OAUTH2_BASE_URL = env('ADMIN_OAUTH2_BASE_URL')
+    ADMIN_OAUTH2_TOKEN_FETCH_PATH = env('ADMIN_OAUTH2_TOKEN_FETCH_PATH')
+    ADMIN_OAUTH2_USER_PROFILE_PATH = env('ADMIN_OAUTH2_USER_PROFILE_PATH')
+    ADMIN_OAUTH2_AUTH_PATH = env('ADMIN_OAUTH2_AUTH_PATH')
+    ADMIN_OAUTH2_CLIENT_ID = env('ADMIN_OAUTH2_CLIENT_ID')
+    ADMIN_OAUTH2_CLIENT_SECRET = env('ADMIN_OAUTH2_CLIENT_SECRET')
+    ADMIN_OAUTH2_LOGOUT_PATH = env('ADMIN_OAUTH2_LOGOUT_PATH')
 
 # django-oauth-toolkit settings
 
@@ -381,6 +395,10 @@ if REDIS_BASE_URL:
                 'refresh_gross_value_added_value_for_fdi_investment_projects'
             ),
             'schedule': crontab(minute=0, hour=3, day_of_month=21)
+        },
+        'update_companies_from_dnb_service': {
+            'task': 'datahub.dnb_api.tasks.get_company_updates',
+            'schedule': crontab(minute=0, hour=0),
         }
     }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
@@ -592,9 +610,14 @@ DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = env.list('DNB_INVESTIGATION_NOTIFICA
 DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 DNB_SERVICE_TIMEOUT = 15
+DNB_AUTOMATIC_UPDATE_LIMIT = env.int('DNB_AUTOMATIC_UPDATE_LIMIT', default=None)
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)
 
 STATSD_HOST = env('STATSD_HOST', default='localhost')
 STATSD_PORT = env('STATSD_PORT', default='9125')
 STATSD_PREFIX = env('STATSD_PREFIX', default='datahub-api')
+
+# Settings for CSRF cookie.
+CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', default=False)
+CSRF_COOKIE_HTTPONLY = env('CSRF_COOKIE_HTTPONLY', default=False)

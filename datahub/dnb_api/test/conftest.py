@@ -7,17 +7,19 @@ from freezegun import freeze_time
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, Sector, UKRegion
-from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_SEARCH
+from datahub.dnb_api.constants import (
+    FEATURE_FLAG_DNB_COMPANY_UPDATES,
+)
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
-@pytest.fixture
-def dnb_company_search_feature_flag(db):
+@pytest.fixture()
+def dnb_company_updates_feature_flag():
     """
-    Creates the dnb company search feature flag.
+    Creates the DNB company updates feature flag.
     """
-    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_SEARCH)
+    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_UPDATES)
 
 
 @pytest.fixture
@@ -86,68 +88,14 @@ def dnb_response_non_uk():
 
 
 @pytest.fixture
-def dnb_response_uk():
+def dnb_company_updates_response_uk(dnb_response_uk):
     """
-    Returns a UK-based DNB company.
+    Returns a UK based DNB company in the format of the "company update" API endpoint
+    for dnb-service.
     """
     return {
-        'results': [
-            {
-                'address_country': 'GB',
-                'address_county': '',
-                'address_line_1': 'Unit 10, Ockham Drive',
-                'address_line_2': '',
-                'address_postcode': 'UB6 0F2',
-                'address_town': 'GREENFORD',
-                'annual_sales': 50651895.0,
-                'annual_sales_currency': 'USD',
-                'domain': 'foo.com',
-                'duns_number': '123456789',
-                'employee_number': 260,
-                'global_ultimate_duns_number': '291332174',
-                'global_ultimate_primary_name': 'FOO BICYCLE LIMITED',
-                'industry_codes': [
-                    {
-                        'code': '336991',
-                        'description': 'Motorcycle, Bicycle, and Parts Manufacturing',
-                        'priority': 1,
-                        'typeDescription': 'North American Industry Classification System 2017',
-                        'typeDnbCode': 30832,
-                    },
-                    {
-                        'code': '1927',
-                        'description': 'Motorcycle Manufacturing',
-                        'priority': 1,
-                        'typeDescription': 'D&B Hoovers Industry Code',
-                        'typeDnbCode': 25838,
-                    },
-                ],
-                'is_annual_sales_estimated': None,
-                'is_employees_number_estimated': True,
-                'is_out_of_business': False,
-                'legal_status': 'corporation',
-                'primary_industry_codes': [
-                    {
-                        'usSicV4': '3751',
-                        'usSicV4Description': 'Mfg motorcycles/bicycles',
-                    },
-                ],
-                'primary_name': 'FOO BICYCLE LIMITED',
-                'registered_address_country': 'GB',
-                'registered_address_county': '',
-                'registered_address_line_1': 'C/O LONE VARY',
-                'registered_address_line_2': '',
-                'registered_address_postcode': 'UB6 0F2',
-                'registered_address_town': 'GREENFORD',
-                'registration_numbers': [
-                    {
-                        'registration_number': '01261539',
-                        'registration_type': 'uk_companies_house_number',
-                    },
-                ],
-                'trading_names': [],
-            },
-        ],
+        **dnb_response_uk,
+        'next': None,
     }
 
 

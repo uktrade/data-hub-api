@@ -2,8 +2,8 @@ from urllib.parse import urljoin
 from uuid import UUID
 
 import pytest
+import reversion
 from django.conf import settings
-from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import (
@@ -17,14 +17,18 @@ from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
+from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
-    format_dnb_company,
     get_company,
+    get_company_update_page,
+    RevisionNotFoundError,
+    rollback_dnb_company_update,
     update_company_from_dnb,
 )
 from datahub.metadata.models import Country
@@ -33,14 +37,7 @@ pytestmark = pytest.mark.django_db
 
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
-
-
-@pytest.fixture
-def formatted_dnb_company(dnb_response_uk):
-    """
-    Get formatted DNB company data.
-    """
-    return format_dnb_company(dnb_response_uk['results'][0])
+DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
 
 
 @pytest.mark.parametrize(
@@ -57,7 +54,6 @@ def formatted_dnb_company(dnb_response_uk):
 def test_get_company_dnb_service_error(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     dnb_response_status,
 ):
     """
@@ -108,7 +104,6 @@ def test_get_company_dnb_service_error(
 def test_get_company_dnb_service_request_error(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     request_exception,
     expected_exception,
     expected_message,
@@ -154,7 +149,6 @@ def test_get_company_dnb_service_request_error(
 def test_get_company_invalid_request_response(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     search_results,
     expected_exception,
     expected_message,
@@ -179,7 +173,6 @@ def test_get_company_invalid_request_response(
 def test_get_company_valid(
     caplog,
     requests_mock,
-    dnb_company_search_feature_flag,
     dnb_response_uk,
 ):
     """
@@ -246,7 +239,6 @@ class TestUpdateCompanyFromDNB:
     @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
         update_descriptor,
@@ -267,7 +259,7 @@ class TestUpdateCompanyFromDNB:
         )
         company.refresh_from_db()
         uk_country = Country.objects.get(iso_alpha2_code='GB')
-        assert model_to_dict(company) == {
+        assert model_to_dict_company(company) == {
             'address_1': 'Unit 10, Ockham Drive',
             'address_2': '',
             'address_country': uk_country.id,
@@ -304,12 +296,6 @@ class TestUpdateCompanyFromDNB:
             'one_list_tier': None,
             'pending_dnb_investigation': False,
             'reference_code': '',
-            'registered_address_1': 'C/O LONE VARY',
-            'registered_address_2': '',
-            'registered_address_country': uk_country.id,
-            'registered_address_county': '',
-            'registered_address_postcode': 'UB6 0F2',
-            'registered_address_town': 'GREENFORD',
             'sector': original_company.sector.id,
             'trading_names': [],
             'transfer_reason': '',
@@ -320,7 +306,6 @@ class TestUpdateCompanyFromDNB:
             'turnover_range': original_company.turnover_range.id,
             'uk_region': original_company.uk_region.id,
             'vat_number': '',
-            'website': 'http://foo.com',
             'dnb_modified_on': now(),
         }
 
@@ -346,7 +331,6 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_partial_fields_single(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
     ):
@@ -380,7 +364,6 @@ class TestUpdateCompanyFromDNB:
     )
     def test_update_company_from_dnb_partial_fields_multiple(
         self,
-        dnb_company_search_feature_flag,
         formatted_dnb_company,
         adviser_callable,
     ):
@@ -423,3 +406,203 @@ class TestUpdateCompanyFromDNB:
         with pytest.raises(serializers.ValidationError) as excinfo:
             update_company_from_dnb(company, formatted_dnb_company, adviser)
             assert str(excinfo) == 'Data from D&B did not pass the Data Hub validation checks.'
+
+
+class TestGetCompanyUpdatePage:
+    """
+    Test for the `get_company_update_page` utility function.
+    """
+
+    @pytest.mark.parametrize(
+        'last_updated_after', (
+            '2019-11-11T12:00:00',
+            '2019-11-11',
+        ),
+    )
+    @pytest.mark.parametrize(
+        'next_page', (
+            None,
+            'http://some.url/endpoint?cursor=some-cursor',
+        ),
+    )
+    def test_valid(self, requests_mock, last_updated_after, next_page):
+        """
+        Test if `get_company_update_page` returns the right response
+        on the happy-path.
+        """
+        expected_response = {
+            'previous': None,
+            'next': f'{DNB_UPDATES_URL}?cursor=next-cursor',
+            'results': [
+                {'key': 'value'},
+            ],
+        }
+        mocker = requests_mock.get(
+            next_page if next_page else DNB_UPDATES_URL,
+            status_code=status.HTTP_200_OK,
+            json=expected_response,
+        )
+        response = get_company_update_page(last_updated_after, next_page)
+
+        if next_page:
+            assert mocker.last_request.url == next_page
+        else:
+            assert mocker.last_request.qs.get('last_updated_after') == [last_updated_after]
+
+        assert response == expected_response
+
+    @pytest.mark.parametrize(
+        'dnb_response_status',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ),
+    )
+    def test_dnb_service_error(
+        self,
+        caplog,
+        requests_mock,
+        dnb_response_status,
+    ):
+        """
+        Test if the dnb-service returns a status code that is not
+        200, we log it and raise the exception with an appropriate
+        message.
+        """
+        requests_mock.get(
+            DNB_UPDATES_URL,
+            status_code=dnb_response_status,
+        )
+
+        with pytest.raises(DNBServiceError) as e:
+            get_company_update_page(last_updated_after='foo')
+
+        expected_message = f'DNB service returned an error status: {dnb_response_status}'
+
+        assert e.value.args[0] == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                ConnectTimeout,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+            (
+                ReadTimeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_get_company_dnb_service_request_error(
+        self,
+        caplog,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we log it and raise
+        the exception with an appropriate message.
+        """
+        requests_mock.get(
+            DNB_UPDATES_URL,
+            exc=request_exception,
+        )
+
+        with pytest.raises(expected_exception) as excinfo:
+            get_company_update_page(last_updated_after='foo')
+
+        assert str(excinfo.value) == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
+
+
+class TestRollbackDNBCompanyUpdate:
+    """
+    Test rollback_dnb_company_update utility function.
+    """
+
+    @pytest.mark.parametrize(
+        'fields, expected_fields',
+        (
+            (None, ALL_DNB_UPDATED_MODEL_FIELDS),
+            (['name'], ['name']),
+        ),
+    )
+    def test_rollback(
+        self,
+        formatted_dnb_company,
+        fields,
+        expected_fields,
+    ):
+        """
+        Test that rollback_dnb_company_update will roll back all DNB fields.
+        """
+        with reversion.create_revision():
+            company = CompanyFactory(duns_number=formatted_dnb_company['duns_number'])
+
+        original_company = Company.objects.get(id=company.id)
+
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            update_descriptor='foo',
+        )
+
+        rollback_dnb_company_update(company, 'foo', fields_to_update=fields)
+
+        company.refresh_from_db()
+        for field in expected_fields:
+            assert getattr(company, field) == getattr(original_company, field)
+
+        latest_version = Version.objects.get_for_object(company)[0]
+        assert latest_version.revision.comment == 'Reverted D&B update from: foo'
+
+    @pytest.mark.parametrize(
+        'update_comment, error_message',
+        (
+            ('foo', 'Revision with comment: foo is the base version.'),
+            ('bar', 'Revision with comment: bar not found.'),
+        ),
+    )
+    def test_rollback_error(
+        self,
+        formatted_dnb_company,
+        update_comment,
+        error_message,
+    ):
+        """
+        Test that rollback_dnb_company_update will fail with the given error
+        message when there is an issue in finding the version to revert to.
+        """
+        company = CompanyFactory(duns_number=formatted_dnb_company['duns_number'])
+
+        update_company_from_dnb(
+            company,
+            formatted_dnb_company,
+            update_descriptor='foo',
+        )
+
+        with pytest.raises(RevisionNotFoundError) as excinfo:
+            rollback_dnb_company_update(company, update_comment)
+            assert str(excinfo.value) == error_message

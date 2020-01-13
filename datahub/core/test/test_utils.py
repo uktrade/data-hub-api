@@ -1,5 +1,6 @@
 from datetime import date
 from enum import Enum
+from unittest import mock
 from uuid import UUID
 
 import pytest
@@ -11,6 +12,7 @@ from datahub.core.utils import (
     get_financial_year,
     join_truthy_strings,
     load_constants_to_database,
+    log_to_sentry,
     reverse_with_query_string,
     slice_iterable_into_chunks,
 )
@@ -143,3 +145,41 @@ def test_reverse_with_query_string(query_args, expected_url):
 def test_get_financial_year(date_obj, expected_financial_year):
     """Test for get financial year"""
     assert get_financial_year(date_obj) == expected_financial_year
+
+
+@pytest.mark.parametrize(
+    'extra',
+    (
+        None,
+        {'bar': 'baz', 'a': 'b'},
+    ),
+)
+@pytest.mark.parametrize(
+    'level',
+    (
+        None,
+        'warning',
+    ),
+)
+@mock.patch('datahub.core.utils.sentry_sdk.push_scope')
+@mock.patch('datahub.core.utils.sentry_sdk.capture_message')
+def test_log_to_sentry(mocked_capture_message, mocked_push_scope, level, extra):
+    """
+    Test log_to_sentry utility.
+    """
+    kwargs = {}
+    expected_extra = {}
+    if extra:
+        kwargs['extra'] = extra
+        expected_extra = extra
+    expected_level = 'info'
+    if level:
+        kwargs['level'] = level
+        expected_level = level
+
+    log_to_sentry('foo', **kwargs)
+
+    mocked_capture_message.assert_called_with('foo', level=expected_level)
+    mocked_scope = mocked_push_scope.return_value.__enter__.return_value
+    for key, value in expected_extra.items():
+        mocked_scope.set_extra.assert_any_call(key, value)

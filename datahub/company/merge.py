@@ -1,4 +1,7 @@
 from collections import namedtuple
+from typing import Callable, NamedTuple, Sequence, Type
+
+from django.db import models
 
 from datahub.company.models import Company, Contact
 from datahub.core.exceptions import DataHubException
@@ -11,7 +14,6 @@ from datahub.user.company_list.models import CompanyListItem
 
 ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('company_list_items').remote_field,
-    Company._meta.get_field('dnbmatchingresult').remote_field,
     Contact.company.field,
     Interaction.company.field,
     InvestmentProject.investor_company.field,
@@ -43,13 +45,26 @@ MergeEntrySummary = namedtuple(
 )
 
 
-MergeConfiguration = namedtuple(
-    'MergeConfiguration',
-    [
-        'model',
-        'fields',
-    ],
-)
+def _default_object_updater(obj, field, target_company):
+    setattr(obj, field, target_company)
+    obj.save(update_fields=(field,))
+
+
+def _company_list_item_updater(list_item, field, target_company):
+    # If there is already a list item for the target company, delete this list item instead
+    # as duplicates are not allowed
+    if CompanyListItem.objects.filter(list_id=list_item.list_id, company=target_company).exists():
+        list_item.delete()
+    else:
+        _default_object_updater(list_item, field, target_company)
+
+
+class MergeConfiguration(NamedTuple):
+    """Specifies how company merging should be handled for a particular related model."""
+
+    model: Type[models.Model]
+    fields: Sequence[str]
+    object_updater: Callable[[models.Model, str, Company], None] = _default_object_updater
 
 
 MERGE_CONFIGURATION = [
@@ -57,7 +72,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
     MergeConfiguration(Order, ('company',)),
-    MergeConfiguration(CompanyListItem, ('company',)),
+    MergeConfiguration(CompanyListItem, ('company',), _company_list_item_updater),
 ]
 
 
@@ -128,11 +143,10 @@ def merge_companies(source_company: Company, target_company: Company, user):
     ):
         raise MergeNotAllowedError()
 
-    results = _process_all_objects(
-        _update_objects,
-        source=source_company,
-        target=target_company,
-    )
+    results = {
+        configuration.model: _update_objects(configuration, source_company, target_company)
+        for configuration in MERGE_CONFIGURATION
+    }
 
     source_company.mark_as_transferred(
         target_company,
@@ -145,22 +159,14 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
 def get_planned_changes(company: Company):
     """Gets information about the changes that would be made if merge proceeds."""
-    results = _process_all_objects(
-        _count_objects,
-        source=company,
-    )
+    results = {
+        configuration.model: _count_objects(configuration, company)
+        for configuration in MERGE_CONFIGURATION
+    }
 
     should_archive = not company.archived
 
     return results, should_archive
-
-
-def _process_all_objects(process_objects_fn, **kwargs):
-    """Process all objects defined in the configuration using provided function."""
-    return {
-        configuration.model: process_objects_fn(configuration, **kwargs)
-        for configuration in MERGE_CONFIGURATION
-    }
 
 
 def _update_objects(configuration: MergeConfiguration, source, target):
@@ -169,17 +175,16 @@ def _update_objects(configuration: MergeConfiguration, source, target):
 
     for field, filtered_objects in _get_objects_from_configuration(configuration, source):
         for obj in filtered_objects.iterator():
-            setattr(obj, field, target)
-            obj.save(update_fields=(field,))
+            configuration.object_updater(obj, field, target)
             objects_updated[field] += 1
     return objects_updated
 
 
-def _count_objects(configuration: MergeConfiguration, source):
+def _count_objects(configuration: MergeConfiguration, company):
     """Count objects for each field from given model with the target value."""
     objects_updated = {field: 0 for field in configuration.fields}
 
-    for field, filtered_objects in _get_objects_from_configuration(configuration, source):
+    for field, filtered_objects in _get_objects_from_configuration(configuration, company):
         objects_updated[field] = filtered_objects.count()
 
     return objects_updated

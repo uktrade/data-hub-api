@@ -149,3 +149,13 @@ DNB_SERVICE_TOKEN = 'dnbtoken1234'
 DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
 
 DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = ['notifyme@digital.trade.gov.uk']
+
+ADMIN_OAUTH2_ENABLED = True
+ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
+ADMIN_OAUTH2_BASE_URL = ''
+ADMIN_OAUTH2_TOKEN_FETCH_PATH = 'http://sso-server/o/token/'
+ADMIN_OAUTH2_USER_PROFILE_PATH = 'http://sso-server/o/v1/user/me/'
+ADMIN_OAUTH2_AUTH_PATH = 'http://sso-server/o/authorize/'
+ADMIN_OAUTH2_CLIENT_ID = 'client-id'
+ADMIN_OAUTH2_CLIENT_SECRET = 'client-secret'
+ADMIN_OAUTH2_LOGOUT_PATH = 'http://sso-server/o/logout'

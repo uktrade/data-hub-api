@@ -1,40 +1,40 @@
 # Django and django related
-Django==2.2.7
-djangorestframework==3.10.3
+Django==2.2.9
+djangorestframework==3.11.0
 django-admin-ip-restrictor==1.0.0
 django-environ==0.4.5
 django-extensions==2.2.5
 django-filter==2.2.0
-django-reversion==3.0.4
-django-pglocks==1.0.3
-django-model-utils==3.2.0
+django-reversion==3.0.5
+django-pglocks==1.0.4
+django-model-utils==4.0.0
 django-mptt==0.10.0
 django-oauth-toolkit==1.2.0
 oauthlib==2.1.0
-uritemplate==3.0.0  # required for DRF schema features
-whitenoise==4.1.4
+uritemplate==3.0.1  # required for DRF schema features
+whitenoise==5.0.1
 
 chardet==3.0.4
-pyyaml==5.1.2
+pyyaml==5.2
 python-dateutil==2.8.1
 
 # Persistency layer
 psycopg2==2.8.4
 psycogreen==1.0.1
 
-boto3==1.10.8
+boto3==1.10.46
 
-notifications-python-client==5.4.0
+notifications-python-client==5.4.1
 
 # Prometheus
 statsd==3.3.0
 
 # Email
 mail-parser==3.9.3
-icalendar==4.0.3
+icalendar==4.0.4
 
 # REDIS
-django-redis==4.10.0
+django-redis==4.11.0
 redis==3.3.11
 
 # ES
@@ -42,31 +42,32 @@ elasticsearch==6.4.0
 elasticsearch-dsl==6.3.1
 
 # Celery
-celery[redis]==4.3
+celery[redis]==4.4
 billiard==3.6.1.0  # Not used directly, but pinned as it has been a source of breakage in the past
-kombu==4.6.6  # Not used directly, but pinned as it has been a source of breakage in the past
+kombu==4.6.7  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==5.3.0
+pytest==5.3.2
 pytest-django==3.7.0
 pytest-sugar==0.9.2
 pytest-cov==2.8.1
-pytest-xdist==1.30.0
-ipython==7.9.0
+pytest-xdist==1.31.0
+ipython==7.11.1
 factory-boy==2.12.0
 freezegun==0.3.12
 requests-mock==1.7.0
 django-debug-toolbar==2.1
 werkzeug==0.16.0  # Required by runserver_plus - useful for local dev
-pip-tools==4.2.0
-piprot==0.9.10
+pip-tools==4.3.0
+piprot==0.9.11
+semantic_version==2.8.4
 towncrier==19.2.0
 watchdog==0.9.0
 
 # Code static analysis
 flake8==3.7.9
 flake8-blind-except==0.1.1
-flake8-bugbear==19.8.0
+flake8-bugbear==20.1.2
 flake8-commas==2.0.0
 flake8-debugger==3.2.1
 flake8-import-order==0.18.1
@@ -75,11 +76,11 @@ flake8-print==3.1.4
 flake8-quotes==2.1.1
 flake8-string-format==0.2.3
 pep8-naming==0.9.1
-pydocstyle==4.0.1
+pydocstyle==5.0.2
 
-gunicorn==20.0.2
+gunicorn==20.0.4
 gevent==1.4.0
 mohawk==1.1.0
 requests==2.22.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.13.2
+sentry_sdk==0.13.5

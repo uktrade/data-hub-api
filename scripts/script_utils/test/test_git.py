@@ -5,6 +5,7 @@ import pytest
 
 from script_utils.git import (
     any_uncommitted_changes,
+    get_file_contents,
     local_branch_exists,
     remote_branch_exists,
     remote_tag_exists,
@@ -31,6 +32,13 @@ def test_any_uncommitted_changes(stdout, expected_result, mock_subprocess_run):
     mock_subprocess_run.return_value = subprocess.CompletedProcess((), 0, stdout=stdout)
 
     assert any_uncommitted_changes() == expected_result
+
+
+def test_get_file_contents(mock_subprocess_run):
+    """Test that get_file_contents() returns the contents of stdout."""
+    mock_subprocess_run.return_value = subprocess.CompletedProcess((), 0, stdout=b'file-contents')
+
+    assert get_file_contents('origin/master', 'file.txt') == 'file-contents'
 
 
 @pytest.mark.parametrize(

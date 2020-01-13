@@ -19,6 +19,14 @@ job_defaults: &job_defaults
       default: false
 
   environment:
+    ADMIN_OAUTH2_ENABLED: 'True'
+    ADMIN_OAUTH2_BASE_URL: ''
+    ADMIN_OAUTH2_TOKEN_FETCH_PATH: '/o/token/'
+    ADMIN_OAUTH2_USER_PROFILE_PATH: '/o/v1/user/me/'
+    ADMIN_OAUTH2_AUTH_PATH: '/o/authorize/'
+    ADMIN_OAUTH2_CLIENT_ID: 'client-id'
+    ADMIN_OAUTH2_CLIENT_SECRET: 'client-secret'
+    ADMIN_OAUTH2_LOGOUT_PATH: '/o/logout'
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
     DATABASE_URL: postgresql://postgres@localhost/datahub
@@ -106,7 +114,7 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.7
+          python_image: python:3.8
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2

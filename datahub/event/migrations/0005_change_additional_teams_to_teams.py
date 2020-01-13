@@ -8,7 +8,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('event', '0004_add_location_type_event_type'),
     ]
 

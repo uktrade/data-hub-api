@@ -4,6 +4,7 @@ from logging import getLogger
 from uuid import UUID
 
 import requests
+import sentry_sdk
 from django.conf import settings
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -15,7 +16,7 @@ class StrEnum(str, Enum):
     """
     Enum subclass where members are also str instances.
 
-    Defined as per https://docs.python.org/3.7/library/enum.html#others
+    Defined as per https://docs.python.org/3.8/library/enum.html#others
     """
 
 
@@ -141,3 +142,16 @@ def get_financial_year(date_obj):
     if date_obj.month > 3:
         return date_obj.year
     return date_obj.year - 1
+
+
+def log_to_sentry(message, extra=None, level='info'):
+    """
+    Log a message to sentry directly.  This will only normally be needed if there is a desire to
+    log info or warning-level messages to sentry; for error messages, a standard python logger can
+    be used with the `extra` kwarg.
+    """
+    extra = extra or {}
+    with sentry_sdk.push_scope() as scope:
+        for key, value in extra.items():
+            scope.set_extra(key, value)
+        sentry_sdk.capture_message(message, level=level)

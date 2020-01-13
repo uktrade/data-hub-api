@@ -11,34 +11,36 @@ As a general guide:
 * if it contains breaking API changes, then it's a major version
 * anything else is a minor version 
 
-You can run `towncrier --draft --version draft` to generate a draft changelog and help you decide.
+You can run `towncrier --draft --version draft` to generate a draft changelog, or [look at the difference between develop and master](https://github.com/uktrade/data-hub-api/compare/develop...master), to help you decide.
 
-## Update the changelog
+## Bump the version and update the changelog
 
 Once you've reviewed the draft changelog and decided on the release type, you can create the changelog by running:
 
 ```shell
-scripts/create_changelog.py <major|minor|patch>
+scripts/prepare_release.py <major|minor|patch>
 ```
 
+<details>
+<summary>What the command does</summary>
 The command will:
 
 - determine the new version number
 - create a branch named `changelog/<version>`
-- commit the changelog to it
+- bump the version and update the changelog
+- commit the changes
 - push the branch
 - open your browser window ready to create a PR
+</details>
 
-If the command fails, review the error and investigate.
+If the command succeeds, it will open your web browser ready to create a PR to merge `changelog/<version>` into 
+`develop`.
 
-In your web browser, check the changelog preview, and then open a PR to merge `changelog/<version>` 
-into `develop`.
-
-Assign at least two developers for review.
+Check the changelog preview is as expected, add at least two developers as reviewers and click 'Create pull request'.
 
 When ready, merge `changelog/<version>` into `develop` and delete the merged branch.
 
-## Prepare the release
+## Create the release PR
 
 Create and push a release branch from develop by running:
 
@@ -46,43 +48,47 @@ Create and push a release branch from develop by running:
 scripts/create_release_pr.py
 ```
 
+<details>
+<summary>What the command does</summary>
 The command will:
 
 - run `git fetch`
 - create a branch `release/<version>` based on `origin/develop`
 - push this branch
 - open a web browser window to the create PR page for the pushed branch (with `master` as the base branch)
+</details>
 
-Once your web browser has opened, double-check that the details are correct and that the base branch is set to `master`.
+If the command succeeds, it will open your web browser ready to create a PR to merge `release/<version>` into `master`. 
+
+Double-check that the details are correct and that the base branch is set to `master`.
 
 Add at least two developers as reviewers and click 'Create pull request'.
 
-## Release to staging
+## Deploy to staging
 
 After the PR has been reviewed, merge it into `master` and delete the merged branch.
 The release will be automatically deployed to staging via Jenkins.
 Check that everything looks fine before proceeding.
 
-## Release to production
-Releasing to production happens manually but after it has been announced and approved by the Live Services Team.
+## Tag and publish the release on GitHub
 
-Post in the `#data-hub` slack channel the following (replace `<version>` with the version number and `<service-manager>` with the person resposible for approvals):
+Following the automatic staging deployment, the next step is create a release on GitHub. To do this, you will need to [generate a GitHub personal access 
+token](https://github.com/settings/tokens) with the `public_repo` scope.
 
+Once you have this, you can either set it in the `GITHUB_TOKEN` environment variable, or enter it when prompted.
+
+When you have a token, run:
+
+```shell
+scripts/publish_release.py
 ```
-@here Data Hub API version <version> is ready to be deployed. Please check the release notes to know how this will affect you: https://github.com/uktrade/data-hub-api/blob/master/CHANGELOG.md. @<service-manager> Are you happy for us to release?
-```
 
-After the approval, the release can be deployed.
+This will tag, create and publish the release on GitHub and open it in your web browser. 
 
-In jenkins, go to the _datahub_ tab, the _datahub-api_ project and click on _Build with Parameters_.
+<details>
+<summary>If you are unable to use the script</summary>
 
-Type the following:
-* **environment**: `production`
-* **git commit**: `master`
-
-Click on `build`, follow the deployment and check that everything looks fine after it finishes.
-
-## Formalise the release
+If you can‘t use the script for some reason, you can still manually create and publish the release.
 
 In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/new) with the following values:
 
@@ -94,3 +100,25 @@ In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/n
 And click on _Publish release_.
 
 For more information see the [GitHub documentation](https://help.github.com/articles/creating-releases/).
+
+</details>
+
+## Deploy to production
+Deployment to production happens manually but after the release has been announced on Slack.
+
+Post in the `#data-hub` slack channel the following (replacing `<version>` with the version number):
+
+```
+@here Data Hub API version <version> is ready to be deployed to production. Have a look at the release notes to see how this will affect you: https://github.com/uktrade/data-hub-api/blob/master/CHANGELOG.md.
+Will deploy in 30 minutes or so if no objections.
+```
+
+If no objections are received, the release can be deployed to production.
+
+In Jenkins, go to the _datahub_ tab, the _datahub-api_ project and click on _Build with Parameters_.
+
+Type the following:
+* **environment**: `production`
+* **git commit**: `master`
+
+Click on `build`, follow the deployment and check that everything looks fine after it finishes.

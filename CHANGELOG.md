@@ -1,3 +1,286 @@
+# Data Hub API 26.1.0 (2020-01-09)
+
+
+## API
+
+- **Advisers** `GET /v4/company-list/<pk>/item`: The latest interaction of each list item now includes an array of DIT participants in the `dit_participants` field. In context, the field has the following structure:
+
+  ```json
+  {
+      "results": [
+          {
+              "latest_interaction": {
+                  "dit_participants": [
+                      {
+                         "adviser": {
+                             "id": ...,
+                             "name": ...
+                         },
+                         "team": {
+                             "id": ...,
+                             "name": ...
+                         }
+                      },
+                      ...
+                  ]
+              }
+          }
+      ]
+  }
+  ```
+
+
+# Data Hub API 26.0.0 (2020-01-08)
+
+
+## Removals
+
+- The following deprecated endpoints have been removed from Data Hub API:
+
+  - `GET v4/dnb-match/<uuid:company_pk>`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-match`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-no-match`
+- The following deprecated tables have been removed from Data Hub API:
+
+  - dnb_match_dnbmatchingcsvrecord
+  - dnb_match_dnbmatchingresult
+
+## Features
+
+- **Companies** The `datahub.dnb_api.tasks.get_company_updates` task now run with a specific list of fields to update by default.
+
+  This was introduced to not update `domain` & `registered_address` fields. This is because the data for these fields does not meet Data Hub standards. D&B have been informed of this and are working on a fix.
+
+- Python was updated from version 3.7.5 to 3.8.1. This includes updating various indirect dependencies.
+
+## Internal changes
+
+- The following internal query utilities were added:
+
+  - `get_array_agg_subquery()`
+  - `JSONBBuildObject`
+
+## API
+
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: The `allow_blank_possible_uk_regions` field was removed and replaced with `uk_region_location_names`.
+
+
+# Data Hub API 25.0.0 (2020-01-02)
+
+
+## Removals
+
+- **Companies** The feature flag that enabled the new add-a-company journey was removed.
+
+  This makes the new add-a-company journey the default way to add a new company in Data Hub.
+- **Companies** The `get_dnb_one_list_tier_companies` management command was removed from Data Hub.
+
+  This command was put in temporarily to safely run queries required for DNB company hierarchies rollout.
+
+## Deprecations
+
+- The following `dnb-match` endpoints will be deprecated on or after 5 January 2020:
+
+  - `GET v4/dnb-match/<uuid:company_pk>`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-match`
+  - `POST v4/dnb-match/<uuid:company_pk>/select-no-match`
+- The following tables will be removed from Data Hub on or after 5 Jan 2020:
+
+  - `dnb_match_dnbmatchingcsvrecord`
+  - `dnb_match_dnbmatchingresult`
+
+
+# Data Hub API 24.5.0 (2019-12-23)
+
+
+## Features
+
+- **Companies** Added integration tests for the `rollback_dnb_company_updates` management command.
+  This can now be used as it has been fully tested.
+- **Companies** A management command `rollback_dnb_company_updates` was added to revert updates applied
+  by either the `update_company_dnb_data` command or the `get_company_updates` task. 
+  At present, the rollback command calls a stub function which will be fleshed out later -
+  it is not ready for use.
+
+## Bug fixes
+
+- **Companies** A bugfix was made to ensure that the task id for the overall company updates
+  process is used as an update descriptor in reversion comments.  This will allow the use
+  of a rollback tool in the event that D&B updates need to be undone.
+
+
+# Data Hub API 24.4.0 (2019-12-20)
+
+
+## Features
+
+- **Companies** A new management command, `update_company_uk_region`, was added.
+
+  This can update the UK regions of companies using a CSV file stored in Amazon S3.
+- **Companies** A new management command, `update_company_sector`, was added.
+
+  This can update the sectors of companies using a CSV file stored in Amazon S3.
+
+
+# Data Hub API 24.3.0 (2019-12-19)
+
+
+## Features
+
+- **Companies** The `update_company_dnb_data` command was adjusted so that an audit log is fired
+  to sentry after a successful run.
+
+
+# Data Hub API 24.2.1 (2019-12-18)
+
+
+## Bug fixes
+
+- **Companies** A bug was fixed that resulted in a runtime error in the `get_company_updates` celery task.
+
+  The error happened when `get_company_updates` tried to wait on the results of sub-tasks in order to produce an audit log.
+
+
+# Data Hub API 24.2.0 (2019-12-17)
+
+
+## Features
+
+- **Companies** A schedule was added for a nightly run of the celery task: `datahub.dnb_api.tasks.get_company_updates`.
+
+  This task will ingest D&B updates from `dnb_service`. The number of updates applied in a single run will be controlled by the environment variable called `DNB_AUTOMATIC_UPDATE_LIMIT`.
+
+
+# Data Hub API 24.1.0 (2019-12-17)
+
+
+## Features
+
+- **Companies** Companies updated with the `update_company_from_dnb` command and the 
+  `update_companies_from_dnb_service` task are now saved with a reversion version
+  which has a meaningful identifier in the comment. This identifier will help provide
+  the groundwork for an "undo tool" which will allow us to reverse these automatic
+  updates in the event of a problem.
+- The CSRF token is now being added to API Docs request header. It is now possible to try POST requests.
+
+## Internal changes
+
+- **Companies** We are now recording `future_interest_countries` 
+  and `export_to_countries` with both the `Company` model and the new model `CompanyExportCountry` 
+  which we're currently integrating.
+- **Investment** All `investor_profile` app database migrations were squashed. The old migrations will be removed once the squashed migration has been applied to all environments.
+- The Elasticsearch suggester query parameter `contexts` is now used instead of the deprecated `context` parameter.
+
+
+# Data Hub API 24.0.0 (2019-12-10)
+
+
+## Removals
+
+- **Investment** The following deprecated investor profile tables were removed:
+
+  - `investor_profile_investorprofile_asset_classes_of_interest`
+  - `investor_profile_investorprofile_construction_risks`
+  - `investor_profile_investorprofile_deal_ticket_sizes`
+  - `investor_profile_investorprofile_desired_deal_roles`
+  - `investor_profile_investorprofile_investment_types`
+  - `investor_profile_investorprofile_other_countries_being_cons84de`
+  - `investor_profile_investorprofile_restrictions`
+  - `investor_profile_investorprofile_time_horizons`
+  - `investor_profile_investorprofile_uk_region_locations`
+  - `investor_profile_investorprofile`
+  - `investor_profile_profiletype`
+
+## Features
+
+- **Companies** A setting `DNB_AUTOMATIC_UPDATE_LIMIT` was added which can be used to limit the
+  number of companies updated by the `datahub.dnb_api.tasks.get_company_updates`
+  task.
+- **Companies** Info log messages and a sentry-based audit log were added to the DNB company
+  updates tasks to help provide better visibility for task runs.
+- **Companies** A feature flag was added `"dnb-company-updates"` which governs whether or not to
+  run the logic within the `datahub.dnb_api.tasks.get_company_updates` celery task.
+  This affords us the ability to easily switch on/off DNB company updates as needed 
+  during the rollout of this feature.
+
+## Bug fixes
+
+- **Companies** A bug was fixed to ensure that DNB company updates can be ingested over multiple
+  pages from dnb-service.  Previously, the cursor value was not being extracted
+  from the URL for the next page correctly.
+
+## Internal changes
+
+- **Companies** Integration tests were added for the `datahub.dnb_api.tasks.get_company_updates` task.
+  These were not added as part of the original development as the task and it's dependent
+  task (`datahub.dnb_api.tasks.update_company_from_dnb_data`) were developed in parallel.
+
+  Additionally, the calls that `datahub.dnb_api.tasks.get_company_updates` makes to
+  `datahub.dnb_api.tasks.update_company_from_dnb_data` were fixed to be the correct
+  signature.
+- Python was updated from version 3.7.4 to 3.7.5 in deployed environments.
+
+## Database schema
+
+- **Interactions** A new table `interaction_interactionexportcountry` was created.
+  It has foreign key fields `interaction_id` and `country_id`
+  with status, value is expressed as:
+  * 'currently exporting to'
+  * 'future interest'
+  * 'not interested'
+
+
+# Data Hub API 23.2.0 (2019-12-02)
+
+
+## Features
+
+- **Companies** A celery task was added which takes a dictionary of company data sourced from
+  dnb-service and updates the company record corresponding to it in Data Hub.
+- A celery task called `get_company_updates` was added.
+
+  This task gets all the available company updates from the dnb-service and spawns downstream tasks to apply these updates to D&B matched company records in Data Hub.
+- The views that will replace stock Django Admin method of authentication with Staff SSO were added.
+
+## Bug fixes
+
+- **Companies** Merging two companies (via the admin site) now works when both companies are on the same company list.
+
+## Internal changes
+
+- We are now exposing  `CSRF_COOKIE_SECURE` and `CSRF_COOKIE_HTTPONLY` Django settings 
+  via environment variables.
+- The squashed `metadata` app migration `0001_squashed_0010_auto_20180613_1553` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## API
+
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: The `competing_countries` field was updated to return country names rather than ids
+- **OMIS** `GET /v4/dataset/omis-dataset`: The field `quote__accepted_on` was added to the omis dataset endpoint
+
+
+# Data Hub API 23.1.0 (2019-11-28)
+
+
+## Removals
+
+- The `init_es` management command has been removed. Please use `migrate_es` instead.
+
+## Features
+
+- The `migrate_es` management command was updated to handle the case when indexes don‘t already exist.
+
+  Hence, the `init_es` command is no longer required and has been removed.
+
+## Internal changes
+
+- **Companies** The squashed `company` app migration `0001_squashed_0096_company_global_ultimate_duns_number` was transitioned to a normal migration and the migrations it replaced were removed.
+- **Investment** The squashed `investment` app migration `0001_squashed_0068_remove_interaction_location_from_database` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## Database schema
+
+- **Companies** A new table `company_companyexportcountry` was created to maintain company's export interests. Multiple countries along with a status can be recorded for each company. Status being one of `not_interested`, `future_interest` or `currently_exporting`. This will now allow, for each entry, to record date and adviser that created and modified for audit.
+
+
 # Data Hub API 23.0.0 (2019-11-22)
 
 

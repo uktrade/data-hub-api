@@ -10,7 +10,6 @@ from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
-from datahub.dnb_match import urls as dnb_match_urls
 from datahub.event import urls as event_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
@@ -61,7 +60,6 @@ v3_urls = [
 v4_urls = [
     path('', include((company_urls.urls, 'company'), namespace='company')),
     path('dnb/', include((dnb_api_urls, 'dnb_api'), namespace='dnb-api')),
-    path('dnb-match/', include((dnb_match_urls, 'dnb_match'), namespace='dnb-match')),
     path('', include((search_urls.urls_v4, 'search'), namespace='search')),
     path(
         '',

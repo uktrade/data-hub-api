@@ -8,6 +8,7 @@ from django.db import models
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
+from datahub.company.models import CompanyExportCountry
 from datahub.core import reversion
 from datahub.core.models import (
     ArchivableModel,
@@ -16,6 +17,7 @@ from datahub.core.models import (
     BaseOrderedConstantModel,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -294,6 +296,8 @@ class Interaction(ArchivableModel, BaseModel):
     )
     policy_feedback_notes = models.TextField(blank=True, default='')
 
+    were_countries_discussed = models.BooleanField(null=True)
+
     @property
     def is_event(self):
         """Whether this service delivery is for an event."""
@@ -344,4 +348,51 @@ class Interaction(ArchivableModel, BaseModel):
             'change_all',
             'delete',
             'view_all',
+        )
+
+
+@reversion.register_base_model()
+class InteractionExportCountry(BaseModel):
+    """
+    Record `Interaction`'s exporting status to a `Country`.
+    Where `Status` is `CompanyExportCountry.EXPORT_INTEREST_STATUSES`
+
+    This data will help consolidate company level countries
+    in `company.CompanyExportCountry`
+    """
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.PROTECT,
+        related_name='interaction_discussed',
+    )
+    interaction = models.ForeignKey(
+        Interaction,
+        on_delete=models.CASCADE,
+        related_name='export_countries',
+    )
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['country', 'interaction'],
+                name='unique_country_interaction',
+            ),
+        ]
+        verbose_name_plural = 'interaction export countries'
+
+    def __str__(self):
+        """
+        Admin human readable name
+        """
+        return (
+            f'{self.interaction} {self.country} {self.status}'
         )

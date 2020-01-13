@@ -63,7 +63,7 @@ This project uses Docker compose to setup and run all the necessary components. 
 
 Dependencies:
 
--   Python 3.7.x
+-   Python 3.8.x
 -   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
 -   redis 3.2
 -   Elasticsearch 6.8
@@ -75,7 +75,7 @@ Dependencies:
     cd data-hub-api
     ```
 
-2.  Install Python 3.7.
+2.  Install Python 3.8.
 
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
 
@@ -84,7 +84,7 @@ Dependencies:
     On Ubuntu:
 
     ```shell
-    sudo apt install build-essential libpq-dev python3.7-dev python3.7-venv
+    sudo apt install build-essential libpq-dev python3.8-dev python3.8-venv
     ```
 
     On macOS:
@@ -96,7 +96,7 @@ Dependencies:
 4.  Create and activate the virtualenv:
 
     ```shell
-    python3.7 -m venv env
+    python3.8 -m venv env
     source env/bin/activate
     pip install -U pip
     ```
@@ -240,6 +240,13 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ACTIVITY_STREAM_OUTGOING_URL` | No | The URL used to read from activity stream |
 | `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
 | `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY` | No | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ADMIN_OAUTH2_ENABLED` | Yes | Enables Django Admin SSO login when is True. |
+| `ADMIN_OAUTH2_BASE_URL` | If `ADMIN_OAUTH2_ENABLED` is set | A base URL of OAuth provider. |
+| `ADMIN_OAUTH2_TOKEN_FETCH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth fetch token path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_USER_PROFILE_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth user profile path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_AUTH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth auth path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_ID` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client ID for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_SECRET` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client secret for Django Admin SSO login. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
@@ -249,6 +256,8 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
 | `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
+| `CSRF_COOKIE_HTTPONLY` | No | Whether to use HttpOnly flag on the CSRF cookie (default=False). |
+| `CSRF_COOKIE_SECURE` | No | Whether to use a secure cookie for the CSRF cookie (default=False). |
 | `DATA_FLOW_API_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_FLOW_API_SECRET_ACCESS_KEY`. The holder of the secret key can access the omis-dataset endpoint by Hawk authentication. |
 | `DATA_FLOW_API_SECRET_ACCESS_KEY` | If `DATA_FLOW_API_ACCESS_KEY_ID` is set | A secret key, corresponding to `DATA_FLOW_API_ACCESS_KEY_ID`. The holder of this key can access the omis-dataset endpoint by Hawk authentication. |
 | `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
@@ -264,6 +273,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
+| `DNB_AUTOMATIC_UPDATE_LIMIT` | No | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set. |
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
 | `DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS` | No | Email addresses for recipients that should receive DNB company investigation notifications. |
