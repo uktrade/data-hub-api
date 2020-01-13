@@ -109,6 +109,8 @@ class Company(BaseESModel):
     turnover_range = fields.id_name_field()
     uk_region = fields.id_name_field()
     uk_based = Boolean()
+    uk_address_postcode = fields.PostcodeKeyword()
+    uk_registered_address_postcode = fields.PostcodeKeyword()
     vat_number = Keyword(index=False)
     duns_number = Keyword()
     website = Text()
@@ -131,6 +133,9 @@ class Company(BaseESModel):
             dict_utils.contact_or_adviser_dict,
         ),
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
+        'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',
+        'uk_registered_address_postcode':
+            lambda obj: obj.registered_address_postcode if obj.uk_based else '',
     }
 
     MAPPINGS = {

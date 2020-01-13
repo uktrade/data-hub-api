@@ -53,6 +53,8 @@ class TestCompanyElasticModel:
             'turnover_range',
             'uk_based',
             'uk_region',
+            'uk_address_postcode',
+            'uk_registered_address_postcode',
             'vat_number',
             'duns_number',
             'website',

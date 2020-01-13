@@ -2,7 +2,11 @@ from functools import partial
 
 from elasticsearch_dsl import Keyword, Object, Text
 
-from datahub.search.elasticsearch import lowercase_asciifolding_normalizer
+from datahub.search.elasticsearch import (
+    lowercase_asciifolding_normalizer,
+    postcode_analyzer,
+    postcode_search_analyzer,
+)
 
 # Keyword with normalisation to improve sorting (by keeping e, E, è, ê etc. together).
 NormalizedKeyword = partial(
@@ -16,6 +20,12 @@ TextWithTrigram = partial(
     fields={
         'trigram': TrigramText(),
     },
+)
+# Keyword with normalisation that recognises UK postcodes to improve searching
+PostcodeKeyword = partial(
+    Text,
+    analyzer=postcode_analyzer,
+    search_analyzer=postcode_search_analyzer,
 )
 
 
