@@ -21,6 +21,7 @@ from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
     InteractionDITParticipant,
+    InteractionExportCountry,
     PolicyArea,
     PolicyIssueType,
     ServiceDeliveryStatus,
@@ -32,7 +33,7 @@ from datahub.interaction.validators import (
     StatusChangeValidator,
 )
 from datahub.investment.project.serializers import NestedInvestmentProjectField
-from datahub.metadata.models import Service, Team
+from datahub.metadata.models import Country, Service, Team
 from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
@@ -98,6 +99,18 @@ class InteractionDITParticipantSerializer(serializers.ModelSerializer):
         # (UniqueTogetherValidator would not function correctly when multiple items are being
         # updated at once.)
         validators = []
+
+
+class InteractionExportCountrySerializer(serializers.ModelSerializer):
+    """
+    InteractionExportCountry serializer.
+    """
+
+    country = NestedRelatedField(Country)
+
+    class Meta:
+        model = InteractionExportCountry
+        fields = ('country', 'status')
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -185,6 +198,10 @@ class InteractionSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    export_countries = InteractionExportCountrySerializer(
+        many=True,
+        required=False,
+    )
 
     def validate_service(self, value):
         """Make sure only a service without children can be assigned."""
@@ -219,12 +236,15 @@ class InteractionSerializer(serializers.ModelSerializer):
         """
         Create an interaction.
 
-        Overridden to handle updating of dit_participants.
+        Overridden to handle updating of dit_participants
+        and export_countries.
         """
         dit_participants = validated_data.pop('dit_participants')
+        export_countries = validated_data.pop('export_countries', [])
 
         interaction = super().create(validated_data)
         self._save_dit_participants(interaction, dit_participants)
+        self._save_export_countries(interaction, export_countries)
 
         return interaction
 
@@ -233,14 +253,19 @@ class InteractionSerializer(serializers.ModelSerializer):
         """
         Create an interaction.
 
-        Overridden to handle updating of dit_participants.
+        Overridden to handle updating of dit_participants
+        and export_countries.
         """
         dit_participants = validated_data.pop('dit_participants', None)
+        export_countries = validated_data.pop('export_countries', None)
         interaction = super().update(instance, validated_data)
 
         # For PATCH requests, dit_participants may not be being updated
         if dit_participants is not None:
             self._save_dit_participants(interaction, dit_participants)
+
+        if export_countries is not None:
+            self._save_export_countries(interaction, export_countries)
 
         return interaction
 
@@ -289,6 +314,32 @@ class InteractionSerializer(serializers.ModelSerializer):
         for adviser in old_advisers - new_advisers:
             old_adviser_mapping[adviser].delete()
 
+    def _save_export_countries(self, interaction, validated_export_countries):
+        """
+        Adds export countries related to an interaction
+        Update is not allowed yet
+        """
+        existing_country_mapping = {
+            export_country.country: export_country
+            for export_country in interaction.export_countries.all()
+        }
+        new_country_mapping = {
+            item['country']: item
+            for item in validated_export_countries
+        }
+
+        for new_country, export_data in new_country_mapping.items():
+            status = export_data['status']
+            if new_country in existing_country_mapping:
+                # TODO: updates are not supported yet
+                raise NotImplementedError()
+            InteractionExportCountry.objects.create(
+                country=new_country,
+                interaction=interaction,
+                status=status,
+                created_by=interaction.created_by,
+            )
+
     class Meta:
         model = Interaction
         extra_kwargs = {
@@ -334,6 +385,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'policy_feedback_notes',
             'policy_issue_types',
             'was_policy_feedback_provided',
+            'were_countries_discussed',
+            'export_countries',
             'archived',
             'archived_by',
             'archived_on',
