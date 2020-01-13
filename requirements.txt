@@ -10,8 +10,8 @@ argh==0.26.2              # via watchdog
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.1.0
-boto3==1.10.46
-botocore==1.13.46         # via boto3, s3transfer
+boto3==1.11.0
+botocore==1.14.0          # via boto3, s3transfer
 celery[redis]==4.4
 certifi==2019.11.28       # via requests, sentry-sdk
 chardet==3.0.4
@@ -109,7 +109,7 @@ requests-futures==1.0.0   # via piprot
 requests-mock==1.7.0
 requests==2.22.0
 requests_toolbelt==0.9.1
-s3transfer==0.2.1         # via boto3
+s3transfer==0.3.0         # via boto3
 semantic_version==2.8.4
 sentry_sdk==0.14.0
 simplejson==3.17.0        # via mail-parser
