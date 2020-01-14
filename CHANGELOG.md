@@ -1,3 +1,33 @@
+# Data Hub API 26.2.0 (2020-01-14)
+
+
+## Internal changes
+
+- `Elasticsearch`: The new `postcode_analyzer` and `postcode_search_analyzer` analyzers were added. Analyzers can be used 
+  to enable partial search for area, district, sub-district, sector and a whole postcode. 
+
+  The search is case insensitive and any spaces are filtered out before analysis.
+- Uses of the deprecated Django function aliases `force_text()` and `urlquote()` were replaced with `force_str()` and `urllib.parse.quote()`.
+
+## API
+
+- **Companies** `POST /v4/search/company`: A `uk_postcode` filter was added for the `address_postcode` and `registered_address_postcode` 
+  fields for UK based companies. The filter accepts a single or a partial postcode as well as an array of postcodes. 
+  Multiple postcodes are matched with `or` query.
+- **Interactions** `GET /v4/dataset/interactions-dataset`: 3 new fields were added to the interactions dataset response:
+  - `policy_area_names`
+  - `policy_feedback_notes`
+  - `policy_issue_type_names`
+- **Interactions** Interactions API `/v3/interaction` now allows to specify if there was a discussion of countries during the interaction and add one or more export countries along with their status.
+
+  `were_countries_discussed` is a nullable boolean field.
+
+  `export_countries` field is of type `InteractionExportCountry` and takes a list of `country` and `status` combinations where `country` is of type `Country` and `status` is a choice of `Not interested`, `Currently exporting to` or `Future country of interest`.
+
+  * Above details are only valid for non-investment themed interactions. Hence `were_countries_discussed` is mandatory field for both `export` and `other` themed interactions.
+  * At least one country/status combination is mandatory if `were_countries_discussed` is set to True
+
+
 # Data Hub API 26.1.0 (2020-01-09)
 
 
