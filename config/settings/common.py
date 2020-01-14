@@ -94,9 +94,6 @@ LOCAL_APPS = [
     'datahub.user_event_log',
     'datahub.activity_feed',
     'datahub.dataset',
-
-    # TODO: delete after the whole data cleansing piece of work is complete
-    'datahub.dnb_match',
 ]
 
 MI_APPS = [
