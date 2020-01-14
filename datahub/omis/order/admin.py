@@ -1,4 +1,5 @@
 from functools import update_wrapper
+from urllib.parse import quote
 
 from django import forms
 from django.contrib import admin
@@ -13,9 +14,8 @@ from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import format_html, format_html_join
-from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
@@ -239,7 +239,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
             context = dict(
                 self.admin_site.each_context(request),
                 title=_('Are you sure?'),
-                object_name=force_text(opts.verbose_name),
+                object_name=force_str(opts.verbose_name),
                 object=obj,
                 opts=opts,
                 app_label=opts.app_label,
@@ -259,8 +259,8 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         opts = self.model._meta
 
         msg_dict = {
-            'name': force_text(opts.verbose_name),
-            'obj': format_html('<a href="{0}">{1}</a>', urlquote(request.path), obj),
+            'name': force_str(opts.verbose_name),
+            'obj': format_html('<a href="{0}">{1}</a>', quote(request.path), obj),
         }
         msg = format_html(
             _('The {name} "{obj}" was cancelled successfully.'),

@@ -18,7 +18,6 @@ def test_mapping(es):
         CompanySearchApp.es_model.get_write_index(),
         CompanySearchApp.name,
     )
-
     assert mapping.to_dict() == {
         'company': {
             'dynamic': 'false',
@@ -217,6 +216,16 @@ def test_mapping(es):
                             },
                         },
                     },
+                },
+                'uk_address_postcode': {
+                    'analyzer': 'postcode_analyzer',
+                    'search_analyzer': 'postcode_search_analyzer',
+                    'type': 'text',
+                },
+                'uk_registered_address_postcode': {
+                    'analyzer': 'postcode_analyzer',
+                    'search_analyzer': 'postcode_search_analyzer',
+                    'type': 'text',
                 },
                 'one_list_group_global_account_manager': {
                     'properties': {
@@ -558,6 +567,8 @@ def test_indexed_doc(es):
         'turnover_range',
         'uk_based',
         'uk_region',
+        'uk_address_postcode',
+        'uk_registered_address_postcode',
         'vat_number',
         'duns_number',
         'website',

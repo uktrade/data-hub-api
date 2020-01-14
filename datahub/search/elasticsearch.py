@@ -34,6 +34,60 @@ trigram_analyzer = analysis.CustomAnalyzer(
     filter=('lowercase',),
 )
 
+space_remover = analysis.token_filter(
+    'space_remover',
+    type='pattern_replace',
+    pattern=' ',
+    replacement='',
+)
+
+AREA_REGEX = r'[a-z]{1,2}'
+DISTRICT_REGEX = r'[0-9][a-z]|[0-9]{1,2}'
+SECTOR_REGEX = r'[0-9]'
+UNIT_REGEX = r'[a-z]{2}'
+
+postcode_filter = analysis.token_filter(
+    'postcode_filter',
+    type='pattern_capture',
+    # Match whole postcode
+    preserve_original=True,
+    patterns=[
+        # Match postcode area
+        # See the Royal Mail programmer's guide for the exact definitions
+        rf'^({AREA_REGEX})(?:{DISTRICT_REGEX}){SECTOR_REGEX}{UNIT_REGEX}',
+
+        # Match postcode district (with sub-district code ignored)
+        # This is so `wc1` query would match `wc1ab` and `wc1a1ab`, but not `wc111ab`
+        # Area + one or two digits
+        rf'^(({AREA_REGEX}[0-9]){SECTOR_REGEX}{UNIT_REGEX}|'
+        rf'({AREA_REGEX}[0-9]{{2}}){SECTOR_REGEX}{UNIT_REGEX}|'
+        rf'({AREA_REGEX}[0-9])[a-z]?{SECTOR_REGEX}{UNIT_REGEX})',
+
+        # Match postcode district (including sub-district)
+        rf'^({AREA_REGEX}(?:{DISTRICT_REGEX})){SECTOR_REGEX}{UNIT_REGEX}',
+
+        # Match postcode sector
+        rf'^({AREA_REGEX}(?:{DISTRICT_REGEX}){SECTOR_REGEX}){UNIT_REGEX}',
+    ],
+)
+
+
+postcode_analyzer = analysis.CustomAnalyzer(
+    'postcode_analyzer',
+    type='custom',
+    tokenizer='keyword',
+    filter=(space_remover, 'lowercase', postcode_filter),
+)
+
+
+postcode_search_analyzer = analysis.CustomAnalyzer(
+    'postcode_search_analyzer',
+    type='custom',
+    tokenizer='keyword',
+    filter=(space_remover, 'lowercase'),
+)
+
+
 english_possessive_stemmer = analysis.token_filter(
     'english_possessive_stemmer',
     type='stemmer',

@@ -14,6 +14,7 @@ from datahub.core.validators import (
     IsFieldBeingUpdatedAndIsNotBlankRule,
     IsFieldBeingUpdatedRule,
     IsFieldRule,
+    NotRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -144,6 +145,22 @@ def test_and_rule_combines_other_rules(subrule1_res, subrule2_res):
     )
     combiner = Mock(spec_set=DataCombiner)
     assert rule(combiner) == (subrule1_res and subrule2_res)
+
+
+@pytest.mark.parametrize(
+    'subrule_res,rule_res',
+    (
+        (True, False),
+        (False, True),
+        (None, True),
+    ),
+)
+def test_not_rule(subrule_res, rule_res):
+    """Test that NotRule nagates sub-rule"""
+    rule = NotRule(_make_stub_rule('field1', subrule_res))
+    combiner = Mock(spec_set=DataCombiner)
+    assert rule(combiner) == rule_res
+    assert rule.field is None
 
 
 @pytest.mark.parametrize(
