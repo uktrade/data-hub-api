@@ -6,6 +6,8 @@ from django.db.models import Exists, NOT_PROVIDED, OuterRef, Subquery
 from django.db.transaction import atomic
 from django_pglocks import advisory_lock
 
+from datahub.company.models import Company, CompanyExportCountry
+
 logger = getLogger(__name__)
 
 
@@ -174,3 +176,100 @@ def _copy_foreign_key_to_m2m_field(
     )
 
     return len(objects_to_create)
+
+
+@shared_task(acks_late=True)
+def copy_export_countries_to_company_export_country_model(
+    status,
+    batch_size=5000,
+):
+    """
+    Task that copies all export countries from Company model to CompanyExportCountry
+    """
+    key_switch = {
+        'future_interest': 'future_interest_countries',
+        'currently_exporting': 'export_to_countries',
+    }
+
+    num_updated = _copy_export_countries(key_switch[status], status)
+
+    # If there are definitely no more rows needing processing, return
+    if num_updated < batch_size:
+        return
+
+    copy_export_countries_to_company_export_country_model.apply_async(
+        kwargs={
+            'batch_size': batch_size,
+            'status': status,
+        },
+
+    )
+
+
+@atomic
+def _copy_export_countries(key, status):
+    """
+    Main logic for copying export companies from Company model to
+    CompanyExportCountry one
+    """
+    export_countries = _get_company_countries(key, status)
+    num_updated = _copy_company_countries(
+        key,
+        export_countries,
+        status,
+    )
+
+    logger.info(
+        f'Company.{key} copied to CompanyExportCountry '
+        f'for {num_updated} Company export countries',
+    )
+
+    return num_updated
+
+
+def _get_company_countries(source_field, status):
+
+    any_company_country_subquery = Exists(
+        CompanyExportCountry.objects.filter(
+            company_id=OuterRef('pk'),
+            status=status,
+        ),
+    )
+
+    batch_queryset = Company.objects.select_for_update().annotate(
+        **{
+            f'has_{source_field}': any_company_country_subquery,
+        },
+    ).filter(
+        **{
+            f'{source_field}__isnull': False,
+            f'has_{source_field}': False,
+        },
+    ).only(
+        'pk',
+    )
+
+    return batch_queryset
+
+
+def _copy_company_countries(source_field, company_with_uncopied_countries, status):
+    company_export_country_model = apps.get_model('company', 'CompanyExportCountry')
+
+    num_updated = 0
+
+    for company in company_with_uncopied_countries:
+        for country in getattr(company, source_field).all():
+            export_country, created = company_export_country_model.objects.get_or_create(
+                company=company,
+                country=country,
+                defaults={
+                    'status': status,
+                },
+            )
+            if not created and export_country.status != status:
+                export_country.status = status
+                export_country.save()
+
+            num_updated += 1
+
+    return num_updated
