@@ -2,6 +2,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
+    get_array_agg_subquery,
     get_front_end_url_expression,
 )
 from datahub.dataset.core.views import BaseDatasetView
@@ -28,6 +29,18 @@ class InteractionsDatasetView(BaseDatasetView):
                 ArrayAgg('contacts__id', ordering=('contacts__id',)),
             ),
             interaction_link=get_front_end_url_expression('interaction', 'pk'),
+            policy_area_names=get_array_agg_subquery(
+                Interaction.policy_areas.through,
+                'interaction',
+                'policyarea__name',
+                ordering=('policyarea__order',),
+            ),
+            policy_issue_type_names=get_array_agg_subquery(
+                Interaction.policy_issue_types.through,
+                'interaction',
+                'policyissuetype__name',
+                ordering=('policyissuetype__order',),
+            ),
             sector=get_sector_name_subquery('company__sector'),
             service_delivery=get_service_name_subquery('service'),
         ).values(
@@ -45,6 +58,9 @@ class InteractionsDatasetView(BaseDatasetView):
             'kind',
             'net_company_receipt',
             'notes',
+            'policy_area_names',
+            'policy_feedback_notes',
+            'policy_issue_type_names',
             'sector',
             'service_delivery_status__name',
             'service_delivery',

@@ -55,7 +55,7 @@ class TestServiceAnswers(APITestMixin):
             'company': contact.company.pk,
             'contacts': [contact.pk],
             'was_policy_feedback_provided': False,
-
+            'export_countries': [],
             'service': service.pk,
             'service_answers': {
                 ServiceQuestionID.piai_what_did_you_give_advice_about.value: {

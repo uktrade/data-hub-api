@@ -1,7 +1,7 @@
 # Django and django related
 Django==2.2.9
 djangorestframework==3.11.0
-django-admin-ip-restrictor==1.0.0
+django-admin-ip-restrictor==2.1.1
 django-environ==0.4.5
 django-extensions==2.2.5
 django-filter==2.2.0
@@ -15,16 +15,16 @@ uritemplate==3.0.1  # required for DRF schema features
 whitenoise==5.0.1
 
 chardet==3.0.4
-pyyaml==5.2
+pyyaml==5.3
 python-dateutil==2.8.1
 
 # Persistency layer
 psycopg2==2.8.4
 psycogreen==1.0.1
 
-boto3==1.10.46
+boto3==1.11.0
 
-notifications-python-client==5.4.1
+notifications-python-client==5.5.0
 
 # Prometheus
 statsd==3.3.0
@@ -76,11 +76,11 @@ flake8-print==3.1.4
 flake8-quotes==2.1.1
 flake8-string-format==0.2.3
 pep8-naming==0.9.1
-pydocstyle==5.0.1
+pydocstyle==5.0.2
 
 gunicorn==20.0.4
 gevent==1.4.0
 mohawk==1.1.0
 requests==2.22.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.13.5
+sentry_sdk==0.14.0

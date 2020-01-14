@@ -9,10 +9,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
+from datahub.company.models import Company, CompanyExportCountry
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Service
+from datahub.core.constants import Country, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -24,6 +27,7 @@ from datahub.interaction.models import (
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
+    ExportCountriesInteractionFactory,
     InvestmentProjectInteractionFactory,
 )
 from datahub.interaction.test.permissions import (
@@ -46,10 +50,6 @@ class TestAddInteraction(APITestMixin):
         (
             # company interaction
             {
-            },
-            # company interaction with export theme
-            {
-                'theme': Interaction.THEMES.export,
             },
             # company interaction with investment theme
             {
@@ -167,6 +167,164 @@ class TestAddInteraction(APITestMixin):
             'service_answers': None,
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
+            'were_countries_discussed': None,
+            'export_countries': [],
+            'created_by': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'modified_by': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    @pytest.mark.parametrize(
+        'extra_data',
+        (
+            # company interaction with export theme
+            {
+                'theme': Interaction.THEMES.export,
+                'were_countries_discussed': False,
+            },
+            # export countries in an interaction (export and other)
+            {
+                'theme': Interaction.THEMES.export,
+                'were_countries_discussed': True,
+                'export_countries': [
+                    {
+                        'country': {
+                            'id': Country.canada.value.id,
+                            'name': Country.canada.value.name,
+                        },
+                        'status':
+                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    },
+                ],
+            },
+            {
+                'theme': Interaction.THEMES.other,
+                'were_countries_discussed': True,
+                'export_countries': [
+                    {
+                        'country': {
+                            'id': Country.canada.value.id,
+                            'name': Country.canada.value.name,
+                        },
+                        'status':
+                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    },
+                ],
+            },
+            # normal interaction with no mention of export countries is valid
+            {
+                'were_countries_discussed': False,
+                'export_countries': [],
+            },
+        ),
+    )
+    def test_add_with_export_countries_feature_flag_active(self, extra_data, permissions):
+        """
+        Test add a new interaction with export countries
+        when feature flag is active.
+        """
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.KINDS.interaction,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+
+            **resolve_data(extra_data),
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': Interaction.KINDS.interaction,
+            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'theme': request_data.get('theme', None),
+            'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'net_company_receipt': None,
+            'policy_areas': request_data.get('policy_areas', []),
+            'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
+            'policy_issue_types':
+                request_data.get('policy_issue_types', []),
+            'was_policy_feedback_provided':
+                request_data.get('was_policy_feedback_provided', False),
+            'communication_channel': {
+                'id': str(communication_channel.pk),
+                'name': communication_channel.name,
+            },
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(adviser.pk),
+                        'first_name': adviser.first_name,
+                        'last_name': adviser.last_name,
+                        'name': adviser.name,
+                    },
+                    'team': {
+                        'id': str(adviser.dit_team.pk),
+                        'name': adviser.dit_team.name,
+                    },
+                },
+            ],
+            'notes': request_data.get('notes', ''),
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+            },
+            'contacts': [{
+                'id': str(contact.pk),
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
+            }],
+            'event': None,
+            'service': {
+                'id': str(Service.inbound_referral.value.id),
+                'name': Service.inbound_referral.value.name,
+            },
+            'service_answers': None,
+            'investment_project': request_data.get('investment_project'),
+            'archived_documents_url_path': '',
+            'were_countries_discussed': request_data.get('were_countries_discussed'),
+            'export_countries': request_data.get('export_countries', []),
             'created_by': {
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
@@ -212,8 +370,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -231,8 +391,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -250,8 +412,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -273,8 +437,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -293,6 +459,386 @@ class TestAddInteraction(APITestMixin):
                 },
             ),
 
+            # were_countries_discussed can't be null for export interactions
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'were_countries_discussed': None,
+                },
+                {
+                    'were_countries_discussed': ['This field is required.'],
+                },
+            ),
+            # were_countries_discussed can't be null for other interactions
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.other,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': None,
+                },
+                {
+                    'were_countries_discussed': ['This field is required.'],
+                },
+            ),
+            # were_countries_discussed can't be missing for export/other interactions
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                },
+                {
+                    'were_countries_discussed': ['This field is required.'],
+                },
+            ),
+            # were_countries_discussed can't be missing when sending export_countries
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': None,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'were_countries_discussed': ['This field is required.'],
+                    'export_countries':
+                        ['This field is only valid when countries were discussed.'],
+                },
+            ),
+
+            # export_countries cannot be blank when were_countries_discussed is True
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+
+                    'were_countries_discussed': True,
+                    'export_countries': None,
+                },
+                {
+                    'export_countries': ['This field may not be null.'],
+                },
+            ),
+
+            # export_countries cannot have same country more than once for a company
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        },
+                    ],
+                },
+                {
+                    'non_field_errors':
+                        ['A country that was discussed cannot be entered in multiple fields.'],
+                },
+            ),
+            # export_countries must be fully formed. Status can't be missing
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'country': ['This field is required.']}],
+                },
+            ),
+            # export_countries must be fully formed. Country can't be missing
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'status': ['This field is required.']}],
+                },
+            ),
+
+            # export_countries must be fully formed. status must be a valid choice
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status': 'foobar',
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'status': ['"foobar" is not a valid choice.']}],
+                },
+            ),
+
+            # export_countries must be fully formed. country ID must be a valid UUID
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': '1234',
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [{'country': ['Must be a valid UUID.']}],
+                },
+            ),
+
+            # export_countries must be fully formed. country UUID must be a valid Country
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': '4dee26c2-799d-49a8-a533-c30c595c942c',
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': [
+                        {
+                            'country': [
+                                'Invalid pk "4dee26c2-799d-49a8-a533-c30c595c942c"'
+                                ' - object does not exist.',
+                            ],
+                        },
+                    ],
+                },
+            ),
+
+            # export_countries cannot be set when were_countries_discussed is False
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.THEMES.export,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+
+                    'were_countries_discussed': False,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.canada.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries':
+                        ['This field is only valid when countries were discussed.'],
+                },
+            ),
+
             # fields not allowed
             (
                 {
@@ -300,8 +846,10 @@ class TestAddInteraction(APITestMixin):
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -346,8 +894,10 @@ class TestAddInteraction(APITestMixin):
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
@@ -369,8 +919,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -392,8 +944,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -416,8 +970,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
 
@@ -436,8 +992,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {
                             'adviser': AdviserFactory,
@@ -458,8 +1016,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {
                             'adviser': AdviserFactory,
@@ -478,8 +1038,10 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'company': CompanyFactory,
-                    'contacts': [ContactFactory],
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
@@ -491,10 +1053,82 @@ class TestAddInteraction(APITestMixin):
                     'status': ['This field may not be null.'],
                 },
             ),
+
+            # were_countries_discussed can't be true for investment theme
+            (
+                {
+                    'theme': Interaction.THEMES.investment,
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                },
+                {
+                    'were_countries_discussed':
+                        ["This value can't be selected for investment interactions."],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        data = resolve_data(data)
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.post(url, data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == errors
+
+    def test_validaton_when_interaction_add_countries_feature_flag_off(self):
+        """
+        Check export country fields are not allowed to be updated
+        when feature flas is off.
+        """
+        data = {
+            'theme': Interaction.THEMES.export,
+            'kind': Interaction.KINDS.interaction,
+            'date': date.today().isoformat(),
+            'subject': 'whatever',
+            'company': lambda: CompanyFactory(name='Martian Island'),
+            'contacts': [
+                lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+            ],
+            'dit_participants': [
+                {'adviser': AdviserFactory},
+            ],
+            'service': Service.inbound_referral.value.id,
+            'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+            'was_policy_feedback_provided': False,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status':
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                },
+            ],
+        }
+        errors = {
+            'export_countries':
+                ['export_countries fields are not valid when feature flag is off.'],
+            'were_countries_discussed':
+                ['export_countries fields are not valid when feature flag is off.'],
+        }
+
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=False)
         data = resolve_data(data)
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, data)
@@ -623,6 +1257,7 @@ class TestGetInteraction(APITestMixin):
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
             InvestmentProjectInteractionFactory,
+            ExportCountriesInteractionFactory,
         ),
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -710,6 +1345,17 @@ class TestGetInteraction(APITestMixin):
                 'project_code': interaction.investment_project.project_code,
             } if interaction.investment_project else None,
             'archived_documents_url_path': interaction.archived_documents_url_path,
+            'were_countries_discussed': interaction.were_countries_discussed,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.id),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.all()
+            ],
             'created_by': {
                 'id': str(interaction.created_by.pk),
                 'first_name': interaction.created_by.first_name,
@@ -810,6 +1456,17 @@ class TestGetInteraction(APITestMixin):
                 'name': interaction.investment_project.name,
                 'project_code': interaction.investment_project.project_code,
             },
+            'were_countries_discussed': interaction.were_countries_discussed,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.id),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.all()
+            ],
             'archived_documents_url_path': interaction.archived_documents_url_path,
             'created_by': {
                 'id': str(interaction.created_by.pk),
@@ -1040,6 +1697,180 @@ class TestUpdateInteraction(APITestMixin):
 
         assert(response.status_code == status.HTTP_400_BAD_REQUEST)
         assert response.data == error_response
+
+    @pytest.mark.parametrize(
+        'data,error_response',
+        (
+            (
+                {
+                    'were_countries_discussed': False,
+                },
+                {
+                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                },
+            ),
+            (
+                {
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.greece.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                    'export_countries': ['This field is invalid for interaction updates.'],
+                },
+            ),
+            (
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.greece.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': ['This field is invalid for interaction updates.'],
+                },
+            ),
+        ),
+    )
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @pytest.mark.parametrize('flag', ((True, False)))
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_clean_interaction_update_export_countries_validation_error(
+        self, permissions, data, error_response, flag,
+    ):
+        """
+        Test that a user can't update export countries in an interaction
+        when the interaction doesn't have any export countries.
+        """
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = CompanyInteractionFactory(
+            subject='I am a subject',
+            theme=Interaction.THEMES.export,
+        )
+
+        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        data = resolve_data(data)
+        response = api_client.patch(url, data=data)
+
+        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.json() == error_response
+
+    @pytest.mark.parametrize(
+        'data,error_response',
+        (
+            (
+                {
+                    'were_countries_discussed': False,
+                },
+                {
+                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                },
+            ),
+            (
+                {
+                    'were_countries_discussed': True,
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.greece.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                    'export_countries': ['This field is invalid for interaction updates.'],
+                },
+            ),
+            (
+                {
+                    'export_countries': [
+                        {
+                            'country': {
+                                'id': Country.greece.value.id,
+                            },
+                            'status':
+                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        },
+                    ],
+                },
+                {
+                    'export_countries': ['This field is invalid for interaction updates.'],
+                },
+            ),
+        ),
+    )
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @pytest.mark.parametrize('flag', ((True, False)))
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_update_export_countries_validation_error(
+        self, permissions, data, error_response, flag,
+    ):
+        """
+        Test that a user can't update export countries in an interaction
+        when the interaction already has export countries set.
+        """
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = ExportCountriesInteractionFactory(
+            export_countries__country_id=Country.canada.value.id,
+            export_countries__status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+        )
+
+        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        data = resolve_data(data)
+        response = api_client.patch(url, data=data)
+
+        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.json() == error_response
+
+    @pytest.mark.parametrize('flag', ((True, False)))
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_update_interaction_when_export_countries_set(self, permissions, flag):
+        """
+        Test that a user can update the interaction otherwise
+        when the interaction already has export countries set
+        """
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = ExportCountriesInteractionFactory()
+
+        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
+
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        data = {
+            'subject': 'I am another subject',
+        }
+        data = resolve_data(data)
+        response = api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['subject'] == 'I am another subject'
 
 
 class TestListInteractions(APITestMixin):
