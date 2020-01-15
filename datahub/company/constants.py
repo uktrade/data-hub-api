@@ -5,6 +5,7 @@ from datahub.core.constants import Constant
 
 
 NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG = 'notify-dnb-investigations'
+AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG = 'automatic-company-archive'
 
 
 class BusinessTypeConstant(Enum):
