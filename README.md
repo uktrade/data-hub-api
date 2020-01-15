@@ -247,8 +247,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ADMIN_OAUTH2_AUTH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth auth path for Django Admin SSO login. |
 | `ADMIN_OAUTH2_CLIENT_ID` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client ID for Django Admin SSO login. |
 | `ADMIN_OAUTH2_CLIENT_SECRET` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client secret for Django Admin SSO login. |
-| `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
-| `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
@@ -324,7 +322,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `REPORT_BUCKET` | No | S3 bucket for report storage. |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
-| `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
 | `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |

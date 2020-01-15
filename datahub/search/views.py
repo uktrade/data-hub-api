@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
@@ -35,6 +36,67 @@ from datahub.search.utils import SearchOrdering
 from datahub.user_event_log.constants import USER_EVENT_TYPES
 from datahub.user_event_log.utils import record_user_event
 
+
+class SearchStubSchema(AutoSchema):
+    """
+    AutoSchema with supressed responses schema.
+
+    The search response has different schema than the request. This prevents showing
+    wrong example in the OpenAPI docs.
+    """
+
+    def get_operation(self, path, method):
+        """
+        Supress showing the response in the form of the request body.
+        """
+        operation = super().get_operation(path, method)
+
+        operation['responses'] = {
+            '200': {
+                'description': '',
+                'content': {
+                    'application/json': {
+                        'schema': {},
+                    },
+                },
+            },
+        }
+
+        return operation
+
+
+class SearchBasicStubSchema(SearchStubSchema):
+    """
+    SearchStubSchema with defined query parameters to allow query basic search from the Open API
+    docs.
+    """
+
+    def get_operation(self, path, method):
+        """Include parameters to query the basic search endpoint."""
+        operation = super().get_operation(path, method)
+        operation['parameters'] = [
+            {
+                'description': '',
+                'in': 'query',
+                'name': 'term',
+                'required': True,
+                'schema': {
+                    'type': 'string',
+                },
+            },
+            {
+                'description': '',
+                'in': 'query',
+                'name': 'entity',
+                'required': False,
+                'schema': {
+                    'type': 'string',
+                },
+            },
+        ]
+        return operation
+
+
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
 v3_view_registry = {}
@@ -48,6 +110,7 @@ class SearchBasicAPIView(APIView):
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
+    schema = SearchBasicStubSchema()
 
     def get(self, request, format=None):
         """Performs basic search."""
@@ -92,6 +155,8 @@ def _get_permission_filters(request):
 
 class SearchAPIView(APIView):
     """Filtered search view."""
+
+    schema = SearchStubSchema()
 
     search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
@@ -176,6 +241,10 @@ class SearchAPIView(APIView):
     def enhance_response(self, results, response):
         """Placeholder for a method to enhance the response with custom data."""
         return response
+
+    def get_serializer(self):
+        """Return query serializer for use with OpenAPI documentation."""
+        return self.serializer_class()
 
 
 class SearchExportAPIView(SearchAPIView):

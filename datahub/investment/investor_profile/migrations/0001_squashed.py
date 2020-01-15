@@ -34,17 +34,6 @@ def load_metadata(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('investor_profile', '0001_initial'),
-        ('investor_profile', '0002_auto_20190319_1611'),
-        ('investor_profile', '0003_auto_20190412_1437'),
-        ('investor_profile', '0004_auto_20190512_2123'),
-        ('investor_profile', '0005_delete_profiletype'),
-        ('investor_profile', '0006_fix_asset_class_spellings'),
-        ('investor_profile', '0007_add_bank_and_corporate_investor_to_investor_type'),
-        ('investor_profile', '0008_remove_investor_profile_and_type_from_db'),
-    ]
-
     initial = True
 
     dependencies = [
