@@ -74,7 +74,7 @@ def create_release_branch():
 
     news_fragment_paths = list_news_fragments()
     if news_fragment_paths:
-        joined_paths = '\n'.join(news_fragment_paths)
+        joined_paths = '\n'.join(str(path) for path in news_fragment_paths)
 
         raise CommandError(
             'These are news fragments on origin/develop:\n\n'
