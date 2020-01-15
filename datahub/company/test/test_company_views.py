@@ -1865,37 +1865,6 @@ class TestCompanyExportCountryModel(APITestMixin):
                         ["Same country can't be added more than once to export_countries."],
                 },
             ),
-            # export_countries must be fully formed. Country can't be missing
-            (
-                True,
-                {
-                    'export_countries': [
-                        {
-                            'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                        },
-                    ],
-                },
-                {
-                    'export_countries': [{'country': ['This field is required.']}],
-                },
-            ),
-            # export_countries must be fully formed. Status can't be missing
-            (
-                True,
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                            },
-                        },
-                    ],
-                },
-                {
-                    'export_countries': [{'status': ['This field is required.']}],
-                },
-            ),
             # export_countries must be fully formed. status must be a valid choice
             (
                 True,
@@ -1983,7 +1952,7 @@ class TestCompanyExportCountryModel(APITestMixin):
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
         ]
-        return random.choice(CompanyExportCountry.EXPORT_INTEREST_STATUSES)
+        return random.choice(export_interest_statuses)
 
     def test_update_company_with_export_country(self):
         """Test company update."""
@@ -1999,10 +1968,7 @@ class TestCompanyExportCountryModel(APITestMixin):
                     'id': str(country.id),
                     'name': country.name,
                 },
-                'status':
-                    factory.LazyFunction(
-                        lambda: random.choice(CompanyExportCountry.EXPORT_INTEREST_STATUSES)[0],
-                ),
+                'status': self._get_export_interest_status(),
             }
             for country in countries_set
         ]
@@ -2037,31 +2003,3 @@ class TestCompanyExportCountryModel(APITestMixin):
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_reqest == current_countries_response
         assert future_countries_request == future_countries_response
-
-    def test_adding_to_empty_company_fields(self):
-        """
-        Adding export countries to empty ComapnyExportModel
-        should update company fields, exporting_to and future_interest.
-        """
-        assert True
-
-    def test_updating_existing_company_fields(self):
-        """
-        Update existing export countries in ComapnyExportModel
-        should update company fields, exporting_to and future_interest
-        """
-        assert True
-
-    def test_add_more_to_existing_company_fields(self):
-        """
-        Appending export countries to existing ones in CompanyExportModel
-        should be added to company fields, exporting_to and future_interest
-        """
-        assert True
-
-    def test_not_interested_are_unaffected(self):
-        """
-        Make sure existing not_interested export countries are unaffected
-        when exporting_to and future_interest fields are updated
-        """
-        assert True
