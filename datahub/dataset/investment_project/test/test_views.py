@@ -6,7 +6,6 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import (
     format_date_or_datetime,
     get_attr_or_none,
-    join_attr_values,
     str_or_none,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
@@ -25,8 +24,9 @@ def get_expected_data_from_project(project):
     """Returns expected dictionary based on given project"""
     return {
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
-        'actual_uk_region_names': (join_attr_values(project.actual_uk_regions.order_by('name'))
-                                   if project.actual_uk_regions.exists() else None),
+        'actual_uk_region_names': (
+            [region.name for region in project.actual_uk_regions.order_by('name')]
+        ) if project.actual_uk_regions.exists() else None,
         'address_1': project.address_1,
         'address_2': project.address_2,
         'address_town': project.address_town,
@@ -36,7 +36,9 @@ def get_expected_data_from_project(project):
             project.associated_non_fdi_r_and_d_project_id,
         ),
         'average_salary__name': get_attr_or_none(project, 'average_salary.name'),
-        'business_activity_names': join_attr_values(project.business_activities.order_by('name')),
+        'business_activity_names': (
+            [activity.name for activity in project.business_activities.order_by('name')]
+        ) if project.business_activities.exists() else None,
         'client_relationship_manager_id': str_or_none(project.client_relationship_manager_id),
         'client_requirements': project.client_requirements,
         'competing_countries': (
@@ -45,8 +47,10 @@ def get_expected_data_from_project(project):
         ),
         'created_by_id': str_or_none(project.created_by_id),
         'created_on': format_date_or_datetime(project.created_on),
-        'delivery_partner_names': (join_attr_values(project.delivery_partners.order_by('name'))
-                                   if project.delivery_partners.exists() else None),
+        'delivery_partner_names': (
+            [partner.name for partner in project.delivery_partners.order_by('name')]
+
+        ) if project.delivery_partners.exists() else None,
         'description': project.description,
         'estimated_land_date': format_date_or_datetime(project.estimated_land_date),
         'export_revenue': project.export_revenue,
@@ -105,8 +109,9 @@ def get_expected_data_from_project(project):
         'specific_programme__name': get_attr_or_none(project, 'specific_programme.name'),
         'stage__name': get_attr_or_none(project, 'stage.name'),
         'status': project.status,
-        'strategic_driver_names': (join_attr_values(project.strategic_drivers.order_by('name'))
-                                   if project.strategic_drivers.exists() else None),
+        'strategic_driver_names': (
+            [driver.name for driver in project.strategic_drivers.order_by('name')]
+        ) if project.strategic_drivers.exists() else None,
         'team_member_ids': (
             [
                 str(team_member.adviser_id)
@@ -117,9 +122,8 @@ def get_expected_data_from_project(project):
         'uk_company_id': str_or_none(project.uk_company_id),
         'uk_company_sector': get_attr_or_none(project, 'uk_company.sector.name'),
         'uk_region_location_names': (
-            join_attr_values(project.uk_region_locations.order_by('name'))
-            if project.uk_region_locations.exists() else None
-        ),
+            [region.name for region in project.uk_region_locations.order_by('name')]
+        ) if project.uk_region_locations.exists() else None,
     }
 
 

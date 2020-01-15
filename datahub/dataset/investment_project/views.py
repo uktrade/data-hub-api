@@ -1,10 +1,11 @@
 from django.contrib.postgres.aggregates import ArrayAgg
 
-from datahub.core.query_utils import get_aggregate_subquery, get_empty_string_if_null_expression
-from datahub.dataset.core.views import BaseDatasetView
-from datahub.dataset.investment_project.query_utils import (
-    get_investment_project_to_many_string_agg_subquery,
+from datahub.core.query_utils import (
+    get_aggregate_subquery,
+    get_array_agg_subquery,
+    get_empty_string_if_null_expression,
 )
+from datahub.dataset.core.views import BaseDatasetView
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
@@ -22,26 +23,38 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
     def get_dataset(self):
         """Returns list of Investment Projects Dataset records"""
         return InvestmentProject.objects.annotate(
-            actual_uk_region_names=get_investment_project_to_many_string_agg_subquery(
-                'actual_uk_regions__name',
+            actual_uk_region_names=get_array_agg_subquery(
+                InvestmentProject.actual_uk_regions.through,
+                'investmentproject',
+                'ukregion__name',
+                ordering=('ukregion__name',),
             ),
-            business_activity_names=get_investment_project_to_many_string_agg_subquery(
-                'business_activities__name',
+            business_activity_names=get_array_agg_subquery(
+                InvestmentProject.business_activities.through,
+                'investmentproject',
+                'investmentbusinessactivity__name',
+                ordering=('investmentbusinessactivity__name',),
             ),
             competing_countries=get_aggregate_subquery(
                 InvestmentProject,
                 ArrayAgg('competitor_countries__name', ordering=('competitor_countries__name',)),
             ),
-            delivery_partner_names=get_investment_project_to_many_string_agg_subquery(
-                'delivery_partners__name',
+            delivery_partner_names=get_array_agg_subquery(
+                InvestmentProject.delivery_partners.through,
+                'investmentproject',
+                'investmentdeliverypartner__name',
+                ordering=('investmentdeliverypartner__name',),
             ),
             investor_company_sector=get_sector_name_subquery('investor_company__sector'),
             level_of_involvement_name=get_empty_string_if_null_expression(
                 'level_of_involvement__name',
             ),
             project_reference=get_project_code_expression(),
-            strategic_driver_names=get_investment_project_to_many_string_agg_subquery(
-                'strategic_drivers__name',
+            strategic_driver_names=get_array_agg_subquery(
+                InvestmentProject.strategic_drivers.through,
+                'investmentproject',
+                'investmentstrategicdriver__name',
+                ordering=('investmentstrategicdriver__name',),
             ),
             sector_name=get_sector_name_subquery('sector'),
             team_member_ids=get_aggregate_subquery(
@@ -49,8 +62,11 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
                 ArrayAgg('team_members__adviser_id', ordering=('team_members__id',)),
             ),
             uk_company_sector=get_sector_name_subquery('uk_company__sector'),
-            uk_region_location_names=get_investment_project_to_many_string_agg_subquery(
-                'uk_region_locations__name',
+            uk_region_location_names=get_array_agg_subquery(
+                InvestmentProject.uk_region_locations.through,
+                'investmentproject',
+                'ukregion__name',
+                ordering=('ukregion__name',),
             ),
         ).values(
             'actual_land_date',

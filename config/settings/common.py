@@ -94,9 +94,6 @@ LOCAL_APPS = [
     'datahub.user_event_log',
     'datahub.activity_feed',
     'datahub.dataset',
-
-    # TODO: delete after the whole data cleansing piece of work is complete
-    'datahub.dnb_match',
 ]
 
 MI_APPS = [
@@ -114,7 +111,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'admin_ip_restrictor.middleware.AdminIPRestrictorMiddleware',
     'datahub.core.reversion.NonAtomicRevisionMiddleware',
 ]
 
@@ -219,12 +215,6 @@ AUTHENTICATION_BACKENDS = [
     'datahub.core.auth.TeamModelPermissionsBackend'
 ]
 
-
-# django-admin-ip-restrictor
-
-RESTRICT_ADMIN = env.bool('RESTRICT_ADMIN', False)
-ALLOWED_ADMIN_IPS = env.list('ALLOWED_ADMIN_IPS', default=[])
-ALLOWED_ADMIN_IP_RANGES = env.list('ALLOWED_ADMIN_IP_RANGES', default=[])
 
 # OAuth2 settings to authenticate Django admin users
 
