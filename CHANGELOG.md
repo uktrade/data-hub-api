@@ -1,3 +1,28 @@
+# Data Hub API 26.3.0 (2020-01-15)
+
+
+## Removals
+
+- The IP restriction functionality provided by `django-admin-ip-restrictor` was removed as it was not in use as we're using private networking and other mechanisms within GOV.UK PaaS instead.
+
+## Features
+
+- It is now possible to perform queries to search endpoints in the API browser.
+
+## Internal changes
+
+- **Investment** The squashed `investor_profile` migration `0001_squashed` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## API
+
+- **Investment** `GET /v4/dataset/investment-projects-dataset`: 5 comma joined string fields were changed to return arrays of strings:
+  - `actual_uk_region_names`
+  - `business_activity_names`
+  - `delivery_partner_names`
+  - `strategic_driver_names`
+  - `uk_region_location_names`
+
+
 # Data Hub API 26.2.0 (2020-01-14)
 
 
