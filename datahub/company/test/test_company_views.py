@@ -1862,7 +1862,7 @@ class TestCompanyExportCountryModel(APITestMixin):
                 },
                 {
                     'non_field_errors':
-                        ["Same country can't be added more than once to export_countries."],
+                        ['A country that was discussed cannot be entered in multiple fields.'],
                 },
             ),
             # export_countries must be fully formed. status must be a valid choice
@@ -1956,6 +1956,60 @@ class TestCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_with_export_country(self):
         """Test company update."""
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        company = CompanyFactory()
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+
+        countries_set = list(CountryModel.objects.order_by('name')[:4])
+        data_items = [
+            {
+                'country': {
+                    'id': str(country.id),
+                    'name': country.name,
+                },
+                'status': self._get_export_interest_status(),
+            }
+            for country in countries_set
+        ]
+        data = {
+            'export_countries': data_items,
+        }
+
+        status_wise_items = {
+            outer['status']: [
+                inner['country']['id']
+                for inner in data_items if inner['status'] == outer['status']
+            ] for outer in data_items
+        }
+
+        response = self.api_client.patch(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+
+        company_after_update = Company.objects.get(id=company.pk)
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        response_data['export_countries'].sort(key=lambda item: item['country']['name'])
+        current_countries_reqest = status_wise_items[
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        ]
+        current_countries_response = [c['id'] for c in company_after_update.export_to_countries]
+
+        future_countries_request = status_wise_items[
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        ]
+        future_countries_response = [
+            c['id'] for c in company_after_update.future_interest_countries
+        ]
+
+        assert company_after_update.export_countries == data['export_countries']
+        assert current_countries_reqest == current_countries_response
+        assert future_countries_request == future_countries_response
+
+    def test_get_company_with_export_countries(self):
+        """Test get company details after updating export countries."""
         FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
         company = CompanyFactory()
 

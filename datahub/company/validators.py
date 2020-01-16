@@ -60,7 +60,7 @@ class DuplicateExportCountryValidator:
             country = item['country']
             if country in deduped:
                 raise serializers.ValidationError(
-                    "Same country can't be added more than once to export_countries.",
+                    'A country that was discussed cannot be entered in multiple fields.',
                     code='duplicate_export_country',
                 )
             deduped.add(country)
