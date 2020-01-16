@@ -5,6 +5,8 @@ import reversion
 from django.apps import apps
 from django.core.management import BaseCommand
 from django.db import transaction
+from django.db.models import CharField
+from django.db.models.functions import Cast
 from reversion.models import Revision, Version
 
 logger = getLogger(__name__)
@@ -41,7 +43,10 @@ class Command(BaseCommand):
 
         counter = Counter()
         for model in models:
-            _, deletions_by_model = Version.objects.get_deleted(model).delete()
+            # The Version's `get_deleted` method was originally used here, but it was not working
+            # quickly enough for our use case. The records to be deleted are now being determined
+            # in a way that is easier on the database being used.
+            _, deletions_by_model = _get_orphaned_versions_query(model).delete()
             counter.update(deletions_by_model)
 
         # delete revisions without versions
@@ -51,3 +56,23 @@ class Command(BaseCommand):
         logger.info(f'{sum(counter.values())} records deleted. Breakdown by model:')
         for deletion_model, model_deletion_count in counter.items():
             logger.info(f'{deletion_model}: {model_deletion_count}')
+
+
+def _get_orphaned_versions_query(model):
+    all_model_ids = model.objects.annotate(
+        object_id=Cast('pk', CharField()),
+    ).values(
+        'object_id',
+    )
+
+    version_ids_to_delete = Version.objects.get_for_model(
+        model,
+    ).values(
+        'object_id',
+    ).difference(
+        all_model_ids,
+    )
+
+    return Version.objects.get_for_model(model).filter(
+        object_id__in=version_ids_to_delete,
+    )
