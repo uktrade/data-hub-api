@@ -97,14 +97,16 @@ def company_names_and_postcodes(es_with_collector):
         ('company_w1', 'w1 2AB'),  # AB in suffix to ensure not matched in AB tests
         ('company_w1a', 'W1A2AB'),  # AB in suffix to ensure not matched in AB tests
         ('company_w11', 'W112AB'),  # AB in suffix to ensure not matched in AB tests
-        ('company_ab1', 'AB11WC'),  # WC in suffix to ensure not matched in WC tests
+        ('company_ab1_1', 'AB11WC'),  # WC in suffix to ensure not matched in WC tests
         ('company_ab10', 'ab10 1WC'),  # WC in suffix to ensure not matched in WC tests
+        # to test the difference between searching for AB1 0 (sector) and AB10 (district)
+        ('company_ab1_0', 'AB1 0WC'),
         ('company_wc2b', 'WC2B4AB'),  # AB in suffix to ensure not matched in AB tests
         ('company_wc2n', 'WC2N9ZZ'),
         ('company_wc1x', 'w  C   1 x0aA'),
         ('company_wc1a', 'W C 1 A 1 G A'),
         ('company_se1', 'SE13A J'),
-        ('company_se1_2', 'SE13AJ'),
+        ('company_se1_3', 'SE13AJ'),
         ('company_se2', 'SE23AJ'),
         ('company_se3', 'SE33AJ'),
     ))
@@ -420,37 +422,36 @@ class TestSearch(APITestMixin):
             # Postcode area
             ('W', ['company_w1', 'company_w1a', 'company_w11']),
             ('WC', ['company_wc2b', 'company_wc2n', 'company_wc1x', 'company_wc1a']),
-            ('AB', ['company_ab1', 'company_ab10']),
+            ('AB', ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
 
             # Postcode district
             ('W1', ['company_w1', 'company_w1a']),
             ('W11', ['company_w11']),
             ('WC2', ['company_wc2b', 'company_wc2n']),
-            ('AB1', ['company_ab1']),
-            ('AB10', ['company_ab10']),
-            ('SE1', ['company_se1', 'company_se1_2']),
+            ('AB1', ['company_ab1_0', 'company_ab1_1']),
+            ('AB10', ['company_ab10']),  # Should not match company_ab1_0
+            ('SE1', ['company_se1', 'company_se1_3']),
 
             # Postcode district with sub-district
             ('W1A', ['company_w1a']),
 
             # Postcode sector
-            ('SE1 3', ['company_se1', 'company_se1_2']),
-            ('WC2B4', ['company_wc2b']),
+            ('AB1 0', ['company_ab1_0']),  # Should not match company_ab10
+            ('SE1 3', ['company_se1', 'company_se1_3']),
+            ('WC2B 4', ['company_wc2b']),
 
             # Multiple postcodes searched
             (['W1', 'W11'], ['company_w1', 'company_w1a', 'company_w11']),
-            (['AB1', 'AB10'], ['company_ab1', 'company_ab10']),
+            (['AB1', 'AB10'], ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
 
             # Valid and invalid
-            (['SE1', 'Invalid'], ['company_se1', 'company_se1_2']),
+            (['SE1', 'Invalid'], ['company_se1', 'company_se1_3']),
 
             # Mixed-case search
-            (['aB1', 'ab10'], ['company_ab1', 'company_ab10']),
+            (['aB1', 'ab10'], ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
 
-            # Spaces
-            (['W     1', 'W   1   1     '], ['company_w1', 'company_w1a', 'company_w11']),
-
-            # Entire postcode
+            # Entire postcode (spaces should be ignored)
+            (['AB101WC', 'WC2B4AB'], ['company_ab10', 'company_wc2b']),
             (['AB10 1WC', 'WC2B 4AB'], ['company_ab10', 'company_wc2b']),
         ],
     )
