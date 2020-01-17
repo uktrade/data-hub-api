@@ -331,14 +331,19 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             )
         else:
             export_countries = validated_data.pop('export_countries', None)
-            self._update_export_countries(instance, export_countries, adviser)
+            self._update_export_countries_model(instance, export_countries, adviser)
 
         company = super().update(instance, validated_data)
 
         return company
 
     def _update_company_export_country_fields(self, instance, export_to, future_interest, adviser):
-        """Update export country fields in `Company` model"""
+        """
+        Updates `CompanyExportCountry` with export country fields in `Company` model.
+        Adds/updates export countries related to a company within
+        export_to_countries and future_interest_countries.
+        And removes existing ones that are not in the list excluding `not_interested` items.
+        """
         all_countries = {
             *(export_to or []),
             *(future_interest or []),
@@ -368,6 +373,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ).delete()
 
     def _sync_to_company_export_country_model(self, company, adviser, export_countries, status):
+        """
+        Helper funtion to sync data for export country field and status within `Company` model
+        into `CompanyExportCountry` model.
+        """
         for country in export_countries:
             export_country, created = CompanyExportCountry.objects.get_or_create(
                 country=country,
@@ -384,7 +393,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 export_country.modified_by = adviser
                 export_country.save()
 
-    def _update_export_countries(self, company, validated_export_countries, adviser):
+    def _update_export_countries_model(self, company, validated_export_countries, adviser):
         """
         Adds/updates export countries related to a company within validated_export_countries.
         And removes existing ones that are not in the list.
@@ -417,19 +426,22 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         self._sync_to_company_export_country_fields(company, adviser)
 
     def _sync_to_company_export_country_fields(self, company, adviser):
+        """
+        Helper function to sync data from `ComapnyExportCountry` model back
+        into `Company` export country fields: `exporting_to_countries` and 
+        `future_interest_countries`.
+        """
         currently_exporting = CompanyExportCountry.objects.filter(
             company=company,
             status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
         )
         exporting_to_countries = [item.country for item in currently_exporting]
-        print(exporting_to_countries)
 
         future_interest = CompanyExportCountry.objects.filter(
             company=company,
             status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
         )
         future_interest_countries = [item.country for item in future_interest]
-        print(future_interest_countries)
 
         company.export_to_countries.set(exporting_to_countries)
         company.future_interest_countries.set(future_interest_countries)

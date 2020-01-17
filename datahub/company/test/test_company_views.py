@@ -1930,7 +1930,6 @@ class TestCompanyExportCountryModel(APITestMixin):
     def test_validation_error(self, flag, data, expected_error):
         """Test validation scenarios."""
         FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
-        # new_countries = list(CountryModel.objects.order_by('?')[:2])
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
@@ -1954,14 +1953,14 @@ class TestCompanyExportCountryModel(APITestMixin):
         ]
         return random.choice(export_interest_statuses)
 
-    def test_update_company_with_export_country(self):
+    def test_update_company_with_export_countries(self):
         """Test company update."""
         FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
         company = CompanyFactory()
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
 
-        countries_set = list(CountryModel.objects.order_by('name')[:4])
+        countries_set = list(CountryModel.objects.order_by('name')[:10])
         data_items = [
             {
                 'country': {
@@ -1995,16 +1994,17 @@ class TestCompanyExportCountryModel(APITestMixin):
         current_countries_reqest = status_wise_items[
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
         ]
-        current_countries_response = [c['id'] for c in company_after_update.export_to_countries]
+        current_countries_response = [
+            str(c.id) for c in company_after_update.export_to_countries.all()
+        ]
 
         future_countries_request = status_wise_items[
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
         ]
         future_countries_response = [
-            c['id'] for c in company_after_update.future_interest_countries
+            str(c.id) for c in company_after_update.future_interest_countries.all()
         ]
 
-        assert company_after_update.export_countries == data['export_countries']
         assert current_countries_reqest == current_countries_response
         assert future_countries_request == future_countries_response
 
@@ -2015,7 +2015,7 @@ class TestCompanyExportCountryModel(APITestMixin):
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
 
-        countries_set = list(CountryModel.objects.order_by('name')[:4])
+        countries_set = list(CountryModel.objects.order_by('name')[:10])
         data_items = [
             {
                 'country': {
