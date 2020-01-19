@@ -10,7 +10,12 @@ from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, CompanyExportCountry
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.core.constants import Country, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
@@ -37,6 +42,7 @@ from datahub.interaction.test.permissions import (
 )
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.metadata import models as meta_models
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -344,6 +350,150 @@ class TestAddInteraction(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
         }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_interaction_add_company_export_country(self, permissions):
+        """
+        Test add a new interaction with export country
+        make sure it syncs across to company as a new entry.
+        """
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.KINDS.interaction,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'theme': Interaction.THEMES.export,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status':
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                },
+            ],
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        export_countries = company.export_countries.all()
+        assert export_countries.count() == 1
+        assert str(export_countries[0].country.id) == Country.canada.value.id
+        currently_exporting = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        assert export_countries[0].status == currently_exporting
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    @pytest.mark.parametrize(
+        'export_country_date,interaction_date,expected_status',
+        (
+            # current dated interaction overriding existing older status
+            (
+                '2017-01-18',
+                '2017-04-18',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            ),
+            # past dated interaction can't override existing newer status
+            (
+                '2017-03-18',
+                '2017-02-18',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+            ),
+            # future dated interaction, will be treated as current
+            # and can't override existing much newer status
+            (
+                '2017-05-18',
+                '2018-02-18',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+            ),
+            # future dated interaction, will be treated as current
+            # and will override existing older status
+            (
+                '2017-03-18',
+                '2018-02-18',
+                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            ),
+        ),
+    )
+    def test_add_interaction_update_company_export_country(
+        self,
+        permissions,
+        export_country_date,
+        interaction_date,
+        expected_status,
+    ):
+        """
+        Test add a new interaction with export country
+        consolidates to company export countries.
+        """
+        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
+        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        company = CompanyFactory()
+        with freeze_time(export_country_date):
+            company.export_countries.set([
+                CompanyExportCountryFactory(
+                    company=company,
+                    country=meta_models.Country.objects.get(id=Country.canada.value.id),
+                    status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+                ),
+            ])
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'date': interaction_date,
+            'kind': Interaction.KINDS.interaction,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'theme': Interaction.THEMES.export,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status':
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                },
+            ],
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        export_countries = company.export_countries.all()
+        assert export_countries.count() == 1
+        assert str(export_countries[0].country.id) == Country.canada.value.id
+        assert export_countries[0].status == expected_status
 
     @pytest.mark.parametrize(
         'data,errors',
@@ -1123,9 +1273,9 @@ class TestAddInteraction(APITestMixin):
         }
         errors = {
             'export_countries':
-                ['export_countries fields are not valid when feature flag is off.'],
+                ['export countries related fields are not valid when feature flag is off.'],
             'were_countries_discussed':
-                ['export_countries fields are not valid when feature flag is off.'],
+                ['export countries related fields are not valid when feature flag is off.'],
         }
 
         FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=False)
