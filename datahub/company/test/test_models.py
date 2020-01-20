@@ -7,6 +7,7 @@ from datahub.company.models import OneListTier
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
+    CompanyExportCountryHistoryFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
@@ -265,3 +266,13 @@ class TestCompanyExportCountry:
                 company=company_1,
                 country=country,
             )
+
+
+class TestCompanyExportCountryHistory:
+    """Tests Company export country history model"""
+
+    def test_str(self):
+        """Test the human friendly string representation of the object"""
+        history = CompanyExportCountryHistoryFactory()
+        status = f'{history.company} {history.country} {history.status}'
+        assert str(history) == status
