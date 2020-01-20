@@ -419,6 +419,28 @@ class Company(ArchivableModel, BaseModel):
         self.one_list_tier = None
         self.save()
 
+    def add_export_country(self, country, status, record_date, adviser):
+        """
+        Add a company export_country, if it doesn't exist.
+        If the company already exists and incoming status is different
+        check if incoming record is newer and update.
+        """
+        export_country, created = CompanyExportCountry.objects.get_or_create(
+            country=country,
+            company=self,
+            defaults={
+                'status': status,
+                'created_by': adviser,
+                'modified_by': adviser,
+            },
+        )
+
+        if not created:
+            if export_country.status != status and export_country.modified_on < record_date:
+                export_country.status = status
+                export_country.modified_by = adviser
+                export_country.save()
+
 
 class OneListCoreTeamMember(models.Model):
     """
@@ -515,6 +537,62 @@ class CompanyExportCountry(BaseModel):
             ),
         ]
         verbose_name_plural = 'company export countries'
+
+    def __str__(self):
+        """Admin displayed human readable name"""
+        return (
+            f'{self.company} {self.country} {self.status}'
+        )
+
+
+class CompanyExportCountryHistory(models.Model):
+    """
+    Historical log of `CompanyExportCountry` model.
+    Keeps record of each new status in order to come up with
+    accurate consolidated export country history for a given
+    company and/or country.
+    """
+
+    HISTORY_TYPES = Choices(
+        ('insert', 'Inserted'),
+        ('update', 'Updated'),
+        ('delete', 'Deleted'),
+    )
+
+    history_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    history_date = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
+    history_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    history_type = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=HISTORY_TYPES,
+    )
+    id = models.UUIDField(db_index=True)
+    country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='export_countries_history',
+    )
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+    )
+
+    class Meta:
+        verbose_name_plural = 'company export country history'
 
     def __str__(self):
         """Admin displayed human readable name"""
