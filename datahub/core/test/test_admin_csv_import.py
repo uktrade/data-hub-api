@@ -55,7 +55,7 @@ row2é\r
 
         assert 'csv_file' in form.errors
         assert form.errors['csv_file'] == [
-            f"File extension '{ext[1:]}' is not allowed. Allowed extensions are: 'csv'.",
+            f'File extension “{ext[1:]}” is not allowed. Allowed extensions are: csv.',
         ]
 
     def test_does_not_allow_file_without_required_column(self):

@@ -152,7 +152,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
             ),
             (
                 '1234',
-                "'1234' is not a valid UUID.",
+                '“1234” is not a valid UUID.',
             ),
             (
                 '',
