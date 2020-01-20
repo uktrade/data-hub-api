@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from requests import HTTPError
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -79,7 +79,7 @@ def get_adviser_by_sso_user_profile(sso_user_profile):
 def get_safe_next_url_from_request(request):
     """Get safe next URL from request."""
     next_url = request.GET.get('next')
-    if is_safe_url(
+    if url_has_allowed_host_and_scheme(
         url=next_url,
         allowed_hosts={request.get_host()},
         require_https=request.is_secure(),

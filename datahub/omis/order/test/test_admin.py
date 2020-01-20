@@ -60,7 +60,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         response = self.client.get(url, follow=True)
         assert response.status_code == 200
         assert [msg.message for msg in response.context['messages']] == [
-            f'order with ID "{order_id}" doesn\'t exist. Perhaps it was deleted?',
+            f'order with ID “{order_id}” doesn’t exist. Perhaps it was deleted?',
         ]
 
     def test_400_popup_not_allowed(self):

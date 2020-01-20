@@ -162,11 +162,11 @@ class TestLargeCapitalProfileListView(APITestMixin):
             ),
             (
                 'hello',
-                {'investor_company_id': ["'hello' is not a valid UUID."]},
+                {'investor_company_id': ['“hello” is not a valid UUID.']},
             ),
             (
                 1,
-                {'investor_company_id': ["'1' is not a valid UUID."]},
+                {'investor_company_id': ['“1” is not a valid UUID.']},
             ),
         ),
     )
