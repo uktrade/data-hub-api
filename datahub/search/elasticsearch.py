@@ -86,7 +86,7 @@ normalise_postcode_filter = analysis.token_filter(
 
 
 postcode_analyzer = analysis.CustomAnalyzer(
-    'postcode_analyzer',
+    'postcode_analyzer_v2',
     type='custom',
     tokenizer='keyword',
     filter=(space_remover, 'lowercase', normalise_postcode_filter, postcode_filter),
@@ -94,7 +94,7 @@ postcode_analyzer = analysis.CustomAnalyzer(
 
 
 postcode_search_analyzer = analysis.CustomAnalyzer(
-    'postcode_search_analyzer',
+    'postcode_search_analyzer_v2',
     type='custom',
     tokenizer='keyword',
     filter=('lowercase', normalise_postcode_filter),
