@@ -1,3 +1,38 @@
+# Data Hub API 26.4.0 (2020-01-20)
+
+
+## Features
+
+- **Companies** A new Celery task called `automatic_company_archive` was added to Data Hub API.
+
+  This task would run every Saturday at 8pm in *simulation mode* with an upper limit of a *1000 companies*. In simulation mode, this task would log the IDs of the companies that would have been automatically archived using the following criteria:
+
+  - Do not have any OMIS orders
+  - Do not have any interactions during the last 8 years
+  - Not matched to any D&B records
+  - Not created or modified during the last 3 months
+
+## Bug fixes
+
+- The `delete_orphaned_versions` command was modified to select records to be deleted in a fashion that is more 
+  efficient in the environment it will run.
+
+## API
+
+- **Companies** `POST /v4/search/company`: The behaviour of the `uk_postcode` filter was modified so that spaces are ignored only if a full postcode is searched for.
+
+  This means that `AB11` and `AB1 1` are now distinct searches (where the former would match e.g. `AB11 1AA` and the latter would match e.g. `AB1 1AA`). (Previously, both searches were equivalent and matched both postcodes.)
+- **Interactions** Interactions API `/v3/interaction`, `export_countries` tagged to an interaction are consolidated into `CompanyExportCountry` model, in order to maintain company export countries list. If a country added to an interaction doesn't already exist in company export countries, it will be added. If in case that country already exists, following business rules apply:
+
+  * `Status` of `InteractionExportCountry` added to an interaction with current date overrides the entry within `CompanyExportCountry` with older date.
+  * Whereas `Status` of `InteractionExportCountry` added to an interaction with past date can't override the entry within `CompanyExportCountry` with newer date.
+  * An interaction added with future date, will be treated as current date and existing rules apply.
+
+## Database schema
+
+- **Companies** A new model `company_companyexportcountryhistory` was created to log all changes made to `company_companyexportcountry` model. This will maintain all inserts, updates and deletions to that model with appropriate `history_type` with values `insert`, `update` and `delete`.
+
+
 # Data Hub API 26.3.0 (2020-01-15)
 
 
