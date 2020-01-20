@@ -42,33 +42,46 @@ space_remover = analysis.token_filter(
 )
 
 AREA_REGEX = r'[a-z]{1,2}'
-DISTRICT_REGEX = r'[0-9][a-z]|[0-9]{1,2}'
+DISTRICT_REGEX = r'(?:[0-9][a-z]|[0-9]{1,2})'
 SECTOR_REGEX = r'[0-9]'
 UNIT_REGEX = r'[a-z]{2}'
 
 postcode_filter = analysis.token_filter(
     'postcode_filter',
     type='pattern_capture',
-    # Match whole postcode
+    # Index whole postcode (with space)
     preserve_original=True,
     patterns=[
-        # Match postcode area
+        # Index postcode area
         # See the Royal Mail programmer's guide for the exact definitions
-        rf'^({AREA_REGEX})(?:{DISTRICT_REGEX}){SECTOR_REGEX}{UNIT_REGEX}',
+        rf'^({AREA_REGEX}){DISTRICT_REGEX} {SECTOR_REGEX}{UNIT_REGEX}',
 
-        # Match postcode district (with sub-district code ignored)
+        # Index postcode district (with sub-district code ignored)
         # This is so `wc1` query would match `wc1ab` and `wc1a1ab`, but not `wc111ab`
         # Area + one or two digits
-        rf'^(({AREA_REGEX}[0-9]){SECTOR_REGEX}{UNIT_REGEX}|'
-        rf'({AREA_REGEX}[0-9]{{2}}){SECTOR_REGEX}{UNIT_REGEX}|'
-        rf'({AREA_REGEX}[0-9])[a-z]?{SECTOR_REGEX}{UNIT_REGEX})',
+        rf'^(({AREA_REGEX}[0-9]) {SECTOR_REGEX}{UNIT_REGEX}|'
+        rf'({AREA_REGEX}[0-9]{{2}}) {SECTOR_REGEX}{UNIT_REGEX}|'
+        rf'({AREA_REGEX}[0-9])[a-z]? {SECTOR_REGEX}{UNIT_REGEX})',
 
-        # Match postcode district (including sub-district)
-        rf'^({AREA_REGEX}(?:{DISTRICT_REGEX})){SECTOR_REGEX}{UNIT_REGEX}',
+        # Index postcode district (including sub-district)
+        rf'^({AREA_REGEX}{DISTRICT_REGEX}) {SECTOR_REGEX}{UNIT_REGEX}',
 
-        # Match postcode sector
-        rf'^({AREA_REGEX}(?:{DISTRICT_REGEX}){SECTOR_REGEX}){UNIT_REGEX}',
+        # Index postcode sector
+        rf'^({AREA_REGEX}{DISTRICT_REGEX} {SECTOR_REGEX}){UNIT_REGEX}',
     ],
+)
+
+# Token filter that adds a space to well-formed UK postcodes that don't have one.
+normalise_postcode_filter = analysis.token_filter(
+    'normalise_postcode_filter',
+    type='pattern_replace',
+    pattern=rf'^'
+            rf'(?<area>{AREA_REGEX})'
+            rf'(?<district>{DISTRICT_REGEX})'
+            rf'(?<sector>{SECTOR_REGEX})'
+            rf'(?<unit>{UNIT_REGEX})'
+            rf'$',
+    replacement=r'${area}${district} ${sector}${unit}',
 )
 
 
@@ -76,7 +89,7 @@ postcode_analyzer = analysis.CustomAnalyzer(
     'postcode_analyzer',
     type='custom',
     tokenizer='keyword',
-    filter=(space_remover, 'lowercase', postcode_filter),
+    filter=(space_remover, 'lowercase', normalise_postcode_filter, postcode_filter),
 )
 
 
@@ -84,7 +97,7 @@ postcode_search_analyzer = analysis.CustomAnalyzer(
     'postcode_search_analyzer',
     type='custom',
     tokenizer='keyword',
-    filter=(space_remover, 'lowercase'),
+    filter=('lowercase', normalise_postcode_filter),
 )
 
 
