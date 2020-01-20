@@ -389,7 +389,11 @@ if REDIS_BASE_URL:
         'update_companies_from_dnb_service': {
             'task': 'datahub.dnb_api.tasks.get_company_updates',
             'schedule': crontab(minute=0, hour=0),
-        }
+        },
+        'automatic_company_archive': {
+            'task': 'datahub.company.tasks.automatic_company_archive',
+            'schedule': crontab(minute=0, hour=20, day_of_week='SAT'),
+        },
     }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
         CELERY_BEAT_SCHEDULE['sync_es'] = {

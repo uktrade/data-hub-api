@@ -2,11 +2,15 @@ import logging
 from functools import partial
 
 from django.db import transaction
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_migrate, post_save, pre_delete
 from django.dispatch import receiver
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company
+from datahub.company.models import (
+    Company,
+    CompanyExportCountry,
+    CompanyExportCountryHistory,
+)
 from datahub.company.notify import notify_new_dnb_investigation
 from datahub.core.utils import load_constants_to_database
 from datahub.metadata.models import BusinessType
@@ -49,3 +53,52 @@ def notify_dnb_investigation_post_save(sender, instance, created, raw, **kwargs)
 def _notify_dnb_investigation_post_save(instance):
     logger.info(f'Company with ID {instance.id} is pending DNB investigation.')
     notify_new_dnb_investigation(instance)
+
+
+@receiver(
+    post_save,
+    sender=CompanyExportCountry,
+    dispatch_uid='record_export_country_history_update',
+)
+def record_export_country_history_update(sender, instance, created, raw, **kwargs):
+    """
+    Record export country changes to history.
+    """
+    if raw:
+        return
+
+    action = CompanyExportCountryHistory.HISTORY_TYPES.update
+    if created:
+        action = CompanyExportCountryHistory.HISTORY_TYPES.insert
+
+    _record_export_country_history(instance, action)
+
+
+@receiver(
+    pre_delete,
+    sender=CompanyExportCountry,
+    dispatch_uid='record_export_country_history_delete',
+)
+def record_export_country_history_delete(sender, instance, **kwargs):
+    """
+    Record export country deletions to history.
+    """
+    action = CompanyExportCountryHistory.HISTORY_TYPES.delete
+
+    _record_export_country_history(instance, action)
+
+
+def _record_export_country_history(export_country, action):
+    """
+    Records each change made to `CompanyExportCountry` model
+    into companion log model, `CompanyExportCountryHistory`.
+    Along with type of change, insert, update or delete.
+    """
+    CompanyExportCountryHistory.objects.create(
+        history_user=export_country.modified_by,
+        history_type=action,
+        id=export_country.id,
+        company=export_country.company,
+        country=export_country.country,
+        status=export_country.status,
+    )
