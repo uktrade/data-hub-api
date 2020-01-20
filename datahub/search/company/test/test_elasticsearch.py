@@ -218,13 +218,13 @@ def test_mapping(es):
                     },
                 },
                 'uk_address_postcode': {
-                    'analyzer': 'postcode_analyzer',
-                    'search_analyzer': 'postcode_search_analyzer',
+                    'analyzer': 'postcode_analyzer_v2',
+                    'search_analyzer': 'postcode_search_analyzer_v2',
                     'type': 'text',
                 },
                 'uk_registered_address_postcode': {
-                    'analyzer': 'postcode_analyzer',
-                    'search_analyzer': 'postcode_search_analyzer',
+                    'analyzer': 'postcode_analyzer_v2',
+                    'search_analyzer': 'postcode_search_analyzer_v2',
                     'type': 'text',
                 },
                 'one_list_group_global_account_manager': {
