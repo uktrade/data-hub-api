@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.models import Document, UploadStatus
 from datahub.investment.project.proposition.constants import PropositionStatus
 from datahub.investment.project.proposition.models import (
     Proposition,
@@ -1456,7 +1456,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'signed_upload_url': 'http://document-about-ocelots',
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1512,7 +1512,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'signed_upload_url': 'http://document-about-ocelots',
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1599,7 +1599,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'av_clean': True,
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanned,
+            'status': UploadStatus.VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1655,7 +1655,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'av_clean': True,
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanned,
+            'status': UploadStatus.VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1730,7 +1730,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1776,7 +1776,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1887,7 +1887,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 },
                 'original_filename': 'test.txt',
                 'url': _get_document_url(entity_document.proposition, entity_document),
-                'status': UPLOAD_STATUSES.virus_scanned,
+                'status': UploadStatus.VIRUS_SCANNED,
                 'document_url': 'http://what',
                 'created_on': format_date_or_datetime(entity_document.created_on),
                 'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1963,7 +1963,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -2022,7 +2022,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -2066,7 +2066,7 @@ class TestPropositionDocumentViews(APITestMixin):
         }
 
         entity_document.document.refresh_from_db()
-        assert entity_document.document.status == UPLOAD_STATUSES.not_virus_scanned
+        assert entity_document.document.status == UploadStatus.NOT_VIRUS_SCANNED
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
     @patch('datahub.documents.tasks.delete_document.apply_async')
@@ -2176,7 +2176,7 @@ class TestPropositionDocumentViews(APITestMixin):
         }
 
         entity_document.document.refresh_from_db()
-        assert entity_document.document.status == UPLOAD_STATUSES.virus_scanned
+        assert entity_document.document.status == UploadStatus.VIRUS_SCANNED
         assert delete_document.called is False
 
     @patch('datahub.documents.tasks.delete_document.apply_async')

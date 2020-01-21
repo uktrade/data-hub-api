@@ -73,7 +73,7 @@ def perform_delete_document(document_pk):
     Deletes Document and corresponding S3 file.
 
     :raises: DocumentDeleteException if document:
-        - doesn't have status=UPLOAD_STATUSES.deletion_pending
+        - doesn't have status=UploadStatus.DELETION_PENDING
         - response from S3 doesn't declare no content (status_code=204)
         - doesn't exist
     :raises: botocore.exceptions.ClientError if there was a problem with the S3 client
@@ -81,7 +81,7 @@ def perform_delete_document(document_pk):
 
     :param document_pk: id of the Document
     """
-    from datahub.documents.models import UPLOAD_STATUSES
+    from datahub.documents.models import UploadStatus
 
     document = get_document_by_pk(document_pk)
     if not document:
@@ -89,7 +89,7 @@ def perform_delete_document(document_pk):
             f'Document with ID {document_pk} not found.',
         )
 
-    if document.status != UPLOAD_STATUSES.deletion_pending:
+    if document.status != UploadStatus.DELETION_PENDING:
         raise DocumentDeleteException(
             f'Document with ID {document_pk} is not pending deletion.',
         )
