@@ -32,7 +32,7 @@ def spi_report():
 @pytest.fixture
 def ist_adviser():
     """Provides IST adviser."""
-    team = TeamFactory(tags=[Team.TAGS.investment_services_team])
+    team = TeamFactory(tags=[Team.Tag.INVESTMENT_SERVICES_TEAM])
     yield AdviserFactory(dit_team_id=team.id)
 
 
