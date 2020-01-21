@@ -216,7 +216,7 @@ class TestAddInteraction(APITestMixin):
                             'name': Country.canada.value.name,
                         },
                         'status':
-                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     },
                 ],
             },
@@ -230,7 +230,7 @@ class TestAddInteraction(APITestMixin):
                             'name': Country.canada.value.name,
                         },
                         'status':
-                            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     },
                 ],
             },
@@ -385,7 +385,7 @@ class TestAddInteraction(APITestMixin):
                         'id': Country.canada.value.id,
                     },
                     'status':
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
         }
@@ -398,7 +398,7 @@ class TestAddInteraction(APITestMixin):
         export_countries = company.export_countries.all()
         assert export_countries.count() == 1
         assert str(export_countries[0].country.id) == Country.canada.value.id
-        currently_exporting = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        currently_exporting = CompanyExportCountry.Status.CURRENTLY_EXPORTING
         assert export_countries[0].status == currently_exporting
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -410,27 +410,27 @@ class TestAddInteraction(APITestMixin):
             (
                 '2017-01-18',
                 '2017-04-18',
-                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             ),
             # past dated interaction can't override existing newer status
             (
                 '2017-03-18',
                 '2017-02-18',
-                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+                CompanyExportCountry.Status.NOT_INTERESTED,
             ),
             # future dated interaction, will be treated as current
             # and can't override existing much newer status
             (
                 '2017-05-18',
                 '2018-02-18',
-                CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+                CompanyExportCountry.Status.NOT_INTERESTED,
             ),
             # future dated interaction, will be treated as current
             # and will override existing older status
             (
                 '2017-03-18',
                 '2018-02-18',
-                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             ),
         ),
     )
@@ -453,7 +453,7 @@ class TestAddInteraction(APITestMixin):
                 CompanyExportCountryFactory(
                     company=company,
                     country=meta_models.Country.objects.get(id=Country.canada.value.id),
-                    status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+                    status=CompanyExportCountry.Status.NOT_INTERESTED,
                 ),
             ])
         contact = ContactFactory(company=company)
@@ -480,7 +480,7 @@ class TestAddInteraction(APITestMixin):
                         'id': Country.canada.value.id,
                     },
                     'status':
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
         }
@@ -704,7 +704,7 @@ class TestAddInteraction(APITestMixin):
                                 'id': Country.canada.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -767,14 +767,14 @@ class TestAddInteraction(APITestMixin):
                                 'id': Country.canada.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                         {
                             'country': {
                                 'id': Country.canada.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                                CompanyExportCountry.Status.FUTURE_INTEREST,
                         },
                     ],
                 },
@@ -805,7 +805,7 @@ class TestAddInteraction(APITestMixin):
                     'export_countries': [
                         {
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -903,7 +903,7 @@ class TestAddInteraction(APITestMixin):
                                 'id': '1234',
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -937,7 +937,7 @@ class TestAddInteraction(APITestMixin):
                                 'id': '4dee26c2-799d-49a8-a533-c30c595c942c',
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -979,7 +979,7 @@ class TestAddInteraction(APITestMixin):
                                 'id': Country.canada.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -1267,7 +1267,7 @@ class TestAddInteraction(APITestMixin):
                         'id': Country.canada.value.id,
                     },
                     'status':
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
         }
@@ -1868,7 +1868,7 @@ class TestUpdateInteraction(APITestMixin):
                                 'id': Country.greece.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -1885,7 +1885,7 @@ class TestUpdateInteraction(APITestMixin):
                                 'id': Country.greece.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -1942,7 +1942,7 @@ class TestUpdateInteraction(APITestMixin):
                                 'id': Country.greece.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -1959,7 +1959,7 @@ class TestUpdateInteraction(APITestMixin):
                                 'id': Country.greece.value.id,
                             },
                             'status':
-                                CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -1983,7 +1983,7 @@ class TestUpdateInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         interaction = ExportCountriesInteractionFactory(
             export_countries__country_id=Country.canada.value.id,
-            export_countries__status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+            export_countries__status=CompanyExportCountry.Status.NOT_INTERESTED,
         )
 
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0

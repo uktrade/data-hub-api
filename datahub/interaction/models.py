@@ -352,7 +352,7 @@ class Interaction(ArchivableModel, BaseModel):
 class InteractionExportCountry(BaseModel):
     """
     Record `Interaction`'s exporting status to a `Country`.
-    Where `Status` is `CompanyExportCountry.EXPORT_INTEREST_STATUSES`
+    Where `status` is `CompanyExportCountry.Status`
 
     This data will help consolidate company level countries
     in `company.CompanyExportCountry`
@@ -374,7 +374,7 @@ class InteractionExportCountry(BaseModel):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+        choices=CompanyExportCountry.Status.choices,
     )
 
     class Meta:
