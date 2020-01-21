@@ -26,15 +26,15 @@ def get_level_of_involvement_simplified_expression():
     return Case(
         When(
             level_of_involvement_id=None,
-            then=Value(IProjectAbstract.INVOLVEMENT.unspecified),
+            then=Value(IProjectAbstract.Involvement.UNSPECIFIED),
         ),
         When(
             level_of_involvement_id=Involvement.no_involvement.value.id,
-            then=Value(IProjectAbstract.INVOLVEMENT.not_involved),
+            then=Value(IProjectAbstract.Involvement.NOT_INVOLVED),
         ),
         When(
             ~Q(level_of_involvement_id=Involvement.no_involvement.value.id),
-            then=Value(IProjectAbstract.INVOLVEMENT.involved),
+            then=Value(IProjectAbstract.Involvement.INVOLVED),
         ),
         output_field=CharField(),
     )
