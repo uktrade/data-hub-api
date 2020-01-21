@@ -476,7 +476,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'invalid_for_investment',
                     EqualsRule('kind', Interaction.Kind.INTERACTION),
-                    when=EqualsRule('theme', Interaction.THEMES.investment),
+                    when=EqualsRule('theme', Interaction.Theme.INVESTMENT),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
@@ -532,7 +532,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'invalid_for_investment',
                     OperatorRule('were_countries_discussed', not_),
                     OperatorRule('export_countries', not_),
-                    when=EqualsRule('theme', Interaction.THEMES.investment),
+                    when=EqualsRule('theme', Interaction.Theme.INVESTMENT),
                 ),
                 ValidationRule(
                     'required',
@@ -542,7 +542,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),
@@ -553,7 +553,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         OperatorRule('were_countries_discussed', bool),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),
@@ -566,7 +566,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         OperatorRule('were_countries_discussed', not_),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),

@@ -44,7 +44,7 @@ class TestAddServiceDelivery(APITestMixin):
             # non-event service delivery with theme
             {
                 'is_event': False,
-                'theme': Interaction.THEMES.export,
+                'theme': Interaction.Theme.EXPORT,
             },
             # non-event service delivery with blank notes
             {
@@ -365,7 +365,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'was_policy_feedback_provided': False,
                     'is_event': False,
 
-                    'theme': Interaction.THEMES.investment,
+                    'theme': Interaction.Theme.INVESTMENT,
                 },
                 {
                     'kind': ["This value can't be selected for investment interactions."],

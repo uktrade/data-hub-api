@@ -129,7 +129,7 @@ class InteractionCSVRowForm(forms.Form):
         'event': 'event_id',
     }
 
-    theme = forms.ChoiceField(choices=Interaction.THEMES)
+    theme = forms.ChoiceField(choices=Interaction.Theme.choices)
     kind = forms.ChoiceField(choices=Interaction.Kind.choices)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     # Used to attempt to find a matching contact (and company) for the interaction
