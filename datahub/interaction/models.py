@@ -151,13 +151,13 @@ class ServiceAnswerOption(BaseOrderedConstantModel):
 class ServiceAdditionalQuestion(BaseOrderedConstantModel):
     """Service additional question model."""
 
-    TYPES = Choices(
-        ('text', 'Text'),
-        ('money', 'Money'),
-    )
+    class Type(models.TextChoices):
+        TEXT = ('text', 'Text')
+        MONEY = ('money', 'Money')
+
     type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=TYPES,
+        choices=Type.choices,
     )
 
     is_required = models.BooleanField(default=False)
