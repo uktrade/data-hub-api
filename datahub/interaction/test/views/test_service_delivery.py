@@ -72,7 +72,7 @@ class TestAddServiceDelivery(APITestMixin):
             # Interaction with a status
             {
                 'is_event': False,
-                'status': Interaction.STATUSES.draft,
+                'status': Interaction.Status.DRAFT,
             },
         ),
     )
@@ -104,7 +104,7 @@ class TestAddServiceDelivery(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.SERVICE_DELIVERY,
-            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'status': request_data.get('status', Interaction.Status.COMPLETE),
             'theme': request_data.get('theme', None),
             'is_event': request_data['is_event'],
             'service_delivery_status': request_data.get('service_delivery_status'),

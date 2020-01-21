@@ -432,7 +432,7 @@ class InteractionCSVRowForm(forms.Form):
             'notes': data.get('notes'),
             'service': data['service'],
             'service_answers': data.get('service_answers'),
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'subject': subject,
             'theme': data['theme'],
             'was_policy_feedback_provided': False,

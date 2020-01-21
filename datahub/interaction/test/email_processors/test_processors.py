@@ -198,7 +198,7 @@ class TestCalendarInteractionEmailProcessor:
             'meeting': {'id': interaction_data['meeting_details']['uid']},
         }
         assert interaction.subject == expected_subject
-        assert interaction.status == Interaction.STATUSES.draft
+        assert interaction.status == Interaction.Status.DRAFT
 
         sender_participant = interaction.dit_participants.get(
             adviser__email__iexact=interaction_data['sender_email'],
