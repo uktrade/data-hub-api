@@ -502,11 +502,10 @@ class CompanyExportCountry(BaseModel):
         - future_interest_countries
     """
 
-    EXPORT_INTEREST_STATUSES = Choices(
-        ('not_interested', 'Not interested'),
-        ('currently_exporting', 'Currently exporting to'),
-        ('future_interest', 'Future country of interest'),
-    )
+    class Status(models.TextChoices):
+        NOT_INTERESTED = ('not_interested', 'Not interested')
+        CURRENTLY_EXPORTING = ('currently_exporting', 'Currently exporting to')
+        FUTURE_INTEREST = ('future_interest', 'Future country of interest')
 
     id = models.UUIDField(
         primary_key=True,
@@ -524,7 +523,7 @@ class CompanyExportCountry(BaseModel):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=EXPORT_INTEREST_STATUSES,
+        choices=Status.choices,
     )
 
     class Meta:
@@ -586,7 +585,7 @@ class CompanyExportCountryHistory(models.Model):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+        choices=CompanyExportCountry.Status.choices,
     )
 
     class Meta:
