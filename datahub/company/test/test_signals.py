@@ -99,7 +99,7 @@ class TestNotifyDNBInvestigationPostSave:
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
         assert history[0].status == export_country.status
-        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
     def test_company_export_country_history_update(self):
         """
@@ -115,7 +115,7 @@ class TestNotifyDNBInvestigationPostSave:
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
         assert history[0].status == export_country.status
-        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
         export_country.status = CompanyExportCountry.Status.CURRENTLY_EXPORTING
         export_country.save()
@@ -127,12 +127,12 @@ class TestNotifyDNBInvestigationPostSave:
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
         assert history[0].status == CompanyExportCountry.Status.FUTURE_INTEREST
-        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
         assert history[1].id == export_country.id
         assert history[1].company == export_country.company
         assert history[1].country == export_country.country
         assert history[1].status == export_country.status
-        assert history[1].history_type == CompanyExportCountryHistory.HISTORY_TYPES.update
+        assert history[1].history_type == CompanyExportCountryHistory.HistoryType.UPDATE
 
     def test_company_export_country_history_delete(self):
         """
@@ -148,7 +148,7 @@ class TestNotifyDNBInvestigationPostSave:
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
         assert history[0].status == export_country.status
-        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
         export_country_id = export_country.id
         export_country.delete()
@@ -158,7 +158,7 @@ class TestNotifyDNBInvestigationPostSave:
         assert len(history) == 2
         assert history[0].id == export_country_id
         assert history[0].status == CompanyExportCountry.Status.FUTURE_INTEREST
-        assert history[0].history_type == CompanyExportCountryHistory.HISTORY_TYPES.insert
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
         assert history[1].id == export_country_id
         assert history[1].status == CompanyExportCountry.Status.FUTURE_INTEREST
-        assert history[1].history_type == CompanyExportCountryHistory.HISTORY_TYPES.delete
+        assert history[1].history_type == CompanyExportCountryHistory.HistoryType.DELETE

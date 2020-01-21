@@ -11,7 +11,6 @@ from django.core.validators import (
 )
 from django.db import models
 from django.utils.timezone import now
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.core import constants, reversion
@@ -550,11 +549,10 @@ class CompanyExportCountryHistory(models.Model):
     company and/or country.
     """
 
-    HISTORY_TYPES = Choices(
-        ('insert', 'Inserted'),
-        ('update', 'Updated'),
-        ('delete', 'Deleted'),
-    )
+    class HistoryType(models.TextChoices):
+        INSERT = ('insert', 'Inserted')
+        UPDATE = ('update', 'Updated')
+        DELETE = ('delete', 'Deleted')
 
     history_id = models.UUIDField(
         primary_key=True,
@@ -570,7 +568,7 @@ class CompanyExportCountryHistory(models.Model):
     )
     history_type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=HISTORY_TYPES,
+        choices=HistoryType.choices,
     )
     id = models.UUIDField(db_index=True)
     country = models.ForeignKey(

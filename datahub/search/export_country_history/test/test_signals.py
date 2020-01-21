@@ -22,9 +22,9 @@ def test_new_export_country_history_synced(es_with_signals):
 def test_updated_interaction_synced(es_with_signals):
     """Test that when export country history is updated, it is synced to ES."""
     export_country_history = CompanyExportCountryHistoryFactory(
-        history_type=CompanyExportCountryHistory.HISTORY_TYPES.insert,
+        history_type=CompanyExportCountryHistory.HistoryType.INSERT,
     )
-    history_type = CompanyExportCountryHistory.HISTORY_TYPES.update
+    history_type = CompanyExportCountryHistory.HistoryType.UPDATE
     export_country_history.history_type = history_type
     export_country_history.save()
     es_with_signals.indices.refresh()
