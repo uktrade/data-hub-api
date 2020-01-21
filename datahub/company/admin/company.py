@@ -213,6 +213,9 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'name',
         'registered_address_country',
     )
+    list_filter = (
+        'dnb_modified_on',
+    )
     inlines = (
         OneListCoreTeamMemberInline,
     )
