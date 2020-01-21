@@ -152,9 +152,8 @@ class Team(BaseConstantModel):
         Comments: For when filtering by name__iexact
     """
 
-    TAGS = Choices(
-        ('investment_services_team', 'Investment Services Team'),
-    )
+    class Tag(models.TextChoices):
+        INVESTMENT_SERVICES_TEAM = ('investment_services_team', 'Investment Services Team')
 
     role = models.ForeignKey(
         TeamRole,
@@ -176,7 +175,7 @@ class Team(BaseConstantModel):
     )
     tags = MultipleChoiceField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=TAGS,
+        choices=Tag.choices,
         blank=True,
     )
 
