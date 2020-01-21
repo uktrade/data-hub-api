@@ -83,14 +83,13 @@ class IProjectAbstract(models.Model):
         MEDIUM = ('2_medium', 'Medium')
         HIGH = ('3_high', 'High')
 
-    STATUSES = Choices(
-        ('ongoing', 'Ongoing'),
-        ('delayed', 'Delayed'),
-        ('dormant', 'Dormant'),
-        ('lost', 'Lost'),
-        ('abandoned', 'Abandoned'),
-        ('won', 'Won'),
-    )
+    class Status(models.TextChoices):
+        ONGOING = ('ongoing', 'Ongoing')
+        DELAYED = ('delayed', 'Delayed')
+        DORMANT = ('dormant', 'Dormant')
+        LOST = ('lost', 'Lost')
+        ABANDONED = ('abandoned', 'Abandoned')
+        WON = ('won', 'Won')
 
     INVOLVEMENT = Choices(
         ('unspecified', 'Unspecified'),
@@ -145,7 +144,7 @@ class IProjectAbstract(models.Model):
         default=InvestmentProjectStage.prospect.value.id,
     )
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=STATUSES, default=STATUSES.ongoing,
+        max_length=MAX_LENGTH, choices=Status.choices, default=Status.ONGOING,
     )
     reason_delayed = models.TextField(blank=True, null=True)
     reason_abandoned = models.TextField(blank=True, null=True)

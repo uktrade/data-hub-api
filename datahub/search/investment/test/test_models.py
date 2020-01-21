@@ -42,7 +42,7 @@ def project_with_max_gross_value_added():
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
             fdi_value_id=constants.FDIValue.higher.value.id,
-            status=InvestmentProject.STATUSES.won,
+            status=InvestmentProject.Status.WON,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],

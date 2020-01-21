@@ -155,7 +155,7 @@ class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):
     """Investment project in the Won stage."""
 
     stage_id = InvestmentProjectStage.won.value.id
-    status = InvestmentProject.STATUSES.won
+    status = InvestmentProject.Status.WON
     actual_land_date = factory.Faker('past_date')
 
 

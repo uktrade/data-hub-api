@@ -492,12 +492,12 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         new_status = combiner.get_value('status')
 
         if str(new_stage.id) == InvestmentProjectStage.won.value.id:
-            data['status'] = InvestmentProject.STATUSES.won
+            data['status'] = InvestmentProject.Status.WON
         elif (
             old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
-            and new_status == InvestmentProject.STATUSES.won
+            and new_status == InvestmentProject.Status.WON
         ):
-            data['status'] = InvestmentProject.STATUSES.ongoing
+            data['status'] = InvestmentProject.Status.ONGOING
 
     class Meta:
         model = InvestmentProject
