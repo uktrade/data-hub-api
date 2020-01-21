@@ -173,10 +173,9 @@ class ServiceAdditionalQuestion(BaseOrderedConstantModel):
 class Interaction(ArchivableModel, BaseModel):
     """Interaction."""
 
-    KINDS = Choices(
-        ('interaction', 'Interaction'),
-        ('service_delivery', 'Service delivery'),
-    )
+    class Kind(models.TextChoices):
+        INTERACTION = ('interaction', 'Interaction')
+        SERVICE_DELIVERY = ('service_delivery', 'Service delivery')
 
     STATUSES = Choices(
         ('draft', 'Draft'),
@@ -197,7 +196,7 @@ class Interaction(ArchivableModel, BaseModel):
         null=True,
         blank=True,
     )
-    kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
+    kind = models.CharField(max_length=MAX_LENGTH, choices=Kind.choices)
     status = models.CharField(
         max_length=MAX_LENGTH,
         choices=STATUSES,
@@ -301,7 +300,7 @@ class Interaction(ArchivableModel, BaseModel):
     @property
     def is_event(self):
         """Whether this service delivery is for an event."""
-        if self.kind == self.KINDS.service_delivery:
+        if self.kind == self.Kind.SERVICE_DELIVERY:
             return bool(self.event)
         return None
 

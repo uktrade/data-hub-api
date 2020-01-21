@@ -464,7 +464,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'required',
                     OperatorRule('communication_channel', bool),
                     when=AndRule(
-                        EqualsRule('kind', Interaction.KINDS.interaction),
+                        EqualsRule('kind', Interaction.Kind.INTERACTION),
                         EqualsRule('status', Interaction.STATUSES.complete),
                     ),
                 ),
@@ -475,25 +475,25 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ),
                 ValidationRule(
                     'invalid_for_investment',
-                    EqualsRule('kind', Interaction.KINDS.interaction),
+                    EqualsRule('kind', Interaction.Kind.INTERACTION),
                     when=EqualsRule('theme', Interaction.THEMES.investment),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
                     OperatorRule('communication_channel', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'invalid_for_non_service_delivery',
                     OperatorRule('is_event', is_blank),
                     OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=EqualsRule('kind', Interaction.Kind.INTERACTION),
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
@@ -512,7 +512,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('is_event', is_not_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'too_many_contacts_for_event_service_delivery',
@@ -578,7 +578,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', bool),
                     when=AndRule(
                         OperatorRule('is_event', bool),
-                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                        EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                     ),
                 ),
                 ValidationRule(
@@ -586,7 +586,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', not_),
                     when=AndRule(
                         OperatorRule('is_event', not_),
-                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                        EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                     ),
                 ),
             ),

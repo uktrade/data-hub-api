@@ -93,7 +93,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 class CompanyInteractionFactory(InteractionFactoryBase):
     """Factory for creating an interaction relating to a company."""
 
-    kind = Interaction.KINDS.interaction
+    kind = Interaction.Kind.INTERACTION
     theme = factory.Iterator(tuple(filter(None, Interaction.THEMES._db_values)))
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
@@ -106,7 +106,7 @@ class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
     additionally provided.
     """
 
-    kind = Interaction.KINDS.interaction
+    kind = Interaction.Kind.INTERACTION
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
     )
@@ -135,7 +135,7 @@ class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
 class InvestmentProjectInteractionFactory(InteractionFactoryBase):
     """Factory for creating an interaction relating to an investment project."""
 
-    kind = Interaction.KINDS.interaction
+    kind = Interaction.Kind.INTERACTION
     theme = Interaction.THEMES.investment
     investment_project = factory.SubFactory(InvestmentProjectFactory)
     communication_channel = factory.LazyFunction(
@@ -146,7 +146,7 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
 class ServiceDeliveryFactory(InteractionFactoryBase):
     """Service delivery factory."""
 
-    kind = Interaction.KINDS.service_delivery
+    kind = Interaction.Kind.SERVICE_DELIVERY
     service_delivery_status = factory.LazyFunction(
         lambda: random_obj_for_model(ServiceDeliveryStatus),
     )
@@ -164,7 +164,7 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
 class EventServiceDeliveryFactory(InteractionFactoryBase):
     """Event service delivery factory."""
 
-    kind = Interaction.KINDS.service_delivery
+    kind = Interaction.Kind.SERVICE_DELIVERY
     theme = Interaction.THEMES.export
     event = factory.SubFactory(EventFactory)
 
@@ -196,7 +196,7 @@ class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
 class ExportCountriesInteractionFactory(InteractionFactoryBase):
     """Factory for creating an export interaction with export countries."""
 
-    kind = Interaction.KINDS.interaction
+    kind = Interaction.Kind.INTERACTION
     theme = factory.Iterator([Interaction.THEMES.export, Interaction.THEMES.other])
     were_countries_discussed = True
     communication_channel = factory.LazyFunction(

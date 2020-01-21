@@ -303,7 +303,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
             ),
             (
                 Interaction.THEMES.export,
-                Interaction.KINDS.interaction,
+                Interaction.Kind.INTERACTION,
                 '01/01/2018',
                 adviser.name,
                 'person@company.uk',
