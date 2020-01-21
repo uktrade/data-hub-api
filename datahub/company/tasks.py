@@ -30,7 +30,7 @@ def _automatic_company_archive(limit, simulate):
         ),
         active_investment_projects=FilteredRelation(
             'investor_investment_projects',
-            condition=Q(investor_investment_projects__status=InvestmentProject.STATUSES.ongoing),
+            condition=Q(investor_investment_projects__status=InvestmentProject.Status.ONGOING),
         ),
     ).filter(
         Q(latest_interaction_date__date__lt=_8y_ago) | Q(latest_interaction_date__isnull=True),

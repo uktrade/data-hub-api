@@ -72,7 +72,7 @@ def project_with_max_gross_value_added():
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
             fdi_value_id=constants.FDIValue.higher.value.id,
-            status=InvestmentProject.STATUSES.won,
+            status=InvestmentProject.Status.WON,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
@@ -96,7 +96,7 @@ def setup_data(es_with_collector, project_with_max_gross_value_added):
             investor_company=CompanyFactory(
                 address_country_id=constants.Country.united_states.value.id,
             ),
-            status=InvestmentProject.STATUSES.ongoing,
+            status=InvestmentProject.Status.ONGOING,
             uk_region_locations=[
                 constants.UKRegion.east_midlands.value.id,
                 constants.UKRegion.isle_of_man.value.id,
@@ -118,7 +118,7 @@ def setup_data(es_with_collector, project_with_max_gross_value_added):
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
             fdi_value_id=constants.FDIValue.higher.value.id,
-            status=InvestmentProject.STATUSES.delayed,
+            status=InvestmentProject.Status.DELAYED,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
