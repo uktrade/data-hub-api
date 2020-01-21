@@ -1,8 +1,9 @@
-from model_utils import Choices
+from django.db import models
 
 
-PropositionStatus = Choices(
-    ('ongoing', 'Ongoing'),
-    ('abandoned', 'Abandoned'),
-    ('completed', 'Completed'),
-)
+class PropositionStatus(models.TextChoices):
+    """Proposition statuses."""
+
+    ONGOING = ('ongoing', 'Ongoing')
+    ABANDONED = ('abandoned', 'Abandoned')
+    COMPLETED = ('completed', 'Completed')
