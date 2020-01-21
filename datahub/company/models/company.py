@@ -58,13 +58,12 @@ class Company(ArchivableModel, BaseModel):
     class TransferReason(models.TextChoices):
         DUPLICATE = ('duplicate', 'Duplicate record')
 
-    EXPORT_POTENTIAL_SCORES = Choices(
-        ('very_high', 'Very High'),
-        ('high', 'High'),
-        ('medium', 'Medium'),
-        ('low', 'Low'),
-        ('very_low', 'Very Low'),
-    )
+    class ExportPotentialScore(models.TextChoices):
+        VERY_HIGH = ('very_high', 'Very High')
+        HIGH = ('high', 'High')
+        MEDIUM = ('medium', 'Medium')
+        LOW = ('low', 'Low')
+        VERY_LOW = ('very_low', 'Very Low')
 
     GREAT_PROFILE_STATUSES = Choices(
         ('published', 'Published'),
@@ -240,7 +239,7 @@ class Company(ArchivableModel, BaseModel):
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        choices=EXPORT_POTENTIAL_SCORES,
+        choices=ExportPotentialScore.choices,
         help_text='Score that signifies export potential, imported from Data Science',
     )
     great_profile_status = models.CharField(
