@@ -7,7 +7,6 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 from reversion.models import Revision
 
@@ -91,11 +90,10 @@ class IProjectAbstract(models.Model):
         ABANDONED = ('abandoned', 'Abandoned')
         WON = ('won', 'Won')
 
-    INVOLVEMENT = Choices(
-        ('unspecified', 'Unspecified'),
-        ('not_involved', 'Not involved'),
-        ('involved', 'Involved'),
-    )
+    class Involvement(models.TextChoices):
+        UNSPECIFIED = ('unspecified', 'Unspecified')
+        NOT_INVOLVED = ('not_involved', 'Not involved')
+        INVOLVED = ('involved', 'Involved')
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
@@ -253,13 +251,13 @@ class IProjectAbstract(models.Model):
     def level_of_involvement_simplified(self):
         """Returns simplified level of involvement for the Investment Project."""
         if self.level_of_involvement_id is None:
-            return self.INVOLVEMENT.unspecified
+            return self.Involvement.UNSPECIFIED
 
         not_involved_id = constants.Involvement.no_involvement.value.id
         if force_uuid(self.level_of_involvement_id) == force_uuid(not_involved_id):
-            return self.INVOLVEMENT.not_involved
+            return self.Involvement.NOT_INVOLVED
 
-        return self.INVOLVEMENT.involved
+        return self.Involvement.INVOLVED
 
 
 class IProjectValueAbstract(models.Model):
