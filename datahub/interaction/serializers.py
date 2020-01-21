@@ -402,7 +402,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
-            'status': {'default': Interaction.STATUSES.complete},
+            'status': {'default': Interaction.Status.COMPLETE},
             'theme': {
                 'allow_blank': False,
                 'default': None,
@@ -465,13 +465,13 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('communication_channel', bool),
                     when=AndRule(
                         EqualsRule('kind', Interaction.Kind.INTERACTION),
-                        EqualsRule('status', Interaction.STATUSES.complete),
+                        EqualsRule('status', Interaction.Status.COMPLETE),
                     ),
                 ),
                 ValidationRule(
                     'required',
                     OperatorRule('service', bool),
-                    when=EqualsRule('status', Interaction.STATUSES.complete),
+                    when=EqualsRule('status', Interaction.Status.COMPLETE),
                 ),
                 ValidationRule(
                     'invalid_for_investment',

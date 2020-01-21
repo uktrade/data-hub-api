@@ -1190,7 +1190,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'notes': '',
             'service': service,
             'service_answers': None,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'subject': service.name,
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
@@ -1234,7 +1234,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'notes': data['notes'],
             'service': service,
             'service_answers': None,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'subject': data['subject'],
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
@@ -1274,7 +1274,7 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.communication_channel == communication_channel
         assert interaction.service == service
-        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.status == Interaction.Status.COMPLETE
         assert interaction.subject == service.name
         assert interaction.event is None
         assert interaction.notes == ''
@@ -1322,7 +1322,7 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.event == event
         assert interaction.service == service
-        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.status == Interaction.Status.COMPLETE
         assert interaction.subject == data['subject']
         assert interaction.event == event
         assert interaction.notes == data['notes']

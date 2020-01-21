@@ -177,10 +177,9 @@ class Interaction(ArchivableModel, BaseModel):
         INTERACTION = ('interaction', 'Interaction')
         SERVICE_DELIVERY = ('service_delivery', 'Service delivery')
 
-    STATUSES = Choices(
-        ('draft', 'Draft'),
-        ('complete', 'Complete'),
-    )
+    class Status(models.TextChoices):
+        DRAFT = ('draft', 'Draft')
+        COMPLETE = ('complete', 'Complete')
 
     THEMES = Choices(
         (None, 'Not set'),
@@ -199,8 +198,8 @@ class Interaction(ArchivableModel, BaseModel):
     kind = models.CharField(max_length=MAX_LENGTH, choices=Kind.choices)
     status = models.CharField(
         max_length=MAX_LENGTH,
-        choices=STATUSES,
-        default=STATUSES.complete,
+        choices=Status.choices,
+        default=Status.COMPLETE,
     )
     # Set if the interaction was imported from an external source
     # (e.g. an .ics (iCalendar) file or a CSV file).

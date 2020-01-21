@@ -131,7 +131,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             'date': data['date'],
             'dit_participants': dit_participants,
             'kind': Interaction.Kind.INTERACTION,
-            'status': Interaction.STATUSES.draft,
+            'status': Interaction.Status.DRAFT,
             'subject': data['subject'],
             'was_policy_feedback_provided': False,
         }

@@ -606,9 +606,9 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'current_status,new_status',
         (
-            (Interaction.STATUSES.draft, Interaction.STATUSES.draft),
-            (Interaction.STATUSES.draft, Interaction.STATUSES.complete),
-            (Interaction.STATUSES.complete, Interaction.STATUSES.complete),
+            (Interaction.Status.DRAFT, Interaction.Status.DRAFT),
+            (Interaction.Status.DRAFT, Interaction.Status.COMPLETE),
+            (Interaction.Status.COMPLETE, Interaction.Status.COMPLETE),
         ),
     )
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -633,17 +633,17 @@ class TestUpdateInteraction(APITestMixin):
         'current_status,new_status,response_body',
         (
             (
-                Interaction.STATUSES.draft,
+                Interaction.Status.DRAFT,
                 None,
                 {'status': ['This field may not be null.']},
             ),
             (
-                Interaction.STATUSES.complete,
-                Interaction.STATUSES.draft,
+                Interaction.Status.COMPLETE,
+                Interaction.Status.DRAFT,
                 {'non_field_errors': ['The status of a complete interaction cannot change.']},
             ),
             (
-                Interaction.STATUSES.complete,
+                Interaction.Status.COMPLETE,
                 None,
                 {'status': ['This field may not be null.']},
             ),

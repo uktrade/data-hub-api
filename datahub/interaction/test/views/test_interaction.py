@@ -71,7 +71,7 @@ class TestAddInteraction(APITestMixin):
             },
             # interaction with a status
             {
-                'status': Interaction.STATUSES.draft,
+                'status': Interaction.Status.DRAFT,
             },
             # investment project interaction
             {
@@ -121,7 +121,7 @@ class TestAddInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.INTERACTION,
-            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'status': request_data.get('status', Interaction.Status.COMPLETE),
             'theme': request_data.get('theme', None),
             'is_event': None,
             'service_delivery_status': None,
@@ -277,7 +277,7 @@ class TestAddInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.INTERACTION,
-            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'status': request_data.get('status', Interaction.Status.COMPLETE),
             'theme': request_data.get('theme', None),
             'is_event': None,
             'service_delivery_status': None,
@@ -1427,7 +1427,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.INTERACTION,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -1549,7 +1549,7 @@ class TestGetInteraction(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.INTERACTION,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -1808,7 +1808,7 @@ class TestUpdateInteraction(APITestMixin):
         (
             (
                 {
-                    'status': Interaction.STATUSES.complete,
+                    'status': Interaction.Status.COMPLETE,
                     'service': Service.inbound_referral.value.id,
                 },
                 {
@@ -1817,7 +1817,7 @@ class TestUpdateInteraction(APITestMixin):
             ),
             (
                 {
-                    'status': Interaction.STATUSES.complete,
+                    'status': Interaction.Status.COMPLETE,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                 },
                 {
@@ -1836,7 +1836,7 @@ class TestUpdateInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         draft_interaction = CompanyInteractionFactory(
             kind=Interaction.Kind.INTERACTION,
-            status=Interaction.STATUSES.draft,
+            status=Interaction.Status.DRAFT,
             service_id=None,
             communication_channel=None,
         )
