@@ -5,7 +5,6 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import CompanyExportCountry
@@ -181,17 +180,17 @@ class Interaction(ArchivableModel, BaseModel):
         DRAFT = ('draft', 'Draft')
         COMPLETE = ('complete', 'Complete')
 
-    THEMES = Choices(
-        (None, 'Not set'),
-        ('export', 'Export'),
-        ('investment', 'Investment'),
-        ('other', 'Something else'),
-    )
+    class Theme(models.TextChoices):
+        EXPORT = ('export', 'Export')
+        INVESTMENT = ('investment', 'Investment')
+        OTHER = ('other', 'Something else')
+
+        __empty__ = 'Not set'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     theme = models.CharField(
         max_length=MAX_LENGTH,
-        choices=THEMES,
+        choices=Theme.choices,
         null=True,
         blank=True,
     )
