@@ -4,7 +4,6 @@ from logging import getLogger
 from django.conf import settings
 from django.db import models, transaction
 from django.utils.timezone import now
-from model_utils import Choices
 
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.tasks import virus_scan_document
@@ -13,14 +12,15 @@ from datahub.documents.utils import sign_s3_url
 logger = getLogger(__name__)
 
 
-UPLOAD_STATUSES = Choices(
-    ('not_virus_scanned', 'Not virus scanned'),
-    ('virus_scanning_scheduled', 'Virus scanning scheduled'),
-    ('virus_scanning_in_progress', 'Virus scanning in progress'),
-    ('virus_scanning_failed', 'Virus scanning failed.'),
-    ('virus_scanned', 'Virus scanned'),
-    ('deletion_pending', 'Deletion pending'),
-)
+class UploadStatus(models.TextChoices):
+    """Upload statuses."""
+
+    NOT_VIRUS_SCANNED = ('not_virus_scanned', 'Not virus scanned')
+    VIRUS_SCANNING_SCHEDULED = ('virus_scanning_scheduled', 'Virus scanning scheduled')
+    VIRUS_SCANNING_IN_PROGRESS = ('virus_scanning_in_progress', 'Virus scanning in progress')
+    VIRUS_SCANNING_FAILED = ('virus_scanning_failed', 'Virus scanning failed.')
+    VIRUS_SCANNED = ('virus_scanned', 'Virus scanned')
+    DELETION_PENDING = ('deletion_pending', 'Deletion pending')
 
 
 class Document(BaseModel, ArchivableModel):
@@ -45,8 +45,8 @@ class Document(BaseModel, ArchivableModel):
 
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=UPLOAD_STATUSES,
-        default=UPLOAD_STATUSES.not_virus_scanned,
+        choices=UploadStatus.choices,
+        default=UploadStatus.NOT_VIRUS_SCANNED,
     )
 
     class Meta:
@@ -86,29 +86,29 @@ class Document(BaseModel, ArchivableModel):
 
     def mark_deletion_pending(self):
         """Marks document as scheduled for deletion."""
-        return self._update_status(UPLOAD_STATUSES.deletion_pending)
+        return self._update_status(UploadStatus.DELETION_PENDING)
 
     def mark_as_scanned(self, av_clean, av_reason):
         """Marks document as scanned."""
         self.scanned_on = now()
         self.av_clean = av_clean
         self.av_reason = av_reason
-        return self._update_status(UPLOAD_STATUSES.virus_scanned)
+        return self._update_status(UploadStatus.VIRUS_SCANNED)
 
     def mark_scan_scheduled(self):
         """Marks document scan has been scheduled."""
         self.uploaded_on = now()
-        return self._update_status(UPLOAD_STATUSES.virus_scanning_scheduled)
+        return self._update_status(UploadStatus.VIRUS_SCANNING_SCHEDULED)
 
     def mark_scan_initiated(self):
         """Marks document that scan has been initiated."""
         self.scan_initiated_on = now()
-        return self._update_status(UPLOAD_STATUSES.virus_scanning_in_progress)
+        return self._update_status(UploadStatus.VIRUS_SCANNING_IN_PROGRESS)
 
     def mark_scan_failed(self, reason):
         """Marks document that scan has failed."""
         self.av_reason = reason
-        return self._update_status(UPLOAD_STATUSES.virus_scanning_failed)
+        return self._update_status(UploadStatus.VIRUS_SCANNING_FAILED)
 
     def _update_status(self, status):
         self.status = status
@@ -151,7 +151,7 @@ class EntityDocumentManager(models.Manager):
             pk=document_pk,
             bucket_id=self.model.BUCKET,
             path=self._create_document_path(document_pk, original_filename),
-            status=UPLOAD_STATUSES.not_virus_scanned,
+            status=UploadStatus.NOT_VIRUS_SCANNED,
         )
         document.save()
         return super().create(
@@ -162,7 +162,7 @@ class EntityDocumentManager(models.Manager):
 
     def get_queryset(self):
         """Exclude objects with document having deletion pending as status."""
-        return super().get_queryset().exclude(document__status=UPLOAD_STATUSES.deletion_pending)
+        return super().get_queryset().exclude(document__status=UploadStatus.DELETION_PENDING)
 
     def include_objects_deletion_pending(self):
         """
