@@ -1,8 +1,8 @@
 """
 Contains various utilities and helper functions for working with models.
 
-(As we already use a third-party package called model_utils, this module is named model_helpers
-rather than model_utils.)
+(This module is named model_helpers rather than model_utils as we were previously
+using a third-party package called model_utils.)
 """
 
 
