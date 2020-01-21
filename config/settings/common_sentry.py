@@ -1,8 +1,12 @@
 import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk import serializer
 
 from config.settings.common import *
+
+# Monkeypatch the constant that trims data in `extra`
+MAX_DATABAG_BREADTH = 1000
 
 # Logging
 LOGGING = {
