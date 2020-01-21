@@ -130,7 +130,7 @@ class InteractionCSVRowForm(forms.Form):
     }
 
     theme = forms.ChoiceField(choices=Interaction.THEMES)
-    kind = forms.ChoiceField(choices=Interaction.KINDS)
+    kind = forms.ChoiceField(choices=Interaction.Kind.choices)
     date = forms.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     # Used to attempt to find a matching contact (and company) for the interaction
     # Note that if a matching contact is not found, the interaction in question is
@@ -219,7 +219,7 @@ class InteractionCSVRowForm(forms.Form):
 
         # Ignore communication channel for service deliveries (as it is not a valid field for
         # service deliveries, but we are likely to get it in provided data anyway)
-        if kind == Interaction.KINDS.service_delivery:
+        if kind == Interaction.Kind.SERVICE_DELIVERY:
             data['communication_channel'] = None
 
         # Look up values for adviser_1 and adviser_2 (adding errors if the look-up fails)
@@ -438,7 +438,7 @@ class InteractionCSVRowForm(forms.Form):
             'was_policy_feedback_provided': False,
         }
 
-        if data['kind'] == Interaction.KINDS.service_delivery:
+        if data['kind'] == Interaction.Kind.SERVICE_DELIVERY:
             creation_data['is_event'] = bool(data.get('event_id'))
 
         return creation_data

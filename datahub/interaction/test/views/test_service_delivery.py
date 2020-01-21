@@ -83,7 +83,7 @@ class TestAddServiceDelivery(APITestMixin):
         contact = ContactFactory(company=company)
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.service_delivery,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_participants': [
@@ -103,7 +103,7 @@ class TestAddServiceDelivery(APITestMixin):
 
         assert response_data == {
             'id': response_data['id'],
-            'kind': Interaction.KINDS.service_delivery,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
             'status': request_data.get('status', Interaction.STATUSES.complete),
             'theme': request_data.get('theme', None),
             'is_event': request_data['is_event'],
@@ -181,7 +181,7 @@ class TestAddServiceDelivery(APITestMixin):
             # required fields
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                 },
                 {
                     'contacts': ['This field is required.'],
@@ -196,7 +196,7 @@ class TestAddServiceDelivery(APITestMixin):
             # required fields for service delivery
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,
@@ -215,7 +215,7 @@ class TestAddServiceDelivery(APITestMixin):
             # policy feedback fields cannot be omitted when policy feedback provided
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -243,7 +243,7 @@ class TestAddServiceDelivery(APITestMixin):
             # policy feedback fields cannot be blank when policy feedback provided
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -274,7 +274,7 @@ class TestAddServiceDelivery(APITestMixin):
             # fields not allowed
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -318,7 +318,7 @@ class TestAddServiceDelivery(APITestMixin):
             # fields where None is not allowed
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -348,7 +348,7 @@ class TestAddServiceDelivery(APITestMixin):
             # theme=investment not allowed
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,
@@ -375,7 +375,7 @@ class TestAddServiceDelivery(APITestMixin):
             # event field not allowed for non-event service delivery
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -404,7 +404,7 @@ class TestAddServiceDelivery(APITestMixin):
             # event field required for event service delivery
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,
@@ -431,7 +431,7 @@ class TestAddServiceDelivery(APITestMixin):
             # multiple contacts not allowed for event service delivery
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,
@@ -459,7 +459,7 @@ class TestAddServiceDelivery(APITestMixin):
             # dit_participants cannot be empty list
             (
                 {
-                    'kind': Interaction.KINDS.service_delivery,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': CompanyFactory,

@@ -346,7 +346,7 @@ def test_kinds_mapping():
     """
     Tests if the mapping covers all kinds of interactions.
     """
-    model_kinds = {k for k, _ in Interaction.KINDS}
+    model_kinds = set(Interaction.Kind.values)
     serializer_kinds = {k for k in InteractionActivitySerializer.KINDS_JSON}
     assert model_kinds == serializer_kinds
 

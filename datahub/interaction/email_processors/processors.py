@@ -130,7 +130,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             'company': {'id': data['top_company'].id},
             'date': data['date'],
             'dit_participants': dit_participants,
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'status': Interaction.STATUSES.draft,
             'subject': data['subject'],
             'was_policy_feedback_provided': False,
