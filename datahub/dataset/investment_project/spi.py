@@ -60,7 +60,7 @@ def proposition_formatter(propositions):
             'status': proposition['status'],
             'modified_on':
                 dateutil_parse(proposition['modified_on']).isoformat()
-                if proposition['status'] != PropositionStatus.ongoing else '',
+                if proposition['status'] != PropositionStatus.ONGOING else '',
             'adviser_id': proposition['adviser_id'],
         }
         for proposition in propositions

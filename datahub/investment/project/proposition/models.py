@@ -114,7 +114,9 @@ class Proposition(BaseModel):
     )
     deadline = models.DateField()
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=PropositionStatus, default=PropositionStatus.ongoing,
+        max_length=MAX_LENGTH,
+        choices=PropositionStatus.choices,
+        default=PropositionStatus.ONGOING,
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -128,7 +130,7 @@ class Proposition(BaseModel):
 
     def _change_status(self, status, by, details):
         """Change status of a proposition."""
-        if self.status != PropositionStatus.ongoing:
+        if self.status != PropositionStatus.ONGOING:
             raise APIConflictException(
                 f'The action cannot be performed in the current status {self.status}.',
             )
@@ -150,7 +152,7 @@ class Proposition(BaseModel):
             raise ValidationError({
                 'non_field_errors': ['Proposition has no documents uploaded.'],
             })
-        self._change_status(PropositionStatus.completed, by, details)
+        self._change_status(PropositionStatus.COMPLETED, by, details)
 
     def abandon(self, by, details):
         """
@@ -159,7 +161,7 @@ class Proposition(BaseModel):
         :param by: the adviser who marked the proposition as abandoned
         :param details: reason of abandonment
         """
-        self._change_status(PropositionStatus.abandoned, by, details)
+        self._change_status(PropositionStatus.ABANDONED, by, details)
 
     class Meta:
         permissions = (
