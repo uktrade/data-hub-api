@@ -25,7 +25,7 @@ class Command(CSVBaseCommand):
 
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
-        score_dict = {value.lower(): key for key, value in Company.EXPORT_POTENTIAL_SCORES}
+        score_dict = {value.lower(): key for key, value in Company.ExportPotentialScore.choices}
 
         pk = parse_uuid(row['datahub_company_id'])
         company = Company.objects.get(pk=pk)

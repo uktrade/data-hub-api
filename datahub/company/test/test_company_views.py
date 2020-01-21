@@ -909,7 +909,7 @@ class TestUpdateCompany(APITestMixin):
             number_of_employees=95,
             is_number_of_employees_estimated=False,
             pending_dnb_investigation=True,
-            export_potential=Company.EXPORT_POTENTIAL_SCORES.very_high,
+            export_potential=Company.ExportPotentialScore.VERY_HIGH,
             great_profile_status=Company.GREAT_PROFILE_STATUSES.published,
         )
 
@@ -927,7 +927,7 @@ class TestUpdateCompany(APITestMixin):
                 'number_of_employees': 96,
                 'is_number_of_employees_estimated': True,
                 'pending_dnb_investigation': False,
-                'export_potential': Company.EXPORT_POTENTIAL_SCORES.very_low,
+                'export_potential': Company.ExportPotentialScore.VERY_LOW,
                 'great_profile_status': Company.GREAT_PROFILE_STATUSES.unpublished,
             },
         )
@@ -947,7 +947,7 @@ class TestUpdateCompany(APITestMixin):
         assert response_data['number_of_employees'] == 95
         assert not response_data['is_number_of_employees_estimated']
         assert response_data['pending_dnb_investigation']
-        assert response_data['export_potential'] == Company.EXPORT_POTENTIAL_SCORES.very_high
+        assert response_data['export_potential'] == Company.ExportPotentialScore.VERY_HIGH
         assert response_data['great_profile_status'] == Company.GREAT_PROFILE_STATUSES.published
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
