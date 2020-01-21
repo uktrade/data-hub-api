@@ -142,7 +142,7 @@ class DuplicateCompanyFactory(ArchivedCompanyFactory):
     transferred_by = factory.SubFactory(AdviserFactory)
     transferred_on = factory.Faker('past_datetime', tzinfo=utc)
     transferred_to = factory.SubFactory(CompanyFactory)
-    transfer_reason = Company.TRANSFER_REASONS.duplicate
+    transfer_reason = Company.TransferReason.DUPLICATE
 
 
 def _get_random_company_category():

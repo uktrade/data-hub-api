@@ -150,7 +150,7 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
     source_company.mark_as_transferred(
         target_company,
-        Company.TRANSFER_REASONS.duplicate,
+        Company.TransferReason.DUPLICATE,
         user,
     )
 
