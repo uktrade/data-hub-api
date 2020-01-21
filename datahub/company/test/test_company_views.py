@@ -910,7 +910,7 @@ class TestUpdateCompany(APITestMixin):
             is_number_of_employees_estimated=False,
             pending_dnb_investigation=True,
             export_potential=Company.ExportPotentialScore.VERY_HIGH,
-            great_profile_status=Company.GREAT_PROFILE_STATUSES.published,
+            great_profile_status=Company.GreatProfileStatus.PUBLISHED,
         )
 
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
@@ -928,7 +928,7 @@ class TestUpdateCompany(APITestMixin):
                 'is_number_of_employees_estimated': True,
                 'pending_dnb_investigation': False,
                 'export_potential': Company.ExportPotentialScore.VERY_LOW,
-                'great_profile_status': Company.GREAT_PROFILE_STATUSES.unpublished,
+                'great_profile_status': Company.GreatProfileStatus.UNPUBLISHED,
             },
         )
 
@@ -948,7 +948,7 @@ class TestUpdateCompany(APITestMixin):
         assert not response_data['is_number_of_employees_estimated']
         assert response_data['pending_dnb_investigation']
         assert response_data['export_potential'] == Company.ExportPotentialScore.VERY_HIGH
-        assert response_data['great_profile_status'] == Company.GREAT_PROFILE_STATUSES.published
+        assert response_data['great_profile_status'] == Company.GreatProfileStatus.PUBLISHED
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
         """
@@ -1383,8 +1383,8 @@ class TestUpdateCompany(APITestMixin):
     @pytest.mark.parametrize(
         'profile_status',
         (
-            Company.GREAT_PROFILE_STATUSES.published,
-            Company.GREAT_PROFILE_STATUSES.unpublished,
+            Company.GreatProfileStatus.PUBLISHED,
+            Company.GreatProfileStatus.UNPUBLISHED,
             None,
         ),
     )

@@ -65,11 +65,11 @@ class Company(ArchivableModel, BaseModel):
         LOW = ('low', 'Low')
         VERY_LOW = ('very_low', 'Very Low')
 
-    GREAT_PROFILE_STATUSES = Choices(
-        ('published', 'Published'),
-        ('unpublished', 'Unpublished'),
-        (None, 'No profile or not known'),
-    )
+    class GreatProfileStatus(models.TextChoices):
+        PUBLISHED = ('published', 'Published')
+        UNPUBLISHED = ('unpublished', 'Unpublished')
+
+        __empty__ = 'No profile or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
@@ -246,7 +246,7 @@ class Company(ArchivableModel, BaseModel):
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        choices=GREAT_PROFILE_STATUSES,
+        choices=GreatProfileStatus.choices,
         help_text='Whether this company has a profile and agreed to be published or not',
     )
     global_ultimate_duns_number = models.CharField(
