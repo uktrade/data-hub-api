@@ -78,11 +78,10 @@ class IProjectAbstract(models.Model):
     class Meta:
         abstract = True
 
-    PRIORITIES = Choices(
-        ('1_low', 'low', 'Low'),
-        ('2_medium', 'medium', 'Medium'),
-        ('3_high', 'high', 'High'),
-    )
+    class Priority(models.TextChoices):
+        LOW = ('1_low', 'Low')
+        MEDIUM = ('2_medium', 'Medium')
+        HIGH = ('3_high', 'High')
 
     STATUSES = Choices(
         ('ongoing', 'Ongoing'),
@@ -126,7 +125,12 @@ class IProjectAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL,
     )
 
-    priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
+    priority = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Priority.choices,
+        blank=True,
+        null=True,
+    )
 
     approved_commitment_to_invest = models.BooleanField(null=True)
     approved_fdi = models.BooleanField(null=True)
