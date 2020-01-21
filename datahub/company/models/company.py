@@ -55,9 +55,8 @@ class OneListTier(BaseOrderedConstantModel):
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
-    TRANSFER_REASONS = Choices(
-        ('duplicate', 'Duplicate record'),
-    )
+    class TransferReason(models.TextChoices):
+        DUPLICATE = ('duplicate', 'Duplicate record')
 
     EXPORT_POTENTIAL_SCORES = Choices(
         ('very_high', 'Very High'),
@@ -218,7 +217,7 @@ class Company(ArchivableModel, BaseModel):
     transfer_reason = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
-        choices=TRANSFER_REASONS,
+        choices=TransferReason.choices,
         help_text='The reason data for this company was transferred.',
     )
     transferred_on = models.DateTimeField(blank=True, null=True)
