@@ -17,7 +17,7 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     transaction_reference = factory.Faker('pystr')
     additional_reference = factory.Faker('pystr')
     amount = factory.Faker('random_int', max=100)
-    method = constants.PaymentMethod.bacs
+    method = constants.PaymentMethod.BACS
     received_on = factory.Faker('date_object')
 
     class Meta:
@@ -67,7 +67,7 @@ class ApprovedRefundFactory(RequestedRefundFactory):
     level2_approved_by = factory.SelfAttribute('created_by')
     level2_approval_notes = factory.Faker('text')
 
-    method = constants.PaymentMethod.bacs
+    method = constants.PaymentMethod.BACS
 
     vat_amount = factory.LazyAttribute(
         lambda refund: int(refund.requested_amount * 0.2),

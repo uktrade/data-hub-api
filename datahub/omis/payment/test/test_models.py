@@ -236,7 +236,7 @@ class TestPaymentGatewaySessionRefresh:
 
         payment = Payment.objects.filter(order=order).first()
         assert payment.amount == response_json['amount']
-        assert payment.method == PaymentMethod.card
+        assert payment.method == PaymentMethod.CARD
         assert payment.received_on == dateutil_parse('2018-02-13').date()
         assert payment.transaction_reference == '12345'
 
