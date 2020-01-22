@@ -9,11 +9,7 @@ from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.constants import (
-    BusinessTypeConstant,
-    INTERACTION_ADD_COUNTRIES,
-    OneListTierID,
-)
+from datahub.company.constants import BusinessTypeConstant, OneListTierID
 from datahub.company.models import (
     Advisor,
     Company,
@@ -29,7 +25,7 @@ from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
 )
-from datahub.core.constants import Country
+from datahub.core.constants import Country, INTERACTION_ADD_COUNTRIES
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
     AddressSerializer,
@@ -315,9 +311,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     @atomic
     def update(self, instance, validated_data):
         """
-        Using writable nested representations to copy export country elements
-        from the `Company` model into the `CompanyExportCountry`
-        or vice-versa based on feature flag.
+        If the feature flag is ON, write data to export country model
+        and sync data back to compay export country fields.
+        When the feature flag is OFF, write data to company export coutry fields
+        and sync data into company export country fields.
         """
         adviser = validated_data.get('modified_by')
         if not is_feature_flag_active(INTERACTION_ADD_COUNTRIES):

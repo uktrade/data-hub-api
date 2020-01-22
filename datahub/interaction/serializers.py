@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
+from datahub.core.constants import INTERACTION_ADD_COUNTRIES
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
@@ -22,7 +23,6 @@ from datahub.core.validators import (
     ValidationRule,
 )
 from datahub.event.models import Event
-from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,

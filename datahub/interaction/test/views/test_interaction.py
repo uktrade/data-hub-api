@@ -16,11 +16,10 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
-from datahub.core.constants import Country, Service
+from datahub.core.constants import Country, INTERACTION_ADD_COUNTRIES, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,

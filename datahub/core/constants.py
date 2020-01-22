@@ -3,6 +3,7 @@ from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
 OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
+INTERACTION_ADD_COUNTRIES = 'interaction-add-countries'
 
 
 class Country(Enum):
