@@ -47,7 +47,7 @@ def _extract_calendar_string_from_text(message):
     :param message: MailParser message object
     :returns: A string of the icalendar body or None if it could not be found in plain text
     """
-    for text_part in message.text_plain:
+    for text_part in message.text_not_managed:
         if text_part.startswith(BEGIN_VCALENDAR):
             return text_part
     return None
