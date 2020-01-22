@@ -25,7 +25,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             for method in PaymentMethod
             if method[0] in ('bacs', 'manual')
         ],
-        default=PaymentMethod.bacs,
+        default=PaymentMethod.BACS,
     )
 
     class Meta:

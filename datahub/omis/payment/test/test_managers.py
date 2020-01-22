@@ -302,7 +302,7 @@ class TestPaymentGatewaySessionManager:
         payment = Payment.objects.first()
 
         assert payment.amount == order.total_cost
-        assert payment.method == PaymentMethod.card
+        assert payment.method == PaymentMethod.CARD
         assert payment.received_on == dateutil_parse('2018-02-13').date()
         assert payment.transaction_reference == '12345'
         assert payment.cardholder_name == 'John Doe'

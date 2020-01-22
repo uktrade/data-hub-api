@@ -21,12 +21,13 @@ class PaymentGatewaySessionStatus(models.TextChoices):
     ERROR = ('error', 'Error')
 
 
-PaymentMethod = Choices(
-    ('card', 'Card'),
-    ('bacs', 'BACS'),
-    ('cheque', 'Cheque'),
-    ('manual', 'Manual'),
-)
+class PaymentMethod(models.TextChoices):
+    """Payment methods."""
+
+    CARD = ('card', 'Card')
+    BACS = ('bacs', 'BACS')
+    CHEQUE = ('cheque', 'Cheque')
+    MANUAL = ('manual', 'Manual')
 
 
 RefundStatus = Choices(

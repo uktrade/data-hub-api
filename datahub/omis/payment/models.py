@@ -142,8 +142,8 @@ class Payment(BaseModel):
     amount = models.PositiveIntegerField(help_text='Amount paid in pence.')
     method = models.CharField(
         max_length=100,
-        choices=PaymentMethod,
-        default=PaymentMethod.bacs,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.BACS,
     )
     received_on = models.DateField()
 
@@ -227,7 +227,7 @@ class Refund(BaseModel):
     method = models.CharField(
         max_length=100,
         null=True, blank=True,
-        choices=PaymentMethod,
+        choices=PaymentMethod.choices,
     )
     net_amount = models.PositiveIntegerField(
         null=True, blank=True,
