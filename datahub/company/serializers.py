@@ -553,66 +553,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
-    # @atomic
-    # def create(self, validated_data):
-    #     """
-    #     Create a company.
-
-    #     Overridden to handle updating of export_countries.
-    #     """
-    #     export_countries = validated_data.pop('export_countries', None)
-    #     adviser = validated_data.get('created_by')
-
-    #     company = super().create(validated_data)
-    #     if export_countries is not None:
-    #         self._update_export_countries(company, export_countries, adviser)
-
-    #     return company
-
-    # @atomic
-    # def update(self, instance, validated_data):
-    #     """
-    #     Using writable nested representations to copy export country elements
-    #     from the `Company` model into the `CompanyExportCountry`.
-    #     """
-    #     validated_export_countries = validated_data.pop('export_countries', None)
-    #     adviser = validated_data.get('modified_by')
-
-    #     company = super().update(instance, validated_data)
-
-    #     if validated_export_countries is not None:
-    #         self._update_export_countries(instance, validated_export_countries, adviser)
-
-    #     return company
-
-    # def _update_export_countries(self, company, validated_export_countries, adviser):
-    #     """
-    #     Adds/updates export countries related to a company within validated_export_countries.
-    #     And removes existing ones that are not in the list.
-    #     """
-    #     for item in validated_export_countries:
-    #         country = meta_models.Country.objects.get(id=item['country'].id)
-    #         status = item['status']
-    #         company.add_export_country(
-    #             country=country,
-    #             status=status,
-    #             record_date=company.modified_on,
-    #             adviser=adviser,
-    #         )
-
-    #     existing_countries = [item.country for item in CompanyExportCountry.objects.all()]
-    #     new_countries = [
-    #         meta_models.Country.objects.get(id=item['country'].id)
-    #         for item in validated_export_countries
-    #     ]
-    #     countries_delta = list(set(existing_countries) - set(new_countries))
-
-    #     if countries_delta:
-    #         CompanyExportCountry.objects.filter(
-    #             company=company,
-    #             country__in=countries_delta,
-    #         ).delete()
-
     class Meta:
         model = Company
         fields = (

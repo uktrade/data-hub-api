@@ -293,6 +293,51 @@ class TestCompanyExportCountryModel(APITestMixin):
             list(actual_future_interest_countries)[0].country,
         ] == list(set(new_future_interest_countries) - set(new_export_to_countries))
 
+    def test_edit_company_fields_check_not_interested_is_intact(self):
+        """
+        Check when in case feature flag is switched OFF
+        and updating old export country fields will not wipe off
+        not_interested countries in `CompanyExportCountry` model.
+        """
+        initial_countries = list(CountryModel.objects.order_by('?')[:5])
+        company = CompanyFactory()
+        CompanyExportCountry(
+            country=initial_countries[0],
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        ).save()
+        CompanyExportCountry(
+            country=initial_countries[1],
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        ).save()
+        CompanyExportCountry(
+            country=initial_countries[2],
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+        ).save()
+
+        new_countries = list(CountryModel.objects.order_by('?')[:5])
+        new_export_to_countries = new_countries[:2]
+        new_future_interest_countries = new_countries[:3]
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'export_to_countries': [country.id for country in new_export_to_countries],
+                'future_interest_countries': [
+                    country.id for country in new_future_interest_countries
+                ],
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        not_interested = company.export_countries.filter(
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested,
+        )
+        assert len(not_interested) == 1
+        assert not_interested[0].country == initial_countries[2]
+
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         'flag,data,expected_error',
