@@ -16,10 +16,10 @@ class TestUpdateOrderPricingPreSave:
         Test that if an order is saved, the related pricing is recalculated and
         the order updated.
         """
-        order = OrderFactory(vat_status=VATStatus.uk, discount_value=0)
+        order = OrderFactory(vat_status=VATStatus.UK, discount_value=0)
         assert order.vat_cost > 0
 
-        order.vat_status = VATStatus.outside_eu
+        order.vat_status = VATStatus.OUTSIDE_EU
         order.save()
 
         order.refresh_from_db()

@@ -242,7 +242,7 @@ class OrderSerializer(serializers.ModelSerializer):
         data_combiner = DataCombiner(self.instance, data)
 
         vat_status = data_combiner.get_value('vat_status')
-        if vat_status and vat_status != VATStatus.eu:
+        if vat_status and vat_status != VATStatus.EU:
             data['vat_number'] = ''
             data['vat_verified'] = None
 
