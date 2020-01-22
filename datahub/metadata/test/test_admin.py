@@ -14,13 +14,13 @@ from datahub.metadata.test.factories import ServiceFactory
 class TestServiceAdmin:
     """Tests for ServiceAdmin."""
 
-    @pytest.mark.parametrize('context', (Service.CONTEXTS.interaction, Service.CONTEXTS.event))
+    @pytest.mark.parametrize('context', (Service.Context.INTERACTION, Service.Context.EVENT))
     def test_context_filter(self, context):
         """Tests filtering by context."""
         test_data_contexts = (
-            [Service.CONTEXTS.interaction],
-            [Service.CONTEXTS.service_delivery],
-            [Service.CONTEXTS.interaction, Service.CONTEXTS.service_delivery],
+            [Service.Context.INTERACTION],
+            [Service.Context.SERVICE_DELIVERY],
+            [Service.Context.INTERACTION, Service.Context.SERVICE_DELIVERY],
         )
         ServiceFactory.create_batch(
             len(test_data_contexts),
