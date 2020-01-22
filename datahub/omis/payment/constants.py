@@ -1,15 +1,24 @@
+from django.db import models
 from model_utils import Choices
 
 
-PaymentGatewaySessionStatus = Choices(
-    ('created', 'Created'),  # Payment created; user has not yet visited the payment url
-    ('started', 'Started'),  # User has visited payment url and is entering payment details
-    ('submitted', 'Submitted'),  # User has submitted payment details but hasn't confirmed yet
-    ('success', 'Success'),  # User successfully completed the payment
-    ('failed', 'Failed'),  # User attempted to make a payment but the payment did not complete
-    ('cancelled', 'Cancelled'),  # Payment cancelled by the system
-    ('error', 'Error'),  # Something went wrong with GOV.UK Pay
-)
+class PaymentGatewaySessionStatus(models.TextChoices):
+    """Statuses for payment gateway sessions."""
+
+    # Payment created; user has not yet visited the payment url
+    CREATED = ('created', 'Created')
+    # User has visited payment url and is entering payment details
+    STARTED = ('started', 'Started')
+    # User has submitted payment details but hasn't confirmed yet
+    SUBMITTED = ('submitted', 'Submitted')
+    # User successfully completed the payment
+    SUCCESS = ('success', 'Success')
+    # User attempted to make a payment but the payment did not complete
+    FAILED = ('failed', 'Failed')
+    # Payment cancelled by the system
+    CANCELLED = ('cancelled', 'Cancelled')
+    # Something went wrong with GOV.UK Pay
+    ERROR = ('error', 'Error')
 
 
 PaymentMethod = Choices(
