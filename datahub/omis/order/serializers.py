@@ -163,23 +163,23 @@ class OrderSerializer(serializers.ModelSerializer):
             # only some of the fields can be changed depending of the status
             OrderEditableFieldsValidator(
                 {
-                    OrderStatus.draft: {
+                    OrderStatus.DRAFT: {
                         *ORDER_FIELDS_INVOICE_RELATED,
                         'description', 'service_types', 'sector', 'uk_region',
                         'contacts_not_to_approach', 'contact', 'existing_agents',
                         'further_info', 'delivery_date',
                     },
-                    OrderStatus.quote_awaiting_acceptance: {
+                    OrderStatus.QUOTE_AWAITING_ACCEPTANCE: {
                         *ORDER_FIELDS_INVOICE_RELATED,
                         'contact',
                     },
-                    OrderStatus.quote_accepted: {
+                    OrderStatus.QUOTE_ACCEPTED: {
                         *ORDER_FIELDS_INVOICE_RELATED,
                         'contact',
                     },
-                    OrderStatus.paid: {'contact'},
-                    OrderStatus.complete: {},  # nothing can be changed
-                    OrderStatus.cancelled: {},  # nothing can be changed
+                    OrderStatus.PAID: {'contact'},
+                    OrderStatus.COMPLETE: {},  # nothing can be changed
+                    OrderStatus.CANCELLED: {},  # nothing can be changed
                 },
             ),
             # contact has to work at company
@@ -270,7 +270,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
             # update invoice details if necessary
             if (
-                instance.status == OrderStatus.quote_accepted
+                instance.status == OrderStatus.QUOTE_ACCEPTED
                 and (ORDER_FIELDS_INVOICE_RELATED & validated_data.keys())
             ):
                 instance.update_invoice_details()
@@ -375,10 +375,10 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
     default_validators = [
         OrderInStatusValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.quote_awaiting_acceptance,
-                OrderStatus.quote_accepted,
-                OrderStatus.paid,
+                OrderStatus.DRAFT,
+                OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                OrderStatus.QUOTE_ACCEPTED,
+                OrderStatus.PAID,
             ),
         ),
     ]
@@ -454,10 +454,10 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
     default_validators = [
         OrderInStatusValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.quote_awaiting_acceptance,
-                OrderStatus.quote_accepted,
-                OrderStatus.paid,
+                OrderStatus.DRAFT,
+                OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                OrderStatus.QUOTE_ACCEPTED,
+                OrderStatus.PAID,
             ),
         ),
     ]
@@ -473,7 +473,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         order = self.context['order']
         force_delete = self.context['force_delete']
 
-        if order.status != OrderStatus.draft and force_delete:
+        if order.status != OrderStatus.DRAFT and force_delete:
             raise ValidationError('You cannot delete any assignees at this stage.')
         return data
 
@@ -484,7 +484,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         order = self.context['order']
         force_delete = self.context['force_delete']
 
-        if order.status != OrderStatus.draft:
+        if order.status != OrderStatus.DRAFT:
             return
 
         existing_assignees = dict(order.assignees.values_list('adviser_id', 'is_lead'))
@@ -606,9 +606,9 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                     OperatorRule('actual_time', is_blank),
                     when=OrderInStatusRule(
                         [
-                            OrderStatus.draft,
-                            OrderStatus.quote_awaiting_acceptance,
-                            OrderStatus.quote_accepted,
+                            OrderStatus.DRAFT,
+                            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                            OrderStatus.QUOTE_ACCEPTED,
                         ],
                     ),
                 ),
@@ -619,9 +619,9 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                     OperatorRule('estimated_time', is_blank),
                     when=OrderInStatusRule(
                         [
-                            OrderStatus.quote_awaiting_acceptance,
-                            OrderStatus.quote_accepted,
-                            OrderStatus.paid,
+                            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                            OrderStatus.QUOTE_ACCEPTED,
+                            OrderStatus.PAID,
                         ],
                     ),
                 ),
@@ -631,9 +631,9 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                     OperatorRule('is_lead', is_blank),
                     when=OrderInStatusRule(
                         [
-                            OrderStatus.quote_awaiting_acceptance,
-                            OrderStatus.quote_accepted,
-                            OrderStatus.paid,
+                            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                            OrderStatus.QUOTE_ACCEPTED,
+                            OrderStatus.PAID,
                         ],
                     ),
                 ),

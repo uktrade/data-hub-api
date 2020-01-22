@@ -15,15 +15,15 @@ class OrderQuerySet(models.QuerySet):
         """
         q = models.Q(
             status__in=(
-                OrderStatus.quote_awaiting_acceptance,
-                OrderStatus.quote_accepted,
-                OrderStatus.paid,
-                OrderStatus.complete,
+                OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+                OrderStatus.QUOTE_ACCEPTED,
+                OrderStatus.PAID,
+                OrderStatus.COMPLETE,
             ),
         )
         if include_reopened:
             q = q | models.Q(
-                status=OrderStatus.draft,
+                status=OrderStatus.DRAFT,
                 quote__cancelled_on__isnull=False,
             )
 
