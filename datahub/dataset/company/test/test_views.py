@@ -32,6 +32,12 @@ def get_expected_data_from_company(company):
             company,
             'export_experience_category.name',
         ),
+        'global_headquarters_id': (
+            str(company.global_headquarters_id)
+            if company.global_headquarters_id is not None
+            else None
+        ),
+        'global_ultimate_duns_number': company.global_ultimate_duns_number,
         'headquarter_type__name': get_attr_or_none(
             'company',
             'headquarter_type.name',
