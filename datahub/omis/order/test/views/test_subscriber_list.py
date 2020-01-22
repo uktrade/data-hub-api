@@ -154,10 +154,10 @@ class TestChangeSubscriberList(APITestMixin):
 
     @pytest.mark.parametrize(
         'allowed_status', (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
         ),
     )
     def test_change_existing_list(self, allowed_status):
@@ -197,10 +197,10 @@ class TestChangeSubscriberList(APITestMixin):
 
     @pytest.mark.parametrize(
         'allowed_status', (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
         ),
     )
     def test_remove_all(self, allowed_status):
@@ -247,8 +247,8 @@ class TestChangeSubscriberList(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
@@ -272,6 +272,6 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }

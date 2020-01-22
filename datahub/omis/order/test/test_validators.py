@@ -309,13 +309,13 @@ class TestOrderInStatusSubValidator:
         """
         Test that the validation passes if order.status is one of the allowed statuses.
         """
-        order = OrderFactory(status=OrderStatus.complete)
+        order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusSubValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.complete,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.COMPLETE,
+                OrderStatus.CANCELLED,
             ),
         )
 
@@ -328,12 +328,12 @@ class TestOrderInStatusSubValidator:
         """
         Test that the validation fails if order.status is NOT one of the allowed statuses.
         """
-        order = OrderFactory(status=OrderStatus.complete)
+        order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusSubValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.CANCELLED,
             ),
         )
 
@@ -347,9 +347,9 @@ class TestOrderInStatusSubValidator:
         """
         validator = OrderInStatusSubValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.complete,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.COMPLETE,
+                OrderStatus.CANCELLED,
             ),
             order_required=False,
         )
@@ -375,13 +375,13 @@ class TestOrderInStatusValidator:
         """
         Test that the validation passes if order.status is one of the allowed statuses.
         """
-        order = OrderFactory(status=OrderStatus.complete)
+        order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.complete,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.COMPLETE,
+                OrderStatus.CANCELLED,
             ),
         )
         serializer = serializer_factory(order)
@@ -402,12 +402,12 @@ class TestOrderInStatusValidator:
         """
         Test that the validation fails if order.status is NOT one of the allowed statuses.
         """
-        order = OrderFactory(status=OrderStatus.complete)
+        order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.CANCELLED,
             ),
         )
         serializer = serializer_factory(order)
@@ -422,9 +422,9 @@ class TestOrderInStatusValidator:
         """
         validator = OrderInStatusValidator(
             allowed_statuses=(
-                OrderStatus.draft,
-                OrderStatus.complete,
-                OrderStatus.cancelled,
+                OrderStatus.DRAFT,
+                OrderStatus.COMPLETE,
+                OrderStatus.CANCELLED,
             ),
             order_required=False,
         )
@@ -639,20 +639,20 @@ class TestCancellableOrderSubValidator:
         'order_status,force,should_pass',
         (
             # with force=False
-            (OrderStatus.draft, False, True),
-            (OrderStatus.quote_awaiting_acceptance, False, True),
-            (OrderStatus.quote_accepted, False, False),
-            (OrderStatus.paid, False, False),
-            (OrderStatus.complete, False, False),
-            (OrderStatus.cancelled, False, False),
+            (OrderStatus.DRAFT, False, True),
+            (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, False, True),
+            (OrderStatus.QUOTE_ACCEPTED, False, False),
+            (OrderStatus.PAID, False, False),
+            (OrderStatus.COMPLETE, False, False),
+            (OrderStatus.CANCELLED, False, False),
 
             # with force=True
-            (OrderStatus.draft, True, True),
-            (OrderStatus.quote_awaiting_acceptance, True, True),
-            (OrderStatus.quote_accepted, True, True),
-            (OrderStatus.paid, True, True),
-            (OrderStatus.complete, True, False),
-            (OrderStatus.cancelled, True, False),
+            (OrderStatus.DRAFT, True, True),
+            (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, True, True),
+            (OrderStatus.QUOTE_ACCEPTED, True, True),
+            (OrderStatus.PAID, True, True),
+            (OrderStatus.COMPLETE, True, False),
+            (OrderStatus.CANCELLED, True, False),
         ),
     )
     def test_validation(self, order_status, force, should_pass):
@@ -671,8 +671,8 @@ class TestCancellableOrderSubValidator:
 @pytest.mark.parametrize(
     'order_status,expected_status,res',
     (
-        (OrderStatus.draft, OrderStatus.draft, True),
-        (OrderStatus.draft, OrderStatus.paid, False),
+        (OrderStatus.DRAFT, OrderStatus.DRAFT, True),
+        (OrderStatus.DRAFT, OrderStatus.PAID, False),
     ),
 )
 def test_order_in_status_rule(order_status, expected_status, res):
@@ -693,36 +693,36 @@ class TestOrderEditableFieldsValidator:
         (
             # allowed field => OK
             (
-                OrderStatus.draft,
-                {OrderStatus.draft: {'description'}},
+                OrderStatus.DRAFT,
+                {OrderStatus.DRAFT: {'description'}},
                 {'description': 'lorem ipsum'},
                 True,
             ),
             # disallowed field => Fail
             (
-                OrderStatus.draft,
-                {OrderStatus.draft: {'contact'}},
+                OrderStatus.DRAFT,
+                {OrderStatus.DRAFT: {'contact'}},
                 {'description': 'lorem ipsum'},
                 False,
             ),
             # status not in mapping => OK
             (
-                OrderStatus.draft,
-                {OrderStatus.paid: {'contact'}},
+                OrderStatus.DRAFT,
+                {OrderStatus.PAID: {'contact'}},
                 {'description': 'lorem ipsum'},
                 True,
             ),
             # disallowed field didn't change => OK
             (
-                OrderStatus.draft,
-                {OrderStatus.draft: {'contact'}},
+                OrderStatus.DRAFT,
+                {OrderStatus.DRAFT: {'contact'}},
                 {'description': 'original description'},
                 True,
             ),
             # nothing allowed => Fail
             (
-                OrderStatus.draft,
-                {OrderStatus.draft: {}},
+                OrderStatus.DRAFT,
+                {OrderStatus.DRAFT: {}},
                 {'description': 'lorem ipsum'},
                 False,
             ),
@@ -748,5 +748,5 @@ class TestOrderEditableFieldsValidator:
         """Test that the validation passes if we are creating the order instead of editing it."""
         serializer = mock.Mock(instance=None)
 
-        validator = OrderEditableFieldsValidator({OrderStatus.paid: {'contact'}})
+        validator = OrderEditableFieldsValidator({OrderStatus.PAID: {'contact'}})
         validator({'description': 'lorem ipsum'}, serializer)

@@ -629,8 +629,8 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
@@ -655,7 +655,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -930,8 +930,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     def test_ok_if_assignee_added(self, order_status):
@@ -982,8 +982,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     def test_400_if_assignee_deleted(self, order_status):
@@ -1038,8 +1038,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     @pytest.mark.parametrize(
@@ -1082,8 +1082,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     @pytest.mark.parametrize(

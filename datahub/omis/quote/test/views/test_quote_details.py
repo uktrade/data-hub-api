@@ -54,11 +54,11 @@ class TestCreatePreviewOrder(APITestMixin):
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
@@ -78,7 +78,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -257,7 +257,7 @@ class TestGetQuote(APITestMixin):
         """Test a successful call to get a quote without Ts and Cs."""
         order = OrderFactory(
             quote=QuoteFactory(terms_and_conditions=None),
-            status=OrderStatus.quote_awaiting_acceptance,
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         )
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
@@ -299,9 +299,9 @@ class TestCancelOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
@@ -325,7 +325,7 @@ class TestCancelOrder(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }
 

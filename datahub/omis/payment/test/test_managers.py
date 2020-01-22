@@ -223,11 +223,11 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_exception_if_order_in_disallowed_status(self, disallowed_status):
@@ -296,7 +296,7 @@ class TestPaymentGatewaySessionManager:
 
         # check order and payment
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
 
         assert Payment.objects.count() == 1
         payment = Payment.objects.first()

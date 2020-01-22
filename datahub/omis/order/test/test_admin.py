@@ -175,7 +175,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         assert response.redirect_chain[0][0] == change_url
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.cancelled
+        assert order.status == OrderStatus.CANCELLED
         assert order.cancelled_on
         assert order.cancelled_by == self.user
         assert order.cancellation_reason == reason
