@@ -499,7 +499,7 @@ class TestCompanyExportCountryModel(APITestMixin):
                     },
                     'status':
                         CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                }
+                },
             ],
         }
 

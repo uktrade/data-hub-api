@@ -425,7 +425,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     def _sync_to_company_export_country_fields(self, company, adviser):
         """
         Helper function to sync data from `ComapnyExportCountry` model back
-        into `Company` export country fields: `exporting_to_countries` and 
+        into `Company` export country fields: `exporting_to_countries` and
         `future_interest_countries`.
         """
         currently_exporting = CompanyExportCountry.objects.filter(
