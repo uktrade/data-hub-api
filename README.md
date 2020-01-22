@@ -57,7 +57,7 @@ This project uses Docker compose to setup and run all the necessary components. 
 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both the API and the frontend under one docker-compose
-    project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#setting-up-with-docker-compose).
+    project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
 
 ## Native installation (without Docker)
 
