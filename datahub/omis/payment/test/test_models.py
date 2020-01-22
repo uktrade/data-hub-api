@@ -17,13 +17,13 @@ class TestPaymentGatewaySessionIsFinished:
     @pytest.mark.parametrize(
         'status,finished',
         (
-            (PaymentGatewaySessionStatus.created, False),
-            (PaymentGatewaySessionStatus.started, False),
-            (PaymentGatewaySessionStatus.submitted, False),
-            (PaymentGatewaySessionStatus.success, True),
-            (PaymentGatewaySessionStatus.failed, True),
-            (PaymentGatewaySessionStatus.cancelled, True),
-            (PaymentGatewaySessionStatus.error, True),
+            (PaymentGatewaySessionStatus.CREATED, False),
+            (PaymentGatewaySessionStatus.STARTED, False),
+            (PaymentGatewaySessionStatus.SUBMITTED, False),
+            (PaymentGatewaySessionStatus.SUCCESS, True),
+            (PaymentGatewaySessionStatus.FAILED, True),
+            (PaymentGatewaySessionStatus.CANCELLED, True),
+            (PaymentGatewaySessionStatus.ERROR, True),
         ),
     )
     def test_value(self, status, finished):
@@ -85,10 +85,10 @@ class TestPaymentGatewaySessionGetPaymentURL:
     @pytest.mark.parametrize(
         'session_status',
         (
-            PaymentGatewaySessionStatus.success,
-            PaymentGatewaySessionStatus.failed,
-            PaymentGatewaySessionStatus.cancelled,
-            PaymentGatewaySessionStatus.error,
+            PaymentGatewaySessionStatus.SUCCESS,
+            PaymentGatewaySessionStatus.FAILED,
+            PaymentGatewaySessionStatus.CANCELLED,
+            PaymentGatewaySessionStatus.ERROR,
         ),
     )
     def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_mock):
@@ -110,10 +110,10 @@ class TestPaymentGatewaySessionRefresh:
 
     @pytest.mark.parametrize(
         'status', (
-            PaymentGatewaySessionStatus.success,
-            PaymentGatewaySessionStatus.failed,
-            PaymentGatewaySessionStatus.cancelled,
-            PaymentGatewaySessionStatus.error,
+            PaymentGatewaySessionStatus.SUCCESS,
+            PaymentGatewaySessionStatus.FAILED,
+            PaymentGatewaySessionStatus.CANCELLED,
+            PaymentGatewaySessionStatus.ERROR,
         ),
     )
     def test_already_finished_doesnt_do_anything(self, status, requests_mock):
@@ -129,9 +129,9 @@ class TestPaymentGatewaySessionRefresh:
     @pytest.mark.parametrize(
         'status',
         (
-            PaymentGatewaySessionStatus.created,
-            PaymentGatewaySessionStatus.started,
-            PaymentGatewaySessionStatus.submitted,
+            PaymentGatewaySessionStatus.CREATED,
+            PaymentGatewaySessionStatus.STARTED,
+            PaymentGatewaySessionStatus.SUBMITTED,
         ),
     )
     def test_with_unchanged_govuk_payment_status_doesnt_change_anything(
@@ -159,7 +159,7 @@ class TestPaymentGatewaySessionRefresh:
         'status',
         (
             status[0] for status in PaymentGatewaySessionStatus
-            if status[0] != PaymentGatewaySessionStatus.success
+            if status[0] != PaymentGatewaySessionStatus.SUCCESS
         ),
     )
     def test_with_different_govuk_payment_status_updates_session(self, status, requests_mock):
@@ -168,9 +168,9 @@ class TestPaymentGatewaySessionRefresh:
         the record is updated.
         """
         # choose an initial status != from the govuk one to test the update
-        initial_status = PaymentGatewaySessionStatus.created
+        initial_status = PaymentGatewaySessionStatus.CREATED
         if initial_status == status:
-            initial_status = PaymentGatewaySessionStatus.started
+            initial_status = PaymentGatewaySessionStatus.STARTED
 
         session = PaymentGatewaySessionFactory(status=initial_status)
         url = govuk_url(f'payments/{session.govuk_payment_id}')
@@ -195,7 +195,7 @@ class TestPaymentGatewaySessionRefresh:
         """
         order = OrderWithAcceptedQuoteFactory()
         session = PaymentGatewaySessionFactory(
-            status=PaymentGatewaySessionStatus.created,
+            status=PaymentGatewaySessionStatus.CREATED,
             order=order,
         )
         url = govuk_url(f'payments/{session.govuk_payment_id}')
@@ -225,7 +225,7 @@ class TestPaymentGatewaySessionRefresh:
 
         # check session
         session.refresh_from_db()
-        assert session.status == PaymentGatewaySessionStatus.success
+        assert session.status == PaymentGatewaySessionStatus.SUCCESS
 
         # check order
         order.refresh_from_db()
@@ -337,7 +337,7 @@ class TestPaymentGatewaySessionCancel:
         session.cancel()
 
         session.refresh_from_db()
-        assert session.status == PaymentGatewaySessionStatus.cancelled
+        assert session.status == PaymentGatewaySessionStatus.CANCELLED
 
         assert requests_mock.call_count == 2
 

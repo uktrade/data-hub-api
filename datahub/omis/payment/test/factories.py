@@ -28,7 +28,7 @@ class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
     """PaymentGatewaySession factory."""
 
     order = factory.SubFactory(OrderWithAcceptedQuoteFactory)
-    status = constants.PaymentGatewaySessionStatus.created
+    status = constants.PaymentGatewaySessionStatus.CREATED
     govuk_payment_id = factory.Faker('pystr', min_chars=27, max_chars=27)
 
     class Meta:
