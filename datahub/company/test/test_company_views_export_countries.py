@@ -1,19 +1,13 @@
 import random
-import uuid
 from operator import attrgetter, itemgetter
 
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import CompanyExportCountry, OneListTier
-from datahub.company.test.factories import (
-    AdviserFactory,
-    CompanyExportCountryFactory,
-    CompanyFactory,
-)
-from datahub.core.constants import Country
-from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.company.models import CompanyExportCountry
+from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.models import Country as CountryModel
 
 
@@ -21,19 +15,11 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     """Tests for copying export countries from company model to CompanyExportCountry model"""
 
     def test_get_company_with_export_countries(self):
-        """Tests the company item view."""
-        ghq = CompanyFactory(
-            global_headquarters=None,
-            one_list_tier=OneListTier.objects.first(),
-            one_list_account_owner=AdviserFactory(),
-        )
-        company = CompanyFactory(
-            company_number='123',
-            trading_names=['Xyz trading', 'Abc trading'],
-            global_headquarters=ghq,
-            one_list_tier=None,
-            one_list_account_owner=None,
-        )
+        """
+        Tests the company response has export countries that are
+        in the new CompanyExportCountry model.
+        """
+        company = CompanyFactory()
         export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
         company.export_countries.set([export_country_one, export_country_two])
         user = create_test_user(
@@ -48,127 +34,17 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'id': str(company.pk),
-            'created_on': format_date_or_datetime(company.created_on),
-            'modified_on': format_date_or_datetime(company.modified_on),
-            'name': company.name,
-            'reference_code': company.reference_code,
-            'company_number': company.company_number,
-            'vat_number': company.vat_number,
-            'duns_number': company.duns_number,
-            'trading_names': company.trading_names,
-            'address': {
-                'line_1': company.address_1,
-                'line_2': company.address_2 or '',
-                'town': company.address_town,
-                'county': company.address_county or '',
-                'postcode': company.address_postcode or '',
+        assert response.json().get('export_countries', []) is not []
+        export_countries_response = response.json().get('export_countries')
+        assert export_countries_response == [
+            {
                 'country': {
-                    'id': str(company.address_country.id),
-                    'name': company.address_country.name,
+                    'id': str(item.country.pk),
+                    'name': item.country.name,
                 },
-            },
-            'registered_address': {
-                'line_1': company.registered_address_1,
-                'line_2': company.registered_address_2 or '',
-                'town': company.registered_address_town,
-                'county': company.registered_address_county or '',
-                'postcode': company.registered_address_postcode or '',
-                'country': {
-                    'id': str(company.registered_address_country.id),
-                    'name': company.registered_address_country.name,
-                },
-            },
-            'uk_based': (
-                company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)
-            ),
-            'uk_region': {
-                'id': str(company.uk_region.id),
-                'name': company.uk_region.name,
-            },
-            'business_type': {
-                'id': str(company.business_type.id),
-                'name': company.business_type.name,
-            },
-            'contacts': [],
-            'description': company.description,
-            'employee_range': {
-                'id': str(company.employee_range.id),
-                'name': company.employee_range.name,
-            },
-            'number_of_employees': company.number_of_employees,
-            'is_number_of_employees_estimated': company.is_number_of_employees_estimated,
-            'export_experience_category': {
-                'id': str(company.export_experience_category.id),
-                'name': company.export_experience_category.name,
-            },
-            'export_potential': None,
-            'great_profile_status': None,
-            'export_to_countries': [],
-            'future_interest_countries': [],
-            'headquarter_type': company.headquarter_type,
-            'sector': {
-                'id': str(company.sector.id),
-                'name': company.sector.name,
-            },
-            'turnover_range': {
-                'id': str(company.turnover_range.id),
-                'name': company.turnover_range.name,
-            },
-            'turnover': company.turnover,
-            'is_turnover_estimated': company.is_turnover_estimated,
-            'website': company.website,
-            'global_headquarters': {
-                'id': str(ghq.id),
-                'name': ghq.name,
-            },
-            'one_list_group_tier': {
-                'id': str(ghq.one_list_tier.id),
-                'name': ghq.one_list_tier.name,
-            },
-            'one_list_group_global_account_manager': {
-                'id': str(ghq.one_list_account_owner.pk),
-                'name': ghq.one_list_account_owner.name,
-                'first_name': ghq.one_list_account_owner.first_name,
-                'last_name': ghq.one_list_account_owner.last_name,
-                'contact_email': ghq.one_list_account_owner.contact_email,
-                'dit_team': {
-                    'id': str(ghq.one_list_account_owner.dit_team.id),
-                    'name': ghq.one_list_account_owner.dit_team.name,
-                    'uk_region': {
-                        'id': str(ghq.one_list_account_owner.dit_team.uk_region.pk),
-                        'name': ghq.one_list_account_owner.dit_team.uk_region.name,
-                    },
-                    'country': {
-                        'id': str(ghq.one_list_account_owner.dit_team.country.pk),
-                        'name': ghq.one_list_account_owner.dit_team.country.name,
-                    },
-                },
-            },
-            'export_countries': [
-                {
-                    'country': {
-                        'id': str(item.country.pk),
-                        'name': item.country.name,
-                    },
-                    'status': item.status,
-                } for item in company.export_countries.order_by('pk')
-            ],
-            'archived_documents_url_path': company.archived_documents_url_path,
-            'archived': False,
-            'archived_by': None,
-            'archived_on': None,
-            'archived_reason': None,
-            'transferred_by': None,
-            'transferred_on': None,
-            'transferred_to': None,
-            'transfer_reason': '',
-            'pending_dnb_investigation': False,
-            'is_global_ultimate': company.is_global_ultimate,
-            'global_ultimate_duns_number': company.global_ultimate_duns_number,
-            'dnb_modified_on': company.dnb_modified_on,
-        }
+                'status': item.status,
+            } for item in company.export_countries.order_by('pk')
+        ]
 
     @staticmethod
     def update_company_export_country_model(*, self, new_countries, field, company, model_status):
