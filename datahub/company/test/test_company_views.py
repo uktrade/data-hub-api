@@ -18,11 +18,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
 )
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange
-from datahub.core.test_utils import (
-    APITestMixin,
-    create_test_user,
-    format_date_or_datetime,
-)
+from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.test.factories import TeamFactory
 
@@ -356,6 +352,7 @@ class TestGetCompany(APITestMixin):
                     },
                 },
             },
+            'export_countries': [],
             'archived_documents_url_path': company.archived_documents_url_path,
             'archived': False,
             'archived_by': None,
@@ -478,6 +475,38 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         global_ultimate_duns_number = global_ultimate_overrides['global_ultimate_duns_number']
         assert response.json()['global_ultimate_duns_number'] == global_ultimate_duns_number
+
+    def test_get_company_with_export_countries(self):
+        """
+        Tests the company response has export countries that are
+        in the new CompanyExportCountry model.
+        """
+        company = CompanyFactory()
+        export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
+        company.export_countries.set([export_country_one, export_country_two])
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_company_document',
+            ),
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json().get('export_countries', []) is not []
+        export_countries_response = response.json().get('export_countries')
+        assert export_countries_response == [
+            {
+                'country': {
+                    'id': str(item.country.pk),
+                    'name': item.country.name,
+                },
+                'status': item.status,
+            } for item in company.export_countries.order_by('pk')
+        ]
 
     @pytest.mark.parametrize(
         'build_company',
