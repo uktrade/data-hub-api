@@ -56,6 +56,7 @@ class InteractionsDatasetView(BaseDatasetView):
             'interaction_link',
             'investment_project_id',
             'kind',
+            'modified_on',
             'net_company_receipt',
             'notes',
             'policy_area_names',
