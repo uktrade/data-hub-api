@@ -279,12 +279,12 @@ REST_FRAMEWORK = {
 # See https://unpkg.com/ for info on unpkg and if are updating these (the integrity value
 # can be obtained by adding ?meta to the URL of the resource).
 SWAGGER_UI_CSS = {
-    'url': 'https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui.css',
-    'integrity': 'sha384-tgOpIqeb5Ds0xSeXMInWaZ1o8ujNJdUUIiDk/ZpnZjFDQl0t1yxsBpGsG8/fjDZS',
+    'url': 'https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui.css',
+    'integrity': 'sha384-WBdQ4nw0UWAWpf/c1u6DHcCmoT1wY63dk3fPmcb0vKhXP81/lK4GSIiU5nrA6qEs',
 }
 SWAGGER_UI_JS = {
-    'url': 'https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui-bundle.js',
-    'integrity': 'sha384-61ytfM+owD7jIzMmLJD2aRIp30qF9hY+2KyBhMk89VT/kR7Dhwa5UBTmwLZbA2Pz',
+    'url': 'https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-bundle.js',
+    'integrity': 'sha384-LayfYpTwEewV6vK80x7XxHevzp5lS9x3eH/rfMVR26RiPbwjOdH1r6CUTPfABavZ',
 }
 
 # Simplified static file serving.
