@@ -34,7 +34,7 @@ class TestRefundAdmin(AdminTestMixin):
         url = reverse('admin:omis-payment_refund_add')
         data = {
             'order': order.pk,
-            'status': RefundStatus.approved,
+            'status': RefundStatus.APPROVED,
             'requested_on_0': now_date_str,
             'requested_on_1': now_time_str,
             'requested_by': AdviserFactory().pk,
@@ -157,7 +157,7 @@ class TestRefundAdmin(AdminTestMixin):
         (
             # invalid status
             (
-                {'status': RefundStatus.rejected},
+                {'status': RefundStatus.REJECTED},
                 {
                     'status': [
                         'Select a valid choice. rejected is not one of the available choices.',
@@ -261,7 +261,7 @@ class TestRefundAdmin(AdminTestMixin):
         url = reverse('admin:omis-payment_refund_add')
         data = {
             'order': order.pk,
-            'status': RefundStatus.approved,
+            'status': RefundStatus.APPROVED,
             'requested_on_0': now_date_str,
             'requested_on_1': now_time_str,
             'requested_by': AdviserFactory().pk,
@@ -404,7 +404,7 @@ class TestRefundAdmin(AdminTestMixin):
             'vat_amount': '' if refund.vat_amount is None else refund.vat_amount,
         }
 
-        for changed_status, _ in RefundStatus:
+        for changed_status, _ in RefundStatus.choices:
             if changed_status == refund.status:
                 continue
 

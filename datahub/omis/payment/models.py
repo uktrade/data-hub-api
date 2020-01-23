@@ -192,7 +192,7 @@ class Refund(BaseModel):
         related_name='%(class)ss',
     )
     reference = models.CharField(max_length=100)
-    status = models.CharField(max_length=100, choices=RefundStatus)
+    status = models.CharField(max_length=100, choices=RefundStatus.choices)
 
     requested_on = models.DateTimeField()
     requested_by = models.ForeignKey(

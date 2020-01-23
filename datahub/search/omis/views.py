@@ -110,7 +110,7 @@ class SearchOrderExportAPIView(SearchOrderAPIViewMixin, SearchExportAPIView):
         net_refund_in_pounds=Subquery(
             Refund.objects.filter(
                 order=OuterRef('pk'),
-                status=RefundStatus.approved,
+                status=RefundStatus.APPROVED,
             ).order_by(
             ).values(
                 'order',

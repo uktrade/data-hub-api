@@ -1,5 +1,4 @@
 from django.db import models
-from model_utils import Choices
 
 
 class PaymentGatewaySessionStatus(models.TextChoices):
@@ -30,8 +29,9 @@ class PaymentMethod(models.TextChoices):
     MANUAL = ('manual', 'Manual')
 
 
-RefundStatus = Choices(
-    ('requested', 'Requested'),
-    ('approved', 'Approved and Paid'),
-    ('rejected', 'Rejected'),
-)
+class RefundStatus(models.TextChoices):
+    """Refund statuses."""
+
+    REQUESTED = ('requested', 'Requested')
+    APPROVED = ('approved', 'Approved and Paid')
+    REJECTED = ('rejected', 'Rejected')
