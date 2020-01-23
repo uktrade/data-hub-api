@@ -47,6 +47,7 @@ def get_expected_data_from_interaction(interaction):
             else None
         ),
         'kind': interaction.kind,
+        'modified_on': format_date_or_datetime(interaction.modified_on),
         'net_company_receipt': (
             float(interaction.net_company_receipt)
             if interaction.net_company_receipt is not None
