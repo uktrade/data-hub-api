@@ -114,12 +114,15 @@ Dependencies:
     ```
 
 7.  Set `DOCKER_DEV=False` in `.env`
-8.  Create the db. By default, the dev version uses postgres:
+8.  Create the required PostgreSQL databases:
 
     ```shell
     psql -p5432
     create database datahub;
+    create database mi;
     ```
+    
+    (Most Django apps use the `datahub` database. The `mi` database is used only by the `mi_dashboard` Django app.)
 
 9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
@@ -129,10 +132,11 @@ Dependencies:
 
 10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-11. Populate the database and initialise Elasticsearch:
+11. Populate the databases and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
+    ./manage.py migrate --database mi
     ./manage.py migrate_es
 
     ./manage.py loadinitialmetadata
@@ -344,8 +348,16 @@ If using Docker, remember to run these commands inside your container by prefixi
 
 #### Apply migrations
 
+##### For the default database
+
 ```shell
 ./manage.py migrate
+```
+
+##### For the MI database
+
+```shell
+./manage.py migrate --database mi
 ```
 
 #### Create django-reversion initial revisions
