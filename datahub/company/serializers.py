@@ -291,7 +291,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         allow_null=True,
     )
     address = AddressSerializer(source_model=Company, address_source_prefix='address')
-    export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
+    export_countries = CompanyExportCountrySerializer(many=True, required=False)
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
     serializer_field_mapping = {
