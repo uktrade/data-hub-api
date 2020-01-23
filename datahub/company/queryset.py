@@ -1,4 +1,4 @@
-from datahub.company.models import Contact
+from datahub.company.models import CompanyExportCountry, Contact
 
 
 def get_contact_queryset():
@@ -10,3 +10,8 @@ def get_contact_queryset():
         'address_country',
         'archived_by',
     )
+
+
+def get_export_country_queryset():
+    """Gets the export country query set used by views."""
+    return CompanyExportCountry.objects.order_by('pk').select_related('country')

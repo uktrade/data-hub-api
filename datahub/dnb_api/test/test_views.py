@@ -427,6 +427,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
             ),
             'dnb_modified_on': '2019-01-01T11:12:13Z',
+            'export_countries': [],
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
