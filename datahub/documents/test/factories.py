@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 from django.utils.timezone import utc
 
@@ -10,7 +8,6 @@ from datahub.documents.models import UPLOAD_STATUSES
 class DocumentFactory(factory.django.DjangoModelFactory):
     """Document factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     bucket_id = 'default'

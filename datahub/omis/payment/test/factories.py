@@ -1,5 +1,4 @@
 import random
-import uuid
 
 import factory
 from django.utils.timezone import utc
@@ -13,7 +12,6 @@ from datahub.omis.payment.models import RefundStatus
 class PaymentFactory(factory.django.DjangoModelFactory):
     """Payment factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderPaidFactory)
     reference = factory.Faker('pystr')
     transaction_reference = factory.Faker('pystr')
@@ -29,7 +27,6 @@ class PaymentFactory(factory.django.DjangoModelFactory):
 class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
     """PaymentGatewaySession factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderWithAcceptedQuoteFactory)
     status = constants.PaymentGatewaySessionStatus.created
     govuk_payment_id = factory.Faker('pystr', min_chars=27, max_chars=27)
@@ -41,7 +38,6 @@ class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
 class RequestedRefundFactory(factory.django.DjangoModelFactory):
     """Factory for refund requested."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     order = factory.SubFactory(OrderPaidFactory)

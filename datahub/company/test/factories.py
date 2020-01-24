@@ -27,7 +27,6 @@ from datahub.metadata.test.factories import TeamFactory
 class AdviserFactory(factory.django.DjangoModelFactory):
     """Adviser factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     dit_team = factory.SubFactory(TeamFactory)
@@ -44,7 +43,6 @@ class AdviserFactory(factory.django.DjangoModelFactory):
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('company')
@@ -154,7 +152,6 @@ def _get_random_company_category():
 class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     title_id = constants.Title.wing_commander.value.id
@@ -196,7 +193,6 @@ class ArchivedContactFactory(ContactFactory):
 class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
     """Factory for Company export country"""
 
-    id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
     status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting

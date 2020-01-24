@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 import factory
 from django.utils.timezone import now, utc
@@ -20,7 +19,6 @@ from datahub.omis.quote.test.factories import (
 class OrderFactory(factory.django.DjangoModelFactory):
     """Order factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     company = factory.SubFactory(CompanyFactory)
@@ -154,7 +152,6 @@ class OrderWithoutLeadAssigneeFactory(OrderFactory):
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
@@ -166,7 +163,6 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
 class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     """Order Assignee factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
@@ -184,8 +180,6 @@ class OrderAssigneeCompleteFactory(OrderAssigneeFactory):
 
 class HourlyRateFactory(factory.django.DjangoModelFactory):
     """HourlyRate factory."""
-
-    id = factory.LazyFunction(uuid.uuid4)
 
     class Meta:
         model = 'order.HourlyRate'
