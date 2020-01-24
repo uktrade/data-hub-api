@@ -93,6 +93,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         """
         return []
 
+    @to_many_field
+    def export_countries(self):  # noqa: D102
+        """
+        Add support for setting `export_countries`.
+        """
+        return []
+
     class Params:
         hq = factory.Trait(
             headquarter_type=factory.LazyFunction(lambda: random_obj_for_model(HeadquarterType)),
