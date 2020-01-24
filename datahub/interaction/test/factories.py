@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 import factory
 from django.utils.timezone import now, utc
 
@@ -24,7 +22,6 @@ from datahub.metadata.test.factories import ServiceFactory
 class ServiceQuestionFactory(factory.django.DjangoModelFactory):
     """ServiceQuestion factory."""
 
-    id = factory.LazyFunction(uuid4)
     name = factory.Faker('word')
     service = factory.SubFactory(ServiceFactory)
 
@@ -35,7 +32,6 @@ class ServiceQuestionFactory(factory.django.DjangoModelFactory):
 class ServiceAnswerOptionFactory(factory.django.DjangoModelFactory):
     """ServiceQuestion factory."""
 
-    id = factory.LazyFunction(uuid4)
     name = factory.Faker('word')
     question = factory.SubFactory(ServiceQuestionFactory)
 
@@ -46,7 +42,6 @@ class ServiceAnswerOptionFactory(factory.django.DjangoModelFactory):
 class CommunicationChannelFactory(factory.django.DjangoModelFactory):
     """CommunicationChannel factory."""
 
-    id = factory.LazyFunction(uuid4)
     name = factory.Faker('word')
 
     class Meta:
@@ -188,7 +183,6 @@ class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
 class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
     """Factory for Interaction export country."""
 
-    id = factory.LazyFunction(uuid4)
     interaction = factory.SubFactory(CompanyInteractionFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
     status = factory.Iterator(tuple(CompanyExportCountry.EXPORT_INTEREST_STATUSES._db_values))
