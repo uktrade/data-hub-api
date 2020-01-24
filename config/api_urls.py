@@ -8,6 +8,7 @@ from datahub.activity_stream import urls as activity_stream_urls
 from datahub.company import views as company_views
 from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
+from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
 from datahub.event import urls as event_urls
@@ -59,6 +60,7 @@ v3_urls = [
 
 v4_urls = [
     path('', include((company_urls.urls, 'company'), namespace='company')),
+    path('', include((company_referral_urls, 'company-referral'), namespace='company-referral')),
     path('dnb/', include((dnb_api_urls, 'dnb_api'), namespace='dnb-api')),
     path('', include((search_urls.urls_v4, 'search'), namespace='search')),
     path(
