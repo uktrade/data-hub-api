@@ -302,6 +302,7 @@ SEARCH_APPS = [
     'datahub.search.company.CompanySearchApp',
     'datahub.search.contact.ContactSearchApp',
     'datahub.search.event.EventSearchApp',
+    'datahub.search.export_country_history.ExportCountryHistoryApp',
     'datahub.search.interaction.InteractionSearchApp',
     'datahub.search.investment.InvestmentSearchApp',
     'datahub.search.omis.OrderSearchApp',
