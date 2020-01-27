@@ -28,10 +28,11 @@
           SwaggerUIBundle.SwaggerUIStandalonePreset
         ],
         layout: "BaseLayout",
+        operationsSorter: 'alpha',
         requestInterceptor: (req) => {
             req.headers['X-CSRFToken'] = "{{csrf_token}}";
             return req;
-        }
+        },
       })
     </script>
   </body>
