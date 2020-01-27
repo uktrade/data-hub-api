@@ -520,6 +520,34 @@
     created_on: '2018-02-28T15:00:00Z'
     modified_on: '2018-06-05T00:00:00Z'
 
+- model: company_referral.companyreferral
+  pk: 02e4cce0-caf5-4eb8-8d6d-ebdd69a6545b
+  fields:
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    contact: null
+    recipient: e83a608e-84a4-11e6-ae22-56b6b6499611
+    status: outstanding
+    subject: Wants to export to the US
+    notes: Example oustanding referral
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2019-06-15T10:00:00Z'
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_on: '2019-06-15T10:00:00Z'
+
+- model: company_referral.companyreferral
+  pk: 92d8c757-9fa6-4a00-93d4-e0fee40b953b
+  fields:
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    recipient: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    status: outstanding
+    subject: Wants to export graphene
+    notes: Example oustanding referral with a contact
+    created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    created_on: '2019-07-20T10:00:00Z'
+    modified_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    modified_on: '2019-07-20T10:00:00Z'
+
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:
