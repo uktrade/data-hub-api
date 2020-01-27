@@ -39,7 +39,7 @@ def _automatic_company_archive(task, limit, simulate):
         message = f'Automatically archived company: {company.id}'
         if simulate:
             logger.info(f'[SIMULATION] {message}')
-            return
+            continue
         company.archived = True
         company.archived_reason = 'This record was automatically archived due to inactivity'
         company.archived_on = timezone.now()
