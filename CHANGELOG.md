@@ -1,3 +1,54 @@
+# Data Hub API 26.5.0 (2020-01-27)
+
+
+## Features
+
+- **Companies** The company list view in Django admin now has a filter for `dnb_modified_on` field.
+
+  This allows us to e.g. filter companies that were updated during today.
+- Endpoints are now sorted by path in the API docs.
+
+## Internal changes
+
+- Swagger UI, used in the API docs, was updated to version 3.25.0.
+
+## API
+
+- **Companies** `GET /v4/dataset/companies-dataset`: 2 new fields were added to the companies dataset response:
+  - `global_headquarters_id`
+  - `global_ultimate_duns_number`
+- **Companies** `GET /v4/company/<pk>`: Expose export countries as `export_countries` from new `CompanyExportCountry` model within company response. The field has following structure:
+
+   ```json
+  {
+      "export_countries": [
+          {
+          "country": {
+              "name": ...,
+              "id": ...
+          },
+          "status": "currently_exporting"
+          },
+          {
+          "country": {
+              "name": ...,
+              "id": ...
+          },
+          "status": "not_interested"
+          },
+          {
+          "country": {
+              "name": ...,
+              "id": ...
+          },
+          "status": "future_interest"
+          },
+      ]
+  }
+  ```
+- **Interactions** `GET /v4/dataset/interactions-dataset`: The field `modified_on` was added to the interactions dataset endpoint.
+
+
 # Data Hub API 26.4.0 (2020-01-20)
 
 
