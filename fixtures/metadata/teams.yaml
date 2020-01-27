@@ -277,6 +277,15 @@
     - - delete_companylistitem
       - company_list
       - companylistitem
+    - - add_companyreferral
+      - company_referral
+      - companyreferral
+    - - change_companyreferral
+      - company_referral
+      - companyreferral
+    - - view_companyreferral
+      - company_referral
+      - companyreferral
     - - add_contact
       - company
       - contact
