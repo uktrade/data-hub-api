@@ -29,7 +29,7 @@ notifications-python-client==5.5.0
 statsd==3.3.0
 
 # Email
-mail-parser==3.11.0
+mail-parser==3.12.0
 icalendar==4.0.4
 
 # REDIS
