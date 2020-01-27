@@ -1,4 +1,3 @@
-import uuid
 from random import randrange, sample
 
 import factory
@@ -10,7 +9,6 @@ from datahub.metadata.models import Service
 class ServiceFactory(factory.django.DjangoModelFactory):
     """Service factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     segment = factory.Sequence(lambda n: f'name {n}')
 
     contexts = factory.LazyFunction(
@@ -27,7 +25,6 @@ class ServiceFactory(factory.django.DjangoModelFactory):
 class ChildServiceFactory(factory.django.DjangoModelFactory):
     """Child service factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     segment = factory.Sequence(lambda n: f'child name {n}')
     parent = factory.SubFactory(ServiceFactory)
     contexts = factory.LazyFunction(
@@ -44,7 +41,6 @@ class ChildServiceFactory(factory.django.DjangoModelFactory):
 class TeamRoleFactory(factory.django.DjangoModelFactory):
     """TeamRole factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
@@ -54,7 +50,6 @@ class TeamRoleFactory(factory.django.DjangoModelFactory):
 class TeamFactory(factory.django.DjangoModelFactory):
     """Team factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
     role = factory.SubFactory(TeamRoleFactory)
     uk_region_id = constants.UKRegion.east_midlands.value.id
@@ -68,7 +63,6 @@ class TeamFactory(factory.django.DjangoModelFactory):
 class ReferralSourceActivityFactory(factory.django.DjangoModelFactory):
     """ReferralSourceActivity factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
@@ -78,7 +72,6 @@ class ReferralSourceActivityFactory(factory.django.DjangoModelFactory):
 class ReferralSourceWebsiteFactory(factory.django.DjangoModelFactory):
     """ReferralSourceWebsite factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
@@ -88,7 +81,6 @@ class ReferralSourceWebsiteFactory(factory.django.DjangoModelFactory):
 class ReferralSourceMarketingFactory(factory.django.DjangoModelFactory):
     """ReferralSourceMarketing factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
@@ -98,7 +90,6 @@ class ReferralSourceMarketingFactory(factory.django.DjangoModelFactory):
 class SectorFactory(factory.django.DjangoModelFactory):
     """Sector factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     segment = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
