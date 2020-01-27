@@ -195,6 +195,18 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
+class CompanyExportCountrySerializer(serializers.ModelSerializer):
+    """
+    CompanyExportCountry serializer.
+    """
+
+    country = NestedRelatedField(meta_models.Country)
+
+    class Meta:
+        model = CompanyExportCountry
+        fields = ('country', 'status')
+
+
 class CompanySerializer(PermittedFieldsModelSerializer):
     """
     Base Company read/write serializer
@@ -269,6 +281,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         allow_null=True,
     )
     address = AddressSerializer(source_model=Company, address_source_prefix='address')
+    export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
     serializer_field_mapping = {
@@ -474,6 +487,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_global_ultimate',
             'global_ultimate_duns_number',
             'dnb_modified_on',
+            'export_countries',
         )
         read_only_fields = (
             'archived',
@@ -493,6 +507,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_global_ultimate',
             'global_ultimate_duns_number',
             'dnb_modified_on',
+            'export_countries',
         )
         dnb_read_only_fields = (
             'name',

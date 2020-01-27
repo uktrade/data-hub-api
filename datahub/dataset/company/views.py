@@ -30,6 +30,8 @@ class CompaniesDatasetView(BaseDatasetView):
             'description',
             'duns_number',
             'export_experience_category__name',
+            'global_headquarters_id',
+            'global_ultimate_duns_number',
             'headquarter_type__name',
             'id',
             'is_number_of_employees_estimated',
