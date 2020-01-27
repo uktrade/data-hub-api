@@ -1,6 +1,5 @@
 """Model instance factories for investment tests."""
 
-import uuid
 from datetime import date
 from decimal import Decimal
 
@@ -34,7 +33,6 @@ from datahub.metadata.models import UKRegion
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Investment project factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     name = factory.Sequence(lambda n: f'name {n}')
