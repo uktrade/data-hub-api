@@ -25,6 +25,7 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
+    format_dnb_company,
     get_company,
     get_company_update_page,
     RevisionNotFoundError,
@@ -606,3 +607,32 @@ class TestRollbackDNBCompanyUpdate:
         with pytest.raises(RevisionNotFoundError) as excinfo:
             rollback_dnb_company_update(company, update_comment)
             assert str(excinfo.value) == error_message
+
+
+class TestFormatDNBCompany:
+    """
+    Tests for format_dnb_company function.
+    """
+
+    def test_turnover_usd(self, dnb_response_uk):
+        """
+        Test that the function returns `turnover`
+        and `is_turnover_estimated` when `annual_sales`
+        are in USD.
+        """
+        dnb_company = dnb_response_uk['results'][0]
+        company = format_dnb_company(dnb_company)
+        assert company['turnover'] == dnb_company['annual_sales']
+        assert company['is_turnover_estimated'] == dnb_company['is_annual_sales_estimated']
+
+    def test_turnover_non_usd(self, dnb_response_uk):
+        """
+        Test that the function does not return `turnover`
+        and `is_turnover_estimated` when `annual_sales`
+        are not in USD.
+        """
+        dnb_company = dnb_response_uk['results'][0]
+        dnb_company['annual_sales_currency'] = 'GBP'
+        company = format_dnb_company(dnb_company)
+        assert company['turnover'] is None
+        assert company['is_turnover_estimated'] is None
