@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 from django.utils.timezone import now
 
@@ -10,7 +8,6 @@ from datahub.omis.quote.models import TermsAndConditions
 class QuoteFactory(factory.django.DjangoModelFactory):
     """Order factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     reference = factory.Faker('text', max_nb_chars=10)

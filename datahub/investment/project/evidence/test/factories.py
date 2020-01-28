@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 
 from datahub.investment.project.evidence.models import EvidenceDocument, EvidenceTag
@@ -9,7 +7,6 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 class EvidenceTagFactory(factory.django.DjangoModelFactory):
     """Evidence tag factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Faker('sentence', nb_words=2)
 
     class Meta:

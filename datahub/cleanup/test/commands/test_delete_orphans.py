@@ -17,6 +17,7 @@ from datahub.company.test.factories import (
     ContactFactory,
     OneListCoreTeamMemberFactory,
 )
+from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
@@ -44,6 +45,7 @@ MAPPINGS = {
     'company.Contact': {
         'factory': ContactFactory,
         'dependent_models': (
+            (CompanyReferralFactory, 'contact'),
             (CompanyInteractionFactory, 'contacts'),
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
@@ -55,6 +57,7 @@ MAPPINGS = {
     'company.Company': {
         'factory': CompanyFactory,
         'dependent_models': (
+            (CompanyReferralFactory, 'company'),
             (CompanyInteractionFactory, 'company'),
             (ContactFactory, 'company'),
             (ShallowInvestmentProjectFactory, 'intermediate_company'),

@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 from django.utils.timezone import now
 
@@ -9,8 +7,6 @@ from datahub.investment.project.report.models import SPIReport
 
 class SPIReportFactory(factory.django.DjangoModelFactory):
     """Investment project report factory."""
-
-    id = factory.LazyFunction(uuid.uuid4)
 
     s3_key = factory.Faker('slug')
 
