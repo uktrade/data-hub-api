@@ -1,3 +1,39 @@
+# Data Hub API 26.6.0 (2020-01-28)
+
+
+## Features
+
+- **Companies** The `format_dnb_company` now includes a check for `annual_sales_currency`.
+
+  If `annual_sales_currency` is not US Dollars, we do not propagate `annual_sales` or `is_annual_sales_estimated` fields downstream.
+
+  All D&B records that we have encountered until now have `annual_sales` in US dollars but we would like to monitor this behavior and not ingest bad data in case there is an exception.
+- **Companies** Added a `datahub.dbmaintenance` command `get_dnb_one_list_tier_companies.py` which
+  enables querying of DNB-matched One List Tier B companies. This was re-instated
+  after removal in a previous commit to enable further rollout of DNB hierarchies
+  to Data Hub company records.
+
+## Database schema
+
+- **Companies** A new `company_referral_companyreferral` table was added to hold referrals of companies between DIT advisers.
+
+  The table has the following columns:
+
+  - `"id" uuid NOT NULL PRIMARY KEY`
+  - `"created_on" timestamp with time zone NULL`
+  - `"modified_on" timestamp with time zone NULL`
+  - `"status" varchar(255) NOT NULL`
+  - `"completed_on" timestamp with time zone NULL`
+  - `"subject" varchar(255) NOT NULL`
+  - `"notes" text NOT NULL`
+  - `"company_id" uuid NOT NULL`
+  - `"completed_by_id" uuid NULL`
+  - `"contact_id" uuid NULL`
+  - `"created_by_id" uuid NULL`
+  - `"modified_by_id" uuid NULL`
+  - `"recipient_id" uuid NOT NULL`
+
+
 # Data Hub API 26.5.0 (2020-01-27)
 
 
