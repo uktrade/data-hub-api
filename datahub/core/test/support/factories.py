@@ -1,5 +1,4 @@
 from random import choice
-from uuid import uuid4
 
 import factory
 
@@ -11,7 +10,6 @@ from datahub.core.test.support.models import Book
 class MetadataModelFactory(factory.django.DjangoModelFactory):
     """MetadataModel factory."""
 
-    id = factory.LazyFunction(uuid4)
     name = factory.Faker('sentence')
 
     class Meta:

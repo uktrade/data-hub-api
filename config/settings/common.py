@@ -62,6 +62,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'datahub.core',
     'datahub.company',
+    'datahub.company_referral',
     'datahub.documents',
     'datahub.email_ingestion',
     'datahub.dnb_api',

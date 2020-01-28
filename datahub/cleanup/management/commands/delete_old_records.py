@@ -61,6 +61,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('orders'): (),
                 Company._meta.get_field('subsidiaries'): (),
                 Company._meta.get_field('transferred_from'): (),
+                Company._meta.get_field('referrals'): (),
                 Company._meta.get_field('investor_profiles'): (
                     DatetimeLessThanCleanupFilter('modified_on', INVESTOR_PROFILE_EXPIRY_PERIOD),
                 ),
@@ -87,8 +88,15 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('interactions'): (),
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
+                Contact._meta.get_field('referrals'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
             },
+        ),
+        'company_referral.CompanyReferral': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPIRY_PERIOD),
+            ),
         ),
         'interaction.Interaction': ModelCleanupConfig(
             (

@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 from django.utils.timezone import now
 
@@ -11,8 +9,6 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 class PropositionFactory(factory.django.DjangoModelFactory):
     """Investment project proposition factory."""
-
-    id = factory.LazyFunction(uuid.uuid4)
 
     investment_project = factory.SubFactory(InvestmentProjectFactory)
     adviser = factory.SubFactory(AdviserFactory)

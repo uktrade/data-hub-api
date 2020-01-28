@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 from django.utils.timezone import utc
 
@@ -12,7 +10,6 @@ from datahub.event.constants import EventType, LocationType, Programme
 class EventFactory(factory.django.DjangoModelFactory):
     """Event factory."""
 
-    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('text')

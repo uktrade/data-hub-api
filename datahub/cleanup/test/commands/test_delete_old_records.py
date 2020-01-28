@@ -31,6 +31,7 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
+from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
@@ -133,6 +134,17 @@ MAPPING = {
                 ],
             },
             {
+                'factory': CompanyReferralFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
                 'factory': CompanyInteractionFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
@@ -214,6 +226,28 @@ MAPPING = {
             },
         ],
     },
+    'company_referral.CompanyReferral': {
+        'factory': CompanyReferralFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [],
+    },
     'company.Contact': {
         'factory': ContactFactory,
         'implicitly_deletable_models': set(),
@@ -234,6 +268,17 @@ MAPPING = {
             },
         ],
         'relations': [
+            {
+                'factory': CompanyReferralFactory,
+                'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
             {
                 'factory': CompanyInteractionFactory,
                 'field': 'contacts',
@@ -655,6 +700,7 @@ def test_run(
     model_factory = mapping['factory']
     command = delete_old_records.Command()
     model = apps.get_model(model_label)
+    has_search_app = not mapping.get('has_no_search_app')
 
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
@@ -679,12 +725,13 @@ def test_run(
 
     num_expired_records = 1 if is_expired else 0
 
-    search_app = get_search_app_by_model(model)
-    doc_type = search_app.name
-    read_alias = search_app.es_model.get_read_alias()
+    if has_search_app:
+        search_app = get_search_app_by_model(model)
+        doc_type = search_app.name
+        read_alias = search_app.es_model.get_read_alias()
+        assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
     assert model.objects.count() == total_model_records
-    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
     # Run the command
     management.call_command(command, model_label)
@@ -692,10 +739,12 @@ def test_run(
 
     # Check if the object has been deleted
     assert model.objects.count() == total_model_records - num_expired_records
-    assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == (
-        total_model_records
-        - num_expired_records
-    )
+
+    if has_search_app:
+        assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == (
+            total_model_records
+            - num_expired_records
+        )
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -735,6 +784,7 @@ def test_simulate(
 
     mapping = MAPPING[model_name]
     model_factory = mapping['factory']
+    has_search_app = not mapping.get('has_no_search_app')
 
     with es_collector_context_manager as collector:
         for _ in range(3):
@@ -743,11 +793,13 @@ def test_simulate(
         collector.flush_and_refresh()
 
     model = apps.get_model(model_name)
-    search_app = get_search_app_by_model(model)
-    read_alias = search_app.es_model.get_read_alias()
+
+    if has_search_app:
+        search_app = get_search_app_by_model(model)
+        read_alias = search_app.es_model.get_read_alias()
+        assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
     assert model.objects.count() == 3
-    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
     # Run the command
     management.call_command(command, model_name, simulate=True)
@@ -768,7 +820,9 @@ def test_simulate(
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
+
+    if has_search_app:
+        assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
