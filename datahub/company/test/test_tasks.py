@@ -12,6 +12,9 @@ from datahub.company.tasks import automatic_company_archive
 from datahub.company.test.factories import CompanyFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
@@ -83,7 +86,7 @@ class TestAutomaticCompanyArchive:
         ),
     )
     @freeze_time('2020-01-01-12:00:00')
-    def test_success_no_interactions(
+    def test_no_interactions(
         self,
         caplog,
         automatic_company_archive_feature_flag,
@@ -211,7 +214,7 @@ class TestAutomaticCompanyArchive:
         assert archived_company.modified_on == company.modified_on
 
     @freeze_time('2020-01-01-12:00:00')
-    def test_success_orders(
+    def test_orders(
         self,
         automatic_company_archive_feature_flag,
     ):
@@ -278,3 +281,44 @@ class TestAutomaticCompanyArchive:
 
         assert archived_companies_count == 1
 
+    @pytest.mark.parametrize(
+        'investment_projects_status, expected_archived',
+        (
+            (
+                [InvestmentProject.STATUSES.lost],
+                True,
+            ),
+            (
+                [InvestmentProject.STATUSES.lost, InvestmentProject.STATUSES.ongoing],
+                False,
+            ),
+            (
+                [InvestmentProject.STATUSES.ongoing],
+                False,
+            ),
+            (
+                [],
+                True,
+            ),
+        ),
+    )
+    @freeze_time('2020-01-01-12:00:00')
+    def test_investment_projects(
+        self,
+        automatic_company_archive_feature_flag,
+        investment_projects_status,
+        expected_archived,
+    ):
+        """
+        Test that a company with active investment projects is not
+        archived.
+        """
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        with freeze_time(gt_3m_ago):
+            company = CompanyFactory()
+        for status in investment_projects_status:
+            InvestmentProjectFactory(investor_company=company, status=status)
+        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
+        assert task_result.successful()
+        company.refresh_from_db()
+        assert company.archived == expected_archived
