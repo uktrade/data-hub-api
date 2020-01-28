@@ -31,6 +31,7 @@ def _automatic_company_archive(task, limit, simulate):
         archived=False,
         duns_number__isnull=True,
         orders__isnull=True,
+        investor_profiles__isnull=True,
         created_on__lt=_3m_ago,
         modified_on__lt=_3m_ago,
     )[:limit]

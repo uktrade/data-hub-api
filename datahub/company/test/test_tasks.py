@@ -254,3 +254,27 @@ class TestAutomaticCompanyArchive:
                 archived_companies_count += 1
 
         assert archived_companies_count == 2
+
+    @freeze_time('2020-01-01-12:00:00')
+    def test_investor_profile(
+        self,
+        automatic_company_archive_feature_flag,
+    ):
+        """
+        Test that a company with investor profile is not archived.
+        """
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        with freeze_time(gt_3m_ago):
+            companies = CompanyFactory.create_batch(2)
+        LargeCapitalInvestorProfileFactory(investor_company=companies[0])
+        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
+        assert task_result.successful()
+
+        archived_companies_count = 0
+        for company in companies:
+            company.refresh_from_db()
+            if company.archived:
+                archived_companies_count += 1
+
+        assert archived_companies_count == 1
+
