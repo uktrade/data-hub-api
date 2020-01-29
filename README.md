@@ -12,6 +12,8 @@ More guides can be found in the [docs](./docs/) folder.
 
 This project uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
 
+**Note for Mac Users:** By default, docker on Mac will restrict itself to using just 2GB of memory. This [should be increased](https://docs.docker.com/docker-for-mac/#resources) to at least 4GB to avoid running in to unexpected problems.
+
 1.  Clone the repository:
 
     ```shell
