@@ -1,4 +1,4 @@
-from datahub.company.models import Company
+from datahub.company.models import CompanyExportCountry
 from datahub.dataset.company_export_to_country.pagination import (
     CompanyExportToCountriesDatasetViewCursorPagination,
 )
@@ -17,7 +17,9 @@ class CompanyExportToCountriesDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         """Returns list of company_export_to_countries records"""
-        return Company.export_to_countries.through.objects.values(
+        return CompanyExportCountry.objects.filter(
+            status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+        ).values(
             'id',
             'company_id',
             'country__name',

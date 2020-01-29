@@ -1,4 +1,4 @@
-from datahub.company.models import Company
+from datahub.company.models import CompanyExportCountry
 from datahub.dataset.company_future_interest_countries.pagination import (
     CompanyFutureInterestCountriesDatasetViewCursorPagination,
 )
@@ -17,7 +17,9 @@ class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
-        return Company.future_interest_countries.through.objects.values(
+        return CompanyExportCountry.objects.filter(
+            status=CompanyExportCountry.Status.FUTURE_INTEREST,
+        ).values(
             'id',
             'company_id',
             'country__name',
