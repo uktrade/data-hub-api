@@ -25,6 +25,9 @@ This project uses Docker compose to setup and run all the necessary components. 
     cp sample.env .env
     ```
 
+    If you're working with data-hub-frontend and mock-sso, `SUPERUSER_USERNAME` should
+    be the same as MOCK_SSO_USERNAME in the frontend's .env file.
+
 3.  Build and run the necessary containers for the required environment:
 
     ```shell
