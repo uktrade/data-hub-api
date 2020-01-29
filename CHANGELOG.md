@@ -1,3 +1,29 @@
+# Data Hub API 27.0.0 (2020-01-29)
+
+
+## Removals
+
+- **Advisers** `GET /adviser/`: The deprecated `first_name`, `first_name__icontains`, `last_name`, `last_name__icontains`, `email` and `email__icontains` query parameters were removed.
+
+## Features
+
+- **Companies** A utility function `datahub.dnb_api.link_company.link_company_with_dnb` was added which
+  provides a mechanism for linking a Data Hub company record with a D&B company
+  record. The utility function saves the pertinent D&B data to the Data Hub record.
+
+  This will allow us to firstly provide an admin mechanism for quickly linking
+  companies, followed by an API endpoint.
+- **Companies** The following criteria were added to the `automatic-company-archive` Celery task:
+
+  - Do not have any ongoing investment projects
+  - Do not have any investor profiles
+
+## API
+
+- **Advisers** `GET /adviser/`: The deprecated `first_name`, `first_name__icontains`, `last_name`, `last_name__icontains`, `email` and `email__icontains` query parameters were removed.
+- **Companies** A new endpoint, `POST /v4/company-referral`, was added. This creates a new company referral. Refer to the API documentation for the schema.
+
+
 # Data Hub API 26.6.0 (2020-01-28)
 
 
