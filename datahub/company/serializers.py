@@ -71,6 +71,16 @@ NestedAdviserWithTeamField = partial(
     ),
 )
 
+NestedAdviserWithEmailAndTeamField = partial(
+    NestedRelatedField,
+    'company.Advisor',
+    extra_fields=(
+        'name',
+        'contact_email',
+        ('dit_team', NestedRelatedField('metadata.Team')),
+    ),
+)
+
 # like NestedAdviserField but includes dit_team with uk_region and country
 NestedAdviserWithEmailAndTeamGeographyField = partial(
     NestedRelatedField,

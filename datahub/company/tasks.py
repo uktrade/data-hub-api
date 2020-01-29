@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from dateutil.relativedelta import relativedelta
-from django.db.models import OuterRef, Q, Subquery
+from django.db.models import FilteredRelation, OuterRef, Q, Subquery
 from django.utils import timezone
 from django_pglocks import advisory_lock
 
@@ -9,11 +9,13 @@ from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models.company import Company
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
+from datahub.investment.project.models import InvestmentProject
+
 
 logger = get_task_logger(__name__)
 
 
-def _automatic_company_archive(task, limit, simulate):
+def _automatic_company_archive(limit, simulate):
 
     _8y_ago = timezone.now() - relativedelta(years=8)
     _3m_ago = timezone.now() - relativedelta(months=3)
@@ -26,11 +28,17 @@ def _automatic_company_archive(task, limit, simulate):
         latest_interaction_date=Subquery(
             latest_interaction.values('date')[:1],
         ),
+        active_investment_projects=FilteredRelation(
+            'investor_investment_projects',
+            condition=Q(investor_investment_projects__status=InvestmentProject.STATUSES.ongoing),
+        ),
     ).filter(
         Q(latest_interaction_date__date__lt=_8y_ago) | Q(latest_interaction_date__isnull=True),
         archived=False,
         duns_number__isnull=True,
         orders__isnull=True,
+        investor_profiles__isnull=True,
+        active_investment_projects__isnull=True,
         created_on__lt=_3m_ago,
         modified_on__lt=_3m_ago,
     )[:limit]
@@ -76,4 +84,4 @@ def automatic_company_archive(self, limit=1000, simulate=True):
             logger.info('Another instance of this task is already running.')
             return
 
-        _automatic_company_archive(self, limit, simulate)
+        _automatic_company_archive(limit, simulate)
