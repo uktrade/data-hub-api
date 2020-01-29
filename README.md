@@ -12,6 +12,8 @@ More guides can be found in the [docs](./docs/) folder.
 
 This project uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
 
+**Note for Mac Users:** By default, docker on Mac will restrict itself to using just 2GB of memory. This [should be increased](https://docs.docker.com/docker-for-mac/#resources) to at least 4GB to avoid running in to unexpected problems.
+
 1.  Clone the repository:
 
     ```shell
@@ -24,6 +26,9 @@ This project uses Docker compose to setup and run all the necessary components. 
     ```shell
     cp sample.env .env
     ```
+
+    If you're working with data-hub-frontend and mock-sso, `SUPERUSER_USERNAME` should
+    be the same as MOCK_SSO_USERNAME in the frontend's .env file.
 
 3.  Build and run the necessary containers for the required environment:
 
@@ -57,7 +62,7 @@ This project uses Docker compose to setup and run all the necessary components. 
 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both the API and the frontend under one docker-compose
-    project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#setting-up-with-docker-compose).
+    project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
 
 ## Native installation (without Docker)
 
