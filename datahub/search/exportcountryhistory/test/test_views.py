@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory, CompanyFactory
+from datahub.core.constants import Country as CountryConstant
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -26,40 +27,36 @@ FROZEN_DATETIME_1 = datetime(2001, 1, 24, 1, 2, 3, tzinfo=utc)
 FROZEN_DATETIME_2 = datetime(2002, 1, 24, 1, 2, 3, tzinfo=utc)
 FROZEN_DATETIME_3 = datetime(2003, 1, 24, 1, 2, 3, tzinfo=utc)
 
-AUSTRALIA_UUID = '9f5f66a0-5d95-e211-a939-e4115bead28a'
-ECUADOR_UUID = '75af72a6-5d95-e211-a939-e4115bead28a'
 COMPANY_UUID = 'f9ea83a6-41d7-11ea-a185-3c15c2e46112'
 
 
 @pytest.fixture
 def setup_data():
     """Sets up data for the tests."""
-    benchmark_country_australia = list(Country.objects.filter(
-        id=AUSTRALIA_UUID,
-    ))[0]
-
-    benchmark_country_ecuador = list(Country.objects.filter(
-        id=ECUADOR_UUID,
-    ))[0]
-
-    benchmark_company = CompanyFactory(
-        id='f9ea83a6-41d7-11ea-a185-3c15c2e46112',
+    benchmark_country_japan = Country.objects.get(
+        pk=CountryConstant.japan.value.id,
     )
+
+    benchmark_country_canada = Country.objects.get(
+        pk=CountryConstant.canada.value.id,
+    )
+
+    benchmark_company = CompanyFactory()
 
     export_country_history_items = []
 
     with freeze_time(FROZEN_DATETIME_1):
         export_country_history_items.append([
             CompanyExportCountryHistoryFactory(
-                country=benchmark_country_australia,
+                country=benchmark_country_japan,
                 company=benchmark_company,
             ),
             CompanyExportCountryHistoryFactory(
                 company=benchmark_company,
-                country=benchmark_country_ecuador,
+                country=benchmark_country_canada,
             ),
             CompanyExportCountryHistoryFactory(
-                country=benchmark_country_ecuador,
+                country=benchmark_country_canada,
             ),
             CompanyExportCountryHistoryFactory(),
         ])
@@ -67,18 +64,18 @@ def setup_data():
     with freeze_time(FROZEN_DATETIME_2):
         export_country_history_items.append([
             CompanyExportCountryHistoryFactory(
-                country=benchmark_country_australia,
+                country=benchmark_country_japan,
             ),
         ])
 
     with freeze_time(FROZEN_DATETIME_3):
         export_country_history_items.append([
             CompanyExportCountryHistoryFactory(
-                country=benchmark_country_australia,
+                country=benchmark_country_japan,
             ),
         ])
 
-    yield export_country_history_items
+    yield str(benchmark_company.id)
 
 
 class TestSearchExportCountryHistory(APITestMixin):
@@ -105,62 +102,13 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @pytest.mark.parametrize(
-        'request_data,expected_status,expected_count,expected_data',
-        (
-            (
-                {
-                    'country': AUSTRALIA_UUID,
-                },
-                status.HTTP_200_OK,
-                3,
-                {
-                    'country': {
-                        'id': AUSTRALIA_UUID,
-                    },
-                },
-            ),
-            (
-                {
-                    'company': COMPANY_UUID,
-                },
-                status.HTTP_200_OK,
-                2,
-                {
-                    'company': {
-                        'id': COMPANY_UUID,
-                    },
-                },
-            ),
-            (
-                {
-                    'company': COMPANY_UUID,
-                    'country': ECUADOR_UUID,
-                },
-                status.HTTP_200_OK,
-                1,
-                {
-                    'company': {
-                        'id': COMPANY_UUID,
-                    },
-                    'country': {
-                        'id': ECUADOR_UUID,
-                    },
-                },
-            ),
-        ),
-    )
-    def test_export_country_history_search(
+    def test_filtering_by_country_on_export_country_history_search(
         self,
         es_with_collector,
-        request_data,
-        expected_status,
-        expected_count,
-        expected_data,
         setup_data,
     ):
         """
-        Test ExportCountryHistory search app with country and/or company param.
+        Test ExportCountryHistory search app with country param.
         """
         es_with_collector.flush_and_refresh()
 
@@ -168,11 +116,87 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         response = self.api_client.post(
             url,
-            data=request_data,
+            data={
+                'country': CountryConstant.japan.value.id,
+            },
         )
 
-        assert response.status_code == expected_status
-        assert response.data['count'] == expected_count
+        expected_data = {
+            'country': {
+                'id': CountryConstant.japan.value.id,
+            },
+        }
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+        for key, _value in expected_data.items():
+            assert any(
+                data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
+            )
+
+    def test_filtering_by_company_on_export_country_history_search(
+        self,
+        es_with_collector,
+        setup_data,
+    ):
+        """
+        Test ExportCountryHistory search app with company param.
+        """
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': setup_data,
+            },
+        )
+
+        expected_data = {
+            'company': {
+                'id': setup_data,
+            },
+        }
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        for key, _value in expected_data.items():
+            assert any(
+                data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
+            )
+
+    def test_filtering_by_company_and_country_on_export_country_history_search(
+        self,
+        es_with_collector,
+        setup_data,
+    ):
+        """
+        Test ExportCountryHistory search app with company param.
+        """
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': setup_data,
+                'country': CountryConstant.canada.value.id,
+            },
+        )
+
+        expected_data = {
+            'company': {
+                'id': setup_data,
+            },
+            'country': {
+                'id': CountryConstant.canada.value.id,
+            },
+        }
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
         for key, _value in expected_data.items():
             assert any(
                 data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
@@ -187,7 +211,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'country': AUSTRALIA_UUID,
+                'country': CountryConstant.japan.value.id,
             },
         )
 

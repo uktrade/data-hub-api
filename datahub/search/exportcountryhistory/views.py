@@ -16,7 +16,6 @@ class ExportCountryHistoryView(SearchAPIView):
 
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
     FILTER_FIELDS = [
-        'history_user',
         'country',
         'company',
     ]
@@ -26,15 +25,4 @@ class ExportCountryHistoryView(SearchAPIView):
         'country': 'country.id',
     }
 
-    # creates "or" query with a list of fields for given filter name
-    # filter must exist in FILTER_FIELDS
-    COMPOSITE_FILTERS = {}
-    # Remappings from sortby values in the request to the actual field path in the search model
-    # e.g. 'name' to 'name.keyword'
-    es_sort_by_remappings = {}
-
     serializer_class = SearchExportCountryHistorySerializer
-    fields_to_include = None
-    fields_to_exclude = None
-
-    http_method_names = ('post',)
