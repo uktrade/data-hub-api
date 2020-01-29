@@ -23,7 +23,7 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 180s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 180s
     env_file: .env
     command: watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A config -l info -Q celery -B
 
