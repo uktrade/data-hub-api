@@ -246,11 +246,7 @@ class AdviserFilter(FilterSet):
 
     class Meta:
         model = Advisor
-        # TODO: Remove unused options following the deprecation period.
         fields = {
-            'first_name': ('exact', 'icontains'),
-            'last_name': ('exact', 'icontains'),
-            'email': ('exact', 'icontains'),
             'is_active': ('exact',),
         }
 
