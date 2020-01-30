@@ -1,6 +1,7 @@
 """Company and related resources view sets."""
-from django.db.models import Prefetch
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django.contrib.auth.models import Group, Permission
+from django.db.models import Exists, Prefetch, Q
+from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
@@ -262,12 +263,59 @@ class ContactAuditViewSet(AuditViewSet):
     queryset = Contact.objects.all()
 
 
+def _build_permission_filter(app_label, codename):
+    """
+    Create a Q object that checks if an adviser has a particular permission.
+
+    All possible places permissions could be stored are checked:
+
+    - directly on the user
+    - in the users' groups
+    - in the user's team role's groups
+    """
+    all_matching_permissions = Permission.objects.filter(
+        content_type__app_label=app_label,
+        codename=codename,
+    ).order_by()
+
+    matching_permission = all_matching_permissions[:1]
+
+    # Use a subquery for groups as joining on the permissions table is very inefficient
+    groups_with_permission = Group.objects.filter(
+        permissions=matching_permission,
+    )
+
+    return Exists(all_matching_permissions) & (
+        Q(is_superuser=True)
+        | Q(user_permissions=matching_permission)
+        | Q(groups__in=groups_with_permission)
+        | Q(dit_team__role__groups__in=groups_with_permission)
+    )
+
+
 class AdviserFilter(FilterSet):
     """Adviser filter."""
 
     autocomplete = AutocompleteFilter(
         search_fields=('first_name', 'last_name', 'dit_team__name'),
     )
+    permissions__has = CharFilter(method='filter_permissions__has')
+
+    @staticmethod
+    def filter_permissions__has(queryset, field_name, value):
+        """
+        Filter advisers by a single permission (e.g. filter to advisers with the
+        'company.add_company' permission).
+
+        Note: An adviser could have the same permission multiple times (in different
+        locations) and so duplicates need be avoided when this is the case. This is
+        done by using a subquery.
+        """
+        app_label, _, codename = value.partition('.')
+        q = _build_permission_filter(app_label, codename)
+        subquery = Advisor.objects.filter(q).values('pk')
+
+        return queryset.filter(pk__in=subquery)
 
     class Meta:
         model = Advisor
