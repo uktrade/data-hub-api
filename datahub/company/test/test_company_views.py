@@ -1901,7 +1901,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                 },
                 {
                     'non_field_errors':
-                        ['A country that was discussed cannot be entered in multiple fields.'],
+                        ['You cannot enter the same country in multiple fields.'],
                 },
             ),
             # export_countries must be fully formed. status must be a valid choice
