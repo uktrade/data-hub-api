@@ -700,7 +700,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
             'This field invalid when export countries feature flag is OFF.',
         ),
         'duplicate_export_country': gettext_lazy(
-            'A country that was discussed cannot be entered in multiple fields.',
+            'You cannot enter the same country in multiple fields.',
         ),
     }
 
