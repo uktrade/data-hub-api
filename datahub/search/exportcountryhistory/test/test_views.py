@@ -27,8 +27,6 @@ FROZEN_DATETIME_1 = datetime(2001, 1, 24, 1, 2, 3, tzinfo=utc)
 FROZEN_DATETIME_2 = datetime(2002, 1, 24, 1, 2, 3, tzinfo=utc)
 FROZEN_DATETIME_3 = datetime(2003, 1, 24, 1, 2, 3, tzinfo=utc)
 
-COMPANY_UUID = 'f9ea83a6-41d7-11ea-a185-3c15c2e46112'
-
 
 @pytest.fixture
 def setup_data():
@@ -43,37 +41,29 @@ def setup_data():
 
     benchmark_company = CompanyFactory()
 
-    export_country_history_items = []
-
     with freeze_time(FROZEN_DATETIME_1):
-        export_country_history_items.append([
-            CompanyExportCountryHistoryFactory(
-                country=benchmark_country_japan,
-                company=benchmark_company,
-            ),
-            CompanyExportCountryHistoryFactory(
-                company=benchmark_company,
-                country=benchmark_country_canada,
-            ),
-            CompanyExportCountryHistoryFactory(
-                country=benchmark_country_canada,
-            ),
-            CompanyExportCountryHistoryFactory(),
-        ])
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_japan,
+            company=benchmark_company,
+        )
+        CompanyExportCountryHistoryFactory(
+            company=benchmark_company,
+            country=benchmark_country_canada,
+        )
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_canada,
+        )
+        CompanyExportCountryHistoryFactory()
 
     with freeze_time(FROZEN_DATETIME_2):
-        export_country_history_items.append([
-            CompanyExportCountryHistoryFactory(
-                country=benchmark_country_japan,
-            ),
-        ])
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_japan,
+        )
 
     with freeze_time(FROZEN_DATETIME_3):
-        export_country_history_items.append([
-            CompanyExportCountryHistoryFactory(
-                country=benchmark_country_japan,
-            ),
-        ])
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_japan,
+        )
 
     yield str(benchmark_company.id)
 
@@ -129,10 +119,10 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
-        for key, _value in expected_data.items():
-            assert any(
-                data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
-            )
+        assert all(
+            data['country']['id'] == expected_data['country']['id']
+            for data in response.data['results']
+        )
 
     def test_filtering_by_company_on_export_country_history_search(
         self,
@@ -161,10 +151,10 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        for key, _value in expected_data.items():
-            assert any(
-                data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
-            )
+        assert all(
+            data['company']['id'] == expected_data['company']['id']
+            for data in response.data['results']
+        )
 
     def test_filtering_by_company_and_country_on_export_country_history_search(
         self,
@@ -197,10 +187,14 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        for key, _value in expected_data.items():
-            assert any(
-                data[key]['id'] == expected_data[key]['id'] for data in response.data['results']
-            )
+        assert all(
+            data['company']['id'] == expected_data['company']['id']
+            for data in response.data['results']
+        )
+        assert all(
+            data['country']['id'] == expected_data['country']['id']
+            for data in response.data['results']
+        )
 
     def test_sorting_in_export_country_history(self, es_with_collector, setup_data):
         """Tests the sorting of country history search response."""

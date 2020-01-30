@@ -34,4 +34,22 @@ def test_updated_interaction_synced(es_with_signals):
         doc_type=ExportCountryHistoryApp.name,
         id=export_country_history.pk,
     )
-    assert result['_source']['history_type'] == history_type
+
+    assert result['_source'] == {
+        'history_user': {
+            'id': str(export_country_history.history_user.id),
+            'name': export_country_history.history_user.name,
+        },
+        'country': {
+            'id': str(export_country_history.country.id),
+            'name': export_country_history.country.name,
+        },
+        'company': {
+            'id': str(export_country_history.company.id),
+            'name': export_country_history.company.name,
+        },
+        'id': str(export_country_history.pk),
+        'history_type': export_country_history.history_type,
+        'history_date': export_country_history.history_date.isoformat(),
+        'status': str(export_country_history.status),
+    }
