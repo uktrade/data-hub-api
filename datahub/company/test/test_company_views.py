@@ -1979,7 +1979,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.json() == expected_error
 
     def _get_export_interest_status(self):
-        """Helper function to randamly select export status"""
+        """Helper function to randomly select export status"""
         export_interest_statuses = [
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
@@ -2047,12 +2047,14 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                 for inner in data_items if inner['status'] == outer['status']
             ] for outer in data_items
         }
-        current_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
-        ]
-        future_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
-        ]
+        current_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            [],
+        )
+        future_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            [],
+        )
 
         url = reverse('api-v4:company:update-export-detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, data=data)
@@ -2108,12 +2110,14 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                 for inner in data_items if inner['status'] == outer['status']
             ] for outer in data_items
         }
-        current_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
-        ]
-        future_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
-        ]
+        current_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            [],
+        )
+        future_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            [],
+        )
 
         url = reverse('api-v4:company:update-export-detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, data=data)
@@ -2282,15 +2286,21 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['export_countries'].sort(key=lambda item: item['country']['name'])
-        current_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        current_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            [],
+        )
+        current_countries_response = [
+            c['id'] for c in response_data.get('export_to_countries', [])
         ]
-        current_countries_response = [c['id'] for c in response_data['export_to_countries']]
 
-        future_countries_request = status_wise_items[
-            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        future_countries_request = status_wise_items.get(
+            CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            [],
+        )
+        future_countries_response = [
+            c['id'] for c in response_data.get('future_interest_countries', [])
         ]
-        future_countries_response = [c['id'] for c in response_data['future_interest_countries']]
 
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response
