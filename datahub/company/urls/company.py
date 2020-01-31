@@ -33,6 +33,10 @@ company_remove_account_manager = CompanyViewSet.as_action_view(
     'remove_account_manager',
 )
 
+update_export_detail = CompanyViewSet.as_action_view(
+    'update_export_detail',
+)
+
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
@@ -61,6 +65,11 @@ urls = [
         'company/<uuid:pk>/one-list-group-core-team',
         one_list_group_core_team,
         name='one-list-group-core-team',
+    ),
+    path(
+        'company/<uuid:pk>/export-detail',
+        update_export_detail,
+        name='update-export-detail',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]
