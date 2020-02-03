@@ -119,7 +119,7 @@ class TestPopulateBillingData:
             billing_address_town='',
             billing_address_county='',
             billing_address_postcode='',
-            billing_address_country=None,
+            billing_address_country_id=None,
 
             company=company,
             contact=ContactFactory.build(),
