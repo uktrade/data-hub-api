@@ -181,10 +181,16 @@ def format_dnb_company(dnb_company):
     company_website = f'http://{domain}' if domain else ''
 
     duns_number = dnb_company.get('duns_number')
-    is_turnover_in_usd = dnb_company.get('annual_sales_currency') == 'USD'
+    turnover_currency = dnb_company.get('annual_sales_currency')
 
-    if not is_turnover_in_usd:
-        logger.error(f'D&B did not have USD turnover for: {duns_number}')
+    if turnover_currency and turnover_currency != 'USD':
+        logger.error(
+            'D&B did not have USD turnover',
+            extra={
+                'duns_number': duns_number,
+                'currency': turnover_currency,
+            },
+        )
         dnb_company.pop('annual_sales', None)
         dnb_company.pop('is_annual_sales_estimated', None)
 
