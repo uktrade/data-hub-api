@@ -12,4 +12,13 @@ urlpatterns = [
         ),
         name='collection',
     ),
+    path(
+        'company-referral/<uuid:pk>',
+        CompanyReferralViewSet.as_view(
+            {
+                'get': 'retrieve',
+            },
+        ),
+        name='item',
+    ),
 ]
