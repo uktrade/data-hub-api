@@ -239,7 +239,7 @@ class TestLoadYamlInMigration:
             with mock.patch('datahub.core.migration_utils.open', mocked_read, create=True):
                 load_yaml_data_in_migration(migration_apps, 'path-to-file.yaml')
         assert str(excinfo.value) == (
-            "[\"'invalid' value must be an integer.\"]: (book:pk=1) field_value was 'invalid'"
+            "['“invalid” value must be an integer.']: (book:pk=1) field_value was 'invalid'"
         )
 
     def test_invalid_field_raises_exception(self, migration_apps):
@@ -260,7 +260,7 @@ class TestLoadYamlInMigration:
             with mock.patch('datahub.core.migration_utils.open', mocked_read, create=True):
                 load_yaml_data_in_migration(migration_apps, 'path-to-file.yaml')
         assert str(excinfo.value) == (
-            "[\"'invalid' value has an invalid date format. It must be in YYYY-MM-DD format.\"]: "
+            "['“invalid” value has an invalid date format. It must be in YYYY-MM-DD format.']: "
             "(book:pk=1) field_value was 'invalid'"
         )
 

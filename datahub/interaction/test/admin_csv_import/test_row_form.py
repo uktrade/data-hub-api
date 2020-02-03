@@ -289,7 +289,7 @@ class TestInteractionCSVRowFormValidation:
                 {'event_id': 'non_existent_event_id'},
                 {
                     'event_id': [
-                        "'non_existent_event_id' is not a valid UUID.",
+                        '“non_existent_event_id” is not a valid UUID.',
                     ],
                 },
                 id='event_id invalid',

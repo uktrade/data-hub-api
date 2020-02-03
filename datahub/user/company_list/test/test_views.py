@@ -153,7 +153,7 @@ class TestListCompanyListsView(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'items__company_id': ["'invalid_id' is not a valid UUID."],
+            'items__company_id': ['“invalid_id” is not a valid UUID.'],
         }
 
     def test_can_filter_by_valid_company_id(self):
