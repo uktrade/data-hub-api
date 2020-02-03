@@ -7,5 +7,12 @@
       Export One List
     </a>
   </li>
+  {% if has_change_permission %}
+  <li>
+    <a href="{% url opts|admin_urlname:'dnb-link-select-ids' %}">
+      Link Company with D&B
+    </a>
+  </li>
+  {% endif %}
   {{block.super}}
 {% endblock %}
