@@ -4,10 +4,16 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
+from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.constants import BusinessTypeConstant, OneListTierID
+from datahub.company.constants import (
+    BusinessTypeConstant,
+    EXPORT_COUNTRIES_FEATURE_FLAG,
+    OneListTierID,
+)
 from datahub.company.models import (
     Advisor,
     Company,
@@ -42,6 +48,7 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -207,7 +214,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
     """
-    CompanyExportCountry serializer.
+    Export country serializer holding `Country` and its status.
     """
 
     country = NestedRelatedField(meta_models.Country)
@@ -220,7 +227,6 @@ class CompanyExportCountrySerializer(serializers.ModelSerializer):
 class CompanySerializer(PermittedFieldsModelSerializer):
     """
     Base Company read/write serializer
-
     Note that there is special validation for company number for UK establishments. This is
     because we don't get UK establishments in our Companies House data file at present, so users
     have to enter company numbers for UK establishments manually.
@@ -248,6 +254,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'uk_establishment_not_in_uk': gettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.',
+        ),
+        'invalid_when_exports_feature_flag_is_on': gettext_lazy(
+            'This field invalid when export countries feature flag is ON.',
         ),
     }
 
@@ -310,11 +319,18 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             for field in self.Meta.dnb_read_only_fields:
                 self.fields[field].read_only = True
 
+    @atomic
     def update(self, instance, validated_data):
         """
         Using writable nested representations to copy export country elements
         from the `Company` model into the `CompanyExportCountry`.
+        Skip this update when feature flag is ON.
         """
+        company = super().update(instance, validated_data)
+
+        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
+            return company
+
         export_to_countries = validated_data.get('export_to_countries')
         future_interest_countries = validated_data.get('future_interest_countries')
         adviser = validated_data.get('modified_by')
@@ -322,8 +338,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             *(export_to_countries or []),
             *(future_interest_countries or []),
         }
-
-        company = super().update(instance, validated_data)
 
         if future_interest_countries is not None:
             self._save_to_company_export_country_model(
@@ -341,10 +355,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
             )
 
+        not_interested_status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested
         CompanyExportCountry.objects.filter(
             company=instance,
         ).exclude(
-            country__in=all_countries,
+            Q(status=not_interested_status) | Q(country__in=all_countries),
         ).delete()
 
         return company
@@ -429,6 +444,24 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 )
 
         return global_headquarters
+
+    def validate_export_to_countries(self, export_to_countries):
+        """This field is invalid when feature flag is active"""
+        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
+            raise serializers.ValidationError(
+                self.error_messages['invalid_when_exports_feature_flag_is_on'],
+            )
+
+        return export_to_countries
+
+    def validate_future_interest_countries(self, future_interest_countries):
+        """This field is invalid when feature flag is active"""
+        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
+            raise serializers.ValidationError(
+                self.error_messages['invalid_when_exports_feature_flag_is_on'],
+            )
+
+        return future_interest_countries
 
     def get_one_list_group_tier(self, obj):
         """
@@ -654,6 +687,100 @@ class RemoveAccountManagerSerializer(serializers.Serializer):
         """Unset the company's One List account manager and tier."""
         self.instance.remove_from_one_list(by)
         return self.instance
+
+
+class UpdateExportDetailsSerializer(serializers.Serializer):
+    """
+    Serializer for updating export related information of a company.
+    For now this updates export countries along with repective status.
+    """
+
+    default_error_messages = {
+        'invalid_when_exports_feature_flag_is_off': gettext_lazy(
+            'This field invalid when export countries feature flag is OFF.',
+        ),
+        'duplicate_export_country': gettext_lazy(
+            'You cannot enter the same country in multiple fields.',
+        ),
+    }
+
+    export_countries = CompanyExportCountrySerializer(many=True, required=True)
+
+    def validate(self, data):
+        """
+        Validate export countries.
+        Updating export countries is not valid when feature flag is ON.
+        And same country can't be added twice.
+        """
+        data = super().validate(data)
+
+        if not is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
+            raise serializers.ValidationError(
+                self.error_messages['invalid_when_exports_feature_flag_is_off'],
+            )
+
+        # check for duplicate countries
+        export_countries = data.get('export_countries', [])
+        countries = [item['country'] for item in export_countries]
+        if len(countries) > len(set(countries)):
+            raise serializers.ValidationError(self.error_messages['duplicate_export_country'])
+
+        return data
+
+    def save(self, adviser):
+        """Save it"""
+        export_countries = self.validated_data.pop('export_countries', [])
+        self._update_export_countries_model(self.instance, export_countries, adviser)
+
+    def _update_export_countries_model(self, company, validated_export_countries, adviser):
+        """
+        Adds/updates export countries related to a company within validated_export_countries.
+        And removes existing ones that are not in the list.
+        """
+        for item in validated_export_countries:
+            country = meta_models.Country.objects.get(id=item['country'].id)
+            status = item['status']
+            company.add_export_country(
+                country=country,
+                status=status,
+                record_date=company.modified_on,
+                adviser=adviser,
+            )
+
+        existing_country_ids = [item.country.id for item in company.export_countries.all()]
+        new_country_ids = [item['country'].id for item in validated_export_countries]
+        country_ids_delta = list(set(existing_country_ids) - set(new_country_ids))
+
+        if country_ids_delta:
+            CompanyExportCountry.objects.filter(
+                company=company,
+                country_id__in=country_ids_delta,
+            ).delete()
+
+        self._sync_to_company_export_country_fields(company, adviser)
+
+    def _sync_to_company_export_country_fields(self, company, adviser):
+        """
+        Helper function to sync data from `ComapnyExportCountry` model back
+        into `Company` export country fields: `exporting_to_countries` and
+        `future_interest_countries`.
+        """
+        currently_exporting_items = CompanyExportCountry.objects.filter(
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        )
+        exporting_to_countries = [item.country for item in currently_exporting_items]
+
+        future_interest_items = CompanyExportCountry.objects.filter(
+            company=company,
+            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        )
+        future_interest_countries = [item.country for item in future_interest_items]
+
+        company.export_to_countries.set(exporting_to_countries)
+        company.future_interest_countries.set(future_interest_countries)
+        company.modified_by = adviser
+        company.save()
 
 
 class PublicCompanySerializer(CompanySerializer):

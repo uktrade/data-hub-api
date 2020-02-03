@@ -143,15 +143,15 @@ def _copy_foreign_key_to_m2m_field(
     # e.g. 'contact_id' for Interaction.contacts
     m2m_reverse_column_name = target_m2m_field.m2m_reverse_name()
 
+    has_no_m2m_values_subquery = ~Exists(
+        m2m_model.objects.filter(**{m2m_column_name: OuterRef('pk')}),
+    )
+
     # Select a batch of rows. The rows are locked to avoid race conditions.
-    batch_queryset = model.objects.select_for_update().annotate(
-        has_m2m_values=Exists(
-            m2m_model.objects.filter(**{m2m_column_name: OuterRef('pk')}),
-        ),
-    ).filter(
+    batch_queryset = model.objects.select_for_update().filter(
+        has_no_m2m_values_subquery,
         **{
             f'{source_fk_field_name}__isnull': False,
-            'has_m2m_values': False,
         },
     ).values(
         'pk',
@@ -229,21 +229,17 @@ def _copy_export_countries(key, status):
 
 def _get_company_countries(source_field, status):
 
-    any_company_country_subquery = Exists(
+    no_company_country_subquery = ~Exists(
         CompanyExportCountry.objects.filter(
             company_id=OuterRef('pk'),
             status=status,
         ),
     )
 
-    batch_queryset = Company.objects.select_for_update().annotate(
-        **{
-            f'has_{source_field}': any_company_country_subquery,
-        },
-    ).filter(
+    batch_queryset = Company.objects.select_for_update().filter(
+        no_company_country_subquery,
         **{
             f'{source_field}__isnull': False,
-            f'has_{source_field}': False,
         },
     ).only(
         'pk',

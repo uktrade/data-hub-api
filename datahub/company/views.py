@@ -27,6 +27,7 @@ from datahub.company.serializers import (
     PublicCompanySerializer,
     RemoveAccountManagerSerializer,
     SelfAssignAccountManagerSerializer,
+    UpdateExportDetailsSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
@@ -142,6 +143,21 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         instance = self.get_object()
         serializer = RemoveAccountManagerSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['patch'], detail=True)
+    def update_export_detail(self, request, *args, **kwargs):
+        """
+        Update export related information for the company.
+        """
+        instance = self.get_object()
+        serializer = UpdateExportDetailsSerializer(
+            instance=instance,
+            data=request.data,
+            partial=True,
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)

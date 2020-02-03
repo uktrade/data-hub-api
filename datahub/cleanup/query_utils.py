@@ -1,5 +1,3 @@
-from secrets import token_urlsafe
-
 from django.db.models import Exists, OuterRef, Q
 from django.db.models.deletion import CASCADE, get_candidate_relations_to_delete
 
@@ -41,13 +39,12 @@ def get_unreferenced_objects_query(
 
     fields = set(get_related_fields(model)) - set(excluded_relations)
 
-    identifiers = [f'ann_{token_urlsafe(6)}' for _ in range(len(fields))]
-
     if relation_exclusion_filter_mapping.keys() - fields:
         raise ValueError('Invalid fields detected in relation_exclusion_filter_mapping.')
 
-    qs = model.objects.all()
-    for identifier, field in zip(identifiers, fields):
+    q = Q()
+
+    for field in fields:
         related_field = field.field
         exclusion_filters = relation_exclusion_filter_mapping.get(field, Q())
         subquery = related_field.model.objects.filter(
@@ -55,11 +52,9 @@ def get_unreferenced_objects_query(
         ).exclude(
             exclusion_filters,
         ).only('pk')
-        qs = qs.annotate(**{identifier: Exists(subquery)})
+        q &= Q(~Exists(subquery))
 
-    filter_args = {identifier: False for identifier in identifiers}
-
-    return qs.filter(**filter_args)
+    return model.objects.filter(q)
 
 
 def get_relations_to_delete(model):
