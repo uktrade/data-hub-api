@@ -11,6 +11,8 @@ from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
 from datahub.company.admin.archiving.unarchive import unarchive_company
+from datahub.company.admin.dnb_link.review_changes import dnb_link_review_changes
+from datahub.company.admin.dnb_link.select_ids import dnb_link_select_ids
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
@@ -269,6 +271,18 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 self.admin_site.admin_view(partial(update_from_dnb, self)),
                 name=f'{model_meta.app_label}_'
                      f'{model_meta.model_name}_update-from-dnb',
+            ),
+            path(
+                'dnb-link/step-1-select-ids/',
+                self.admin_site.admin_view(partial(dnb_link_select_ids, self)),
+                name=f'{model_meta.app_label}_'
+                     f'{model_meta.model_name}_dnb-link-select-ids',
+            ),
+            path(
+                'dnb-link/step-2-review-changes/',
+                self.admin_site.admin_view(partial(dnb_link_review_changes, self)),
+                name=f'{model_meta.app_label}_'
+                     f'{model_meta.model_name}_dnb-link-review-changes',
             ),
             *super().get_urls(),
         ]
