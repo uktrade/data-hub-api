@@ -713,7 +713,7 @@ class TestOrderAssignee:
         assert str(assignee.country_id) == constants.Country.france.value.id
 
         # adviser belonging to a team without country
-        team = TeamFactory(country=None)
+        team = TeamFactory(country_id=None)
         adviser = AdviserFactory(dit_team=team)
         assignee = OrderAssigneeFactory(adviser=adviser)
 
