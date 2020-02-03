@@ -11,10 +11,10 @@ from django.utils.safestring import mark_safe
 from reversion.admin import VersionAdmin
 
 from datahub.company.admin.archiving.unarchive import unarchive_company
-from datahub.company.admin.dnb import update_from_dnb
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
+from datahub.company.admin.update_from_dnb import update_from_dnb
 from datahub.company.models import Company, OneListCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin, get_change_link
 from datahub.core.templatetags.datahub_extras import admin_change_link
