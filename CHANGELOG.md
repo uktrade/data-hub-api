@@ -1,3 +1,21 @@
+# Data Hub API 27.1.0 (2020-02-03)
+
+
+## Internal changes
+
+- **Companies** The `update_from_dnb` admin tool was refactored to break out some useful utilities
+  for use by other modules.  This will aid in the new "Link Company with D&B" tool
+  which will follow shortly.
+- Some data retention and `dbmaintenance` queries were updated to filter on `Exists()` subqueries directly (rather than via an annotation) following the update to Django 3.0.
+- Django was updated from version 2.2.9 to 3.0.3.
+
+## API
+
+- **Companies** A new endpoint `PATCH /v4/company/<pk>/export-detail` was added to allow export related details of a company to be edited, including adding export countries into the new `CompanyExportCountry` model, moving from old company export country fields: `export_to_countries` and `future_interest_countries`.
+
+  If feature flag is OFF, API will work as is updating old fields. And if the feature flag is ON, API will start updating new model instead. In both scenarios, data will be synced across to allow feature flag to be switched ON and OFF when required.
+
+
 # Data Hub API 27.0.0 (2020-01-29)
 
 
