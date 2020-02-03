@@ -1,3 +1,0 @@
-A new endpoint `PATCH /v4/company/<pk>/export-detail` was added to allow export related details of a company to be edited, including adding export countries into the new `CompanyExportCountry` model, moving from old company export country fields: `export_to_countries` and `future_interest_countries`.
-
-If feature flag is OFF, API will work as is updating old fields. And if the feature flag is ON, API will start updating new model instead. In both scenarios, data will be synced across to allow feature flag to be switched ON and OFF when required.
