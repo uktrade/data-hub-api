@@ -8,6 +8,7 @@ urlpatterns = [
         CompanyReferralViewSet.as_view(
             {
                 'post': 'create',
+                'get': 'list',
             },
         ),
         name='collection',
