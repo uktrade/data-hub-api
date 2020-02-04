@@ -1,1 +1,0 @@
-A new endpoint, `GET /v4/company-referral/<id>`, was added. This retrieves a single referral object.
