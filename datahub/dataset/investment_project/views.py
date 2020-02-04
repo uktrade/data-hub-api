@@ -2,12 +2,18 @@ from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
-    get_array_agg_subquery,
     get_empty_string_if_null_expression,
 )
+from datahub.core.query_utils import (
+    get_array_agg_subquery,
+)
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.investment_project.pagination import (
+    InvestmentProjectActivityDatasetViewCursorPagination,
+)
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
+from datahub.investment.project.report.spi import get_spi_report_queryset
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
@@ -129,3 +135,21 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'uk_company_sector',
             'uk_region_location_names',
         )
+
+
+class InvestmentProjectsActivityDatasetView(BaseDatasetView):
+    """
+    An APIView that provides 'get' action which queries and returns desired fields
+    for Investment Projects Activity Dataset to be consumed by Data-flow periodically.
+
+    Activity contains SPI report records and it is linked to Investment Project by Data Hub ID.
+    Because of the way the report is generated, the relevant SPI report fields are attached to
+    Investment Project record in the 'InvestmentProjectActivityDatasetViewCursorPagination'
+    pagination class and at the same time all other fields are being left out.
+    """
+
+    pagination_class = InvestmentProjectActivityDatasetViewCursorPagination
+
+    def get_dataset(self):
+        """Get dataset."""
+        return get_spi_report_queryset()

@@ -3,12 +3,15 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import AdviserFactory, TeamFactory
 from datahub.core.test_utils import (
     format_date_or_datetime,
     get_attr_or_none,
     str_or_none,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.investment.project.proposition.models import PropositionDocument
+from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
     AssignPMInvestmentProjectFactory,
@@ -18,6 +21,64 @@ from datahub.investment.project.test.factories import (
     VerifyWinInvestmentProjectFactory,
     WonInvestmentProjectFactory,
 )
+from datahub.metadata.models import Team
+
+pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def ist_adviser():
+    """Provides IST adviser."""
+    team = TeamFactory(tags=[Team.TAGS.investment_services_team])
+    yield AdviserFactory(dit_team_id=team.id)
+
+
+@pytest.fixture
+def propositions(ist_adviser):
+    """Gets variety of propositions."""
+    investment_project = InvestmentProjectFactory(
+        project_manager=ist_adviser,
+    )
+    adviser = AdviserFactory(
+        first_name='John',
+        last_name='Doe',
+    )
+    items = [
+        PropositionFactory(
+            deadline='2017-01-05',
+            status='ongoing',
+            adviser=adviser,
+            investment_project=investment_project,
+            created_by=ist_adviser,
+        ),
+        PropositionFactory(
+            deadline='2017-01-05',
+            status='ongoing',
+            adviser=adviser,
+            investment_project=investment_project,
+            created_by=ist_adviser,
+        ),
+        PropositionFactory(
+            deadline='2017-01-05',
+            status='ongoing',
+            adviser=adviser,
+            investment_project=investment_project,
+            created_by=ist_adviser,
+        ),
+    ]
+
+    with freeze_time('2017-01-04 11:11:11'):
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=items[1].pk,
+            original_filename='test.txt',
+            created_by=adviser,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+        items[1].complete(by=adviser, details='what')
+
+        items[2].abandon(by=adviser, details='what')
+
+    yield items
 
 
 def get_expected_data_from_project(project):
@@ -187,3 +248,58 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
                                        key=lambda item: item.pk) + [project_1, project_2]
         for index, project in enumerate(expected_project_list):
             assert str(project.id) == response_results[index]['id']
+
+
+class TestInvestmentProjectsActivityDatasetViewSet(BaseDatasetViewTest):
+    """
+    Tests for InvestmentProjectsActivityDatasetView
+
+    It only tests if results are being returned. The results are validated in separate tests
+    in the investment project app.
+    """
+
+    view_url = reverse('api-v4:dataset:investment-projects-activity-dataset')
+    factory = InvestmentProjectFactory
+
+    def test_propositions_are_being_formatted(self, data_flow_api_client, propositions):
+        """Test that returned propositions are being formatted correctly."""
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_results = response.json()['results']
+        assert len(response_results[0]['propositions']) == len(propositions)
+
+        adviser_id = str(propositions[0].adviser_id)
+        assert response_results == [
+            {
+                'propositions': [
+                    {
+                        'deadline': '2017-01-05',
+                        'status': 'ongoing',
+                        'modified_on': '',
+                        'adviser_id': adviser_id,
+                    },
+                    {
+                        'deadline': '2017-01-05',
+                        'status': 'completed',
+                        'modified_on': '2017-01-04T11:11:11+00:00',
+                        'adviser_id': adviser_id,
+                    },
+                    {
+                        'deadline': '2017-01-05',
+                        'status': 'abandoned',
+                        'modified_on': '2017-01-04T11:11:11+00:00',
+                        'adviser_id': adviser_id,
+                    },
+                ],
+                'investment_project_id': str(propositions[0].investment_project.id),
+                'enquiry_processed': '',
+                'enquiry_type': '',
+                'enquiry_processed_by_id': '',
+                'assigned_to_ist': '',
+                'project_manager_assigned': '',
+                'project_manager_assigned_by_id': '',
+                'project_moved_to_won': '',
+                'aftercare_offered_on': '',
+            },
+        ]
