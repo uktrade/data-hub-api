@@ -147,7 +147,16 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['patch'], detail=True)
+    @action(
+        methods=['patch'],
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.change_companyexportcountry',
+            ),
+        ],
+        detail=True,
+    )
     def update_export_detail(self, request, *args, **kwargs):
         """
         Update export related information for the company.
