@@ -5,7 +5,7 @@ from random import sample, shuffle
 import factory
 import pytest
 from django.conf import settings
-from django.db.models import CharField, F, Max, Value
+from django.db.models import CharField, F, Max, Q, Value
 from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
@@ -122,6 +122,46 @@ class TestGetArrayAggSubquery:
             assert Counter(actual_author_names) == Counter(set(names))
         else:
             assert Counter(actual_author_names) == Counter(names)
+
+    @pytest.mark.parametrize(
+        'names,desired_names', (
+            (
+                ['Barbara'], ['Barbara'],
+            ),
+            (
+                ['Barbara', 'Claire'], ['Claire'],
+            ),
+            (
+                ['Barbara', 'Claire', 'John', 'John'], ['Barbara', 'John'],
+            ),
+            (
+                ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
+                ['John', 'Samantha'],
+            ),
+        ),
+    )
+    def test_aggregates_as_filtered_array(self, names, desired_names):
+        """
+        Test that the desired first names of authors for each book can be aggregated into an array
+        for various cases.
+        """
+        authors = PersonFactory.create_batch(
+            len(names),
+            first_name=factory.Iterator(
+                sample(names, len(names)),
+            ),
+        )
+        BookFactory(authors=authors)
+        queryset = Book.objects.annotate(
+            author_names=get_array_agg_subquery(
+                Book.authors.through,
+                'book',
+                'person__first_name',
+                filter=Q(person__first_name__in=desired_names),
+            ),
+        )
+        actual_author_names = queryset.first()
+        assert set(actual_author_names.author_names) == set(desired_names)
 
     @pytest.mark.parametrize(
         'ordering,expected_names',
