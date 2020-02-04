@@ -1,3 +1,22 @@
+# Data Hub API 27.2.0 (2020-02-04)
+
+
+## Features
+
+- **Companies** A view was added to allow admin users to select company ID/duns number for D&B
+  company linking. This forms the first step for the admin D&B link tool. As the
+  tool is not yet complete, it is not linked to from elsewhere in the admin yet.
+
+## API
+
+- **Companies** The `GET /v4/company/<pk>` API endpoint was updated to make sure `export_countries` field is included in the response only when the user has `company.view_companyexportcountry` permission. And omits otherwise.
+
+  The `PATCH /v4/company/<pk>/export-detail` API endpoint was updated to make sure requests from users with `company.change_companyexportcountry` permission are honoured.
+- **Companies** A new endpoint, `GET /v4/company-referral` has been added. It lists referral sent or received by the adviser. 
+  Refer to the API documentation for the schema.
+- **Companies** A new endpoint, `GET /v4/company-referral/<id>`, was added. This retrieves a single referral object.
+
+
 # Data Hub API 27.1.0 (2020-02-03)
 
 
