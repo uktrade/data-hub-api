@@ -236,6 +236,32 @@ def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
         sync_company_with_dnb(company.id)
 
 
+@pytest.mark.parametrize(
+    'error',
+    (
+        DNBServiceError('An error occurred', status_code=504),
+        DNBServiceError('An error occurred', status_code=503),
+        DNBServiceError('An error occurred', status_code=502),
+        DNBServiceError('An error occurred', status_code=500),
+        DNBServiceConnectionError('An error occurred'),
+        DNBServiceTimeoutError('An error occurred'),
+    ),
+)
+def test_sync_company_with_dnb_respects_retry_failures_flag(monkeypatch, error):
+    """
+    Test the sync_company_with_dnb task retries server errors.
+    """
+    company = CompanyFactory(duns_number='123456789')
+
+    # Set up a DNBServiceError with the parametrized status code
+    mocked_get_company = mock.Mock()
+    mocked_get_company.side_effect = error
+    monkeypatch.setattr('datahub.dnb_api.tasks.get_company', mocked_get_company)
+
+    with pytest.raises(error.__class__):
+        sync_company_with_dnb(company.id, retry_failures=False)
+
+
 @pytest.mark.usefixtures('dnb_company_updates_feature_flag')
 class TestGetCompanyUpdates:
     """
