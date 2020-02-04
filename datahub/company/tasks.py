@@ -7,6 +7,7 @@ from django_pglocks import advisory_lock
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models.company import Company
+from datahub.core.utils import log_to_sentry
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
@@ -44,9 +45,10 @@ def _automatic_company_archive(limit, simulate):
     )[:limit]
 
     for company in companies_to_be_archived:
-        message = f'Automatically archived company: {company.id}'
+        message = 'Automatically archived company'
+        extra = {'company_id': str(company.id)}
         if simulate:
-            logger.info(f'[SIMULATION] {message}')
+            log_to_sentry(f'[SIMULATION] {message}', extra=extra)
             continue
         company.archived = True
         company.archived_reason = 'This record was automatically archived due to inactivity'
@@ -58,7 +60,7 @@ def _automatic_company_archive(limit, simulate):
                 'archived_on',
             ],
         )
-        logger.info(message)
+        log_to_sentry(message, extra=extra)
 
 
 @shared_task(
