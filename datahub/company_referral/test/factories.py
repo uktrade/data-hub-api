@@ -11,6 +11,8 @@ class CompanyReferralFactory(factory.django.DjangoModelFactory):
     recipient = factory.SubFactory(AdviserFactory)
     subject = factory.Faker('sentence', nb_words=8)
     notes = factory.Faker('paragraph', nb_sentences=10)
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
 
     class Meta:
         model = 'company_referral.CompanyReferral'

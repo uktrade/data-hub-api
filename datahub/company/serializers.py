@@ -613,6 +613,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         )
         permissions = {
             f'company.{CompanyPermission.view_company_document}': 'archived_documents_url_path',
+            f'company.view_companyexportcountry': 'export_countries',
         }
 
 

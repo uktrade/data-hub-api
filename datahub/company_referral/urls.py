@@ -8,8 +8,18 @@ urlpatterns = [
         CompanyReferralViewSet.as_view(
             {
                 'post': 'create',
+                'get': 'list',
             },
         ),
         name='collection',
+    ),
+    path(
+        'company-referral/<uuid:pk>',
+        CompanyReferralViewSet.as_view(
+            {
+                'get': 'retrieve',
+            },
+        ),
+        name='item',
     ),
 ]
