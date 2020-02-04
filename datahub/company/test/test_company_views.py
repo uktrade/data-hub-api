@@ -2144,13 +2144,11 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         and make sure old ones are removed.
         """
         company = CompanyFactory()
-        export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
-        company.export_countries.set([export_country_one, export_country_two])
-
-        new_countries = list(CountryModel.objects.order_by('id')[:10])
-        # remove one of the initial countries, if exists
-        if export_country_one in new_countries:
-            new_countries.remove(export_country_one)
+        new_countries = list(CountryModel.objects.order_by('id')[:3])
+        CompanyExportCountryFactory(
+            country=new_countries.pop(0),
+            company=company,
+        )
 
         input_data_items = [
             {
