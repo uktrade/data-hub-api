@@ -88,7 +88,7 @@ class TestAutomaticCompanyArchive:
     @freeze_time('2020-01-01-12:00:00')
     def test_no_interactions(
         self,
-        caplog,
+        monkeypatch,
         automatic_company_archive_feature_flag,
         simulate,
     ):
@@ -96,7 +96,11 @@ class TestAutomaticCompanyArchive:
         Test that a company without interaction that fits
         all the other criteria is archived.
         """
-        caplog.set_level(logging.INFO, logger='datahub.company.tasks')
+        mock_log_to_sentry = mock.MagicMock()
+        monkeypatch.setattr(
+            'datahub.company.tasks.log_to_sentry',
+            mock_log_to_sentry,
+        )
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             company = CompanyFactory()
@@ -105,15 +109,17 @@ class TestAutomaticCompanyArchive:
         )
         company.refresh_from_db()
         if simulate:
-            assert caplog.messages == [
-                f'[SIMULATION] Automatically archived company: {company.id}',
-            ]
+            mock_log_to_sentry.assert_called_with(
+                '[SIMULATION] Automatically archived company',
+                extra={'company_id': str(company.id)},
+            )
         else:
             assert task_result.successful()
             assert company.archived
-            assert caplog.messages == [
-                f'Automatically archived company: {company.id}',
-            ]
+            mock_log_to_sentry.assert_called_with(
+                'Automatically archived company',
+                extra={'company_id': str(company.id)},
+            )
 
     @pytest.mark.parametrize(
         'interaction_date_delta, expected_archived',
