@@ -261,6 +261,7 @@ class TestGetCompany(APITestMixin):
             permission_codenames=(
                 'view_company',
                 'view_company_document',
+                'view_companyexportcountry',
             ),
         )
         api_client = self.create_api_client(user=user)
@@ -502,7 +503,7 @@ class TestGetCompany(APITestMixin):
         user = create_test_user(
             permission_codenames=(
                 'view_company',
-                'view_company_document',
+                'view_companyexportcountry',
             ),
         )
         api_client = self.create_api_client(user=user)
@@ -522,6 +523,27 @@ class TestGetCompany(APITestMixin):
                 'status': item.status,
             } for item in company.export_countries.order_by('pk')
         ]
+
+    def test_check_company_dont_return_export_countries_with_no_permission(self):
+        """
+        Tests the company response has no export countries
+        without appropriate permission.
+        """
+        company = CompanyFactory()
+        export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
+        company.export_countries.set([export_country_one, export_country_two])
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+            ),
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'export_countries' not in response.json()
 
     @pytest.mark.parametrize(
         'build_company',
@@ -1394,7 +1416,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         user = create_test_user(
             permission_codenames=(
                 'view_company',
-                'view_company_document',
+                'view_companyexportcountry',
             ),
         )
         api_client = self.create_api_client(user=user)
@@ -1736,6 +1758,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         (
             (),
             (CompanyPermission.change_company,),
+            ('change_companyexportcountry',),
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
@@ -2144,13 +2167,11 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         and make sure old ones are removed.
         """
         company = CompanyFactory()
-        export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
-        company.export_countries.set([export_country_one, export_country_two])
-
-        new_countries = list(CountryModel.objects.order_by('id')[:10])
-        # remove one of the initial countries, if exists
-        if export_country_one in new_countries:
-            new_countries.remove(export_country_one)
+        new_countries = list(CountryModel.objects.order_by('id')[:3])
+        CompanyExportCountryFactory(
+            country=new_countries.pop(0),
+            company=company,
+        )
 
         input_data_items = [
             {

@@ -457,6 +457,12 @@
     - - export_largecapitalinvestorprofile
       - investor_profile
       - largecapitalinvestorprofile
+    - - view_companyexportcountry
+      - company
+      - companyexportcountry
+    - - change_companyexportcountry
+      - company
+      - companyexportcountry
   model: auth.group
 - fields:
     name: Regional account managers
