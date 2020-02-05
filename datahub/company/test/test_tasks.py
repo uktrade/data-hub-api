@@ -96,7 +96,7 @@ class TestAutomaticCompanyArchive:
         Test that a company without interaction that fits
         all the other criteria is archived.
         """
-        mock_log_to_sentry = mock.MagicMock()
+        mock_log_to_sentry = mock.Mock()
         monkeypatch.setattr(
             'datahub.company.tasks.log_to_sentry',
             mock_log_to_sentry,
