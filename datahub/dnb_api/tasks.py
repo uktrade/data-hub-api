@@ -25,17 +25,25 @@ from datahub.feature_flag.utils import is_feature_flag_active
 logger = get_task_logger(__name__)
 
 
-def _sync_company_with_dnb(company_id, fields_to_update, task, update_descriptor):
+def _sync_company_with_dnb(
+    company_id,
+    fields_to_update,
+    task,
+    update_descriptor,
+    retry_failures=True,
+):
     dh_company = Company.objects.get(id=company_id)
 
     try:
         dnb_company = get_company(dh_company.duns_number)
     except DNBServiceError as exc:
-        if is_server_error(exc.status_code):
+        if is_server_error(exc.status_code) and retry_failures:
             raise task.retry(exc=exc, countdown=60)
         raise
     except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
-        raise task.retry(exc=exc, countdown=60)
+        if retry_failures:
+            raise task.retry(exc=exc, countdown=60)
+        raise
 
     update_company_from_dnb(
         dh_company,
@@ -51,7 +59,13 @@ def _sync_company_with_dnb(company_id, fields_to_update, task, update_descriptor
     priority=9,
     max_retries=3,
 )
-def sync_company_with_dnb(self, company_id, fields_to_update=None, update_descriptor=None):
+def sync_company_with_dnb(
+    self,
+    company_id,
+    fields_to_update=None,
+    update_descriptor=None,
+    retry_failures=True,
+):
     """
     Sync a company record with data sourced from DNB. This task will interact with dnb-service to
     get the latest data for the company.
@@ -63,7 +77,7 @@ def sync_company_with_dnb(self, company_id, fields_to_update=None, update_descri
     """
     if not update_descriptor:
         update_descriptor = f'celery:sync_company_with_dnb:{self.request.id}'
-    _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor)
+    _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor, retry_failures)
 
 
 def _record_audit(update_results, producer_task, start_time):
