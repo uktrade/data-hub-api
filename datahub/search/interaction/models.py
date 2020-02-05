@@ -36,6 +36,33 @@ def _dit_participant_list(dit_participant_manager):
     ]
 
 
+def _export_country_field():
+    return Object(
+        properties={
+            'id': Keyword(index=False),
+            'country': Object(
+                properties={
+                    'id': Keyword(),
+                    'name': Text(index=False),
+                }),
+            'status': Object(
+                properties={
+                    'type': Keyword(),
+                }),
+        },
+    )
+
+
+def _export_countries_list(export_countries):
+    return [
+        {
+            'country': dict_utils.id_name_dict(export_country.country),
+            'status': export_country.status,
+        }
+        for export_country in export_countries.all()
+    ]
+
+
 class _DITParticipant(InnerDoc):
     adviser = Object(Person)
     team = Object(IDNameTrigram)
@@ -50,6 +77,7 @@ class Interaction(BaseESModel):
     company_one_list_group_tier = fields.id_unindexed_name_field()
     communication_channel = fields.id_unindexed_name_field()
     contacts = _contact_field()
+    export_countries = _export_country_field()
     created_on = Date()
     date = Date()
     dit_participants = Object(_DITParticipant)
@@ -72,12 +100,14 @@ class Interaction(BaseESModel):
         },
     )
     was_policy_feedback_provided = Boolean()
+    were_countries_discussed = Boolean()
 
     MAPPINGS = {
         'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
         'contacts': dict_utils.contact_or_adviser_list_of_dicts,
         'dit_participants': _dit_participant_list,
+        'export_countries': _export_countries_list,
         'event': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
         'policy_areas': dict_utils.id_name_list_of_dicts,

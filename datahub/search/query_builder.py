@@ -79,6 +79,7 @@ def get_search_by_entity_query(
         ordering=None,
         fields_to_include=None,
         fields_to_exclude=None,
+        chaining_model=None,
 ):
     """
     Performs filtered search for the given term in the given entity.
@@ -92,9 +93,67 @@ def get_search_by_entity_query(
 
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
+    index = entity.get_read_alias() if not chaining_model \
+        else entity.get_multiple_read_aliases(chaining_model)
 
     s = Search(
-        index=entity.get_read_alias(),
+        index=index,
+    ).query(
+        Bool(must=query),
+    )
+
+    permission_query = _build_entity_permission_query(permission_filters)
+    if permission_query:
+        s = s.filter(permission_query)
+
+    s = s.filter(Bool(must=must_filter))
+    s = _apply_sorting_to_query(s, ordering)
+    return _apply_source_filtering_to_query(
+        s,
+        fields_to_include=fields_to_include,
+        fields_to_exclude=fields_to_exclude,
+    )
+
+
+def get_search_by_multiple_entities_query(
+        entity,
+        term=None,
+        filter_data=None,
+        composite_field_mapping=None,
+        permission_filters=None,
+        ordering=None,
+        fields_to_include=None,
+        fields_to_exclude=None,
+        chaining_model=None,
+):
+    """
+    Performs filtered search for the given term in the given entity.
+    """
+    filter_data = filter_data or {}
+    query = [
+        # Term(_type=entity._doc_type.name),
+        # Term(_type=chaining_model._doc_type.name),
+        {
+            'bool': {
+                'must_not': {
+                    'term': {'history_type': 'update'},
+                },
+            },
+        },
+    ]
+
+    if term != '':
+        query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
+
+    filters, ranges = _split_range_fields(filter_data)
+
+    # document must match all filters in the list (and)
+    must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
+    index = entity.get_read_alias() if not chaining_model \
+        else entity.get_multiple_read_aliases(chaining_model)
+
+    s = Search(
+        index=index,
     ).query(
         Bool(must=query),
     )

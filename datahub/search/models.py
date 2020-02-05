@@ -38,9 +38,21 @@ class BaseESModel(Document):
         dynamic = MetaField('false')
 
     @classmethod
-    def get_read_alias(cls):
+    def get_read_alias(cls, *args):
         """Gets the alias to be used for read operations."""
         return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-read'
+
+    @classmethod
+    def get_multiple_read_aliases(cls, *args):
+        """Gets the multiple aliases to be used for read operations."""
+        if args:
+            indexes = [
+                f'{settings.ES_INDEX_PREFIX}-{cl._doc_type.name}-read' for cl in args
+            ]
+            indexes.insert(0, cls.get_read_alias())
+            return indexes
+        else:
+            return cls.get_read_alias()
 
     @classmethod
     def get_write_alias(cls):

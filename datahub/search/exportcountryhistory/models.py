@@ -12,7 +12,7 @@ class ExportCountryHistory(BaseESModel):
     id = Keyword()
     history_date = Date(index=False)
     history_user = fields.id_unindexed_name_field()
-    history_type = Keyword(index=False)
+    history_type = Keyword()
     country = fields.id_unindexed_name_field()
 
     company = fields.id_unindexed_name_field()

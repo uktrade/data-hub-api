@@ -6,7 +6,6 @@ from datahub.search.serializers import (
     SingleOrListField,
     StringUUIDField,
 )
-from datahub.search.utils import SearchOrdering, SortDirection
 
 
 class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
@@ -16,6 +15,7 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)
     company_one_list_group_tier = SingleOrListField(child=StringUUIDField(), required=False)
+    country = SingleOrListField(child=StringUUIDField(), required=False)
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
     created_on_exists = serializers.BooleanField(required=False)
@@ -29,7 +29,8 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     was_policy_feedback_provided = serializers.BooleanField(required=False)
 
-    DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
+    # TODO: re-enable this once history_date filed is renamed
+    # DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
 
     SORT_BY_FIELDS = (
         'company.name',

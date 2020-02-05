@@ -1,14 +1,12 @@
 from logging import getLogger
 
 from django.utils.translation import gettext_lazy
-from rest_framework import serializers
 
 from datahub.search.serializers import (
     EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
-from datahub.search.utils import SearchOrdering, SortDirection
 
 logger = getLogger(__name__)
 
@@ -22,20 +20,21 @@ class SearchExportCountryHistorySerializer(EntitySearchQuerySerializer):
         ),
     }
 
-    DEFAULT_ORDERING = SearchOrdering('history_date', SortDirection.desc)
+    # TODO: re-enable these once the history_date field is updated
+    # DEFAULT_ORDERING = SearchOrdering('history_date', SortDirection.desc)
 
-    SORT_BY_FIELDS = (
-        'history_date',
-    )
+    # SORT_BY_FIELDS = (
+    #     'history_date',
+    # )
 
     country = SingleOrListField(child=StringUUIDField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
 
-    def validate(self, data):
-        """Serializer should have at least one parameter"""
-        if 'country' not in data and 'company' not in data:
-            raise serializers.ValidationError(
-                self.error_messages['no_empty_field'],
-            )
-
-        return data
+    # def validate(self, data):
+    #     """Serializer should have at least one parameter"""
+    #     if 'country' not in data and 'company' not in data:
+    #         raise serializers.ValidationError(
+    #             self.error_messages['no_empty_field'],
+    #         )
+    #
+    #     return data
