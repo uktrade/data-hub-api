@@ -48,6 +48,7 @@ def _automatic_company_archive(limit, simulate):
         message = 'Automatically archived company'
         extra = {'company_id': str(company.id)}
         if simulate:
+            logger.info(f'[SIMULATION] {message}', extra=extra)
             log_to_sentry(f'[SIMULATION] {message}', extra=extra)
             continue
         company.archived = True
@@ -60,6 +61,7 @@ def _automatic_company_archive(limit, simulate):
                 'archived_on',
             ],
         )
+        logger.info(message, extra=extra)
         log_to_sentry(message, extra=extra)
 
 
