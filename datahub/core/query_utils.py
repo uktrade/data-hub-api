@@ -85,6 +85,7 @@ def get_array_agg_subquery(
     model,
     join_field_name,
     expression_to_aggregate,
+    filter=None,
     distinct=False,
     ordering=(),
 ):
@@ -112,6 +113,15 @@ def get_array_agg_subquery(
             ),
         )
 
+        Interaction.objects.annotate(
+            adviser_first_names=get_array_agg_subquery(
+                InteractionDITParticipant,
+                'interaction',
+                'first_name,
+                filter=Q('first_name__startswith='A'),
+            ),
+        )
+
     Note: The usage of this function differs from `get_string_agg_subquery()`, as this function
     omits the outer model from the subquery to avoid unwanted NULL values appearing in the
     returned arrays when rows don't have any values in the intermediate model being queried.
@@ -124,7 +134,12 @@ def get_array_agg_subquery(
     """
     return get_aggregate_subquery(
         model,
-        ArrayAgg(expression_to_aggregate, distinct=distinct, ordering=ordering),
+        ArrayAgg(
+            expression_to_aggregate,
+            distinct=distinct,
+            ordering=ordering,
+            filter=filter,
+        ),
         join_field_name=join_field_name,
     )
 

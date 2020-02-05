@@ -9,6 +9,48 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.core.utils import reverse_with_query_string
 
 
+class TestLinkCompanyLink(AdminTestMixin):
+    """
+    Tests the 'Link Company with D&B' link on the change list.
+    """
+
+    def test_link_exists(self):
+        """
+        Test that the link exists for a user with the change company permission.
+        """
+        list_route_name = admin_urlname(Company._meta, 'changelist')
+        list_url = reverse(list_route_name)
+
+        response = self.client.get(list_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        company_link_route_name = admin_urlname(Company._meta, 'dnb-link-select-ids')
+        company_link_url = reverse(company_link_route_name)
+
+        assert company_link_url in response.rendered_content
+
+    def test_link_does_not_exist_with_only_view_permission(self):
+        """
+        Test that the link does not exist for a user with only the view company permission.
+        """
+        list_route_name = admin_urlname(Company._meta, 'changelist')
+        list_url = reverse(list_route_name)
+
+        user = create_test_user(
+            permission_codenames=(CompanyPermission.view_company,),
+            is_staff=True,
+            password=self.PASSWORD,
+        )
+        client = self.create_client(user=user)
+        response = client.get(list_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        company_link_route_name = admin_urlname(Company._meta, 'dnb-link-select-ids')
+        company_link_url = reverse(company_link_route_name)
+
+        assert company_link_url not in response.rendered_content
+
+
 class TestSelectIDsViewGet(AdminTestMixin):
     """
     Test response for GET requests on the select IDs view.

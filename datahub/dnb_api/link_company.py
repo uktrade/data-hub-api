@@ -32,7 +32,10 @@ def link_company_with_dnb(
     company.save()
     sync_company_with_dnb.apply(
         args=(company.id,),
-        kwargs={'update_descriptor': update_descriptor},
+        kwargs={
+            'update_descriptor': update_descriptor,
+            'retry_failures': False,
+        },
         throw=True,
     )
     company.refresh_from_db()
