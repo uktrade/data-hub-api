@@ -1,3 +1,37 @@
+# Data Hub API 27.3.0 (2020-02-05)
+
+
+## Features
+
+- **Companies** A button was added to the admin company change list "Link Company With D&B" which
+  puts the D&B link tool live for admin users.
+- **Companies** A view was added to allow admin users to review and confirm changes that will 
+  be made for D&B company linking.
+
+## API
+
+- **Investment** The `GET /v4/dataset/investment-projects-activity-dataset` has been added. The endpoint returns SPI report records for 
+  corresponding investment projects. The response has following fields:
+ 
+    - investment_project_id
+    - enquiry_processed
+    - enquiry_type
+    - enquiry_processed_by_id
+    - assigned_to_ist
+    - project_manager_assigned
+    - project_manager_assigned_by_id
+    - project_moved_to_won
+    - aftercare_offered_on
+    - propositions
+
+      The propositions is an array with following fields:
+    
+      - deadline
+      - status
+      - modified_on
+      - adviser_id
+
+
 # Data Hub API 27.2.0 (2020-02-04)
 
 
