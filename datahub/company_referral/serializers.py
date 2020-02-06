@@ -10,6 +10,7 @@ class CompanyReferralSerializer(serializers.ModelSerializer):
 
     company = NestedRelatedField('company.Company')
     contact = NestedRelatedField('company.Contact', required=False, allow_null=True)
+    completed_by = NestedAdviserWithEmailAndTeamField(read_only=True)
     created_by = NestedAdviserWithEmailAndTeamField(read_only=True)
     recipient = NestedAdviserWithEmailAndTeamField()
 
@@ -18,6 +19,7 @@ class CompanyReferralSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'company',
+            'completed_by',
             'completed_on',
             'contact',
             'created_by',
