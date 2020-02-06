@@ -81,7 +81,7 @@ class TestAddInteraction(APITestMixin):
             # empty string not allowed for theme
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
@@ -101,7 +101,7 @@ class TestAddInteraction(APITestMixin):
             # invalid theme not allowed
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
@@ -143,7 +143,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -178,7 +178,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -237,7 +237,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -606,9 +606,9 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'current_status,new_status',
         (
-            (Interaction.STATUSES.draft, Interaction.STATUSES.draft),
-            (Interaction.STATUSES.draft, Interaction.STATUSES.complete),
-            (Interaction.STATUSES.complete, Interaction.STATUSES.complete),
+            (Interaction.Status.DRAFT, Interaction.Status.DRAFT),
+            (Interaction.Status.DRAFT, Interaction.Status.COMPLETE),
+            (Interaction.Status.COMPLETE, Interaction.Status.COMPLETE),
         ),
     )
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -633,17 +633,17 @@ class TestUpdateInteraction(APITestMixin):
         'current_status,new_status,response_body',
         (
             (
-                Interaction.STATUSES.draft,
+                Interaction.Status.DRAFT,
                 None,
                 {'status': ['This field may not be null.']},
             ),
             (
-                Interaction.STATUSES.complete,
-                Interaction.STATUSES.draft,
+                Interaction.Status.COMPLETE,
+                Interaction.Status.DRAFT,
                 {'non_field_errors': ['The status of a complete interaction cannot change.']},
             ),
             (
-                Interaction.STATUSES.complete,
+                Interaction.Status.COMPLETE,
                 None,
                 {'status': ['This field may not be null.']},
             ),
@@ -864,7 +864,7 @@ class TestInteractionVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:interaction:collection'),
             data={
-                'kind': Interaction.KINDS.interaction,
+                'kind': Interaction.Kind.INTERACTION,
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
@@ -898,7 +898,7 @@ class TestInteractionVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:interaction:collection'),
             data={
-                'kind': Interaction.KINDS.interaction,
+                'kind': Interaction.Kind.INTERACTION,
             },
         )
 

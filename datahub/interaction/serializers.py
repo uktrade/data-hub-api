@@ -402,7 +402,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
             'net_company_receipt': {'min_value': 0},
-            'status': {'default': Interaction.STATUSES.complete},
+            'status': {'default': Interaction.Status.COMPLETE},
             'theme': {
                 'allow_blank': False,
                 'default': None,
@@ -464,36 +464,36 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'required',
                     OperatorRule('communication_channel', bool),
                     when=AndRule(
-                        EqualsRule('kind', Interaction.KINDS.interaction),
-                        EqualsRule('status', Interaction.STATUSES.complete),
+                        EqualsRule('kind', Interaction.Kind.INTERACTION),
+                        EqualsRule('status', Interaction.Status.COMPLETE),
                     ),
                 ),
                 ValidationRule(
                     'required',
                     OperatorRule('service', bool),
-                    when=EqualsRule('status', Interaction.STATUSES.complete),
+                    when=EqualsRule('status', Interaction.Status.COMPLETE),
                 ),
                 ValidationRule(
                     'invalid_for_investment',
-                    EqualsRule('kind', Interaction.KINDS.interaction),
-                    when=EqualsRule('theme', Interaction.THEMES.investment),
+                    EqualsRule('kind', Interaction.Kind.INTERACTION),
+                    when=EqualsRule('theme', Interaction.Theme.INVESTMENT),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
                     OperatorRule('communication_channel', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'invalid_for_non_service_delivery',
                     OperatorRule('is_event', is_blank),
                     OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=EqualsRule('kind', Interaction.Kind.INTERACTION),
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
@@ -512,7 +512,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('is_event', is_not_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                 ),
                 ValidationRule(
                     'too_many_contacts_for_event_service_delivery',
@@ -532,7 +532,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     'invalid_for_investment',
                     OperatorRule('were_countries_discussed', not_),
                     OperatorRule('export_countries', not_),
-                    when=EqualsRule('theme', Interaction.THEMES.investment),
+                    when=EqualsRule('theme', Interaction.Theme.INVESTMENT),
                 ),
                 ValidationRule(
                     'required',
@@ -542,7 +542,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),
@@ -553,7 +553,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         OperatorRule('were_countries_discussed', bool),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),
@@ -566,7 +566,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                         OperatorRule('were_countries_discussed', not_),
                         InRule(
                             'theme',
-                            [Interaction.THEMES.export, Interaction.THEMES.other],
+                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
                 ),
@@ -578,7 +578,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', bool),
                     when=AndRule(
                         OperatorRule('is_event', bool),
-                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                        EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                     ),
                 ),
                 ValidationRule(
@@ -586,7 +586,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', not_),
                     when=AndRule(
                         OperatorRule('is_event', not_),
-                        EqualsRule('kind', Interaction.KINDS.service_delivery),
+                        EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
                     ),
                 ),
             ),

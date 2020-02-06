@@ -111,8 +111,8 @@ class TestInteractionCSVRowFormValidation:
             ),
             pytest.param(
                 {
-                    'kind': Interaction.KINDS.service_delivery,
-                    'theme': Interaction.THEMES.investment,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
+                    'theme': Interaction.Theme.INVESTMENT,
                 },
                 {
                     'kind': ["This value can't be selected for investment interactions."],
@@ -278,7 +278,7 @@ class TestInteractionCSVRowFormValidation:
             pytest.param(
                 {
                     'communication_channel': '',
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                 },
                 {
                     'communication_channel': ['This field is required.'],
@@ -316,7 +316,7 @@ class TestInteractionCSVRowFormValidation:
             # This error comes from the serialiser validation rules
             pytest.param(
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'event_id': lambda: str(EventFactory().pk),
                 },
                 {
@@ -326,7 +326,7 @@ class TestInteractionCSVRowFormValidation:
             ),
             pytest.param(
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'service': lambda: ServiceAnswerOptionFactory().question.service.name,
                     'service_answer': 'Feline super heroes',
                 },
@@ -339,7 +339,7 @@ class TestInteractionCSVRowFormValidation:
             ),
             pytest.param(
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'service': lambda: ServiceFactory().name,
                     'service_answer': 'Feline friends',
                 },
@@ -353,7 +353,7 @@ class TestInteractionCSVRowFormValidation:
             ),
             pytest.param(
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'service': lambda: ServiceAnswerOptionFactory().question.service.name,
                     'service_answer': '',
                 },
@@ -374,8 +374,8 @@ class TestInteractionCSVRowFormValidation:
         communication_channel = random_communication_channel()
 
         resolved_data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -502,8 +502,8 @@ class TestInteractionCSVRowFormValidation:
             )
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
 
@@ -623,8 +623,8 @@ class TestInteractionCSVRowFormValidation:
             duplicate_tracker.add_item(resolved_duplicate_item)
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
 
@@ -651,8 +651,8 @@ class TestInteractionCSVRowFormValidation:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'service': service.name,
@@ -718,8 +718,8 @@ class TestInteractionCSVRowFormSerializerUsage:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -784,8 +784,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         communication_channel = random_communication_channel()
 
         resolved_data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
@@ -801,7 +801,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
     @pytest.mark.parametrize(
         'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.service_delivery),
+        (Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY),
     )
     @pytest.mark.parametrize(
         'field,object_creator,input_transformer',
@@ -873,7 +873,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         obj = object_creator()
 
         resolved_data = {
-            'theme': Interaction.THEMES.export,
+            'theme': Interaction.Theme.EXPORT,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -913,8 +913,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         obj = object_creator()
 
         resolved_data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -967,8 +967,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         obj = object_creator()
 
         resolved_data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.service_delivery,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -983,7 +983,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
     @pytest.mark.parametrize(
         'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.service_delivery),
+        (Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY),
     )
     def test_subject_falls_back_to_service(self, kind):
         """Test that if subject is not specified, the name of the service is used instead."""
@@ -993,7 +993,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
+            'theme': Interaction.Theme.EXPORT,
             'kind': kind,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
@@ -1034,8 +1034,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'service': service.name,
@@ -1073,8 +1073,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': 'person@company.com',
@@ -1163,8 +1163,8 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         communication_channel = random_communication_channel()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -1190,7 +1190,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'notes': '',
             'service': service,
             'service_answers': None,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'subject': service.name,
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
@@ -1204,8 +1204,8 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         event = EventFactory()
 
         data = {
-            'theme': Interaction.THEMES.other,
-            'kind': Interaction.KINDS.service_delivery,
+            'theme': Interaction.Theme.OTHER,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -1234,7 +1234,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'notes': data['notes'],
             'service': service,
             'service_answers': None,
-            'status': Interaction.STATUSES.complete,
+            'status': Interaction.Status.COMPLETE,
             'subject': data['subject'],
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
@@ -1255,8 +1255,8 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -1274,7 +1274,7 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.communication_channel == communication_channel
         assert interaction.service == service
-        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.status == Interaction.Status.COMPLETE
         assert interaction.subject == service.name
         assert interaction.event is None
         assert interaction.notes == ''
@@ -1300,8 +1300,8 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.service_delivery,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
             'date': '02/03/2018',
             'adviser_1': adviser_1.name,
             'adviser_2': adviser_2.name,
@@ -1322,7 +1322,7 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
         assert interaction.event == event
         assert interaction.service == service
-        assert interaction.status == Interaction.STATUSES.complete
+        assert interaction.status == Interaction.Status.COMPLETE
         assert interaction.subject == data['subject']
         assert interaction.event == event
         assert interaction.notes == data['notes']
@@ -1356,8 +1356,8 @@ class TestInteractionCSVRowFormSaving:
         service_answer = ServiceAnswerOptionFactory()
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -1388,8 +1388,8 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
             'contact_email': 'non-existent-contact@company.com',
@@ -1419,8 +1419,8 @@ class TestInteractionCSVRowFormSaving:
         source = {'test-source': 'test-value'}
 
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '02/03/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,

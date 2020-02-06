@@ -302,8 +302,8 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
                 'communication_channel',
             ),
             (
-                Interaction.THEMES.export,
-                Interaction.KINDS.interaction,
+                Interaction.Theme.EXPORT,
+                Interaction.Kind.INTERACTION,
                 '01/01/2018',
                 adviser.name,
                 'person@company.uk',
