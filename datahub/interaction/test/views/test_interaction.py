@@ -59,7 +59,7 @@ class TestAddInteraction(APITestMixin):
             },
             # company interaction with investment theme
             {
-                'theme': Interaction.THEMES.investment,
+                'theme': Interaction.Theme.INVESTMENT,
             },
             # company interaction with blank notes
             {
@@ -71,7 +71,7 @@ class TestAddInteraction(APITestMixin):
             },
             # interaction with a status
             {
-                'status': Interaction.STATUSES.draft,
+                'status': Interaction.Status.DRAFT,
             },
             # investment project interaction
             {
@@ -98,7 +98,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -120,8 +120,8 @@ class TestAddInteraction(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
-            'kind': Interaction.KINDS.interaction,
-            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'kind': Interaction.Kind.INTERACTION,
+            'status': request_data.get('status', Interaction.Status.COMPLETE),
             'theme': request_data.get('theme', None),
             'is_event': None,
             'service_delivery_status': None,
@@ -202,12 +202,12 @@ class TestAddInteraction(APITestMixin):
         (
             # company interaction with export theme
             {
-                'theme': Interaction.THEMES.export,
+                'theme': Interaction.Theme.EXPORT,
                 'were_countries_discussed': False,
             },
             # export countries in an interaction (export and other)
             {
-                'theme': Interaction.THEMES.export,
+                'theme': Interaction.Theme.EXPORT,
                 'were_countries_discussed': True,
                 'export_countries': [
                     {
@@ -221,7 +221,7 @@ class TestAddInteraction(APITestMixin):
                 ],
             },
             {
-                'theme': Interaction.THEMES.other,
+                'theme': Interaction.Theme.OTHER,
                 'were_countries_discussed': True,
                 'export_countries': [
                     {
@@ -254,7 +254,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -276,8 +276,8 @@ class TestAddInteraction(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
-            'kind': Interaction.KINDS.interaction,
-            'status': request_data.get('status', Interaction.STATUSES.complete),
+            'kind': Interaction.Kind.INTERACTION,
+            'status': request_data.get('status', Interaction.Status.COMPLETE),
             'theme': request_data.get('theme', None),
             'is_event': None,
             'service_delivery_status': None,
@@ -366,7 +366,7 @@ class TestAddInteraction(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -377,7 +377,7 @@ class TestAddInteraction(APITestMixin):
             'contacts': [contact.pk],
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
-            'theme': Interaction.THEMES.export,
+            'theme': Interaction.Theme.EXPORT,
             'were_countries_discussed': True,
             'export_countries': [
                 {
@@ -462,7 +462,7 @@ class TestAddInteraction(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'date': interaction_date,
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'dit_participants': [
@@ -472,7 +472,7 @@ class TestAddInteraction(APITestMixin):
             'contacts': [contact.pk],
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
-            'theme': Interaction.THEMES.export,
+            'theme': Interaction.Theme.EXPORT,
             'were_countries_discussed': True,
             'export_countries': [
                 {
@@ -501,7 +501,7 @@ class TestAddInteraction(APITestMixin):
             # required fields
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                 },
                 {
                     'contacts': ['This field is required.'],
@@ -517,7 +517,7 @@ class TestAddInteraction(APITestMixin):
             # required fields
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -538,7 +538,7 @@ class TestAddInteraction(APITestMixin):
             # communication_channel required for complete interaction
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -559,7 +559,7 @@ class TestAddInteraction(APITestMixin):
             # policy feedback fields required when policy feedback provided
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -584,7 +584,7 @@ class TestAddInteraction(APITestMixin):
             # policy feedback fields cannot be blank when policy feedback provided
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -612,8 +612,8 @@ class TestAddInteraction(APITestMixin):
             # were_countries_discussed can't be null for export interactions
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -635,8 +635,8 @@ class TestAddInteraction(APITestMixin):
             # were_countries_discussed can't be null for other interactions
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.other,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.OTHER,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -659,8 +659,8 @@ class TestAddInteraction(APITestMixin):
             # were_countries_discussed can't be missing for export/other interactions
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -682,8 +682,8 @@ class TestAddInteraction(APITestMixin):
             # were_countries_discussed can't be missing when sending export_countries
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -718,8 +718,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries cannot be blank when were_countries_discussed is True
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -745,8 +745,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries cannot have same country more than once for a company
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -786,8 +786,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries must be fully formed. Status can't be missing
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -816,8 +816,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries must be fully formed. Country can't be missing
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -848,8 +848,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries must be fully formed. status must be a valid choice
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -881,8 +881,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries must be fully formed. country ID must be a valid UUID
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -915,8 +915,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries must be fully formed. country UUID must be a valid Country
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -956,8 +956,8 @@ class TestAddInteraction(APITestMixin):
             # export_countries cannot be set when were_countries_discussed is False
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
-                    'theme': Interaction.THEMES.export,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -992,7 +992,7 @@ class TestAddInteraction(APITestMixin):
             # fields not allowed
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -1040,7 +1040,7 @@ class TestAddInteraction(APITestMixin):
             # fields where None is not allowed
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
@@ -1066,7 +1066,7 @@ class TestAddInteraction(APITestMixin):
             # no contradictory messages if event is None but and is_event is True
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1091,7 +1091,7 @@ class TestAddInteraction(APITestMixin):
             # no duplicate messages for event if provided and is_event is False
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1117,7 +1117,7 @@ class TestAddInteraction(APITestMixin):
             # dit_participants cannot be empty list
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1139,7 +1139,7 @@ class TestAddInteraction(APITestMixin):
             # status must be a valid choice
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1163,7 +1163,7 @@ class TestAddInteraction(APITestMixin):
             # service must be without children
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1185,7 +1185,7 @@ class TestAddInteraction(APITestMixin):
 
             (
                 {
-                    'kind': Interaction.KINDS.interaction,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1207,8 +1207,8 @@ class TestAddInteraction(APITestMixin):
             # were_countries_discussed can't be true for investment theme
             (
                 {
-                    'theme': Interaction.THEMES.investment,
-                    'kind': Interaction.KINDS.interaction,
+                    'theme': Interaction.Theme.INVESTMENT,
+                    'kind': Interaction.Kind.INTERACTION,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1246,8 +1246,8 @@ class TestAddInteraction(APITestMixin):
         when feature flas is off.
         """
         data = {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': date.today().isoformat(),
             'subject': 'whatever',
             'company': lambda: CompanyFactory(name='Martian Island'),
@@ -1304,7 +1304,7 @@ class TestAddInteraction(APITestMixin):
         response = api_client.post(
             url,
             data={
-                'kind': Interaction.KINDS.interaction,
+                'kind': Interaction.Kind.INTERACTION,
                 'company': company.pk,
                 'contacts': [contact.pk],
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
@@ -1343,7 +1343,7 @@ class TestAddInteraction(APITestMixin):
         response = api_client.post(
             url,
             data={
-                'kind': Interaction.KINDS.interaction,
+                'kind': Interaction.Kind.INTERACTION,
                 'company': CompanyFactory().pk,
                 'contacts': [ContactFactory().pk],
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
@@ -1377,7 +1377,7 @@ class TestAddInteraction(APITestMixin):
         response = api_client.post(
             url,
             data={
-                'kind': Interaction.KINDS.interaction,
+                'kind': Interaction.Kind.INTERACTION,
                 'company': CompanyFactory().pk,
                 'contacts': [ContactFactory().pk],
                 'communication_channel': random_obj_for_model(CommunicationChannel).pk,
@@ -1426,8 +1426,8 @@ class TestGetInteraction(APITestMixin):
         response_data['dit_participants'].sort(key=lambda item: item['adviser']['id'])
         assert response_data == {
             'id': response_data['id'],
-            'kind': Interaction.KINDS.interaction,
-            'status': Interaction.STATUSES.complete,
+            'kind': Interaction.Kind.INTERACTION,
+            'status': Interaction.Status.COMPLETE,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -1548,8 +1548,8 @@ class TestGetInteraction(APITestMixin):
         )
         assert response_data == {
             'id': response_data['id'],
-            'kind': Interaction.KINDS.interaction,
-            'status': Interaction.STATUSES.complete,
+            'kind': Interaction.Kind.INTERACTION,
+            'status': Interaction.Status.COMPLETE,
             'theme': interaction.theme,
             'is_event': None,
             'service_delivery_status': None,
@@ -1763,7 +1763,7 @@ class TestUpdateInteraction(APITestMixin):
         (
             (
                 None,
-                Interaction.THEMES.export,
+                Interaction.Theme.EXPORT,
             ),
             (
                 None,
@@ -1788,7 +1788,7 @@ class TestUpdateInteraction(APITestMixin):
 
     def test_cannot_unset_theme(self):
         """Test that a theme can't be removed from an interaction."""
-        interaction = CompanyInteractionFactory(theme=Interaction.THEMES.export)
+        interaction = CompanyInteractionFactory(theme=Interaction.Theme.EXPORT)
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(
@@ -1808,7 +1808,7 @@ class TestUpdateInteraction(APITestMixin):
         (
             (
                 {
-                    'status': Interaction.STATUSES.complete,
+                    'status': Interaction.Status.COMPLETE,
                     'service': Service.inbound_referral.value.id,
                 },
                 {
@@ -1817,7 +1817,7 @@ class TestUpdateInteraction(APITestMixin):
             ),
             (
                 {
-                    'status': Interaction.STATUSES.complete,
+                    'status': Interaction.Status.COMPLETE,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                 },
                 {
@@ -1835,8 +1835,8 @@ class TestUpdateInteraction(APITestMixin):
         """
         requester = create_test_user(permission_codenames=permissions)
         draft_interaction = CompanyInteractionFactory(
-            kind=Interaction.KINDS.interaction,
-            status=Interaction.STATUSES.draft,
+            kind=Interaction.Kind.INTERACTION,
+            status=Interaction.Status.DRAFT,
             service_id=None,
             communication_channel=None,
         )
@@ -1909,7 +1909,7 @@ class TestUpdateInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         interaction = CompanyInteractionFactory(
             subject='I am a subject',
-            theme=Interaction.THEMES.export,
+            theme=Interaction.Theme.EXPORT,
         )
 
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0

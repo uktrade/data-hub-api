@@ -5,7 +5,6 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import CompanyExportCountry
@@ -151,13 +150,13 @@ class ServiceAnswerOption(BaseOrderedConstantModel):
 class ServiceAdditionalQuestion(BaseOrderedConstantModel):
     """Service additional question model."""
 
-    TYPES = Choices(
-        ('text', 'Text'),
-        ('money', 'Money'),
-    )
+    class Type(models.TextChoices):
+        TEXT = ('text', 'Text')
+        MONEY = ('money', 'Money')
+
     type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=TYPES,
+        choices=Type.choices,
     )
 
     is_required = models.BooleanField(default=False)
@@ -173,35 +172,33 @@ class ServiceAdditionalQuestion(BaseOrderedConstantModel):
 class Interaction(ArchivableModel, BaseModel):
     """Interaction."""
 
-    KINDS = Choices(
-        ('interaction', 'Interaction'),
-        ('service_delivery', 'Service delivery'),
-    )
+    class Kind(models.TextChoices):
+        INTERACTION = ('interaction', 'Interaction')
+        SERVICE_DELIVERY = ('service_delivery', 'Service delivery')
 
-    STATUSES = Choices(
-        ('draft', 'Draft'),
-        ('complete', 'Complete'),
-    )
+    class Status(models.TextChoices):
+        DRAFT = ('draft', 'Draft')
+        COMPLETE = ('complete', 'Complete')
 
-    THEMES = Choices(
-        (None, 'Not set'),
-        ('export', 'Export'),
-        ('investment', 'Investment'),
-        ('other', 'Something else'),
-    )
+    class Theme(models.TextChoices):
+        EXPORT = ('export', 'Export')
+        INVESTMENT = ('investment', 'Investment')
+        OTHER = ('other', 'Something else')
+
+        __empty__ = 'Not set'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     theme = models.CharField(
         max_length=MAX_LENGTH,
-        choices=THEMES,
+        choices=Theme.choices,
         null=True,
         blank=True,
     )
-    kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
+    kind = models.CharField(max_length=MAX_LENGTH, choices=Kind.choices)
     status = models.CharField(
         max_length=MAX_LENGTH,
-        choices=STATUSES,
-        default=STATUSES.complete,
+        choices=Status.choices,
+        default=Status.COMPLETE,
     )
     # Set if the interaction was imported from an external source
     # (e.g. an .ics (iCalendar) file or a CSV file).
@@ -301,7 +298,7 @@ class Interaction(ArchivableModel, BaseModel):
     @property
     def is_event(self):
         """Whether this service delivery is for an event."""
-        if self.kind == self.KINDS.service_delivery:
+        if self.kind == self.Kind.SERVICE_DELIVERY:
             return bool(self.event)
         return None
 

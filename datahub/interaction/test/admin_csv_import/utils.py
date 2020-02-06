@@ -65,8 +65,8 @@ def make_matched_rows(num_records):
 
     return [
         {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact.email,
@@ -91,8 +91,8 @@ def make_multiple_matches_rows(num_records):
 
     return [
         {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': contact_email,
@@ -114,8 +114,8 @@ def make_unmatched_rows(num_records):
 
     return [
         {
-            'theme': Interaction.THEMES.export,
-            'kind': Interaction.KINDS.interaction,
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
             'date': '01/01/2018',
             'adviser_1': adviser.name,
             'contact_email': f'unmatched{i}@unmatched.uk',

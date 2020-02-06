@@ -45,7 +45,7 @@ class TestServiceAnswers(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -180,7 +180,7 @@ class TestServiceAnswers(APITestMixin):
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': Interaction.KINDS.interaction,
+            'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),

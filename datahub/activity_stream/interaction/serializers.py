@@ -6,8 +6,8 @@ class InteractionActivitySerializer(ActivitySerializer):
     """Interaction serialiser for activity stream."""
 
     KINDS_JSON = {
-        Interaction.KINDS.interaction: 'Interaction',
-        Interaction.KINDS.service_delivery: 'ServiceDelivery',
+        Interaction.Kind.INTERACTION: 'Interaction',
+        Interaction.Kind.SERVICE_DELIVERY: 'ServiceDelivery',
     }
 
     class Meta:
@@ -34,9 +34,9 @@ class InteractionActivitySerializer(ActivitySerializer):
         }
 
     def _get_context(self, instance):
-        if instance.kind == Interaction.KINDS.interaction:
+        if instance.kind == Interaction.Kind.INTERACTION:
             context = self._get_project_context(instance.investment_project)
-        elif instance.kind == Interaction.KINDS.service_delivery:
+        elif instance.kind == Interaction.Kind.SERVICE_DELIVERY:
             context = self._get_event_context(instance.event)
         else:
             context = {}
@@ -94,7 +94,7 @@ class InteractionActivitySerializer(ActivitySerializer):
             interaction['object']['context'] = [context]
 
         if (
-            instance.kind == Interaction.KINDS.interaction
+            instance.kind == Interaction.Kind.INTERACTION
             and instance.communication_channel is not None
         ):
             interaction['object']['dit:communicationChannel'] = {

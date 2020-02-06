@@ -1,3 +1,19 @@
+# Data Hub API 27.4.0 (2020-02-06)
+
+
+## Bug fixes
+
+- **Companies** It's now possible to execute the export countries migration task in batches.
+
+## API
+
+- **Advisers** `GET /adviser/`: A new query parameter, `permissions__has`, was added. This filters results to 
+  advisers with a particular permission.
+
+  For example, `GET /adviser/?permissions__has=company_referral.change_companyreferral` returns
+  advisers that are allowed to update company referrals.
+
+
 # Data Hub API 27.3.0 (2020-02-05)
 
 
