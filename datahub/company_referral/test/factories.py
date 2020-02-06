@@ -20,6 +20,14 @@ class CompanyReferralFactory(factory.django.DjangoModelFactory):
         model = 'company_referral.CompanyReferral'
 
 
+class ClosedCompanyReferralFactory(CompanyReferralFactory):
+    """A factory for referrals that have been closed."""
+
+    status = CompanyReferral.Status.CLOSED
+    closed_by = factory.SubFactory(AdviserFactory)
+    closed_on = factory.Faker('past_datetime', tzinfo=utc)
+
+
 class CompleteCompanyReferralFactory(CompanyReferralFactory):
     """A factory for referrals that have been completed."""
 

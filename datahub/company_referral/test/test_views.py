@@ -12,6 +12,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import (
+    ClosedCompanyReferralFactory,
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
 )
@@ -78,6 +79,8 @@ class TestListCompanyListsView(APITestMixin):
         assert len(results) == 1
         assert results[0] == {
             'id': str(company_referral.pk),
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
@@ -224,6 +227,8 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -268,6 +273,8 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -369,6 +376,7 @@ class TestGetCompanyReferral(APITestMixin):
         'factory',
         (
             CompanyReferralFactory,
+            ClosedCompanyReferralFactory,
             CompleteCompanyReferralFactory,
         ),
     )
@@ -382,6 +390,8 @@ class TestGetCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data == {
+            'closed_by': _format_expected_adviser(referral.closed_by),
+            'closed_on': format_date_or_datetime(referral.closed_on),
             'company': {
                 'id': str(referral.company.pk),
                 'name': referral.company.name,
