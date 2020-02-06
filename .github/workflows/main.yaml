@@ -1,0 +1,34 @@
+name: Push Docker Image to Quay.io
+
+on: [push]
+
+jobs:
+
+    build:
+
+        runs-on: ubuntu-latest
+
+        steps:
+
+            - uses: actions/checkout@v2
+
+            - name: Create tags
+              id: tags
+              run: |
+                  echo ::set-output name=tag::${GITHUB_REF##*/}-$(git rev-parse --short "$GITHUB_SHA")
+
+            - name: Build image
+              run: docker build . --file Dockerfile --tag quay.io/${{ github.repository }}:${{ steps.tags.outputs.tag }}
+
+            - name: Log in to Quay.io registry
+
+              env:
+                  QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+                  QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+                  
+              run: echo $QUAY_PASSWORD | docker login quay.io -u $QUAY_USERNAME --password-stdin
+
+            - name: Push image
+              run: |
+                  docker push quay.io/${{ github.repository }}:${{ steps.tags.outputs.tag }}
+
