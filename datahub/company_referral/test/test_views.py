@@ -353,6 +353,8 @@ class TestAddCompanyReferral(APITestMixin):
         referral_data = CompanyReferral.objects.values().get(pk=pk)
 
         assert referral_data == {
+            'closed_by_id': None,
+            'closed_on': None,
             'company_id': request_data['company']['id'],
             'completed_by_id': None,
             'completed_on': None,
