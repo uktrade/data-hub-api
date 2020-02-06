@@ -1,3 +1,24 @@
+# Data Hub API 27.5.0 (2020-02-06)
+
+
+## Features
+
+- **Companies** A search app `ExportCountryHistory` was added to expose an API interface to the frontend. The app is supposed to 
+  aggregate data from both `CompanyExportCountryHistory` model and related `Interactions` data with the possibility to 
+  filter by `country.pk` and `company.pk`. The response should be in descending order by `history_date` datetime.
+
+## Internal changes
+
+- **Companies** Filtering by export countries is now being done with the `CompanyExportcountry` model.
+
+## Database schema
+
+- **Companies** The following columns were added to the `company_referral_companyreferral` table:
+
+  - `"closed_by_id" uuid NULL`
+  - `"closed_on" timestamp with time zone NULL`
+
+
 # Data Hub API 27.4.0 (2020-02-06)
 
 

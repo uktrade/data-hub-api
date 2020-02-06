@@ -1,1 +1,0 @@
-Filtering by export countries is now being done with the `CompanyExportcountry` model.
