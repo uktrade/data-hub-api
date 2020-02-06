@@ -284,7 +284,6 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             (10, 5, 3),
             (11, 6, 2),
             (11, 12, 1),
-            (0, 5, 1),
         ),
     )
     def test_successfully_copies_from_company_model_future_interest(
@@ -303,9 +302,9 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             task_mock,
         )
 
-        countries = list(Country.objects.order_by('?')[:num_objects + 5])
-        mock_future_interest_countries = countries[:num_objects]
-        other_countries_list = countries[num_objects:]
+        countries = list(Country.objects.order_by('?')[:12])
+        mock_future_interest_countries = countries[:5]
+        other_countries_list = countries[5:]
 
         companies_to_update = CompanyFactory.create_batch(
             num_objects,
@@ -327,6 +326,7 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         )
 
         assert result_future_interest.successful()
+        assert task_mock.apply_async.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
@@ -359,7 +359,6 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             (10, 5, 3),
             (11, 6, 2),
             (11, 12, 1),
-            (0, 5, 1),
         ),
     )
     def test_successfully_copies_from_company_model_currently_exporting(
@@ -378,9 +377,9 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             task_mock,
         )
 
-        countries = list(Country.objects.order_by('?')[:num_objects + 5])
-        mock_export_to_countries = countries[:num_objects]
-        other_countries_list = countries[num_objects:]
+        countries = list(Country.objects.order_by('?')[:12])
+        mock_export_to_countries = countries[:5]
+        other_countries_list = countries[5:]
 
         companies_to_update = CompanyFactory.create_batch(
             num_objects,
@@ -402,6 +401,7 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         )
 
         assert result_currently_exporting.successful()
+        assert task_mock.apply_async.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
@@ -480,6 +480,7 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         )
 
         assert result_currently_exporting.successful()
+        assert task_mock.apply_async.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 

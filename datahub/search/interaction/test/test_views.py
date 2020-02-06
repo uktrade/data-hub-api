@@ -372,7 +372,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'kind': Interaction.KINDS.service_delivery,
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
         }
         response = self.api_client.post(url, request_data)
 

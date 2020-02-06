@@ -191,7 +191,7 @@ def copy_export_countries_to_company_export_country_model(
         'currently_exporting': 'export_to_countries',
     }
 
-    num_updated = _copy_export_countries(key_switch[status], status)
+    num_updated = _copy_export_countries(key_switch[status], status, batch_size)
 
     # If there are definitely no more rows needing processing, return
     if num_updated < batch_size:
@@ -202,17 +202,16 @@ def copy_export_countries_to_company_export_country_model(
             'batch_size': batch_size,
             'status': status,
         },
-
     )
 
 
 @atomic
-def _copy_export_countries(key, status):
+def _copy_export_countries(key, status, batch_size):
     """
     Main logic for copying export companies from Company model to
     CompanyExportCountry one
     """
-    export_countries = _get_company_countries(key, status)
+    export_countries = _get_company_countries(key, status, batch_size)
     num_updated = _copy_company_countries(
         key,
         export_countries,
@@ -227,25 +226,28 @@ def _copy_export_countries(key, status):
     return num_updated
 
 
-def _get_company_countries(source_field, status):
-
+def _get_company_countries(source_field, status, batch_size):
     no_company_country_subquery = ~Exists(
         CompanyExportCountry.objects.filter(
             company_id=OuterRef('pk'),
             status=status,
         ),
     )
-
+    has_existing_old_countries = Exists(
+        Company.objects.filter(
+            **{
+                'pk': OuterRef('pk'),
+                f'{source_field}__isnull': False,
+            },
+        ),
+    )
     batch_queryset = Company.objects.select_for_update().filter(
         no_company_country_subquery,
-        **{
-            f'{source_field}__isnull': False,
-        },
+        has_existing_old_countries,
     ).only(
         'pk',
     )
-
-    return batch_queryset
+    return batch_queryset[:batch_size]
 
 
 def _copy_company_countries(source_field, company_with_uncopied_countries, status):
@@ -254,6 +256,8 @@ def _copy_company_countries(source_field, company_with_uncopied_countries, statu
     num_updated = 0
 
     for company in company_with_uncopied_countries:
+        num_updated += 1
+
         for country in getattr(company, source_field).all():
             export_country, created = company_export_country_model.objects.get_or_create(
                 company=company,
@@ -265,7 +269,5 @@ def _copy_company_countries(source_field, company_with_uncopied_countries, statu
             if not created and export_country.status != status:
                 export_country.status = status
                 export_country.save()
-
-            num_updated += 1
 
     return num_updated
