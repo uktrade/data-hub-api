@@ -12,12 +12,14 @@ class CompanyReferral(BaseModel):
     to another (the recipient).
 
     TODO:
-    - add additional statuses
+    - add a reason closed field
     - add a OneToOneField between this model and Interaction (could go on either model)
     """
 
     class Status(models.TextChoices):
         OUTSTANDING = ('outstanding', 'Outstanding')
+        CLOSED = ('closed', 'Closed')
+        COMPLETE = ('complete', 'Complete')
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     company = models.ForeignKey(
