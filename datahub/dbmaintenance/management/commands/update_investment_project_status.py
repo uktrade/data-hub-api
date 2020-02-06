@@ -22,7 +22,7 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         investment_project = InvestmentProject.objects.get(pk=pk)
-        status = parse_choice(row['status'], InvestmentProject.STATUSES)
+        status = parse_choice(row['status'], InvestmentProject.Status.choices)
 
         if investment_project.status == status:
             return

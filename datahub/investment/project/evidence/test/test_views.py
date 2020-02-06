@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import TeamFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.models import Document, UploadStatus
 from datahub.investment.project.evidence.models import EvidenceDocument, EvidenceDocumentPermission
 from datahub.investment.project.evidence.test.factories import EvidenceTagFactory
 from datahub.investment.project.evidence.test.utils import create_evidence_document
@@ -261,7 +261,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             ],
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'signed_upload_url': 'http://document-about-ocelots',
             'created_on': format_date_or_datetime(entity_document.created_on),
             'modified_on': format_date_or_datetime(entity_document.modified_on),
@@ -325,7 +325,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             ],
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document),
-            'status': UPLOAD_STATUSES.virus_scanned,
+            'status': UploadStatus.VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'modified_on': format_date_or_datetime(entity_document.modified_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -381,7 +381,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             ],
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'modified_on': format_date_or_datetime(entity_document.modified_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -480,7 +480,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 ],
                 'original_filename': 'test.txt',
                 'url': _get_document_url(entity_document),
-                'status': UPLOAD_STATUSES.virus_scanned,
+                'status': UploadStatus.VIRUS_SCANNED,
                 'created_on': format_date_or_datetime(entity_document.created_on),
                 'modified_on': format_date_or_datetime(entity_document.modified_on),
                 'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -576,7 +576,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             ],
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document),
-            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'modified_on': format_date_or_datetime(entity_document.modified_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),

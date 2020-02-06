@@ -296,7 +296,7 @@ def test_can_get_propositions_with_custom_formatting(propositions):
             'deadline': dateutil_parse(proposition['deadline']).strftime('%Y-%m-%d'),
             'status': proposition['status'],
             'modified_on': dateutil_parse(proposition['modified_on']).isoformat()
-            if proposition['status'] != PropositionStatus.ongoing else '',
+            if proposition['status'] != PropositionStatus.ONGOING else '',
             'adviser_id': str(proposition['adviser_id']),
         } for proposition in propositions]
 

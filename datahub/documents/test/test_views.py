@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
-from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.models import Document, UploadStatus
 from datahub.documents.test.my_entity_document.models import MyEntityDocument
 
 
@@ -169,4 +169,4 @@ class TestDocumentViews(APITestMixin):
         delete_document.assert_called_once_with(args=(document_pk,))
 
         entity_document.document.refresh_from_db()
-        assert entity_document.document.status == UPLOAD_STATUSES.deletion_pending
+        assert entity_document.document.status == UploadStatus.DELETION_PENDING

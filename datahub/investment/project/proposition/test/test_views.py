@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.documents.models import Document, UPLOAD_STATUSES
+from datahub.documents.models import Document, UploadStatus
 from datahub.investment.project.proposition.constants import PropositionStatus
 from datahub.investment.project.proposition.models import (
     Proposition,
@@ -127,7 +127,7 @@ class TestCreateProposition(APITestMixin):
                 'id': str(adviser.pk),
             },
             'deadline': '2018-02-10',
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'name': 'My proposition.',
             'scope': 'Very broad scope.',
             'details': '',
@@ -220,7 +220,7 @@ class TestCreateProposition(APITestMixin):
                 'id': str(adviser.pk),
             },
             'deadline': '2018-02-10',
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'name': 'My proposition.',
             'scope': 'Very broad scope.',
             'details': '',
@@ -487,17 +487,17 @@ class TestListPropositions(APITestMixin):
     @pytest.mark.parametrize(
         'proposition_status',
         (
-            PropositionStatus.ongoing,
-            PropositionStatus.abandoned,
-            PropositionStatus.completed,
+            PropositionStatus.ONGOING,
+            PropositionStatus.ABANDONED,
+            PropositionStatus.COMPLETED,
         ),
     )
     def test_filtered_by_status(self, proposition_status):
         """List of propositions filtered by status."""
         statuses = (
-            PropositionStatus.ongoing,
-            PropositionStatus.abandoned,
-            PropositionStatus.completed,
+            PropositionStatus.ONGOING,
+            PropositionStatus.ABANDONED,
+            PropositionStatus.COMPLETED,
         )
         investment_project = InvestmentProjectFactory()
         PropositionFactory.create_batch(
@@ -572,7 +572,7 @@ class TestGetProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'name': proposition.name,
             'scope': proposition.scope,
             'details': '',
@@ -634,7 +634,7 @@ class TestGetProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'name': proposition.name,
             'scope': proposition.scope,
             'details': '',
@@ -786,7 +786,7 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.completed,
+            'status': PropositionStatus.COMPLETED,
             'name': proposition.name,
             'scope': proposition.scope,
             'created_on': format_date_or_datetime(proposition.created_on),
@@ -881,7 +881,7 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.completed,
+            'status': PropositionStatus.COMPLETED,
             'name': proposition.name,
             'scope': proposition.scope,
             'created_on': format_date_or_datetime(proposition.created_on),
@@ -944,7 +944,7 @@ class TestCompleteProposition(APITestMixin):
 
     @pytest.mark.parametrize(
         'proposition_status', (
-            PropositionStatus.completed, PropositionStatus.abandoned,
+            PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
         ),
     )
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
@@ -997,7 +997,7 @@ class TestCompleteProposition(APITestMixin):
         response_data = response.json()
         assert response_data['non_field_errors'] == ['Proposition has no documents uploaded.']
         proposition.refresh_from_db()
-        assert proposition.status == PropositionStatus.ongoing
+        assert proposition.status == PropositionStatus.ONGOING
 
 
 class TestAbandonProposition(APITestMixin):
@@ -1042,7 +1042,7 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.abandoned,
+            'status': PropositionStatus.ABANDONED,
             'name': proposition.name,
             'scope': proposition.scope,
             'created_on': format_date_or_datetime(proposition.created_on),
@@ -1136,7 +1136,7 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.adviser.pk),
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': PropositionStatus.abandoned,
+            'status': PropositionStatus.ABANDONED,
             'name': proposition.name,
             'scope': proposition.scope,
             'created_on': format_date_or_datetime(proposition.created_on),
@@ -1199,7 +1199,7 @@ class TestAbandonProposition(APITestMixin):
 
     @pytest.mark.parametrize(
         'proposition_status', (
-            PropositionStatus.completed, PropositionStatus.abandoned,
+            PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
         ),
     )
     def test_cannot_abandon_proposition_without_ongoing_status(self, proposition_status):
@@ -1249,7 +1249,7 @@ class TestAbandonProposition(APITestMixin):
         response_data = response.json()
         assert response_data['details'] == ['This field may not be blank.']
         proposition.refresh_from_db()
-        assert proposition.status == PropositionStatus.ongoing
+        assert proposition.status == PropositionStatus.ONGOING
 
 
 @pytest.mark.parametrize('http_method', ('get', 'post'))
@@ -1456,7 +1456,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'signed_upload_url': 'http://document-about-ocelots',
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1512,7 +1512,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'signed_upload_url': 'http://document-about-ocelots',
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1599,7 +1599,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'av_clean': True,
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanned,
+            'status': UploadStatus.VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1655,7 +1655,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'av_clean': True,
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanned,
+            'status': UploadStatus.VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1730,7 +1730,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1776,7 +1776,7 @@ class TestPropositionDocumentViews(APITestMixin):
             },
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'status': UploadStatus.NOT_VIRUS_SCANNED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -1887,7 +1887,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 },
                 'original_filename': 'test.txt',
                 'url': _get_document_url(entity_document.proposition, entity_document),
-                'status': UPLOAD_STATUSES.virus_scanned,
+                'status': UploadStatus.VIRUS_SCANNED,
                 'document_url': 'http://what',
                 'created_on': format_date_or_datetime(entity_document.created_on),
                 'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
@@ -1963,7 +1963,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -2022,7 +2022,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
-            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
             'created_on': format_date_or_datetime(entity_document.created_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
@@ -2066,7 +2066,7 @@ class TestPropositionDocumentViews(APITestMixin):
         }
 
         entity_document.document.refresh_from_db()
-        assert entity_document.document.status == UPLOAD_STATUSES.not_virus_scanned
+        assert entity_document.document.status == UploadStatus.NOT_VIRUS_SCANNED
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
     @patch('datahub.documents.tasks.delete_document.apply_async')
@@ -2176,7 +2176,7 @@ class TestPropositionDocumentViews(APITestMixin):
         }
 
         entity_document.document.refresh_from_db()
-        assert entity_document.document.status == UPLOAD_STATUSES.virus_scanned
+        assert entity_document.document.status == UploadStatus.VIRUS_SCANNED
         assert delete_document.called is False
 
     @patch('datahub.documents.tasks.delete_document.apply_async')

@@ -7,7 +7,6 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 from reversion.models import Revision
 
@@ -78,26 +77,23 @@ class IProjectAbstract(models.Model):
     class Meta:
         abstract = True
 
-    PRIORITIES = Choices(
-        ('1_low', 'low', 'Low'),
-        ('2_medium', 'medium', 'Medium'),
-        ('3_high', 'high', 'High'),
-    )
+    class Priority(models.TextChoices):
+        LOW = ('1_low', 'Low')
+        MEDIUM = ('2_medium', 'Medium')
+        HIGH = ('3_high', 'High')
 
-    STATUSES = Choices(
-        ('ongoing', 'Ongoing'),
-        ('delayed', 'Delayed'),
-        ('dormant', 'Dormant'),
-        ('lost', 'Lost'),
-        ('abandoned', 'Abandoned'),
-        ('won', 'Won'),
-    )
+    class Status(models.TextChoices):
+        ONGOING = ('ongoing', 'Ongoing')
+        DELAYED = ('delayed', 'Delayed')
+        DORMANT = ('dormant', 'Dormant')
+        LOST = ('lost', 'Lost')
+        ABANDONED = ('abandoned', 'Abandoned')
+        WON = ('won', 'Won')
 
-    INVOLVEMENT = Choices(
-        ('unspecified', 'Unspecified'),
-        ('not_involved', 'Not involved'),
-        ('involved', 'Involved'),
-    )
+    class Involvement(models.TextChoices):
+        UNSPECIFIED = ('unspecified', 'Unspecified')
+        NOT_INVOLVED = ('not_involved', 'Not involved')
+        INVOLVED = ('involved', 'Involved')
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
@@ -126,7 +122,12 @@ class IProjectAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL,
     )
 
-    priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
+    priority = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Priority.choices,
+        blank=True,
+        null=True,
+    )
 
     approved_commitment_to_invest = models.BooleanField(null=True)
     approved_fdi = models.BooleanField(null=True)
@@ -141,7 +142,7 @@ class IProjectAbstract(models.Model):
         default=InvestmentProjectStage.prospect.value.id,
     )
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=STATUSES, default=STATUSES.ongoing,
+        max_length=MAX_LENGTH, choices=Status.choices, default=Status.ONGOING,
     )
     reason_delayed = models.TextField(blank=True, null=True)
     reason_abandoned = models.TextField(blank=True, null=True)
@@ -250,13 +251,13 @@ class IProjectAbstract(models.Model):
     def level_of_involvement_simplified(self):
         """Returns simplified level of involvement for the Investment Project."""
         if self.level_of_involvement_id is None:
-            return self.INVOLVEMENT.unspecified
+            return self.Involvement.UNSPECIFIED
 
         not_involved_id = constants.Involvement.no_involvement.value.id
         if force_uuid(self.level_of_involvement_id) == force_uuid(not_involved_id):
-            return self.INVOLVEMENT.not_involved
+            return self.Involvement.NOT_INVOLVED
 
-        return self.INVOLVEMENT.involved
+        return self.Involvement.INVOLVED
 
 
 class IProjectValueAbstract(models.Model):
