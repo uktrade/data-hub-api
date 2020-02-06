@@ -1,7 +1,7 @@
 import uuid
 from random import choice
 
-import factory
+import factory.fuzzy
 from django.utils.timezone import now, utc
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
@@ -10,6 +10,7 @@ from datahub.company.models import (
     Advisor,
     Company,
     CompanyExportCountry,
+    CompanyExportCountryHistory,
     ExportExperienceCategory,
 )
 from datahub.core import constants
@@ -209,8 +210,13 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
-    status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+    status = factory.fuzzy.FuzzyChoice(
+        CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+    )
     history_user = factory.SubFactory(AdviserFactory)
+    history_type = factory.fuzzy.FuzzyChoice(
+        CompanyExportCountryHistory.HISTORY_TYPES,
+    )
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'
