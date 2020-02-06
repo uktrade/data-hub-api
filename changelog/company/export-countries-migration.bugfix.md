@@ -1,1 +1,0 @@
-It's now possible to execute the export countries migration task in batches.
