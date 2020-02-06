@@ -54,6 +54,19 @@ class ActivitySerializer(serializers.Serializer):
             'name': adviser.name,
         }
 
+    def _get_adviser_with_team(self, adviser, team):
+        adviser_with_team = self._get_adviser(adviser)
+        if team is not None:
+            adviser_with_team['dit:team'] = self._get_team(team)
+        return adviser_with_team
+
+    def _get_team(self, team):
+        return {} if team is None else {
+            'id': f'dit:DataHubTeam:{team.pk}',
+            'type': ['Group', 'dit:Team'],
+            'name': team.name,
+        }
+
     def _get_generator(self):
         """
         Get a serialized representation of the generator.
