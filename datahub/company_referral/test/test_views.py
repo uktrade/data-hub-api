@@ -263,7 +263,7 @@ class TestAddCompanyReferral(APITestMixin):
                 'id': str(recipient.pk),
                 'name': recipient.name,
             },
-            'status': CompanyReferral.STATUSES.outstanding,
+            'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
 
@@ -325,7 +325,7 @@ class TestAddCompanyReferral(APITestMixin):
                 'id': str(recipient.pk),
                 'name': recipient.name,
             },
-            'status': CompanyReferral.STATUSES.outstanding,
+            'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
 
@@ -364,7 +364,7 @@ class TestAddCompanyReferral(APITestMixin):
             'modified_on': FROZEN_DATETIME,
             'notes': request_data['notes'],
             'recipient_id': request_data['recipient']['id'],
-            'status': CompanyReferral.STATUSES.outstanding,
+            'status': CompanyReferral.Status.OUTSTANDING,
             'subject': request_data['subject'],
         }
 
