@@ -1,12 +1,23 @@
 from collections import Counter
+from typing import NamedTuple
 
 import pytest
+from django.contrib.auth.models import Group, Permission
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
+
+
+class AdviserPermissionConfig(NamedTuple):
+    """Adviser permission configuration for test_filter_by_permission parametrisations."""
+
+    is_superuser: bool = False
+    user_permission: str = None
+    group_permission: str = None
+    team_role_permission: str = None
 
 
 @pytest.fixture
@@ -395,3 +406,113 @@ class TestAdviser(APITestMixin):
         assert actual_results == expected_results
 
         assert response_data['count'] == len(expected_results)
+
+    @pytest.mark.parametrize(
+        'permission_config,filter_by_permission,should_match',
+        (
+            (
+                AdviserPermissionConfig(user_permission='support.add_permissionmodel'),
+                'support.add_permissionmodel',
+                True,
+            ),
+            (
+                AdviserPermissionConfig(group_permission='support.add_permissionmodel'),
+                'support.add_permissionmodel',
+                True,
+            ),
+            (
+                AdviserPermissionConfig(team_role_permission='support.add_permissionmodel'),
+                'support.add_permissionmodel',
+                True,
+            ),
+            (
+                AdviserPermissionConfig(user_permission='support.add_permissionmodel'),
+                'support.view_permissionmodel',
+                False,
+            ),
+            (
+                AdviserPermissionConfig(is_superuser=True),
+                'support.add_permissionmodel',
+                True,
+            ),
+            (
+                AdviserPermissionConfig(),
+                'support.add_permissionmodel',
+                False,
+            ),
+            # If the same permission is specified in multiple locations, we should not get
+            # duplicate results
+            (
+                AdviserPermissionConfig(
+                    user_permission='support.add_permissionmodel',
+                    group_permission='support.add_permissionmodel',
+                    team_role_permission='support.add_permissionmodel',
+                ),
+                'support.add_permissionmodel',
+                True,
+            ),
+            # If the permission does not exist, even a super user shouldn't be returned
+            (
+                AdviserPermissionConfig(is_superuser=True),
+                'non-existent.permission',
+                False,
+            ),
+        ),
+    )
+    def test_filter_by_permission(
+        self,
+        permission_config,
+        filter_by_permission,
+        should_match,
+    ):
+        """Test the `has_permission` filter in various cases."""
+        user = create_test_user(
+            permission_codenames=('view_advisor',),
+            is_superuser=permission_config.is_superuser,
+            dit_team=TeamFactory(),
+        )
+
+        if permission_config.user_permission:
+            permission = _get_permission(permission_config.user_permission)
+            user.user_permissions.add(permission)
+
+        if permission_config.group_permission:
+            group = _make_group('group 1', permission_config.group_permission)
+            user.groups.add(group)
+
+        if permission_config.team_role_permission:
+            group = _make_group('group 2', permission_config.team_role_permission)
+            user.dit_team.role.groups.add(group)
+
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v1:advisor-list')
+        response = api_client.get(
+            url,
+            data={
+                'permissions__has': filter_by_permission,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        if should_match:
+            assert response_data['count'] == 1
+            result = response_data['results'][0]
+            assert result['id'] == str(user.pk)
+        else:
+            assert response_data['count'] == 0
+
+
+def _get_permission(name):
+    app_label, _, codename = name.partition('.')
+    return Permission.objects.get(content_type__app_label=app_label, codename=codename)
+
+
+def _make_group(group_name, permission_name):
+    permission = _get_permission(permission_name)
+
+    group = Group.objects.create(name=group_name)
+    group.permissions.add(permission)
+
+    return group
