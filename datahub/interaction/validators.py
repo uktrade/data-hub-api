@@ -160,7 +160,7 @@ class StatusChangeValidator:
         instance = serializer.instance
         if not instance:
             return
-        existing_interaction_complete = instance.status == Interaction.STATUSES.complete
+        existing_interaction_complete = instance.status == Interaction.Status.COMPLETE
         combiner = DataCombiner(instance, data)
         new_status = combiner.get_value('status')
         update_changes_status = new_status != instance.status
