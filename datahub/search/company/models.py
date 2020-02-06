@@ -4,6 +4,7 @@ from functools import partial
 from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
 from elasticsearch_dsl import Completion
 
+from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
@@ -76,7 +77,9 @@ def get_suggestions(db_company):
 
 
 class Company(BaseESModel):
-    """Elasticsearch representation of Company model."""
+    """
+    Elasticsearch representation of Company model.
+    """
 
     id = Keyword()
     archived = Boolean()
@@ -132,6 +135,14 @@ class Company(BaseESModel):
             'get_one_list_group_global_account_manager',
             dict_utils.contact_or_adviser_dict,
         ),
+        'export_to_countries': lambda obj: [
+            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
+            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+        ],
+        'future_interest_countries': lambda obj: [
+            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
+            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+        ],
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
         'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',
         'uk_registered_address_postcode':
@@ -143,8 +154,6 @@ class Company(BaseESModel):
         'business_type': dict_utils.id_name_dict,
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,
-        'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
-        'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
