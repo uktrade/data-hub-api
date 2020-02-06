@@ -2,7 +2,7 @@ import factory
 from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.documents.models import UPLOAD_STATUSES
+from datahub.documents.models import UploadStatus
 
 
 class DocumentFactory(factory.django.DjangoModelFactory):
@@ -17,7 +17,7 @@ class DocumentFactory(factory.django.DjangoModelFactory):
     scanned_on = None
     av_clean = None
     av_reason = ''
-    status = UPLOAD_STATUSES.not_virus_scanned
+    status = UploadStatus.NOT_VIRUS_SCANNED
 
     class Meta:
         model = 'documents.Document'

@@ -285,15 +285,15 @@ class TestAutomaticCompanyArchive:
         'investment_projects_status, expected_archived',
         (
             (
-                [InvestmentProject.STATUSES.lost],
+                [InvestmentProject.Status.LOST],
                 True,
             ),
             (
-                [InvestmentProject.STATUSES.lost, InvestmentProject.STATUSES.ongoing],
+                [InvestmentProject.Status.LOST, InvestmentProject.Status.ONGOING],
                 False,
             ),
             (
-                [InvestmentProject.STATUSES.ongoing],
+                [InvestmentProject.Status.ONGOING],
                 False,
             ),
             (

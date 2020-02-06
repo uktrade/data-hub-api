@@ -58,13 +58,13 @@ def test_proposition_formatter():
         {
             'deadline': '2010-02-01T00:00:00+00:00',
             'modified_on': '2010-02-02T00:00:00+00:00',
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'adviser_id': uuid4(),
         },
         {
             'deadline': '2010-02-01T00:00:00+00:00',
             'modified_on': '2010-02-02T00:00:00+00:00',
-            'status': PropositionStatus.completed,
+            'status': PropositionStatus.COMPLETED,
             'adviser_id': uuid4(),
         },
     ]
@@ -75,13 +75,13 @@ def test_proposition_formatter():
         {
             'deadline': '2010-02-01',
             'modified_on': '',
-            'status': PropositionStatus.ongoing,
+            'status': PropositionStatus.ONGOING,
             'adviser_id': propositions[0]['adviser_id'],
         },
         {
             'deadline': '2010-02-01',
             'modified_on': '2010-02-02T00:00:00+00:00',
-            'status': PropositionStatus.completed,
+            'status': PropositionStatus.COMPLETED,
             'adviser_id': propositions[1]['adviser_id'],
         },
     ]
