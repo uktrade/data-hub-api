@@ -77,7 +77,12 @@ def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False):
     """
     return get_aggregate_subquery(
         model,
-        StringAgg(expression, delimiter, ordering=(expression,), distinct=distinct),
+        StringAgg(
+            expression,
+            delimiter,
+            ordering=(expression,),
+            distinct=distinct,
+        ),
     )
 
 

@@ -25,10 +25,10 @@ def test_run(s3_stubber, caplog, simulate):
     caplog.set_level('ERROR')
 
     original_statuses = [
-        InvestmentProject.STATUSES.ongoing,
-        InvestmentProject.STATUSES.ongoing,
-        InvestmentProject.STATUSES.won,
-        InvestmentProject.STATUSES.abandoned,
+        InvestmentProject.Status.ONGOING,
+        InvestmentProject.Status.ONGOING,
+        InvestmentProject.Status.WON,
+        InvestmentProject.Status.ABANDONED,
     ]
     investment_projects = InvestmentProjectFactory.create_batch(
         len(original_statuses),
@@ -69,18 +69,18 @@ def test_run(s3_stubber, caplog, simulate):
         assert [project.status for project in investment_projects] == original_statuses
     else:
         expected_statuses = [
-            InvestmentProject.STATUSES.ongoing,  # no change as the new value wasn't valid
-            InvestmentProject.STATUSES.ongoing,
-            InvestmentProject.STATUSES.dormant,
-            InvestmentProject.STATUSES.ongoing,
+            InvestmentProject.Status.ONGOING,  # no change as the new value wasn't valid
+            InvestmentProject.Status.ONGOING,
+            InvestmentProject.Status.DORMANT,
+            InvestmentProject.Status.ONGOING,
         ]
         assert [project.status for project in investment_projects] == expected_statuses
 
 
 def test_audit_log(s3_stubber):
     """Test that reversion revisions are created for updated rows."""
-    project_without_change = InvestmentProjectFactory(status=InvestmentProject.STATUSES.ongoing)
-    project_with_change = InvestmentProjectFactory(status=InvestmentProject.STATUSES.ongoing)
+    project_without_change = InvestmentProjectFactory(status=InvestmentProject.Status.ONGOING)
+    project_with_change = InvestmentProjectFactory(status=InvestmentProject.Status.ONGOING)
 
     bucket = 'test_bucket'
     object_key = 'test_key'

@@ -3,7 +3,7 @@ from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
 from config.settings.types import HawkScope
-from datahub.company.models import Company as DBCompany
+from datahub.company.models import Company as DBCompany, CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
@@ -185,15 +185,25 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             default='employee_range__name',
             output_field=CharField(),
         ),
-
         export_to_countries_list=get_string_agg_subquery(
             DBCompany,
-            'export_to_countries__name',
+            Case(
+                When(
+                    export_countries__status=CompanyExportCountry
+                    .EXPORT_INTEREST_STATUSES.currently_exporting,
+                    then='export_countries__country__name',
+                ),
+            ),
         ),
-
         future_interest_countries_list=get_string_agg_subquery(
             DBCompany,
-            'future_interest_countries__name',
+            Case(
+                When(
+                    export_countries__status=CompanyExportCountry
+                    .EXPORT_INTEREST_STATUSES.future_interest,
+                    then='export_countries__country__name',
+                ),
+            ),
         ),
     )
     field_titles = {
