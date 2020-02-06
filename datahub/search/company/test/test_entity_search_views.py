@@ -14,8 +14,12 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.models import Company, CompanyExportCountry, CompanyPermission
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyFactory,
+)
 from datahub.core import constants
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import (
@@ -23,7 +27,6 @@ from datahub.core.test_utils import (
     create_test_user,
     format_csv_data,
     get_attr_or_none,
-    join_attr_values,
     random_obj_for_queryset,
 )
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -47,7 +50,7 @@ def setup_data(es_with_collector):
     country_us = constants.Country.united_states.value.id
     country_anguilla = constants.Country.anguilla.value.id
     uk_region = constants.UKRegion.south_east.value.id
-    CompanyFactory(
+    company1 = CompanyFactory(
         name='abc defg ltd',
         trading_names=['helm', 'nop'],
         address_1='1 Fake Lane',
@@ -55,29 +58,53 @@ def setup_data(es_with_collector):
         address_country_id=country_uk,
         registered_address_country_id=country_uk,
         uk_region_id=uk_region,
-        export_to_countries=[
-            constants.Country.france.value.id,
-        ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-            constants.Country.united_states.value.id,
-        ],
     )
-    CompanyFactory(
+
+    CompanyExportCountryFactory(
+        company=company1,
+        country_id=constants.Country.france.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company1,
+        country_id=constants.Country.japan.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+
+    CompanyExportCountryFactory(
+        company=company1,
+        country_id=constants.Country.united_states.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+
+    company2 = CompanyFactory(
         name='abc defg us ltd',
         trading_names=['helm', 'nop', 'qrs'],
         address_1='1 Fake Lane',
         address_town='Downtown',
         address_country_id=country_us,
         registered_address_country_id=country_us,
-        export_to_countries=[
-            constants.Country.canada.value.id,
-            constants.Country.france.value.id,
-        ],
-        future_interest_countries=[
-            constants.Country.japan.value.id,
-        ],
     )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country_id=constants.Country.canada.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country_id=constants.Country.france.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+    )
+
+    CompanyExportCountryFactory(
+        company=company2,
+        country_id=constants.Country.japan.value.id,
+        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+    )
+
     CompanyFactory(
         name='archived',
         trading_names=[],
@@ -939,23 +966,37 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
-        CompanyFactory.create_batch(
+        companies_1 = CompanyFactory.create_batch(
             3,
             turnover=None,
             is_turnover_estimated=None,
             number_of_employees=None,
             is_number_of_employees_estimated=None,
-            future_interest_countries=Country.objects.order_by('?')[:3],
         )
-        CompanyFactory.create_batch(
+        companies_2 = CompanyFactory.create_batch(
             2,
             hq=True,
             turnover=100,
             is_turnover_estimated=True,
             number_of_employees=95,
             is_number_of_employees_estimated=True,
-            export_to_countries=Country.objects.order_by('?')[:2],
         )
+
+        for company in (*companies_1, *companies_2):
+            CompanyExportCountryFactory.create_batch(
+                3,
+                company=company,
+                country=factory.Iterator(
+                    Country.objects.order_by('?'),
+                ),
+                status=factory.Iterator(
+                    [
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    ],
+                ),
+            )
 
         es_with_collector.flush_and_refresh()
 
@@ -986,12 +1027,16 @@ class TestCompanyExportView(APITestMixin):
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
-                'Countries exported to': join_attr_values(
-                    company.export_to_countries.order_by('name'),
-                ),
-                'Countries of interest': join_attr_values(
-                    company.future_interest_countries.order_by('name'),
-                ),
+                'Countries exported to': ', '.join([
+                    e.country.name for e in company.export_countries.filter(
+                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                    ).order_by('country__name')
+                ]),
+                'Countries of interest':', '.join([
+                    e.country.name for e in company.export_countries.filter(
+                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                    ).order_by('country__name')
+                ]),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (

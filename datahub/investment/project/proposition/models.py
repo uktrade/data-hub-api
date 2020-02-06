@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
-from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
+from datahub.documents.models import AbstractEntityDocumentModel, UploadStatus
 from datahub.investment.project.proposition.constants import PropositionStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -114,7 +114,9 @@ class Proposition(BaseModel):
     )
     deadline = models.DateField()
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=PropositionStatus, default=PropositionStatus.ongoing,
+        max_length=MAX_LENGTH,
+        choices=PropositionStatus.choices,
+        default=PropositionStatus.ONGOING,
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -128,7 +130,7 @@ class Proposition(BaseModel):
 
     def _change_status(self, status, by, details):
         """Change status of a proposition."""
-        if self.status != PropositionStatus.ongoing:
+        if self.status != PropositionStatus.ONGOING:
             raise APIConflictException(
                 f'The action cannot be performed in the current status {self.status}.',
             )
@@ -146,11 +148,11 @@ class Proposition(BaseModel):
         :raises ValidationError: when trying to complete proposition without uploaded documents
         :raises APIConflictException: when proposition status is not ongoing
         """
-        if self.documents.filter(document__status=UPLOAD_STATUSES.virus_scanned).count() == 0:
+        if self.documents.filter(document__status=UploadStatus.VIRUS_SCANNED).count() == 0:
             raise ValidationError({
                 'non_field_errors': ['Proposition has no documents uploaded.'],
             })
-        self._change_status(PropositionStatus.completed, by, details)
+        self._change_status(PropositionStatus.COMPLETED, by, details)
 
     def abandon(self, by, details):
         """
@@ -159,7 +161,7 @@ class Proposition(BaseModel):
         :param by: the adviser who marked the proposition as abandoned
         :param details: reason of abandonment
         """
-        self._change_status(PropositionStatus.abandoned, by, details)
+        self._change_status(PropositionStatus.ABANDONED, by, details)
 
     class Meta:
         permissions = (

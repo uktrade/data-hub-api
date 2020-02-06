@@ -697,7 +697,7 @@ class TestRetrieveView(APITestMixin):
     def test_get_project_status(self):
         """Test getting project status fields."""
         project = InvestmentProjectFactory(
-            status=InvestmentProject.STATUSES.lost,
+            status=InvestmentProject.Status.LOST,
             reason_delayed='Problems getting planning permission.',
             date_abandoned=date(2019, 1, 1),
             reason_abandoned='No longer viable.',

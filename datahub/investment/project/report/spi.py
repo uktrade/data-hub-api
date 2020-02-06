@@ -172,7 +172,7 @@ class SPIReport:
         for proposition in propositions:
             formatted.append(dateutil_parse(proposition['deadline']).strftime('%Y-%m-%d'))
             formatted.append(proposition['status'])
-            if proposition['status'] == PropositionStatus.ongoing:
+            if proposition['status'] == PropositionStatus.ONGOING:
                 modified_on = ''
             else:
                 modified_on = dateutil_parse(proposition['modified_on']).isoformat()
