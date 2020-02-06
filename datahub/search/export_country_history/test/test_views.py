@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -12,14 +13,19 @@ from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
 )
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.export_country_history import ExportCountryHistoryApp
+from datahub.search.interaction import InteractionSearchApp
 
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp),
+    pytest.mark.es_collector_apps.with_args(
+        ExportCountryHistoryApp,
+        InteractionSearchApp,
+    ),
 ]
 
 FROZEN_DATETIME_1 = datetime(2001, 1, 22, 1, 2, 3, tzinfo=utc).isoformat()
@@ -62,6 +68,11 @@ def setup_data():
     with freeze_time(FROZEN_DATETIME_3):
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_japan,
+        )
+
+        CompanyInteractionFactory(
+            company=benchmark_company,
+            date=dateutil_parse('2017-10-30T00:00:00Z'),
         )
 
     yield str(benchmark_company.id)
