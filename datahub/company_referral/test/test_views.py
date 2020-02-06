@@ -79,30 +79,14 @@ class TestListCompanyListsView(APITestMixin):
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
             },
-            'completed_on': format_date_or_datetime(company_referral.completed_on),
+            'completed_on': None,
             'contact': {
                 'id': str(company_referral.contact.pk),
                 'name': company_referral.contact.name,
             },
-            'created_by': {
-                'id': str(company_referral.created_by.pk),
-                'name': company_referral.created_by.name,
-                'contact_email': company_referral.created_by.contact_email,
-                'dit_team': {
-                    'id': str(company_referral.created_by.dit_team.pk),
-                    'name': company_referral.created_by.dit_team.name,
-                },
-            },
+            'created_by': _format_expected_adviser(company_referral.created_by),
             'created_on': format_date_or_datetime(company_referral.created_on),
-            'recipient': {
-                'id': str(company_referral.recipient.pk),
-                'name': company_referral.recipient.name,
-                'contact_email': company_referral.recipient.contact_email,
-                'dit_team': {
-                    'id': str(company_referral.recipient.dit_team.id),
-                    'name': company_referral.recipient.dit_team.name,
-                },
-            },
+            'recipient': _format_expected_adviser(company_referral.recipient),
             'status': company_referral.status,
             'subject': company_referral.subject,
             'notes': company_referral.notes,
@@ -242,27 +226,11 @@ class TestAddCompanyReferral(APITestMixin):
             },
             'completed_on': None,
             'contact': None,
-            'created_by': {
-                'contact_email': self.user.contact_email,
-                'dit_team': {
-                    'id': str(self.user.dit_team.pk),
-                    'name': self.user.dit_team.name,
-                },
-                'id': str(self.user.pk),
-                'name': self.user.name,
-            },
+            'created_by': _format_expected_adviser(self.user),
             'created_on': format_date_or_datetime(FROZEN_DATETIME),
             'id': ANY,
             'notes': '',
-            'recipient': {
-                'contact_email': recipient.contact_email,
-                'dit_team': {
-                    'id': str(recipient.dit_team.pk),
-                    'name': recipient.dit_team.name,
-                },
-                'id': str(recipient.pk),
-                'name': recipient.name,
-            },
+            'recipient': _format_expected_adviser(recipient),
             'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
@@ -304,27 +272,11 @@ class TestAddCompanyReferral(APITestMixin):
                 'id': str(contact.pk),
                 'name': contact.name,
             },
-            'created_by': {
-                'contact_email': self.user.contact_email,
-                'dit_team': {
-                    'id': str(self.user.dit_team.pk),
-                    'name': self.user.dit_team.name,
-                },
-                'id': str(self.user.pk),
-                'name': self.user.name,
-            },
+            'created_by': _format_expected_adviser(self.user),
             'created_on': format_date_or_datetime(FROZEN_DATETIME),
             'id': ANY,
             'notes': notes,
-            'recipient': {
-                'contact_email': recipient.contact_email,
-                'dit_team': {
-                    'id': str(recipient.dit_team.pk),
-                    'name': recipient.dit_team.name,
-                },
-                'id': str(recipient.pk),
-                'name': recipient.name,
-            },
+            'recipient': _format_expected_adviser(recipient),
             'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
@@ -421,35 +373,34 @@ class TestGetCompanyReferral(APITestMixin):
                 'id': str(referral.company.pk),
                 'name': referral.company.name,
             },
-            'completed_on': None,
+            'completed_on': format_date_or_datetime(referral.completed_on),
             'contact': {
                 'id': str(referral.contact.pk),
                 'name': referral.contact.name,
             },
-            'created_by': {
-                'contact_email': referral.created_by.contact_email,
-                'dit_team': {
-                    'id': str(referral.created_by.dit_team.pk),
-                    'name': referral.created_by.dit_team.name,
-                },
-                'id': str(referral.created_by.pk),
-                'name': referral.created_by.name,
-            },
+            'created_by': _format_expected_adviser(referral.created_by),
             'created_on': format_date_or_datetime(referral.created_on),
             'id': str(referral.pk),
             'notes': referral.notes,
-            'recipient': {
-                'contact_email': referral.recipient.contact_email,
-                'dit_team': {
-                    'id': str(referral.recipient.dit_team.pk),
-                    'name': referral.recipient.dit_team.name,
-                },
-                'id': str(referral.recipient.pk),
-                'name': referral.recipient.name,
-            },
+            'recipient': _format_expected_adviser(referral.recipient),
             'status': referral.status,
             'subject': referral.subject,
         }
+
+
+def _format_expected_adviser(adviser):
+    if not adviser:
+        return None
+
+    return {
+        'contact_email': adviser.contact_email,
+        'dit_team': {
+            'id': str(adviser.dit_team.pk),
+            'name': adviser.dit_team.name,
+        },
+        'id': str(adviser.pk),
+        'name': adviser.name,
+    }
 
 
 def _resolve_data(data):
