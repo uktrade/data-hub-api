@@ -11,7 +11,10 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_referral.models import CompanyReferral
-from datahub.company_referral.test.factories import CompanyReferralFactory
+from datahub.company_referral.test.factories import (
+    CompanyReferralFactory,
+    CompleteCompanyReferralFactory,
+)
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 
 FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=utc)
@@ -79,6 +82,7 @@ class TestListCompanyListsView(APITestMixin):
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
             },
+            'completed_by': None,
             'completed_on': None,
             'contact': {
                 'id': str(company_referral.contact.pk),
@@ -224,6 +228,7 @@ class TestAddCompanyReferral(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'completed_by': None,
             'completed_on': None,
             'contact': None,
             'created_by': _format_expected_adviser(self.user),
@@ -267,6 +272,7 @@ class TestAddCompanyReferral(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'completed_by': None,
             'completed_on': None,
             'contact': {
                 'id': str(contact.pk),
@@ -359,9 +365,16 @@ class TestGetCompanyReferral(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_retrieve_a_referral(self):
+    @pytest.mark.parametrize(
+        'factory',
+        (
+            CompanyReferralFactory,
+            CompleteCompanyReferralFactory,
+        ),
+    )
+    def test_retrieve_a_referral(self, factory):
         """Test that a single referral can be retrieved."""
-        referral = CompanyReferralFactory()
+        referral = factory()
         url = _item_url(referral.pk)
 
         response = self.api_client.get(url)
@@ -373,6 +386,7 @@ class TestGetCompanyReferral(APITestMixin):
                 'id': str(referral.company.pk),
                 'name': referral.company.name,
             },
+            'completed_by': _format_expected_adviser(referral.completed_by),
             'completed_on': format_date_or_datetime(referral.completed_on),
             'contact': {
                 'id': str(referral.contact.pk),
