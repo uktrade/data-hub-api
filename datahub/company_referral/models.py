@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
-from model_utils import Choices
 
 from datahub.core.models import BaseModel
 
@@ -17,9 +16,8 @@ class CompanyReferral(BaseModel):
     - add a OneToOneField between this model and Interaction (could go on either model)
     """
 
-    STATUSES = Choices(
-        'outstanding', 'Outstanding',
-    )
+    class Status(models.TextChoices):
+        OUTSTANDING = ('outstanding', 'Outstanding')
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     company = models.ForeignKey(
@@ -41,8 +39,8 @@ class CompanyReferral(BaseModel):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=STATUSES,
-        default=STATUSES.outstanding,
+        choices=Status.choices,
+        default=Status.OUTSTANDING,
     )
     completed_by = models.ForeignKey(
         'company.Advisor',
