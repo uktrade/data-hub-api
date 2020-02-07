@@ -29,7 +29,13 @@ api_client = APIClient(
 )
 
 
-class DNBServiceError(Exception):
+class DNBServiceException(Exception):
+    """
+    Base exception class for DNBService related errors.
+    """
+
+
+class DNBServiceError(DNBServiceException):
     """
     Exception for when DNB service doesn't return a response with a status code of 200.
     """
@@ -42,25 +48,25 @@ class DNBServiceError(Exception):
         self.status_code = status_code
 
 
-class DNBServiceInvalidRequest(Exception):
+class DNBServiceInvalidRequest(DNBServiceException):
     """
     Exception for when the request to DNB service is not valid.
     """
 
 
-class DNBServiceInvalidResponse(Exception):
+class DNBServiceInvalidResponse(DNBServiceException):
     """
     Exception for when the response from DNB service is not valid.
     """
 
 
-class DNBServiceConnectionError(Exception):
+class DNBServiceConnectionError(DNBServiceException):
     """
     Exception for when an error was encountered when connecting to DNB service.
     """
 
 
-class DNBServiceTimeoutError(Exception):
+class DNBServiceTimeoutError(DNBServiceException):
     """
     Exception for when a timeout was encountered when connecting to DNB service.
     """

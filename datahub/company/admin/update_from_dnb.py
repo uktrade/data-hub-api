@@ -17,11 +17,8 @@ from datahub.company.admin.utils import (
     redirect_with_message,
 )
 from datahub.dnb_api.utils import (
-    DNBServiceConnectionError,
-    DNBServiceError,
+    DNBServiceException,
     DNBServiceInvalidRequest,
-    DNBServiceInvalidResponse,
-    DNBServiceTimeoutError,
     get_company,
     update_company_from_dnb,
 )
@@ -60,17 +57,12 @@ def update_from_dnb(model_admin, request, object_id):
     try:
         dnb_company = get_company(dh_company.duns_number)
 
-    except (
-        DNBServiceError,
-        DNBServiceConnectionError,
-        DNBServiceTimeoutError,
-        DNBServiceInvalidResponse,
-    ):
-        message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, company_change_page)
-
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
+        raise AdminException(message, company_change_page)
+
+    except DNBServiceException:
+        message = 'Something went wrong in an upstream service.'
         raise AdminException(message, company_change_page)
 
     if request.method == 'GET':
