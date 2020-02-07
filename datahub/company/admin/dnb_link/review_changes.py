@@ -17,11 +17,8 @@ from datahub.company.admin.utils import (
 )
 from datahub.dnb_api.link_company import link_company_with_dnb
 from datahub.dnb_api.utils import (
-    DNBServiceConnectionError,
-    DNBServiceError,
+    DNBServiceException,
     DNBServiceInvalidRequest,
-    DNBServiceInvalidResponse,
-    DNBServiceTimeoutError,
     get_company,
 )
 
@@ -39,19 +36,17 @@ def _link_company_with_dnb(dh_company_id, duns_number, user, error_url):
     # do this validation for us
     try:
         link_company_with_dnb(dh_company_id, duns_number, user)
+
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
         raise AdminException(message, error_url)
-    except (
-        DNBServiceError,
-        DNBServiceConnectionError,
-        DNBServiceTimeoutError,
-        DNBServiceInvalidResponse,
-    ):
-        message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, error_url)
+
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
+        raise AdminException(message, error_url)
+
+    except DNBServiceException:
+        message = 'Something went wrong in an upstream service.'
         raise AdminException(message, error_url)
 
 
@@ -59,17 +54,12 @@ def _get_company(duns_number, error_url):
     try:
         return get_company(duns_number)
 
-    except (
-        DNBServiceError,
-        DNBServiceConnectionError,
-        DNBServiceTimeoutError,
-        DNBServiceInvalidResponse,
-    ):
-        message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, error_url)
-
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
+        raise AdminException(message, error_url)
+
+    except DNBServiceException:
+        message = 'Something went wrong in an upstream service.'
         raise AdminException(message, error_url)
 
 
