@@ -19,6 +19,7 @@ class CompanyReferralAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     raw_id_fields = (
         'company',
         'contact',
+        'interaction',
         'recipient',
         'completed_by',
     )

@@ -327,6 +327,7 @@ class TestAddCompanyReferral(APITestMixin):
             'created_by_id': self.user.pk,
             'created_on': FROZEN_DATETIME,
             'id': UUID(pk),
+            'interaction_id': None,
             'modified_by_id': self.user.pk,
             'modified_on': FROZEN_DATETIME,
             'notes': request_data['notes'],
