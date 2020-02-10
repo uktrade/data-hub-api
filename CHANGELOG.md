@@ -287,6 +287,8 @@
 
 - The IP restriction functionality provided by `django-admin-ip-restrictor` was removed as it was not in use as we're using private networking and other mechanisms within GOV.UK PaaS instead.
 
+- The `dnb_match` app has been removed from Data Hub.
+
 ## Features
 
 - It is now possible to perform queries to search endpoints in the API browser.
@@ -306,7 +308,6 @@
 
 
 # Data Hub API 26.2.0 (2020-01-14)
-
 
 ## Internal changes
 
