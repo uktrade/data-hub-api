@@ -11,7 +11,11 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_referral.models import CompanyReferral
-from datahub.company_referral.test.factories import CompanyReferralFactory
+from datahub.company_referral.test.factories import (
+    ClosedCompanyReferralFactory,
+    CompanyReferralFactory,
+    CompleteCompanyReferralFactory,
+)
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 
 FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=utc)
@@ -75,34 +79,21 @@ class TestListCompanyListsView(APITestMixin):
         assert len(results) == 1
         assert results[0] == {
             'id': str(company_referral.pk),
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
             },
-            'completed_on': format_date_or_datetime(company_referral.completed_on),
+            'completed_by': None,
+            'completed_on': None,
             'contact': {
                 'id': str(company_referral.contact.pk),
                 'name': company_referral.contact.name,
             },
-            'created_by': {
-                'id': str(company_referral.created_by.pk),
-                'name': company_referral.created_by.name,
-                'contact_email': company_referral.created_by.contact_email,
-                'dit_team': {
-                    'id': str(company_referral.created_by.dit_team.pk),
-                    'name': company_referral.created_by.dit_team.name,
-                },
-            },
+            'created_by': _format_expected_adviser(company_referral.created_by),
             'created_on': format_date_or_datetime(company_referral.created_on),
-            'recipient': {
-                'id': str(company_referral.recipient.pk),
-                'name': company_referral.recipient.name,
-                'contact_email': company_referral.recipient.contact_email,
-                'dit_team': {
-                    'id': str(company_referral.recipient.dit_team.id),
-                    'name': company_referral.recipient.dit_team.name,
-                },
-            },
+            'recipient': _format_expected_adviser(company_referral.recipient),
             'status': company_referral.status,
             'subject': company_referral.subject,
             'notes': company_referral.notes,
@@ -236,33 +227,20 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'completed_by': None,
             'completed_on': None,
             'contact': None,
-            'created_by': {
-                'contact_email': self.user.contact_email,
-                'dit_team': {
-                    'id': str(self.user.dit_team.pk),
-                    'name': self.user.dit_team.name,
-                },
-                'id': str(self.user.pk),
-                'name': self.user.name,
-            },
+            'created_by': _format_expected_adviser(self.user),
             'created_on': format_date_or_datetime(FROZEN_DATETIME),
             'id': ANY,
             'notes': '',
-            'recipient': {
-                'contact_email': recipient.contact_email,
-                'dit_team': {
-                    'id': str(recipient.dit_team.pk),
-                    'name': recipient.dit_team.name,
-                },
-                'id': str(recipient.pk),
-                'name': recipient.name,
-            },
+            'recipient': _format_expected_adviser(recipient),
             'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
@@ -295,36 +273,23 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
+            'closed_by': None,
+            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'completed_by': None,
             'completed_on': None,
             'contact': {
                 'id': str(contact.pk),
                 'name': contact.name,
             },
-            'created_by': {
-                'contact_email': self.user.contact_email,
-                'dit_team': {
-                    'id': str(self.user.dit_team.pk),
-                    'name': self.user.dit_team.name,
-                },
-                'id': str(self.user.pk),
-                'name': self.user.name,
-            },
+            'created_by': _format_expected_adviser(self.user),
             'created_on': format_date_or_datetime(FROZEN_DATETIME),
             'id': ANY,
             'notes': notes,
-            'recipient': {
-                'contact_email': recipient.contact_email,
-                'dit_team': {
-                    'id': str(recipient.dit_team.pk),
-                    'name': recipient.dit_team.name,
-                },
-                'id': str(recipient.pk),
-                'name': recipient.name,
-            },
+            'recipient': _format_expected_adviser(recipient),
             'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
         }
@@ -353,6 +318,8 @@ class TestAddCompanyReferral(APITestMixin):
         referral_data = CompanyReferral.objects.values().get(pk=pk)
 
         assert referral_data == {
+            'closed_by_id': None,
+            'closed_on': None,
             'company_id': request_data['company']['id'],
             'completed_by_id': None,
             'completed_on': None,
@@ -405,9 +372,17 @@ class TestGetCompanyReferral(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_retrieve_a_referral(self):
+    @pytest.mark.parametrize(
+        'factory',
+        (
+            CompanyReferralFactory,
+            ClosedCompanyReferralFactory,
+            CompleteCompanyReferralFactory,
+        ),
+    )
+    def test_retrieve_a_referral(self, factory):
         """Test that a single referral can be retrieved."""
-        referral = CompanyReferralFactory()
+        referral = factory()
         url = _item_url(referral.pk)
 
         response = self.api_client.get(url)
@@ -415,39 +390,41 @@ class TestGetCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data == {
+            'closed_by': _format_expected_adviser(referral.closed_by),
+            'closed_on': format_date_or_datetime(referral.closed_on),
             'company': {
                 'id': str(referral.company.pk),
                 'name': referral.company.name,
             },
-            'completed_on': None,
+            'completed_by': _format_expected_adviser(referral.completed_by),
+            'completed_on': format_date_or_datetime(referral.completed_on),
             'contact': {
                 'id': str(referral.contact.pk),
                 'name': referral.contact.name,
             },
-            'created_by': {
-                'contact_email': referral.created_by.contact_email,
-                'dit_team': {
-                    'id': str(referral.created_by.dit_team.pk),
-                    'name': referral.created_by.dit_team.name,
-                },
-                'id': str(referral.created_by.pk),
-                'name': referral.created_by.name,
-            },
+            'created_by': _format_expected_adviser(referral.created_by),
             'created_on': format_date_or_datetime(referral.created_on),
             'id': str(referral.pk),
             'notes': referral.notes,
-            'recipient': {
-                'contact_email': referral.recipient.contact_email,
-                'dit_team': {
-                    'id': str(referral.recipient.dit_team.pk),
-                    'name': referral.recipient.dit_team.name,
-                },
-                'id': str(referral.recipient.pk),
-                'name': referral.recipient.name,
-            },
+            'recipient': _format_expected_adviser(referral.recipient),
             'status': referral.status,
             'subject': referral.subject,
         }
+
+
+def _format_expected_adviser(adviser):
+    if not adviser:
+        return None
+
+    return {
+        'contact_email': adviser.contact_email,
+        'dit_team': {
+            'id': str(adviser.dit_team.pk),
+            'name': adviser.dit_team.name,
+        },
+        'id': str(adviser.pk),
+        'name': adviser.name,
+    }
 
 
 def _resolve_data(data):
