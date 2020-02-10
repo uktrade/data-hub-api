@@ -67,12 +67,12 @@ def should_vat_be_applied(order):
     """
     _validate_vat(order)
 
-    if order.vat_status == VATStatus.uk:
+    if order.vat_status == VATStatus.UK:
         return True
-    if order.vat_status == VATStatus.outside_eu:
+    if order.vat_status == VATStatus.OUTSIDE_EU:
         return False
 
-    assert order.vat_status == VATStatus.eu
+    assert order.vat_status == VATStatus.EU
     return not order.vat_verified
 
 

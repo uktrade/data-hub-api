@@ -137,11 +137,11 @@ class Company(BaseESModel):
         ),
         'export_to_countries': lambda obj: [
             dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
-            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+            if o.status == CompanyExportCountry.Status.CURRENTLY_EXPORTING
         ],
         'future_interest_countries': lambda obj: [
             dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
-            if o.status == CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest
+            if o.status == CompanyExportCountry.Status.FUTURE_INTEREST
         ],
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
         'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',

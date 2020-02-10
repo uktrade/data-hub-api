@@ -53,20 +53,20 @@ class RefundForm(forms.ModelForm):
         """
         Initialise the object.
 
-        During the creation step, the value of status can only be RefundStatus.approved.
+        During the creation step, the value of status can only be RefundStatus.APPROVED.
         During the editing step, the value of status cannot be changed any longer.
         """
         super().__init__(*args, **kwargs)
 
         # set up the status field
-        refund_status = self.instance.status or RefundStatus.approved
+        refund_status = self.instance.status or RefundStatus.APPROVED
 
         self.fields['status'].choices = (
-            (refund_status, RefundStatus[refund_status]),
+            (refund_status, RefundStatus(refund_status).label),
         )
 
         # set up mandatory fields when status == approved
-        if refund_status == RefundStatus.approved:
+        if refund_status == RefundStatus.APPROVED:
             for field_name in self.APPROVED_MANDATORY_FIELDS:
                 self.fields[field_name].required = True
 

@@ -22,7 +22,8 @@ from datahub.investment.project.proposition.models import (
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
+from datahub.user_event_log.constants import UserEventType
+from datahub.user_event_log.models import UserEvent
 
 NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
@@ -2255,7 +2256,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
         user_event = UserEvent.objects.first()
         assert user_event.adviser == user
-        assert user_event.type == USER_EVENT_TYPES.proposition_document_delete
+        assert user_event.type == UserEventType.PROPOSITION_DOCUMENT_DELETE
         assert user_event.timestamp == frozen_time
         assert user_event.api_url_path == url
         assert user_event.data == expected_user_event_data

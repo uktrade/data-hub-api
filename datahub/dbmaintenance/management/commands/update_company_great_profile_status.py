@@ -34,9 +34,9 @@ class Command(CSVBaseCommand):
 
         profile_status = None
         if has_profile and is_published:
-            profile_status = Company.GREAT_PROFILE_STATUSES.published
+            profile_status = Company.GreatProfileStatus.PUBLISHED
         elif has_profile:
-            profile_status = Company.GREAT_PROFILE_STATUSES.unpublished
+            profile_status = Company.GreatProfileStatus.UNPUBLISHED
 
         if company.great_profile_status == profile_status:
             return

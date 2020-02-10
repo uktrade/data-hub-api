@@ -78,13 +78,13 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert PaymentGatewaySession.objects.count() == 1
         session = PaymentGatewaySession.objects.first()
         assert session.govuk_payment_id == govuk_payment_id
-        assert session.status == PaymentGatewaySessionStatus.created
+        assert session.status == PaymentGatewaySessionStatus.CREATED
 
         # check API response
         assert response.json() == {
             'id': str(session.id),
             'created_on': format_date_or_datetime(session.created_on),
-            'status': PaymentGatewaySessionStatus.created,
+            'status': PaymentGatewaySessionStatus.CREATED,
             'payment_url': next_url,
         }
 
@@ -113,9 +113,9 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             3,
             order=order,
             status=factory.Iterator([
-                PaymentGatewaySessionStatus.created,
-                PaymentGatewaySessionStatus.started,
-                PaymentGatewaySessionStatus.failed,
+                PaymentGatewaySessionStatus.CREATED,
+                PaymentGatewaySessionStatus.STARTED,
+                PaymentGatewaySessionStatus.FAILED,
             ]),
         )
 
@@ -183,7 +183,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         # check sessions cancelled
         for existing_session in existing_data[:-1]:
             existing_session.refresh_from_db()
-            assert existing_session.status == PaymentGatewaySessionStatus.cancelled
+            assert existing_session.status == PaymentGatewaySessionStatus.CANCELLED
 
         # check session record created
         assert PaymentGatewaySession.objects.ongoing().count() == 1
@@ -194,7 +194,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert response.json() == {
             'id': str(session.id),
             'created_on': format_date_or_datetime(session.created_on),
-            'status': PaymentGatewaySessionStatus.created,
+            'status': PaymentGatewaySessionStatus.CREATED,
             'payment_url': next_url,
         }
 
@@ -216,7 +216,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.created,
+            status=PaymentGatewaySessionStatus.CREATED,
         )
 
         # mock GOV.UK requests used to
@@ -335,7 +335,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.started,
+            status=PaymentGatewaySessionStatus.STARTED,
         )
 
         # mock GOV.UK requests used to refresh the payment session.
@@ -379,7 +379,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
         # check session record
         existing_session.refresh_from_db()
-        assert existing_session.status == PaymentGatewaySessionStatus.success
+        assert existing_session.status == PaymentGatewaySessionStatus.SUCCESS
 
         # check order and pyament
         order.refresh_from_db()
@@ -531,9 +531,9 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
     @pytest.mark.parametrize(
         'session_status',
         (
-            PaymentGatewaySessionStatus.created,
-            PaymentGatewaySessionStatus.started,
-            PaymentGatewaySessionStatus.submitted,
+            PaymentGatewaySessionStatus.CREATED,
+            PaymentGatewaySessionStatus.STARTED,
+            PaymentGatewaySessionStatus.SUBMITTED,
         ),
     )
     def test_get(self, order_status, session_status, requests_mock):
@@ -584,10 +584,10 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
     @pytest.mark.parametrize(
         'session_status',
         (
-            PaymentGatewaySessionStatus.success,
-            PaymentGatewaySessionStatus.failed,
-            PaymentGatewaySessionStatus.cancelled,
-            PaymentGatewaySessionStatus.error,
+            PaymentGatewaySessionStatus.SUCCESS,
+            PaymentGatewaySessionStatus.FAILED,
+            PaymentGatewaySessionStatus.CANCELLED,
+            PaymentGatewaySessionStatus.ERROR,
         ),
     )
     def test_doesnt_call_govuk_pay_if_session_finished(self, session_status, requests_mock):
@@ -621,12 +621,12 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
     @pytest.mark.parametrize(
         'govuk_status,payment_url',
         (
-            (PaymentGatewaySessionStatus.created, 'https://payment.example.com/123abc'),
-            (PaymentGatewaySessionStatus.started, 'https://payment.example.com/123abc'),
-            (PaymentGatewaySessionStatus.submitted, 'https://payment.example.com/123abc'),
-            (PaymentGatewaySessionStatus.failed, ''),
-            (PaymentGatewaySessionStatus.cancelled, ''),
-            (PaymentGatewaySessionStatus.error, ''),
+            (PaymentGatewaySessionStatus.CREATED, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.STARTED, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.SUBMITTED, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.FAILED, ''),
+            (PaymentGatewaySessionStatus.CANCELLED, ''),
+            (PaymentGatewaySessionStatus.ERROR, ''),
         ),
     )
     def test_with_different_govuk_payment_status_updates_session(
@@ -637,9 +637,9 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         the record is updated.
         """
         # choose an initial status != from the govuk one to test the update
-        initial_status = PaymentGatewaySessionStatus.created
+        initial_status = PaymentGatewaySessionStatus.CREATED
         if initial_status == govuk_status:
-            initial_status = PaymentGatewaySessionStatus.started
+            initial_status = PaymentGatewaySessionStatus.STARTED
 
         session = PaymentGatewaySessionFactory(status=initial_status)
 
@@ -689,7 +689,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         order = OrderWithAcceptedQuoteFactory()
         session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.created,
+            status=PaymentGatewaySessionStatus.CREATED,
         )
 
         # mock GOV.UK calls used to refresh the payment session
@@ -738,13 +738,13 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert response.json() == {
             'id': str(session.id),
             'created_on': format_date_or_datetime(session.created_on),
-            'status': PaymentGatewaySessionStatus.success,
+            'status': PaymentGatewaySessionStatus.SUCCESS,
             'payment_url': '',
         }
 
         # check session record
         session.refresh_from_db()
-        assert session.status == PaymentGatewaySessionStatus.success
+        assert session.status == PaymentGatewaySessionStatus.SUCCESS
 
         # check order and payment
         order.refresh_from_db()
@@ -764,7 +764,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         order = OrderWithAcceptedQuoteFactory()
         session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.created,
+            status=PaymentGatewaySessionStatus.CREATED,
         )
 
         requests_mock.get(

@@ -48,7 +48,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
 
         assert payment_data == {
             'amount': 1234,
-            'method': PaymentMethod.card,
+            'method': PaymentMethod.CARD,
             'received_on': dateutil_parse('2018-02-13').date(),
             'transaction_reference': '12345',
             'cardholder_name': 'John Doe',

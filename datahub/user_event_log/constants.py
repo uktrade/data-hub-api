@@ -1,7 +1,9 @@
-from model_utils import Choices
+from django.db import models
 
-USER_EVENT_TYPES = Choices(
-    ('search_export', 'Exported search results'),
-    ('proposition_document_delete', 'Deleted proposition document'),
-    ('evidence_document_delete', 'Deleted evidence document'),
-)
+
+class UserEventType(models.TextChoices):
+    """User event types."""
+
+    SEARCH_EXPORT = ('search_export', 'Exported search results')
+    PROPOSITION_DOCUMENT_DELETE = ('proposition_document_delete', 'Deleted proposition document')
+    EVIDENCE_DOCUMENT_DELETE = ('evidence_document_delete', 'Deleted evidence document')

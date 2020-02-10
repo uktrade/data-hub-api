@@ -80,7 +80,7 @@ class TestGenerateQuoteContent:
             discount_value=100,
             hourly_rate=hourly_rate,
             assignees=[],
-            vat_status=VATStatus.uk,
+            vat_status=VATStatus.UK,
             contact_email='contact-email@mycoorp.com',
         )
         OrderAssigneeFactory(
@@ -142,7 +142,7 @@ class TestGenerateQuoteContent:
             discount_value=0,
             hourly_rate=hourly_rate,
             assignees=[],
-            vat_status=VATStatus.uk,
+            vat_status=VATStatus.UK,
         )
         OrderAssigneeFactory(
             order=order,

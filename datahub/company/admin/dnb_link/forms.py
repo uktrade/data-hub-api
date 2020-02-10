@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import integer_validator
 from django.utils.translation import gettext_lazy
 
 from datahub.company.models import Company
@@ -23,7 +24,11 @@ class SelectIdsToLinkForm(forms.Form):
         widget=RawIdWidget(Company),
         label='Data Hub Company',
     )
-    duns_number = forms.CharField(min_length=9, max_length=9)
+    duns_number = forms.CharField(
+        min_length=9,
+        max_length=9,
+        validators=(integer_validator,),
+    )
 
     def clean_company(self):
         """

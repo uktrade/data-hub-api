@@ -60,7 +60,7 @@ class TestAddOrder(APITestMixin):
                 'existing_agents': 'Contacts in the market',
                 'delivery_date': '2017-04-20',
                 'po_number': 'PO 123',
-                'vat_status': VATStatus.eu,
+                'vat_status': VATStatus.EU,
                 'vat_number': '01234566789',
                 'vat_verified': True,
                 'billing_address_1': 'Apt 1',
@@ -124,7 +124,7 @@ class TestAddOrder(APITestMixin):
             'contact_phone': '',
             'po_number': 'PO 123',
             'discount_value': 0,
-            'vat_status': VATStatus.eu,
+            'vat_status': VATStatus.EU,
             'vat_number': '01234566789',
             'vat_verified': True,
             'net_cost': 0,
@@ -343,7 +343,7 @@ class TestAddOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.outside_eu, VATStatus.uk),
+        (VATStatus.OUTSIDE_EU, VATStatus.UK),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -410,7 +410,7 @@ class TestGeneralChangeOrder(APITestMixin):
         it doesn't get populated automatically on change.
         """
         order = OrderFactory(
-            vat_status=VATStatus.outside_eu,
+            vat_status=VATStatus.OUTSIDE_EU,
             uk_region_id=None,
         )
         assert not order.uk_region
@@ -585,7 +585,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.outside_eu, VATStatus.uk),
+        (VATStatus.OUTSIDE_EU, VATStatus.UK),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -593,7 +593,7 @@ class TestGeneralChangeOrder(APITestMixin):
         they are set to '' and None as they only make sense if company in 'eu'.
         """
         order = OrderFactory(
-            vat_status=VATStatus.eu,
+            vat_status=VATStatus.EU,
             vat_number='0123456789',
             vat_verified=True,
         )
@@ -646,7 +646,7 @@ class TestChangeOrderInDraft(APITestMixin):
     def test_can_change_allowed_fields(self):
         """Test changing an existing order."""
         order = OrderFactory(
-            vat_status=VATStatus.outside_eu,
+            vat_status=VATStatus.OUTSIDE_EU,
             uk_region_id=UKRegion.alderney.value.id,
         )
         new_contact = ContactFactory(company=order.company)
@@ -670,7 +670,7 @@ class TestChangeOrderInDraft(APITestMixin):
                 'existing_agents': 'Updated contacts in the market',
                 'delivery_date': '2017-04-21',
                 'po_number': 'NEW PO 321',
-                'vat_status': VATStatus.eu,
+                'vat_status': VATStatus.EU,
                 'vat_number': 'new vat number',
                 'vat_verified': False,
                 'billing_address_1': 'Apt 1',
@@ -735,7 +735,7 @@ class TestChangeOrderInDraft(APITestMixin):
             'contact_phone': order.contact_phone,
             'po_number': 'NEW PO 321',
             'discount_value': order.discount_value,
-            'vat_status': VATStatus.eu,
+            'vat_status': VATStatus.EU,
             'vat_number': 'new vat number',
             'vat_verified': False,
             'net_cost': order.net_cost,
@@ -812,7 +812,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
     def test_can_change_allowed_fields(self, order_factory):
         """Test that allowed fields can be changed."""
         order = order_factory(
-            vat_status=VATStatus.eu,
+            vat_status=VATStatus.EU,
             vat_number='01234566789',
             vat_verified=True,
         )
@@ -825,7 +825,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             'billing_address_county': 'New billing county',
             'billing_address_postcode': 'New billing postcode',
             'billing_address_country': Country.france.value.id,
-            'vat_status': VATStatus.eu,
+            'vat_status': VATStatus.EU,
             'vat_number': '987654321',
             'vat_verified': False,
             'po_number': 'New po number',
@@ -925,7 +925,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('billing_address_county', 'New billing county'),
             ('billing_address_postcode', 'New billing postcode'),
             ('billing_address_country', Country.france.value.id),
-            ('vat_status', VATStatus.eu),
+            ('vat_status', VATStatus.EU),
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
@@ -937,7 +937,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         billing fields has changed, a new invoice is generated.
         """
         order = OrderWithAcceptedQuoteFactory(
-            vat_status=VATStatus.eu,
+            vat_status=VATStatus.EU,
             vat_number='01234566789',
             vat_verified=True,
         )
@@ -962,7 +962,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         get updated.
         """
         order = OrderWithAcceptedQuoteFactory(
-            vat_status=VATStatus.eu,
+            vat_status=VATStatus.EU,
             vat_number='01234566789',
             vat_verified=True,
         )
@@ -1006,7 +1006,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
     def test_invoice_not_generated(self, order_factory, data):
         """Test that changing `data` does not generate a new invoice."""
         order = order_factory(
-            vat_status=VATStatus.eu,
+            vat_status=VATStatus.EU,
             vat_number='01234566789',
             vat_verified=True,
         )
@@ -1068,7 +1068,7 @@ class TestChangeOrderInPaid(APITestMixin):
             ('billing_address_county', 'New billing county'),
             ('billing_address_postcode', 'New billing postcode'),
             ('billing_address_country', Country.france.value.id),
-            ('vat_status', VATStatus.uk),
+            ('vat_status', VATStatus.UK),
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
@@ -1154,7 +1154,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             ('billing_address_county', 'New billing county'),
             ('billing_address_postcode', 'New billing postcode'),
             ('billing_address_country', Country.france.value.id),
-            ('vat_status', VATStatus.uk),
+            ('vat_status', VATStatus.UK),
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
