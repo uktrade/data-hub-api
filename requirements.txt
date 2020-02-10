@@ -11,8 +11,8 @@ asgiref==3.2.3            # via django
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.2.0
-boto3==1.11.9
-botocore==1.14.9          # via boto3, s3transfer
+boto3==1.11.13
+botocore==1.14.13         # via boto3, s3transfer
 celery[redis]==4.4
 certifi==2019.11.28       # via requests, sentry-sdk
 chardet==3.0.4
