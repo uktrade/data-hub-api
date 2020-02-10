@@ -142,7 +142,7 @@ class DuplicateCompanyFactory(ArchivedCompanyFactory):
     transferred_by = factory.SubFactory(AdviserFactory)
     transferred_on = factory.Faker('past_datetime', tzinfo=utc)
     transferred_to = factory.SubFactory(CompanyFactory)
-    transfer_reason = Company.TRANSFER_REASONS.duplicate
+    transfer_reason = Company.TransferReason.DUPLICATE
 
 
 def _get_random_company_category():
@@ -196,7 +196,7 @@ class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
 
     company = factory.SubFactory(CompanyFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
-    status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting
+    status = CompanyExportCountry.Status.CURRENTLY_EXPORTING
     created_by = factory.SubFactory(AdviserFactory)
 
     class Meta:
@@ -210,13 +210,9 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
-    status = factory.fuzzy.FuzzyChoice(
-        CompanyExportCountry.EXPORT_INTEREST_STATUSES,
-    )
+    status = factory.fuzzy.FuzzyChoice(CompanyExportCountry.Status.choices)
     history_user = factory.SubFactory(AdviserFactory)
-    history_type = factory.fuzzy.FuzzyChoice(
-        CompanyExportCountryHistory.HISTORY_TYPES,
-    )
+    history_type = factory.fuzzy.FuzzyChoice(CompanyExportCountryHistory.HistoryType.choices)
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'

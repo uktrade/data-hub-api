@@ -20,12 +20,12 @@ def test_run(s3_stubber, caplog):
     original_datetime = datetime(2017, 1, 1, tzinfo=timezone.utc)
     with freeze_time(original_datetime):
         profile_statuses = [
-            Company.GREAT_PROFILE_STATUSES.unpublished,
+            Company.GreatProfileStatus.UNPUBLISHED,
             None,
-            Company.GREAT_PROFILE_STATUSES.published,
-            Company.GREAT_PROFILE_STATUSES.published,
-            Company.GREAT_PROFILE_STATUSES.unpublished,
-            Company.GREAT_PROFILE_STATUSES.published,
+            Company.GreatProfileStatus.PUBLISHED,
+            Company.GreatProfileStatus.PUBLISHED,
+            Company.GreatProfileStatus.UNPUBLISHED,
+            Company.GreatProfileStatus.PUBLISHED,
         ]
         companies = CompanyFactory.create_batch(
             6,
@@ -66,12 +66,12 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [company.great_profile_status for company in companies] == [
-        Company.GREAT_PROFILE_STATUSES.published,
-        Company.GREAT_PROFILE_STATUSES.unpublished,
+        Company.GreatProfileStatus.PUBLISHED,
+        Company.GreatProfileStatus.UNPUBLISHED,
         None,
         None,
-        Company.GREAT_PROFILE_STATUSES.unpublished,
-        Company.GREAT_PROFILE_STATUSES.published,
+        Company.GreatProfileStatus.UNPUBLISHED,
+        Company.GreatProfileStatus.PUBLISHED,
     ]
     assert all(company.modified_on == original_datetime for company in companies)
 
@@ -81,11 +81,11 @@ def test_simulate(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     profile_statuses = [
-        Company.GREAT_PROFILE_STATUSES.unpublished,
+        Company.GreatProfileStatus.UNPUBLISHED,
         None,
-        Company.GREAT_PROFILE_STATUSES.published,
-        Company.GREAT_PROFILE_STATUSES.published,
-        Company.GREAT_PROFILE_STATUSES.unpublished,
+        Company.GreatProfileStatus.PUBLISHED,
+        Company.GreatProfileStatus.PUBLISHED,
+        Company.GreatProfileStatus.UNPUBLISHED,
     ]
     companies = CompanyFactory.create_batch(
         5,
@@ -128,10 +128,10 @@ def test_simulate(s3_stubber, caplog):
 def test_audit_log(s3_stubber):
     """Test that reversion revisions are created."""
     company_without_change = CompanyFactory(
-        great_profile_status=Company.GREAT_PROFILE_STATUSES.published,
+        great_profile_status=Company.GreatProfileStatus.PUBLISHED,
     )
     company_with_change = CompanyFactory(
-        great_profile_status=Company.GREAT_PROFILE_STATUSES.unpublished,
+        great_profile_status=Company.GreatProfileStatus.UNPUBLISHED,
     )
 
     bucket = 'test_bucket'
@@ -155,12 +155,12 @@ def test_audit_log(s3_stubber):
     call_command('update_company_great_profile_status', bucket, object_key)
 
     company_without_change.refresh_from_db()
-    assert company_without_change.great_profile_status == Company.GREAT_PROFILE_STATUSES.published
+    assert company_without_change.great_profile_status == Company.GreatProfileStatus.PUBLISHED
     versions = Version.objects.get_for_object(company_without_change)
     assert versions.count() == 0
 
     company_with_change.refresh_from_db()
-    assert company_with_change.great_profile_status == Company.GREAT_PROFILE_STATUSES.published
+    assert company_with_change.great_profile_status == Company.GreatProfileStatus.PUBLISHED
     versions = Version.objects.get_for_object(company_with_change)
     assert versions.count() == 1
     assert versions[0].revision.get_comment() == 'GREAT profile status updated.'

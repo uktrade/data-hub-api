@@ -33,7 +33,7 @@ from datahub.search.serializers import (
     EntitySearchQuerySerializer,
 )
 from datahub.search.utils import SearchOrdering
-from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
 
@@ -269,7 +269,7 @@ class SearchExportAPIView(SearchAPIView):
             'args': validated_data,
         }
 
-        record_user_event(request, USER_EVENT_TYPES.search_export, data=user_event_data)
+        record_user_event(request, UserEventType.SEARCH_EXPORT, data=user_event_data)
 
         return create_csv_response(db_queryset, self.field_titles, base_filename)
 

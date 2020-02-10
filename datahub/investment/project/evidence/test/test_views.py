@@ -16,7 +16,8 @@ from datahub.investment.project.evidence.models import EvidenceDocument, Evidenc
 from datahub.investment.project.evidence.test.factories import EvidenceTagFactory
 from datahub.investment.project.evidence.test.utils import create_evidence_document
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
+from datahub.user_event_log.constants import UserEventType
+from datahub.user_event_log.models import UserEvent
 
 pytestmark = pytest.mark.django_db
 
@@ -714,7 +715,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         user_event.data['tags'].sort(key=itemgetter('id'))
 
         assert user_event.adviser == user
-        assert user_event.type == USER_EVENT_TYPES.evidence_document_delete
+        assert user_event.type == UserEventType.EVIDENCE_DOCUMENT_DELETE
         assert user_event.timestamp == frozen_time
         assert user_event.api_url_path == url
         assert user_event.data == expected_user_event_data

@@ -3,7 +3,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
-from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.constants import UserEventType
 
 
 class UserEvent(models.Model):
@@ -24,7 +24,10 @@ class UserEvent(models.Model):
         on_delete=models.CASCADE,
         related_name='user_events',
     )
-    type = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=USER_EVENT_TYPES)
+    type = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=UserEventType.choices,
+    )
     api_url_path = models.CharField(verbose_name='API URL path', max_length=5000, db_index=True)
     data = JSONField(null=True, encoder=DjangoJSONEncoder)
 

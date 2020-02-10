@@ -16,7 +16,7 @@ from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
-from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.models import UserEvent
 
 pytestmark = pytest.mark.django_db
@@ -515,7 +515,7 @@ class TestSearchExportAPIView(APITestMixin):
 
         user_event = UserEvent.objects.first()
         assert user_event.adviser == user
-        assert user_event.type == USER_EVENT_TYPES.search_export
+        assert user_event.type == UserEventType.SEARCH_EXPORT
         assert user_event.timestamp == frozen_time
         assert user_event.api_url_path == '/v3/search/simplemodel/export'
         assert user_event.data == {

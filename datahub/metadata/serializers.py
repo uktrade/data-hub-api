@@ -69,7 +69,7 @@ class ServiceQuestionSerializer(serializers.ModelSerializer):
 class ServiceSerializer(ConstantModelSerializer):
     """Service serializer."""
 
-    contexts = serializers.MultipleChoiceField(choices=Service.CONTEXTS, read_only=True)
+    contexts = serializers.MultipleChoiceField(choices=Service.Context.choices, read_only=True)
     interaction_questions = ServiceQuestionSerializer(many=True, read_only=True)
 
 
