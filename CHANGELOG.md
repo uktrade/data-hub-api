@@ -307,6 +307,9 @@
 
 # Data Hub API 26.2.0 (2020-01-14)
 
+## Removals
+
+- The `dnb_match` app has been removed from Data Hub.
 
 ## Internal changes
 
