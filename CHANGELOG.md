@@ -1,3 +1,29 @@
+# Data Hub API 27.6.0 (2020-02-10)
+
+
+## Features
+
+- **Companies** The `automatic-company-archive` Celery job will now run with simulation mode turned off.
+
+  We ran this job in simulation mode in order to audit the list of companies that would be archived. This is now done and so we are ready to turn off the simulation.
+- **Companies** Formatting of the dnb link admin tool's validation errors were improved by
+  splitting them across multiple flash messages.
+
+## Internal changes
+
+- **Companies** A base exception class `DNBServiceError` was added that all dnb-service related
+  exceptions inherit.
+- **Companies** Duns number validation was standardised to use django's `integer_validator`.
+
+## API
+
+- **Companies** `GET /v4/company-referral`, `POST /v4/company-referral`, `GET /v4/company-referral/<id>`: The following read-only fields were added to responses:
+
+  - `closed_by`
+  - `closed_on`
+  - `completed_by`
+
+
 # Data Hub API 27.5.0 (2020-02-06)
 
 
