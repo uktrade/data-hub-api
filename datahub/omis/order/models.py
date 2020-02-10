@@ -204,7 +204,7 @@ class Order(BaseModel):
     discount_value = models.PositiveIntegerField(default=0)
     discount_label = models.CharField(max_length=100, blank=True)
 
-    vat_status = models.CharField(max_length=100, choices=VATStatus, blank=True)
+    vat_status = models.CharField(max_length=100, choices=VATStatus.choices, blank=True)
     vat_number = models.CharField(max_length=100, blank=True)
     vat_verified = models.BooleanField(null=True)
 

@@ -88,7 +88,7 @@ class TestCreatePayments(APITestMixin):
                 {
                     'transaction_reference': 'some ref2',
                     'amount': order.total_cost - 1,
-                    'method': PaymentMethod.manual,
+                    'method': PaymentMethod.MANUAL,
                     'received_on': '2017-04-21',
                 },
             ],
@@ -102,7 +102,7 @@ class TestCreatePayments(APITestMixin):
                 'transaction_reference': 'some ref1',
                 'additional_reference': '',
                 'amount': 1,
-                'method': PaymentMethod.bacs,  # bacs is the default one
+                'method': PaymentMethod.BACS,  # bacs is the default one
                 'received_on': '2017-04-20',
             },
             {
@@ -111,7 +111,7 @@ class TestCreatePayments(APITestMixin):
                 'transaction_reference': 'some ref2',
                 'additional_reference': '',
                 'amount': order.total_cost - 1,
-                'method': PaymentMethod.manual,
+                'method': PaymentMethod.MANUAL,
                 'received_on': '2017-04-21',
             },
         ]
@@ -125,8 +125,8 @@ class TestCreatePayments(APITestMixin):
             # amount != from order total cost
             (
                 [
-                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
-                    {'amount': 0, 'received_on': '2017-04-21', 'method': PaymentMethod.bacs},
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.BACS},
+                    {'amount': 0, 'received_on': '2017-04-21', 'method': PaymentMethod.BACS},
                 ],
                 {
                     'non_field_errors': (
@@ -137,9 +137,9 @@ class TestCreatePayments(APITestMixin):
             # required fields
             (
                 [
-                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
-                    {'received_on': '2017-04-21', 'method': PaymentMethod.bacs},
-                    {'amount': 0, 'method': PaymentMethod.bacs},
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.BACS},
+                    {'received_on': '2017-04-21', 'method': PaymentMethod.BACS},
+                    {'amount': 0, 'method': PaymentMethod.BACS},
                 ],
                 [
                     {},
@@ -150,8 +150,8 @@ class TestCreatePayments(APITestMixin):
             # payment method not allowed
             (
                 [
-                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.card},
-                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.cheque},
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.CARD},
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.CHEQUE},
                 ],
                 [
                     {'method': ['"card" is not a valid choice.']},
@@ -182,12 +182,12 @@ class TestCreatePayments(APITestMixin):
             [
                 {
                     'amount': order.total_cost,
-                    'method': PaymentMethod.bacs,
+                    'method': PaymentMethod.BACS,
                     'received_on': '2017-04-20',
                 },
                 {
                     'amount': 1,
-                    'method': PaymentMethod.bacs,
+                    'method': PaymentMethod.BACS,
                     'received_on': '2017-04-21',
                 },
             ],

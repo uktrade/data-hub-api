@@ -17,7 +17,7 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     transaction_reference = factory.Faker('pystr')
     additional_reference = factory.Faker('pystr')
     amount = factory.Faker('random_int', max=100)
-    method = constants.PaymentMethod.bacs
+    method = constants.PaymentMethod.BACS
     received_on = factory.Faker('date_object')
 
     class Meta:
@@ -28,7 +28,7 @@ class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
     """PaymentGatewaySession factory."""
 
     order = factory.SubFactory(OrderWithAcceptedQuoteFactory)
-    status = constants.PaymentGatewaySessionStatus.created
+    status = constants.PaymentGatewaySessionStatus.CREATED
     govuk_payment_id = factory.Faker('pystr', min_chars=27, max_chars=27)
 
     class Meta:
@@ -42,7 +42,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SelfAttribute('created_by')
     order = factory.SubFactory(OrderPaidFactory)
     reference = factory.Faker('pystr')
-    status = RefundStatus.requested
+    status = RefundStatus.REQUESTED
     requested_on = factory.Faker('date_time', tzinfo=utc)
     requested_by = factory.SubFactory(AdviserFactory)
     refund_reason = factory.Faker('text')
@@ -57,7 +57,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
 class ApprovedRefundFactory(RequestedRefundFactory):
     """Factory for refund requested, approved and paid."""
 
-    status = RefundStatus.approved
+    status = RefundStatus.APPROVED
 
     level1_approved_on = factory.Faker('date_time', tzinfo=utc)
     level1_approved_by = factory.SelfAttribute('created_by')
@@ -67,7 +67,7 @@ class ApprovedRefundFactory(RequestedRefundFactory):
     level2_approved_by = factory.SelfAttribute('created_by')
     level2_approval_notes = factory.Faker('text')
 
-    method = constants.PaymentMethod.bacs
+    method = constants.PaymentMethod.BACS
 
     vat_amount = factory.LazyAttribute(
         lambda refund: int(refund.requested_amount * 0.2),
@@ -84,6 +84,6 @@ class ApprovedRefundFactory(RequestedRefundFactory):
 class RejectedRefundFactory(RequestedRefundFactory):
     """Factory for refund requested and rejected."""
 
-    status = RefundStatus.rejected
+    status = RefundStatus.REJECTED
 
     rejection_reason = factory.Faker('text')

@@ -44,7 +44,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     po_number = factory.Faker('text', max_nb_chars=50)
     discount_value = factory.Faker('random_int', max=100)
     discount_label = factory.Faker('text', max_nb_chars=50)
-    vat_status = VATStatus.eu
+    vat_status = VATStatus.EU
     vat_number = '0123456789'
     vat_verified = True
     billing_company_name = factory.LazyAttribute(lambda o: o.company.name)

@@ -75,9 +75,9 @@ class PaymentGatewaySessionQuerySet(models.QuerySet):
         """
         return self.filter(
             status__in=[
-                PaymentGatewaySessionStatus.created,
-                PaymentGatewaySessionStatus.started,
-                PaymentGatewaySessionStatus.submitted,
+                PaymentGatewaySessionStatus.CREATED,
+                PaymentGatewaySessionStatus.STARTED,
+                PaymentGatewaySessionStatus.SUBMITTED,
             ],
         )
 
