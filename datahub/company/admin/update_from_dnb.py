@@ -14,7 +14,7 @@ from rest_framework import serializers
 from datahub.company.admin.utils import (
     AdminException,
     format_company_diff,
-    redirect_with_message,
+    redirect_with_messages,
 )
 from datahub.dnb_api.utils import (
     DNBServiceException,
@@ -27,7 +27,7 @@ from datahub.dnb_api.utils import (
 logger = logging.getLogger(__name__)
 
 
-@redirect_with_message
+@redirect_with_messages
 @method_decorator(require_http_methods(['GET', 'POST']))
 @method_decorator(csrf_protect)
 def update_from_dnb(model_admin, request, object_id):
@@ -59,11 +59,11 @@ def update_from_dnb(model_admin, request, object_id):
 
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
-        raise AdminException(message, company_change_page)
+        raise AdminException([message], company_change_page)
 
     except DNBServiceException:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, company_change_page)
+        raise AdminException([message], company_change_page)
 
     if request.method == 'GET':
         return TemplateResponse(
@@ -84,4 +84,4 @@ def update_from_dnb(model_admin, request, object_id):
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
-        raise AdminException(message, company_change_page)
+        raise AdminException([message], company_change_page)
