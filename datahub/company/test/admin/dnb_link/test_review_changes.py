@@ -48,27 +48,27 @@ class TestReviewChangesViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'data_overrides,expected_error',
+        'data_overrides,expected_errors',
         (
             (
                 {'company': None, 'duns_number': None},  # No data
-                'Company: This field is required. duns_number: This field is required.',
+                ['Company: This field is required.', 'Duns_number: This field is required.'],
             ),
             (
                 {
                     'company': 'abc123',  # Invalid company ID
                 },
-                'Company: “abc123” is not a valid UUID.',
+                ['Company: “abc123” is not a valid UUID.'],
             ),
             (
                 {
                     'duns_number': '1',  # Invalid duns number
                 },
-                'Duns_number: Ensure this value has at least 9 characters (it has 1).',
+                ['Duns_number: Ensure this value has at least 9 characters (it has 1).'],
             ),
         ),
     )
-    def test_validation_errors_rendered(self, data_overrides, expected_error):
+    def test_validation_errors_rendered(self, data_overrides, expected_errors):
         """
         Test that validation errors are rendered as expected.
         """
@@ -86,7 +86,8 @@ class TestReviewChangesViewGet(AdminTestMixin):
         response = self.client.get(review_changes_url, follow=True)
 
         assert response.status_code == status.HTTP_200_OK
-        assert expected_error in response.rendered_content
+        for expected_error in expected_errors:
+            assert expected_error in response.rendered_content
 
     def test_dh_company_already_linked_renders_error(self):
         """

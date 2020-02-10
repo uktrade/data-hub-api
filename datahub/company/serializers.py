@@ -344,7 +344,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 company=instance,
                 adviser=adviser,
                 export_countries=future_interest_countries,
-                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                status=CompanyExportCountry.Status.FUTURE_INTEREST,
             )
 
         if export_to_countries is not None:
@@ -352,10 +352,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 company=instance,
                 adviser=adviser,
                 export_countries=export_to_countries,
-                status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             )
 
-        not_interested_status = CompanyExportCountry.EXPORT_INTEREST_STATUSES.not_interested
+        not_interested_status = CompanyExportCountry.Status.NOT_INTERESTED
         CompanyExportCountry.objects.filter(
             company=instance,
         ).exclude(
@@ -768,13 +768,13 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         """
         currently_exporting_items = CompanyExportCountry.objects.filter(
             company=company,
-            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+            status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
         )
         exporting_to_countries = [item.country for item in currently_exporting_items]
 
         future_interest_items = CompanyExportCountry.objects.filter(
             company=company,
-            status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+            status=CompanyExportCountry.Status.FUTURE_INTEREST,
         )
         future_interest_countries = [item.country for item in future_interest_items]
 

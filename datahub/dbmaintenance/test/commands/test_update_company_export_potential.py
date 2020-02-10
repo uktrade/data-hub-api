@@ -21,11 +21,11 @@ def test_run(s3_stubber, caplog):
 
     with freeze_time(original_datetime):
         export_potential_scores = [
-            Company.EXPORT_POTENTIAL_SCORES.very_high,
-            Company.EXPORT_POTENTIAL_SCORES.medium,
-            Company.EXPORT_POTENTIAL_SCORES.low,
-            Company.EXPORT_POTENTIAL_SCORES.very_high,
-            Company.EXPORT_POTENTIAL_SCORES.high,
+            Company.ExportPotentialScore.VERY_HIGH,
+            Company.ExportPotentialScore.MEDIUM,
+            Company.ExportPotentialScore.LOW,
+            Company.ExportPotentialScore.VERY_HIGH,
+            Company.ExportPotentialScore.HIGH,
         ]
         companies = CompanyFactory.create_batch(
             5,
@@ -65,11 +65,11 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [company.export_potential for company in companies] == [
-        Company.EXPORT_POTENTIAL_SCORES.high,
-        Company.EXPORT_POTENTIAL_SCORES.very_high,
-        Company.EXPORT_POTENTIAL_SCORES.low,
-        Company.EXPORT_POTENTIAL_SCORES.high,
-        Company.EXPORT_POTENTIAL_SCORES.very_high,
+        Company.ExportPotentialScore.HIGH,
+        Company.ExportPotentialScore.VERY_HIGH,
+        Company.ExportPotentialScore.LOW,
+        Company.ExportPotentialScore.HIGH,
+        Company.ExportPotentialScore.VERY_HIGH,
     ]
     assert all(company.modified_on == original_datetime for company in companies)
 
@@ -79,11 +79,11 @@ def test_simulate(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     export_potential_scores = [
-        Company.EXPORT_POTENTIAL_SCORES.very_high,
-        Company.EXPORT_POTENTIAL_SCORES.medium,
-        Company.EXPORT_POTENTIAL_SCORES.low,
-        Company.EXPORT_POTENTIAL_SCORES.very_high,
-        Company.EXPORT_POTENTIAL_SCORES.high,
+        Company.ExportPotentialScore.VERY_HIGH,
+        Company.ExportPotentialScore.MEDIUM,
+        Company.ExportPotentialScore.LOW,
+        Company.ExportPotentialScore.VERY_HIGH,
+        Company.ExportPotentialScore.HIGH,
     ]
     companies = CompanyFactory.create_batch(
         5,
@@ -126,10 +126,10 @@ def test_simulate(s3_stubber, caplog):
 def test_audit_log(s3_stubber):
     """Test that reversion revisions are created."""
     company_without_change = CompanyFactory(
-        export_potential=Company.EXPORT_POTENTIAL_SCORES.high,
+        export_potential=Company.ExportPotentialScore.HIGH,
     )
     company_with_change = CompanyFactory(
-        export_potential=Company.EXPORT_POTENTIAL_SCORES.medium,
+        export_potential=Company.ExportPotentialScore.MEDIUM,
     )
 
     bucket = 'test_bucket'
@@ -153,12 +153,12 @@ def test_audit_log(s3_stubber):
     call_command('update_company_export_potential', bucket, object_key)
 
     company_without_change.refresh_from_db()
-    assert company_without_change.export_potential == Company.EXPORT_POTENTIAL_SCORES.high
+    assert company_without_change.export_potential == Company.ExportPotentialScore.HIGH
     versions = Version.objects.get_for_object(company_without_change)
     assert versions.count() == 0
 
     company_with_change.refresh_from_db()
-    assert company_with_change.export_potential == Company.EXPORT_POTENTIAL_SCORES.very_high
+    assert company_with_change.export_potential == Company.ExportPotentialScore.VERY_HIGH
     versions = Version.objects.get_for_object(company_with_change)
     assert versions.count() == 1
     assert versions[0].revision.get_comment() == 'Export potential updated.'

@@ -65,8 +65,8 @@ class TestCanPricingBeCalculated:
             {'vat_status': None, 'vat_number': '123'},
             {'vat_status': None, 'vat_verified': True},
             {'vat_status': None, 'vat_number': '123', 'vat_verified': True},
-            {'vat_status': VATStatus.eu, 'vat_number': '', 'vat_verified': None},
-            {'vat_status': VATStatus.eu, 'vat_number': '', 'vat_verified': True},
+            {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': None},
+            {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': True},
         ),
     )
     def test_cannot_with_incomplete_vat_data(self, fields):
@@ -79,9 +79,9 @@ class TestCanPricingBeCalculated:
     @pytest.mark.parametrize(
         'fields',
         (
-            {'vat_status': VATStatus.outside_eu},
-            {'vat_status': VATStatus.uk},
-            {'vat_status': VATStatus.eu, 'vat_number': '', 'vat_verified': False},
+            {'vat_status': VATStatus.OUTSIDE_EU},
+            {'vat_status': VATStatus.UK},
+            {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': False},
         ),
     )
     def test_can(self, fields):
@@ -106,8 +106,8 @@ class TestShouldVATBeApplied:
     @pytest.mark.parametrize(
         'fields',
         (
-            {'vat_status': VATStatus.outside_eu},
-            {'vat_status': VATStatus.eu, 'vat_verified': True, 'vat_number': '123'},
+            {'vat_status': VATStatus.OUTSIDE_EU},
+            {'vat_status': VATStatus.EU, 'vat_verified': True, 'vat_number': '123'},
         ),
     )
     def test_shouldnt(self, fields):
@@ -118,8 +118,8 @@ class TestShouldVATBeApplied:
     @pytest.mark.parametrize(
         'fields',
         (
-            {'vat_status': VATStatus.uk},
-            {'vat_status': VATStatus.eu, 'vat_verified': False},
+            {'vat_status': VATStatus.UK},
+            {'vat_status': VATStatus.EU, 'vat_verified': False},
         ),
     )
     def test_should(self, fields):
@@ -234,8 +234,8 @@ class TestCalculateOrderPricing:
     @pytest.mark.parametrize(
         'fields',
         (
-            {'vat_status': VATStatus.uk},
-            {'vat_status': VATStatus.eu, 'vat_verified': False},
+            {'vat_status': VATStatus.UK},
+            {'vat_status': VATStatus.EU, 'vat_verified': False},
         ),
     )
     def test_with_applied_vat(self, fields):
@@ -259,8 +259,8 @@ class TestCalculateOrderPricing:
     @pytest.mark.parametrize(
         'fields',
         (
-            {'vat_status': VATStatus.outside_eu},
-            {'vat_status': VATStatus.eu, 'vat_verified': True},
+            {'vat_status': VATStatus.OUTSIDE_EU},
+            {'vat_status': VATStatus.EU, 'vat_verified': True},
         ),
     )
     def test_without_applied_vat(self, fields):
@@ -291,11 +291,11 @@ class TestUpdateOrderPricing:
         Test that if udpate_order_pricing is called without committing,
         the order model is changed but not the db.
         """
-        order = OrderFactory(vat_status=VATStatus.uk)
+        order = OrderFactory(vat_status=VATStatus.UK)
         orig_total_cost = order.total_cost
 
         # change order and recalculate pricing without saving
-        order.vat_status = VATStatus.outside_eu
+        order.vat_status = VATStatus.OUTSIDE_EU
         update_order_pricing(order, commit=False)
 
         assert order.total_cost != orig_total_cost
@@ -309,11 +309,11 @@ class TestUpdateOrderPricing:
         Test that if udpate_order_pricing is called with commit = True,
         the order model is changed and the db as well.
         """
-        order = OrderFactory(vat_status=VATStatus.uk)
+        order = OrderFactory(vat_status=VATStatus.UK)
         orig_total_cost = order.total_cost
 
         # change order and recalculate pricing without saving
-        order.vat_status = VATStatus.outside_eu
+        order.vat_status = VATStatus.OUTSIDE_EU
         update_order_pricing(order, commit=True)
 
         assert order.total_cost != orig_total_cost

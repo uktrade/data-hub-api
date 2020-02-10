@@ -395,6 +395,9 @@ if REDIS_BASE_URL:
         'automatic_company_archive': {
             'task': 'datahub.company.tasks.automatic_company_archive',
             'schedule': crontab(minute=0, hour=20, day_of_week='SAT'),
+            'kwargs': {
+                'simulate': False,
+            }
         },
     }
     if env.bool('ENABLE_DAILY_ES_SYNC', False):

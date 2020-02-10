@@ -13,8 +13,8 @@ class ServiceFactory(factory.django.DjangoModelFactory):
 
     contexts = factory.LazyFunction(
         lambda: sample(
-            Service.CONTEXTS._db_values,
-            randrange(0, len(Service.CONTEXTS._db_values)),
+            Service.Context.values,
+            randrange(0, len(Service.Context.values)),
         ),
     )
 
@@ -29,8 +29,8 @@ class ChildServiceFactory(factory.django.DjangoModelFactory):
     parent = factory.SubFactory(ServiceFactory)
     contexts = factory.LazyFunction(
         lambda: sample(
-            Service.CONTEXTS._db_values,
-            randrange(0, len(Service.CONTEXTS._db_values)),
+            Service.Context.values,
+            randrange(0, len(Service.Context.values)),
         ),
     )
 

@@ -63,19 +63,19 @@ def setup_data(es_with_collector):
     CompanyExportCountryFactory(
         company=company1,
         country_id=constants.Country.france.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
     )
 
     CompanyExportCountryFactory(
         company=company1,
         country_id=constants.Country.japan.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        status=CompanyExportCountry.Status.FUTURE_INTEREST,
     )
 
     CompanyExportCountryFactory(
         company=company1,
         country_id=constants.Country.united_states.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        status=CompanyExportCountry.Status.FUTURE_INTEREST,
     )
 
     company2 = CompanyFactory(
@@ -90,19 +90,19 @@ def setup_data(es_with_collector):
     CompanyExportCountryFactory(
         company=company2,
         country_id=constants.Country.canada.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
     )
 
     CompanyExportCountryFactory(
         company=company2,
         country_id=constants.Country.france.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
     )
 
     CompanyExportCountryFactory(
         company=company2,
         country_id=constants.Country.japan.value.id,
-        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+        status=CompanyExportCountry.Status.FUTURE_INTEREST,
     )
 
     CompanyFactory(
@@ -991,9 +991,9 @@ class TestCompanyExportView(APITestMixin):
                 ),
                 status=factory.Iterator(
                     [
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
-                        CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                        CompanyExportCountry.Status.FUTURE_INTEREST,
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     ],
                 ),
             )
@@ -1029,12 +1029,12 @@ class TestCompanyExportView(APITestMixin):
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Countries exported to': ', '.join([
                     e.country.name for e in company.export_countries.filter(
-                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.currently_exporting,
+                        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     ).order_by('country__name')
                 ]),
                 'Countries of interest':', '.join([
                     e.country.name for e in company.export_countries.filter(
-                        status=CompanyExportCountry.EXPORT_INTEREST_STATUSES.future_interest,
+                        status=CompanyExportCountry.Status.FUTURE_INTEREST,
                     ).order_by('country__name')
                 ]),
                 'Archived': company.archived,

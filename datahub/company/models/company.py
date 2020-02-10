@@ -11,7 +11,6 @@ from django.core.validators import (
 )
 from django.db import models
 from django.utils.timezone import now
-from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
 from datahub.core import constants, reversion
@@ -55,23 +54,21 @@ class OneListTier(BaseOrderedConstantModel):
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
-    TRANSFER_REASONS = Choices(
-        ('duplicate', 'Duplicate record'),
-    )
+    class TransferReason(models.TextChoices):
+        DUPLICATE = ('duplicate', 'Duplicate record')
 
-    EXPORT_POTENTIAL_SCORES = Choices(
-        ('very_high', 'Very High'),
-        ('high', 'High'),
-        ('medium', 'Medium'),
-        ('low', 'Low'),
-        ('very_low', 'Very Low'),
-    )
+    class ExportPotentialScore(models.TextChoices):
+        VERY_HIGH = ('very_high', 'Very High')
+        HIGH = ('high', 'High')
+        MEDIUM = ('medium', 'Medium')
+        LOW = ('low', 'Low')
+        VERY_LOW = ('very_low', 'Very Low')
 
-    GREAT_PROFILE_STATUSES = Choices(
-        ('published', 'Published'),
-        ('unpublished', 'Unpublished'),
-        (None, 'No profile or not known'),
-    )
+    class GreatProfileStatus(models.TextChoices):
+        PUBLISHED = ('published', 'Published')
+        UNPUBLISHED = ('unpublished', 'Unpublished')
+
+        __empty__ = 'No profile or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
@@ -218,7 +215,7 @@ class Company(ArchivableModel, BaseModel):
     transfer_reason = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
-        choices=TRANSFER_REASONS,
+        choices=TransferReason.choices,
         help_text='The reason data for this company was transferred.',
     )
     transferred_on = models.DateTimeField(blank=True, null=True)
@@ -241,14 +238,14 @@ class Company(ArchivableModel, BaseModel):
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        choices=EXPORT_POTENTIAL_SCORES,
+        choices=ExportPotentialScore.choices,
         help_text='Score that signifies export potential, imported from Data Science',
     )
     great_profile_status = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        choices=GREAT_PROFILE_STATUSES,
+        choices=GreatProfileStatus.choices,
         help_text='Whether this company has a profile and agreed to be published or not',
     )
     global_ultimate_duns_number = models.CharField(
@@ -504,11 +501,10 @@ class CompanyExportCountry(BaseModel):
         - future_interest_countries
     """
 
-    EXPORT_INTEREST_STATUSES = Choices(
-        ('not_interested', 'Not interested'),
-        ('currently_exporting', 'Currently exporting to'),
-        ('future_interest', 'Future country of interest'),
-    )
+    class Status(models.TextChoices):
+        NOT_INTERESTED = ('not_interested', 'Not interested')
+        CURRENTLY_EXPORTING = ('currently_exporting', 'Currently exporting to')
+        FUTURE_INTEREST = ('future_interest', 'Future country of interest')
 
     id = models.UUIDField(
         primary_key=True,
@@ -526,7 +522,7 @@ class CompanyExportCountry(BaseModel):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=EXPORT_INTEREST_STATUSES,
+        choices=Status.choices,
     )
 
     class Meta:
@@ -553,11 +549,10 @@ class CompanyExportCountryHistory(models.Model):
     company and/or country.
     """
 
-    HISTORY_TYPES = Choices(
-        ('insert', 'Inserted'),
-        ('update', 'Updated'),
-        ('delete', 'Deleted'),
-    )
+    class HistoryType(models.TextChoices):
+        INSERT = ('insert', 'Inserted')
+        UPDATE = ('update', 'Updated')
+        DELETE = ('delete', 'Deleted')
 
     history_id = models.UUIDField(
         primary_key=True,
@@ -573,7 +568,7 @@ class CompanyExportCountryHistory(models.Model):
     )
     history_type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=HISTORY_TYPES,
+        choices=HistoryType.choices,
     )
     id = models.UUIDField(db_index=True)
     country = models.ForeignKey(
@@ -588,7 +583,7 @@ class CompanyExportCountryHistory(models.Model):
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=CompanyExportCountry.EXPORT_INTEREST_STATUSES,
+        choices=CompanyExportCountry.Status.choices,
     )
 
     class Meta:

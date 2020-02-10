@@ -6,7 +6,6 @@ from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from model_utils import Choices
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.core.exceptions import DataHubException
@@ -152,9 +151,8 @@ class Team(BaseConstantModel):
         Comments: For when filtering by name__iexact
     """
 
-    TAGS = Choices(
-        ('investment_services_team', 'Investment Services Team'),
-    )
+    class Tag(models.TextChoices):
+        INVESTMENT_SERVICES_TEAM = ('investment_services_team', 'Investment Services Team')
 
     role = models.ForeignKey(
         TeamRole,
@@ -176,7 +174,7 @@ class Team(BaseConstantModel):
     )
     tags = MultipleChoiceField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=TAGS,
+        choices=Tag.choices,
         blank=True,
     )
 
@@ -219,28 +217,30 @@ class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
     Export Win
     """
 
-    CONTEXTS = Choices(
+    class Context(models.TextChoices):
         # Services that can be attached to an event
-        ('event', 'Event'),
+        EVENT = ('event', 'Event')
         # For interactions added to a company that are about export
-        ('export_interaction', 'Export interaction'),
+        EXPORT_INTERACTION = ('export_interaction', 'Export interaction')
         # For service deliveries added to a company that are about export
-        ('export_service_delivery', 'Export service delivery'),
+        EXPORT_SERVICE_DELIVERY = ('export_service_delivery', 'Export service delivery')
         # For interactions added to a company about investment (but not a
         # specific investment project)
-        ('investment_interaction', 'Investment interaction'),
+        INVESTMENT_INTERACTION = ('investment_interaction', 'Investment interaction')
         # For interactions added to a particular investment project
-        ('investment_project_interaction', 'Investment project interaction'),
+        INVESTMENT_PROJECT_INTERACTION = (
+            'investment_project_interaction',
+            'Investment project interaction',
+        )
         # For interactions added to a company that are about not about export or investment
-        ('other_interaction', 'Other interaction'),
+        OTHER_INTERACTION = ('other_interaction', 'Other interaction')
         # For service deliveries added to a company that are about not about export or investment
-        ('other_service_delivery', 'Other service delivery'),
+        OTHER_SERVICE_DELIVERY = ('other_service_delivery', 'Other service delivery')
 
         # TODO: Deprecated contexts  – remove once the front end has been updated to use
         # other contexts
-        ('interaction', 'Interaction (deprecated)'),
-        ('service_delivery', 'Service delivery (deprecated)'),
-    )
+        INTERACTION = ('interaction', 'Interaction (deprecated)')
+        SERVICE_DELIVERY = ('service_delivery', 'Service delivery (deprecated)')
 
     segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
 
@@ -254,7 +254,7 @@ class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
 
     contexts = MultipleChoiceField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=CONTEXTS,
+        choices=Context.choices,
         blank=True,
         help_text='Contexts are only valid on leaf nodes.',
     )

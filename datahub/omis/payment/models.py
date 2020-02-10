@@ -25,8 +25,8 @@ class PaymentGatewaySession(BaseModel):
     )
     status = models.CharField(
         max_length=100,
-        choices=PaymentGatewaySessionStatus,
-        default=PaymentGatewaySessionStatus.created,
+        choices=PaymentGatewaySessionStatus.choices,
+        default=PaymentGatewaySessionStatus.CREATED,
     )
     govuk_payment_id = models.CharField(
         max_length=100,
@@ -67,10 +67,10 @@ class PaymentGatewaySession(BaseModel):
         :returns: True if this payment gateway session is in a finished status
         """
         return self.status in (
-            PaymentGatewaySessionStatus.success,
-            PaymentGatewaySessionStatus.failed,
-            PaymentGatewaySessionStatus.cancelled,
-            PaymentGatewaySessionStatus.error,
+            PaymentGatewaySessionStatus.SUCCESS,
+            PaymentGatewaySessionStatus.FAILED,
+            PaymentGatewaySessionStatus.CANCELLED,
+            PaymentGatewaySessionStatus.ERROR,
         )
 
     @transaction.atomic
@@ -98,7 +98,7 @@ class PaymentGatewaySession(BaseModel):
         self.status = new_status
         self.save()
 
-        if self.status == PaymentGatewaySessionStatus.success:
+        if self.status == PaymentGatewaySessionStatus.SUCCESS:
             self.order.mark_as_paid(
                 by=None,
                 payments_data=[
@@ -142,8 +142,8 @@ class Payment(BaseModel):
     amount = models.PositiveIntegerField(help_text='Amount paid in pence.')
     method = models.CharField(
         max_length=100,
-        choices=PaymentMethod,
-        default=PaymentMethod.bacs,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.BACS,
     )
     received_on = models.DateField()
 
@@ -192,7 +192,7 @@ class Refund(BaseModel):
         related_name='%(class)ss',
     )
     reference = models.CharField(max_length=100)
-    status = models.CharField(max_length=100, choices=RefundStatus)
+    status = models.CharField(max_length=100, choices=RefundStatus.choices)
 
     requested_on = models.DateTimeField()
     requested_by = models.ForeignKey(
@@ -227,7 +227,7 @@ class Refund(BaseModel):
     method = models.CharField(
         max_length=100,
         null=True, blank=True,
-        choices=PaymentMethod,
+        choices=PaymentMethod.choices,
     )
     net_amount = models.PositiveIntegerField(
         null=True, blank=True,

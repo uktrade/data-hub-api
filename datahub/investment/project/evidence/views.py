@@ -11,7 +11,7 @@ from datahub.investment.project.evidence.permissions import (
 from datahub.investment.project.evidence.serializers import EvidenceDocumentSerializer
 from datahub.investment.project.models import InvestmentProject
 from datahub.oauth.scopes import Scope
-from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
 
@@ -63,5 +63,5 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
         """Record delete event."""
         entity_document = self.get_object()
         data = self.serializer_class(entity_document).data
-        record_user_event(request, USER_EVENT_TYPES.evidence_document_delete, data=data)
+        record_user_event(request, UserEventType.EVIDENCE_DOCUMENT_DELETE, data=data)
         return super().destroy(request, *args, **kwargs)

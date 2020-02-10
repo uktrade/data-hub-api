@@ -1,6 +1,6 @@
 import functools
 
-from django.contrib import messages
+from django.contrib import messages as django_messages
 from django.http import HttpResponseRedirect
 
 from datahub.metadata.models import Country
@@ -108,24 +108,33 @@ def format_company_diff(dh_company, dnb_company):
     }
 
 
-def redirect_with_message(func):
+def redirect_with_messages(func):
     """
-    Decorator that redirects to a given URL with a given
-    message for the user in case of an error.
+    Decorator that redirects to a given URL with one or more messages for the user in case of an
+    error.
     """
     @functools.wraps(func)
     def wrapper(model_admin, request, *args, **kwargs):
         try:
             return func(model_admin, request, *args, **kwargs)
         except AdminException as exc:
-            message, redirect_url = exc.args
-            messages.add_message(request, messages.ERROR, message)
+            messages = exc.messages
+            redirect_url = exc.redirect_url
+            for message in messages:
+                django_messages.add_message(request, django_messages.ERROR, message)
             return HttpResponseRedirect(redirect_url)
     return wrapper
 
 
 class AdminException(Exception):
     """
-    Exception in an admin view. Contains the message
-    to be displayed to the usr and the redirect_url.
+    Exception in an admin view. Contains the message to be displayed to the user and the
+    redirect_url.
     """
+
+    def __init__(self, messages, redirect_url):
+        """
+        Initialise the AdminException.
+        """
+        self.messages = messages
+        self.redirect_url = redirect_url

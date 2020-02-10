@@ -244,7 +244,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         )
         assert source_company.modified_by == self.user
         assert source_company.modified_on == merge_time
-        assert source_company.transfer_reason == Company.TRANSFER_REASONS.duplicate
+        assert source_company.transfer_reason == Company.TransferReason.DUPLICATE
         assert source_company.transferred_by == self.user
         assert source_company.transferred_on == merge_time
         assert source_company.transferred_to == target_company
