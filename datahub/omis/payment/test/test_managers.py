@@ -97,7 +97,7 @@ class TestPaymentGatewaySessionManager:
 
         # check session
         assert session.order == order
-        assert session.status == PaymentGatewaySessionStatus.created
+        assert session.status == PaymentGatewaySessionStatus.CREATED
         assert session.govuk_payment_id == govuk_payment_id
         assert session.created_by == adviser
 
@@ -143,9 +143,9 @@ class TestPaymentGatewaySessionManager:
             3,
             order=order,
             status=factory.Iterator([
-                PaymentGatewaySessionStatus.created,
-                PaymentGatewaySessionStatus.started,
-                PaymentGatewaySessionStatus.failed,
+                PaymentGatewaySessionStatus.CREATED,
+                PaymentGatewaySessionStatus.STARTED,
+                PaymentGatewaySessionStatus.FAILED,
             ]),
         )
 
@@ -198,7 +198,7 @@ class TestPaymentGatewaySessionManager:
         # check sessions cancelled
         for existing_session in existing_data[:-1]:
             existing_session.refresh_from_db()
-            assert existing_session.status == PaymentGatewaySessionStatus.cancelled
+            assert existing_session.status == PaymentGatewaySessionStatus.CANCELLED
 
         assert PaymentGatewaySession.objects.count() == 4
 
@@ -257,7 +257,7 @@ class TestPaymentGatewaySessionManager:
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.started,
+            status=PaymentGatewaySessionStatus.STARTED,
         )
 
         # mock GOV.UK requests used to refresh the payment session,
@@ -292,7 +292,7 @@ class TestPaymentGatewaySessionManager:
 
         # check session record
         existing_session.refresh_from_db()
-        assert existing_session.status == PaymentGatewaySessionStatus.success
+        assert existing_session.status == PaymentGatewaySessionStatus.SUCCESS
 
         # check order and payment
         order.refresh_from_db()
@@ -302,7 +302,7 @@ class TestPaymentGatewaySessionManager:
         payment = Payment.objects.first()
 
         assert payment.amount == order.total_cost
-        assert payment.method == PaymentMethod.card
+        assert payment.method == PaymentMethod.CARD
         assert payment.received_on == dateutil_parse('2018-02-13').date()
         assert payment.transaction_reference == '12345'
         assert payment.cardholder_name == 'John Doe'
@@ -360,7 +360,7 @@ class TestPaymentGatewaySessionManager:
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.created,
+            status=PaymentGatewaySessionStatus.CREATED,
         )
 
         # mock GOV.UK requests used to
@@ -404,18 +404,18 @@ class TestPaymentGatewaySessionManager:
             3,
             order=order1,
             status=factory.Iterator([
-                PaymentGatewaySessionStatus.created,
-                PaymentGatewaySessionStatus.submitted,
-                PaymentGatewaySessionStatus.failed,
+                PaymentGatewaySessionStatus.CREATED,
+                PaymentGatewaySessionStatus.SUBMITTED,
+                PaymentGatewaySessionStatus.FAILED,
             ]),
         )
         order2_sessions = PaymentGatewaySessionFactory.create_batch(
             3,
             order=order2,
             status=factory.Iterator([
-                PaymentGatewaySessionStatus.started,
-                PaymentGatewaySessionStatus.success,
-                PaymentGatewaySessionStatus.cancelled,
+                PaymentGatewaySessionStatus.STARTED,
+                PaymentGatewaySessionStatus.SUCCESS,
+                PaymentGatewaySessionStatus.CANCELLED,
             ]),
         )
 

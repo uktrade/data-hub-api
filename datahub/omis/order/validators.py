@@ -110,7 +110,7 @@ class VATSubValidator:
                 'vat_status': [self.message],
             })
 
-        if vat_status == VATStatus.eu:
+        if vat_status == VATStatus.EU:
             vat_verified = data_combiner.get_value('vat_verified')
             if vat_verified is None:
                 raise ValidationError({

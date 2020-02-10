@@ -36,18 +36,18 @@ class TestRefreshPendingPaymentGatewaySessions:
         # populate db
         data = (
             # shouldn't be included because modified_on == 59 mins ago
-            ('2017-04-18 19:01', PaymentGatewaySessionStatus.started),
+            ('2017-04-18 19:01', PaymentGatewaySessionStatus.STARTED),
 
             # shouldn't be included because status != 'ongoing'
-            ('2017-04-18 18:59', PaymentGatewaySessionStatus.success),
-            ('2017-04-18 18:59', PaymentGatewaySessionStatus.failed),
-            ('2017-04-18 18:59', PaymentGatewaySessionStatus.cancelled),
-            ('2017-04-18 18:59', PaymentGatewaySessionStatus.error),
+            ('2017-04-18 18:59', PaymentGatewaySessionStatus.SUCCESS),
+            ('2017-04-18 18:59', PaymentGatewaySessionStatus.FAILED),
+            ('2017-04-18 18:59', PaymentGatewaySessionStatus.CANCELLED),
+            ('2017-04-18 18:59', PaymentGatewaySessionStatus.ERROR),
 
             # should be included because modified_on >= 60 mins ago
-            ('2017-04-18 19:00', PaymentGatewaySessionStatus.created),
-            ('2017-04-18 18:59', PaymentGatewaySessionStatus.started),
-            ('2017-04-17 20:00', PaymentGatewaySessionStatus.submitted),
+            ('2017-04-18 19:00', PaymentGatewaySessionStatus.CREATED),
+            ('2017-04-18 18:59', PaymentGatewaySessionStatus.STARTED),
+            ('2017-04-17 20:00', PaymentGatewaySessionStatus.SUBMITTED),
         )
         sessions = []
         for frozen_time, session_status in data:
@@ -62,7 +62,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         assert requests_mock.call_count == 3
         for session in sessions[-3:]:
             session.refresh_from_db()
-            assert session.status == PaymentGatewaySessionStatus.failed
+            assert session.status == PaymentGatewaySessionStatus.FAILED
 
     @freeze_time('2017-04-18 20:00')
     def test_one_failed_refresh_doesnt_stop_others(self, requests_mock):
@@ -90,7 +90,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         # populate db
         sessions = PaymentGatewaySessionFactory.create_batch(
             3,
-            status=PaymentGatewaySessionStatus.started,
+            status=PaymentGatewaySessionStatus.STARTED,
             govuk_payment_id=factory.Iterator(govuk_payment_ids),
         )
 
@@ -102,6 +102,6 @@ class TestRefreshPendingPaymentGatewaySessions:
             session.refresh_from_db()
 
         assert requests_mock.call_count == 3
-        assert sessions[0].status == PaymentGatewaySessionStatus.failed
-        assert sessions[1].status == PaymentGatewaySessionStatus.started
-        assert sessions[2].status == PaymentGatewaySessionStatus.failed
+        assert sessions[0].status == PaymentGatewaySessionStatus.FAILED
+        assert sessions[1].status == PaymentGatewaySessionStatus.STARTED
+        assert sessions[2].status == PaymentGatewaySessionStatus.FAILED

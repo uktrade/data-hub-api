@@ -611,7 +611,7 @@ class TestOrderExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchOrderExportAPIView.field_titles.values())
         sorted_orders_and_refunds = (
-            (order, order.refunds.filter(status=RefundStatus.approved))
+            (order, order.refunds.filter(status=RefundStatus.APPROVED))
             for order in sorted_orders
         )
 
