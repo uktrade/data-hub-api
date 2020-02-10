@@ -13,23 +13,23 @@ class CompanyReferralAdmin(BaseModelAdminMixin, admin.ModelAdmin):
         'company__pk',
         'company__name',
     )
-    ordering = (
-        '-created_on',
-    )
     raw_id_fields = (
+        'closed_by',
         'company',
+        'completed_by',
         'contact',
         'interaction',
         'recipient',
-        'completed_by',
     )
     readonly_fields = (
+        'id',
         'created',
         'modified',
     )
     list_display = (
-        'company',
         'subject',
+        'company',
+        'status',
         'created_on',
     )
     list_select_related = (
