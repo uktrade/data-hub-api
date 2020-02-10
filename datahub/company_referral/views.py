@@ -14,7 +14,10 @@ class CompanyReferralViewSet(CoreViewSet):
     queryset = CompanyReferral.objects.select_related(
         'company',
         'contact',
+        'closed_by__dit_team',
+        'completed_by__dit_team',
         'created_by__dit_team',
+        'interaction',
         'recipient__dit_team',
     )
 
