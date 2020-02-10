@@ -1,4 +1,4 @@
-from django.contrib import messages
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -13,7 +13,7 @@ from datahub.company.admin.dnb_link.forms import SelectIdsToLinkForm
 from datahub.company.admin.utils import (
     AdminException,
     format_company_diff,
-    redirect_with_message,
+    redirect_with_messages,
 )
 from datahub.dnb_api.link_company import link_company_with_dnb
 from datahub.dnb_api.utils import (
@@ -23,12 +23,14 @@ from datahub.dnb_api.utils import (
 )
 
 
-def _build_error_message(all_errors):
-    error_message = ''
-    for field, errors in all_errors.items():
-        concatenated_errors = ', '.join(errors)
-        error_message += f'{field}: {concatenated_errors} '
-    return error_message
+def _build_error_messages(all_errors):
+    messages = [
+        f'{field}: {error}'
+        for field, errors in all_errors.items()
+        for error in errors
+    ]
+
+    return messages
 
 
 def _link_company_with_dnb(dh_company_id, duns_number, user, error_url):
@@ -39,15 +41,14 @@ def _link_company_with_dnb(dh_company_id, duns_number, user, error_url):
 
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
-        raise AdminException(message, error_url)
-
+        raise AdminException([message], error_url)
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
-        raise AdminException(message, error_url)
+        raise AdminException([message], error_url)
 
     except DNBServiceException:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, error_url)
+        raise AdminException([message], error_url)
 
 
 def _get_company(duns_number, error_url):
@@ -56,14 +57,14 @@ def _get_company(duns_number, error_url):
 
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
-        raise AdminException(message, error_url)
+        raise AdminException([message], error_url)
 
     except DNBServiceException:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException(message, error_url)
+        raise AdminException([message], error_url)
 
 
-@redirect_with_message
+@redirect_with_messages
 @method_decorator(csrf_protect)
 def dnb_link_review_changes(model_admin, request):
     """
@@ -79,8 +80,8 @@ def dnb_link_review_changes(model_admin, request):
 
     form = SelectIdsToLinkForm(data=request.GET)
     if not form.is_valid():
-        message = _build_error_message(form.errors)
-        raise AdminException(message, company_list_page)
+        messages = _build_error_messages(form.errors)
+        raise AdminException(messages, company_list_page)
 
     dh_company = form.cleaned_data['company']
     duns_number = form.cleaned_data['duns_number']
@@ -90,7 +91,11 @@ def dnb_link_review_changes(model_admin, request):
     if is_post:
         _link_company_with_dnb(dh_company.pk, duns_number, request.user, company_list_page)
 
-        messages.add_message(request, messages.SUCCESS, 'Company linked to D&B successfully.')
+        django_messages.add_message(
+            request,
+            django_messages.SUCCESS,
+            'Company linked to D&B successfully.',
+        )
         company_change_page = reverse(
             admin_urlname(model_admin.model._meta, 'change'),
             kwargs={'object_id': dh_company.pk},
