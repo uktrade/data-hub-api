@@ -6,7 +6,7 @@ import pytest
 from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
 
@@ -35,10 +35,10 @@ def test_record_user_event(data, expected_data):
     """Test record_user_event() for various model and data values."""
     adviser = AdviserFactory()
     request = Mock(user=adviser, path='test-path')
-    event = record_user_event(request, USER_EVENT_TYPES.search_export, data=data)
+    event = record_user_event(request, UserEventType.SEARCH_EXPORT, data=data)
     event.refresh_from_db()
 
     assert event.adviser == adviser
-    assert event.type == USER_EVENT_TYPES.search_export
+    assert event.type == UserEventType.SEARCH_EXPORT
     assert event.api_url_path == 'test-path'
     assert event.data == expected_data

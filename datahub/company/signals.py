@@ -67,9 +67,9 @@ def record_export_country_history_update(sender, instance, created, raw, **kwarg
     if raw:
         return
 
-    action = CompanyExportCountryHistory.HISTORY_TYPES.update
+    action = CompanyExportCountryHistory.HistoryType.UPDATE
     if created:
-        action = CompanyExportCountryHistory.HISTORY_TYPES.insert
+        action = CompanyExportCountryHistory.HistoryType.INSERT
 
     _record_export_country_history(instance, action)
 
@@ -83,7 +83,7 @@ def record_export_country_history_delete(sender, instance, **kwargs):
     """
     Record export country deletions to history.
     """
-    action = CompanyExportCountryHistory.HISTORY_TYPES.delete
+    action = CompanyExportCountryHistory.HistoryType.DELETE
 
     _record_export_country_history(instance, action)
 

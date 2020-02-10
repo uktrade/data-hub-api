@@ -145,7 +145,7 @@ class SPIReport:
         return (
             project_manager
             and project_manager.dit_team
-            and Team.TAGS.investment_services_team in project_manager.dit_team.tags
+            and Team.Tag.INVESTMENT_SERVICES_TEAM in project_manager.dit_team.tags
         )
 
     def _find_when_project_moved_to_won(self, investment_project):
