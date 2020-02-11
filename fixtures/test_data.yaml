@@ -548,6 +548,23 @@
     modified_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
     modified_on: '2019-07-20T10:00:00Z'
 
+- model: company_referral.companyreferral
+  pk: 3d4b1d90-eeb2-4823-a3a2-459f61483e2f
+  fields:
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    contact: 048f2edc-e7ed-4881-b1cc-29142a80238a
+    recipient: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    interaction: 04e8c0cb-3a52-46b1-a465-76f206d0fd37
+    status: complete
+    subject: Wants to export saxophones
+    notes: Example complete referral
+    completed_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    completed_on: '2020-02-01T10:00:00Z'
+    created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    created_on: '2020-01-02T10:00:00Z'
+    modified_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    modified_on: '2020-02-01T10:00:00Z'
+
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:
@@ -774,6 +791,35 @@
     interaction: aa350238-5d84-4bed-be68-b08dea7ea6d5
     adviser: a80ff5fd-8904-4940-bf96-fe8047e34be5
     team: a4f924aa-9698-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: 04e8c0cb-3a52-46b1-a465-76f206d0fd37
+  fields:
+    theme: export
+    kind: interaction
+    subject: Conversation about exporting saxophones
+    date: '2020-02-01T00:00:00Z'
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    event: ~
+    service: fee6779d-e127-4e1e-89f6-d614b4df3581
+    notes: This is a dummy service delivery connected to a referral for testing
+    communication_channel: ~
+    investment_project: ~
+    was_policy_feedback_provided: false
+    were_countries_discussed: false
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2020-02-01T10:00:00Z'
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_on: '2020-02-01T10:00:00Z'
+
+- model: interaction.interactionditparticipant
+  pk: 9
+  fields:
+    interaction: 04e8c0cb-3a52-46b1-a465-76f206d0fd37
+    adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    team: c833d869-2f50-e311-a56a-e4115bead28a
 
 - model: investment.investmentproject
   pk: 721e2a04-21c3-4172-a321-4368463a4b2d

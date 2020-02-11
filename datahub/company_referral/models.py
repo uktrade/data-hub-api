@@ -13,7 +13,6 @@ class CompanyReferral(BaseModel):
 
     TODO:
     - add a reason closed field
-    - add a OneToOneField between this model and Interaction (could go on either model)
     """
 
     class Status(models.TextChoices):
@@ -51,6 +50,12 @@ class CompanyReferral(BaseModel):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=Status.choices,
         default=Status.OUTSTANDING,
+    )
+    interaction = models.OneToOneField(
+        'interaction.Interaction',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
     )
     completed_by = models.ForeignKey(
         'company.Advisor',
