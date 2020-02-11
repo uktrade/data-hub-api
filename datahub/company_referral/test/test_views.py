@@ -81,6 +81,7 @@ class TestListCompanyListsView(APITestMixin):
             'id': str(company_referral.pk),
             'closed_by': None,
             'closed_on': None,
+            'closure_reason': '',
             'company': {
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
@@ -230,6 +231,7 @@ class TestAddCompanyReferral(APITestMixin):
         assert response_data == {
             'closed_by': None,
             'closed_on': None,
+            'closure_reason': '',
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -277,6 +279,7 @@ class TestAddCompanyReferral(APITestMixin):
         assert response_data == {
             'closed_by': None,
             'closed_on': None,
+            'closure_reason': '',
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -397,6 +400,7 @@ class TestGetCompanyReferral(APITestMixin):
         assert response_data == {
             'closed_by': _format_expected_adviser(referral.closed_by),
             'closed_on': format_date_or_datetime(referral.closed_on),
+            'closure_reason': referral.closure_reason,
             'company': {
                 'id': str(referral.company.pk),
                 'name': referral.company.name,

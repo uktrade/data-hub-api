@@ -26,6 +26,7 @@ class CompanyReferralSerializer(serializers.ModelSerializer):
             'id',
             'closed_by',
             'closed_on',
+            'closure_reason',
             'company',
             'completed_by',
             'completed_on',
@@ -41,6 +42,7 @@ class CompanyReferralSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'closed_on',
+            'closure_reason',
             'completed_on',
             'created_on',
             'status',
