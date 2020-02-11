@@ -25,6 +25,7 @@ class ClosedCompanyReferralFactory(CompanyReferralFactory):
     """A factory for referrals that have been closed."""
 
     status = CompanyReferral.Status.CLOSED
+    closure_reason = factory.Faker('random_element', elements=CompanyReferral.ClosureReason.values)
     closed_by = factory.SubFactory(AdviserFactory)
     closed_on = factory.Faker('past_datetime', tzinfo=utc)
 

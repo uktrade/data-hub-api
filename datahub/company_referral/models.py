@@ -10,9 +10,6 @@ class CompanyReferral(BaseModel):
     """
     An internal referral of a company, from one adviser (the creator of the referrer)
     to another (the recipient).
-
-    TODO:
-    - add a reason closed field
     """
 
     class Status(models.TextChoices):
@@ -20,7 +17,26 @@ class CompanyReferral(BaseModel):
         CLOSED = ('closed', 'Closed')
         COMPLETE = ('complete', 'Complete')
 
+    class ClosureReason(models.TextChoices):
+        UNREACHABLE = (
+            'unreachable',
+            'The company or contact couldn’t be reached',
+        )
+        INSUFFICIENT_INFORMATION = (
+            'insufficient_information',
+            'The information in this referral is insufficient',
+        )
+        WRONG_RECIPIENT = (
+            'wrong_recipient',
+            'I’m not the right person for this referral',
+        )
+
     id = models.UUIDField(primary_key=True, default=uuid4)
+    closure_reason = models.CharField(
+        blank=True,
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=ClosureReason.choices,
+    )
     closed_by = models.ForeignKey(
         'company.Advisor',
         null=True,

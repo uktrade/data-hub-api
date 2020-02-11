@@ -323,6 +323,7 @@ class TestAddCompanyReferral(APITestMixin):
         assert referral_data == {
             'closed_by_id': None,
             'closed_on': None,
+            'closure_reason': '',
             'company_id': request_data['company']['id'],
             'completed_by_id': None,
             'completed_on': None,
