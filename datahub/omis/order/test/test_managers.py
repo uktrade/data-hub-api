@@ -20,24 +20,24 @@ class TestOrderManager:
         Test that `publicly_accessible()` only returns the publicly accessible orders.
         """
         # set up db
-        for order_status_choice in OrderStatus:
+        for order_status_choice in OrderStatus.choices:
             order_status = order_status_choice[0]
             OrderFactory(
                 status=order_status,
                 reference=f'{order_status}',
             )
         OrderFactory(
-            status=OrderStatus.draft,
+            status=OrderStatus.DRAFT,
             quote=CancelledQuoteFactory(),
             reference='draft_with_cancelled_quote',
         )
 
         # define expectation
         expected_orders = {
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         }
         if include_reopened:
             expected_orders.add('draft_with_cancelled_quote')

@@ -40,7 +40,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
-    status = OrderStatus.draft
+    status = OrderStatus.DRAFT
     po_number = factory.Faker('text', max_nb_chars=50)
     discount_value = factory.Faker('random_int', max=100)
     discount_label = factory.Faker('text', max_nb_chars=50)
@@ -84,7 +84,7 @@ class OrderWithOpenQuoteFactory(OrderFactory):
     """Order factory with an active quote."""
 
     quote = factory.SubFactory(QuoteFactory)
-    status = OrderStatus.quote_awaiting_acceptance
+    status = OrderStatus.QUOTE_AWAITING_ACCEPTANCE
 
 
 class OrderWithCancelledQuoteFactory(OrderFactory):
@@ -97,7 +97,7 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     """Order factory with an accepted quote."""
 
     quote = factory.SubFactory(AcceptedQuoteFactory)
-    status = OrderStatus.quote_accepted
+    status = OrderStatus.QUOTE_ACCEPTED
 
     @factory.post_generation
     def set_invoice(self, create, extracted, **kwargs):
@@ -110,7 +110,7 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
 class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
-    status = OrderStatus.complete
+    status = OrderStatus.COMPLETE
     completed_on = factory.Faker('date_time', tzinfo=utc)
     completed_by = factory.SubFactory(AdviserFactory)
 
@@ -118,7 +118,7 @@ class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
 class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
     """Factory for cancelled orders."""
 
-    status = OrderStatus.cancelled
+    status = OrderStatus.CANCELLED
     cancelled_on = factory.Faker('date_time', tzinfo=utc)
     cancelled_by = factory.SubFactory(AdviserFactory)
     cancellation_reason = factory.LazyFunction(CancellationReason.objects.first)
@@ -128,7 +128,7 @@ class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
     paid_on = factory.Faker('date_time', tzinfo=utc)
-    status = OrderStatus.paid
+    status = OrderStatus.PAID
 
 
 class OrderWithoutAssigneesFactory(OrderFactory):

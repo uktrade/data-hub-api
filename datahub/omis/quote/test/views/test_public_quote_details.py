@@ -19,10 +19,10 @@ class TestPublicGetQuote(APITestMixin):
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         ),
     )
     def test_get(self, order_status):
@@ -57,7 +57,7 @@ class TestPublicGetQuote(APITestMixin):
         """Test a successful call to get a quote without Ts and Cs."""
         order = OrderFactory(
             quote=QuoteFactory(accepted_on=now(), terms_and_conditions=None),
-            status=OrderStatus.quote_accepted,
+            status=OrderStatus.QUOTE_ACCEPTED,
         )
 
         url = reverse(
@@ -77,7 +77,7 @@ class TestPublicGetQuote(APITestMixin):
         """Test getting a cancelled quote with order in draft is allowed."""
         order = OrderFactory(
             quote=QuoteFactory(cancelled_on=now()),
-            status=OrderStatus.draft,
+            status=OrderStatus.DRAFT,
         )
 
         url = reverse(
@@ -117,7 +117,7 @@ class TestPublicGetQuote(APITestMixin):
 
     def test_404_if_quote_doesnt_exist(self):
         """Test that if the quote doesn't exist, the endpoint returns 404."""
-        order = OrderFactory(status=OrderStatus.quote_awaiting_acceptance)
+        order = OrderFactory(status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE)
         assert not order.quote
 
         url = reverse(
@@ -134,7 +134,7 @@ class TestPublicGetQuote(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.cancelled),
+        (OrderStatus.DRAFT, OrderStatus.CANCELLED),
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -157,7 +157,7 @@ class TestPublicGetQuote(APITestMixin):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance,
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         )
 
         url = reverse(
@@ -179,7 +179,7 @@ class TestPublicGetQuote(APITestMixin):
         """Test that other oauth2 scopes are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance,
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         )
 
         url = reverse(
@@ -214,10 +214,10 @@ class TestAcceptOrder(APITestMixin):
     @pytest.mark.parametrize(
         'disallowed_status,quote_fields',
         (
-            (OrderStatus.draft, {'cancelled_on': now()}),
-            (OrderStatus.quote_accepted, {}),
-            (OrderStatus.paid, {}),
-            (OrderStatus.complete, {}),
+            (OrderStatus.DRAFT, {'cancelled_on': now()}),
+            (OrderStatus.QUOTE_ACCEPTED, {}),
+            (OrderStatus.PAID, {}),
+            (OrderStatus.COMPLETE, {}),
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status, quote_fields):
@@ -245,7 +245,7 @@ class TestAcceptOrder(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }
 

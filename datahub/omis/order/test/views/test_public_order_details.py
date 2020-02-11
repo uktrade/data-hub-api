@@ -20,10 +20,10 @@ class TestViewPublicOrderDetails(APITestMixin):
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         ),
     )
     def test_get(self, order_status):
@@ -125,7 +125,7 @@ class TestViewPublicOrderDetails(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.cancelled),
+        (OrderStatus.DRAFT, OrderStatus.CANCELLED),
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -148,7 +148,7 @@ class TestViewPublicOrderDetails(APITestMixin):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance,
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         )
 
         url = reverse(
@@ -170,7 +170,7 @@ class TestViewPublicOrderDetails(APITestMixin):
         """Test that other oauth2 scopes are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance,
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         )
 
         url = reverse(
