@@ -210,9 +210,9 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
     country = factory.LazyFunction(lambda: random_obj_for_model(Country))
-    status = factory.fuzzy.FuzzyChoice(CompanyExportCountry.Status.choices)
+    status = factory.fuzzy.FuzzyChoice(CompanyExportCountry.Status.values)
     history_user = factory.SubFactory(AdviserFactory)
-    history_type = factory.fuzzy.FuzzyChoice(CompanyExportCountryHistory.HistoryType.choices)
+    history_type = factory.fuzzy.FuzzyChoice(CompanyExportCountryHistory.HistoryType.values)
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'
