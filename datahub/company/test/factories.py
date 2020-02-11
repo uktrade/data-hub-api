@@ -195,7 +195,7 @@ class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
     """Factory for Company export country"""
 
     company = factory.SubFactory(CompanyFactory)
-    country = factory.LazyFunction(lambda: random_obj_for_model(Country))
+    country = factory.Iterator(Country.objects.all())
     status = CompanyExportCountry.Status.CURRENTLY_EXPORTING
     created_by = factory.SubFactory(AdviserFactory)
 
@@ -209,7 +209,7 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
     history_id = factory.LazyFunction(uuid.uuid4)
     id = factory.LazyFunction(uuid.uuid4)
     company = factory.SubFactory(CompanyFactory)
-    country = factory.LazyFunction(lambda: random_obj_for_model(Country))
+    country = factory.Iterator(Country.objects.all())
     status = factory.fuzzy.FuzzyChoice(CompanyExportCountry.Status.values)
     history_user = factory.SubFactory(AdviserFactory)
     history_type = factory.fuzzy.FuzzyChoice(CompanyExportCountryHistory.HistoryType.values)
