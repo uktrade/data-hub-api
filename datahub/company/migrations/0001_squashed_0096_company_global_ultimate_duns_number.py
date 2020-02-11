@@ -146,7 +146,7 @@ class Migration(migrations.Migration):
                 ('pending_dnb_investigation', models.BooleanField(default=False, help_text='Whether this company is to be investigated by DNB.')),
                 ('dnb_investigation_data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ('export_potential', models.CharField(blank=True, choices=[('very_high', 'Very High'), ('high', 'High'), ('medium', 'Medium'), ('low', 'Low'), ('very_low', 'Very Low')], help_text='Score that signifies export potential, imported from Data Science', max_length=255, null=True)),
-                ('great_profile_status', models.CharField(blank=True, choices=[('published', 'Published'), ('unpublished', 'Unpublished'), (None, 'No profile or not known')], help_text='Whether this company has a profile and agreed to be published or not', max_length=255, null=True)),
+                ('great_profile_status', models.CharField(blank=True, choices=[(None, 'No profile or not known'), ('published', 'Published'), ('unpublished', 'Unpublished')], help_text='Whether this company has a profile and agreed to be published or not', max_length=255, null=True)),
                 ('global_ultimate_duns_number', models.CharField(blank=True, db_index=True, help_text='Dun & Bradstreet unique identifier for global ultimate.', max_length=9, validators=[django.core.validators.MinLengthValidator(9), django.core.validators.MaxLengthValidator(9), django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z'), code='invalid', message='Enter a valid integer.')])),
             ],
             options={
