@@ -332,13 +332,13 @@ class CancellableOrderSubValidator(OrderInStatusSubValidator):
             is allowed.
         """
         allowed_statuses = [
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
         ]
         if force:
             allowed_statuses += [
-                OrderStatus.quote_accepted,
-                OrderStatus.paid,
+                OrderStatus.QUOTE_ACCEPTED,
+                OrderStatus.PAID,
             ]
         super().__init__(allowed_statuses, order_required=True)
 

@@ -42,5 +42,5 @@ class PublicInvoiceViewSet(BaseInvoiceViewSet):
     order_lookup_field = 'public_token'
     order_lookup_url_kwarg = 'public_token'
     order_queryset = Order.objects.publicly_accessible().exclude(
-        status=OrderStatus.quote_awaiting_acceptance,
+        status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
     )
