@@ -249,3 +249,26 @@ class DNBCompanyCreateInvestigationView(APIView):
         return Response(
             company_serializer.to_representation(datahub_company),
         )
+
+
+class DNBCompanyLinkView(APIView):
+    """
+    View for linking a company to a DNB record.
+    """
+
+    required_scopes = (Scope.internal_front_end, )
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        Given a Data Hub Company ID and a duns-number, link the Data Hub
+        Company to the D&B record.
+        """
+        return Response(status.HTTP_200_OK)

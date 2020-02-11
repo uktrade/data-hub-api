@@ -31,6 +31,7 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
         reverse('api-v4:dnb-api:company-create-investigation'),
+        reverse('api-v4:dnb-api:company-link'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -1067,3 +1068,65 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
         statsd_mock.incr.assert_called_with(
             f'dnb.create.investigation',
         )
+
+
+class TestCompanyLinkView(APITestMixin):
+    """
+    Test POST `/dnb/company-link` endpoint.
+    """
+
+    def test_200(self):
+        """
+        Test that POST `/dnb/company-link` returns 200.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+        ),
+    )
+    def test_content_type(
+        self,
+        content_type,
+        expected_status_code,
+    ):
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            content_type=content_type,
+        )
+
+        assert response.status_code == expected_status_code
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.change_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_no_permission(
+        self,
+        permissions,
+    ):
+        """
+        The endpoint should return 403 if the user does not have the necessary permissions.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
