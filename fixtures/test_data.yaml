@@ -549,6 +549,24 @@
     modified_on: '2019-07-20T10:00:00Z'
 
 - model: company_referral.companyreferral
+  pk: 51f5af3a-2f70-432a-960a-86cdbb1687af
+  fields:
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    contact: null
+    recipient: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    interaction: null
+    status: closed
+    closure_reason: unreachable
+    subject: Wants to export wine
+    notes: Example closed referral
+    closed_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    closed_on: '2020-01-23T10:00:00Z'
+    created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    created_on: '2020-01-05T10:00:00Z'
+    modified_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    modified_on: '2020-01-23T10:00:00Z'
+
+- model: company_referral.companyreferral
   pk: 3d4b1d90-eeb2-4823-a3a2-459f61483e2f
   fields:
     company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
