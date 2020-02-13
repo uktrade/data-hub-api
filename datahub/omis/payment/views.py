@@ -74,9 +74,9 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
     order_lookup_url_kwarg = 'public_token'
     order_queryset = Order.objects.filter(
         status__in=(
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         ),
     )
 

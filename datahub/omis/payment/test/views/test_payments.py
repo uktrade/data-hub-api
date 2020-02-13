@@ -69,7 +69,7 @@ class TestCreatePayments(APITestMixin):
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     def test_create(self, order_status):
@@ -116,7 +116,7 @@ class TestCreatePayments(APITestMixin):
             },
         ]
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
         assert order.paid_on == dateutil_parse('2017-04-21T00:00:00Z')
 
     @pytest.mark.parametrize(
@@ -196,11 +196,11 @@ class TestCreatePayments(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):

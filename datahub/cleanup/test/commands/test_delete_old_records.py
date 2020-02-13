@@ -31,7 +31,10 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
-from datahub.company_referral.test.factories import CompanyReferralFactory
+from datahub.company_referral.test.factories import (
+    CompanyReferralFactory,
+    CompleteCompanyReferralFactory,
+)
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
@@ -351,6 +354,14 @@ MAPPING = {
                 # hence expired_objects_kwargs is left as an single empty dict
                 'expired_objects_kwargs': [{}],
                 'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': CompleteCompanyReferralFactory,
+                'field': 'interaction',
+                'expired_objects_kwargs': [],
+                # Interactions shouldn't be deleted if there is a related company referral
+                # (the referrals have to expired and be deleted first).
+                'unexpired_objects_kwargs': [{}],
             },
         ],
     },

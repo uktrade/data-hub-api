@@ -290,8 +290,8 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
@@ -315,7 +315,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert response.json() == {
             'detail': (
                 'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
+                f'in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -383,16 +383,16 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
         # check order and pyament
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
 
         assert Payment.objects.filter(order=order).count() == 1
 
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_404_if_order_not_accessible(self, order_status):
@@ -523,9 +523,9 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status', (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
         ),
     )
     @pytest.mark.parametrize(
@@ -748,7 +748,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
         # check order and payment
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
         assert Payment.objects.filter(order=order).count() == 1
 
     @pytest.mark.parametrize('govuk_status_code', (401, 404, 500))
@@ -787,9 +787,9 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_404_if_in_disallowed_status(self, order_status):

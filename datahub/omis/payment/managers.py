@@ -29,7 +29,7 @@ class BasePaymentGatewaySessionManager(models.Manager):
         # validate that the order is in `quote_accepted`
         order.refresh_from_db()
         validator = OrderInStatusSubValidator(
-            allowed_statuses=(OrderStatus.quote_accepted,),
+            allowed_statuses=(OrderStatus.QUOTE_ACCEPTED,),
         )
         validator(order=order)
 
