@@ -1,3 +1,19 @@
+# Data Hub API 27.7.0 (2020-02-13)
+
+
+## Features
+
+- **Companies** The global ultimate duns number field was added to the company admin change view.
+
+## API
+
+- **Companies** `GET /v4/company-referral`, `POST /v4/company-referral`, `GET /v4/company-referral/<id>`: A read-only `interaction` field was added to responses.
+
+## Database schema
+
+- **Companies** A `"interaction_id" uuid NULL` column was added to the `company_referral_companyreferral` table.
+
+
 # Data Hub API 27.6.0 (2020-02-10)
 
 
