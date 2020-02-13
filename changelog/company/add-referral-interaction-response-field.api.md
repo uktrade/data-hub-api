@@ -1,1 +1,0 @@
-`GET /v4/company-referral`, `POST /v4/company-referral`, `GET /v4/company-referral/<id>`: A read-only `interaction` field was added to responses.
