@@ -229,7 +229,7 @@ class TestPaymentGatewaySessionRefresh:
 
         # check order
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
 
         # check payment object
         assert Payment.objects.filter(order=order).count() == 1

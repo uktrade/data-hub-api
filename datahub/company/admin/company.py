@@ -102,6 +102,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'company_number',
                     'vat_number',
                     'duns_number',
+                    'global_ultimate_duns_number',
                     'description',
                     'website',
                     'business_type',

@@ -96,7 +96,7 @@ class TestPublicGetInvoice(APITestMixin):
 
     def test_404_if_invoice_doesnt_exist(self):
         """Test that if the invoice doesn't exist, the endpoint returns 404."""
-        order = OrderFactory(status=OrderStatus.quote_accepted)
+        order = OrderFactory(status=OrderStatus.QUOTE_ACCEPTED)
         assert not order.invoice
 
         url = reverse(
@@ -113,7 +113,7 @@ class TestPublicGetInvoice(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance, OrderStatus.cancelled),
+        (OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE, OrderStatus.CANCELLED),
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""

@@ -203,11 +203,11 @@ class TestGenerateQuote:
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_draft(self, disallowed_status):
@@ -259,7 +259,7 @@ class TestGenerateQuote:
         assert order.quote.created_by == adviser
 
         # status changed
-        assert order.status == OrderStatus.quote_awaiting_acceptance
+        assert order.status == OrderStatus.QUOTE_AWAITING_ACCEPTANCE
 
         assert not order.billing_contact_name
         assert not order.billing_email
@@ -281,12 +281,12 @@ class TestGenerateQuote:
 
         assert order.quote.reference
         assert order.quote.content
-        assert order.status == OrderStatus.quote_awaiting_acceptance
+        assert order.status == OrderStatus.QUOTE_AWAITING_ACCEPTANCE
 
         order.refresh_from_db()
         assert not order.quote
         assert not Quote.objects.count()
-        assert order.status == OrderStatus.draft
+        assert order.status == OrderStatus.DRAFT
 
 
 class TestReopen:
@@ -295,8 +295,8 @@ class TestReopen:
     @pytest.mark.parametrize(
         'allowed_status',
         (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
         ),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
@@ -307,7 +307,7 @@ class TestReopen:
 
         order.reopen(by=AdviserFactory())
 
-        assert order.status == OrderStatus.draft
+        assert order.status == OrderStatus.DRAFT
 
     def test_with_active_quote(self):
         """
@@ -324,15 +324,15 @@ class TestReopen:
             assert order.quote.is_cancelled()
             assert order.quote.cancelled_by == adviser
             assert order.quote.cancelled_on == now()
-            assert order.status == OrderStatus.draft
+            assert order.status == OrderStatus.DRAFT
 
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.draft,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
@@ -362,11 +362,11 @@ class TestUpdateInvoiceDetails:
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
@@ -385,7 +385,7 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.quote_awaiting_acceptance,),
+        (OrderStatus.QUOTE_AWAITING_ACCEPTANCE,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -398,7 +398,7 @@ class TestAcceptQuote:
         order.accept_quote(by=contact)
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.quote_accepted
+        assert order.status == OrderStatus.QUOTE_ACCEPTED
         assert order.quote.accepted_on
         assert order.quote.accepted_by == contact
         assert order.invoice
@@ -415,10 +415,10 @@ class TestAcceptQuote:
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
@@ -451,7 +451,7 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.quote_accepted,),
+        (OrderStatus.QUOTE_ACCEPTED,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -475,7 +475,7 @@ class TestMarkOrderAsPaid:
         )
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.paid
+        assert order.status == OrderStatus.PAID
         assert order.paid_on == dateutil_parse('2017-01-02T00:00:00Z')
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on'),
@@ -487,11 +487,11 @@ class TestMarkOrderAsPaid:
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
@@ -522,7 +522,7 @@ class TestMarkOrderAsPaid:
                 )
 
             order.refresh_from_db()
-            assert order.status == OrderStatus.quote_accepted
+            assert order.status == OrderStatus.QUOTE_ACCEPTED
             assert not order.paid_on
             assert not Payment.objects.count()
 
@@ -548,7 +548,7 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.paid,),
+        (OrderStatus.PAID,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -562,18 +562,18 @@ class TestCompleteOrder:
             order.complete(by=adviser)
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.complete
+        assert order.status == OrderStatus.COMPLETE
         assert order.completed_on == dateutil_parse('2018-07-12T13:00Z')
         assert order.completed_by == adviser
 
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
@@ -599,7 +599,7 @@ class TestCompleteOrder:
                 order.complete(by=None)
 
             order.refresh_from_db()
-            assert order.status == OrderStatus.paid
+            assert order.status == OrderStatus.PAID
             assert not order.completed_on
             assert not order.completed_by
 
@@ -623,14 +623,14 @@ class TestCancelOrder:
         'allowed_status,force',
         (
             # force=False
-            (OrderStatus.draft, False),
-            (OrderStatus.quote_awaiting_acceptance, False),
+            (OrderStatus.DRAFT, False),
+            (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, False),
 
             # force=True
-            (OrderStatus.draft, True),
-            (OrderStatus.quote_awaiting_acceptance, True),
-            (OrderStatus.quote_accepted, True),
-            (OrderStatus.paid, True),
+            (OrderStatus.DRAFT, True),
+            (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, True),
+            (OrderStatus.QUOTE_ACCEPTED, True),
+            (OrderStatus.PAID, True),
         ),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status, force):
@@ -645,7 +645,7 @@ class TestCancelOrder:
             order.cancel(by=adviser, reason=reason, force=force)
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.cancelled
+        assert order.status == OrderStatus.CANCELLED
         assert order.cancelled_on == dateutil_parse('2018-07-12T13:00Z')
         assert order.cancellation_reason == reason
         assert order.cancelled_by == adviser
@@ -654,14 +654,14 @@ class TestCancelOrder:
         'disallowed_status,force',
         (
             # force=False
-            (OrderStatus.quote_accepted, False),
-            (OrderStatus.paid, False),
-            (OrderStatus.complete, False),
-            (OrderStatus.cancelled, False),
+            (OrderStatus.QUOTE_ACCEPTED, False),
+            (OrderStatus.PAID, False),
+            (OrderStatus.COMPLETE, False),
+            (OrderStatus.CANCELLED, False),
 
             # force=True
-            (OrderStatus.complete, True),
-            (OrderStatus.cancelled, True),
+            (OrderStatus.COMPLETE, True),
+            (OrderStatus.CANCELLED, True),
         ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status, force):
@@ -681,7 +681,7 @@ class TestCancelOrder:
         Test that if there's a problem with saving the order, nothing gets saved.
         """
         reason = CancellationReason.objects.order_by('?').first()
-        order = OrderFactory(status=OrderStatus.draft)
+        order = OrderFactory(status=OrderStatus.DRAFT)
 
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
@@ -690,7 +690,7 @@ class TestCancelOrder:
                 order.cancel(by=None, reason=reason)
 
             order.refresh_from_db()
-            assert order.status == OrderStatus.draft
+            assert order.status == OrderStatus.DRAFT
             assert not order.cancellation_reason
             assert not order.cancelled_on
             assert not order.cancelled_by

@@ -75,7 +75,7 @@ class RefundForm(forms.ModelForm):
         order = self.cleaned_data.get('order')
         if not order:
             return
-        if order.status not in (OrderStatus.complete, OrderStatus.paid, OrderStatus.cancelled):
+        if order.status not in (OrderStatus.COMPLETE, OrderStatus.PAID, OrderStatus.CANCELLED):
             self.add_error(
                 'order',
                 ValidationError(_('This order has not been paid for.'), code='not_paid'),

@@ -102,6 +102,11 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),
             ),
+            relation_filter_mapping={
+                # Interactions are not deleted if they have any related company referrals.
+                # These must be deleted first (once they've expired).
+                Interaction._meta.get_field('companyreferral'): (),
+            },
             # We want to delete the relations below along with any expired interactions
             excluded_relations=(
                 Interaction._meta.get_field('dit_participants'),

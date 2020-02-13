@@ -76,7 +76,7 @@ class TestAddOrder(APITestMixin):
         assert response.json() == {
             'id': response.json()['id'],
             'reference': response.json()['reference'],
-            'status': OrderStatus.draft,
+            'status': OrderStatus.DRAFT,
             'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
@@ -533,7 +533,7 @@ class TestGeneralChangeOrder(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'status': OrderStatus.complete,
+                'status': OrderStatus.COMPLETE,
                 'product_info': 'Updated product info',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
                 'contact_email': 'updated-email@email.com',
@@ -560,7 +560,7 @@ class TestGeneralChangeOrder(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['status'] == OrderStatus.draft
+        assert response.json()['status'] == OrderStatus.DRAFT
         assert response.json()['product_info'] != 'Updated product info'
         assert response.json()['permission_to_approach_contacts'] != \
             'Updated permission to approach contacts'
@@ -687,7 +687,7 @@ class TestChangeOrderInDraft(APITestMixin):
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
-            'status': OrderStatus.draft,
+            'status': OrderStatus.DRAFT,
             'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(order.created_by.pk),
@@ -1223,7 +1223,7 @@ class TestMarkOrderAsComplete(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.paid,),
+        (OrderStatus.PAID,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test marking an order as complete."""
@@ -1235,7 +1235,7 @@ class TestMarkOrderAsComplete(APITestMixin):
 
         expected_completed_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['status'] == OrderStatus.complete
+        assert response.json()['status'] == OrderStatus.COMPLETE
         assert response.json()['completed_on'] == format_date_or_datetime(expected_completed_on)
         assert response.json()['completed_by'] == {
             'id': str(self.user.pk),
@@ -1243,18 +1243,18 @@ class TestMarkOrderAsComplete(APITestMixin):
         }
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.complete
+        assert order.status == OrderStatus.COMPLETE
         assert order.completed_on == expected_completed_on
         assert order.completed_by == self.user
 
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.DRAFT,
+            OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
@@ -1276,7 +1276,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         Test that if not all assignee actual time fields have been set,
         a validation error is raised and the call fails.
         """
-        order = OrderPaidFactory(status=OrderStatus.paid, assignees=[])
+        order = OrderPaidFactory(status=OrderStatus.PAID, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
         OrderAssigneeFactory(order=order)
 
@@ -1297,7 +1297,7 @@ class TestCancelOrder(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance),
+        (OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test cancelling an order."""
@@ -1316,7 +1316,7 @@ class TestCancelOrder(APITestMixin):
 
         expected_cancelled_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['status'] == OrderStatus.cancelled
+        assert response.json()['status'] == OrderStatus.CANCELLED
         assert response.json()['cancelled_on'] == format_date_or_datetime(expected_cancelled_on)
         assert response.json()['cancellation_reason'] == {
             'id': str(reason.pk),
@@ -1328,7 +1328,7 @@ class TestCancelOrder(APITestMixin):
         }
 
         order.refresh_from_db()
-        assert order.status == OrderStatus.cancelled
+        assert order.status == OrderStatus.CANCELLED
         assert order.cancelled_on == expected_cancelled_on
         assert order.cancellation_reason == reason
         assert order.cancelled_by == self.user
@@ -1336,10 +1336,10 @@ class TestCancelOrder(APITestMixin):
     @pytest.mark.parametrize(
         'disallowed_status',
         (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            OrderStatus.QUOTE_ACCEPTED,
+            OrderStatus.PAID,
+            OrderStatus.COMPLETE,
+            OrderStatus.CANCELLED,
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
@@ -1382,7 +1382,7 @@ class TestCancelOrder(APITestMixin):
         """
         Test that if cancellation_reason is invalid, the endpoint returns 400.
         """
-        order = OrderFactory(status=OrderStatus.draft)
+        order = OrderFactory(status=OrderStatus.DRAFT)
 
         url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
         response = self.api_client.post(url, data)
@@ -1407,7 +1407,7 @@ class TestViewOrderDetails(APITestMixin):
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
-            'status': OrderStatus.draft,
+            'status': OrderStatus.DRAFT,
             'created_on': format_date_or_datetime(order.created_on),
             'created_by': {
                 'id': str(order.created_by.pk),
