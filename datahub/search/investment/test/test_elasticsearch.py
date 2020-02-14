@@ -3,7 +3,7 @@ from elasticsearch_dsl import Mapping
 from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 from datahub.search.query_builder import (
     get_basic_search_query,
-    get_search_by_entity_query,
+    get_search_by_entities_query,
     limit_search_query,
 )
 
@@ -775,8 +775,8 @@ def test_limited_get_search_by_entity_query():
         'estimated_land_date_after': date,
         'estimated_land_date_before': date,
     }
-    query = get_search_by_entity_query(
-        ESInvestmentProject,
+    query = get_search_by_entities_query(
+        [ESInvestmentProject],
         term='test',
         filter_data=filter_data,
     )
@@ -791,10 +791,6 @@ def test_limited_get_search_by_entity_query():
             'bool': {
                 'must': [
                     {
-                        'term': {
-                            '_type': 'investment_project',
-                        },
-                    }, {
                         'bool': {
                             'should': [
                                 {
