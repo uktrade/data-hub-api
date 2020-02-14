@@ -1,6 +1,4 @@
-from collections.abc import Mapping, Sequence
-
-from datahub.core.test_utils import create_test_user
+from datahub.core.test_utils import create_test_user, resolve_objects
 from datahub.interaction.models import InteractionPermission
 
 
@@ -15,31 +13,19 @@ def resolve_data(data):
 
     The resolved value is returned.
     """
-    if isinstance(data, Sequence) and not isinstance(data, str):
-        return [resolve_data(item) for item in data]
-
-    if isinstance(data, Mapping):
-        return {key: resolve_data(value) for key, value in data.items()}
-
-    return _resolve_single_value(data)
+    return resolve_objects(data, object_resolver=_resolve_model_object)
 
 
-def _resolve_single_value(value):
-    if callable(value):
-        resolved_value = value()
-    else:
-        resolved_value = value
+def _resolve_model_object(obj):
+    resolved_value = {
+        'id': str(obj.id),
+        'name': obj.name,
+    }
 
-    if hasattr(resolved_value, 'pk'):
-        obj_value = resolved_value
-        resolved_value = {
-            'id': str(obj_value.id),
-            'name': obj_value.name,
-        }
+    # this is here because of inconsistent endpoint :(
+    if hasattr(obj, 'project_code'):
+        resolved_value['project_code'] = obj.project_code
 
-        # this is here because of inconsistent endpoint :(
-        if hasattr(obj_value, 'project_code'):
-            resolved_value['project_code'] = obj_value.project_code
     return resolved_value
 
 

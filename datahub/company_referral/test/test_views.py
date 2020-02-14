@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from datetime import datetime
 from unittest.mock import ANY
 from uuid import UUID, uuid4
@@ -16,7 +15,12 @@ from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
 )
-from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+    resolve_objects,
+)
 
 FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=utc)
 
@@ -200,7 +204,7 @@ class TestAddCompanyReferral(APITestMixin):
     )
     def test_validates_input(self, request_data, expected_response_data):
         """Test validation for various scenarios."""
-        resolved_request_data = _resolve_data(request_data)
+        resolved_request_data = resolve_objects(request_data)
         response = self.api_client.post(collection_url, data=resolved_request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -433,16 +437,3 @@ def _format_expected_adviser(adviser):
         'id': str(adviser.pk),
         'name': adviser.name,
     }
-
-
-def _resolve_data(data):
-    """Resolve callables in values used in parametrised tests."""
-    if isinstance(data, Mapping):
-        return {key: _resolve_data(value) for key, value in data.items()}
-
-    if callable(data):
-        resolved_value = data()
-    else:
-        resolved_value = data
-
-    return getattr(resolved_value, 'pk', resolved_value)

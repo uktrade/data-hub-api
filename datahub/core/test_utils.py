@@ -1,4 +1,5 @@
 import json
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 from operator import attrgetter
@@ -437,3 +438,52 @@ def construct_mock(**props):
 def str_or_none(value):
     """Returns string casted value if given value is not None"""
     return str(value) if value is not None else value
+
+
+def identity(value):
+    """Pass through a single argument unchanged."""
+    return value
+
+
+def resolve_data(data, value_resolver=identity):
+    """
+    Recursively resolve callables in data structures.
+
+    Given a value:
+
+    - if it's a callable, resolve it
+    - if it's a sequence, resolve each of the sequence's values
+    - if it's a dict, resolve each value of the dict
+
+    The resolved value is returned.
+
+    Used in parametrised tests.
+    """
+    if isinstance(data, Mapping):
+        return {
+            key: resolve_data(value, value_resolver=value_resolver)
+            for key, value in data.items()
+        }
+
+    if isinstance(data, Sequence) and not isinstance(data, (str, bytes)):
+        return [resolve_data(value, value_resolver=value_resolver) for value in data]
+
+    if callable(data):
+        return value_resolver(data())
+
+    return value_resolver(data)
+
+
+def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
+    """
+    Recursively resolve callables in data structures and also resolve model objects to pk values.
+
+    Used in parametrised tests.
+    """
+
+    def resolve_value(value):
+        if hasattr(value, 'pk'):
+            return object_resolver(value)
+        return value
+
+    return resolve_data(data, value_resolver=resolve_value)
