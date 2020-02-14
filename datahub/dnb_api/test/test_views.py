@@ -1130,3 +1130,34 @@ class TestCompanyLinkView(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'override',
+        (
+            {'duns_number': None},
+            {'duns_number': 'foobarbaz'},
+            {'duns_number': '12345678'},
+            {'duns_number': '1234567890'},
+            {'company_id': None},
+            {'company_id': 'does-not-exist'},
+            {'company_id': '11111111-2222-3333-4444-555555555555'},
+        ),
+    )
+    def test_invalid(
+        self,
+        override,
+    ):
+        """
+        Test that a query without a valid `duns_number` returns 400.
+        """
+        company = CompanyFactory()
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                **override,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
