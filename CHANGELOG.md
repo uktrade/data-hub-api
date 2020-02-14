@@ -1,3 +1,11 @@
+# Data Hub API 27.8.0 (2020-02-14)
+
+
+## Features
+
+- **Companies** The maximum limit for number of inactive companies to be archived by the automatic-company-archive job has been bumped to 5000.
+
+
 # Data Hub API 27.7.0 (2020-02-13)
 
 
