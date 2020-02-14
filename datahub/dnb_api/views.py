@@ -17,6 +17,7 @@ from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
+    DNBCompanyLinkSerializer,
     DNBCompanySerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
@@ -271,4 +272,14 @@ class DNBCompanyLinkView(APIView):
         Given a Data Hub Company ID and a duns-number, link the Data Hub
         Company to the D&B record.
         """
+        link_serializer = DNBCompanyLinkSerializer(data=request.data)
+
+        link_serializer.is_valid(raise_exception=True)
+
+        # This bit: validated_data['company_id'].id is weird but the alternative
+        # is to rename the field to `company_id` which would (1) still be weird
+        # and (2) leak the weirdness to the API
+        company_id = link_serializer.validated_data['company_id'].id
+        duns_number = link_serializer.validated_data['duns_number']
+
         return Response(status.HTTP_200_OK)
