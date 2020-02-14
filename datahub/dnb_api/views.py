@@ -10,10 +10,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.models import CompanyPermission
+from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
@@ -282,4 +284,22 @@ class DNBCompanyLinkView(APIView):
         company_id = link_serializer.validated_data['company_id'].id
         duns_number = link_serializer.validated_data['duns_number']
 
-        return Response(status.HTTP_200_OK)
+        try:
+            company = link_company_with_dnb(company_id, duns_number, request.user)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceInvalidResponse,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        except (
+            DNBServiceInvalidRequest,
+            CompanyAlreadyDNBLinkedException,
+        ) as exc:
+            raise APIBadRequestException(str(exc))
+
+        return Response(
+            CompanySerializer().to_representation(company),
+        )
