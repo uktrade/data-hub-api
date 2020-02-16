@@ -3,6 +3,7 @@ from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScop
 from datahub.oauth.scopes import Scope
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
+from datahub.search.interaction.models import Interaction
 from datahub.search.permissions import SearchPermissions
 from datahub.search.views import register_v4_view, SearchAPIView
 
@@ -26,3 +27,6 @@ class ExportCountryHistoryView(SearchAPIView):
     }
 
     serializer_class = SearchExportCountryHistorySerializer
+
+    def get_entities(self):
+        return [self.search_app.es_model, Interaction]

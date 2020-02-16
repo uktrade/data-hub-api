@@ -99,9 +99,7 @@ def get_search_by_entities_query(
             entity.get_read_alias()
             for entity in entities
         ],
-    ).query(
-        Bool(must=query),
-    )
+    ).query(Bool(must=query))
 
     permission_query = _build_entity_permission_query(permission_filters)
     if permission_query:

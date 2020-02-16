@@ -6,12 +6,14 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import CompanyExportCountry, CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory, CompanyFactory
 from datahub.core.constants import Country as CountryConstant
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
 )
+from datahub.interaction.test.factories import CompanyInteractionFactory, ExportCountriesInteractionFactory
 from datahub.metadata.models import Country
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.export_country_history import ExportCountryHistoryApp
@@ -219,3 +221,33 @@ class TestSearchExportCountryHistory(APITestMixin):
         ]
 
         assert date_times == [FROZEN_DATETIME_3, FROZEN_DATETIME_2, FROZEN_DATETIME_1]
+
+    def test_export_country_history_search_interactions_by_company(self, es_with_collector):
+        benchmark_country_canada = Country.objects.get(
+            pk=CountryConstant.canada.value.id,
+        )
+        benchmark_company = CompanyFactory()
+
+        ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            export_countries__country=benchmark_country_canada,
+            export_countries__status=CompanyExportCountry.Status.NOT_INTERESTED,
+        )
+        es_with_collector.flush_and_refresh()
+        company_id = str(benchmark_company.id)
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': company_id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == 1
+        assert all(
+            result['company']['id'] == company_id
+            for result in response.json()['results']
+        )

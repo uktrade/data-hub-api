@@ -114,6 +114,8 @@ def test_interaction_to_dict(es, factory_cls):
         'grant_amount_offered': None,
         'net_company_receipt': None,
         'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+        'export_countries': [],
+        'were_countries_discussed': None,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }
@@ -191,6 +193,8 @@ def test_service_delivery_to_dict(es):
         'grant_amount_offered': interaction.grant_amount_offered,
         'net_company_receipt': interaction.net_company_receipt,
         'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+        'export_countries': [],
+        'were_countries_discussed': None,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }

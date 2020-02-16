@@ -185,6 +185,9 @@ class SearchAPIView(APIView):
         }
         return filters
 
+    def get_entities(self):
+        return [self.search_app.es_model]
+
     def validate_data(self, data):
         """Validate and clean data."""
         serializer = self.serializer_class(data=data)
@@ -194,11 +197,12 @@ class SearchAPIView(APIView):
     def get_base_query(self, request, validated_data):
         """Gets a filtered Elasticsearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
+        entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entities_query(
-            [self.search_app.es_model],
+            entities=entities,
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,
