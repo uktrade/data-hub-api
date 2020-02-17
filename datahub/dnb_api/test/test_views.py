@@ -1200,12 +1200,13 @@ class TestCompanyLinkView(APITestMixin):
             reverse('api-v4:dnb-api:company-link'),
             data={
                 'company_id': company.pk,
-                'duns_number': '123456789',
+                'duns_number': '012345678',
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'duns_number': ['Company with duns_number: 123456789 already exists in DataHub.'],
+            'detail': f'Company {str(company.id)} is already linked '
+                      'with duns number 123456789',
         }
 
     def test_duplicate_duns_number(self):
