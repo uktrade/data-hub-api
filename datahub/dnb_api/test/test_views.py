@@ -1,6 +1,7 @@
 import json
 from unittest.mock import Mock
 from urllib.parse import urljoin
+from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -15,6 +16,8 @@ from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
+from datahub.dnb_api.utils import format_dnb_company
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country
 
@@ -31,6 +34,7 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
         reverse('api-v4:dnb-api:company-create-investigation'),
+        reverse('api-v4:dnb-api:company-link'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -1067,3 +1071,218 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
         statsd_mock.incr.assert_called_with(
             f'dnb.create.investigation',
         )
+
+
+class TestCompanyLinkView(APITestMixin):
+    """
+    Test POST `/dnb/company-link` endpoint.
+    """
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+        ),
+    )
+    def test_content_type(
+        self,
+        content_type,
+        expected_status_code,
+    ):
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            content_type=content_type,
+        )
+
+        assert response.status_code == expected_status_code
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.change_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_no_permission(
+        self,
+        permissions,
+    ):
+        """
+        The endpoint should return 403 if the user does not have the necessary permissions.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'override',
+        (
+            {'duns_number': None},
+            {'duns_number': 'foobarbaz'},
+            {'duns_number': '12345678'},
+            {'duns_number': '1234567890'},
+            {'company_id': None},
+            {'company_id': 'does-not-exist'},
+            {'company_id': '11111111-2222-3333-4444-555555555555'},
+        ),
+    )
+    def test_invalid(
+        self,
+        override,
+    ):
+        """
+        Test that a query without a valid `duns_number` returns 400.
+        """
+        company = CompanyFactory()
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                **override,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+        ),
+    )
+    def test_dnb_service_error(
+        self,
+        requests_mock,
+        status_code,
+    ):
+        """
+        Test if company-link endpoint returns 502 if the upstream
+        `dnb-service` returns an error.
+        """
+        company = CompanyFactory()
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            status_code=status_code,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.id,
+                'duns_number': 123456789,
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def test_already_linked(self):
+        """
+        Test that the endpoint returns 400 for a company that is already linked.
+        """
+        company = CompanyFactory(duns_number='123456789')
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                'duns_number': '123456789',
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'duns_number': ['Company with duns_number: 123456789 already exists in DataHub.'],
+        }
+
+    def test_duplicate_duns_number(self):
+        """
+        Test that the endpoint returns 400 if we try to link a company to a D&B record
+        that has already been linked to a different company.
+        """
+        CompanyFactory(duns_number='123456789')
+        company = CompanyFactory()
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                'duns_number': '123456789',
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'duns_number': ['Company with duns_number: 123456789 already exists in DataHub.'],
+        }
+
+    def test_company_not_found(
+        self,
+        requests_mock,
+    ):
+        """
+        Test that when a duns_number does not return any company from
+        dnb-service, the endpoint returns 400 status.
+        """
+        company = CompanyFactory()
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            status_code=status.HTTP_200_OK,
+            json={'results': []},
+        )
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                'duns_number': '123456789',
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'detail': 'Cannot find a company with duns_number: 123456789',
+        }
+
+    def test_valid(
+        self,
+        requests_mock,
+        dnb_response_uk,
+    ):
+        """
+        Test that valid request to company-link endpoint returns 200.
+        """
+        company = CompanyFactory()
+        requests_mock.post(
+            DNB_SEARCH_URL,
+            status_code=status.HTTP_200_OK,
+            json=dnb_response_uk,
+        )
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-link'),
+            data={
+                'company_id': company.pk,
+                'duns_number': '123456789',
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        dh_company = response.json()
+        dnb_company = format_dnb_company(dnb_response_uk['results'][0])
+        # TODO: The format for the payload returned via CompanySerializer and that returned via
+        # format_dnb_company is slightly different.
+        # format_dnb_company: {... 'country': UUID(...)}
+        # CompanySerializer: {... 'country': {'id': <uuid:str>}}
+        dh_company['address']['country'] = UUID(dh_company['address']['country']['id'])
+
+        for field in ALL_DNB_UPDATED_SERIALIZER_FIELDS:
+            assert dh_company[field] == dnb_company[field]
