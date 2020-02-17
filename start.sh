@@ -12,8 +12,8 @@ python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
 # Create superuser - ignore errors as we may have already loaded it in to
 # this DB.
-if [[ -n "${SUPERUSER_USERNAME}" && -n "${SUPERUSER_PASSWORD}" ]]; then
-    python manage.py createsuperuserwithpassword $SUPERUSER_USERNAME $SUPERUSER_PASSWORD || true
+if [[ -n "${DJANGO_SUPERUSER_EMAIL}" && -n "${DJANGO_SUPERUSER_PASSWORD}" ]]; then
+    python manage.py createsuperuser --noinput || true
 fi
 
 # Run runserver in a while loop as the whole docker container will otherwise die
