@@ -16,12 +16,13 @@ from datahub.core.test_utils import (
 from datahub.interaction.test.factories import CompanyInteractionFactory, ExportCountriesInteractionFactory
 from datahub.metadata.models import Country
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.interaction import InteractionSearchApp
 from datahub.search.export_country_history import ExportCountryHistoryApp
 
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp),
+    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp, InteractionSearchApp),
 ]
 
 FROZEN_DATETIME_1 = datetime(2001, 1, 22, 1, 2, 3, tzinfo=utc).isoformat()
