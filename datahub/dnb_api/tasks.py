@@ -4,6 +4,7 @@ from celery import shared_task
 from celery.result import ResultSet
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.db.models import F, Max, Q
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
@@ -78,6 +79,82 @@ def sync_company_with_dnb(
     if not update_descriptor:
         update_descriptor = f'celery:sync_company_with_dnb:{self.request.id}'
     _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor, retry_failures)
+
+
+@shared_task(
+    bind=True,
+    acks_late=True,
+    priority=9,
+    max_retries=3,
+    rate_limit=1,  # Run this task at most once per worker per second
+    queue='long-running',
+)
+def sync_company_with_dnb_rate_limited(
+    self,
+    company_id,
+    fields_to_update=None,
+    update_descriptor=None,
+    retry_failures=True,
+    simulate=False,
+):
+    """
+    A rate limited wrapper around the sync_company_with_dnb task. This task
+    can be used for bulk tasks to ensure that we do not exceed our agreed
+    rate limit with D&B.
+    """
+    message = f'Syncing dnb-linked company: {company_id}'
+    if simulate:
+        logger.info(f'[SIMULATION] {message}')
+        return
+    sync_company_with_dnb.apply(
+        kwargs={
+            'company_id': company_id,
+            'fields_to_update': fields_to_update,
+            'update_descriptor': update_descriptor,
+            'retry_failures': retry_failures,
+        },
+    )
+    logger.info(message)
+
+
+@shared_task(
+    bind=True,
+    acks_late=True,
+    priority=9,
+    queue='long-running',
+)
+def sync_outdated_companies_with_dnb(
+    self,
+    dnb_modified_on_before,
+    fields_to_update=None,
+    limit=100,
+    simulate=True,
+):
+    """
+    Sync company records with data sourced from DNB which are determined as outdated.
+    This task will filter dnb-matched companies which have a `dnb_modified_on` date which is before
+    `dnb_modified_on_before` and will then interact with dnb-service to get the latest data to sync
+    these companies.
+    """
+    company_ids = Company.objects.filter(
+        Q(dnb_modified_on__lte=dnb_modified_on_before) | Q(dnb_modified_on__isnull=True),
+        duns_number__isnull=False,
+    ).annotate(
+        most_recent_interaction_date=Max('interactions__date'),
+    ).order_by(
+        F('most_recent_interaction_date').desc(nulls_last=True),
+        'dnb_modified_on',
+    ).values_list('id', flat=True)[:limit]
+
+    for company_id in company_ids:
+        sync_company_with_dnb_rate_limited.apply_async(
+            kwargs={
+                'company_id': company_id,
+                'fields_to_update': fields_to_update,
+                'update_descriptor': 'celery:sync_outdated_companies_with_dnb:{self.request.id}',
+                'simulate': simulate,
+            },
+        )
 
 
 def _record_audit(update_results, producer_task, start_time):
