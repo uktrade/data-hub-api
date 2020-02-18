@@ -137,6 +137,7 @@ class Interaction(BaseESModel):
         'dit_participants.adviser.name.trigram',
         'dit_participants.team.name',
         'dit_participants.team.name.trigram',
+        'export_countries.country.name',  # for export country filter
     )
 
     class Meta:

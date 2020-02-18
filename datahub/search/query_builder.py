@@ -84,7 +84,10 @@ def get_search_by_entities_query(
     Performs filtered search for the given term across given entities.
     """
     filter_data = filter_data or {}
-    query = []
+    query = [
+        # Term(_type=entity._doc_type.name)
+        # for entity in entities
+    ]
     if term != '':
         for entity in entities:
             query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -107,6 +110,7 @@ def get_search_by_entities_query(
 
     s = s.filter(Bool(must=must_filter))
     s = _apply_sorting_to_query(s, ordering)
+
     return _apply_source_filtering_to_query(
         s,
         fields_to_include=fields_to_include,

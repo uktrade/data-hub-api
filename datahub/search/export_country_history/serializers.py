@@ -18,10 +18,10 @@ class SearchExportCountryHistorySerializer(EntitySearchQuerySerializer):
         ),
     }
 
-    DEFAULT_ORDERING = SearchOrdering('history_date', SortDirection.desc)
+    DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
 
     SORT_BY_FIELDS = (
-        'history_date',
+        'date',
     )
 
     country = SingleOrListField(child=StringUUIDField(), required=False)

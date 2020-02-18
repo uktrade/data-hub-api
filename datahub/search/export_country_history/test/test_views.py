@@ -6,22 +6,24 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import CompanyExportCountry, CompanyExportCountryHistory
+from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory, CompanyFactory
 from datahub.core.constants import Country as CountryConstant
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
 )
-from datahub.interaction.test.factories import CompanyInteractionFactory, ExportCountriesInteractionFactory
+from datahub.interaction.test.factories import (
+    ExportCountriesInteractionFactory,
+    InteractionExportCountryFactory,
+)
 from datahub.metadata.models import Country
 from datahub.metadata.test.factories import TeamFactory
-from datahub.search.interaction import InteractionSearchApp
 from datahub.search.export_country_history import ExportCountryHistoryApp
+from datahub.search.interaction import InteractionSearchApp
 
 pytestmark = [
     pytest.mark.django_db,
-    # Index objects for this search app only
     pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp, InteractionSearchApp),
 ]
 
@@ -47,24 +49,65 @@ def setup_data():
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_japan,
             company=benchmark_company,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
         )
         CompanyExportCountryHistoryFactory(
             company=benchmark_company,
             country=benchmark_country_canada,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
         )
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_canada,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
         )
         CompanyExportCountryHistoryFactory()
+
+        ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            were_countries_discussed=True,
+            export_countries=[InteractionExportCountryFactory(
+                country=benchmark_country_canada,
+            )],
+        )
+        ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            were_countries_discussed=False,
+        )
+        ExportCountriesInteractionFactory(
+            were_countries_discussed=True,
+            export_countries=[InteractionExportCountryFactory(
+                country=benchmark_country_canada,
+            )],
+        )
 
     with freeze_time(FROZEN_DATETIME_2):
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_japan,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+        )
+
+        ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            were_countries_discussed=True,
+            export_countries=[InteractionExportCountryFactory(
+                country=benchmark_country_japan,
+            )],
+        )
+        ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            were_countries_discussed=False,
+        )
+        ExportCountriesInteractionFactory(
+            were_countries_discussed=True,
+            export_countries=[InteractionExportCountryFactory(
+                country=benchmark_country_japan,
+            )],
         )
 
     with freeze_time(FROZEN_DATETIME_3):
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_japan,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
         )
 
     yield str(benchmark_company.id)
@@ -96,7 +139,103 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()['non_field_errors'][0] == error_response
 
-    def test_filtering_by_country_on_export_country_history_search(
+    @pytest.mark.parametrize(
+        'history_type,count',
+        (
+            (CompanyExportCountryHistory.HistoryType.INSERT, 1),
+            (CompanyExportCountryHistory.HistoryType.DELETE, 1),
+            (CompanyExportCountryHistory.HistoryType.UPDATE, 0),
+        ),
+    )
+    def test_filtering_by_only_export_country_history_by_company(
+        self,
+        es_with_collector,
+        history_type,
+        count,
+    ):
+        """
+        Check search works when there are only export country history, no interactions.
+        """
+        benchmark_country_canada = Country.objects.get(
+            pk=CountryConstant.canada.value.id,
+        )
+        benchmark_company = CompanyFactory()
+        CompanyExportCountryHistoryFactory(
+            company=benchmark_company,
+            country=benchmark_country_canada,
+            history_type=history_type,
+        )
+
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:export-country-history')
+        company_id = str(benchmark_company.id)
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': company_id,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == count
+        assert all(
+            result['company']['id'] == company_id
+            for result in response.json()['results']
+        )
+
+    @pytest.mark.parametrize(
+        'countries_discussed,count',
+        (
+            (True, 1),
+            (False, 0),
+        ),
+    )
+    def test_filter_only_interactions_by_company(
+        self,
+        es_with_collector,
+        countries_discussed,
+        count,
+    ):
+        """
+        Check search works when there are only interactions, no export country history.
+        """
+        benchmark_country_canada = Country.objects.get(
+            pk=CountryConstant.canada.value.id,
+        )
+        benchmark_company = CompanyFactory()
+
+        interaction = ExportCountriesInteractionFactory(
+            company=benchmark_company,
+            were_countries_discussed=countries_discussed,
+        )
+        if countries_discussed:
+            interaction.export_countries.set([
+                InteractionExportCountryFactory(
+                    country=benchmark_country_canada,
+                ),
+            ])
+
+        es_with_collector.flush_and_refresh()
+        company_id = str(benchmark_company.id)
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': company_id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == count
+        assert all(
+            result['company']['id'] == company_id
+            for result in response.json()['results']
+        )
+
+    def test_filtering_by_country(
         self,
         es_with_collector,
         setup_data,
@@ -122,13 +261,13 @@ class TestSearchExportCountryHistory(APITestMixin):
         }
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 3
+        assert response.json()['count'] == 5
         assert all(
             result['country']['id'] == expected_data['country']['id']
             for result in response.json()['results']
         )
 
-    def test_filtering_by_company_on_export_country_history_search(
+    def test_filtering_by_company(
         self,
         es_with_collector,
         setup_data,
@@ -155,13 +294,13 @@ class TestSearchExportCountryHistory(APITestMixin):
         }
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 2
+        assert response.json()['count'] == 5
         assert all(
             result['company']['id'] == expected_data['company']['id']
             for result in response.json()['results']
         )
 
-    def test_filtering_by_company_and_country_on_export_country_history_search(
+    def test_filtering_by_company_and_country(
         self,
         es_with_collector,
         setup_data,
@@ -201,7 +340,7 @@ class TestSearchExportCountryHistory(APITestMixin):
             for result in response.json()['results']
         )
 
-    def test_sorting_in_export_country_history(self, es_with_collector, setup_data):
+    def test_sorting(self, es_with_collector, setup_data):
         """Tests the sorting of country history search response."""
         es_with_collector.flush_and_refresh()
 
@@ -210,45 +349,15 @@ class TestSearchExportCountryHistory(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'country': CountryConstant.japan.value.id,
+                'country': CountryConstant.canada.value.id,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 3
+        assert response.json()['count'] == 4
 
         date_times = [
             result['history_date'] for result in response.json()['results']
         ]
 
         assert date_times == [FROZEN_DATETIME_3, FROZEN_DATETIME_2, FROZEN_DATETIME_1]
-
-    def test_export_country_history_search_interactions_by_company(self, es_with_collector):
-        benchmark_country_canada = Country.objects.get(
-            pk=CountryConstant.canada.value.id,
-        )
-        benchmark_company = CompanyFactory()
-
-        ExportCountriesInteractionFactory(
-            company=benchmark_company,
-            export_countries__country=benchmark_country_canada,
-            export_countries__status=CompanyExportCountry.Status.NOT_INTERESTED,
-        )
-        es_with_collector.flush_and_refresh()
-        company_id = str(benchmark_company.id)
-
-        url = reverse('api-v4:search:export-country-history')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'company': company_id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 1
-        assert all(
-            result['company']['id'] == company_id
-            for result in response.json()['results']
-        )
