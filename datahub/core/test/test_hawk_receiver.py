@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Mapping
 
 import mohawk
 import pytest
@@ -9,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
 from datahub.core.test.support.views import HawkViewWithScope
-from datahub.core.test_utils import create_test_user
+from datahub.core.test_utils import create_test_user, resolve_data
 
 
 def _url():
@@ -48,16 +47,6 @@ def _auth_sender(
         content=content,
         content_type=content_type,
     )
-
-
-def _resolve_value(value):
-    if isinstance(value, Mapping):
-        return {item_key: _resolve_value(item_value) for item_key, item_value in value.items()}
-
-    if callable(value):
-        return value()
-
-    return value
 
 
 @pytest.mark.django_db
@@ -142,7 +131,7 @@ class TestHawkAuthentication:
         """If the request isn't properly Hawk-authenticated, then a 401 is
         returned
         """
-        resolved_get_kwargs = _resolve_value(get_kwargs)
+        resolved_get_kwargs = resolve_data(get_kwargs)
         response = api_client.get(
             _url(),
             **resolved_get_kwargs,

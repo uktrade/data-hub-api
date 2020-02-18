@@ -10,13 +10,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.models import CompanyPermission
+from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
+    DNBCompanyLinkSerializer,
     DNBCompanySerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
@@ -248,4 +251,55 @@ class DNBCompanyCreateInvestigationView(APIView):
         statsd.incr(f'dnb.create.investigation')
         return Response(
             company_serializer.to_representation(datahub_company),
+        )
+
+
+class DNBCompanyLinkView(APIView):
+    """
+    View for linking a company to a DNB record.
+    """
+
+    required_scopes = (Scope.internal_front_end, )
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        Given a Data Hub Company ID and a duns-number, link the Data Hub
+        Company to the D&B record.
+        """
+        link_serializer = DNBCompanyLinkSerializer(data=request.data)
+
+        link_serializer.is_valid(raise_exception=True)
+
+        # This bit: validated_data['company_id'].id is weird but the alternative
+        # is to rename the field to `company_id` which would (1) still be weird
+        # and (2) leak the weirdness to the API
+        company_id = link_serializer.validated_data['company_id'].id
+        duns_number = link_serializer.validated_data['duns_number']
+
+        try:
+            company = link_company_with_dnb(company_id, duns_number, request.user)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceInvalidResponse,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        except (
+            DNBServiceInvalidRequest,
+            CompanyAlreadyDNBLinkedException,
+        ) as exc:
+            raise APIBadRequestException(str(exc))
+
+        return Response(
+            CompanySerializer().to_representation(company),
         )

@@ -9,7 +9,7 @@ from datahub.company.validators import (
     has_uk_establishment_number_prefix,
 )
 from datahub.core.constants import Country
-from datahub.core.serializers import PermittedFieldsModelSerializer
+from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
 
@@ -223,3 +223,11 @@ class DNBCompanyInvestigationSerializer(CompanySerializer):
 
     class Meta(CompanySerializer.Meta):
         fields = CompanySerializer.Meta.fields + ('dnb_investigation_data', )
+
+
+class DNBCompanyLinkSerializer(DUNSNumberSerializer):
+    """
+    Validate POST data for DNBCompanyLinkView.
+    """
+
+    company_id = NestedRelatedField('company.Company', required=True)
