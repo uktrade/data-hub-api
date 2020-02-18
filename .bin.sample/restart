@@ -1,0 +1,2 @@
+docker restart data-hub_api_1
+docker restart data-hub_celery_1

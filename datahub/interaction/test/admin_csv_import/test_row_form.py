@@ -1,5 +1,4 @@
 from collections import Counter
-from collections.abc import Mapping
 from datetime import date, datetime, time
 from unittest.mock import Mock
 
@@ -11,6 +10,7 @@ from rest_framework import serializers
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
+from datahub.core.test_utils import resolve_data
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
 from datahub.interaction.admin_csv_import.row_form import (
@@ -382,7 +382,7 @@ class TestInteractionCSVRowFormValidation:
             'service': service.name,
             'communication_channel': communication_channel.name,
 
-            **_resolve_data(data),
+            **resolve_data(data),
         }
 
         form = InteractionCSVRowForm(data=resolved_data)
@@ -482,7 +482,7 @@ class TestInteractionCSVRowFormValidation:
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         communication_channel = random_communication_channel()
 
-        resolved_row_data = _resolve_data(row_data)
+        resolved_row_data = resolve_data(row_data)
         resolved_existing_objects_data = [
             {
                 key: value(resolved_row_data)
@@ -609,7 +609,7 @@ class TestInteractionCSVRowFormValidation:
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
         communication_channel = random_communication_channel()
 
-        resolved_row_data = _resolve_data(row_data)
+        resolved_row_data = resolve_data(row_data)
         resolved_prior_rows = [
             {
                 key: value(resolved_row_data)
@@ -1435,14 +1435,3 @@ class TestInteractionCSVRowFormSaving:
             form.save(user, source=source)
 
         assert not Interaction.objects.exists()
-
-
-def _resolve_data(data):
-    """Resolve callables in values used in parametrised tests."""
-    if isinstance(data, Mapping):
-        return {key: _resolve_data(value) for key, value in data.items()}
-
-    if callable(data):
-        return data()
-
-    return data
