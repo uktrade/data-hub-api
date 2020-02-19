@@ -163,7 +163,10 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         Returns the instantiated serializer.
         """
         transformed_data = self._to_serializer_format(data)
-        serializer = InteractionSerializer(context={'is_bulk_import': True}, data=transformed_data)
+        serializer = InteractionSerializer(
+            context={'check_association_permissions': False},
+            data=transformed_data,
+        )
         serializer.is_valid(raise_exception=True)
         return serializer
 

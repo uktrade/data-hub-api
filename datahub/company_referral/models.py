@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
 from datahub.core.models import BaseModel
 from datahub.core.utils import get_front_end_url
@@ -76,3 +77,11 @@ class CompanyReferral(BaseModel):
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
+
+    def mark_as_complete(self, interaction, user):
+        """Mark this referral as complete."""
+        self.status = CompanyReferral.Status.COMPLETE
+        self.interaction = interaction
+        self.modified_by = user
+        self.completed_by = user
+        self.completed_on = now()

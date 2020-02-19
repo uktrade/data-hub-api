@@ -22,4 +22,9 @@ urlpatterns = [
         ),
         name='item',
     ),
+    path(
+        'company-referral/<uuid:pk>/complete',
+        CompanyReferralViewSet.as_action_view('complete'),
+        name='complete',
+    ),
 ]
