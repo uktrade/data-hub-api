@@ -6,11 +6,10 @@ from django.utils import timezone
 from django_pglocks import advisory_lock
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
-from datahub.company.models.company import Company
+from datahub.company.models import Company
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
-
 
 logger = get_task_logger(__name__)
 
@@ -67,6 +66,8 @@ def _automatic_company_archive(limit, simulate):
     priority=9,
     max_retries=3,
     queue='long-running',
+    name='datahub.company.tasks.automatic_company_archive',
+    # name set explicitly to maintain backwards compatibility
 )
 def automatic_company_archive(self, limit=1000, simulate=True):
     """
