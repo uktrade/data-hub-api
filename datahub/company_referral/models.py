@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core.models import BaseModel
+from datahub.core.utils import get_front_end_url
 
 
 class CompanyReferral(BaseModel):
@@ -71,3 +72,7 @@ class CompanyReferral(BaseModel):
     def __str__(self):
         """Human-friendly representation (for admin etc.)."""
         return f'{self.company} – {self.subject}'
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)

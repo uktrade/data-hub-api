@@ -460,6 +460,7 @@ DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://loc
 #  support urls that have object pks within the url.
 DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
+    'companyreferral': f'{DATAHUB_FRONTEND_BASE_URL}/company-referrals',
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'event': f'{DATAHUB_FRONTEND_BASE_URL}/events',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
