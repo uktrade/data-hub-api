@@ -176,7 +176,7 @@ class SearchAPIView(APIView):
 
     http_method_names = ('post',)
 
-    def get_filter_data(self, validated_data):
+    def _get_filter_data(self, validated_data):
         """Returns filter data."""
         filters = {
             self.REMAP_FIELDS.get(field, field): validated_data[field]
@@ -197,7 +197,7 @@ class SearchAPIView(APIView):
 
     def get_base_query(self, request, validated_data):
         """Gets a filtered Elasticsearch query for the provided search parameters."""
-        filter_data = self.get_filter_data(validated_data)
+        filter_data = self._get_filter_data(validated_data)
         entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)

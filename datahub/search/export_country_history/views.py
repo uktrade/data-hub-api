@@ -1,7 +1,6 @@
-# from elasticsearch_dsl.query import Bool, Match, MultiMatch, Q
+from elasticsearch_dsl.query import Bool, Q
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
-# from datahub.company.models import CompanyExportCountryHistory as DBCompanyExportCountryHistory
 from datahub.oauth.scopes import Scope
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
@@ -25,7 +24,13 @@ class ExportCountryHistoryView(SearchAPIView):
 
     REMAP_FIELDS = {
         'company': 'company.id',
-        'country': 'country.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'country': [
+            'country.id',
+            'export_countries.country.id',
+        ],
     }
 
     serializer_class = SearchExportCountryHistorySerializer
@@ -36,43 +41,32 @@ class ExportCountryHistoryView(SearchAPIView):
         """
         return [self.search_app.es_model, Interaction]
 
-    def get_filter_data(self, validated_data):
-        """
-        Overriding to add extra filters
-        """
-        filter_data = {
-            **super().get_filter_data(validated_data),
-            # 'were_countries_discussed': True,
-        }
-        return filter_data
-
     def get_base_query(self, request, validated_data):
         """
-        Overriding to extra query items to exlcude:
-        interactions without export countries
-        and UPDATE history items
+        Overriding base_query to add extra filters:
+        include interactions with export countries:
+            - kind: interaction and were_countries_discussed: True
+        and export country history items without UPDATEs:
+            - history_type: [INSERT, DELETE]
         """
         base_query = super().get_base_query(request, validated_data)
-        # 1
-        # base_query = base_query.filter('match', **{'were_countries_discussed': True}) \
-        #     .exclude('match', **{
-        #         'history_type': DBCompanyExportCountryHistory.HistoryType.UPDATE
-        #     })
-        # 2
-        # field_query = {
-        #     'query': True,
-        #     'operator': 'and',
-        # }
-        # should_filter = [Match(**{'were_countries_discussed': field_query})]
-        # 3
-        # base_query.query(Bool(should=should_filter, minimum_should_match=1))
-        # 4
-        # base_query = base_query.filter('term', **{'were_countries_discussed': True})
-        # 5
-        # sub_query = Q(
-        #   Q('match', **{'were_countries_discussed': True}) & \
-        #   Q('match', **{'_type': 'export-country-history'})
-        # ) | Q('match', **{'_type': 'interaction'})
-        # base_query = base_query.query(sub_query)
-        # print(base_query.to_dict())
+        should_filters = []
+        should_filters.append(
+            Q('bool', must=[
+                Q(
+                    Q(
+                        'match', **{'were_countries_discussed': True},
+                    ) & Q(
+                        'match', **{'kind': 'interaction'},
+                    ),
+                ) | Q(
+                    'match', **{'history_type': 'insert'},
+                ) | Q(
+                    'match', **{'history_type': 'delete'},
+                ),
+            ]),
+        )
+        base_query.query.filter.append(
+            Bool(should=should_filters, minimum_should_match=1),
+        )
         return base_query

@@ -32,6 +32,8 @@ class ExportCountryHistory(BaseESModel):
         'date': lambda obj: obj.history_date,
     }
 
+    COMPOSITE_FIELDS = ('export_countries.country.id')
+
     class Meta:
         """Default document meta data."""
 

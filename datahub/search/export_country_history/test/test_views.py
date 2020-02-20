@@ -58,9 +58,14 @@ def setup_data():
         )
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_canada,
-            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
-        CompanyExportCountryHistoryFactory()
+        # will be excluded, becuase of UPDATE
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_japan,
+            company=benchmark_company,
+            history_type=CompanyExportCountryHistory.HistoryType.UPDATE,
+        )
 
         ExportCountriesInteractionFactory(
             company=benchmark_company,
@@ -68,16 +73,20 @@ def setup_data():
             export_countries=[InteractionExportCountryFactory(
                 country=benchmark_country_canada,
             )],
+            date=FROZEN_DATETIME_1,
         )
+        # will be excluded as were_countries_discussed is False
         ExportCountriesInteractionFactory(
             company=benchmark_company,
             were_countries_discussed=False,
+            date=FROZEN_DATETIME_1,
         )
         ExportCountriesInteractionFactory(
             were_countries_discussed=True,
             export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_canada,
+                country=benchmark_country_japan,
             )],
+            date=FROZEN_DATETIME_1,
         )
 
     with freeze_time(FROZEN_DATETIME_2):
@@ -85,6 +94,22 @@ def setup_data():
             country=benchmark_country_japan,
             history_type=CompanyExportCountryHistory.HistoryType.INSERT,
         )
+        CompanyExportCountryHistoryFactory(
+            company=benchmark_company,
+            country=benchmark_country_canada,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+        )
+        CompanyExportCountryHistoryFactory(
+            company=benchmark_company,
+            country=benchmark_country_japan,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
+        )
+        # will be excluded, becuase of UPDATE
+        CompanyExportCountryHistoryFactory(
+            country=benchmark_country_canada,
+            company=benchmark_company,
+            history_type=CompanyExportCountryHistory.HistoryType.UPDATE,
+        )
 
         ExportCountriesInteractionFactory(
             company=benchmark_company,
@@ -92,22 +117,32 @@ def setup_data():
             export_countries=[InteractionExportCountryFactory(
                 country=benchmark_country_japan,
             )],
+            date=FROZEN_DATETIME_2,
         )
+        # will be excluded as were_countries_discussed is False
         ExportCountriesInteractionFactory(
             company=benchmark_company,
             were_countries_discussed=False,
+            date=FROZEN_DATETIME_2,
         )
         ExportCountriesInteractionFactory(
             were_countries_discussed=True,
             export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_japan,
+                country=benchmark_country_canada,
             )],
+            date=FROZEN_DATETIME_2,
         )
 
     with freeze_time(FROZEN_DATETIME_3):
         CompanyExportCountryHistoryFactory(
-            country=benchmark_country_japan,
+            country=benchmark_country_canada,
             history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+            history_user=None,
+        )
+        CompanyExportCountryHistoryFactory(
+            company=benchmark_company,
+            country=benchmark_country_japan,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
 
     yield str(benchmark_company.id)
@@ -175,8 +210,11 @@ class TestSearchExportCountryHistory(APITestMixin):
             url,
             data={
                 'company': company_id,
+                # 'were_countries_discussed': True,
+                # 'history_type': ['insert', 'delete'],
             },
         )
+        # print(response.json())
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == count
         assert all(
@@ -225,6 +263,8 @@ class TestSearchExportCountryHistory(APITestMixin):
             url,
             data={
                 'company': company_id,
+                # 'kind': 'interaction',
+                # 'were_countries_discussed': True,
             },
         )
 
@@ -235,45 +275,14 @@ class TestSearchExportCountryHistory(APITestMixin):
             for result in response.json()['results']
         )
 
-    def test_filtering_by_country(
+    def test_all_history_filtering_by_company(
         self,
         es_with_collector,
         setup_data,
     ):
         """
-        Test ExportCountryHistory search app with country param.
-        """
-        es_with_collector.flush_and_refresh()
-
-        url = reverse('api-v4:search:export-country-history')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'country': CountryConstant.japan.value.id,
-            },
-        )
-
-        expected_data = {
-            'country': {
-                'id': CountryConstant.japan.value.id,
-            },
-        }
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 5
-        assert all(
-            result['country']['id'] == expected_data['country']['id']
-            for result in response.json()['results']
-        )
-
-    def test_filtering_by_company(
-        self,
-        es_with_collector,
-        setup_data,
-    ):
-        """
-        Test ExportCountryHistory search app with company param.
+        Test ExportCountryHistory, along with interactions
+        search app with company param.
         """
         es_with_collector.flush_and_refresh()
 
@@ -294,13 +303,13 @@ class TestSearchExportCountryHistory(APITestMixin):
         }
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 5
+        assert response.json()['count'] == 7
         assert all(
             result['company']['id'] == expected_data['company']['id']
             for result in response.json()['results']
         )
 
-    def test_filtering_by_company_and_country(
+    def test_all_history_filtering_by_company_and_country(
         self,
         es_with_collector,
         setup_data,
@@ -330,17 +339,89 @@ class TestSearchExportCountryHistory(APITestMixin):
         }
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 1
+        assert response.json()['count'] == 3
         assert all(
             result['company']['id'] == expected_data['company']['id']
             for result in response.json()['results']
         )
+        for result in response.json()['results']:
+            if result.get('kind', '') == 'interaction':
+                result_countries = [item['country']['id'] for item in result['export_countries']]
+                assert expected_data['country']['id'] in result_countries
         assert all(
             result['country']['id'] == expected_data['country']['id']
             for result in response.json()['results']
+            if result.get('kind', '') != 'interaction'
         )
 
-    def test_sorting(self, es_with_collector, setup_data):
+    def test_company_filter_sorting(self, es_with_collector, setup_data):
+        """Tests the sorting of company history search response."""
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'company': setup_data,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == 7
+
+        date_times = [
+            result['date'] for result in response.json()['results']
+        ]
+        assert date_times == [
+            FROZEN_DATETIME_3,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+        ]
+
+    def test_filtering_by_country(
+        self,
+        es_with_collector,
+        setup_data,
+    ):
+        """
+        Test ExportCountryHistory search app with country param.
+        Not a real life usecase, but still good to check.
+        """
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:export-country-history')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'country': CountryConstant.japan.value.id,
+            },
+        )
+
+        expected_data = {
+            'country': {
+                'id': CountryConstant.japan.value.id,
+            },
+        }
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == 6
+        for result in response.json()['results']:
+            if result.get('kind', '') == 'interaction':
+                result_countries = [item['country']['id'] for item in result['export_countries']]
+                assert expected_data['country']['id'] in result_countries
+        assert all(
+            result['country']['id'] == expected_data['country']['id']
+            for result in response.json()['results']
+            if result.get('kind', '') != 'interaction'
+        )
+
+    def test_country_filter_sorting(self, es_with_collector, setup_data):
         """Tests the sorting of country history search response."""
         es_with_collector.flush_and_refresh()
 
@@ -354,10 +435,16 @@ class TestSearchExportCountryHistory(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 4
+        assert response.json()['count'] == 6
 
         date_times = [
-            result['history_date'] for result in response.json()['results']
+            result['date'] for result in response.json()['results']
         ]
-
-        assert date_times == [FROZEN_DATETIME_3, FROZEN_DATETIME_2, FROZEN_DATETIME_1]
+        assert date_times == [
+            FROZEN_DATETIME_3,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+        ]
