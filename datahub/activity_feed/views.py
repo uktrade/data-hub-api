@@ -25,6 +25,7 @@ class ActivityFeedView(APIView):
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     ACTIVITY_MODELS_PERMISSIONS_REQUIRED = (
+        'company_referral.view_companyreferral',
         'interaction.view_all_interaction',
         'investment.view_all_investmentproject',
         'order.view_order',

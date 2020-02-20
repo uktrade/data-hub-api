@@ -252,7 +252,7 @@ class InteractionCSVRowForm(forms.Form):
             return
 
         transformed_data = self.cleaned_data_as_serializer_dict()
-        serializer = InteractionSerializer(context={'is_bulk_import': True})
+        serializer = InteractionSerializer(context={'check_association_permissions': False})
 
         try:
             serializer.run_validators(transformed_data)

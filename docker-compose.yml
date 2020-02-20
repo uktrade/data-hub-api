@@ -32,12 +32,14 @@ services:
     restart: always
     environment:
       - POSTGRES_DB=datahub
+      - POSTGRES_PASSWORD=datahub
 
   mi-postgres:
     image: postgres:9.6
     restart: always
     environment:
       - POSTGRES_DB=mi
+      - POSTGRES_PASSWORD=mi
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
