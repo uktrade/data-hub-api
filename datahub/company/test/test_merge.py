@@ -19,6 +19,8 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
+from datahub.company_referral.models import CompanyReferral
+from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.models import InvestmentProject
@@ -38,6 +40,7 @@ def unrelated_objects():
     do not affect the counts of objects that will be affected by the merge.
     """
     ContactFactory.create_batch(2)
+    CompanyReferralFactory.create_batch(2)
     CompanyInteractionFactory.create_batch(2)
     OrderFactory.create_batch(2)
     InvestmentProjectFactory.create_batch(2)
@@ -63,6 +66,17 @@ def company_with_contacts_factory():
     """Factory for a company with contacts."""
     company = CompanyFactory()
     ContactFactory.create_batch(3, company=company)
+    return company
+
+
+def company_with_referrals_factory():
+    """
+    Factory for a company with referrals.
+
+    No company contacts are created to simplify testing.
+    """
+    company = CompanyFactory()
+    CompanyReferralFactory.create_batch(3, company=company, contact=None)
     return company
 
 
@@ -92,6 +106,7 @@ class TestDuplicateCompanyMerger:
                 CompanyFactory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
                     Interaction: {'company': 0},
                     InvestmentProject: {
@@ -105,6 +120,7 @@ class TestDuplicateCompanyMerger:
                 company_with_interactions_and_contacts_factory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
                     Interaction: {'company': 3},
                     InvestmentProject: {
@@ -118,7 +134,22 @@ class TestDuplicateCompanyMerger:
                 company_with_contacts_factory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
+                    Interaction: {'company': 0},
+                    InvestmentProject: {
+                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                    },
+                    Order: {'company': 0},
+                },
+                True,
+            ),
+            (
+                company_with_referrals_factory,
+                {
+                    CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 3},
+                    Contact: {'company': 0},
                     Interaction: {'company': 0},
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
@@ -131,6 +162,7 @@ class TestDuplicateCompanyMerger:
                 company_with_company_list_items_factory,
                 {
                     CompanyListItem: {'company': 3},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
                     Interaction: {'company': 0},
                     InvestmentProject: {
@@ -144,6 +176,7 @@ class TestDuplicateCompanyMerger:
                 company_with_investment_projects_factory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
                     Interaction: {'company': 0},
                     InvestmentProject: {
@@ -157,6 +190,7 @@ class TestDuplicateCompanyMerger:
                 company_with_orders_factory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
                     Interaction: {'company': 0},
                     InvestmentProject: {
@@ -170,6 +204,7 @@ class TestDuplicateCompanyMerger:
                 ArchivedCompanyFactory,
                 {
                     CompanyListItem: {'company': 0},
+                    CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
                     Interaction: {'company': 0},
                     InvestmentProject: {
@@ -205,6 +240,7 @@ class TestDuplicateCompanyMerger:
             ('num_contacts', True),
             ('num_interactions', True),
             ('num_orders', True),
+            ('num_referrals', False),
         ),
     )
     @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
@@ -230,6 +266,7 @@ class TestDuplicateCompanyMerger:
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
         source_orders = list(source_company.orders.all())
+        source_referrals = list(source_company.referrals.all())
         source_company_list_items = list(source_company.company_list_items.all())
 
         # Each interaction and order has a contact, so actual number of contacts is
@@ -243,6 +280,7 @@ class TestDuplicateCompanyMerger:
 
         assert result == {
             CompanyListItem: {'company': len(source_company_list_items)},
+            CompanyReferral: {'company': len(source_referrals)},
             Contact: {'company': len(source_contacts)},
             Interaction: {'company': len(source_interactions)},
             InvestmentProject: {
@@ -251,7 +289,7 @@ class TestDuplicateCompanyMerger:
             Order: {'company': len(source_orders)},
         }
 
-        for obj in chain(source_interactions, source_contacts, source_orders):
+        for obj in chain(source_interactions, source_contacts, source_orders, source_referrals):
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_interactions)
@@ -260,6 +298,8 @@ class TestDuplicateCompanyMerger:
         assert all(obj.modified_on == creation_time for obj in source_contacts)
         assert all(obj.company == target_company for obj in source_orders)
         assert all(obj.modified_on == creation_time for obj in source_orders)
+        assert all(obj.company == target_company for obj in source_referrals)
+        assert all(obj.modified_on == creation_time for obj in source_referrals)
 
         source_company.refresh_from_db()
 
@@ -316,6 +356,7 @@ class TestDuplicateCompanyMerger:
         assert result == {
             # each interaction has a contact, that's why 4 contacts should be moved
             CompanyListItem: {'company': 0},
+            CompanyReferral: {'company': 0},
             Contact: {'company': 0},
             Interaction: {'company': 0},
             InvestmentProject: {
@@ -408,11 +449,18 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
 
-def _company_factory(num_interactions=0, num_contacts=0, num_orders=0, num_company_list_items=0):
+def _company_factory(
+        num_interactions=0,
+        num_contacts=0,
+        num_orders=0,
+        num_referrals=0,
+        num_company_list_items=0,
+):
     """Factory for a company that has companies, interactions and OMIS orders."""
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    CompanyReferralFactory.create_batch(num_referrals, company=company, contact=None)
     OrderFactory.create_batch(num_orders, company=company)
     CompanyListItemFactory.create_batch(num_company_list_items, company=company)
     return company

@@ -21,6 +21,8 @@ from datahub.company.test.factories import (
     ContactFactory,
     SubsidiaryFactory,
 )
+from datahub.company_referral.models import CompanyReferral
+from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
 from datahub.interaction.models import Interaction
@@ -108,6 +110,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ('num_interactions', True),
             ('num_investment_projects', False),
             ('num_orders', True),
+            ('num_referrals', False),
         ),
     )
     @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
@@ -131,6 +134,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
         source_orders = list(source_company.orders.all())
+        source_referrals = list(source_company.referrals.all())
         source_company_list_items = list(source_company.company_list_items.all())
 
         source_investment_projects_by_field = {
@@ -188,6 +192,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 f'{len(source_orders)} {order_noun}',
             )
 
+        if len(source_referrals) > 0:
+            referral_noun = _get_verbose_name(len(source_referrals), CompanyReferral)
+            merge_entries.append(
+                f'{len(source_referrals)} {referral_noun}',
+            )
+
         if len(source_company_list_items) > 0:
             company_list_item_noun = _get_verbose_name(
                 len(source_company_list_items),
@@ -217,10 +227,13 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             'target_company': escape(str(target_company)),
         }
 
-        for obj in chain(source_interactions, source_contacts, source_orders, chain.from_iterable(
-            investment_projects
-            for investment_projects in source_investment_projects_by_field.values()
-        )):
+        for obj in chain(
+            source_interactions,
+            source_contacts,
+            source_orders,
+            source_referrals,
+            chain.from_iterable(source_investment_projects_by_field.values()),
+        ):
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_interactions)
@@ -229,6 +242,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert all(obj.modified_on == creation_time for obj in source_contacts)
         assert all(obj.company == target_company for obj in source_orders)
         assert all(obj.modified_on == creation_time for obj in source_orders)
+        assert all(obj.company == target_company for obj in source_referrals)
+        assert all(obj.modified_on == creation_time for obj in source_referrals)
         for field, investment_projects in source_investment_projects_by_field.items():
             assert all(getattr(obj, field) == target_company for obj in investment_projects)
             assert all(obj.modified_on == creation_time for obj in investment_projects)
@@ -339,6 +354,7 @@ def _company_factory(
         num_contacts=0,
         num_investment_projects=0,
         num_orders=0,
+        num_referrals=0,
         num_company_list_items=0,
 ):
     """
@@ -347,6 +363,7 @@ def _company_factory(
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)
+    CompanyReferralFactory.create_batch(num_referrals, company=company, contact=None)
     OrderFactory.create_batch(num_orders, company=company)
     CompanyListItemFactory.create_batch(num_company_list_items, company=company)
 
