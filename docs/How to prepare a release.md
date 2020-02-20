@@ -64,44 +64,26 @@ Double-check that the details are correct and that the base branch is set to `ma
 
 Add at least two developers as reviewers and click 'Create pull request'.
 
+After the PR has been reviewed, merge it into `master` and delete the merged branch.
+
 ## Deploy to staging
 
-After the PR has been reviewed, merge it into `master` and delete the merged branch.
-The release will be automatically deployed to staging via Jenkins.
+Following the merge of the release PR, the release will be automatically 
+deployed to staging via Jenkins.
+
 Check that everything looks fine before proceeding.
 
 ## Tag and publish the release on GitHub
 
-Following the automatic staging deployment, the next step is create a release on GitHub. To do this, you will need to [generate a GitHub personal access 
-token](https://github.com/settings/tokens) with the `public_repo` scope.
+The merging of the release PR will also trigger a GitHub Actions workflow
+that will automatically publish the release on GitHub.
 
-Once you have this, you can either set it in the `GITHUB_TOKEN` environment variable, or enter it when prompted.
+You can [check the status of the job on the Actions tab on GitHub](https://github.com/uktrade/data-hub-api/actions).
 
-When you have a token, run:
+Once the job is complete, the release should appear [on the releases tab](https://github.com/uktrade/data-hub-api/releases).
 
-```shell
-scripts/publish_release.py
-```
-
-This will tag, create and publish the release on GitHub and open it in your web browser. 
-
-<details>
-<summary>If you are unable to use the script</summary>
-
-If you can‘t use the script for some reason, you can still manually create and publish the release.
-
-In GitHub, [create a release](https://github.com/uktrade/data-hub-api/releases/new) with the following values:
-
-* **Tag version**: `v<version>` e.g. `v6.3.0`
-* **Target**: `master`
-* **Release title**: `v<version>` e.g. `v6.3.0`
-* **Describe this release**: copy/paste the notes from the compiled changelog.
-
-And click on _Publish release_.
-
-For more information see the [GitHub documentation](https://help.github.com/articles/creating-releases/).
-
-</details>
+(If something goes wrong, it’s also possible to run `scripts/publish_release.py` locally.
+To do that you, you’ll need to [generate a GitHub personal access token](https://github.com/settings/tokens) with the `public_repo` scope.)
 
 ## Deploy to production
 Deployment to production happens manually but after the release has been announced on Slack.
