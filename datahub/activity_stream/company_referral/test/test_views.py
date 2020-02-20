@@ -38,6 +38,7 @@ def test_company_referral_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubCompanyReferral:{company_referral.id}',
+                    'type': ['dit:CompanyReferral'],
                     'startTime': format_date_or_datetime(company_referral.created_on),
                     'dit:subject': company_referral.subject,
                     'dit:status': str(company_referral.status),
@@ -118,6 +119,7 @@ def test_closed_company_referral_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubCompanyReferral:{company_referral.id}',
+                    'type': ['dit:CompanyReferral'],
                     'startTime': format_date_or_datetime(company_referral.created_on),
                     'dit:subject': company_referral.subject,
                     'dit:status': str(company_referral.status),
@@ -213,6 +215,7 @@ def test_complete_company_referral_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubCompanyReferral:{company_referral.id}',
+                    'type': ['dit:CompanyReferral'],
                     'startTime': format_date_or_datetime(company_referral.created_on),
                     'dit:subject': company_referral.subject,
                     'dit:status': str(company_referral.status),
@@ -310,6 +313,7 @@ def test_company_referral_activity_without_team_and_contact(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubCompanyReferral:{company_referral.id}',
+                    'type': ['dit:CompanyReferral'],
                     'startTime': format_date_or_datetime(company_referral.created_on),
                     'dit:subject': company_referral.subject,
                     'dit:status': str(company_referral.status),
