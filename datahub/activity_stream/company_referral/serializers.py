@@ -26,6 +26,7 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': company_referral_id,
+                'type': ['dit:CompanyReferral'],
                 'startTime': instance.created_on,
                 'dit:subject': instance.subject,
                 'dit:status': str(instance.status),
