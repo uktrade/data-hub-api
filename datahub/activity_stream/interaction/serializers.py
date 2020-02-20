@@ -42,25 +42,12 @@ class InteractionActivitySerializer(ActivitySerializer):
             context = {}
         return context
 
-    def _get_adviser_with_team(self, participant):
-        adviser = self._get_adviser(participant.adviser)
-        if participant.team is not None:
-            adviser['dit:team'] = self._get_team(participant.team)
-        return adviser
-
     def _get_dit_participants(self, participants):
         return [
-            self._get_adviser_with_team(participant)
+            self._get_adviser_with_team(participant.adviser, participant.team)
             for participant in participants.all()
             if participant.adviser is not None
         ]
-
-    def _get_team(self, team):
-        return {} if team is None else {
-            'id': f'dit:DataHubTeam:{team.pk}',
-            'type': ['Group', 'dit:Team'],
-            'name': team.name,
-        }
 
     def to_representation(self, instance):
         """

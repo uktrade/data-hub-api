@@ -1,13 +1,44 @@
 ### Description of change
 
-
+<!--
+Enter a description of the changes in the PR here.
+Include any context that will help reviewers understand the reason for these changes.
+-->
 
 ### Checklist
 
-* [ ] Has a new newsfragment been created? Check [changelog/README.md](https://github.com/uktrade/data-hub-api/blob/master/changelog/README.md) for instructions
-* [ ] Do any added or updated endpoints appear in the API documentation? See [docs/Maintaining the API documentation.md](https://github.com/uktrade/data-hub-api/blob/develop/docs/Maintaining&#32;the&#32;API&#32;documentation.md) for more details
-* [ ] Have any relevant search models been updated?
-* [ ] Have any relevant fixtures (`fixtures/test_data.yaml`) been updated?
-* [ ] Have any relevant select-/prefetch-related field lists in the views and search apps been updated?
-* [ ] Has the admin site been updated (for new models, fields etc.)?
-* [ ] Has the README been updated (if needed)?
+* [ ] If this is a releasable change, has a news fragment been added?
+
+  <details>
+  <summary>Explanation</summary>
+  
+  A news fragment is required for any releasable change (i.e. code that runs in or affects production) so that a corresponding changelog entry is added when releasing.
+  
+  Check [changelog/README.md](https://github.com/uktrade/data-hub-api/blob/master/changelog/README.md) for instructions.
+  
+  </details>
+  
+* [ ] Has this branch been rebased on top of the current `develop` branch?
+
+  <details>
+  <summary>Explanation</summary>
+  
+  The branch should not be stale or have conflicts at the time reviews are requested.
+  
+  </details>
+
+* [ ] Is the CircleCI build passing?
+
+### General points
+
+<details>
+<summary><strong>Other things to check</strong></summary><p></p>
+
+* Make sure `fixtures/test_data.yaml` is maintained when updating models
+* Consider the admin site when making changes to models
+* Use select-/prefetch-related field lists in views and search apps, and update them when fields are added
+* Make sure the README is updated e.g. when adding new environment variables
+
+</details>
+
+See [docs/CONTRIBUTING.md](https://github.com/uktrade/data-hub-api/blob/develop/docs/CONTRIBUTING.md) for more guidelines.
