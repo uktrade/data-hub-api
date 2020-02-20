@@ -1,3 +1,25 @@
+# Data Hub API 27.10.0 (2020-02-20)
+
+
+## Removals
+
+- The `createsuperuserwithpassword` management command was removed as [the standard `createsuperuser` now has the same functionality](https://docs.djangoproject.com/en/3.0/ref/django-admin/#django-admin-createsuperuser).
+
+## Bug fixes
+
+- A fix was made for environments using docker-compose which enables the postgres
+  image to start successfully. A `POSTGRES_PASSWORD` was added for each postgres
+  image and configs were updated accordingly.
+
+## API
+
+- **Companies** It is now possible to get a list of company referrals created in activity-stream using 
+  following URL `/v3/activity-stream/company-referral`.
+- **Companies** A new endpoint, `POST /v4/company-referral/<ID>/complete`, was added for completing a company referral.
+
+  The request body is in the same format as `POST /v3/interaction`, except that the `company` field is not used as this comes from the referral object.
+
+
 # Data Hub API 27.9.0 (2020-02-18)
 
 

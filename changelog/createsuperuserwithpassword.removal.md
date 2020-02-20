@@ -1,1 +1,0 @@
-The `createsuperuserwithpassword` management command was removed as [the standard `createsuperuser` now has the same functionality](https://docs.djangoproject.com/en/3.0/ref/django-admin/#django-admin-createsuperuser).
