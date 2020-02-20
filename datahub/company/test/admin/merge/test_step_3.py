@@ -227,23 +227,22 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             'target_company': escape(str(target_company)),
         }
 
+        source_non_project_related_objects = [
+            *source_company_list_items,
+            *source_contacts,
+            *source_interactions,
+            *source_orders,
+            *source_referrals,
+        ]
         for obj in chain(
-            source_interactions,
-            source_contacts,
-            source_orders,
-            source_referrals,
+            source_non_project_related_objects,
             chain.from_iterable(source_investment_projects_by_field.values()),
         ):
             obj.refresh_from_db()
 
-        assert all(obj.company == target_company for obj in source_interactions)
-        assert all(obj.modified_on == creation_time for obj in source_interactions)
-        assert all(obj.company == target_company for obj in source_contacts)
-        assert all(obj.modified_on == creation_time for obj in source_contacts)
-        assert all(obj.company == target_company for obj in source_orders)
-        assert all(obj.modified_on == creation_time for obj in source_orders)
-        assert all(obj.company == target_company for obj in source_referrals)
-        assert all(obj.modified_on == creation_time for obj in source_referrals)
+        assert all(obj.company == target_company for obj in source_non_project_related_objects)
+        assert all(obj.modified_on == creation_time for obj in source_non_project_related_objects)
+
         for field, investment_projects in source_investment_projects_by_field.items():
             assert all(getattr(obj, field) == target_company for obj in investment_projects)
             assert all(obj.modified_on == creation_time for obj in investment_projects)

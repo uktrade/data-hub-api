@@ -1,5 +1,4 @@
 from datetime import datetime
-from itertools import chain
 from unittest.mock import patch
 
 import pytest
@@ -289,17 +288,19 @@ class TestDuplicateCompanyMerger:
             Order: {'company': len(source_orders)},
         }
 
-        for obj in chain(source_interactions, source_contacts, source_orders, source_referrals):
+        source_related_objects = [
+            *source_company_list_items,
+            *source_contacts,
+            *source_interactions,
+            *source_orders,
+            *source_referrals,
+        ]
+
+        for obj in source_related_objects:
             obj.refresh_from_db()
 
-        assert all(obj.company == target_company for obj in source_interactions)
-        assert all(obj.modified_on == creation_time for obj in source_interactions)
-        assert all(obj.company == target_company for obj in source_contacts)
-        assert all(obj.modified_on == creation_time for obj in source_contacts)
-        assert all(obj.company == target_company for obj in source_orders)
-        assert all(obj.modified_on == creation_time for obj in source_orders)
-        assert all(obj.company == target_company for obj in source_referrals)
-        assert all(obj.modified_on == creation_time for obj in source_referrals)
+        assert all(obj.company == target_company for obj in source_related_objects)
+        assert all(obj.modified_on == creation_time for obj in source_related_objects)
 
         source_company.refresh_from_db()
 
