@@ -45,6 +45,7 @@ class TestAddServiceDelivery(APITestMixin):
             {
                 'is_event': False,
                 'theme': Interaction.Theme.EXPORT,
+                'were_countries_discussed': False,
             },
             # non-event service delivery with blank notes
             {

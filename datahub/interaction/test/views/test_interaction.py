@@ -21,8 +21,6 @@ from datahub.company.test.utils import format_expected_adviser
 from datahub.core.constants import Country, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -250,7 +248,6 @@ class TestAddInteraction(APITestMixin):
         Test add a new interaction with export countries
         when feature flag is active.
         """
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
         adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         company = CompanyFactory()
         contact = ContactFactory(company=company)
@@ -363,7 +360,6 @@ class TestAddInteraction(APITestMixin):
         Test add a new interaction with export country
         make sure it syncs across to company as a new entry.
         """
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
         adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         company = CompanyFactory()
         contact = ContactFactory(company=company)
@@ -450,7 +446,6 @@ class TestAddInteraction(APITestMixin):
         Test add a new interaction with export country
         consolidates to company export countries.
         """
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
         adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         company = CompanyFactory()
         with freeze_time(export_country_date):
@@ -1237,53 +1232,6 @@ class TestAddInteraction(APITestMixin):
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=True)
-        data = resolve_data(data)
-        url = reverse('api-v3:interaction:collection')
-        response = self.api_client.post(url, data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == errors
-
-    def test_validaton_when_interaction_add_countries_feature_flag_off(self):
-        """
-        Check export country fields are not allowed to be updated
-        when feature flas is off.
-        """
-        data = {
-            'theme': Interaction.Theme.EXPORT,
-            'kind': Interaction.Kind.INTERACTION,
-            'date': date.today().isoformat(),
-            'subject': 'whatever',
-            'company': lambda: CompanyFactory(name='Martian Island'),
-            'contacts': [
-                lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
-            ],
-            'dit_participants': [
-                {'adviser': AdviserFactory},
-            ],
-            'service': Service.inbound_referral.value.id,
-            'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-            'was_policy_feedback_provided': False,
-            'were_countries_discussed': True,
-            'export_countries': [
-                {
-                    'country': {
-                        'id': Country.canada.value.id,
-                    },
-                    'status':
-                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                },
-            ],
-        }
-        errors = {
-            'export_countries':
-                ['export countries related fields are not valid when feature flag is off.'],
-            'were_countries_discussed':
-                ['export countries related fields are not valid when feature flag is off.'],
-        }
-
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=False)
         data = resolve_data(data)
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, data)
@@ -1925,7 +1873,6 @@ class TestUpdateInteraction(APITestMixin):
         Test that a user can't update export countries in an interaction
         when the interaction doesn't have any export countries.
         """
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
         requester = create_test_user(permission_codenames=permissions)
         interaction = CompanyInteractionFactory(
             subject='I am a subject',
@@ -1999,7 +1946,6 @@ class TestUpdateInteraction(APITestMixin):
         Test that a user can't update export countries in an interaction
         when the interaction already has export countries set.
         """
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
         requester = create_test_user(permission_codenames=permissions)
         interaction = ExportCountriesInteractionFactory(
             export_countries__country_id=Country.canada.value.id,
@@ -2028,9 +1974,6 @@ class TestUpdateInteraction(APITestMixin):
         interaction = ExportCountriesInteractionFactory()
 
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
-
-        FeatureFlagFactory(code=INTERACTION_ADD_COUNTRIES, is_active=flag)
-
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         data = {
