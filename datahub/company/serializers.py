@@ -4,14 +4,11 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
-from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.constants import (
     BusinessTypeConstant,
-    EXPORT_COUNTRIES_FEATURE_FLAG,
     OneListTierID,
 )
 from datahub.company.models import (
@@ -48,7 +45,6 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -255,9 +251,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'uk_establishment_not_in_uk': gettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.',
         ),
-        'invalid_when_exports_feature_flag_is_on': gettext_lazy(
-            'This field invalid when export countries feature flag is ON.',
-        ),
     }
 
     archived_by = NestedAdviserField(read_only=True)
@@ -318,51 +311,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         if self.instance and not isinstance(self.instance, list) and self.instance.duns_number:
             for field in self.Meta.dnb_read_only_fields:
                 self.fields[field].read_only = True
-
-    @atomic
-    def update(self, instance, validated_data):
-        """
-        Using writable nested representations to copy export country elements
-        from the `Company` model into the `CompanyExportCountry`.
-        Skip this update when feature flag is ON.
-        """
-        company = super().update(instance, validated_data)
-
-        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
-            return company
-
-        export_to_countries = validated_data.get('export_to_countries')
-        future_interest_countries = validated_data.get('future_interest_countries')
-        adviser = validated_data.get('modified_by')
-        all_countries = {
-            *(export_to_countries or []),
-            *(future_interest_countries or []),
-        }
-
-        if future_interest_countries is not None:
-            self._save_to_company_export_country_model(
-                company=instance,
-                adviser=adviser,
-                export_countries=future_interest_countries,
-                status=CompanyExportCountry.Status.FUTURE_INTEREST,
-            )
-
-        if export_to_countries is not None:
-            self._save_to_company_export_country_model(
-                company=instance,
-                adviser=adviser,
-                export_countries=export_to_countries,
-                status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            )
-
-        not_interested_status = CompanyExportCountry.Status.NOT_INTERESTED
-        CompanyExportCountry.objects.filter(
-            company=instance,
-        ).exclude(
-            Q(status=not_interested_status) | Q(country__in=all_countries),
-        ).delete()
-
-        return company
 
     @staticmethod
     def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
@@ -444,24 +392,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 )
 
         return global_headquarters
-
-    def validate_export_to_countries(self, export_to_countries):
-        """This field is invalid when feature flag is active"""
-        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
-            raise serializers.ValidationError(
-                self.error_messages['invalid_when_exports_feature_flag_is_on'],
-            )
-
-        return export_to_countries
-
-    def validate_future_interest_countries(self, future_interest_countries):
-        """This field is invalid when feature flag is active"""
-        if is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
-            raise serializers.ValidationError(
-                self.error_messages['invalid_when_exports_feature_flag_is_on'],
-            )
-
-        return future_interest_countries
 
     def get_one_list_group_tier(self, obj):
         """
@@ -697,9 +627,6 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
     """
 
     default_error_messages = {
-        'invalid_when_exports_feature_flag_is_off': gettext_lazy(
-            'This field invalid when export countries feature flag is OFF.',
-        ),
         'duplicate_export_country': gettext_lazy(
             'You cannot enter the same country in multiple fields.',
         ),
@@ -714,11 +641,6 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         And same country can't be added twice.
         """
         data = super().validate(data)
-
-        if not is_feature_flag_active(EXPORT_COUNTRIES_FEATURE_FLAG):
-            raise serializers.ValidationError(
-                self.error_messages['invalid_when_exports_feature_flag_is_off'],
-            )
 
         # check for duplicate countries
         export_countries = data.get('export_countries', [])
