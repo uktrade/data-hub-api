@@ -234,3 +234,7 @@ class CompanyAutocompleteSearchListAPIView(
         'address',
         'registered_address',
     ]
+
+    def get_entities(self):
+        """Returns entities"""
+        return [self.search_app.es_model]

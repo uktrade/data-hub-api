@@ -18,6 +18,7 @@ from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.models import UserEvent
+from elasticsearch_dsl.mapping import Mapping
 
 pytestmark = pytest.mark.django_db
 
@@ -51,7 +52,10 @@ class TestValidateViewAttributes:
 
     def test_validate_composite_filter_fields(self, search_view):
         """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
-        mapping = search_view.search_app.es_model._doc_type.mapping
+        entities = search_view().get_entities()
+        mapping = Mapping('test')
+        for entity_mapping in entities:
+            mapping.update(entity_mapping._doc_type.mapping, update_only=True)
 
         invalid_fields = {
             field
