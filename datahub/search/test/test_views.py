@@ -59,7 +59,6 @@ class TestValidateViewAttributes:
             for field in field_list
             if not mapping.resolve_field(field)
             and field not in search_view.search_app.es_model.PREVIOUS_MAPPING_FIELDS
-            and field not in search_view.search_app.es_model.COMPOSITE_FIELDS
         }
 
         assert not invalid_fields

@@ -34,9 +34,6 @@ class BaseESModel(Document):
     # and the field removed from here.
     PREVIOUS_MAPPING_FIELDS = ()
 
-    # Fields that belong to different es_model, that is being used within this app
-    COMPOSITE_FIELDS = ()
-
     class Meta:
         dynamic = MetaField('false')
 
