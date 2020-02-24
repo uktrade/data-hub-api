@@ -31,6 +31,13 @@ def _item_url(pk):
     return reverse('api-v4:company-referral:item', kwargs={'pk': pk})
 
 
+def _item_by_interaction_id_url(interaction_id):
+    return reverse(
+        'api-v4:company-referral:item-by-interaction-id',
+        kwargs={'interaction_id': interaction_id},
+    )
+
+
 class TestListCompanyListsView(APITestMixin):
     """Tests for listing user's referrals."""
 
@@ -392,6 +399,78 @@ class TestGetCompanyReferral(APITestMixin):
         """Test that a single referral can be retrieved."""
         referral = factory()
         url = _item_url(referral.pk)
+
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'closed_by': _format_expected_adviser(referral.closed_by),
+            'closed_on': format_date_or_datetime(referral.closed_on),
+            'company': {
+                'id': str(referral.company.pk),
+                'name': referral.company.name,
+            },
+            'completed_by': _format_expected_adviser(referral.completed_by),
+            'completed_on': format_date_or_datetime(referral.completed_on),
+            'contact': {
+                'id': str(referral.contact.pk),
+                'name': referral.contact.name,
+            },
+            'created_by': _format_expected_adviser(referral.created_by),
+            'created_on': format_date_or_datetime(referral.created_on),
+            'id': str(referral.pk),
+            'interaction': {
+                'id': str(referral.interaction.pk),
+                'subject': referral.interaction.subject,
+            } if referral.interaction else None,
+            'notes': referral.notes,
+            'recipient': _format_expected_adviser(referral.recipient),
+            'status': referral.status,
+            'subject': referral.subject,
+        }
+
+
+class TestGetCompanyReferralByInteractionID(APITestMixin):
+    """Tests for the get company referral by interaction ID view."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        referral = CompleteCompanyReferralFactory()
+        url = _item_by_interaction_id_url(referral.interaction.pk)
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_companyreferral'], status.HTTP_200_OK),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """
+        Test that the expected status is returned depending on the permissions the user has.
+        """
+        referral = CompleteCompanyReferralFactory()
+        user = create_test_user(permission_codenames=permission_codenames)
+
+        url = _item_by_interaction_id_url(referral.interaction.pk)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.get(url)
+        assert response.status_code == expected_status
+
+    def test_returns_404_for_non_existent_referral(self):
+        """Test that a 404 is returned for a non-existent referral ID."""
+        url = _item_by_interaction_id_url(uuid4())
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_retrieve_a_complete_referral(self):
+        """Test that a complete referral can be retrieved by interaction ID."""
+        referral = CompleteCompanyReferralFactory()
+        url = _item_by_interaction_id_url(referral.interaction.pk)
 
         response = self.api_client.get(url)
 

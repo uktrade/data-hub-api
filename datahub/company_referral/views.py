@@ -14,8 +14,8 @@ from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
 
 
-class CompanyReferralViewSet(CoreViewSet):
-    """Company referral view set."""
+class CompanyReferralBaseViewSet(CoreViewSet):
+    """Company referral base view set."""
 
     serializer_class = CompanyReferralSerializer
     required_scopes = (Scope.internal_front_end,)
@@ -28,6 +28,10 @@ class CompanyReferralViewSet(CoreViewSet):
         'interaction',
         'recipient__dit_team',
     )
+
+
+class CompanyReferralViewSet(CompanyReferralBaseViewSet):
+    """Company referral view set."""
 
     def get_queryset(self):
         """
@@ -78,3 +82,9 @@ class CompanyReferralViewSet(CoreViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class CompanyReferralByInteractionIDViewSet(CompanyReferralBaseViewSet):
+    """Company referral by interaction ID view set."""
+
+    lookup_field = 'interaction_id'
