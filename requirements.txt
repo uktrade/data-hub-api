@@ -83,7 +83,7 @@ pip-tools==4.4.1
 piprot==0.9.11
 pluggy==0.13.1            # via pytest
 prompt-toolkit==3.0.2     # via ipython
-psycogreen==1.0.1
+psycogreen==1.0.2
 psycopg2==2.8.4
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
