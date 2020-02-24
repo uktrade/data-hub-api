@@ -66,8 +66,8 @@ def _automatic_company_archive(limit, simulate):
     priority=9,
     max_retries=3,
     queue='long-running',
-    name='datahub.company.tasks.automatic_company_archive',
     # name set explicitly to maintain backwards compatibility
+    name='datahub.company.tasks.automatic_company_archive',
 )
 def automatic_company_archive(self, limit=1000, simulate=True):
     """
