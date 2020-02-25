@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from django.utils.timezone import utc
+from elasticsearch_dsl.mapping import Mapping
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -18,7 +19,6 @@ from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.models import UserEvent
-from elasticsearch_dsl.mapping import Mapping
 
 pytestmark = pytest.mark.django_db
 
@@ -55,7 +55,7 @@ class TestValidateViewAttributes:
         entities = search_view().get_entities()
         mapping = Mapping('test')
         for entity_mapping in entities:
-            mapping.update(entity_mapping._doc_type.mapping, update_only=True)
+            mapping.update(entity_mapping._doc_type.mapping)
 
         invalid_fields = {
             field
