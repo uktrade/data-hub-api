@@ -1,3 +1,5 @@
+from django.db.transaction import on_commit
+from django.utils.timezone import now
 from functools import partial
 from operator import not_
 from uuid import UUID
@@ -21,6 +23,7 @@ from datahub.company.models import (
     ExportExperienceCategory,
     OneListTier,
 )
+from datahub.company.tasks import update_contact_consent
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
@@ -206,6 +209,52 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
+
+    def notify_consent_service(self, validated_data):
+        """
+        Trigger the update_contact_consent task with the current version
+        of `validated_data`. The actual enqueuing of the task happens in the
+        on_commit hook so it won't actually notify the consent service unless
+        the database transaction was successful.
+        """
+        if 'accepts_dit_email_marketing' not in validated_data:
+            # If no consent value in POST body
+            return
+
+        # If consent value in POST, notify
+        combiner = DataCombiner(self.instance, validated_data)
+        transaction.on_commit(
+            lambda: update_contact_consent.apply_async(
+                args=(
+                    combiner.get_value('email'),
+                    validated_data['accepts_dit_email_marketing'],
+                ),
+                kwargs={
+                    'modified_at': now().isoformat(),
+                },
+
+            ),
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        """
+        Create a new instance using this serializer
+
+        :return: created instance
+        """
+        self.notify_consent_service(validated_data)
+        return super().create(validated_data)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        """
+        Update the given instance with validated_data
+
+        :return: updated instance
+        """
+        self.notify_consent_service(validated_data)
+        return super().update(instance, validated_data)
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
