@@ -415,7 +415,7 @@ if REDIS_BASE_URL:
                     year=2019, month=10, day=24, hour=23, minute=59, second=59, tzinfo=utc,
                 ),
                 'fields_to_update': ['global_ultimate_duns_number',],
-                'limit': env.integer('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
+                'limit': env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
                 'simulate': False,
             },
         }
