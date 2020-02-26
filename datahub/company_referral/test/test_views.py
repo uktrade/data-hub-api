@@ -461,14 +461,18 @@ class TestGetCompanyReferralByInteractionID(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == expected_status
 
-    def test_returns_404_for_non_existent_referral(self):
-        """Test that a 404 is returned for a non-existent referral ID."""
+    def test_returns_404_for_non_existent_interaction(self):
+        """Test that a 404 is returned for a non-existent interaction."""
         url = _item_by_interaction_id_url(uuid4())
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_retrieve_a_complete_referral(self):
-        """Test that a complete referral can be retrieved by interaction ID."""
+        """
+        Test that a complete referral can be retrieved by interaction ID.
+
+        Only complete referral has interaction assigned.
+        """
         referral = CompleteCompanyReferralFactory()
         url = _item_by_interaction_id_url(referral.interaction.pk)
 
