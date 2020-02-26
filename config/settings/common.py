@@ -402,21 +402,24 @@ if REDIS_BASE_URL:
                 'simulate': False,
             }
         },
-        'dnb_heirarchies_backfill': {
+    }
+
+    if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):
+        CELERY_BEAT_SCHEDULE['dnb_heirarchies_backfill'] = {
             'task': 'datahub.dnb_api.tasks.sync_outdated_companies_with_dnb',
             'schedule': crontab(minute=0, hour=1,),
             'kwargs': {
-                # Backfill companies which were last updated before 24 October 2019 -
+                # Backfill companies which were last updated before 25 October 2019 -
                 # this is when we started recording the `global_ultimate_duns_number` field
                 'dnb_modified_on_before': datetime(
                     year=2019, month=10, day=24, hour=23, minute=59, second=59, tzinfo=utc,
                 ),
                 'fields_to_update': ['global_ultimate_duns_number',],
-                'limit': 100,
-                'simulate': True,
+                'limit': env.integer('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
+                'simulate': False,
             },
-        },
-    }
+        }
+
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
         CELERY_BEAT_SCHEDULE['sync_es'] = {
             'task': 'datahub.search.tasks.sync_all_models',
