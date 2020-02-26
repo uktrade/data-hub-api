@@ -1,3 +1,12 @@
+# Data Hub API 27.13.1 (2020-02-26)
+
+
+## Bug fixes
+
+- **Companies** A bug was fixed in `config/settings/common.py` relating to the celery beat config 
+  for the company hierarchy rollout.
+
+
 # Data Hub API 27.13.0 (2020-02-26)
 
 
