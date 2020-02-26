@@ -136,6 +136,7 @@ def sync_outdated_companies_with_dnb(
     `dnb_modified_on_before` and will then interact with dnb-service to get the latest data to sync
     these companies.
     """
+    logger.info('sync_outdated_companies_with_dnb task started.')
     company_ids = Company.objects.filter(
         Q(dnb_modified_on__lte=dnb_modified_on_before) | Q(dnb_modified_on__isnull=True),
         duns_number__isnull=False,
@@ -146,6 +147,10 @@ def sync_outdated_companies_with_dnb(
         'dnb_modified_on',
     ).values_list('id', flat=True)[:limit]
 
+    logger.info(
+        'sync_outdated_companies_with_dnb task emitting sync_company_with_dnb_rate_limited '
+        'sub-tasks.',
+    )
     for company_id in company_ids:
         sync_company_with_dnb_rate_limited.apply_async(
             kwargs={
@@ -155,6 +160,7 @@ def sync_outdated_companies_with_dnb(
                 'simulate': simulate,
             },
         )
+    logger.info('sync_outdated_companies_with_dnb task finished.')
 
 
 def _record_audit(update_results, producer_task, start_time):
