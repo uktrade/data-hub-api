@@ -1,3 +1,14 @@
+# Data Hub API 27.13.0 (2020-02-26)
+
+
+## Features
+
+- **Companies** The daily company hierarchy rollout task was adjusted so that it is no longer
+  in simulation mode. It will ingest a number of companies per night up to a limit
+  configured by the `DAILY_HIERARCHY_ROLLOUT_LIMIT` environment variable.
+- **Companies** The company merging tool in the admin site now allows companies with referrals to be merged. (All referrals are moved to the company that’s retained.)
+
+
 # Data Hub API 27.12.0 (2020-02-24)
 
 
