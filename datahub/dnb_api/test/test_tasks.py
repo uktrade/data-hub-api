@@ -224,7 +224,7 @@ def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
     # Set up a DNBServiceError with the parametrized status code
     mocked_get_company = mock.Mock()
     mocked_get_company.side_effect = error
-    monkeypatch.setattr('datahub.dnb_api.tasks.get_company', mocked_get_company)
+    monkeypatch.setattr('datahub.dnb_api.tasks.sync.get_company', mocked_get_company)
 
     # Mock the task's retry method
     retry_mock = mock.Mock(side_effect=Retry(exc=error))
@@ -259,7 +259,7 @@ def test_sync_company_with_dnb_respects_retry_failures_flag(monkeypatch, error):
     # Set up a DNBServiceError with the parametrized status code
     mocked_get_company = mock.Mock()
     mocked_get_company.side_effect = error
-    monkeypatch.setattr('datahub.dnb_api.tasks.get_company', mocked_get_company)
+    monkeypatch.setattr('datahub.dnb_api.tasks.sync.get_company', mocked_get_company)
 
     with pytest.raises(error.__class__):
         sync_company_with_dnb(company.id, retry_failures=False)
@@ -336,7 +336,7 @@ class TestGetCompanyUpdates:
         """
         mocked_get_company_update_page = mock.Mock(side_effect=error)
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mocked_get_company_update_page,
         )
 
@@ -388,12 +388,12 @@ class TestGetCompanyUpdates:
             side_effect=lambda _, next_page: data[next_page],
         )
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
         mock_update_company = mock.Mock()
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.update_company_from_dnb_data',
+            'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
             mock_update_company,
         )
         task_result = get_company_updates.apply(kwargs={'fields_to_update': fields_to_update})
@@ -441,12 +441,12 @@ class TestGetCompanyUpdates:
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.advisory_lock',
+            'datahub.dnb_api.tasks.update.advisory_lock',
             mock_advisory_lock,
         )
         mock_get_company_updates = mock.Mock()
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks._get_company_updates',
+            'datahub.dnb_api.tasks.update._get_company_updates',
             mock_get_company_updates,
         )
 
@@ -498,12 +498,12 @@ class TestGetCompanyUpdates:
             side_effect=lambda _, next_page: data[next_page],
         )
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
         mock_update_company = mock.Mock()
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.update_company_from_dnb_data',
+            'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
             mock_update_company,
         )
         task_result = get_company_updates.apply()
@@ -522,7 +522,7 @@ class TestGetCompanyUpdates:
             kwargs=expected_kwargs,
         )
 
-    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
+    @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data(
         self,
@@ -539,7 +539,7 @@ class TestGetCompanyUpdates:
             return_value=dnb_company_updates_response_uk,
         )
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
         task_result = get_company_updates.apply_async()
@@ -561,7 +561,7 @@ class TestGetCompanyUpdates:
             },
         )
 
-    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
+    @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
@@ -578,7 +578,7 @@ class TestGetCompanyUpdates:
             return_value=dnb_company_updates_response_uk,
         )
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
         task_result = get_company_updates.apply(kwargs={'fields_to_update': ['name']})
@@ -600,7 +600,7 @@ class TestGetCompanyUpdates:
             },
         )
 
-    @mock.patch('datahub.dnb_api.tasks.log_to_sentry')
+    @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_with_failure(
         self,
@@ -623,7 +623,7 @@ class TestGetCompanyUpdates:
             return_value=dnb_company_updates_response_uk,
         )
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_update_page',
+            'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
         task_result = get_company_updates.apply()
@@ -654,7 +654,7 @@ def test_get_company_updates_feature_flag_inactive_no_updates(
     """
     mocked_get_company_update_page = mock.Mock()
     monkeypatch.setattr(
-        'datahub.dnb_api.tasks.get_company_update_page',
+        'datahub.dnb_api.tasks.update.get_company_update_page',
         mocked_get_company_update_page,
     )
     get_company_updates()
