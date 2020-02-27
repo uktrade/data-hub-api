@@ -16,7 +16,7 @@ class SPIReportFormatter:
         'Data Hub ID': 'investment_project_id',
         'Enquiry processed': 'enquiry_processed',
         'Enquiry type': 'enquiry_type',
-        'Enquiry processed by': 'enquiry_processed_by_id',
+        'Enquiry processed by ID': 'enquiry_processed_by_id',
         'Assigned to IST': 'assigned_to_ist',
         'Project manager assigned': 'project_manager_assigned',
         'Project manager assigned by': 'project_manager_assigned_by_id',
@@ -26,8 +26,7 @@ class SPIReportFormatter:
     }
 
     required_fields_value_mapping = {
-        'Enquiry processed by': lambda adviser: str(adviser),
-        'Project manager assigned by': lambda adviser: str(adviser.id),
+        'Project manager assigned by': lambda adviser: str(adviser.id) if adviser else '',
     }
 
     def __init__(self):
@@ -37,7 +36,8 @@ class SPIReportFormatter:
     def filter_fields(self, result):
         """Filter results fields."""
         return {
-            self.required_fields_label_mapping[key]: value
+            self.required_fields_label_mapping[key]:
+                self.required_fields_value_mapping.get(key, lambda value: value)(value)
             for key, value in result.items()
             if key in self.required_fields_label_mapping
         }
