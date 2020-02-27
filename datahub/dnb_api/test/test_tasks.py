@@ -913,7 +913,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         'vat_number': '',
         'dnb_modified_on': now(),
     }
-    expected_message = f'Syncing dnb-linked company: {company.id}'
+    expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
     assert expected_message in caplog.text
 
 
@@ -1011,7 +1011,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         'website': original_company.website,
         'dnb_modified_on': now(),
     }
-    expected_message = f'Syncing dnb-linked company: {company.id}'
+    expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
     assert expected_message in caplog.text
 
 
@@ -1134,10 +1134,7 @@ def test_sync_outdated_companies_nothing_to_update(
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_sync_outdated_companies_simulation(
-    requests_mock,
-    caplog,
-):
+def test_sync_outdated_companies_simulation(caplog):
     """
     Test that using simulation mode does not modify companies and logs correctly.
     """
@@ -1159,5 +1156,33 @@ def test_sync_outdated_companies_simulation(
     company.refresh_from_db()
     # We expect the company to be unmodified
     assert company.dnb_modified_on == original_company.dnb_modified_on
-    expected_message = f'[SIMULATION] Syncing dnb-linked company: {company.id}'
+    expected_message = f'[SIMULATION] Syncing dnb-linked company "{company.id}" Succeeded'
+    assert expected_message in caplog.text
+
+
+@freeze_time('2019-01-01 11:12:13')
+def test_sync_outdated_companies_sync_task_fails(caplog, monkeypatch):
+    """
+    """
+    caplog.set_level('ERROR')
+    company = CompanyFactory(
+        duns_number='123456789',
+        dnb_modified_on=now() - timedelta(days=5),
+    )
+    mocked_sync_company_with_dnb = mock.Mock(side_effect=Exception())
+    monkeypatch.setattr(
+        'datahub.dnb_api.tasks.sync_company_with_dnb.apply',
+        mocked_sync_company_with_dnb,
+    )
+
+    task_result = sync_outdated_companies_with_dnb.apply_async(
+        kwargs={
+            'fields_to_update': ['global_ultimate_duns_number'],
+            'dnb_modified_on_before': now() - timedelta(days=1),
+            'simulate': False,
+        },
+    )
+
+    assert task_result.successful()
+    expected_message = f'Syncing dnb-linked company "{company.id}" Failed'
     assert expected_message in caplog.text

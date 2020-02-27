@@ -91,19 +91,26 @@ def sync_company_with_dnb_rate_limited(
     can be used for bulk tasks to ensure that we do not exceed our agreed
     rate limit with D&B.
     """
-    message = f'Syncing dnb-linked company: {company_id}'
+    message = f'Syncing dnb-linked company "{company_id}"'
     if simulate:
-        logger.info(f'[SIMULATION] {message}')
+        logger.info(f'[SIMULATION] {message} Succeeded')
         return
-    sync_company_with_dnb.apply(
-        kwargs={
-            'company_id': company_id,
-            'fields_to_update': fields_to_update,
-            'update_descriptor': update_descriptor,
-            'retry_failures': retry_failures,
-        },
-    )
-    logger.info(message)
+
+    try:
+        sync_company_with_dnb.apply(
+            kwargs={
+                'company_id': company_id,
+                'fields_to_update': fields_to_update,
+                'update_descriptor': update_descriptor,
+                'retry_failures': retry_failures,
+            },
+            throw=True,
+        )
+    except Exception:
+        logger.error(f'{message} Failed')
+        raise
+
+    logger.info(f'{message} Succeeded')
 
 
 @shared_task(
