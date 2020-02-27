@@ -1,0 +1,1 @@
+`GET /v4/dataset/interactions-dataset`: The field `created_by_id` was added to the interactions dataset endpoint.
