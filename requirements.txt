@@ -104,6 +104,7 @@ pytz==2019.3              # via celery, django, icalendar
 pyyaml==5.3
 redis==3.4.1
 requests-futures==1.0.0   # via piprot
+requests-hawk==1.0.1
 requests-mock==1.7.0
 requests==2.23.0
 requests_toolbelt==0.9.1

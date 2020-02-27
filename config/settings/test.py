@@ -159,3 +159,7 @@ ADMIN_OAUTH2_AUTH_PATH = 'http://sso-server/o/authorize/'
 ADMIN_OAUTH2_CLIENT_ID = 'client-id'
 ADMIN_OAUTH2_CLIENT_SECRET = 'client-secret'
 ADMIN_OAUTH2_LOGOUT_PATH = 'http://sso-server/o/logout'
+
+CONSENT_SERVICE_BASE_URL = 'http://consent.service/'
+CONSENT_SERVICE_HAWK_ID = 'some-id'
+CONSENT_SERVICE_HAWK_KEY = 'some-secret'

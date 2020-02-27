@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models import Company
-from datahub.company.tasks import automatic_company_archive
+from datahub.company.tasks.company import automatic_company_archive
 from datahub.company.test.factories import CompanyFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -40,7 +40,7 @@ class TestAutomaticCompanyArchive:
         Test that if the feature flag is not enabled, the
         task will not run.
         """
-        caplog.set_level(logging.INFO, logger='datahub.company.tasks')
+        caplog.set_level(logging.INFO, logger='datahub.company.tasks.company')
         automatic_company_archive.apply_async(kwargs={'simulate': False})
         assert caplog.messages == [
             f'Feature flag "{AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG}" is not active, exiting.',
@@ -67,12 +67,12 @@ class TestAutomaticCompanyArchive:
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
         monkeypatch.setattr(
-            'datahub.company.tasks.advisory_lock',
+            'datahub.company.tasks.company.advisory_lock',
             mock_advisory_lock,
         )
         mock_automatic_company_archive = mock.Mock()
         monkeypatch.setattr(
-            'datahub.company.tasks._automatic_company_archive',
+            'datahub.company.tasks.company._automatic_company_archive',
             mock_automatic_company_archive,
         )
         automatic_company_archive()
@@ -96,7 +96,7 @@ class TestAutomaticCompanyArchive:
         Test that a company without interaction that fits
         all the other criteria is archived.
         """
-        caplog.set_level(logging.INFO, logger='datahub.company.tasks')
+        caplog.set_level(logging.INFO, logger='datahub.company.tasks.company')
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             company = CompanyFactory()
