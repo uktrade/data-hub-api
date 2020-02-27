@@ -1161,10 +1161,12 @@ def test_sync_outdated_companies_simulation(caplog):
 
 
 @freeze_time('2019-01-01 11:12:13')
-def test_sync_outdated_companies_sync_task_fails(caplog, monkeypatch):
+def test_sync_outdated_companies_sync_task_failure_logs_error(caplog, monkeypatch):
     """
+    Test that when the sync_company_with_dnb sub-task fails, an error log is
+    generated.
     """
-    caplog.set_level('ERROR')
+    caplog.set_level('WARNING')
     company = CompanyFactory(
         duns_number='123456789',
         dnb_modified_on=now() - timedelta(days=5),
