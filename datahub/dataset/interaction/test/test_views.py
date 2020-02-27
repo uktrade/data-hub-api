@@ -27,6 +27,7 @@ def get_expected_data_from_interaction(interaction):
         ),
         'company_id': str(interaction.company.id),
         'contact_ids': [str(x.id) for x in interaction.contacts.all().order_by('pk')],
+        'created_by_id': str(interaction.created_by_id),
         'created_on': format_date_or_datetime(interaction.created_on),
         'date': format_date_or_datetime(interaction.date),
         'event_id': (
