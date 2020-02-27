@@ -70,8 +70,8 @@ def get_basic_search_query(
     return search[offset:offset + limit]
 
 
-def get_search_by_entity_query(
-        entity,
+def get_search_by_entities_query(
+        entities,
         term=None,
         filter_data=None,
         composite_field_mapping=None,
@@ -81,12 +81,13 @@ def get_search_by_entity_query(
         fields_to_exclude=None,
 ):
     """
-    Performs filtered search for the given term in the given entity.
+    Performs filtered search for the given term across given entities.
     """
     filter_data = filter_data or {}
-    query = [Term(_type=entity._doc_type.name)]
+    query = []
     if term != '':
-        query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
+        for entity in entities:
+            query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
 
     filters, ranges = _split_range_fields(filter_data)
 
@@ -94,7 +95,10 @@ def get_search_by_entity_query(
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
     s = Search(
-        index=entity.get_read_alias(),
+        index=[
+            entity.get_read_alias()
+            for entity in entities
+        ],
     ).query(
         Bool(must=query),
     )

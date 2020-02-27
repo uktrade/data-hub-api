@@ -6,7 +6,7 @@ from datahub.search.company import CompanySearchApp
 from datahub.search.company.models import Company as ESCompany
 from datahub.search.query_builder import (
     get_basic_search_query,
-    get_search_by_entity_query,
+    get_search_by_entities_query,
     limit_search_query,
 )
 from datahub.search.sync_object import sync_object
@@ -419,8 +419,8 @@ def test_limited_get_search_by_entity_query():
         'archived_before': date,
         'archived_after': date,
     }
-    query = get_search_by_entity_query(
-        ESCompany,
+    query = get_search_by_entities_query(
+        [ESCompany],
         term='test',
         filter_data=filter_data,
     )
@@ -435,10 +435,6 @@ def test_limited_get_search_by_entity_query():
             'bool': {
                 'must': [
                     {
-                        'term': {
-                            '_type': 'company',
-                        },
-                    }, {
                         'bool': {
                             'should': [
                                 {
