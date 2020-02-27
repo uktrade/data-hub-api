@@ -58,6 +58,7 @@ class CompanyReferral(BaseModel):
         null=True,
         blank=True,
         on_delete=models.PROTECT,
+        related_name='company_referral',
     )
     completed_by = models.ForeignKey(
         'company.Advisor',

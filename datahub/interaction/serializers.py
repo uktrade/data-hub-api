@@ -1,4 +1,5 @@
 from collections import Counter
+from functools import partial
 from operator import not_
 
 from django.db.transaction import atomic
@@ -7,7 +8,7 @@ from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
-from datahub.company.serializers import NestedAdviserField
+from datahub.company.serializers import NestedAdviserField, NestedAdviserWithEmailAndTeamField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
@@ -118,6 +119,18 @@ class InteractionExportCountrySerializer(serializers.ModelSerializer):
         fields = ('country', 'status')
 
 
+NestedCompanyReferralDetail = partial(
+    NestedRelatedField,
+    'company_referral.CompanyReferral',
+    extra_fields=(
+        'subject',
+        'created_on',
+        ('created_by', NestedAdviserWithEmailAndTeamField()),
+        ('recipient', NestedAdviserWithEmailAndTeamField()),
+    ),
+)
+
+
 class InteractionSerializer(serializers.ModelSerializer):
     """
     Interaction serialiser.
@@ -221,6 +234,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    company_referral = NestedCompanyReferralDetail(read_only=True)
 
     def validate_service(self, value):
         """Make sure only a service without children can be assigned."""
@@ -443,6 +457,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_by',
             'archived_on',
             'archived_reason',
+            'company_referral',
         )
         read_only_fields = (
             'archived_documents_url_path',
