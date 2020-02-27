@@ -125,10 +125,12 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
     if visible:
         assert rows[0]['Enquiry processed'] == interaction.created_on.isoformat()
         assert str(rows[0]['Enquiry processed by']) == interaction.created_by.name
+        assert str(rows[0]['Enquiry processed by ID']) == str(interaction.created_by.id)
         assert rows[0]['Enquiry type'] == interaction.service.name
     else:
         assert rows[0]['Enquiry processed'] == ''
         assert rows[0]['Enquiry processed by'] == ''
+        assert rows[0]['Enquiry processed by ID'] == ''
         assert rows[0]['Enquiry type'] == ''
 
 
