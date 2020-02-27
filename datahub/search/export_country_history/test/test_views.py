@@ -210,11 +210,8 @@ class TestSearchExportCountryHistory(APITestMixin):
             url,
             data={
                 'company': company_id,
-                # 'were_countries_discussed': True,
-                # 'history_type': ['insert', 'delete'],
             },
         )
-        # print(response.json())
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == count
         assert all(
@@ -263,8 +260,6 @@ class TestSearchExportCountryHistory(APITestMixin):
             url,
             data={
                 'company': company_id,
-                # 'kind': 'interaction',
-                # 'were_countries_discussed': True,
             },
         )
 
