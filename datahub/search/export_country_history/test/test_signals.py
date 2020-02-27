@@ -51,5 +51,6 @@ def test_updated_interaction_synced(es_with_signals):
         'id': str(export_country_history.pk),
         'history_type': export_country_history.history_type,
         'history_date': export_country_history.history_date.isoformat(),
+        'date': export_country_history.history_date.isoformat(),
         'status': str(export_country_history.status),
     }

@@ -22,6 +22,7 @@ def test_export_country_history_to_dict(es):
             'name': export_country_history.country.name,
         },
         'history_date': export_country_history.history_date,
+        'date': export_country_history.history_date,
         'history_type': export_country_history.history_type,
         'history_user': {
             'id': str(export_country_history.history_user.pk),
