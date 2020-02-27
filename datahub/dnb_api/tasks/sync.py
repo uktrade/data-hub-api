@@ -107,7 +107,7 @@ def sync_company_with_dnb_rate_limited(
             throw=True,
         )
     except Exception:
-        logger.error(f'{message} Failed')
+        logger.warning(f'{message} Failed')
         raise
 
     logger.info(f'{message} Succeeded')
@@ -149,5 +149,6 @@ def sync_outdated_companies_with_dnb(
                 'fields_to_update': fields_to_update,
                 'update_descriptor': 'celery:sync_outdated_companies_with_dnb:{self.request.id}',
                 'simulate': simulate,
+                'retry_failures': False,
             },
         )
