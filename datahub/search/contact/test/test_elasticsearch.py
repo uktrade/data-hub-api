@@ -4,7 +4,7 @@ from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.models import Contact as ESContact
 from datahub.search.query_builder import (
     get_basic_search_query,
-    get_search_by_entity_query,
+    get_search_by_entities_query,
     limit_search_query,
 )
 
@@ -362,8 +362,8 @@ def test_get_limited_search_by_entity_query():
         'archived_before': date,
         'archived_after': date,
     }
-    query = get_search_by_entity_query(
-        ESContact,
+    query = get_search_by_entities_query(
+        [ESContact],
         term='test',
         filter_data=filter_data,
     )
@@ -378,10 +378,6 @@ def test_get_limited_search_by_entity_query():
             'bool': {
                 'must': [
                     {
-                        'term': {
-                            '_type': 'contact',
-                        },
-                    }, {
                         'bool': {
                             'should': [
                                 {
