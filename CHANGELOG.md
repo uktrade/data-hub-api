@@ -1,3 +1,19 @@
+# Data Hub API 27.15.0 (2020-02-28)
+
+
+## Bug fixes
+
+- **Investment** A bug was fixed in the `GET /v4/dataset/investment-projects-activity-dataset` endpoint so that the SPI report 
+  can be serialised correctly.
+
+## API
+
+- **Companies** `POST /v4/search/export-country-history`
+
+  Indexing `history_type` so that we can filter out results based on its values.
+  Adding common `date` field, which will help sort results across entities, `company_export_history` and `interaction`
+
+
 # Data Hub API 27.14.0 (2020-02-28)
 
 
