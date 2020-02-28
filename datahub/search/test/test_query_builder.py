@@ -12,8 +12,9 @@ from datahub.search.query_builder import (
     _split_range_fields,
     build_autocomplete_query,
     get_basic_search_query,
-    get_search_by_entity_query,
+    get_search_by_entities_query,
 )
+from datahub.search.test.search_support.relatedmodel.apps import RelatedModelSearchApp
 from datahub.search.test.search_support.simplemodel.apps import SimpleModelSearchApp
 from datahub.search.utils import SearchOrdering, SortDirection
 
@@ -407,7 +408,6 @@ def test_build_autocomplete_search_query(keyword, size, only_fields, context, ex
                 'query': {
                     'bool': {
                         'must': [
-                            {'term': {'_type': 'simplemodel'}},
                             {
                                 'bool': {
                                     'should': [
@@ -462,7 +462,6 @@ def test_build_autocomplete_search_query(keyword, size, only_fields, context, ex
                 'query': {
                     'bool': {
                         'must': [
-                            {'term': {'_type': 'simplemodel'}},
                             {
                                 'bool': {
                                     'should': [
@@ -548,7 +547,7 @@ def test_build_autocomplete_search_query(keyword, size, only_fields, context, ex
         ),
     ),
 )
-def test_get_search_by_entity_query(
+def test_get_search_by_entities_query(
     term,
     filter_data,
     composite_field_mapping,
@@ -558,9 +557,9 @@ def test_get_search_by_entity_query(
     fields_to_exclude,
     expected_query,
 ):
-    """Tests for the get_search_by_entity_query function."""
-    query = get_search_by_entity_query(
-        SimpleModelSearchApp.es_model,
+    """Tests for the get_search_by_entities_query function."""
+    query = get_search_by_entities_query(
+        [SimpleModelSearchApp.es_model],
         term=term,
         filter_data=filter_data,
         composite_field_mapping=composite_field_mapping,
@@ -571,6 +570,91 @@ def test_get_search_by_entity_query(
     )
     assert query.to_dict() == expected_query
     assert query._index == [SimpleModelSearchApp.es_model.get_read_alias()]
+
+
+def test_get_search_by_multiple_entities_query():
+    """Tests for the get_search_by_entities_query function."""
+    query = get_search_by_entities_query(
+        [
+            SimpleModelSearchApp.es_model,
+            RelatedModelSearchApp.es_model,
+        ],
+        term=None,
+        filter_data=None,
+        composite_field_mapping=None,
+        permission_filters=None,
+        ordering=None,
+        fields_to_include=None,
+        fields_to_exclude=None,
+    )
+    expected_query = {
+        'query': {
+            'bool': {
+                'filter': [
+                    {
+                        'bool': {},
+                    },
+                ],
+                'must': [
+                    {
+                        'bool': {
+                            'should': [
+                                {
+                                    'match': {
+                                        'name.keyword': {
+                                            'boost': 2,
+                                            'query': None,
+                                        },
+                                    },
+                                },
+                                {
+                                    'multi_match': {
+                                        'fields': (
+                                            'name',
+                                            'name.trigram',
+                                        ),
+                                        'operator': 'and',
+                                        'query': None,
+                                        'type': 'cross_fields',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        'bool': {
+                            'should': [
+                                {
+                                    'match': {
+                                        'name.keyword': {
+                                            'boost': 2,
+                                            'query': None,
+                                        },
+                                    },
+                                },
+                                {
+                                    'multi_match': {
+                                        'fields': ('simpleton.name',),
+                                        'operator': 'and',
+                                        'query': None,
+                                        'type': 'cross_fields',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        'sort': [
+            '_score', 'id',
+        ],
+    }
+    assert query.to_dict() == expected_query
+    assert query._index == [
+        SimpleModelSearchApp.es_model.get_read_alias(),
+        RelatedModelSearchApp.es_model.get_read_alias(),
+    ]
 
 
 @mock.patch('datahub.search.query_builder.get_global_search_apps_as_mapping')
