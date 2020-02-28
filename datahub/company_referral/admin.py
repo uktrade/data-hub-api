@@ -14,7 +14,6 @@ class CompanyReferralAdmin(BaseModelAdminMixin, admin.ModelAdmin):
         'company__name',
     )
     raw_id_fields = (
-        'closed_by',
         'company',
         'completed_by',
         'contact',

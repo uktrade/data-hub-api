@@ -44,11 +44,6 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
             company_referral['object']['attributedTo'].append(
                 self._get_adviser_with_team_and_role(instance.completed_by, 'completer'),
             )
-        if instance.closed_by:
-            company_referral['object']['dit:closedOn'] = instance.closed_on
-            company_referral['object']['attributedTo'].append(
-                self._get_adviser_with_team_and_role(instance.closed_by, 'closer'),
-            )
 
         if instance.contact:
             company_referral['object']['attributedTo'].append(
