@@ -1,3 +1,51 @@
+# Data Hub API 27.14.0 (2020-02-28)
+
+
+## Deprecations
+
+- **Companies** `GET /v3/activity-stream/company-referral`: The following are deprecated and will be removed on or after 3 March 2020:
+
+  - the nested field `object.dit:closedOn`
+  - the `closer` value for the `object.attributedTo.dit:DataHubCompanyReferral:role` nested field
+
+  This is as they are not in use.
+- **Companies** `GET /v4/activity-feed`: For objects of type `dit:CompanyReferral`, the following are deprecated and will be removed on or after 3 March 2020:
+
+  - the nested field `object.dit:closedOn`
+  - the `closer` value for the `object.attributedTo.dit:DataHubCompanyReferral:role` nested field
+
+  This is as they are not in use.
+- **Companies** The following columns in the `company_referral_companyreferral` table are deprecated and will be removed on or after 3 March 2020:
+ 
+  - `closed_on`
+  - `closed_by_id`
+ 
+  This is due to the fields not being in use.
+- **Companies** `GET /v4/company-referral`, `POST /v4/company-referral`, `GET /v4/company-referral/<id>`: The following response fields are deprecated and will be removed on or after 3 March 2020:
+
+  - `closed_on`
+  - `closed_by`
+
+  This is due to the fields not being in use.
+
+## Features
+
+- **Contacts** A new celery task to update the consent service has been added but it's
+  dormant behind a feature flag. It will be used in the future
+  to inform the consent service of changes to email marketing consent.
+
+## Internal changes
+
+- **Companies** The Celery tasks in `datahub.dnb_api.tasks` have been refactored into a package:
+
+  - `datahub.dnb_api.tasks.get_company_updates` is now `datahub.dnb_api.tasks.update.get_company_updates`
+  - `datahub.dnb_api.tasks.sync_outdated_companies_with_dnb` is now `datahub.dnb_api.tasks.sync.sync_outdated_companies_with_dnb`
+
+## API
+
+- **Interactions** `GET /v4/dataset/interactions-dataset`: The field `created_by_id` was added to the interactions dataset endpoint.
+
+
 # Data Hub API 27.13.1 (2020-02-26)
 
 
