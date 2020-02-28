@@ -8,7 +8,7 @@ from datahub.investment.project.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.investment.models import InvestmentProject
 from datahub.search.query_builder import (
-    get_search_by_entity_query,
+    get_search_by_entities_query,
 )
 
 pytestmark = pytest.mark.django_db
@@ -22,8 +22,8 @@ def test_investment_project_auto_sync_to_es(es_with_signals):
     )
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entity_query(
-        InvestmentProject,
+    result = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={'name': test_name},
     ).execute()
@@ -39,8 +39,8 @@ def test_investment_project_auto_updates_to_es(es_with_signals):
     project.save()
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entity_query(
-        InvestmentProject,
+    result = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={'name': new_test_name},
     ).execute()
@@ -58,8 +58,8 @@ def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_m
     """Tests if investment project gets synced to Elasticsearch when a team member is added."""
     es_with_signals.indices.refresh()
 
-    results = get_search_by_entity_query(
-        InvestmentProject,
+    results = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={},
     ).execute()
@@ -78,8 +78,8 @@ def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team
     team_member.save()
     es_with_signals.indices.refresh()
 
-    results = get_search_by_entity_query(
-        InvestmentProject,
+    results = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={},
     ).execute()
@@ -96,8 +96,8 @@ def test_investment_project_team_member_deleted_sync_to_es(es_with_signals, team
     team_member.delete()
     es_with_signals.indices.refresh()
 
-    results = get_search_by_entity_query(
-        InvestmentProject,
+    results = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={},
     ).execute()
@@ -130,8 +130,8 @@ def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
 
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entity_query(
-        InvestmentProject,
+    result = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={'id': project.pk},
     ).execute()
@@ -153,8 +153,8 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
 
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entity_query(
-        InvestmentProject,
+    result = get_search_by_entities_query(
+        [InvestmentProject],
         term='',
         filter_data={'id': team_member.investment_project.pk},
     ).execute()

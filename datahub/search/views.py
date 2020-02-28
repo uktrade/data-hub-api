@@ -24,7 +24,7 @@ from datahub.search.permissions import (
 )
 from datahub.search.query_builder import (
     get_basic_search_query,
-    get_search_by_entity_query,
+    get_search_by_entities_query,
     limit_search_query,
 )
 from datahub.search.serializers import (
@@ -197,8 +197,8 @@ class SearchAPIView(APIView):
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
-        return get_search_by_entity_query(
-            self.search_app.es_model,
+        return get_search_by_entities_query(
+            [self.search_app.es_model],
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,

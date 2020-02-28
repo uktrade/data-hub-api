@@ -48,6 +48,7 @@ class InteractionsDatasetView(BaseDatasetView):
             'communication_channel__name',
             'company_id',
             'contact_ids',
+            'created_by_id',
             'created_on',
             'date',
             'event_id',
