@@ -1,15 +1,19 @@
 import pytest
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, TeamFactory
+from datahub.core.constants import InvestmentProjectStage as InvestmentProjectStageConstant
+from datahub.core.constants import Service as ServiceConstant
 from datahub.core.test_utils import (
     format_date_or_datetime,
     get_attr_or_none,
     str_or_none,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
 from datahub.investment.project.proposition.models import PropositionDocument
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import (
@@ -301,5 +305,50 @@ class TestInvestmentProjectsActivityDatasetViewSet(BaseDatasetViewTest):
                 'project_manager_assigned_by_id': '',
                 'project_moved_to_won': '',
                 'aftercare_offered_on': '',
+            },
+        ]
+
+    def test_spi_fields_are_serialised(self, data_flow_api_client, ist_adviser):
+        """Test that SPI fields are serialised."""
+        pm_assigned_by = AdviserFactory()
+        pm_assigned_on = now()
+        investment_project = VerifyWinInvestmentProjectFactory(
+            project_manager=ist_adviser,
+            project_manager_first_assigned_on=pm_assigned_on,
+            project_manager_first_assigned_by=pm_assigned_by,
+        )
+        spi1 = InvestmentProjectInteractionFactory(
+            investment_project=investment_project,
+            service_id=ServiceConstant.investment_enquiry_requested_more_information.value.id,
+        )
+        spi2 = InvestmentProjectInteractionFactory(
+            investment_project=investment_project,
+            service_id=ServiceConstant.investment_enquiry_assigned_to_ist_cmc.value.id,
+        )
+        with freeze_time('2017-01-01'):
+            investment_project.stage_id = InvestmentProjectStageConstant.won.value.id
+            investment_project.save()
+
+        spi5 = InvestmentProjectInteractionFactory(
+            investment_project=investment_project,
+            service_id=ServiceConstant.investment_ist_aftercare_offered.value.id,
+        )
+
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_results = response.json()['results']
+        assert response_results == [
+            {
+                'enquiry_processed': spi1.created_on.isoformat(),
+                'enquiry_type': spi1.service.name,
+                'enquiry_processed_by_id': str(spi1.created_by.id),
+                'assigned_to_ist': spi2.created_on.isoformat(),
+                'project_manager_assigned': pm_assigned_on.isoformat(),
+                'project_manager_assigned_by_id': str(pm_assigned_by.id),
+                'investment_project_id': str(investment_project.id),
+                'project_moved_to_won': '2017-01-01T00:00:00+00:00',
+                'aftercare_offered_on': spi5.created_on.isoformat(),
+                'propositions': [],
             },
         ]
