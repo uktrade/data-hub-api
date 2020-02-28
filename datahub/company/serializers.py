@@ -264,10 +264,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         meta_models.EmployeeRange, required=False, allow_null=True,
     )
     export_to_countries = NestedRelatedField(
-        meta_models.Country, many=True, required=False,
+        meta_models.Country, many=True, read_only=True,
     )
     future_interest_countries = NestedRelatedField(
-        meta_models.Country, many=True, required=False,
+        meta_models.Country, many=True, read_only=True,
     )
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True,
