@@ -16,10 +16,10 @@ def test_spi_record_row_is_formatted():
         'Project created on': 'project_created_on',
         'Enquiry processed': 'enquiry_processed',
         'Enquiry type': 'enquiry_type',
-        'Enquiry processed by': str(AdviserFactory().id),
+        'Enquiry processed by ID': str(uuid4()),
         'Assigned to IST': 'assigned_to_ist',
         'Project manager assigned': 'project_manager_assigned',
-        'Project manager assigned by': str(AdviserFactory().id),
+        'Project manager assigned by': AdviserFactory(),
         'Propositions': [{
             'deadline': 'deadline',
             'status': 'status',
@@ -36,10 +36,10 @@ def test_spi_record_row_is_formatted():
     assert filtered_row == {
         'enquiry_processed': 'enquiry_processed',
         'enquiry_type': 'enquiry_type',
-        'enquiry_processed_by_id': spi_report_row['Enquiry processed by'],
+        'enquiry_processed_by_id': spi_report_row['Enquiry processed by ID'],
         'assigned_to_ist': 'assigned_to_ist',
         'project_manager_assigned': 'project_manager_assigned',
-        'project_manager_assigned_by_id': spi_report_row['Project manager assigned by'],
+        'project_manager_assigned_by_id': str(spi_report_row['Project manager assigned by'].id),
         'propositions': [{
             'deadline': 'deadline',
             'status': 'status',
