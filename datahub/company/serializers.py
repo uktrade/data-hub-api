@@ -1,11 +1,10 @@
-from django.db.transaction import on_commit
-from django.utils.timezone import now
 from functools import partial
 from operator import not_
 from uuid import UUID
 
 from django.conf import settings
 from django.db import models, transaction
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -210,7 +209,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
 
-    def notify_consent_service(self, validated_data):
+    def _notify_consent_service(self, validated_data):
         """
         Trigger the update_contact_consent task with the current version
         of `validated_data`. The actual enqueuing of the task happens in the
@@ -218,7 +217,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         the database transaction was successful.
         """
         if 'accepts_dit_email_marketing' not in validated_data:
-            # If no consent value in POST body
+            # If no consent value in request body
             return
 
         # If consent value in POST, notify
@@ -232,7 +231,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
                 kwargs={
                     'modified_at': now().isoformat(),
                 },
-
             ),
         )
 
@@ -243,7 +241,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 
         :return: created instance
         """
-        self.notify_consent_service(validated_data)
+        self._notify_consent_service(validated_data)
         return super().create(validated_data)
 
     @transaction.atomic
@@ -253,7 +251,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 
         :return: updated instance
         """
-        self.notify_consent_service(validated_data)
+        self._notify_consent_service(validated_data)
         return super().update(instance, validated_data)
 
 
