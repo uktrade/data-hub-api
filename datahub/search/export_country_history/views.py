@@ -62,23 +62,3 @@ class ExportCountryHistoryView(SearchAPIView):
         )
 
         return base_query.filter(is_relevant_interaction | is_relevant_history_entry)
-        # should_filters = []
-        # should_filters.append(
-        #     Q('bool', must=[
-        #         Q(
-        #             Q(
-        #                 'match', **{'were_countries_discussed': True},
-        #             ) & Q(
-        #                 'match', **{'kind': 'interaction'},
-        #             ),
-        #         ) | Q(
-        #             'match', **{'history_type': 'insert'},
-        #         ) | Q(
-        #             'match', **{'history_type': 'delete'},
-        #         ),
-        #     ]),
-        # )
-        # base_query.query.filter.append(
-        #     Bool(should=should_filters, minimum_should_match=1),
-        # )
-        # return base_query
