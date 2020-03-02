@@ -84,8 +84,6 @@ class TestListCompanyListsView(APITestMixin):
         assert len(results) == 1
         assert results[0] == {
             'id': str(company_referral.pk),
-            'closed_by': None,
-            'closed_on': None,
             'company': {
                 'id': str(company_referral.company.pk),
                 'name': company_referral.company.name,
@@ -233,8 +231,6 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
-            'closed_by': None,
-            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -280,8 +276,6 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data == {
-            'closed_by': None,
-            'closed_on': None,
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -326,8 +320,6 @@ class TestAddCompanyReferral(APITestMixin):
         referral_data = CompanyReferral.objects.values().get(pk=pk)
 
         assert referral_data == {
-            'closed_by_id': None,
-            'closed_on': None,
             'company_id': request_data['company']['id'],
             'completed_by_id': None,
             'completed_on': None,
@@ -399,8 +391,6 @@ class TestGetCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data == {
-            'closed_by': format_expected_adviser(referral.closed_by),
-            'closed_on': format_date_or_datetime(referral.closed_on),
             'company': {
                 'id': str(referral.company.pk),
                 'name': referral.company.name,
