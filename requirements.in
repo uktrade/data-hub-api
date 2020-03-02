@@ -81,5 +81,5 @@ gevent==1.4.0
 mohawk==1.1.0
 requests==2.23.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.14.1
+sentry_sdk==0.14.2
 requests-hawk==1.0.1
