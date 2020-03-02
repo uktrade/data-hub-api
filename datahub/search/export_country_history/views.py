@@ -1,6 +1,8 @@
-from elasticsearch_dsl.query import Bool, Q
+from elasticsearch_dsl.query import Term
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
+from datahub.company.models import CompanyExportCountryHistory as DBCompanyExportCountryHistory
+from datahub.interaction.models import Interaction as DBInteraction
 from datahub.oauth.scopes import Scope
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
@@ -50,23 +52,33 @@ class ExportCountryHistoryView(SearchAPIView):
             - history_type: [INSERT, DELETE]
         """
         base_query = super().get_base_query(request, validated_data)
-        should_filters = []
-        should_filters.append(
-            Q('bool', must=[
-                Q(
-                    Q(
-                        'match', **{'were_countries_discussed': True},
-                    ) & Q(
-                        'match', **{'kind': 'interaction'},
-                    ),
-                ) | Q(
-                    'match', **{'history_type': 'insert'},
-                ) | Q(
-                    'match', **{'history_type': 'delete'},
-                ),
-            ]),
+        is_relevant_interaction = (
+            Term(were_countries_discussed=True) & Term(kind=DBInteraction.Kind.INTERACTION)
         )
-        base_query.query.filter.append(
-            Bool(should=should_filters, minimum_should_match=1),
+        is_relevant_history_entry = Term(
+            history_type=DBCompanyExportCountryHistory.HistoryType.INSERT,
+        ) | Term(
+            history_type=DBCompanyExportCountryHistory.HistoryType.DELETE,
         )
-        return base_query
+
+        return base_query.filter(is_relevant_interaction | is_relevant_history_entry)
+        # should_filters = []
+        # should_filters.append(
+        #     Q('bool', must=[
+        #         Q(
+        #             Q(
+        #                 'match', **{'were_countries_discussed': True},
+        #             ) & Q(
+        #                 'match', **{'kind': 'interaction'},
+        #             ),
+        #         ) | Q(
+        #             'match', **{'history_type': 'insert'},
+        #         ) | Q(
+        #             'match', **{'history_type': 'delete'},
+        #         ),
+        #     ]),
+        # )
+        # base_query.query.filter.append(
+        #     Bool(should=should_filters, minimum_should_match=1),
+        # )
+        # return base_query
