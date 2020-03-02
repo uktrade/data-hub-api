@@ -96,6 +96,9 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
         if next_page is None:
             break
 
+    update_count = response.get('count', 0)
+    logger.info(f'get_company_updates total update count: {update_count}')
+
     # Wait for all update tasks to finish...
     ResultSet(results=update_results).join(
         propagate=False,
