@@ -22,6 +22,7 @@ class TestCompanyElasticModel:
         result = ESCompany.db_object_to_dict(company_qs)
 
         keys = {
+            '_document_type',
             'archived',
             'archived_by',
             'archived_on',

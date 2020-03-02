@@ -2,7 +2,7 @@ from hashlib import blake2b
 from logging import getLogger
 
 from django.conf import settings
-from elasticsearch_dsl import Document, MetaField
+from elasticsearch_dsl import Document, Keyword, MetaField
 
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import get_search_app_by_search_model
@@ -20,6 +20,11 @@ logger = getLogger(__name__)
 
 class BaseESModel(Document):
     """Helps convert Django models to dictionaries."""
+
+    # This is a replacement for the _type (mapping type name) field which is deprecated in
+    # Elasticsearch.
+    # It’s required for the aggregations used in global search.
+    _document_type = Keyword()
 
     MAPPINGS = {}
 
@@ -165,6 +170,7 @@ class BaseESModel(Document):
             **{col: fn(val) if val is not None else None for col, fn, val in mapped_values},
             **{col: fn(db_object) for col, fn in cls.COMPUTED_MAPPINGS.items()},
             **{field: getattr(db_object, field) for field in fields},
+            '_document_type': cls.get_app_name(),
         }
 
         return result
