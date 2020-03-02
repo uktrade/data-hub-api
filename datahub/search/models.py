@@ -5,6 +5,7 @@ from django.conf import settings
 from elasticsearch_dsl import Document, MetaField
 
 from datahub.core.exceptions import DataHubException
+from datahub.search.apps import get_search_app_by_search_model
 from datahub.search.elasticsearch import (
     alias_exists,
     associate_index_with_alias,
@@ -38,14 +39,19 @@ class BaseESModel(Document):
         dynamic = MetaField('false')
 
     @classmethod
+    def get_app_name(cls):
+        """Get the search app name for this search model."""
+        return get_search_app_by_search_model(cls).name
+
+    @classmethod
     def get_read_alias(cls):
         """Gets the alias to be used for read operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-read'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-read'
 
     @classmethod
     def get_write_alias(cls):
         """Gets the alias to be used for write operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-write'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-write'
 
     @classmethod
     def get_write_index(cls):
@@ -64,7 +70,7 @@ class BaseESModel(Document):
     @classmethod
     def get_index_prefix(cls):
         """Gets the prefix used for indices and aliases."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-'
 
     @classmethod
     def get_target_mapping_hash(cls):
@@ -79,7 +85,7 @@ class BaseESModel(Document):
         prefix = cls.get_index_prefix()
         if not current_write_index.startswith(prefix):
             logger.warning(
-                f'Unexpected index prefix for search model {cls._doc_type.name} and '
+                f'Unexpected index prefix for search model {cls.get_app_name()} and '
                 f'index {current_write_index}. It may be a legacy index.',
             )
             return ''
