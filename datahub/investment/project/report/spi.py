@@ -74,6 +74,7 @@ class SPIReport:
     SPI1_END = 'Enquiry processed'
     SPI1_END_INTERACTION_TYPE = 'Enquiry type'
     SPI1_END_BY = 'Enquiry processed by'
+    SPI1_END_BY_ID = 'Enquiry processed by ID'
 
     SPI2_START = 'Assigned to IST'
     SPI2_END = 'Project manager assigned'
@@ -103,6 +104,11 @@ class SPIReport:
         SPI5_END: SPI5_END,
         SPI3: SPI3,
     }
+
+    # TODO: SPI1_END_BY_ID is not present in the CSV report, but is required by
+    # InvestmentProjectActivity endpoint. Once the CSV report gets deprecated it should
+    # be possible to clean it up.
+    default_fields = [*field_titles.keys(), SPI1_END_BY_ID]
 
     MAPPINGS = (
         (SPI1_END_SERVICE_IDS, SPI1_END),
@@ -186,7 +192,7 @@ class SPIReport:
         if spi_data is None:
             spi_data = {}
 
-        spi_data.update({field: '' for field in self.field_titles.keys() if field not in spi_data})
+        spi_data.update({field: '' for field in self.default_fields if field not in spi_data})
 
         spi_data[self.SPI_DH_ID] = str(investment_project.id)
         spi_data[self.SPI_PROJECT_ID] = investment_project.project_code
@@ -203,6 +209,7 @@ class SPIReport:
             data[self.SPI1_END] = spi_interaction['created_on']
             data[self.SPI1_END_INTERACTION_TYPE] = spi_interaction['service_name']
             data[self.SPI1_END_BY] = spi_interaction['created_by_name']
+            data[self.SPI1_END_BY_ID] = spi_interaction['created_by_id']
 
         return data
 
@@ -225,15 +232,14 @@ class SPIReport:
         """Update data with SPI 3 propositions."""
         data = {}
 
-        if not investment_project.spi_propositions:
-            return data
+        spi_propositions = investment_project.spi_propositions or []
 
         formatter = (
             self.proposition_formatter
             if self.proposition_formatter else self._format_propositions
         )
 
-        data[self.SPI3] = formatter(investment_project.spi_propositions)
+        data[self.SPI3] = formatter(spi_propositions)
         return data
 
     def get_spi5(self, investment_project, spi_interactions):
