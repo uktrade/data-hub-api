@@ -25,6 +25,8 @@ def get_base_interaction_queryset():
         'service__parent',
         'service_delivery_status',
         'event',
+        'company_referral__created_by__dit_team',
+        'company_referral__recipient__dit_team',
     ).prefetch_related(
         Prefetch('contacts', queryset=Contact.objects.order_by('pk')),
         'policy_areas',

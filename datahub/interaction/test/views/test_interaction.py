@@ -4,6 +4,7 @@ from itertools import chain
 from operator import itemgetter
 
 import pytest
+from django.core.exceptions import ObjectDoesNotExist
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -16,6 +17,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
+from datahub.company.test.utils import format_expected_adviser
 from datahub.core.constants import Country, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
@@ -32,6 +34,7 @@ from datahub.interaction.models import (
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
+    CompanyReferralInteractionFactory,
     ExportCountriesInteractionFactory,
     InvestmentProjectInteractionFactory,
 )
@@ -193,6 +196,7 @@ class TestAddInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
+            'company_referral': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -349,6 +353,7 @@ class TestAddInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
+            'company_referral': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1408,6 +1413,7 @@ class TestGetInteraction(APITestMixin):
             CompanyInteractionFactoryWithPolicyFeedback,
             InvestmentProjectInteractionFactory,
             ExportCountriesInteractionFactory,
+            CompanyReferralInteractionFactory,
         ),
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -1424,6 +1430,12 @@ class TestGetInteraction(APITestMixin):
         response_data = response.json()
         response_data['contacts'].sort(key=itemgetter('id'))
         response_data['dit_participants'].sort(key=lambda item: item['adviser']['id'])
+
+        try:
+            company_referral = interaction.company_referral
+        except ObjectDoesNotExist:
+            company_referral = None
+
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.INTERACTION,
@@ -1524,6 +1536,13 @@ class TestGetInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
+            'company_referral': {
+                'id': str(company_referral.pk),
+                'subject': company_referral.subject,
+                'created_by': format_expected_adviser(company_referral.created_by),
+                'created_on': '2017-04-18T13:25:30.986208Z',
+                'recipient': format_expected_adviser(company_referral.recipient),
+            } if company_referral else None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1636,6 +1655,7 @@ class TestGetInteraction(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
+            'company_referral': None,
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
