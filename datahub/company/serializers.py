@@ -312,24 +312,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             for field in self.Meta.dnb_read_only_fields:
                 self.fields[field].read_only = True
 
-    @staticmethod
-    def _save_to_company_export_country_model(*, company, adviser, export_countries, status):
-        for country in export_countries:
-            export_country, created = CompanyExportCountry.objects.get_or_create(
-                country=country,
-                company=company,
-                defaults={
-                    'created_by': adviser,
-                    'modified_by': adviser,
-                    'status': status,
-                },
-            )
-
-            if not created and export_country.status != status:
-                export_country.status = status
-                export_country.modified_by = adviser
-                export_country.save()
-
     def validate(self, data):
         """
         Performs cross-field validation and adds extra fields to data.
