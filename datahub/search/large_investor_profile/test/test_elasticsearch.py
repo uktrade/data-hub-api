@@ -23,6 +23,9 @@ def test_mapping(es):
     assert mapping.to_dict() == {
         'large-investor-profile': {
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'asset_classes_of_interest': {
                     'properties': {
                         'id': {
@@ -323,6 +326,7 @@ def test_indexed_doc(es):
 
     assert indexed_large_investor_profile['_id'] == str(large_investor_profile.pk)
     assert indexed_large_investor_profile['_source'] == {
+        '_document_type': LargeInvestorProfileSearchApp.name,
         'id': str(large_investor_profile.pk),
         'asset_classes_of_interest': [],
         'country_of_origin': {

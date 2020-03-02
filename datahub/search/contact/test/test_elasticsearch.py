@@ -19,6 +19,9 @@ def test_mapping(es):
     assert mapping.to_dict() == {
         'contact': {
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'accepts_dit_email_marketing': {'type': 'boolean'},
                 'address_1': {'type': 'text'},
                 'address_2': {'type': 'text'},

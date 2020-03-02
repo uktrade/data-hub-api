@@ -13,6 +13,7 @@ def test_event_dbmodel_to_dict(es):
     result = ESEvent.db_object_to_dict(event)
 
     keys = {
+        '_document_type',
         'id',
         'event_type',
         'location_type',
