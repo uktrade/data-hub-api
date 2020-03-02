@@ -1194,6 +1194,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'subject': service.name,
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
+            'were_countries_discussed': False,
         }
 
     def test_cleaned_data_as_serializer_dict_for_service_delivery(self):
@@ -1238,6 +1239,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'subject': data['subject'],
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
+            'were_countries_discussed': False,
         }
 
 

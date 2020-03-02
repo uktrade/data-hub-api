@@ -1,0 +1,1 @@
+A bug was fixed where it wasn't possible to import interactions using the admin site import interactions tool due to the were_countries_discussed field not being set internally.
