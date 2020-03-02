@@ -137,7 +137,7 @@ def setup_data():
             history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
 
-    yield str(benchmark_company.id)
+    yield benchmark_company
 
 
 class TestSearchExportCountryHistory(APITestMixin):
@@ -274,27 +274,47 @@ class TestSearchExportCountryHistory(APITestMixin):
         es_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:export-country-history')
-        company_id = setup_data
+        company = setup_data
 
         response = self.api_client.post(
             url,
             data={
-                'company': company_id,
+                'company': str(company.id),
             },
         )
-
-        expected_data = {
-            'company': {
-                'id': company_id,
-            },
-        }
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 7
+
         assert all(
-            result['company']['id'] == expected_data['company']['id']
+            result['company']['id'] == str(company.id)
             for result in response.json()['results']
         )
+
+        expected_interaction_ids = [
+            str(i.id)
+            for i in company.interactions.filter(were_countries_discussed=True).all()
+        ]
+        result_interaction_ids = [
+            result['id']
+            for result in response.json()['results']
+            if result.get('kind', '') == 'interaction'
+
+        ]
+        assert sorted(result_interaction_ids) == sorted(expected_interaction_ids)
+
+        expected_history_ids = [
+            str(item.history_id)
+            for item in company.export_countries_history.all()
+            if item.history_type != CompanyExportCountryHistory.HistoryType.UPDATE
+        ]
+        result_history_ids = [
+            result['id']
+            for result in response.json()['results']
+            if result.get('kind', '') != 'interaction'
+
+        ]
+        assert sorted(expected_history_ids) == sorted(result_history_ids)
 
         date_times = [
             result['date'] for result in response.json()['results']
@@ -319,19 +339,23 @@ class TestSearchExportCountryHistory(APITestMixin):
         """
         es_with_collector.flush_and_refresh()
 
+        benchmark_country_canada = Country.objects.get(
+            pk=CountryConstant.canada.value.id,
+        )
+        company = setup_data
         url = reverse('api-v4:search:export-country-history')
 
         response = self.api_client.post(
             url,
             data={
-                'company': setup_data,
+                'company': str(company.id),
                 'country': CountryConstant.canada.value.id,
             },
         )
 
         expected_data = {
             'company': {
-                'id': setup_data,
+                'id': str(company.id),
             },
             'country': {
                 'id': CountryConstant.canada.value.id,
@@ -340,6 +364,37 @@ class TestSearchExportCountryHistory(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 3
+
+        expected_interaction_ids = [
+            str(i.id)
+            for i in company.interactions.filter(
+                were_countries_discussed=True,
+                export_countries__country=benchmark_country_canada,
+            ).all()
+        ]
+        result_interaction_ids = [
+            result['id']
+            for result in response.json()['results']
+            if result.get('kind', '') == 'interaction'
+
+        ]
+        assert sorted(result_interaction_ids) == sorted(expected_interaction_ids)
+
+        expected_history_ids = [
+            str(item.history_id)
+            for item in company.export_countries_history.filter(
+                country=benchmark_country_canada,
+            ).all()
+            if item.history_type != CompanyExportCountryHistory.HistoryType.UPDATE
+        ]
+        result_history_ids = [
+            result['id']
+            for result in response.json()['results']
+            if result.get('kind', '') != 'interaction'
+
+        ]
+        assert sorted(expected_history_ids) == sorted(result_history_ids)
+
         assert all(
             result['company']['id'] == expected_data['company']['id']
             for result in response.json()['results']
