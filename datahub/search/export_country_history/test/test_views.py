@@ -60,7 +60,7 @@ def setup_data():
             country=benchmark_country_canada,
             history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
-        # will be excluded, becuase of UPDATE
+        # will be excluded, because of UPDATE
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_japan,
             company=benchmark_company,
@@ -70,9 +70,7 @@ def setup_data():
         ExportCountriesInteractionFactory(
             company=benchmark_company,
             were_countries_discussed=True,
-            export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_canada,
-            )],
+            export_countries__country=benchmark_country_canada,
             date=FROZEN_DATETIME_1,
         )
         # will be excluded as were_countries_discussed is False
@@ -83,9 +81,7 @@ def setup_data():
         )
         ExportCountriesInteractionFactory(
             were_countries_discussed=True,
-            export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_japan,
-            )],
+            export_countries__country=benchmark_country_japan,
             date=FROZEN_DATETIME_1,
         )
 
@@ -104,7 +100,7 @@ def setup_data():
             country=benchmark_country_japan,
             history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
-        # will be excluded, becuase of UPDATE
+        # will be excluded, because of UPDATE
         CompanyExportCountryHistoryFactory(
             country=benchmark_country_canada,
             company=benchmark_company,
@@ -114,9 +110,7 @@ def setup_data():
         ExportCountriesInteractionFactory(
             company=benchmark_company,
             were_countries_discussed=True,
-            export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_japan,
-            )],
+            export_countries__country=benchmark_country_japan,
             date=FROZEN_DATETIME_2,
         )
         # will be excluded as were_countries_discussed is False
@@ -127,9 +121,7 @@ def setup_data():
         )
         ExportCountriesInteractionFactory(
             were_countries_discussed=True,
-            export_countries=[InteractionExportCountryFactory(
-                country=benchmark_country_canada,
-            )],
+            export_countries__country=benchmark_country_canada,
             date=FROZEN_DATETIME_2,
         )
 
@@ -304,6 +296,19 @@ class TestSearchExportCountryHistory(APITestMixin):
             for result in response.json()['results']
         )
 
+        date_times = [
+            result['date'] for result in response.json()['results']
+        ]
+        assert date_times == [
+            FROZEN_DATETIME_3,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_2,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_1,
+        ]
+
     def test_all_history_filtering_by_company_and_country(
         self,
         es_with_collector,
@@ -349,35 +354,6 @@ class TestSearchExportCountryHistory(APITestMixin):
             if result.get('kind', '') != 'interaction'
         )
 
-    def test_company_filter_sorting(self, es_with_collector, setup_data):
-        """Tests the sorting of company history search response."""
-        es_with_collector.flush_and_refresh()
-
-        url = reverse('api-v4:search:export-country-history')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'company': setup_data,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 7
-
-        date_times = [
-            result['date'] for result in response.json()['results']
-        ]
-        assert date_times == [
-            FROZEN_DATETIME_3,
-            FROZEN_DATETIME_2,
-            FROZEN_DATETIME_2,
-            FROZEN_DATETIME_2,
-            FROZEN_DATETIME_1,
-            FROZEN_DATETIME_1,
-            FROZEN_DATETIME_1,
-        ]
-
     def test_filtering_by_country(
         self,
         es_with_collector,
@@ -416,22 +392,6 @@ class TestSearchExportCountryHistory(APITestMixin):
             if result.get('kind', '') != 'interaction'
         )
 
-    def test_country_filter_sorting(self, es_with_collector, setup_data):
-        """Tests the sorting of country history search response."""
-        es_with_collector.flush_and_refresh()
-
-        url = reverse('api-v4:search:export-country-history')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'country': CountryConstant.canada.value.id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 6
-
         date_times = [
             result['date'] for result in response.json()['results']
         ]
@@ -439,7 +399,7 @@ class TestSearchExportCountryHistory(APITestMixin):
             FROZEN_DATETIME_3,
             FROZEN_DATETIME_2,
             FROZEN_DATETIME_2,
-            FROZEN_DATETIME_1,
+            FROZEN_DATETIME_2,
             FROZEN_DATETIME_1,
             FROZEN_DATETIME_1,
         ]
