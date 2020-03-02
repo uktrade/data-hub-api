@@ -436,6 +436,7 @@ class InteractionCSVRowForm(forms.Form):
             'subject': subject,
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
+            'were_countries_discussed': False,
         }
 
         if data['kind'] == Interaction.Kind.SERVICE_DELIVERY:
