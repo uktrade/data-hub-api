@@ -94,8 +94,10 @@ def dnb_company_updates_response_uk(dnb_response_uk):
     for dnb-service.
     """
     return {
-        **dnb_response_uk,
         'next': None,
+        'previous': None,
+        'count': 1,
+        **dnb_response_uk,
     }
 
 
