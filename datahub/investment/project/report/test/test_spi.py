@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import now
@@ -11,8 +13,12 @@ from datahub.interaction.test.factories import InvestmentProjectInteractionFacto
 from datahub.investment.project.constants import InvestorType as InvestorTypeConstant
 from datahub.investment.project.proposition.models import PropositionDocument, PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
-from datahub.investment.project.report.spi import ALL_SPI_SERVICE_IDS
-from datahub.investment.project.report.spi import SPIReport
+from datahub.investment.project.report.spi import (
+    _filter_row_dicts,
+    ALL_SPI_SERVICE_IDS,
+    SPIReport,
+    write_report,
+)
 from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     VerifyWinInvestmentProjectFactory,
@@ -376,3 +382,87 @@ def test_cannot_get_spi5_start_and_end_for_non_new_investor(
     assert len(rows) == 1
     assert rows[0]['Project moved to won'] == ''
     assert rows[0]['Aftercare offered on'] == ''
+
+
+def test_write_report(ist_adviser):
+    """Test that SPI report CSV is generated correctly."""
+    pm_assigned_by = AdviserFactory()
+    pm_assigned_on = now()
+    investment_project = VerifyWinInvestmentProjectFactory(
+        project_manager=ist_adviser,
+        project_manager_first_assigned_on=pm_assigned_on,
+        project_manager_first_assigned_by=pm_assigned_by,
+    )
+    spi1 = InvestmentProjectInteractionFactory(
+        investment_project=investment_project,
+        service_id=ServiceConstant.investment_enquiry_requested_more_information.value.id,
+    )
+    spi2 = InvestmentProjectInteractionFactory(
+        investment_project=investment_project,
+        service_id=ServiceConstant.investment_enquiry_assigned_to_ist_cmc.value.id,
+    )
+
+    proposition = PropositionFactory(
+        deadline='2017-01-05',
+        status='ongoing',
+        adviser=pm_assigned_by,
+        investment_project=investment_project,
+        created_by=ist_adviser,
+    )
+
+    investment_project.stage_id = InvestmentProjectStageConstant.won.value.id
+    investment_project.save()
+
+    spi5 = InvestmentProjectInteractionFactory(
+        investment_project=investment_project,
+        service_id=ServiceConstant.investment_ist_aftercare_offered.value.id,
+    )
+
+    lines = []
+    file = Mock()
+    file.write = lambda line: lines.append(line.decode('utf8'))
+    write_report(file)
+
+    headers = ','.join(SPIReport.field_titles.keys())
+    assert lines[1] == f'{headers}\r\n'
+
+    row = [
+        str(investment_project.pk),
+        investment_project.project_code,
+        investment_project.name,
+        investment_project.created_on.isoformat(),
+        spi1.created_on.isoformat(),
+        spi1.service.name,
+        spi1.created_by.name,
+        spi2.created_on.isoformat(),
+        investment_project.project_manager_first_assigned_on.isoformat(),
+        investment_project.project_manager_first_assigned_by.name,
+        investment_project.stage_log.get(
+            stage_id=InvestmentProjectStageConstant.won.value.id,
+        ).created_on.isoformat(),
+        spi5.created_on.isoformat(),
+        f'{proposition.deadline};{proposition.status};;{proposition.adviser.name}',
+    ]
+    expected_line = ','.join(row)
+    assert lines[2] == f'{expected_line}\r\n'
+
+
+def test_filter_row_dicts():
+    """Tests that row dicts will have keys, that are not in field items, excluded."""
+    row_dicts = [
+        {'a': 1, 'b': 2, 'c': 3},
+        {'b': 5, 'e': 1},
+        {'x': 4, 'z': 5},
+        {'a': 1, 'b': 2},
+    ]
+    field_titles = ['a', 'b']
+
+    filtered_row_dicts = list(_filter_row_dicts(row_dicts, field_titles))
+
+    expected_row_dicts = [
+        {'a': 1, 'b': 2},
+        {'b': 5},
+        {},
+        {'a': 1, 'b': 2},
+    ]
+    assert filtered_row_dicts == expected_row_dicts

@@ -8,7 +8,6 @@ from rest_framework import serializers
 from rest_framework.settings import api_settings
 
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
-from datahub.feature_flag.utils import is_feature_flag_active
 
 
 class AbstractRule(ABC):
@@ -35,26 +34,6 @@ class BaseRule(AbstractRule):
     def field(self):
         """Field the rule applies to."""
         return self._field
-
-
-class IsFeatureFlagActive(BaseRule):
-    """Rule to check if feature flag is active."""
-
-    def __init__(self, feature_flag: str):
-        """Sets the feature flag name."""
-        super().__init__()
-        self._feature_flag = feature_flag
-
-    @property
-    def feature_flag(self):
-        """Feature flag to check."""
-        return self._feature_flag
-
-    def __call__(self, _) -> bool:
-        """
-        Returns True if the feature flag is active.
-        """
-        return is_feature_flag_active(self.feature_flag)
 
 
 class IsObjectBeingCreated(BaseRule):

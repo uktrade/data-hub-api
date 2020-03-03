@@ -45,6 +45,7 @@ class TestAddServiceDelivery(APITestMixin):
             {
                 'is_event': False,
                 'theme': Interaction.Theme.EXPORT,
+                'were_countries_discussed': False,
             },
             # non-event service delivery with blank notes
             {
@@ -173,6 +174,7 @@ class TestAddServiceDelivery(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
+            'company_referral': None,
         }
 
     @pytest.mark.parametrize(

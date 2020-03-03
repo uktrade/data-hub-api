@@ -123,7 +123,6 @@ def test_closed_company_referral_activity(api_client):
                     'startTime': format_date_or_datetime(company_referral.created_on),
                     'dit:subject': company_referral.subject,
                     'dit:status': str(company_referral.status),
-                    'dit:closedOn': format_date_or_datetime(company_referral.closed_on),
                     'attributedTo': [
                         {
                             'id': f'dit:DataHubCompany:{company_referral.company.pk}',
@@ -159,20 +158,6 @@ def test_closed_company_referral_activity(api_client):
                                 'name': company_referral.recipient.dit_team.name,
                             },
                             'dit:DataHubCompanyReferral:role': 'recipient',
-                        },
-                        {
-                            'id': f'dit:DataHubAdviser:{company_referral.closed_by.pk}',
-                            'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.closed_by.contact_email
-                                or company_referral.closed_by.email,
-                            'name': company_referral.closed_by.name,
-                            'dit:team': {
-                                'id': f'dit:DataHubTeam:{company_referral.closed_by.dit_team.pk}',
-                                'type': ['Group', 'dit:Team'],
-                                'name': company_referral.closed_by.dit_team.name,
-                            },
-                            'dit:DataHubCompanyReferral:role': 'closer',
                         },
                         {
                             'id': f'dit:DataHubContact:{company_referral.contact.pk}',
