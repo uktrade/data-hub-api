@@ -9,10 +9,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.constants import (
-    BusinessTypeConstant,
-    EXPORT_COUNTRIES_FEATURE_FLAG,
-)
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
     Company,
     CompanyExportCountry,
@@ -27,15 +24,8 @@ from datahub.company.test.factories import (
 )
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.test.factories import TeamFactory
-
-
-@pytest.fixture()
-def export_countries_feature_flag():
-    """Creates the export countries feature flag ON."""
-    yield FeatureFlagFactory(code=EXPORT_COUNTRIES_FEATURE_FLAG)
 
 
 class TestListCompanies(APITestMixin):
@@ -1484,268 +1474,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
             'country_ids': actual_response_country_ids,
         }
 
-    @pytest.mark.parametrize(
-        'field,model_status',
-        (
-            (
-                'export_to_countries',
-                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            ),
-            (
-                'future_interest_countries',
-                CompanyExportCountry.Status.FUTURE_INTEREST,
-            ),
-        ),
-    )
-    def test_adding_to_empty_company_export_to_country_model(
-            self,
-            field,
-            model_status,
-    ):
-        """Test adding export countries to an empty CompanyExportCountry model"""
-        company = CompanyFactory(
-            **{field: []},
-        )
-        new_countries = list(CountryModel.objects.order_by('?')[:2])
-
-        # now update them
-        response_data = self.update_company_export_country_model(
-            self=self,
-            new_countries=new_countries,
-            field=field,
-            company=company,
-            model_status=model_status,
-        )
-
-        assert response_data['status_code'] == status.HTTP_200_OK
-        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
-        assert [
-            export_country.country for export_country in response_data['countries']
-        ] == new_countries
-
-    @pytest.mark.parametrize(
-        'field,model_status',
-        (
-            (
-                'export_to_countries',
-                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            ),
-            (
-                'future_interest_countries',
-                CompanyExportCountry.Status.FUTURE_INTEREST,
-            ),
-        ),
-    )
-    def test_changing_company_export_to_country_model(
-            self,
-            field,
-            model_status,
-    ):
-        """Test changing export countries to completely new ones on CompanyExportCountry model"""
-        existing_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
-        # initialise the models in scope
-        company = CompanyFactory(
-            **{
-                field: existing_countries,
-            },
-        )
-
-        for country in existing_countries:
-            CompanyExportCountryFactory(
-                country=country,
-                company=company,
-                status=model_status,
-            )
-
-        random_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
-        new_countries = [country for country in random_countries
-                         if country not in existing_countries]
-
-        # now update them
-        response_data = self.update_company_export_country_model(
-            self=self,
-            new_countries=new_countries,
-            field=field,
-            company=company,
-            model_status=model_status,
-        )
-
-        assert response_data['status_code'] == status.HTTP_200_OK
-        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
-        assert [
-            export_country.country for export_country in response_data['countries']
-        ] == new_countries
-
-    @pytest.mark.parametrize(
-        'field,model_status',
-        (
-            (
-                'export_to_countries',
-                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            ),
-            (
-                'future_interest_countries',
-                CompanyExportCountry.Status.FUTURE_INTEREST,
-            ),
-        ),
-    )
-    def test_appending_new_items_to_existing_ones_in_company_export_to_country_model(
-            self,
-            field,
-            model_status,
-    ):
-        """
-        Test appending new export countries to
-        an existing items in CompanyExportCountry model
-        """
-        existing_countries = list(CountryModel.objects.order_by('?')[:random.randint(1, 10)])
-        # initialise the models in scope
-        company = CompanyFactory(
-            **{
-                field: existing_countries,
-            },
-        )
-
-        for country in existing_countries:
-            CompanyExportCountryFactory(
-                country=country,
-                company=company,
-                status=model_status,
-            )
-
-        new_countries = existing_countries + list(CountryModel.objects.order_by('?')[:0])
-
-        # now update them
-        response_data = self.update_company_export_country_model(
-            self=self,
-            new_countries=new_countries,
-            field=field,
-            company=company,
-            model_status=model_status,
-        )
-
-        assert response_data['status_code'] == status.HTTP_200_OK
-        assert response_data['country_ids'] == [str(country.pk) for country in new_countries]
-        assert [
-            export_country.country for export_country in response_data['countries']
-        ] == new_countries
-
-    def test_adding_overlapping_countries_in_company_export_to_country_model(self):
-        """
-        Test adding overlapping countries to CompanyExportCountry model
-        Priority takes currently exporting to countries over
-        future countries of interest
-        """
-        initial_countries = list(CountryModel.objects.order_by('?')[:5])
-        initial_export_to_countries = initial_countries[:3]
-        initial_future_interest_countries = initial_countries[3:]
-
-        # initialise the models in scope
-        company = CompanyFactory(
-            export_to_countries=initial_export_to_countries,
-            future_interest_countries=initial_future_interest_countries,
-        )
-
-        for country in initial_future_interest_countries:
-            CompanyExportCountryFactory(
-                country=country,
-                company=company,
-                status=CompanyExportCountry.Status.FUTURE_INTEREST,
-            )
-
-        for country in initial_export_to_countries:
-            CompanyExportCountryFactory(
-                country=country,
-                company=company,
-                status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            )
-
-        new_countries = list(CountryModel.objects.order_by('?')[:5])
-        new_export_to_countries = new_countries[:2]
-        new_future_interest_countries = new_countries[:3]
-
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(
-            url,
-            data={
-                'export_to_countries': [country.id for country in new_export_to_countries],
-                'future_interest_countries': [
-                    country.id for country in new_future_interest_countries
-                ],
-            },
-        )
-
-        response_data = response.json()
-
-        response_data['export_to_countries'].sort(key=itemgetter('id'))
-        response_data['future_interest_countries'].sort(key=itemgetter('id'))
-
-        new_export_to_countries.sort(key=attrgetter('pk'))
-
-        actual_response_export_to_country_ids = [
-            country['id'] for country in response_data['export_to_countries']
-        ]
-
-        actual_export_to_countries = CompanyExportCountry.objects.filter(
-            company=company,
-            status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-        ).order_by(
-            'country__pk',
-        )
-
-        actual_future_interest_countries = CompanyExportCountry.objects.filter(
-            company=company,
-            status=CompanyExportCountry.Status.FUTURE_INTEREST,
-        ).order_by(
-            'country__pk',
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert actual_response_export_to_country_ids == [
-            str(country.pk) for country in new_export_to_countries
-        ]
-        assert [
-            export_country.country for export_country in actual_export_to_countries
-        ] == new_export_to_countries
-        assert [
-            list(actual_future_interest_countries)[0].country,
-        ] == list(set(new_future_interest_countries) - set(new_export_to_countries))
-
-    def test_edit_company_fields_check_not_interested_is_intact(self):
-        """
-        Check when in case feature flag is switched OFF
-        and updating old export country fields will not wipe off
-        not_interested countries in `CompanyExportCountry` model.
-        """
-        not_interested_country = CountryModel.objects.order_by('name').first()
-        company = CompanyFactory()
-        CompanyExportCountry(
-            country=not_interested_country,
-            company=company,
-            status=CompanyExportCountry.Status.NOT_INTERESTED,
-        ).save()
-
-        new_countries = list(CountryModel.objects.order_by('id')[:5])
-        new_export_to_countries = new_countries[:2]
-        new_future_interest_countries = new_countries[:3]
-
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(
-            url,
-            data={
-                'export_to_countries': [country.id for country in new_export_to_countries],
-                'future_interest_countries': [
-                    country.id for country in new_future_interest_countries
-                ],
-            },
-        )
-        assert response.status_code == status.HTTP_200_OK
-        not_interested = company.export_countries.filter(
-            status=CompanyExportCountry.Status.NOT_INTERESTED,
-        )
-        assert len(not_interested) == 1
-        assert not_interested[0].country == not_interested_country
-
     def test_returns_401_if_unauthenticated(self, api_client):
         """Test that a 401 is returned if no credentials are provided."""
         company = CompanyFactory()
@@ -1773,130 +1501,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
         response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    @pytest.mark.django_db
-    @pytest.mark.parametrize(
-        'data,expected_error',
-        (
-            # can't send export_to_countries, future_interest_countries when flag is active
-            (
-                {
-                    'export_to_countries': None,
-                    'future_interest_countries': None,
-                },
-                {
-                    'export_to_countries': ['This field may not be null.'],
-                    'future_interest_countries': ['This field may not be null.'],
-                },
-            ),
-            (
-                {
-                    'export_to_countries': [],
-                    'future_interest_countries': [],
-                },
-                {
-                    'export_to_countries': [
-                        'This field invalid when export countries feature flag is ON.',
-                    ],
-                    'future_interest_countries': [
-                        'This field invalid when export countries feature flag is ON.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'export_to_countries': [
-                        Country.canada.value.id,
-                        Country.greece.value.id,
-                    ],
-                    'future_interest_countries': [
-                        Country.united_states.value.id,
-                        Country.azerbaijan.value.id,
-                    ],
-                },
-                {
-                    'export_to_countries': [
-                        'This field invalid when export countries feature flag is ON.',
-                    ],
-                    'future_interest_countries': [
-                        'This field invalid when export countries feature flag is ON.',
-                    ],
-                },
-            ),
-        ),
-    )
-    def test_validation_error_feature_flag_on_company_export_country_fields(
-        self,
-        export_countries_feature_flag,
-        data,
-        expected_error,
-    ):
-        """
-        Test that company export country fields can't be updated when
-        feature flag is ON.
-        """
-        company = CompanyFactory()
-
-        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == expected_error
-
-    @pytest.mark.django_db
-    @pytest.mark.parametrize(
-        'data,expected_error',
-        (
-            # can't send export_countries when flag is inactive
-            (
-                {
-                    'export_countries': None,
-                },
-                {'export_countries': ['This field may not be null.']},
-            ),
-            (
-                {
-                    'export_countries': [],
-                },
-                {
-                    'non_field_errors': [
-                        'This field invalid when export countries feature flag is OFF.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                            },
-                            'status':
-                                CompanyExportCountry.Status.FUTURE_INTEREST,
-                        },
-                    ],
-                },
-                {
-                    'non_field_errors': [
-                        'This field invalid when export countries feature flag is OFF.',
-                    ],
-                },
-            ),
-        ),
-    )
-    def test_validation_error_export_country_api_feature_flag_off(
-        self,
-        data,
-        expected_error,
-    ):
-        """Test validation scenarios."""
-        company = CompanyFactory()
-
-        url = reverse('api-v4:company:update-export-detail', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == expected_error
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
@@ -1986,9 +1590,8 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
             ),
         ),
     )
-    def test_validation_error_export_country_api_feature_flag_on(
+    def test_validation_error_export_country_api(
         self,
-        export_countries_feature_flag,
         data,
         expected_error,
     ):
@@ -2010,7 +1613,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         ]
         return random.choice(export_interest_statuses)
 
-    def test_update_company_with_export_countries(self, export_countries_feature_flag):
+    def test_update_company_with_export_countries(self):
         """
         Test company export countries update.
         """
@@ -2041,7 +1644,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_with_export_countries_sync_company_fields(
         self,
-        export_countries_feature_flag,
     ):
         """
         Test company export countries update
@@ -2097,7 +1699,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_export_countries_with_pre_existing_company_fields_sync(
         self,
-        export_countries_feature_flag,
     ):
         """
         Test sync when company export_countries update, of a company with
@@ -2160,7 +1761,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_export_countries_with_new_list_deletes_old_ones(
         self,
-        export_countries_feature_flag,
     ):
         """
         Test when updating company export countries with a new list
@@ -2209,7 +1809,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_export_countries_with_empty_list_deletes_all(
         self,
-        export_countries_feature_flag,
     ):
         """
         Test when updating company export countries with an empty list
@@ -2245,7 +1844,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_update_company_with_something_check_export_countries(
         self,
-        export_countries_feature_flag,
     ):
         """
         Test when updating company with something else other than export countries
@@ -2268,7 +1866,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     def test_get_company_with_export_countries_feature_flag_on(
         self,
-        export_countries_feature_flag,
     ):
         """Test get company details after updating export countries."""
         company = CompanyFactory()
