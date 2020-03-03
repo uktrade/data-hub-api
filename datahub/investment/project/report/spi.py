@@ -60,10 +60,24 @@ def format_date(d):
     return d.isoformat()
 
 
+def _filter_row_dicts(rows, field_titles):
+    """Filter row dicts to exclude keys which are not present in field_titles."""
+    for row in rows:
+        yield {
+            key: value
+            for key, value in row.items()
+            if key in field_titles
+        }
+
+
 def write_report(file):
     """Write CSV report."""
     spi_report = SPIReport()
-    for line in csv_iterator(spi_report.rows(), spi_report.field_titles):
+    # ensure that rows only contain keys defined in field_titles
+    for line in csv_iterator(
+        _filter_row_dicts(spi_report.rows(), spi_report.field_titles),
+        spi_report.field_titles,
+    ):
         file.write(line)
 
 
