@@ -1,0 +1,2 @@
+The fields `exports_to_countries` and `future_interest_countries` have now been deprecated and are now set to read only
+The api will no longer validate these fields but will ignore them if sent in a request.

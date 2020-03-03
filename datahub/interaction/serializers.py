@@ -15,15 +15,12 @@ from datahub.core.validators import (
     AndRule,
     EqualsRule,
     InRule,
-    IsFeatureFlagActive,
     IsObjectBeingCreated,
-    NotRule,
     OperatorRule,
     RulesBasedValidator,
     ValidationRule,
 )
 from datahub.event.models import Event
-from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -176,9 +173,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
         'cannot_unset_theme': gettext_lazy(
             "A theme can't be removed once set.",
-        ),
-        'invalid_when_feature_flag_off': gettext_lazy(
-            'export countries related fields are not valid when feature flag is off.',
         ),
         'invalid_when_no_countries_discussed': gettext_lazy(
             'This field is only valid when countries were discussed.',
@@ -535,15 +529,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=OperatorRule('is_event', bool),
                 ),
                 ValidationRule(
-                    'invalid_when_feature_flag_off',
-                    OperatorRule('were_countries_discussed', is_blank),
-                    OperatorRule('export_countries', is_blank),
-                    when=AndRule(
-                        IsObjectBeingCreated(),
-                        NotRule(IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES)),
-                    ),
-                ),
-                ValidationRule(
                     'invalid_for_investment',
                     OperatorRule('were_countries_discussed', not_),
                     OperatorRule('export_countries', not_),
@@ -554,7 +539,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('were_countries_discussed', is_not_blank),
                     when=AndRule(
                         IsObjectBeingCreated(),
-                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         InRule(
                             'theme',
                             [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
@@ -577,7 +561,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('export_countries', is_blank),
                     when=AndRule(
                         IsObjectBeingCreated(),
-                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         OperatorRule('were_countries_discussed', not_),
                         InRule(
                             'theme',
