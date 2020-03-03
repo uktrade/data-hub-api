@@ -1,0 +1,1 @@
+`GET /v4/<id>/export-wins`: This endpoint will return a status 501 until the feature is implemented.

@@ -1923,3 +1923,21 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
+
+
+class TestGetCompanyExportWins(APITestMixin):
+    """Test for Export wins."""
+
+    def test_get_export_wins_returns_501(self):
+        """Test export wins returns a HTTP status 501"""
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+            ),
+        )
+        api_client = self.create_api_client(user=user)
+        company = CompanyFactory()
+        url = reverse('api-v4:company:export-wins', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
