@@ -1,3 +1,64 @@
+# Data Hub API 28.0.0 (2020-03-03)
+
+
+## Removals
+
+- **Companies** `GET /v3/activity-stream/company-referral`: The following deprecated fields and values were removed:
+
+  - the nested field `object.dit:closedOn`
+  - the `closer` value for the `object.attributedTo.dit:DataHubCompanyReferral:role` nested field
+- **Companies** `GET /v4/activity-feed`: For objects of type `dit:CompanyReferral`, the following deprecated fields and values were removed:
+
+  - the nested field `object.dit:closedOn`
+  - the `closer` value for the `object.attributedTo.dit:DataHubCompanyReferral:role` nested field
+- **Companies** `GET /v4/company-referral`, `POST /v4/company-referral`, `GET /v4/company-referral/<id>`: The following deprecated response fields were removed:
+
+  - `closed_on`
+  - `closed_by`
+
+## Features
+
+- **Companies** Additional logging was added to the nightly automatic D&B company updates task
+  in order to surface the total number of company updates each day. This will inform
+  how the company updates limit is adjusted over time (currently at 2000).
+
+## Bug fixes
+
+- **Interactions** A bug was fixed where it wasn't possible to import interactions using the admin site import interactions tool due to the were_countries_discussed field not being set internally.
+- **Investment** A bug causing the daily SPI report task to fail was fixed.
+
+## Internal changes
+
+- **Companies** The company hierarchy rollout task -
+  `datahub.dnb_api.tasks.sync_outdated_companies_with_dnb` - was adjusted so that
+  any failed sync tasks are not retried. This fixes a `RuntimeError` raised by
+  celery.
+- **Companies** The logging for the `datahub.dnb_api.tasks.sync_outdated_companies_with_dnb`
+  task was improved so that sync successes and failures are logged consistently.
+
+## API
+
+- **Companies** The fields `exports_to_countries` and `future_interest_countries` have now been deprecated and are now set to read only
+  The api will no longer validate these fields but will ignore them if sent in a request.
+- **Interactions** `GET /v3/interaction`, `GET /v3/interaction/<id>`: A `company_referral` field was added to responses. If interaction 
+  has been created as a result of complete referral, the field will have following structure:
+
+  ```json
+  {
+    ...
+    "company_referral": {
+      "id": <company_referral_id>,
+      "subject": "company referral subject",
+      "created_on": <datetime>,
+      "created_by": <nested adviser with contact email and DIT team>,
+      "recipient": <nested adviser with contact email and DIT team>
+    }
+  }
+  ```
+
+  Otherwise, the value will be `null`.
+
+
 # Data Hub API 27.15.0 (2020-02-28)
 
 
