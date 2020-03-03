@@ -10,124 +10,124 @@ argh==0.26.2              # via watchdog
 asgiref==3.2.3            # via django
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
-billiard==3.6.2.0
-boto3==1.12.5
-botocore==1.15.5          # via boto3, s3transfer
-celery[redis]==4.4
+billiard==3.6.3.0         # via -r requirements.in (line 44), celery
+boto3==1.12.11            # via -r requirements.in (line 23)
+botocore==1.15.11         # via boto3, s3transfer
+celery[redis]==4.4.1      # via -r requirements.in (line 43)
 certifi==2019.11.28       # via requests, sentry-sdk
-chardet==3.0.4
+chardet==3.0.4            # via -r requirements.in (line 15), requests
 click==7.0                # via pip-tools, towncrier
 coverage==5.0.2           # via pytest-cov
 decorator==4.4.1          # via ipython, traitlets
-django-debug-toolbar==2.2
-django-environ==0.4.5
-django-extensions==2.2.8
-django-filter==2.2.0
+django-debug-toolbar==2.2  # via -r requirements.in (line 57)
+django-environ==0.4.5     # via -r requirements.in (line 4)
+django-extensions==2.2.8  # via -r requirements.in (line 5)
+django-filter==2.2.0      # via -r requirements.in (line 6)
 django-js-asset==1.2.2    # via django-mptt
-django-mptt==0.11.0
-django-oauth-toolkit==1.2.0
-django-pglocks==1.0.4
-django-redis==4.11.0
-django-reversion==3.0.7
-django==3.0.3
-djangorestframework==3.11.0
+django-mptt==0.11.0       # via -r requirements.in (line 9)
+django-oauth-toolkit==1.2.0  # via -r requirements.in (line 10)
+django-pglocks==1.0.4     # via -r requirements.in (line 8)
+django-redis==4.11.0      # via -r requirements.in (line 35)
+django-reversion==3.0.7   # via -r requirements.in (line 7)
+django==3.0.3             # via -r requirements.in (line 2), django-debug-toolbar, django-filter, django-mptt, django-oauth-toolkit, django-redis, django-reversion, djangorestframework
+djangorestframework==3.11.0  # via -r requirements.in (line 3)
 docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
-elasticsearch-dsl==6.3.1
-elasticsearch==6.4.0
+elasticsearch-dsl==6.3.1  # via -r requirements.in (line 40)
+elasticsearch==6.4.0      # via -r requirements.in (line 39), elasticsearch-dsl
 entrypoints==0.3          # via flake8
 execnet==1.7.1            # via pytest-xdist
-factory-boy==2.12.0
+factory-boy==2.12.0       # via -r requirements.in (line 54)
 faker==3.0.0              # via factory-boy
-flake8-blind-except==0.1.1
-flake8-bugbear==20.1.4
-flake8-commas==2.0.0
-flake8-debugger==3.2.1
-flake8-docstrings==1.5.0
-flake8-import-order==0.18.1
+flake8-blind-except==0.1.1  # via -r requirements.in (line 67)
+flake8-bugbear==20.1.4    # via -r requirements.in (line 68)
+flake8-commas==2.0.0      # via -r requirements.in (line 69)
+flake8-debugger==3.2.1    # via -r requirements.in (line 70)
+flake8-docstrings==1.5.0  # via -r requirements.in (line 72)
+flake8-import-order==0.18.1  # via -r requirements.in (line 71)
 flake8-polyfill==1.0.2    # via pep8-naming
-flake8-print==3.1.4
-flake8-quotes==2.1.1
-flake8-string-format==0.3.0
-flake8==3.7.9
-freezegun==0.3.15
+flake8-print==3.1.4       # via -r requirements.in (line 73)
+flake8-quotes==2.1.1      # via -r requirements.in (line 74)
+flake8-string-format==0.3.0  # via -r requirements.in (line 75)
+flake8==3.7.9             # via -r requirements.in (line 66), flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
+freezegun==0.3.15         # via -r requirements.in (line 55)
 future==0.18.2            # via notifications-python-client
-gevent==1.4.0
+gevent==1.4.0             # via -r requirements.in (line 80)
 greenlet==0.4.15          # via gevent
-gunicorn==20.0.4
-icalendar==4.0.4
+gunicorn==20.0.4          # via -r requirements.in (line 79)
+icalendar==4.0.4          # via -r requirements.in (line 32)
 idna==2.8                 # via requests
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.12.0
+ipython==7.13.0           # via -r requirements.in (line 53)
 jedi==0.15.2              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.6.7
-mail-parser==3.12.0
+kombu==4.6.8              # via -r requirements.in (line 45), celery
+mail-parser==3.12.0       # via -r requirements.in (line 31)
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
-mohawk==1.1.0
+mohawk==1.1.0             # via -r requirements.in (line 81), requests-hawk
 monotonic==1.5            # via notifications-python-client
 more-itertools==8.0.2     # via pytest
-notifications-python-client==5.5.1
-oauthlib==2.1.0
+notifications-python-client==5.5.1  # via -r requirements.in (line 25)
+oauthlib==2.1.0           # via -r requirements.in (line 11), django-oauth-toolkit
 packaging==20.0           # via pytest, pytest-sugar
 parso==0.5.2              # via jedi
 pathtools==0.1.2          # via watchdog
-pep8-naming==0.9.1
+pep8-naming==0.9.1        # via -r requirements.in (line 76)
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pip-tools==4.5.0
-piprot==0.9.11
+pip-tools==4.5.1          # via -r requirements.in (line 59)
+piprot==0.9.11            # via -r requirements.in (line 60)
 pluggy==0.13.1            # via pytest
 prompt-toolkit==3.0.2     # via ipython
-psycogreen==1.0.2
-psycopg2==2.8.4
+psycogreen==1.0.2         # via -r requirements.in (line 21)
+psycopg2==2.8.4           # via -r requirements.in (line 20)
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
-pydocstyle==5.0.2
+pydocstyle==5.0.2         # via -r requirements.in (line 77), flake8-docstrings
 pyflakes==2.1.1           # via flake8
 pygments==2.5.2           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
 pyparsing==2.4.6          # via packaging
-pytest-cov==2.8.1
-pytest-django==3.8.0
+pytest-cov==2.8.1         # via -r requirements.in (line 51)
+pytest-django==3.8.0      # via -r requirements.in (line 49)
 pytest-forked==1.1.3      # via pytest-xdist
-pytest-sugar==0.9.2
-pytest-xdist==1.31.0
-pytest==5.3.5
-python-dateutil==2.8.1
+pytest-sugar==0.9.2       # via -r requirements.in (line 50)
+pytest-xdist==1.31.0      # via -r requirements.in (line 52)
+pytest==5.3.5             # via -r requirements.in (line 48), pytest-cov, pytest-django, pytest-forked, pytest-sugar, pytest-xdist
+python-dateutil==2.8.1    # via -r requirements.in (line 17), botocore, elasticsearch-dsl, faker, freezegun, icalendar
 pytz==2019.3              # via celery, django, icalendar
-pyyaml==5.3
-redis==3.4.1
+pyyaml==5.3               # via -r requirements.in (line 16), watchdog
+redis==3.4.1              # via -r requirements.in (line 36), celery, django-redis
 requests-futures==1.0.0   # via piprot
-requests-hawk==1.0.1
-requests-mock==1.7.0
-requests==2.23.0
-requests_toolbelt==0.9.1
+requests-hawk==1.0.1      # via -r requirements.in (line 85)
+requests-mock==1.7.0      # via -r requirements.in (line 56)
+requests==2.23.0          # via -r requirements.in (line 82), django-oauth-toolkit, notifications-python-client, piprot, requests-futures, requests-hawk, requests-mock, requests-toolbelt
+requests_toolbelt==0.9.1  # via -r requirements.in (line 83)
 s3transfer==0.3.0         # via boto3
-semantic_version==2.8.4
-sentry_sdk==0.14.1
+semantic_version==2.8.4   # via -r requirements.in (line 61)
+sentry_sdk==0.14.2        # via -r requirements.in (line 84)
 simplejson==3.17.0        # via mail-parser
 six==1.14.0               # via django-extensions, django-pglocks, elasticsearch-dsl, faker, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, pytest-xdist, python-dateutil, requests-mock, traitlets
 snowballstemmer==2.0.0    # via pydocstyle
 sqlparse==0.3.0           # via django, django-debug-toolbar
-statsd==3.3.0
+statsd==3.3.0             # via -r requirements.in (line 28)
 termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.3       # via faker
 toml==0.10.0              # via towncrier
-towncrier==19.2.0
+towncrier==19.2.0         # via -r requirements.in (line 62)
 traitlets==4.3.3          # via ipython
-uritemplate==3.0.1
+uritemplate==3.0.1        # via -r requirements.in (line 12)
 urllib3==1.25.7           # via botocore, elasticsearch, requests, sentry-sdk
 vine==1.3.0               # via amqp, celery
-watchdog[watchmedo]==0.10.2
+watchdog[watchmedo]==0.10.2  # via -r requirements.in (line 63)
 wcwidth==0.1.8            # via prompt-toolkit, pytest
-werkzeug==1.0.0
-whitenoise==5.0.1
+werkzeug==1.0.0           # via -r requirements.in (line 58)
+whitenoise==5.0.1         # via -r requirements.in (line 13)
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

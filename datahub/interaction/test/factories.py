@@ -100,6 +100,16 @@ class CompanyInteractionFactory(InteractionFactoryBase):
     )
 
 
+class CompanyReferralInteractionFactory(CompanyInteractionFactory):
+    """Factory for creating an interaction relating to a company referral."""
+
+    company_referral = factory.RelatedFactory(
+        'datahub.company_referral.test.factories.CompleteCompanyReferralFactory',
+        'interaction',
+        company=factory.SelfAttribute('..company'),
+    )
+
+
 class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
     """
     Factory for creating an interaction relating to a company, with policy feedback

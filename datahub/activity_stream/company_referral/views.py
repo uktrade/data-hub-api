@@ -27,7 +27,6 @@ class CompanyReferralActivityViewSet(ActivityViewSet):
         'company',
         'contact',
         'created_by__dit_team',
-        'closed_by__dit_team',
         'completed_by__dit_team',
         'recipient__dit_team',
     )

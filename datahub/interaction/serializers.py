@@ -1,4 +1,5 @@
 from collections import Counter
+from functools import partial
 from operator import not_
 
 from django.db.transaction import atomic
@@ -7,22 +8,19 @@ from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
-from datahub.company.serializers import NestedAdviserField
+from datahub.company.serializers import NestedAdviserField, NestedAdviserWithEmailAndTeamField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
     AndRule,
     EqualsRule,
     InRule,
-    IsFeatureFlagActive,
     IsObjectBeingCreated,
-    NotRule,
     OperatorRule,
     RulesBasedValidator,
     ValidationRule,
 )
 from datahub.event.models import Event
-from datahub.interaction.constants import INTERACTION_ADD_COUNTRIES
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
@@ -118,6 +116,18 @@ class InteractionExportCountrySerializer(serializers.ModelSerializer):
         fields = ('country', 'status')
 
 
+NestedCompanyReferralDetail = partial(
+    NestedRelatedField,
+    'company_referral.CompanyReferral',
+    extra_fields=(
+        'subject',
+        'created_on',
+        ('created_by', NestedAdviserWithEmailAndTeamField()),
+        ('recipient', NestedAdviserWithEmailAndTeamField()),
+    ),
+)
+
+
 class InteractionSerializer(serializers.ModelSerializer):
     """
     Interaction serialiser.
@@ -163,9 +173,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
         'cannot_unset_theme': gettext_lazy(
             "A theme can't be removed once set.",
-        ),
-        'invalid_when_feature_flag_off': gettext_lazy(
-            'export countries related fields are not valid when feature flag is off.',
         ),
         'invalid_when_no_countries_discussed': gettext_lazy(
             'This field is only valid when countries were discussed.',
@@ -221,6 +228,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    company_referral = NestedCompanyReferralDetail(read_only=True)
 
     def validate_service(self, value):
         """Make sure only a service without children can be assigned."""
@@ -443,6 +451,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_by',
             'archived_on',
             'archived_reason',
+            'company_referral',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -520,15 +529,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=OperatorRule('is_event', bool),
                 ),
                 ValidationRule(
-                    'invalid_when_feature_flag_off',
-                    OperatorRule('were_countries_discussed', is_blank),
-                    OperatorRule('export_countries', is_blank),
-                    when=AndRule(
-                        IsObjectBeingCreated(),
-                        NotRule(IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES)),
-                    ),
-                ),
-                ValidationRule(
                     'invalid_for_investment',
                     OperatorRule('were_countries_discussed', not_),
                     OperatorRule('export_countries', not_),
@@ -539,7 +539,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('were_countries_discussed', is_not_blank),
                     when=AndRule(
                         IsObjectBeingCreated(),
-                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         InRule(
                             'theme',
                             [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
@@ -562,7 +561,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('export_countries', is_blank),
                     when=AndRule(
                         IsObjectBeingCreated(),
-                        IsFeatureFlagActive(INTERACTION_ADD_COUNTRIES),
                         OperatorRule('were_countries_discussed', not_),
                         InRule(
                             'theme',

@@ -23,14 +23,6 @@ class CompanyReferral(BaseModel):
         COMPLETE = ('complete', 'Complete')
 
     id = models.UUIDField(primary_key=True, default=uuid4)
-    closed_by = models.ForeignKey(
-        'company.Advisor',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name='closed_referrals',
-    )
-    closed_on = models.DateTimeField(null=True, blank=True)
     company = models.ForeignKey(
         'company.Company',
         on_delete=models.CASCADE,
@@ -58,6 +50,7 @@ class CompanyReferral(BaseModel):
         null=True,
         blank=True,
         on_delete=models.PROTECT,
+        related_name='company_referral',
     )
     completed_by = models.ForeignKey(
         'company.Advisor',
