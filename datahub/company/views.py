@@ -359,7 +359,7 @@ class AdviserReadOnlyViewSetV1(
 
 
 @api_view(['GET'])
-@permission_classes([HasPermissions(f'company.{CompanyPermission.view_company}')])
+@permission_classes([HasPermissions(f'company.{CompanyPermission.view_export_win}')])
 def export_wins_501_not_implemented(request, pk):
     """
     Get company export wins.
