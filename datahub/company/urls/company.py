@@ -73,9 +73,9 @@ urls = [
         name='update-export-detail',
     ),
     path(
-        'company/<uuid:pk>/export-wins',
+        'company/<uuid:pk>/export-win',
         export_wins_501_not_implemented,
-        name='export-wins',
+        name='export-win',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]
