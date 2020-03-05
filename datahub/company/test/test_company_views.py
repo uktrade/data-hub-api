@@ -1926,7 +1926,14 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
 
 class TestGetCompanyExportWins(APITestMixin):
-    """Test for Export wins."""
+    """Test for GET endpoints that return export wins related to a company."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_export_wins_returns_501(self):
         """Test export wins returns a HTTP status 501"""
