@@ -33,6 +33,7 @@ from datahub.company.serializers import (
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.exceptions import APINotImplementedException
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -364,5 +365,4 @@ def export_wins_501_not_implemented(request, pk):
     Get company export wins.
     The feature is not yet implemented.
     """
-    content = {'error': 'Retriving export wins in not yet implemented.'}
-    return Response(content, status=status.HTTP_501_NOT_IMPLEMENTED)
+    raise APINotImplementedException('Retriving export wins in not yet implemented.')
