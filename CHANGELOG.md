@@ -1,3 +1,20 @@
+# Data Hub API 28.1.0 (2020-03-05)
+
+
+## Removals
+
+- **Companies** The following deprecated columns in the `company_referral_companyreferral` table were removed:
+ 
+  - `closed_on`
+  - `closed_by_id`
+
+## Internal changes
+
+- A bug was fixed on the nightly company updates task which manifested as a result
+  of using the latest celery library. Celery, kombu and billiard dependencies have
+  been locked until this is resolved with a new celery release.
+
+
 # Data Hub API 28.0.0 (2020-03-03)
 
 
