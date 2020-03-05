@@ -1937,7 +1937,7 @@ class TestGetCompanyExportWins(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
         company = CompanyFactory()
-        url = reverse('api-v4:company:export-wins', kwargs={'pk': company.id})
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
