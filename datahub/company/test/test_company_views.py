@@ -1935,16 +1935,18 @@ class TestGetCompanyExportWins(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_export_wins_returns_501(self):
-        """Test export wins returns a HTTP status 501"""
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-            ),
-        )
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_export_win'], status.HTTP_501_NOT_IMPLEMENTED),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames)
         api_client = self.create_api_client(user=user)
         company = CompanyFactory()
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
         response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+        assert response.status_code == expected_status
