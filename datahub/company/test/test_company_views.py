@@ -1923,3 +1923,30 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
+
+
+class TestGetCompanyExportWins(APITestMixin):
+    """Test for GET endpoints that return export wins related to a company."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        company = CompanyFactory()
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_export_win'], status.HTTP_501_NOT_IMPLEMENTED),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames)
+        api_client = self.create_api_client(user=user)
+        company = CompanyFactory()
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+        response = api_client.get(url)
+        assert response.status_code == expected_status
