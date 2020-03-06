@@ -1,4 +1,5 @@
 from datetime import datetime
+from operator import attrgetter, itemgetter
 
 import pytest
 from django.utils.timezone import utc
@@ -82,6 +83,77 @@ class TestSearchExportCountryHistory(APITestMixin):
             },
             'id': str(history_object.pk),
             'status': history_object.status,
+        }
+
+    def test_interaction_response_body(self, es_with_collector):
+        """Test the format of an interaction result in the response body."""
+        interaction = ExportCountriesInteractionFactory()
+        es_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            export_country_history_search_url,
+            data={
+                # The view requires a filter
+                'company': interaction.company.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        assert len(results) == 1
+
+        result = results[0]
+        result['contacts'].sort(key=itemgetter('id'))
+        result['dit_participants'].sort(key=lambda participant: participant['adviser']['id'])
+        result['export_countries'].sort(key=lambda export_country: export_country['country']['id'])
+
+        assert result == {
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+                'trading_names': interaction.company.trading_names,
+            },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'first_name': contact.first_name,
+                    'name': contact.name,
+                    'last_name': contact.last_name,
+                }
+                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+            ],
+            'date': interaction.date.isoformat(),
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'name': dit_participant.adviser.name,
+                        'last_name': dit_participant.adviser.last_name,
+                    },
+                    'team': {
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
+                    },
+                }
+                for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+            ],
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.pk),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.order_by('country__pk')
+            ],
+            'id': str(interaction.pk),
+            'service': {
+                'id': str(interaction.service.pk),
+                'name': interaction.service.name,
+            },
+            'subject': interaction.subject,
         }
 
     @pytest.mark.parametrize(

@@ -18,6 +18,28 @@ class ExportCountryHistoryView(SearchAPIView):
     search_app = ExportCountryHistoryApp
 
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
+
+    fields_to_include = (
+        # Fields common to interactions and export country history objects
+        'company',
+        'date',
+        'id',
+
+        # Export country history object fields
+        'country',
+        'history_date',
+        'history_type',
+        'history_user',
+        'status',
+
+        # Interaction fields
+        'contacts',
+        'dit_participants',
+        'export_countries',
+        'service',
+        'subject',
+    )
+
     FILTER_FIELDS = [
         'country',
         'company',
