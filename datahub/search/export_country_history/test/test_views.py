@@ -1,5 +1,6 @@
 from datetime import datetime
 from operator import attrgetter, itemgetter
+from uuid import uuid4
 
 import pytest
 from django.utils.timezone import utc
@@ -10,13 +11,13 @@ from rest_framework.reverse import reverse
 from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.interaction.models import InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     ExportCountriesInteractionFactory,
     ExportCountriesServiceDeliveryFactory,
 )
 from datahub.metadata.models import Country
-from datahub.metadata.test.factories import TeamFactory
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.interaction import InteractionSearchApp
 
@@ -32,12 +33,39 @@ export_country_history_search_url = reverse('api-v4:search:export-country-histor
 class TestSearchExportCountryHistory(APITestMixin):
     """Tests search views."""
 
-    def test_export_country_history_search_no_permissions(self):
-        """Should return 403"""
-        user = create_test_user(dit_team=TeamFactory())
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            (
+                [],
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                ['view_companyexportcountry'],
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                [InteractionPermission.view_all],
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                ['view_companyexportcountry', InteractionPermission.view_all],
+                status.HTTP_200_OK,
+            ),
+        ),
+    )
+    @pytest.mark.usefixtures('es')
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
         api_client = self.create_api_client(user=user)
-        response = api_client.get(export_country_history_search_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        response = api_client.post(
+            export_country_history_search_url,
+            data={
+                'company': uuid4(),
+            },
+        )
+        assert response.status_code == expected_status
 
     def test_export_country_history_search_with_empty_request(self, es_with_collector):
         """Should return 400."""
