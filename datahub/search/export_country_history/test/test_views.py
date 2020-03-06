@@ -195,8 +195,8 @@ class TestSearchExportCountryHistory(APITestMixin):
         (
             # default sorting
             ({}, True),
-            ({'sortby': 'history_date:asc'}, False),
-            ({'sortby': 'history_date:desc'}, True),
+            ({'sortby': 'date:asc'}, False),
+            ({'sortby': 'date:desc'}, True),
         ),
     )
     def test_sorts_results(self, es_with_collector, request_args, is_reversed):
