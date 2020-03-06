@@ -112,6 +112,11 @@ class SearchBasicAPIView(APIView):
     http_method_names = ('get',)
     schema = SearchBasicStubSchema()
 
+    fields_to_exclude = (
+        'export_countries',
+        'were_countries_discussed',
+    )
+
     def get(self, request, format=None):
         """Performs basic search."""
         serializer = BasicSearchQuerySerializer(data=request.query_params)
@@ -124,6 +129,7 @@ class SearchBasicAPIView(APIView):
             permission_filters_by_entity=dict(_get_permission_filters(request)),
             offset=validated_params['offset'],
             limit=validated_params['limit'],
+            fields_to_exclude=self.fields_to_exclude,
         )
 
         results = execute_search_query(query)
