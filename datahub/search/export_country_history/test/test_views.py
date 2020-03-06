@@ -48,6 +48,42 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()['non_field_errors'][0] == error_response
 
+    def test_export_country_history_response_body(self, es_with_collector):
+        """Test the format of an export country history result in the response body."""
+        history_object = CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT)
+        es_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            export_country_history_search_url,
+            data={
+                # The view requires a filter
+                'company': history_object.company.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        assert len(results) == 1
+        assert results[0] == {
+            'company': {
+                'id': str(history_object.company.pk),
+                'name': history_object.company.name,
+            },
+            'country': {
+                'id': str(history_object.country.pk),
+                'name': history_object.country.name,
+            },
+            'date': history_object.history_date.isoformat(),
+            'history_date': history_object.history_date.isoformat(),
+            'history_type': history_object.history_type,
+            'history_user': {
+                'id': str(history_object.history_user.pk),
+                'name': history_object.history_user.name,
+            },
+            'id': str(history_object.pk),
+            'status': history_object.status,
+        }
+
     @pytest.mark.parametrize(
         'factory',
         (
