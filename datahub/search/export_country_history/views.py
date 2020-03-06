@@ -2,7 +2,6 @@ from elasticsearch_dsl.query import Term
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
 from datahub.company.models import CompanyExportCountryHistory as DBCompanyExportCountryHistory
-from datahub.interaction.models import Interaction as DBInteraction
 from datahub.oauth.scopes import Scope
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
@@ -52,13 +51,10 @@ class ExportCountryHistoryView(SearchAPIView):
             - history_type: [INSERT, DELETE]
         """
         base_query = super().get_base_query(request, validated_data)
-        is_relevant_interaction = (
-            Term(were_countries_discussed=True) & Term(kind=DBInteraction.Kind.INTERACTION)
-        )
-        is_relevant_history_entry = Term(
-            history_type=DBCompanyExportCountryHistory.HistoryType.INSERT,
-        ) | Term(
-            history_type=DBCompanyExportCountryHistory.HistoryType.DELETE,
+        is_relevant_interaction = Term(were_countries_discussed=True)
+        is_relevant_history_entry = (
+            Term(history_type=DBCompanyExportCountryHistory.HistoryType.INSERT)
+            | Term(history_type=DBCompanyExportCountryHistory.HistoryType.DELETE)
         )
 
         return base_query.filter(is_relevant_interaction | is_relevant_history_entry)
