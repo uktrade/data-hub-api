@@ -35,6 +35,7 @@ class CompanyPermission(StrEnum):
     export_company = 'export_company'
     add_company = 'add_company'
     change_company = 'change_company'
+    view_export_win = 'view_export_win'
     # Indicates that the user can assign regional One List account managers to companies
     change_regional_account_manager = 'change_regional_account_manager'
 
@@ -284,6 +285,7 @@ class Company(ArchivableModel, BaseModel):
                 CompanyPermission.change_regional_account_manager.value,
                 'Can change regional account manager',
             ),
+            (CompanyPermission.view_export_win.value, 'Can view company export win'),
         )
         indexes = [
             # For datasets app which includes API endpoints to be consumed by data-flow
