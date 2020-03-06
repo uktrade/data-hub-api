@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
-from datahub.search.apps import get_search_apps
+from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
@@ -121,7 +121,7 @@ class SearchBasicAPIView(APIView):
         query = get_basic_search_query(
             entity=validated_params['entity'],
             term=validated_params['term'],
-            permission_filters_by_entity=dict(_get_permission_filters(request)),
+            permission_filters_by_entity=dict(_get_global_search_permission_filters(request)),
             offset=validated_params['offset'],
             limit=validated_params['limit'],
         )
@@ -138,14 +138,14 @@ class SearchBasicAPIView(APIView):
         return Response(data=response)
 
 
-def _get_permission_filters(request):
+def _get_global_search_permission_filters(request):
     """
     Gets the permissions filters that should be applied to each search entity (to enforce
-    permissions).
+    permissions) in global search.
 
-    Only entities that the user has access are returned.
+    Only global search entities that the user has access to are returned.
     """
-    for app in get_search_apps():
+    for app in get_global_search_apps_as_mapping().values():
         if not has_permissions_for_app(request, app):
             continue
 
