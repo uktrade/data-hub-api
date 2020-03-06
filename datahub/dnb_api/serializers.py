@@ -231,3 +231,37 @@ class DNBCompanyLinkSerializer(DUNSNumberSerializer):
     """
 
     company_id = NestedRelatedField('company.Company', required=True)
+
+
+class DNBCompanyChangeRequestSerializer(serializers.Serializer):
+    """
+    Validate POST data for DNBCompanyChangeRequestView.
+    """
+
+    duns_number = serializers.CharField(
+        write_only=True,
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator,),
+    )
+    changes = serializers.JSONField()
+
+    def validate_duns_number(self, duns_number):
+        """
+        A company with the given duns_number should exist in Data Hub.
+        """
+        if not Company.objects.filter(duns_number=duns_number).exists():
+            raise serializers.ValidationError(
+                f'Company with duns_number: {duns_number} does not exists in DataHub.',
+            )
+        return duns_number
+
+    def validate_changes(self, changes):
+        """
+        Empty changes is not valid.
+        """
+        if not changes:
+            raise serializers.ValidationError(
+                'No changes submitted.',
+            )
+        return changes
