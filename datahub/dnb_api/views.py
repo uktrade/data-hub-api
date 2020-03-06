@@ -18,6 +18,7 @@ from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
+    DNBCompanyChangeRequestSerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -31,6 +32,7 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidResponse,
     format_dnb_company_investigation,
     get_company,
+    request_changes,
     search_dnb,
 )
 from datahub.oauth.scopes import Scope
@@ -302,4 +304,112 @@ class DNBCompanyLinkView(APIView):
 
         return Response(
             CompanySerializer().to_representation(company),
+        )
+
+
+class DNBCompanyChangeRequestView(APIView):
+    """
+    View for requesting change/s to DNB companies.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    FIELD_MAPPING = [
+        # (data-hub-api fields, dnb-service fields)
+        ('name', 'primary_name'),
+        ('trading_names', 'trading_names'),
+        ('website', 'domain'),
+        ('number_of_employees', 'employee_number'),
+        ('turnover', 'annual_sales'),
+        ('turnover_currency', 'annual_sales_currency'),
+        ('address_line_1', 'address_line_1'),
+        ('address_line_2', 'address_line_2'),
+        ('address_town', 'address_town'),
+        ('address_county', 'address_county'),
+        ('address_country', 'address_country'),
+        ('address_postcode', 'address_postcode'),
+    ]
+
+    def _data_hub_to_dnb_service(self, changes):
+        """
+        Flatten the address fields and translate field names from data-hub
+        to dnb-service.
+        """
+        field_mapping = dict(self.FIELD_MAPPING)
+        address = changes.pop('address', {})
+        flat_changes = {
+            **changes,
+            **{
+                f'address_{address_field}': address_value
+                for address_field, address_value in address.items()
+            },
+        }
+
+        return {
+            field_mapping[field]: value
+            for field, value in flat_changes.items()
+        }
+
+    def _dnb_service_to_data_hub(self, changes):
+        """
+        Change field names from dnb-service to data-hub & un-flatten
+        address fields if any.
+        """
+        field_mapping = dict([(dnb, dh) for dh, dnb in self.FIELD_MAPPING])
+        flat_changes = {
+            field_mapping[field]: value
+            for field, value in changes.items()
+        }
+
+        datahub_changes = {'address': {}}
+        for field, value in flat_changes.items():
+            if field.startswith('address_'):
+                address_field = field.replace('address_', '')
+                datahub_changes['address'][address_field] = value
+            else:
+                datahub_changes[field] = value
+        if not datahub_changes['address']:
+            datahub_changes.pop('address')
+
+        return datahub_changes
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        change_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
+        change_serializer.is_valid(raise_exception=True)
+        duns_number = change_serializer.validated_data['duns_number']
+        changes = change_serializer.validated_data['changes']
+        changes['turnover_currency'] = 'GBP'
+        try:
+            response = request_changes(
+                duns_number,
+                self._data_hub_to_dnb_service(changes),
+            )
+        except (
+            DNBServiceConnectionError,
+            DNBServiceInvalidResponse,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        except DNBServiceInvalidRequest as exc:
+            raise APIBadRequestException(str(exc))
+
+        response_changes = response.pop('changes', {})
+        return Response(
+            {
+                **response,
+                **{'changes': self._dnb_service_to_data_hub(response_changes)},
+            },
         )
