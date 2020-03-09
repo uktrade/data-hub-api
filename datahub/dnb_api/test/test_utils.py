@@ -780,6 +780,36 @@ class TestRequestChange:
                 },
             ),
 
+            # No website
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'name': 'Foo Bar',
+                    },
+                },
+            ),
         ),
     )
     def test_valid(
