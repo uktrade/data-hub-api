@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(oauth2_settings.APPLICATION_MODEL),
-        ('oauth2_provider', '0005_auto_20170514_1141'),
+        ('oauth2_provider', '0001_initial'),
     ]
 
     operations = [
