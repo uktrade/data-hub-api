@@ -86,7 +86,7 @@ class TestOAuthScopeBackend:
             data=urlencode(data),
             content_type='application/x-www-form-urlencoded',
         )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'error': 'invalid_scope',
         }
