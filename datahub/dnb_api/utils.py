@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 import reversion
 from django.conf import settings
@@ -14,6 +15,7 @@ from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
+    CHANGE_REQUEST_FIELD_MAPPING,
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import Country
@@ -389,3 +391,112 @@ def rollback_dnb_company_update(
         for field, value in fields.items():
             setattr(company, field, value)
         company.save(update_fields=fields)
+
+
+def _format_change_request_for_dnb_service(datahub_changes):
+    """
+    Flatten the address fields and translate field names from data-hub
+    to dnb-service.
+    """
+    field_mapping = dict(CHANGE_REQUEST_FIELD_MAPPING)
+
+    # Flatten address
+    address = datahub_changes.pop('address', {})
+    flat_datahub_changes = {
+        **datahub_changes,
+        **{
+            f'address_{address_field}': address_value
+            for address_field, address_value in address.items()
+        },
+    }
+
+    # Get domain from website
+    if flat_datahub_changes.get('website'):
+        flat_datahub_changes['website'] = urlparse(
+            flat_datahub_changes['website'],
+        ).netloc
+
+    return {
+        field_mapping[field]: value
+        for field, value in flat_datahub_changes.items()
+    }
+
+
+def _format_change_request_for_datahub(dnb_service_changes):
+    """
+    Change field names from dnb-service to data-hub & un-flatten
+    address fields if any.
+    """
+    field_mapping = dict([(dnb, dh) for dh, dnb in CHANGE_REQUEST_FIELD_MAPPING])
+    flat_datahub_changes = {
+        field_mapping[field]: value
+        for field, value in dnb_service_changes.items()
+    }
+
+    # Get website from domain
+    if flat_datahub_changes.get('website'):
+        flat_datahub_changes['website'] = f'https://{flat_datahub_changes["website"]}'
+
+    # Un-flatten address
+    datahub_changes = {'address': {}}
+    for field, value in flat_datahub_changes.items():
+        if field.startswith('address_'):
+            address_field = field.replace('address_', '')
+            datahub_changes['address'][address_field] = value
+        else:
+            datahub_changes[field] = value
+    if not datahub_changes['address']:
+        datahub_changes.pop('address')
+
+    return datahub_changes
+
+
+def _request_changes(payload):
+    """
+    Submit change request to dnb-service.
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+    response = api_client.request(
+        'POST',
+        'change-request/',
+        json=payload,
+        timeout=3.0,
+    )
+    return response
+
+
+def request_changes(duns_number, changes):
+    """
+    Submit change request for the company with the given duns_number
+    and changes to the dnb-service.
+    """
+    try:
+        dnb_response = _request_changes(
+            {
+                'duns_number': duns_number,
+                'changes': _format_change_request_for_dnb_service(changes),
+            },
+        )
+
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        logger.error(error_message)
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        logger.error(error_message)
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if dnb_response.status_code != status.HTTP_201_CREATED:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        logger.error(error_message)
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    dnb_response_payload = dnb_response.json()
+    changes = dnb_response_payload.pop('changes', {})
+    return {
+        **dnb_response_payload,
+        **{'changes': _format_change_request_for_datahub(changes)},
+    }

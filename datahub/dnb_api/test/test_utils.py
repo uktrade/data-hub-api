@@ -4,6 +4,8 @@ from uuid import UUID
 import pytest
 import reversion
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import (
@@ -28,6 +30,7 @@ from datahub.dnb_api.utils import (
     format_dnb_company,
     get_company,
     get_company_update_page,
+    request_changes,
     RevisionNotFoundError,
     rollback_dnb_company_update,
     update_company_from_dnb,
@@ -39,6 +42,7 @@ pytestmark = pytest.mark.django_db
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
+DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 
 
 @pytest.mark.parametrize(
@@ -636,3 +640,268 @@ class TestFormatDNBCompany:
         company = format_dnb_company(dnb_company)
         assert company['turnover'] is None
         assert company['is_turnover_estimated'] is None
+
+
+class TestRequestChange:
+    """
+    Tests for request_changes function.
+    """
+
+    @pytest.mark.parametrize(
+        'change_request, dnb_response, datahub_response',
+        (
+
+            # All valid fields
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'postcode': 'W1 0TN',
+                            'country': 'GB',
+                        },
+                        'number_of_employees': 100,
+                        'turnover': 1000,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                        'annual_sales_currency': 'GBP',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'postcode': 'W1 0TN',
+                            'country': 'GB',
+                        },
+                        'number_of_employees': 100,
+                        'turnover': 1000,
+                        'turnover_currency': 'GBP',
+                    },
+                },
+            ),
+
+            # No address fields
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'example.com',
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'website': 'https://example.com',
+                    },
+                },
+            ),
+
+            # Website - domain
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'https://example.com/hello',
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'website': 'https://example.com',
+                    },
+                },
+            ),
+
+        ),
+    )
+    def test_valid(
+        self,
+        requests_mock,
+        change_request,
+        dnb_response,
+        datahub_response,
+    ):
+        """
+        The function should return 200 as well as a valid response
+        when it is hit with a valid payload.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
+
+        response = request_changes(**change_request)
+
+        assert response == datahub_response
+
+    @pytest.mark.parametrize(
+        'dnb_response_status',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+        ),
+    )
+    def test_dnb_service_error(
+        self,
+        caplog,
+        requests_mock,
+        dnb_response_status,
+    ):
+        """
+        The  endpoint should return 502 if the upstream
+        `dnb-service` returns an error.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=dnb_response_status,
+        )
+
+        with pytest.raises(DNBServiceError) as e:
+            request_changes(
+                '123456789',
+                {'website': 'www.example.com'},
+            )
+
+        expected_message = f'DNB service returned an error status: {dnb_response_status}'
+
+        assert e.value.args[0] == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                ConnectTimeout,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+            (
+                ReadTimeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_request_error(
+        self,
+        caplog,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we log it and raise the
+        exception with an appropriate message.
+        """
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            exc=request_exception,
+        )
+
+        with pytest.raises(expected_exception) as e:
+            request_changes(
+                '123456789',
+                {'website': 'www.example.com'},
+            )
+
+        assert e.value.args[0] == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_no_dnb_setting(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            request_changes('123456789', {})

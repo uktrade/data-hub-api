@@ -41,3 +41,19 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     'global_ultimate_duns_number',
     'company_number',
 )
+
+CHANGE_REQUEST_FIELD_MAPPING = [
+    # (data-hub-api fields, dnb-service fields)
+    ('name', 'primary_name'),
+    ('trading_names', 'trading_names'),
+    ('number_of_employees', 'employee_number'),
+    ('turnover', 'annual_sales'),
+    ('turnover_currency', 'annual_sales_currency'),
+    ('address_line_1', 'address_line_1'),
+    ('address_line_2', 'address_line_2'),
+    ('address_town', 'address_town'),
+    ('address_county', 'address_county'),
+    ('address_country', 'address_country'),
+    ('address_postcode', 'address_postcode'),
+    ('website', 'domain'),
+]
