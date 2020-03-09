@@ -64,7 +64,7 @@ ipython==7.13.0           # via -r requirements.in
 jedi==0.15.2              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.6.7              # via -r requirements.in, celery
+kombu==4.6.8              # via -r requirements.in, celery
 mail-parser==3.12.0       # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
