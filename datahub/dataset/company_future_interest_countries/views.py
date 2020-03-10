@@ -1,7 +1,4 @@
 from datahub.company.models import CompanyExportCountry
-from datahub.dataset.company_future_interest_countries.pagination import (
-    CompanyFutureInterestCountriesDatasetViewCursorPagination,
-)
 from datahub.dataset.core.views import BaseDatasetView
 
 
@@ -13,8 +10,6 @@ class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
     then be queried to create custom reports for users.
     """
 
-    pagination_class = CompanyFutureInterestCountriesDatasetViewCursorPagination
-
     def get_dataset(self):
         """Returns list of Company Future Interest Countries  records"""
         return CompanyExportCountry.objects.filter(
@@ -24,4 +19,5 @@ class CompanyFutureInterestCountriesDatasetView(BaseDatasetView):
             'company_id',
             'country__name',
             'country__iso_alpha2_code',
+            'created_on',
         )

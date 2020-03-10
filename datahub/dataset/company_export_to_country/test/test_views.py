@@ -1,51 +1,26 @@
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.company.models import CompanyExportCountry
-from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
-from datahub.core.test.factories import to_many_field
+from datahub.company.test.factories import CompanyExportCountryFactory
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.dataset.core.test import BaseDatasetViewTest
 
 
-class CompanyWithExportToCountriesFactory(CompanyFactory):
-    """Extends Company Factory to provide a export_to_countries"""
-
-    @to_many_field
-    def export_countries(self):
-        """Return stubbed export countries"""
-        return [
-            CompanyExportCountryFactory(
-                status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            ),
-        ]
-
-
-def get_expected_data_from_company(company):
+def get_expected_data_from_export_country(export_country):
     """
-    Returns company export_countries data with status `currently_exporting`
+    Returns company export_countries data with status `future_interest`
     as a list of dictionaries
     """
-    values = company.export_countries.filter(
-        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-    ).values(
-        'id',
-        'company_id',
-        'country__name',
-        'country__iso_alpha2_code',
-    )
-    expected = []
-    for value in values:
-        expected.append(
-            {
-                'id': str(value['id']),
-                'company_id': str(value['company_id']),
-                'country__name': value['country__name'],
-                'country__iso_alpha2_code': value['country__iso_alpha2_code'],
-            },
-        )
-    expected = sorted(expected, key=lambda x: x['id'])
-    return expected
+    return {
+        'id': str(export_country.pk),
+        'company_id': str(export_country.company_id),
+        'country__name': export_country.country.name,
+        'country__iso_alpha2_code': export_country.country.iso_alpha2_code,
+        'created_on': format_date_or_datetime(export_country.created_on),
+    }
 
 
 @pytest.mark.django_db
@@ -57,41 +32,49 @@ class TestCompanyExportToCountriesDatasetViewSet(BaseDatasetViewTest):
     factory = CompanyExportCountryFactory
     view_url = reverse('api-v4:dataset:company-export-to-countries-dataset')
 
+    def test_response_body(self, data_flow_api_client):
+        """Test that endpoint returns the expected data for a single export country."""
+        export_country = self.factory()
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_export_country(export_country)
+        assert result == expected_result
+
     @pytest.mark.parametrize(
-        'company_factory', (
-            CompanyFactory,
-            CompanyWithExportToCountriesFactory,
+        'export_country_status',
+        (
+            CompanyExportCountry.Status.FUTURE_INTEREST,
+            CompanyExportCountry.Status.NOT_INTERESTED,
         ),
     )
-    def test_company_with_no_export_to_country(self, data_flow_api_client, company_factory):
-        """Test that endpoint returns with expected data for a single company"""
-        company = company_factory()
+    def test_excludes_other_statuses(self, data_flow_api_client, export_country_status):
+        """Test that endpoint excludes other export country statuses."""
+        CompanyExportCountry(status=export_country_status)
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
-        response_results = response.json()['results']
-        expected_result = get_expected_data_from_company(company)
-        assert response_results == expected_result
+        assert response.json()['results'] == []
 
     def test_with_multiple_records(self, data_flow_api_client):
-        """Test that endpoint returns correct number of records"""
-        company1 = CompanyFactory()
-        company2 = CompanyFactory()
-
-        CompanyExportCountryFactory.create_batch(2, company=company2)
-        company3 = CompanyFactory()
-
-        CompanyExportCountryFactory.create(company=company3)
-        company4 = CompanyFactory()
+        """Test the ordering of results."""
+        with freeze_time('2019-01-01 12:30:00'):
+            export_country_1 = self.factory()
+        with freeze_time('2019-01-03 12:00:00'):
+            export_country_2 = self.factory()
+        with freeze_time('2019-01-01 12:00:00'):
+            export_country_3 = self.factory()
+            export_country_4 = self.factory()
 
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
-        response_results = sorted(response_results, key=lambda x: x['id'])
-        assert len(response_results) == 3
-
-        companies = [company1, company2, company3, company4]
-        expected_results = []
-        for company in companies:
-            expected_results.extend(get_expected_data_from_company(company))
-        expected_results = sorted(expected_results, key=lambda x: x['id'])
-        assert response_results == expected_results
+        assert len(response_results) == 4
+        expected_results = [
+            *sorted([export_country_3, export_country_4], key=lambda x: x.pk),
+            export_country_1,
+            export_country_2,
+        ]
+        for index, export_country in enumerate(expected_results):
+            assert str(export_country.id) == response_results[index]['id']
