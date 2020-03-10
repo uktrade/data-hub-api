@@ -51,13 +51,14 @@ class TestValidateViewAttributes:
 
     def test_validate_composite_filter_fields(self, search_view):
         """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
-        mapping = search_view.search_app.es_model._doc_type.mapping
+        entities = search_view().get_entities()
+        mappings = [entity._doc_type.mapping for entity in entities]
 
         invalid_fields = {
             field
             for field_list in search_view.COMPOSITE_FILTERS.values()
             for field in field_list
-            if not mapping.resolve_field(field)
+            if not any(mapping.resolve_field(field) for mapping in mappings)
             and field not in search_view.search_app.es_model.PREVIOUS_MAPPING_FIELDS
         }
 
