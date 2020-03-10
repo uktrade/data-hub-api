@@ -3,6 +3,7 @@ from django.db.models import Prefetch
 from datahub.interaction.models import (
     Interaction as DBInteraction,
     InteractionDITParticipant,
+    InteractionExportCountry,
     InteractionPermission,
 )
 from datahub.search.apps import SearchApp
@@ -38,5 +39,9 @@ class InteractionSearchApp(SearchApp):
         Prefetch(
             'dit_participants',
             queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
+        ),
+        Prefetch(
+            'export_countries',
+            queryset=InteractionExportCountry.objects.select_related('country'),
         ),
     )
