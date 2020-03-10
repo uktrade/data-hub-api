@@ -1,4 +1,3 @@
-from unittest.mock import patch
 from urllib.parse import urlencode
 
 import pytest
@@ -12,11 +11,9 @@ from datahub.oauth.admin.test.utils import (
     get_request_with_session,
 )
 from datahub.oauth.admin.utils import (
-    fetch_oauth2_state,
     get_access_token,
     get_adviser_by_sso_user_profile,
     get_sso_user_profile,
-    store_oauth2_state,
 )
 
 pytestmark = pytest.mark.django_db
@@ -156,41 +153,3 @@ def test_get_adviser_by_sso_email_non_staff_or_active(flags):
         get_adviser_by_sso_user_profile({'email': 'some@email'})
 
     assert excinfo.value.detail == 'User not found.'
-
-
-@patch('datahub.oauth.admin.utils.cache')
-def test_store_oauth2_state(cache):
-    """Tests that store is being called with correct parameters."""
-    store_oauth2_state('1234', {'state': 1234}, 3600)
-
-    cache.set.assert_called_with(
-        'oauth2-state:1234',
-        {'state': 1234},
-        timeout=3600,
-    )
-
-
-@patch('datahub.oauth.admin.utils.cache')
-def test_store_oauth2_without_state(cache):
-    """Tests that ValueError is raised of state ID is not provided when storing the state."""
-    with pytest.raises(ValueError) as excinfo:
-        store_oauth2_state(None, {}, 3600)
-
-    assert str(excinfo.value) == 'A state ID is required.'
-
-
-@patch('datahub.oauth.admin.utils.cache')
-def test_fetch_oauth2_state(cache):
-    """Tests that store is being called with correct parameters."""
-    fetch_oauth2_state('1234')
-
-    cache.get.assert_called_with('oauth2-state:1234')
-
-
-@patch('datahub.oauth.admin.utils.cache')
-def test_fetch_oauth2_without_state(cache):
-    """Tests that ValueError is raised of state ID is not provided when storing the state."""
-    with pytest.raises(ValueError) as excinfo:
-        fetch_oauth2_state(None)
-
-    assert str(excinfo.value) == 'A state ID is required.'

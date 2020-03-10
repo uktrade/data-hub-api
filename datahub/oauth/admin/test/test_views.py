@@ -1,6 +1,6 @@
+from secrets import token_urlsafe
 from unittest.mock import patch
 from urllib.parse import urlencode, urljoin
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -13,16 +13,15 @@ from datahub.oauth.admin.test.utils import (
     extract_next_url_from_url,
     get_request_with_session,
 )
-from datahub.oauth.admin.utils import store_oauth2_state
 from datahub.oauth.admin.views import callback, login, logout
 
 pytestmark = pytest.mark.django_db
 
 
-@patch('datahub.oauth.admin.views.uuid4')
-def test_login_view_redirects_to_sso_auth_url(_uuid4):
+@patch('datahub.oauth.admin.views.token_urlsafe')
+def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):
     """Tests that login view redirects to Staff SSO Auth URL."""
-    _uuid4.return_value = UUID('d20141b7-2dcf-445f-9875-e3e6a2d610a4')
+    _token_urlsafe.return_value = 'aZFsiJfbDLF9bwve8f2HTBeC1rCnhFUn4K6c_iq-wLo'
 
     request = get_request_with_session(reverse('admin:login'))
     response = login(request)
@@ -31,7 +30,7 @@ def test_login_view_redirects_to_sso_auth_url(_uuid4):
         'response_type': 'code',
         'client_id': settings.ADMIN_OAUTH2_CLIENT_ID,
         'redirect_uri': request.build_absolute_uri(reverse('admin_oauth_callback')),
-        'state': str(_uuid4.return_value),
+        'state': _token_urlsafe.return_value,
         'idp': 'cirrus',
     }
 
@@ -40,7 +39,7 @@ def test_login_view_redirects_to_sso_auth_url(_uuid4):
 
     assert response.status_code == status.HTTP_302_FOUND
     assert response.url == expected_url
-    assert request.session['oauth.state'] == str(_uuid4.return_value)
+    assert request.session['oauth.state'] == _token_urlsafe.return_value
 
 
 def test_login_view_redirects_with_next_url():
@@ -78,7 +77,8 @@ def test_logout():
     """Test that logout view clears session data and redirects to SSO Logout URL."""
     request = get_request_with_session(reverse('admin:logout'))
 
-    request.session['oauth.state'] = 'oauth.state'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
+    request.session['oauth.state'] = fake_state_id
 
     response = logout(request)
     assert response.status_code == status.HTTP_302_FOUND
@@ -115,8 +115,10 @@ def test_callback_without_state_includes_next_url():
 
 def test_callback_with_state_mismatch():
     """Test that a callback without matching state will return an error page."""
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
+
     request = get_request_with_session('/oauth/callback/?state=wrong-one')
-    request.session['oauth.state'] = 'original'
+    request.session['oauth.state'] = fake_state_id
     response = callback(request)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -129,8 +131,10 @@ def test_callback_with_state_mismatch():
 
 def test_callback_without_access_code():
     """Test that a callback without a code will return an error page."""
-    request = get_request_with_session('/oauth/callback/?state=original')
-    request.session['oauth.state'] = 'original'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
+
+    request = get_request_with_session(f'/oauth/callback/?state={fake_state_id}')
+    request.session['oauth.state'] = fake_state_id
     response = callback(request)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -148,8 +152,10 @@ def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
     get_sso_user_profile.return_value = {'email': 'some@email'}
 
-    request = get_request_with_session('/oauth/callback/?state=original&code=code')
-    request.session['oauth.state'] = 'original'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
+
+    request = get_request_with_session(f'/oauth/callback/?state={fake_state_id}&code=code')
+    request.session['oauth.state'] = fake_state_id
     response = callback(request)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -204,15 +210,14 @@ def test_callback_requests_sso_profile_valid_email(get_sso_user_profile, get_acc
     """
     Test that if SSO user has a matching email (and relevant flags), then the access is granted.
     """
-    fake_state_id = 'd20141b7-2dcf-445f-9875-e3e6a2d610a4'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
     adviser = AdviserFactory(email='some@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
     get_sso_user_profile.return_value = {'email': 'some@email'}
 
-    store_oauth2_state(fake_state_id, {}, 3600)
-
     request = get_request_with_session(f'/oauth/callback/?state={fake_state_id}&code=code')
+
     request.session['oauth.state'] = fake_state_id
 
     response = callback(request)
@@ -227,7 +232,7 @@ def test_callback_requests_sso_profile_valid_email(get_sso_user_profile, get_acc
 @patch('datahub.oauth.admin.views.get_sso_user_profile')
 def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
     """Test that successful login redirects user to `next_url`."""
-    fake_state_id = 'd20141b7-2dcf-445f-9875-e3e6a2d610a4'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
     AdviserFactory(email='some@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
@@ -256,7 +261,7 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
 )
 def test_callback_validates_next_url(get_sso_user_profile, get_access_token, dangerous_redirect):
     """Test that successful login redirects user to `next_url`."""
-    fake_state_id = 'd20141b7-2dcf-445f-9875-e3e6a2d610a4'
+    fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
     AdviserFactory(email='some@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
