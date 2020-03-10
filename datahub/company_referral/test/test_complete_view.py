@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.utils import format_expected_adviser
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import (
     ClosedCompanyReferralFactory,
@@ -17,6 +18,7 @@ from datahub.company_referral.test.factories import (
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
+    format_date_or_datetime,
     random_obj_for_model,
     resolve_objects,
 )
@@ -244,7 +246,94 @@ class TestCompleteCompanyReferral(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
 
+        response_data = response.json()
         referral.refresh_from_db()
+        interaction = referral.interaction
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': Interaction.Kind.INTERACTION.value,
+            'status': Interaction.Status.COMPLETE.value,
+            'theme': interaction.theme,
+            'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'net_company_receipt': None,
+            'policy_areas': [],
+            'policy_feedback_notes': '',
+            'policy_issue_types': [],
+            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+            'communication_channel': {
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name,
+            },
+            'subject': interaction.subject,
+            'date': interaction.date.date().isoformat(),
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'last_name': dit_participant.adviser.last_name,
+                        'name': dit_participant.adviser.name,
+                    },
+                    'team': {
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
+                    },
+                }
+                for dit_participant in interaction.dit_participants.order_by('pk')
+            ],
+            'notes': interaction.notes,
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+            },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                }
+                for contact in interaction.contacts.order_by('pk')
+            ],
+            'event': None,
+            'service': {
+                'id': str(interaction.service.pk),
+                'name': interaction.service.name,
+            },
+            'service_answers': None,
+            'investment_project': None,
+            'archived_documents_url_path': interaction.archived_documents_url_path,
+            'were_countries_discussed': interaction.were_countries_discussed,
+            'export_countries': [],
+            'created_by': {
+                'id': str(interaction.created_by.pk),
+                'first_name': interaction.created_by.first_name,
+                'last_name': interaction.created_by.last_name,
+                'name': interaction.created_by.name,
+            },
+            'modified_by': {
+                'id': str(interaction.modified_by.pk),
+                'first_name': interaction.modified_by.first_name,
+                'last_name': interaction.modified_by.last_name,
+                'name': interaction.modified_by.name,
+            },
+            'created_on': format_date_or_datetime(FROZEN_DATETIME),
+            'modified_on': format_date_or_datetime(FROZEN_DATETIME),
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+            'company_referral': {
+                'id': str(referral.pk),
+                'subject': referral.subject,
+                'created_by': format_expected_adviser(referral.created_by),
+                'created_on': format_date_or_datetime(referral.created_on),
+                'recipient': format_expected_adviser(referral.recipient),
+            },
+        }
 
         assert referral.status == CompanyReferral.Status.COMPLETE
         assert referral.completed_by == self.user
