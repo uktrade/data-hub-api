@@ -1,1 +1,0 @@
-A new stub endpoint `GET /v4/<id>/export-win` was added for an upcoming feature that will return export wins for a company. At the moment this endpoint is *not* functional and will return a 501 status code if called.
