@@ -1,1 +1,0 @@
-The ability to merge companies (in the admin site) that have export countries was restored. Note that the merging tool doesn't modify export countries on either company; these can be manually updated after the merge if needed.
