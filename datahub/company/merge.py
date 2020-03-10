@@ -3,7 +3,12 @@ from typing import Callable, NamedTuple, Sequence, Type
 
 from django.db import models
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import (
+    Company,
+    CompanyExportCountry,
+    CompanyExportCountryHistory,
+    Contact,
+)
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
@@ -13,7 +18,11 @@ from datahub.omis.order.models import Order
 from datahub.user.company_list.models import CompanyListItem
 
 
+# Merging is not allowed if the source company has any relations that aren't in
+# this list. This is to avoid references to the source company being inadvertently
+# left behind.
 ALLOWED_RELATIONS_FOR_MERGING = {
+    # These relations are moved to the target company on merge
     Company._meta.get_field('company_list_items').remote_field,
     CompanyReferral.company.field,
     Contact.company.field,
@@ -22,6 +31,12 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
     Order.company.field,
+
+    # Merging is allowed if the source company has export countries, but note that
+    # they aren't moved to the target company (these can be manually moved in
+    # the front end if required)
+    CompanyExportCountry.company.field,
+    CompanyExportCountryHistory.company.field,
 }
 
 

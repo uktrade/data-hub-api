@@ -28,7 +28,6 @@ class TestUserView(APITestMixin):
 
         group = GroupFactory()
         group.permissions.add(permissions[0])
-
         role = TeamRoleFactory(name='Test Role')
 
         team = TeamFactory(name='Test Team', role=role)
@@ -48,9 +47,9 @@ class TestUserView(APITestMixin):
             response_data['permissions'].sort()
 
         expected_permissions = [
-            'admin.add_cats',
-            'admin.view_ipsum',
-            'admin.view_lorem',
+            f'{content_type.app_label}.add_cats',
+            f'{content_type.app_label}.view_ipsum',
+            f'{content_type.app_label}.view_lorem',
         ]
 
         assert response_data == {

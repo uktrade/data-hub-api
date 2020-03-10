@@ -15,6 +15,8 @@ from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     AdviserFactory,
     ArchivedCompanyFactory,
+    CompanyExportCountryFactory,
+    CompanyExportCountryHistoryFactory,
     CompanyFactory,
     ContactFactory,
 )
@@ -418,6 +420,36 @@ class TestDuplicateCompanyMerger:
             company=source_company,
         ).exists()
         assert CompanyListItem.objects.filter(list=company_list, company=target_company).exists()
+
+    def test_merge_allowed_when_source_company_has_export_countries(self):
+        """Test that merging is allowed if the source company has export countries."""
+        source_company = CompanyFactory()
+        CompanyExportCountryFactory(company=source_company)
+        CompanyExportCountryHistoryFactory(company=source_company)
+
+        target_company = CompanyFactory()
+        user = AdviserFactory()
+
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_companies(source_company, target_company, user)
+
+        source_company.refresh_from_db()
+
+        assert source_company.archived
+        assert source_company.archived_by == user
+        assert source_company.archived_on == merge_time
+        assert source_company.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_company} for the following reason: Duplicate record.'
+        )
+        assert source_company.modified_by == user
+        assert source_company.modified_on == merge_time
+        assert source_company.transfer_reason == Company.TransferReason.DUPLICATE
+        assert source_company.transferred_by == user
+        assert source_company.transferred_on == merge_time
+        assert source_company.transferred_to == target_company
 
     @pytest.mark.parametrize(
         'valid_source,valid_target',

@@ -3,6 +3,7 @@ from django.urls import path
 from datahub.company.views import (
     CompanyAuditViewSet,
     CompanyViewSet,
+    export_wins_501_not_implemented,
     OneListGroupCoreTeamViewSet,
     PublicCompanyViewSet,
 )
@@ -70,6 +71,11 @@ urls = [
         'company/<uuid:pk>/export-detail',
         update_export_detail,
         name='update-export-detail',
+    ),
+    path(
+        'company/<uuid:pk>/export-win',
+        export_wins_501_not_implemented,
+        name='export-win',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]

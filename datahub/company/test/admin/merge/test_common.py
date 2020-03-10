@@ -42,11 +42,10 @@ class TestCompanyAdminPermissions(AdminTestMixin):
 
         client = Client()
         request_func = getattr(client, method)
-        response = request_func(url, follow=True)
+        response = request_func(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     @pytest.mark.parametrize(
         'route_name,method',
@@ -81,11 +80,10 @@ class TestCompanyAdminPermissions(AdminTestMixin):
         client = self.create_client(user=user)
         request_func = getattr(client, method)
 
-        response = request_func(url, follow=True)
+        response = request_func(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     @pytest.mark.parametrize(
         'route_name,method',
