@@ -26,11 +26,10 @@ class TestCancelOrderAdmin(AdminTestMixin):
         url = reverse('admin:order_order_cancel', args=(OrderFactory().pk,))
 
         client = Client()
-        response = client.post(url, data={}, follow=True)
+        response = client.post(url, data={})
 
-        assert response.status_code == 200
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == 302
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_403_if_no_permissions(self):
         """Test 403 if user doesn't have enough permissions."""
