@@ -1,3 +1,20 @@
+# Data Hub API 28.2.0 (2020-03-10)
+
+
+## Features
+
+- It is now possible to configure the application to use Staff SSO to log into the admin site.
+
+## Bug fixes
+
+- **Companies** The ability to merge companies (in the admin site) that have export countries was restored. Note that the merging tool doesn't modify export countries on either company; these can be manually updated after the merge if needed.
+
+## API
+
+- **Companies** The `POST /v4/company-referral/<ID>/complete` endpoint now returns the body of Interaction that has been created.
+- **Companies** A new stub endpoint `GET /v4/<id>/export-win` was added for an upcoming feature that will return export wins for a company. At the moment this endpoint is *not* functional and will return a 501 status code if called.
+
+
 # Data Hub API 28.1.0 (2020-03-05)
 
 

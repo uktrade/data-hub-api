@@ -11,13 +11,10 @@ class TestDocsSwaggerUIView(AdminTestMixin):
     def test_redirects_to_login_page_if_not_logged_in(self, client):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         url = reverse('api-docs:swagger-ui')
-        response = client.get(url, follow=True)
+        response = client.get(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain == [
-            (self.login_url_with_redirect(url), status.HTTP_302_FOUND),
-        ]
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_returns_200_if_authenticated(self, client):
         """Test that a 200 is returned if the user is authenticated via the admin site."""

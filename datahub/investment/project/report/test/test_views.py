@@ -20,10 +20,10 @@ class TestGetSPIReport(AdminTestMixin):
                 'pk': report.pk,
             },
         )
-        response = api_client.get(url, follow=True)
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_user_with_permission_can_get_report(self):
         """Test get report by a user with permission."""

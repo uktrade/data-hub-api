@@ -67,11 +67,10 @@ class TestContactAdminOptOutForm(AdminTestMixin):
             admin_urlname(Contact._meta, 'load-email-marketing-opt-outs'),
         )
         client = Client()
-        response = client.get(url, follow=True)
+        response = client.get(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_redirects_to_login_page_if_not_staff(self):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
@@ -81,11 +80,10 @@ class TestContactAdminOptOutForm(AdminTestMixin):
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
         client = self.create_client(user=user)
-        response = client.get(url, follow=True)
+        response = client.get(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_permission_denied_if_staff_and_without_change_permission(self):
         """

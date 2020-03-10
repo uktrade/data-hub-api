@@ -39,5 +39,13 @@ class APIUpstreamException(APIException):
     default_code = 'bad_gateway'
 
 
+class APINotImplementedException(APIException):
+    """DRF Exception for the 501 status code."""
+
+    status_code = status.HTTP_501_NOT_IMPLEMENTED
+    default_detail = _('Cannot process request due to functionality that is unimplemented.')
+    default_code = 'not_implemented'
+
+
 class SimulationRollback(Exception):
     """Used to roll back deletions during a simulation."""

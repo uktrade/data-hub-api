@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group, Permission
 from django.db.models import Exists, Prefetch, Q
 from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -33,6 +33,7 @@ from datahub.company.serializers import (
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.exceptions import APINotImplementedException
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -355,3 +356,13 @@ class AdviserReadOnlyViewSetV1(
             return filtered_queryset.order_by(*self._default_ordering)
 
         return filtered_queryset
+
+
+@api_view(['GET'])
+@permission_classes([HasPermissions(f'company.{CompanyPermission.view_export_win}')])
+def export_wins_501_not_implemented(request, pk):
+    """
+    Get company export wins.
+    The feature is not yet implemented.
+    """
+    raise APINotImplementedException('Retriving export wins in not yet implemented.')
