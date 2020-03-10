@@ -23,11 +23,11 @@ class TestReportAdmin(AdminTestMixin):
     def test_redirects_to_login_page_if_not_logged_in(self, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
-        response = client.get(url, follow=True)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        response = client.get(url)
+
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     @pytest.mark.parametrize(
         'url',
@@ -41,11 +41,10 @@ class TestReportAdmin(AdminTestMixin):
         user = create_test_user(is_staff=False, password=self.PASSWORD)
 
         client = self.create_client(user=user)
-        response = client.get(url, follow=True)
+        response = client.get(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.redirect_chain) == 1
-        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_200_if_staff(self):
         """Test that the view returns a 200 response if the user is an admin user."""

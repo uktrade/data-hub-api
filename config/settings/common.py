@@ -40,10 +40,22 @@ ALLOWED_HOSTS = ['*']
 USE_TZ = True
 TIME_ZONE = 'Etc/UTC'
 
+ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
+
+# If Django Admin OAuth2 authentication is enabled, we swap stock Django admin
+# with our own. We can only have either stock Django admin app or our OAuth2 admin app
+# enabled at a time.
+if ADMIN_OAUTH2_ENABLED:
+    _ADMIN_DJANGO_APP = []
+    _ADMIN_OAUTH2_APP = ['datahub.oauth.admin.apps.OAuthAdminConfig']
+else:
+    _ADMIN_DJANGO_APP = ['django.contrib.admin']
+    _ADMIN_OAUTH2_APP = []
+
 # Application definition
 
 DJANGO_APPS = [
-    'django.contrib.admin',
+    *_ADMIN_DJANGO_APP,
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -78,7 +90,7 @@ LOCAL_APPS = [
     'datahub.investment.investor_profile',
     'datahub.metadata',
     'datahub.oauth',
-    'datahub.oauth.admin.apps.OAuthAdminConfig',
+    *_ADMIN_OAUTH2_APP,
     'datahub.admin_report',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
@@ -221,9 +233,9 @@ AUTHENTICATION_BACKENDS = [
 
 # OAuth2 settings to authenticate Django admin users
 
-ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
 if ADMIN_OAUTH2_ENABLED:
     ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
+    ADMIN_OAUTH2_TOKEN_BYTE_LENGTH = 64
     ADMIN_OAUTH2_BASE_URL = env('ADMIN_OAUTH2_BASE_URL')
     ADMIN_OAUTH2_TOKEN_FETCH_PATH = env('ADMIN_OAUTH2_TOKEN_FETCH_PATH')
     ADMIN_OAUTH2_USER_PROFILE_PATH = env('ADMIN_OAUTH2_USER_PROFILE_PATH')
@@ -231,6 +243,13 @@ if ADMIN_OAUTH2_ENABLED:
     ADMIN_OAUTH2_CLIENT_ID = env('ADMIN_OAUTH2_CLIENT_ID')
     ADMIN_OAUTH2_CLIENT_SECRET = env('ADMIN_OAUTH2_CLIENT_SECRET')
     ADMIN_OAUTH2_LOGOUT_PATH = env('ADMIN_OAUTH2_LOGOUT_PATH')
+
+    authentication_middleware_label = 'django.contrib.auth.middleware.AuthenticationMiddleware'
+    authentication_middleware_index = MIDDLEWARE.index(authentication_middleware_label)
+    MIDDLEWARE.insert(
+        authentication_middleware_index + 1,
+        'datahub.oauth.admin.middleware.OAuthSessionMiddleware',
+    )
 
 # django-oauth-toolkit settings
 
