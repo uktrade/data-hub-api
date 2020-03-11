@@ -6,4 +6,4 @@ class CompanyExportCountryHistoryDatasetViewCursorPagination(DatasetCursorPagina
     Cursor Pagination for CompanyExportCountryHistory
     """
 
-    ordering = ('id', )
+    ordering = ('history_date', 'id')
