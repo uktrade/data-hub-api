@@ -44,6 +44,7 @@ class ExportCountryHistoryView(SearchAPIView):
         'contacts',
         'dit_participants',
         'export_countries',
+        'kind',
         'service',
         'subject',
     )
