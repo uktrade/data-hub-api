@@ -35,6 +35,7 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
         reverse('api-v4:dnb-api:company-create'),
         reverse('api-v4:dnb-api:company-create-investigation'),
         reverse('api-v4:dnb-api:company-link'),
+        reverse('api-v4:dnb-api:company-change-request'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -1287,3 +1288,67 @@ class TestCompanyLinkView(APITestMixin):
 
         for field in ALL_DNB_UPDATED_SERIALIZER_FIELDS:
             assert dh_company[field] == dnb_company[field]
+
+
+class TestCompanyChangeRequestView(APITestMixin):
+    """
+    Test POST `/dnb/company-change-request` endpoint.
+    """
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+        ),
+    )
+    def test_content_type(
+        self,
+        content_type,
+        expected_status_code,
+    ):
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            content_type=content_type,
+        )
+
+        assert response.status_code == expected_status_code
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.change_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_no_permission(
+        self,
+        permissions,
+    ):
+        """
+        The endpoint should return 403 if the user does not have the necessary permissions.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_501(self):
+        """
+        The endpoint should return 501 if called with the right content-type
+        and permissions.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED

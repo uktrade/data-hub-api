@@ -1,6 +1,7 @@
 from django.urls import path
 
 from datahub.dnb_api.views import (
+    DNBCompanyChangeRequestView,
     DNBCompanyCreateInvestigationView,
     DNBCompanyCreateView,
     DNBCompanyLinkView,
@@ -27,5 +28,10 @@ urlpatterns = [
         'company-link',
         DNBCompanyLinkView.as_view(),
         name='company-link',
+    ),
+    path(
+        'company-change-request',
+        DNBCompanyChangeRequestView.as_view(),
+        name='company-change-request',
     ),
 ]
