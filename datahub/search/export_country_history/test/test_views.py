@@ -176,6 +176,7 @@ class TestSearchExportCountryHistory(APITestMixin):
                 }
                 for export_country in interaction.export_countries.order_by('country__pk')
             ],
+            'kind': interaction.kind,
             'id': str(interaction.pk),
             'service': {
                 'id': str(interaction.service.pk),
