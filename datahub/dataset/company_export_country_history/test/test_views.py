@@ -3,6 +3,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.dataset.core.test import BaseDatasetViewTest
 
 
@@ -13,9 +14,7 @@ def get_expected_data_from_export_country_history(export_country_history):
         'company_id': str(export_country_history.company_id),
         'country__name': export_country_history.country.name,
         'country__iso_alpha2_code': export_country_history.country.iso_alpha2_code,
-        'history_date': export_country_history.history_date.strftime(
-            '%Y-%m-%dT%H:%M:%S.%fZ',
-        ),
+        'history_date': format_date_or_datetime(export_country_history.history_date),
         'history_type': export_country_history.history_type,
         'status': export_country_history.status,
     }
