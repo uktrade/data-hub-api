@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django.core.validators import integer_validator
 from rest_framework import serializers
 
@@ -9,9 +11,14 @@ from datahub.company.validators import (
     has_uk_establishment_number_prefix,
 )
 from datahub.core.constants import Country
-from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
+from datahub.core.serializers import (
+    NestedRelatedField,
+    PermittedFieldsModelSerializer,
+    RelaxedURLField,
+)
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
+from datahub.metadata.models import Country as CountryModel
 
 
 class SerializerNotPartial(Exception):
@@ -231,3 +238,100 @@ class DNBCompanyLinkSerializer(DUNSNumberSerializer):
     """
 
     company_id = NestedRelatedField('company.Company', required=True)
+
+
+class AddressRequestSerializer(serializers.Serializer):
+    """
+    Validate address and convert it to the format expected by dnb-service.
+    """
+
+    line_1 = serializers.CharField(source='address_line_1', required=False)
+    line_2 = serializers.CharField(source='address_line_2', required=False)
+    town = serializers.CharField(source='address_town', required=False)
+    county = serializers.CharField(source='address_county', required=False)
+    postcode = serializers.CharField(source='address_postcode', required=False)
+    country = NestedRelatedField(model=CountryModel, source='address_country', required=False)
+
+    def validate_country(self, country):
+        """
+        Return iso_alpha2_code only.
+        """
+        return country.iso_alpha2_code
+
+
+class ChangeRequestSerializer(serializers.Serializer):
+    """
+    Validate change requests and convert it to the format expected by dnb-service.
+    """
+
+    name = serializers.CharField(source='primary_name', required=False)
+    trading_names = serializers.ListField(required=False)
+    number_of_employees = serializers.IntegerField(source='employee_number', required=False)
+    turnover = serializers.IntegerField(source='annual_sales', required=False)
+    address = AddressRequestSerializer(required=False)
+    website = RelaxedURLField(source='domain', required=False)
+
+    def validate_website(self, website):
+        """
+        Change website to domain.
+        """
+        return urlparse(website).netloc
+
+
+class DNBCompanyChangeRequestSerializer(serializers.Serializer):
+    """
+    Validate POST data for DNBCompanyChangeRequestView and convert it to the format
+    expected by dnb-service.
+    """
+
+    duns_number = serializers.CharField(
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator,),
+    )
+
+    changes = ChangeRequestSerializer()
+
+    def validate_duns_number(self, duns_number):
+        """
+        Validate duns_number.
+        """
+        try:
+            company = Company.objects.get(duns_number=duns_number)
+        except Company.DoesNotExist:
+            raise serializers.ValidationError(
+                f'Company with duns_number: {duns_number} does not exists in DataHub.',
+            )
+        self.company = company
+        return duns_number
+
+    def validate_changes(self, changes):
+        """
+        Changes should not be empty.
+        """
+        if not changes:
+            raise serializers.ValidationError(
+                f'No changes submitted.',
+            )
+        return changes
+
+    def validate(self, data):
+        """
+        Augment address changes with unchanged address fields and un-nest address changes.
+        """
+        address_changes = data['changes'].pop('address', {})
+        if address_changes:
+            data['changes'] = {
+                **data['changes'],
+                **{
+                    'address_line_1': self.company.address_1,
+                    'address_line_2': self.company.address_2,
+                    'address_town': self.company.address_town,
+                    'address_county': self.company.address_county,
+                    'address_country': self.company.address_country.iso_alpha2_code,
+                    'address_postcode': self.company.address_postcode,
+                },
+                **address_changes,
+            }
+
+        return data
