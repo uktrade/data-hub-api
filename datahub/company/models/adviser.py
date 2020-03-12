@@ -87,6 +87,15 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField('date joined', default=now)
 
+    sso_email_user_id = models.EmailField(
+        blank=True,
+        unique=True,
+        null=True,
+        max_length=254,  # The length of the field in Staff SSO is 254 characters.
+        verbose_name='SSO email user ID',
+        help_text='This is the `Email user ID` that is shown for this user in Staff SSO.',
+    )
+
     objects = AdviserManager()
 
     USERNAME_FIELD = 'email'

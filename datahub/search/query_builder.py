@@ -30,6 +30,7 @@ def get_basic_search_query(
         permission_filters_by_entity=None,
         offset=0,
         limit=100,
+        fields_to_exclude=None,
 ):
     """
     Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
@@ -61,8 +62,13 @@ def get_basic_search_query(
         Bool(
             should=Term(_type=entity._doc_type.name),
         ),
+    ).sort(
+        '_score',
+        'id',
+    ).source(
+        exclude=fields_to_exclude,
     )
-    search = search.sort('_score', 'id')
+
     search.aggs.bucket(
         'count_by_type', 'terms', field='_type',
     )

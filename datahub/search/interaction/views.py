@@ -23,6 +23,10 @@ class SearchInteractionAPIViewMixin:
     es_sort_by_remappings = {
         'company.name': 'company.name.keyword',
     }
+    fields_to_exclude = (
+        'export_countries',
+        'were_countries_discussed',
+    )
 
     FILTER_FIELDS = (
         'kind',

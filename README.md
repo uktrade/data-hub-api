@@ -302,6 +302,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
 | `GUNICORN_ENABLE_STATSD` | No | Whether to enable Gunicorn StatD instrumentation (default=False). |
+| `GUNICORN_PATCH_ASGIREF` | No | Whether to enable a workaround for https://github.com/django/asgiref/issues/144 when the worker class is 'gevent' (default=False). |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
 | `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE` | No | Maximum file size in bytes for interaction admin CSV uploads (default=2MB). |
