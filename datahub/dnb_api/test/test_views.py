@@ -14,6 +14,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
+from datahub.core import constants
 from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
@@ -1341,14 +1342,208 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_501(self):
+    def test_company_does_not_exist(self):
         """
-        The endpoint should return 501 if called with the right content-type
-        and permissions.
+        The endpoint should return 400 if the company with the given
+        duns_number does not exist.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-change-request'),
-            data={},
+            data={
+                'duns_number': '123456789',
+                'changes': {
+                    'name': 'Foo Bar',
+                },
+            },
         )
 
-        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'duns_number': [
+                'Company with duns_number: 123456789 does not exists in DataHub.',
+            ],
+        }
+
+    @pytest.mark.parametrize(
+        'change_request,expected_response',
+        (
+            # No changes
+            (
+                {
+                    'duns_number': '123456789',
+                },
+                {
+                    'changes': ['This field is required.'],
+                },
+            ),
+            # No duns_number
+            (
+                {
+                    'changes': {
+                        'website': 'example.com',
+                    },
+                },
+                {
+                    'duns_number': ['This field is required.'],
+                },
+            ),
+            # Empty changes
+            (
+                {
+                    'duns_number': '123456789',
+                    'changes': {},
+                },
+                {
+                    'changes': ['No changes submitted.'],
+                },
+            ),
+            # Invalid website
+            (
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'Foo Bar',
+                    },
+                },
+                {
+                    'changes': {
+                        'website': ['Enter a valid URL.'],
+                    },
+                },
+            ),
+        ),
+    )
+    def test_invalid_fields(
+        self,
+        change_request,
+        expected_response,
+    ):
+        """
+        Test that invalid payload results in 400 and an appropriate
+        error message.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data=change_request,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_response
+
+    @pytest.mark.parametrize(
+        'change_request,datahub_response',
+        (
+
+            # All valid fields
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'postcode': 'W1 0TN',
+                            'country': {
+                                'id': constants.Country.united_kingdom.value.id,
+                            },
+                        },
+                        'number_of_employees': 100,
+                        'turnover': 1000,
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+            ),
+
+            # Website - domain
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'https://example.com/hello',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+            ),
+        ),
+    )
+    def test_valid(
+        self,
+        change_request,
+        datahub_response,
+    ):
+        """
+        The endpoint should return 200 as well as a valid response
+        when it is hit with a valid payload.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data=change_request,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == datahub_response
+
+    def test_partial_address(self):
+        """
+        Test that a partial change-request to address returns
+        all address fields.
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data={
+                'duns_number': '123456789',
+                'changes': {
+                    'address': {
+                        'line_1': f'New {company.address_1}',
+                    },
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'duns_number': '123456789',
+            'changes': {
+                'address_line_1': f'New {company.address_1}',
+                'address_line_2': company.address_2,
+                'address_town': company.address_town,
+                'address_county': company.address_county,
+                'address_country': company.address_country.iso_alpha2_code,
+                'address_postcode': company.address_postcode,
+            },
+        }

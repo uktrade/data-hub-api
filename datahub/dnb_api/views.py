@@ -18,6 +18,7 @@ from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
+    DNBCompanyChangeRequestSerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -325,4 +326,6 @@ class DNBCompanyChangeRequestView(APIView):
         """
         A thin wrapper around the dnb-service change request API.
         """
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
+        change_request_serializer.is_valid(raise_exception=True)
+        return Response(change_request_serializer.validated_data)
