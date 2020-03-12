@@ -651,6 +651,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
                 status=status,
                 record_date=company.modified_on,
                 adviser=adviser,
+                track_history=True,
             )
 
         existing_country_ids = [item.country.id for item in company.export_countries.all()]
