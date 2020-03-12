@@ -303,3 +303,26 @@ class DNBCompanyLinkView(APIView):
         return Response(
             CompanySerializer().to_representation(company),
         )
+
+
+class DNBCompanyChangeRequestView(APIView):
+    """
+    View for requesting change/s to DNB companies.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
