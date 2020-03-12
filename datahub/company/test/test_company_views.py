@@ -13,6 +13,7 @@ from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
     Company,
     CompanyExportCountry,
+    CompanyExportCountryHistory,
     CompanyPermission,
     OneListTier,
 )
@@ -20,10 +21,15 @@ from datahub.company.serializers import CompanySerializer
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
+    CompanyExportCountryHistoryFactory,
     CompanyFactory,
 )
 from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange
-from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+)
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.test.factories import TeamFactory
 
@@ -1923,6 +1929,54 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
+
+    def test_delete_company_export_countries_check_history_tracks_correct_user(self):
+        """
+        Check that history correctly tracks the user who deletes the export country
+        """
+        company = CompanyFactory()
+        country = CountryModel.objects.order_by('name')[0]
+        adviser = AdviserFactory()
+        export_country = CompanyExportCountryFactory(
+            company=company,
+            country=country,
+            status=CompanyExportCountry.Status.FUTURE_INTEREST,
+            created_by=adviser,
+        )
+        CompanyExportCountryHistoryFactory(
+            id=export_country.id,
+            company=export_country.company,
+            country=export_country.country,
+            status=export_country.status,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+            history_user=export_country.created_by,
+        )
+
+        new_user = create_test_user(
+            permission_codenames=(
+                'change_company',
+                'change_companyexportcountry',
+            ),
+        )
+        api_client = self.create_api_client(user=new_user)
+        url = reverse('api-v4:company:update-export-detail', kwargs={'pk': company.pk})
+        response = api_client.patch(
+            url,
+            data={
+                'export_countries': [],
+            },
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        company.refresh_from_db()
+        assert company.export_countries.count() == 0
+        delete_history = CompanyExportCountryHistory.objects.filter(
+            company=company,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
+        )
+        assert delete_history.count() == 1
+        assert delete_history[0].country == country
+        assert delete_history[0].history_user == new_user
 
 
 class TestGetCompanyExportWins(APITestMixin):
