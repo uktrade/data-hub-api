@@ -9,10 +9,14 @@ from django.core.validators import (
     MinLengthValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.utils.timezone import now
 from mptt.fields import TreeForeignKey
 
+from datahub.company.signal_receivers import (
+    export_country_delete_signal,
+    export_country_update_signal,
+)
 from datahub.core import constants, reversion
 from datahub.core.models import (
     ArchivableModel,
@@ -423,6 +427,7 @@ class Company(ArchivableModel, BaseModel):
         Add a company export_country, if it doesn't exist.
         If the company already exists and incoming status is different
         check if incoming record is newer and update.
+        And send signal to track history.
         """
         export_country, created = CompanyExportCountry.objects.get_or_create(
             country=country,
@@ -439,6 +444,25 @@ class Company(ArchivableModel, BaseModel):
                 export_country.status = status
                 export_country.modified_by = adviser
                 export_country.save()
+
+        export_country_update_signal.send(
+            sender=CompanyExportCountry,
+            instance=export_country,
+            created=created,
+            by=adviser,
+        )
+
+    @transaction.atomic
+    def delete_export_country(self, country_id, adviser):
+        """Delete export country and send signal for tracking history"""
+        export_country = self.export_countries.filter(country_id=country_id).first()
+        if export_country:
+            export_country_delete_signal.send(
+                sender=CompanyExportCountry,
+                instance=export_country,
+                by=adviser,
+            )
+            export_country.delete()
 
 
 class OneListCoreTeamMember(models.Model):
