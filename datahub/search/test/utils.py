@@ -28,10 +28,19 @@ def create_mock_search_app(
 def doc_exists(es_client, search_app, id_):
     """Checks if a document exists for a specified search app."""
     return es_client.exists(
-        index=search_app.es_model.get_write_index(),
+        index=search_app.es_model.get_read_alias(),
         doc_type=search_app.name,
         id=id_,
     )
+
+
+def doc_count(es_client, search_app):
+    """Return a document count for a specified search app."""
+    response = es_client.count(
+        index=search_app.es_model.get_read_alias(),
+        doc_type=search_app.name,
+    )
+    return response['count']
 
 
 def _create_mock_es_model(

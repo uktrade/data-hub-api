@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from datahub.core.csv import create_csv_response
 from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
-from datahub.search.apps import get_search_apps
+from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
@@ -112,6 +112,11 @@ class SearchBasicAPIView(APIView):
     http_method_names = ('get',)
     schema = SearchBasicStubSchema()
 
+    fields_to_exclude = (
+        'export_countries',
+        'were_countries_discussed',
+    )
+
     def get(self, request, format=None):
         """Performs basic search."""
         serializer = BasicSearchQuerySerializer(data=request.query_params)
@@ -121,9 +126,10 @@ class SearchBasicAPIView(APIView):
         query = get_basic_search_query(
             entity=validated_params['entity'],
             term=validated_params['term'],
-            permission_filters_by_entity=dict(_get_permission_filters(request)),
+            permission_filters_by_entity=dict(_get_global_search_permission_filters(request)),
             offset=validated_params['offset'],
             limit=validated_params['limit'],
+            fields_to_exclude=self.fields_to_exclude,
         )
 
         results = execute_search_query(query)
@@ -138,14 +144,14 @@ class SearchBasicAPIView(APIView):
         return Response(data=response)
 
 
-def _get_permission_filters(request):
+def _get_global_search_permission_filters(request):
     """
     Gets the permissions filters that should be applied to each search entity (to enforce
-    permissions).
+    permissions) in global search.
 
-    Only entities that the user has access are returned.
+    Only global search entities that the user has access to are returned.
     """
-    for app in get_search_apps():
+    for app in get_global_search_apps_as_mapping().values():
         if not has_permissions_for_app(request, app):
             continue
 
@@ -185,6 +191,10 @@ class SearchAPIView(APIView):
         }
         return filters
 
+    def get_entities(self):
+        """Returns entities"""
+        return [self.search_app.es_model]
+
     def validate_data(self, data):
         """Validate and clean data."""
         serializer = self.serializer_class(data=data)
@@ -194,11 +204,12 @@ class SearchAPIView(APIView):
     def get_base_query(self, request, validated_data):
         """Gets a filtered Elasticsearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
+        entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         return get_search_by_entities_query(
-            [self.search_app.es_model],
+            entities=entities,
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,

@@ -41,6 +41,9 @@ worker_connections = os.environ.get('GUNICORN_WORKER_CONNECTIONS', '10')
 _enable_async_psycopg2 = (
     os.environ.get('GUNICORN_ENABLE_ASYNC_PSYCOPG2', 'true').lower() in ('true', '1')
 )
+_patch_asgiref = (
+    os.environ.get('GUNICORN_PATCH_ASGIREF', 'false').lower() in ('true', '1')
+)
 
 
 def post_fork(server, worker):
@@ -49,6 +52,19 @@ def post_fork(server, worker):
 
     Enables async processing in Psycopg2 if GUNICORN_ENABLE_ASYNC_PSYCOPG2 is set.
     """
-    if worker_class == 'gevent' and _enable_async_psycopg2:
-        patch_psycopg()
-        worker.log.info('Enabled async Psycopg2')
+    if worker_class == 'gevent':
+        if _enable_async_psycopg2:
+            patch_psycopg()
+            worker.log.info('Enabled async Psycopg2')
+
+        # Temporary workaround for https://github.com/django/asgiref/issues/144.
+        # Essentially reverts part of
+        # https://github.com/django/django/commit/a415ce70bef6d91036b00dd2c8544aed7aeeaaed.
+        #
+        # TODO: Remove once there is a better fix for https://github.com/django/asgiref/issues/144.
+        if _patch_asgiref:
+            import asgiref.local
+            import threading
+
+            asgiref.local.Local = lambda **kwargs: threading.local()
+            worker.log.info('Patched asgiref.local.Local')

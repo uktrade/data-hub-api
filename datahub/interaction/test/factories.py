@@ -203,15 +203,11 @@ class InteractionExportCountryFactory(factory.django.DjangoModelFactory):
         model = 'interaction.InteractionExportCountry'
 
 
-class ExportCountriesInteractionFactory(InteractionFactoryBase):
+class ExportCountriesInteractionFactory(CompanyInteractionFactory):
     """Factory for creating an export interaction with export countries."""
 
-    kind = Interaction.Kind.INTERACTION
     theme = factory.Iterator([Interaction.Theme.EXPORT, Interaction.Theme.OTHER])
     were_countries_discussed = True
-    communication_channel = factory.LazyFunction(
-        lambda: random_obj_for_model(CommunicationChannel),
-    )
 
     @to_many_field
     def export_countries(self, **kwargs):
@@ -219,9 +215,19 @@ class ExportCountriesInteractionFactory(InteractionFactoryBase):
         Instances of InteractionExportCountryFactory.
         Defaults to one InteractionExportCountryFactory.
         """
-        return [
-            InteractionExportCountryFactory(
-                interaction=self,
-                **kwargs,
-            ),
-        ]
+        return [InteractionExportCountryFactory(interaction=self, **kwargs)]
+
+
+class ExportCountriesServiceDeliveryFactory(ServiceDeliveryFactory):
+    """Factory for creating an export service delivery with export countries."""
+
+    theme = factory.Iterator([Interaction.Theme.EXPORT, Interaction.Theme.OTHER])
+    were_countries_discussed = True
+
+    @to_many_field
+    def export_countries(self, **kwargs):
+        """
+        Instances of InteractionExportCountryFactory.
+        Defaults to one InteractionExportCountryFactory.
+        """
+        return [InteractionExportCountryFactory(interaction=self, **kwargs)]

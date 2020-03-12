@@ -5,6 +5,7 @@ import pytest
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
+    ExportCountriesInteractionFactory,
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
@@ -19,6 +20,7 @@ pytestmark = pytest.mark.django_db
         CompanyInteractionFactory,
         InvestmentProjectInteractionFactory,
         CompanyInteractionFactoryWithPolicyFeedback,
+        ExportCountriesInteractionFactory,
     ),
 )
 def test_interaction_to_dict(es, factory_cls):
@@ -28,6 +30,7 @@ def test_interaction_to_dict(es, factory_cls):
     result = Interaction.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
+    result['export_countries'].sort(key=lambda export_country: export_country['country']['id'])
     result['policy_areas'].sort(key=itemgetter('id'))
     result['policy_issue_types'].sort(key=itemgetter('id'))
 
@@ -114,6 +117,17 @@ def test_interaction_to_dict(es, factory_cls):
         'grant_amount_offered': None,
         'net_company_receipt': None,
         'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+        'export_countries': [
+            {
+                'country': {
+                    'id': str(export_country.country.pk),
+                    'name': export_country.country.name,
+                },
+                'status': export_country.status,
+            }
+            for export_country in interaction.export_countries.order_by('country__pk')
+        ],
+        'were_countries_discussed': interaction.were_countries_discussed,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }
@@ -191,6 +205,8 @@ def test_service_delivery_to_dict(es):
         'grant_amount_offered': interaction.grant_amount_offered,
         'net_company_receipt': interaction.net_company_receipt,
         'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+        'export_countries': [],
+        'were_countries_discussed': None,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }
