@@ -44,6 +44,8 @@ job_defaults: &job_defaults
     SSO_ENABLED: 'True'
     RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
     RESOURCE_SERVER_AUTH_TOKEN: sso-token
+    STAFF_SSO_BASE_URL: http://sso.invalid/
+    STAFF_SSO_AUTH_TOKEN: sso-token
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
     DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
     DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
