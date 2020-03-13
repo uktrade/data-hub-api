@@ -3,7 +3,7 @@ from operator import not_
 from uuid import UUID
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -632,6 +632,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
 
         return data
 
+    @transaction.atomic
     def save(self, adviser):
         """Save it"""
         export_countries = self.validated_data.pop('export_countries', [])
@@ -656,11 +657,8 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         new_country_ids = [item['country'].id for item in validated_export_countries]
         country_ids_delta = list(set(existing_country_ids) - set(new_country_ids))
 
-        if country_ids_delta:
-            CompanyExportCountry.objects.filter(
-                company=company,
-                country_id__in=country_ids_delta,
-            ).delete()
+        for country_id in country_ids_delta:
+            company.delete_export_country(country_id, adviser)
 
         self._sync_to_company_export_country_fields(company, adviser)
 

@@ -1,0 +1,1 @@
+`POST /v4/company/update_export_detail`: will now track correct user that deleted export country instead of user who last updated it.

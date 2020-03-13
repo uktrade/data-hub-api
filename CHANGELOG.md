@@ -1,3 +1,59 @@
+# Data Hub API 28.3.0 (2020-03-12)
+
+
+## Features
+
+- **Companies** This adds a management command, `delete_old_export_country_history`, to delete `CompanyExportCountryHistory` older than a specified date.
+
+  This is a temporary command to delete inaccurate `CompanyExportCountryHistory` objects
+  that were accidentally created during the data migration from the previous `Company.export_to_countries` and `Company.future_interest_countries` fields.
+- **Companies** A serializer was added for validating the change-requests submitted to `dnb/company-change-request` endpoint and translating these change requests to the `dnb-service` format.
+- **Companies** The following endpoint was added the the Data Hub API:
+
+  - POST `/dnb/company-change-request`
+
+  At the moment, the endpoint returns HTTP 501 - Not Implemented. Following PRs would add the requisite functionality to the endpoint.
+
+## Bug fixes
+
+- Add ISO country code to Honduras.
+
+  Lack of the ISO code prevented users from adding a company from that country on the frontend.
+
+## Internal changes
+
+- A workaround was added for a memory leak when using Django 3 with gevent. This is inactive by default.
+
+## API
+
+- **Companies** `POST /v4/search/export-country-history`: Search results now additionally include interactions that have export countries associated with them.
+
+  The endpoint now requires both the `company.view_companyexportcountry` and `interaction.view_all_interaction` permissions.
+- **Companies** `POST /v4/search/export-country-history`: The `history_date` option for the `sortby` parameter was removed and replaced by `date`.
+
+## Database schema
+
+- **Advisers** The column `company_advisor.sso_email_user_id character varying(254) not null` was added. It will be used to identify a 
+  user that is being logged in using Staff SSO.
+
+
+# Data Hub API 28.2.0 (2020-03-10)
+
+
+## Features
+
+- It is now possible to configure the application to use Staff SSO to log into the admin site.
+
+## Bug fixes
+
+- **Companies** The ability to merge companies (in the admin site) that have export countries was restored. Note that the merging tool doesn't modify export countries on either company; these can be manually updated after the merge if needed.
+
+## API
+
+- **Companies** The `POST /v4/company-referral/<ID>/complete` endpoint now returns the body of Interaction that has been created.
+- **Companies** A new stub endpoint `GET /v4/<id>/export-win` was added for an upcoming feature that will return export wins for a company. At the moment this endpoint is *not* functional and will return a 501 status code if called.
+
+
 # Data Hub API 28.1.0 (2020-03-05)
 
 

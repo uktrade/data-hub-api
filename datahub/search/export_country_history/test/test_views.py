@@ -1,4 +1,5 @@
 from datetime import datetime
+from operator import attrgetter, itemgetter
 from uuid import uuid4
 
 import pytest
@@ -7,16 +8,22 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import CompanyExportCountryHistory, CompanyPermission
+from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.interaction.models import InteractionPermission
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    ExportCountriesInteractionFactory,
+    ExportCountriesServiceDeliveryFactory,
+)
 from datahub.metadata.models import Country
 from datahub.search.export_country_history import ExportCountryHistoryApp
+from datahub.search.interaction import InteractionSearchApp
 
 pytestmark = [
     pytest.mark.django_db,
-    # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp),
+    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp, InteractionSearchApp),
 ]
 
 HistoryType = CompanyExportCountryHistory.HistoryType
@@ -34,7 +41,15 @@ class TestSearchExportCountryHistory(APITestMixin):
                 status.HTTP_403_FORBIDDEN,
             ),
             (
-                [CompanyPermission.view_company],
+                ['view_companyexportcountry'],
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                [InteractionPermission.view_all],
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                ['view_companyexportcountry', InteractionPermission.view_all],
                 status.HTTP_200_OK,
             ),
         ),
@@ -98,11 +113,85 @@ class TestSearchExportCountryHistory(APITestMixin):
             'status': history_object.status,
         }
 
+    def test_interaction_response_body(self, es_with_collector):
+        """Test the format of an interaction result in the response body."""
+        interaction = ExportCountriesInteractionFactory()
+        es_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            export_country_history_search_url,
+            data={
+                # The view requires a filter
+                'company': interaction.company.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        assert len(results) == 1
+
+        result = results[0]
+        result['contacts'].sort(key=itemgetter('id'))
+        result['dit_participants'].sort(key=lambda participant: participant['adviser']['id'])
+        result['export_countries'].sort(key=lambda export_country: export_country['country']['id'])
+
+        assert result == {
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+                'trading_names': interaction.company.trading_names,
+            },
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'first_name': contact.first_name,
+                    'name': contact.name,
+                    'last_name': contact.last_name,
+                }
+                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+            ],
+            'date': interaction.date.isoformat(),
+            'dit_participants': [
+                {
+                    'adviser': {
+                        'id': str(dit_participant.adviser.pk),
+                        'first_name': dit_participant.adviser.first_name,
+                        'name': dit_participant.adviser.name,
+                        'last_name': dit_participant.adviser.last_name,
+                    },
+                    'team': {
+                        'id': str(dit_participant.team.pk),
+                        'name': dit_participant.team.name,
+                    },
+                }
+                for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+            ],
+            'export_countries': [
+                {
+                    'country': {
+                        'id': str(export_country.country.pk),
+                        'name': export_country.country.name,
+                    },
+                    'status': export_country.status,
+                }
+                for export_country in interaction.export_countries.order_by('country__pk')
+            ],
+            'kind': interaction.kind,
+            'id': str(interaction.pk),
+            'service': {
+                'id': str(interaction.service.pk),
+                'name': interaction.service.name,
+            },
+            'subject': interaction.subject,
+        }
+
     @pytest.mark.parametrize(
         'factory',
         (
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT),
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.DELETE),
+            ExportCountriesInteractionFactory,
+            ExportCountriesServiceDeliveryFactory,
         ),
     )
     def test_filtering_by_company_returns_matches(self, es_with_collector, factory):
@@ -126,8 +215,12 @@ class TestSearchExportCountryHistory(APITestMixin):
         """Test that filtering by company excludes non-matching objects."""
         company = CompanyFactory()
 
+        # Non-export country interactions should be excluded
+        CompanyInteractionFactory(company=company)
+
         # Unrelated companies should be excluded
         CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT)
+        ExportCountriesInteractionFactory()
 
         es_with_collector.flush_and_refresh()
 
@@ -150,7 +243,11 @@ class TestSearchExportCountryHistory(APITestMixin):
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.DELETE),
         ),
     )
-    def test_filtering_by_country_returns_matches(self, es_with_collector, factory):
+    def test_filtering_by_country_returns_matching_history_objects(
+        self,
+        es_with_collector,
+        factory,
+    ):
         """Test that filtering by country includes matching export country history objects."""
         obj = factory()
         es_with_collector.flush_and_refresh()
@@ -167,14 +264,42 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(obj.pk)
 
+    @pytest.mark.parametrize(
+        'factory',
+        (
+            ExportCountriesInteractionFactory,
+            ExportCountriesServiceDeliveryFactory,
+        ),
+    )
+    def test_filtering_by_country_returns_matching_interactions(self, es_with_collector, factory):
+        """Test that filtering by country includes matching interactions."""
+        obj = factory()
+        es_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            export_country_history_search_url,
+            data={
+                'country': obj.export_countries.first().country.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['id'] == str(obj.pk)
+
     def test_filtering_by_country_excludes_non_matches(self, es_with_collector):
         """Test that filtering by country excludes non-matching objects."""
         countries = list(Country.objects.order_by('?')[:2])
         filter_country = countries[0]
         other_country = countries[1]
 
+        # Non-export country interactions should be excluded
+        CompanyInteractionFactory()
+
         # Unrelated countries should be excluded
         CompanyExportCountryHistoryFactory(country=other_country, history_type=HistoryType.INSERT)
+        ExportCountriesInteractionFactory(export_countries__country=other_country)
 
         es_with_collector.flush_and_refresh()
 
@@ -195,8 +320,8 @@ class TestSearchExportCountryHistory(APITestMixin):
         (
             # default sorting
             ({}, True),
-            ({'sortby': 'history_date:asc'}, False),
-            ({'sortby': 'history_date:desc'}, True),
+            ({'sortby': 'date:asc'}, False),
+            ({'sortby': 'date:desc'}, True),
         ),
     )
     def test_sorts_results(self, es_with_collector, request_args, is_reversed):
@@ -214,8 +339,10 @@ class TestSearchExportCountryHistory(APITestMixin):
         company = CompanyFactory()
 
         objects = [
-            _make_dated_export_country_history(datetime_, company=company)
-            for datetime_ in datetimes
+            ExportCountriesInteractionFactory(date=datetimes.pop(0), company=company),
+            _make_dated_export_country_history(datetimes.pop(0), company=company),
+            ExportCountriesInteractionFactory(date=datetimes.pop(0), company=company),
+            _make_dated_export_country_history(datetimes.pop(0), company=company),
         ]
 
         if is_reversed:

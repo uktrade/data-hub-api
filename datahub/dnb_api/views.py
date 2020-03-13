@@ -18,6 +18,7 @@ from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
+    DNBCompanyChangeRequestSerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -303,3 +304,28 @@ class DNBCompanyLinkView(APIView):
         return Response(
             CompanySerializer().to_representation(company),
         )
+
+
+class DNBCompanyChangeRequestView(APIView):
+    """
+    View for requesting change/s to DNB companies.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
+        change_request_serializer.is_valid(raise_exception=True)
+        return Response(change_request_serializer.validated_data)
