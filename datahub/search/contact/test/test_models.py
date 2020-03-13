@@ -14,6 +14,7 @@ def test_contact_dbmodel_to_dict(es):
     result = ESContact.db_object_to_dict(contact)
 
     keys = {
+        '_document_type',
         'id',
         'title',
         'company',

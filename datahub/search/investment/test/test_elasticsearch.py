@@ -19,6 +19,9 @@ def test_mapping(es):
         'investment_project': {
             'dynamic': 'false',
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'actual_land_date': {'type': 'date'},
                 'actual_uk_regions': {
                     'properties': {

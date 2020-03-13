@@ -2,7 +2,13 @@ from unittest import mock
 
 import pytest
 
-from datahub.search.apps import get_search_app, get_search_app_by_model
+from datahub.search.apps import (
+    get_search_app,
+    get_search_app_by_model,
+    get_search_app_by_search_model,
+)
+from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 
 
 @mock.patch('datahub.search.apps._load_search_apps')
@@ -59,5 +65,21 @@ class TestGetSearchAppByModel:
         mocked_load_search_apps.return_value = {
             'app1': mock.Mock(),
         }
+        with pytest.raises(LookupError):
+            get_search_app_by_model(mock.Mock())
+
+
+class TestGetSearchAppBySearchModel:
+    """Tests for `get_search_app_by_search_model`."""
+
+    def test_found(self):
+        """Test that the expected app is returned for a registered search model."""
+        assert get_search_app_by_search_model(ESSimpleModel) is SimpleModelSearchApp
+
+    def test_not_found(self):
+        """
+        Test that get_search_app_by_model raises LookupError if it
+        can't find the right search app for the search model passed in.
+        """
         with pytest.raises(LookupError):
             get_search_app_by_model(mock.Mock())

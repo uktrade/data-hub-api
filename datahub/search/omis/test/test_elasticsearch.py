@@ -23,6 +23,9 @@ def test_mapping(es):
         'order': {
             'dynamic': 'false',
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'assignees': {
                     'properties': {
                         'dit_team': {
@@ -510,6 +513,7 @@ def test_indexed_doc(order_factory, es):
 
     assert indexed_order['_id'] == str(order.pk)
     assert indexed_order['_source'] == {
+        '_document_type': OrderSearchApp.name,
         'id': str(order.pk),
         'created_by': {
             'id': str(order.created_by.pk),

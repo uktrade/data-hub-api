@@ -36,6 +36,7 @@ def test_updated_interaction_synced(es_with_signals):
     )
 
     assert result['_source'] == {
+        '_document_type': ExportCountryHistoryApp.name,
         'history_user': {
             'id': str(export_country_history.history_user.id),
             'name': export_country_history.history_user.name,
