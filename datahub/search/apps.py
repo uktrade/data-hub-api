@@ -120,6 +120,20 @@ def get_search_app_by_model(model):
 
 
 @lru_cache(maxsize=None)
+def get_search_app_by_search_model(search_model):
+    """
+    :returns: a single search app (by django model)
+    :param search_model: search model for the search app
+    :raises LookupError: if it can't find the search app
+    """
+    for search_app in get_search_apps():
+        if search_app.es_model is search_model:
+            return search_app
+
+    raise LookupError(f'search app for {search_model} not found.')
+
+
+@lru_cache(maxsize=None)
 def _load_search_apps():
     """Loads and registers all search apps specified in `SEARCH_APPS`."""
     apps = (_load_search_app(cls_path) for cls_path in settings.SEARCH_APPS)

@@ -2,9 +2,10 @@ from hashlib import blake2b
 from logging import getLogger
 
 from django.conf import settings
-from elasticsearch_dsl import Document, MetaField
+from elasticsearch_dsl import Document, Keyword, MetaField
 
 from datahub.core.exceptions import DataHubException
+from datahub.search.apps import get_search_app_by_search_model
 from datahub.search.elasticsearch import (
     alias_exists,
     associate_index_with_alias,
@@ -19,6 +20,11 @@ logger = getLogger(__name__)
 
 class BaseESModel(Document):
     """Helps convert Django models to dictionaries."""
+
+    # This is a replacement for the _type (mapping type name) field which is deprecated in
+    # Elasticsearch.
+    # It’s required for the aggregations used in global search.
+    _document_type = Keyword()
 
     MAPPINGS = {}
 
@@ -38,14 +44,19 @@ class BaseESModel(Document):
         dynamic = MetaField('false')
 
     @classmethod
+    def get_app_name(cls):
+        """Get the search app name for this search model."""
+        return get_search_app_by_search_model(cls).name
+
+    @classmethod
     def get_read_alias(cls):
         """Gets the alias to be used for read operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-read'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-read'
 
     @classmethod
     def get_write_alias(cls):
         """Gets the alias to be used for write operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-write'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-write'
 
     @classmethod
     def get_write_index(cls):
@@ -64,7 +75,7 @@ class BaseESModel(Document):
     @classmethod
     def get_index_prefix(cls):
         """Gets the prefix used for indices and aliases."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls._doc_type.name}-'
+        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-'
 
     @classmethod
     def get_target_mapping_hash(cls):
@@ -79,7 +90,7 @@ class BaseESModel(Document):
         prefix = cls.get_index_prefix()
         if not current_write_index.startswith(prefix):
             logger.warning(
-                f'Unexpected index prefix for search model {cls._doc_type.name} and '
+                f'Unexpected index prefix for search model {cls.get_app_name()} and '
                 f'index {current_write_index}. It may be a legacy index.',
             )
             return ''
@@ -159,6 +170,7 @@ class BaseESModel(Document):
             **{col: fn(val) if val is not None else None for col, fn, val in mapped_values},
             **{col: fn(db_object) for col, fn in cls.COMPUTED_MAPPINGS.items()},
             **{field: getattr(db_object, field) for field in fields},
+            '_document_type': cls.get_app_name(),
         }
 
         return result
