@@ -1,3 +1,25 @@
+# Data Hub API 28.4.0 (2020-03-16)
+
+
+## Features
+
+- **Companies** Utility functions were added to the Data Hub API for sending change-requests to dnb-service and returning the response back to the clients.
+
+  The `request_change` utility function was hooked up to the `DNBCompanyChangeRequestView` and tests were added to ensure we are keeping to the agreed contract with the client as well as `dnb-service`.
+
+## Bug fixes
+
+- **Companies** `POST /v4/company/update_export_detail`: will now track correct user that deleted export country instead of user who last updated it.
+
+## Internal changes
+
+- A new `_document_type` field was added internally to all Elasticsearch documents as a replacement for the deprecated Elasticsearch `_type` field.
+
+## API
+
+- **Companies** `GET /v4/dataset/company-export-country-history-dataset`: An API endpoint for a dataset of export country history was added for consumption by data-flow and data-workspace.
+
+
 # Data Hub API 28.3.0 (2020-03-12)
 
 
