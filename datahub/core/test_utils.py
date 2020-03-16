@@ -66,6 +66,10 @@ class HawkAPITestClient:
         """Make a PATCH request with a JSON body."""
         return self.request('patch', path, json_=json_)
 
+    def delete(self, path, json_):
+        """Make a DELETE request with a JSON body."""
+        return self.request('delete', path, json_=json_)
+
     def request(self, method, path, params=None, json_=unset, content_type=''):
         """Make a request with a specified HTTP method."""
         params = urlencode(params) if params else ''
