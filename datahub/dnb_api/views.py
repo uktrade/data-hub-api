@@ -30,8 +30,10 @@ from datahub.dnb_api.utils import (
     DNBServiceError,
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
+    DNBServiceTimeoutError,
     format_dnb_company_investigation,
     get_company,
+    request_changes,
     search_dnb,
 )
 from datahub.oauth.scopes import Scope
@@ -328,4 +330,15 @@ class DNBCompanyChangeRequestView(APIView):
         """
         change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
         change_request_serializer.is_valid(raise_exception=True)
-        return Response(change_request_serializer.validated_data)
+
+        try:
+            response = request_changes(**change_request_serializer.validated_data)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        return Response(response)
