@@ -10,9 +10,14 @@ from datahub.company.constants import (
     NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG,
 )
 from datahub.company.models import CompanyExportCountry, CompanyExportCountryHistory
-from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyExportCountryFactory,
+    CompanyExportCountryHistoryFactory,
+    CompanyFactory,
+)
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.metadata.models import BusinessType
+from datahub.metadata.models import BusinessType, Country as CountryModel
 from datahub.notification.core import notify_gateway
 
 pytestmark = pytest.mark.django_db
@@ -87,14 +92,29 @@ class TestNotifyDNBInvestigationPostSave:
         company.save()
         client.send_email_notification.assert_not_called()
 
+
+class TestExportCountryHistoryCustomSignals:
+    """
+    Test the custom signals are triggered when export country is created, updated and deleted.
+    """
+
     def test_company_export_country_history_create(self):
         """
         Test that creating new CompanyExportCountry record
         sets up a corresponding history record.
         """
-        export_country = CompanyExportCountryFactory()
+        company = CompanyFactory()
+        country = CountryModel.objects.order_by('name')[0]
+        adviser = AdviserFactory()
+        company.add_export_country(
+            country,
+            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+            company.created_on,
+            adviser,
+        )
+        export_country = company.export_countries.first()
         history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
-        assert len(history) == 1
+        assert history.count() == 1
         assert history[0].id == export_country.id
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
@@ -106,23 +126,35 @@ class TestNotifyDNBInvestigationPostSave:
         Test that updating an existing CompanyExportCountry record
         sets up a corresponding history record.
         """
+        company = CompanyFactory()
+        country = CountryModel.objects.order_by('name')[0]
+        adviser = AdviserFactory()
         export_country = CompanyExportCountryFactory(
+            company=company,
+            country=country,
             status=CompanyExportCountry.Status.FUTURE_INTEREST,
+            created_by=adviser,
         )
-        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
-        assert len(history) == 1
-        assert history[0].id == export_country.id
-        assert history[0].company == export_country.company
-        assert history[0].country == export_country.country
-        assert history[0].status == export_country.status
-        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
+        CompanyExportCountryHistoryFactory(
+            id=export_country.id,
+            company=export_country.company,
+            country=export_country.country,
+            status=export_country.status,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+            history_user=export_country.created_by,
+        )
+        # update it, by changing status
+        company.add_export_country(
+            country,
+            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+            company.created_on,
+            adviser,
+        )
 
-        export_country.status = CompanyExportCountry.Status.CURRENTLY_EXPORTING
-        export_country.save()
         history = CompanyExportCountryHistory.objects.filter(
             id=export_country.id,
         ).order_by('history_date')
-        assert len(history) == 2
+        assert history.count() == 2
         assert history[0].id == export_country.id
         assert history[0].company == export_country.company
         assert history[0].country == export_country.country
@@ -139,26 +171,42 @@ class TestNotifyDNBInvestigationPostSave:
         Test that deleting an existing CompanyExportCountry record
         sets up a corresponding history record.
         """
+        company = CompanyFactory()
+        country = CountryModel.objects.order_by('name')[0]
+        adviser = AdviserFactory()
         export_country = CompanyExportCountryFactory(
+            company=company,
+            country=country,
             status=CompanyExportCountry.Status.FUTURE_INTEREST,
         )
-        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
-        assert len(history) == 1
-        assert history[0].id == export_country.id
-        assert history[0].company == export_country.company
-        assert history[0].country == export_country.country
-        assert history[0].status == export_country.status
-        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
-        export_country_id = export_country.id
-        export_country.delete()
+        company.delete_export_country(country.id, adviser)
         history = CompanyExportCountryHistory.objects.filter(
-            id=export_country_id,
-        ).order_by('history_date')
-        assert len(history) == 2
-        assert history[0].id == export_country_id
+            id=export_country.id,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
+        )
+        assert history.count() == 1
+        assert history[0].id == export_country.id
         assert history[0].status == CompanyExportCountry.Status.FUTURE_INTEREST
-        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
-        assert history[1].id == export_country_id
-        assert history[1].status == CompanyExportCountry.Status.FUTURE_INTEREST
-        assert history[1].history_type == CompanyExportCountryHistory.HistoryType.DELETE
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.DELETE
+
+    def test_delete_company_export_country_no_signal(self):
+        """
+        Test that attempting to delete an nonexisting CompanyExportCountry
+        record won't send a signal and won't track history
+        """
+        company = CompanyFactory()
+        countries = CountryModel.objects.order_by('name')[:2]
+        adviser = AdviserFactory()
+        export_country = CompanyExportCountryFactory(
+            company=company,
+            country=countries[0],
+            status=CompanyExportCountry.Status.FUTURE_INTEREST,
+        )
+
+        company.delete_export_country(countries[1].id, adviser)
+        history = CompanyExportCountryHistory.objects.filter(
+            id=export_country.id,
+            history_type=CompanyExportCountryHistory.HistoryType.DELETE,
+        )
+        assert history.count() == 0

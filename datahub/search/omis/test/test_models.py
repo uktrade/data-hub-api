@@ -9,6 +9,7 @@ from datahub.omis.order.test.factories import (
     OrderSubscriberFactory,
     OrderWithAcceptedQuoteFactory,
 )
+from datahub.search.omis import OrderSearchApp
 from datahub.search.omis.models import Order as ESOrder
 
 pytestmark = pytest.mark.django_db
@@ -35,6 +36,7 @@ def test_order_to_dict(order_factory):
     result = ESOrder.db_object_to_dict(order)
 
     assert result == {
+        '_document_type': OrderSearchApp.name,
         'id': order.pk,
         'company': {
             'id': str(order.company.pk),
