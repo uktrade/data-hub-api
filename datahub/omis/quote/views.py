@@ -1,8 +1,14 @@
 from django.http import Http404
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.response import Response
 
+from config.settings.types import HawkScope
+from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.hawk_receiver import (
+    HawkAuthentication,
+    HawkResponseSigningMixin,
+    HawkScopePermission,
+)
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
@@ -51,11 +57,12 @@ class QuoteViewSet(BaseQuoteViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class PublicQuoteViewSet(BaseQuoteViewSet):
-    """ViewSet for public facing API."""
+class PublicQuoteViewSet(HawkResponseSigningMixin, BaseQuoteViewSet):
+    """ViewSet for Hawk authenticated public facing API."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (Scope.public_omis_front_end,)
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission, )
+    required_hawk_scope = HawkScope.public_omis
     serializer_class = PublicQuoteSerializer
 
     order_lookup_field = 'public_token'
