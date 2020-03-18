@@ -4,44 +4,51 @@ from requests.exceptions import ConnectionError
 from rest_framework import status
 
 
-from datahub.oauth.sso_api_client import introspect_token, SSORequestError
+from datahub.oauth.sso_api_client import introspect_token, SSORequestError, SSOTokenDoesNotExist
 
 
 class TestIntrospectToken:
     """Tests for introspect_token()."""
 
     @pytest.mark.parametrize(
-        'mock_kwargs,expected_exception_text',
+        'mock_kwargs,expected_exception',
         (
             (
                 {'status_code': status.HTTP_400_BAD_REQUEST},
-                'SSO request failed',
+                SSORequestError('SSO request failed'),
+            ),
+            (
+                {
+                    'status_code': status.HTTP_401_UNAUTHORIZED,
+                    'json': {'active': False},
+                },
+                SSOTokenDoesNotExist(),
             ),
             (
                 {'exc': ConnectionError},
-                'SSO request failed',
+                SSORequestError('SSO request failed'),
             ),
             (
                 {'text': '{"invalid-json}'},
-                'SSO response parsing failed',
+                SSORequestError('SSO response parsing failed'),
             ),
             # Valid JSON but expected properties missing
             (
                 {'json': {}},
-                'SSO response validation failed',
+                SSORequestError('SSO response validation failed'),
             ),
         ),
     )
-    def test_error_handling(self, requests_mock, mock_kwargs, expected_exception_text):
+    def test_error_handling(self, requests_mock, mock_kwargs, expected_exception):
         """Test that various errors are handled as expected."""
         requests_mock.post(
             f'{settings.STAFF_SSO_BASE_URL}o/introspect/',
             **mock_kwargs,
         )
-        with pytest.raises(SSORequestError) as excinfo:
+        with pytest.raises(expected_exception.__class__) as excinfo:
             introspect_token('test-token')
 
-        assert str(excinfo.value) == expected_exception_text
+        assert str(excinfo.value) == str(expected_exception)
 
     def test_returns_validated_data(self, requests_mock):
         """Test that introspected token data is returned on success."""

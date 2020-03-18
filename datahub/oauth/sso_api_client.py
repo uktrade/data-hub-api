@@ -1,12 +1,21 @@
 from django.conf import settings
 from requests import RequestException
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from datahub.core.api_client import APIClient, TokenAuth
 
 
 class SSORequestError(Exception):
     """An SSO API request error."""
+
+    def __init__(self, message, response=None):
+        """Initialise the exception."""
+        self.message = message
+        self.response = response
+
+
+class SSOTokenDoesNotExist(Exception):
+    """The token does not exist."""
 
 
 class IntrospectionSerializer(serializers.Serializer):
@@ -24,7 +33,14 @@ class IntrospectionSerializer(serializers.Serializer):
 
 def introspect_token(token):
     """Get details about an access token from the introspection endpoint in Staff SSO."""
-    return _request('post', 'o/introspect/', IntrospectionSerializer, data={'token': token})
+    try:
+        return _request('post', 'o/introspect/', IntrospectionSerializer, data={'token': token})
+    except SSORequestError as exc:
+        # SSO returns a 401 if the token is invalid (non-existent)
+        # So this is treated as a special case
+        if exc.response is not None and exc.response.status_code == status.HTTP_401_UNAUTHORIZED:
+            raise SSOTokenDoesNotExist()
+        raise
 
 
 def _request(method, path, response_serializer_class, **kwargs):
@@ -39,7 +55,7 @@ def _request(method, path, response_serializer_class, **kwargs):
     try:
         response = api_client.request(method, path, **kwargs)
     except RequestException as exc:
-        raise SSORequestError('SSO request failed') from exc
+        raise SSORequestError('SSO request failed', response=exc.response) from exc
 
     try:
         response_data = response.json()
