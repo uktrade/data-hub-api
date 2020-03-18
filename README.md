@@ -341,9 +341,10 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
 | `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
-| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (This setting is not yet in use.) |
-| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (This setting is not yet in use.) |
-| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (This setting is not yet in use.) |
+| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=False). |
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
