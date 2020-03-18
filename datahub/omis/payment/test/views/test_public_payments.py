@@ -1,17 +1,83 @@
 import pytest
-from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
-from datahub.oauth.scopes import Scope
+from datahub.core.test_utils import HawkAPITestClient
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderPaidFactory
 from datahub.omis.payment.test.factories import PaymentFactory
 
 
+@pytest.fixture
+def hawk_api_client():
+    """Hawk API client fixture."""
+    yield HawkAPITestClient()
+
+
+@pytest.fixture
+def public_omis_api_client(hawk_api_client):
+    """Hawk API client fixture configured to use credentials with the OMIS scope."""
+    hawk_api_client.set_credentials(
+        'omis-public-id',
+        'omis-public-key',
+    )
+    yield hawk_api_client
+
+
 class TestPublicGetPayments(APITestMixin):
     """Public get payments test case."""
+
+    def test_without_credentials(self, api_client):
+        """Test that making a request without credentials returns an error."""
+        order = OrderFactory()
+
+        url = reverse(
+            'api-v3:public-omis:payment:collection',
+            kwargs={'public_token': order.public_token},
+        )
+        response = api_client.post(url, data={})
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_without_scope(self, hawk_api_client):
+        """Test that making a request without the correct Hawk scope returns an error."""
+        order = OrderFactory()
+
+        hawk_api_client.set_credentials(
+            'test-id-without-scope',
+            'test-key-without-scope',
+        )
+        url = reverse(
+            'api-v3:public-omis:payment:collection',
+            kwargs={'public_token': order.public_token},
+        )
+        response = hawk_api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_without_whitelisted_ip(self, public_omis_api_client):
+        """Test that making a request without the whitelisted client IP returns an error."""
+        order = OrderFactory()
+
+        url = reverse(
+            'api-v3:public-omis:payment:collection',
+            kwargs={'public_token': order.public_token},
+        )
+        public_omis_api_client.set_http_x_forwarded_for('1.1.1.1')
+        response = public_omis_api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    def test_verbs_not_allowed(self, verb, public_omis_api_client):
+        """Test that makes sure the other verbs are not allowed."""
+        order = OrderPaidFactory()
+
+        url = reverse(
+            'api-v3:public-omis:payment:collection',
+            kwargs={'public_token': order.public_token},
+        )
+        response = getattr(public_omis_api_client, verb)(url, json_={})
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
         'order_status',
@@ -22,21 +88,17 @@ class TestPublicGetPayments(APITestMixin):
             OrderStatus.COMPLETE,
         ),
     )
-    def test_get(self, order_status):
+    def test_get(self, order_status, public_omis_api_client):
         """Test a successful call to get a list of payments."""
         order = OrderFactory(status=order_status)
         PaymentFactory.create_batch(2, order=order)
         PaymentFactory.create_batch(5)  # create some extra ones not linked to `order`
 
         url = reverse(
-            'api-v3:omis-public:payment:collection',
+            'api-v3:public-omis:payment:collection',
             kwargs={'public_token': order.public_token},
         )
-        client = self.create_api_client(
-            scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        response = client.get(url)
+        response = public_omis_api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -52,17 +114,13 @@ class TestPublicGetPayments(APITestMixin):
             for payment in order.payments.all()
         ]
 
-    def test_404_if_order_doesnt_exist(self):
+    def test_404_if_order_doesnt_exist(self, public_omis_api_client):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
-            'api-v3:omis-public:payment:collection',
+            'api-v3:public-omis:payment:collection',
             kwargs={'public_token': ('1234-abcd-' * 5)},  # len(token) == 50
         )
-        client = self.create_api_client(
-            scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        response = client.get(url)
+        response = public_omis_api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -70,53 +128,14 @@ class TestPublicGetPayments(APITestMixin):
         'order_status',
         (OrderStatus.DRAFT, OrderStatus.CANCELLED),
     )
-    def test_404_if_in_disallowed_status(self, order_status):
+    def test_404_if_in_disallowed_status(self, order_status, public_omis_api_client):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
         order = OrderFactory(status=order_status)
 
         url = reverse(
-            'api-v3:omis-public:payment:collection',
+            'api-v3:public-omis:payment:collection',
             kwargs={'public_token': order.public_token},
         )
-        client = self.create_api_client(
-            scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        response = client.get(url)
+        response = public_omis_api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
-    def test_verbs_not_allowed(self, verb):
-        """Test that makes sure the other verbs are not allowed."""
-        order = OrderPaidFactory()
-
-        url = reverse(
-            'api-v3:omis-public:payment:collection',
-            kwargs={'public_token': order.public_token},
-        )
-        client = self.create_api_client(
-            scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        response = getattr(client, verb)(url)
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
-
-    @pytest.mark.parametrize(
-        'scope',
-        (s.value for s in Scope if s != Scope.public_omis_front_end.value),
-    )
-    def test_403_if_scope_not_allowed(self, scope):
-        """Test that other oauth2 scopes are not allowed."""
-        order = OrderPaidFactory()
-
-        url = reverse(
-            'api-v3:omis-public:payment:collection',
-            kwargs={'public_token': order.public_token},
-        )
-        client = self.create_api_client(
-            scope=scope,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        )
-        response = client.get(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
