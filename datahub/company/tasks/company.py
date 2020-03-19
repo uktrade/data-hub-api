@@ -16,7 +16,7 @@ logger = get_task_logger(__name__)
 
 def _automatic_company_archive(limit, simulate):
 
-    _8y_ago = timezone.now() - relativedelta(years=8)
+    _5y_ago = timezone.now() - relativedelta(years=5)
     _3m_ago = timezone.now() - relativedelta(months=3)
 
     latest_interaction = Interaction.objects.filter(
@@ -32,7 +32,7 @@ def _automatic_company_archive(limit, simulate):
             condition=Q(investor_investment_projects__status=InvestmentProject.Status.ONGOING),
         ),
     ).filter(
-        Q(latest_interaction_date__date__lt=_8y_ago) | Q(latest_interaction_date__isnull=True),
+        Q(latest_interaction_date__date__lt=_5y_ago) | Q(latest_interaction_date__isnull=True),
         archived=False,
         duns_number__isnull=True,
         orders__isnull=True,

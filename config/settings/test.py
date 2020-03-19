@@ -150,6 +150,9 @@ DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
 
 DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = ['notifyme@digital.trade.gov.uk']
 
+STAFF_SSO_BASE_URL = 'http://sso.test/'
+STAFF_SSO_AUTH_TOKEN = 'test-sso-token'
+
 ADMIN_OAUTH2_ENABLED = True
 ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
 ADMIN_OAUTH2_BASE_URL = ''
@@ -163,3 +166,7 @@ ADMIN_OAUTH2_LOGOUT_PATH = 'http://sso-server/o/logout'
 CONSENT_SERVICE_BASE_URL = 'http://consent.service/'
 CONSENT_SERVICE_HAWK_ID = 'some-id'
 CONSENT_SERVICE_HAWK_KEY = 'some-secret'
+
+COMPANY_MATCHING_SERVICE_BASE_URL = 'http://content.matching/'
+COMPANY_MATCHING_HAWK_ID = 'some-id'
+COMPANY_MATCHING_HAWK_KEY = 'some-secret'

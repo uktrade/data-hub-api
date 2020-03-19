@@ -1,6 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
+from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.models import ExportCountryHistory
 
 pytestmark = pytest.mark.django_db
@@ -12,6 +13,7 @@ def test_export_country_history_to_dict(es):
     result = ExportCountryHistory.db_object_to_dict(export_country_history)
 
     assert result == {
+        '_document_type': ExportCountryHistoryApp.name,
         'id': export_country_history.pk,
         'company': {
             'id': str(export_country_history.company.pk),
