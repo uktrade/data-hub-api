@@ -119,8 +119,8 @@ class TestAutomaticCompanyArchive:
         'interaction_date_delta, expected_archived',
         (
             (relativedelta(), False),
-            (relativedelta(years=8), False),
-            (relativedelta(years=8, days=1), True),
+            (relativedelta(years=5), False),
+            (relativedelta(years=5, days=1), True),
         ),
     )
     @freeze_time('2020-01-01-12:00:00')

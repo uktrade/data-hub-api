@@ -23,6 +23,7 @@ class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
             'country__name',
             'country__iso_alpha2_code',
             'history_date',
+            'history_id',
             'history_type',
             'status',
         )
