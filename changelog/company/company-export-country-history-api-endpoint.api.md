@@ -1,0 +1,1 @@
+Fix: change pagination index from `history_date, id` to `history_date, history_id` since `history_id` is the primary key for this dataset not `id`.
