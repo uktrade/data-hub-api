@@ -10,7 +10,11 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
-from datahub.company.models import Company, CompanyExportCountry
+from datahub.company.models import (
+    Company,
+    CompanyExportCountry,
+    CompanyExportCountryHistory,
+)
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
@@ -1984,6 +1988,59 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_interaction_with_company_export_country_check_history(self, permissions):
+        """
+        Test add a new interaction with export country
+        check to make sure it is not tracked in company export country history.
+        """
+        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.Kind.INTERACTION,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'theme': Interaction.Theme.EXPORT,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status':
+                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                },
+            ],
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        export_countries = company.export_countries.all()
+        assert export_countries.count() == 1
+        assert str(export_countries[0].country.id) == Country.canada.value.id
+        currently_exporting = CompanyExportCountry.Status.CURRENTLY_EXPORTING
+        assert export_countries[0].status == currently_exporting
+        export_history = CompanyExportCountryHistory.objects.filter(
+            company=company,
+        )
+        assert export_history.count() == 0
 
 
 class TestListInteractions(APITestMixin):

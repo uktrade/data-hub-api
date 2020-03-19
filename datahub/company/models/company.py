@@ -422,7 +422,7 @@ class Company(ArchivableModel, BaseModel):
         self.one_list_tier = None
         self.save()
 
-    def add_export_country(self, country, status, record_date, adviser):
+    def add_export_country(self, country, status, record_date, adviser, track_history=False):
         """
         Add a company export_country, if it doesn't exist.
         If the company already exists and incoming status is different
@@ -445,12 +445,13 @@ class Company(ArchivableModel, BaseModel):
                 export_country.modified_by = adviser
                 export_country.save()
 
-        export_country_update_signal.send(
-            sender=CompanyExportCountry,
-            instance=export_country,
-            created=created,
-            by=adviser,
-        )
+        if track_history:
+            export_country_update_signal.send(
+                sender=CompanyExportCountry,
+                instance=export_country,
+                created=created,
+                by=adviser,
+            )
 
     @transaction.atomic
     def delete_export_country(self, country_id, adviser):
