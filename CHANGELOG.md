@@ -1,3 +1,29 @@
+# Data Hub API 28.5.0 (2020-03-19)
+
+
+## Deprecations
+
+- **Companies** The following endpoint is deprecated and will be removed on or after 1 April 2020:
+
+  - `GET /v4/search/company/autocomplete`
+
+  This is because it‘s not in use and isn‘t compatible with Elasticsearch 7 in its current form.
+
+## Features
+
+- **Companies** The `automatic-company-archive` job was revised to new criteria approved by the Data Hub board.
+
+  We are now archiving companies that do not have an interaction during last 5 years.
+
+## Internal changes
+
+- An internal utility function for making Staff SSO introspection requests was added. This will be used as part of upcoming Staff SSO integration enhancements.
+
+## API
+
+- **Companies** Fix: change pagination index from `history_date, id` to `history_date, history_id` since `history_id` is the primary key for this dataset not `id`.
+
+
 # Data Hub API 28.4.0 (2020-03-16)
 
 
