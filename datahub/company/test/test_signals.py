@@ -111,6 +111,7 @@ class TestExportCountryHistoryCustomSignals:
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             company.created_on,
             adviser,
+            True,
         )
         export_country = company.export_countries.first()
         history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
@@ -149,6 +150,7 @@ class TestExportCountryHistoryCustomSignals:
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             company.created_on,
             adviser,
+            True,
         )
 
         history = CompanyExportCountryHistory.objects.filter(
