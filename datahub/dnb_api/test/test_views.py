@@ -8,7 +8,10 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from freezegun import freeze_time
-from requests.exceptions import ConnectionError
+from requests.exceptions import (
+    ConnectionError,
+    Timeout,
+)
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -18,11 +21,16 @@ from datahub.core import constants
 from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
-from datahub.dnb_api.utils import format_dnb_company
+from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
+    DNBServiceTimeoutError,
+    format_dnb_company,
+)
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
@@ -1433,7 +1441,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        'change_request,datahub_response',
+        'change_request,dnb_request,dnb_response,datahub_response',
         (
 
             # All valid fields
@@ -1459,9 +1467,49 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'turnover': 1000,
                     },
                 },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
                 # datahub_response
                 {
                     'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
                     'changes': {
                         'primary_name': 'Foo Bar',
                         'trading_names': ['Foo Bar INC'],
@@ -1487,9 +1535,29 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'website': 'https://example.com/hello',
                     },
                 },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
                 # datahub_response
                 {
                     'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
                     'changes': {
                         'domain': 'example.com',
                     },
@@ -1499,7 +1567,10 @@ class TestCompanyChangeRequestView(APITestMixin):
     )
     def test_valid(
         self,
+        requests_mock,
         change_request,
+        dnb_request,
+        dnb_response,
         datahub_response,
     ):
         """
@@ -1508,20 +1579,150 @@ class TestCompanyChangeRequestView(APITestMixin):
         """
         CompanyFactory(duns_number='123456789')
 
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
+
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-change-request'),
             data=change_request,
         )
 
+        assert requests_mock.last_request.json() == dnb_request
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == datahub_response
 
-    def test_partial_address(self):
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+        ),
+    )
+    def test_dnb_service_error(
+        self,
+        requests_mock,
+        status_code,
+    ):
         """
-        Test that a partial change-request to address returns
-        all address fields.
+        The  endpoint should return 502 if the upstream
+        `dnb-service` returns an error.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status_code,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data={
+                'duns_number': '123456789',
+                'changes': {
+                    'website': 'www.example.com',
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                reverse('api-v4:dnb-api:company-change-request'),
+                data={
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'www.example.com',
+                    },
+                },
+            )
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_request_error(
+        self,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we raise the
+        exception with an appropriate message.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            exc=request_exception,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-change-request'),
+            data={
+                'duns_number': '123456789',
+                'changes': {
+                    'website': 'www.example.com',
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def test_partial_address(
+        self,
+        requests_mock,
+    ):
+        """
+        Test that a partial change-request to address sends
+        all address fields to dnb-service.
         """
         company = CompanyFactory(duns_number='123456789')
+        requests_mock.post(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status.HTTP_201_CREATED,
+            json={
+                'id': '11111111-2222-3333-4444-555555555555',
+                'status': 'pending',
+                'created_on': '2020-01-05T11:00:00',
+                'duns_number': '123456789',
+                'changes': {
+                    'address_line_1': f'New {company.address_1}',
+                    'address_line_2': company.address_2,
+                    'address_town': company.address_town,
+                    'address_county': company.address_county,
+                    'address_country': company.address_country.iso_alpha2_code,
+                    'address_postcode': company.address_postcode,
+                },
+            },
+        )
 
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-change-request'),
@@ -1536,7 +1737,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
+        assert requests_mock.last_request.json() == {
             'duns_number': '123456789',
             'changes': {
                 'address_line_1': f'New {company.address_1}',

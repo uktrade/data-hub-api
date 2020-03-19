@@ -4,7 +4,7 @@ import pytest
 from django.conf import settings
 
 from datahub.core.exceptions import DataHubException
-from datahub.search.apps import get_search_apps, SearchApp
+from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
 from datahub.search.models import BaseESModel
 from datahub.search.test.utils import create_mock_search_app
@@ -29,6 +29,15 @@ class SampleSearchApp(SearchApp):
     es_model = SampleModel
 
 
+@pytest.fixture
+def sample_search_app(settings):
+    """Fixture that registers SampleSearchApp and yields it."""
+    settings.SEARCH_APPS = [f'{SampleSearchApp.__module__}.{SampleSearchApp.__qualname__}']
+    _load_search_apps.cache_clear()
+    yield SampleSearchApp
+    _load_search_apps.cache_clear()
+
+
 def test_migrate_apps(monkeypatch):
     """Test that migrate_apps() migrates the correct apps."""
     migrate_app_mock = Mock()
@@ -38,7 +47,7 @@ def test_migrate_apps(monkeypatch):
     assert {args[0][0] for args in migrate_app_mock.call_args_list} == apps
 
 
-def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client):
+def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client, sample_search_app):
     """
     Test that migrate_app() creates an index and schedules an initial sync for an
     uninitialised search app.
@@ -53,16 +62,16 @@ def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client):
         True,
     ]
 
-    migrate_app(SampleSearchApp)
+    migrate_app(sample_search_app)
 
     expected_index_name = (
-        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-b6f2d7c1a3cf4271b2e8a3ced5862016'
+        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-7c4194a0f6eaa2cee1dda9df1dfc2856'
     )
     assert mock_client.indices.create.call_args_list == [
         call(index=expected_index_name, body=ANY),
     ]
     assert sync_model_task_mock.apply_async.call_args_list == [
-        call(args=(SampleSearchApp.name,)),
+        call(args=(sample_search_app.name,)),
     ]
 
 

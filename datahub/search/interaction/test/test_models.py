@@ -9,6 +9,7 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
+from datahub.search.interaction import InteractionSearchApp
 from datahub.search.interaction.models import Interaction
 
 pytestmark = pytest.mark.django_db
@@ -35,6 +36,7 @@ def test_interaction_to_dict(es, factory_cls):
     result['policy_issue_types'].sort(key=itemgetter('id'))
 
     assert result == {
+        '_document_type': InteractionSearchApp.name,
         'id': interaction.pk,
         'kind': interaction.kind,
         'date': interaction.date,
@@ -142,6 +144,7 @@ def test_service_delivery_to_dict(es):
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
 
     assert result == {
+        '_document_type': InteractionSearchApp.name,
         'id': interaction.pk,
         'kind': interaction.kind,
         'date': interaction.date,

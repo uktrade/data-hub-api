@@ -1,3 +1,51 @@
+# Data Hub API 28.5.0 (2020-03-19)
+
+
+## Deprecations
+
+- **Companies** The following endpoint is deprecated and will be removed on or after 1 April 2020:
+
+  - `GET /v4/search/company/autocomplete`
+
+  This is because it‘s not in use and isn‘t compatible with Elasticsearch 7 in its current form.
+
+## Features
+
+- **Companies** The `automatic-company-archive` job was revised to new criteria approved by the Data Hub board.
+
+  We are now archiving companies that do not have an interaction during last 5 years.
+
+## Internal changes
+
+- An internal utility function for making Staff SSO introspection requests was added. This will be used as part of upcoming Staff SSO integration enhancements.
+
+## API
+
+- **Companies** Fix: change pagination index from `history_date, id` to `history_date, history_id` since `history_id` is the primary key for this dataset not `id`.
+
+
+# Data Hub API 28.4.0 (2020-03-16)
+
+
+## Features
+
+- **Companies** Utility functions were added to the Data Hub API for sending change-requests to dnb-service and returning the response back to the clients.
+
+  The `request_change` utility function was hooked up to the `DNBCompanyChangeRequestView` and tests were added to ensure we are keeping to the agreed contract with the client as well as `dnb-service`.
+
+## Bug fixes
+
+- **Companies** `POST /v4/company/update_export_detail`: will now track correct user that deleted export country instead of user who last updated it.
+
+## Internal changes
+
+- A new `_document_type` field was added internally to all Elasticsearch documents as a replacement for the deprecated Elasticsearch `_type` field.
+
+## API
+
+- **Companies** `GET /v4/dataset/company-export-country-history-dataset`: An API endpoint for a dataset of export country history was added for consumption by data-flow and data-workspace.
+
+
 # Data Hub API 28.3.0 (2020-03-12)
 
 

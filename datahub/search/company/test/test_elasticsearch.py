@@ -22,6 +22,9 @@ def test_mapping(es):
         'company': {
             'dynamic': 'false',
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'archived': {'type': 'boolean'},
                 'archived_by': {
                     'properties': {
@@ -536,6 +539,7 @@ def test_indexed_doc(es):
 
     assert indexed_company['_id'] == str(company.pk)
     assert indexed_company['_source'].keys() == {
+        '_document_type',
         'archived',
         'archived_by',
         'archived_on',

@@ -22,6 +22,7 @@ class TestBaseESModel:
             include_source=include_source,
         )
         source = {
+            '_document_type': 'simplemodel',
             'id': obj.pk,
             'name': 'test-name',
             'date': None,
@@ -48,7 +49,7 @@ def test_validate_model_fields(search_app):
     db_model_properties = _get_object_properties(db_model)
     db_model_fields = _get_db_model_fields(db_model)
 
-    valid_fields = computed_fields | db_model_properties | db_model_fields
+    valid_fields = computed_fields | db_model_properties | db_model_fields | {'_document_type'}
     invalid_fields = fields - valid_fields
 
     assert not invalid_fields

@@ -40,6 +40,7 @@ def get_model_non_mapped_field_names(es_model):
         get_model_field_names(es_model)
         - es_model.MAPPINGS.keys()
         - es_model.COMPUTED_MAPPINGS.keys()
+        - {'_document_type'}
     )
 
 

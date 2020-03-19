@@ -17,6 +17,7 @@ class TestLargeInvestorProfileElasticModel:
 
         result = ESLargeInvestorProfile.db_object_to_dict(large_investor_profile)
         keys = {
+            '_document_type',
             'asset_classes_of_interest',
             'construction_risks',
             'country_of_origin',

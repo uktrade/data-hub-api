@@ -14,6 +14,9 @@ def test_mapping(es):
         'event': {
             'dynamic': 'false',
             'properties': {
+                '_document_type': {
+                    'type': 'keyword',
+                },
                 'address_1': {'type': 'text'},
                 'address_2': {'type': 'text'},
                 'address_country': {

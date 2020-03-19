@@ -333,12 +333,15 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `REPORT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports. |
 | `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
 | `REPORT_BUCKET` | No | S3 bucket for report storage. |
-| `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
+| `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for single sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
 | `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
+| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (This setting is not yet in use.) |
+| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (This setting is not yet in use.) |
+| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (This setting is not yet in use.) |
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |

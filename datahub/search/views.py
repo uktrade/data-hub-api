@@ -102,6 +102,8 @@ EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 v3_view_registry = {}
 v4_view_registry = {}
 
+SHARED_FIELDS_TO_EXCLUDE = ('_document_type',)
+
 
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
@@ -123,13 +125,18 @@ class SearchBasicAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_params = serializer.validated_data
 
+        fields_to_exclude = (
+            *SHARED_FIELDS_TO_EXCLUDE,
+            *(self.fields_to_exclude or ()),
+        )
+
         query = get_basic_search_query(
             entity=validated_params['entity'],
             term=validated_params['term'],
             permission_filters_by_entity=dict(_get_global_search_permission_filters(request)),
             offset=validated_params['offset'],
             limit=validated_params['limit'],
-            fields_to_exclude=self.fields_to_exclude,
+            fields_to_exclude=fields_to_exclude,
         )
 
         results = execute_search_query(query)
@@ -208,6 +215,11 @@ class SearchAPIView(APIView):
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
+        fields_to_exclude = (
+            *SHARED_FIELDS_TO_EXCLUDE,
+            *(self.fields_to_exclude or ()),
+        )
+
         return get_search_by_entities_query(
             entities=entities,
             term=validated_data['original_query'],
@@ -216,7 +228,7 @@ class SearchAPIView(APIView):
             permission_filters=permission_filters,
             ordering=ordering,
             fields_to_include=self.fields_to_include,
-            fields_to_exclude=self.fields_to_exclude,
+            fields_to_exclude=fields_to_exclude,
         )
 
     def post(self, request, format=None):
