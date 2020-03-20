@@ -185,7 +185,7 @@ class TestSearch(APITestMixin):
                 {
                     'gross_value_added_start': 99999999999999,
                 },
-                ['99999989999999999991'],
+                ['99999989999999999990'],
                 ['won project'],
             ),
             (
