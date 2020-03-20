@@ -58,7 +58,7 @@ class CompanyReferral(BaseModel):
     )
     completed_on = models.DateTimeField(null=True, blank=True)
     subject = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
-    notes = models.TextField(blank=True)
+    notes = models.TextField()
 
     def __str__(self):
         """Human-friendly representation (for admin etc.)."""

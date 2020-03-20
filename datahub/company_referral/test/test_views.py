@@ -143,6 +143,7 @@ class TestAddCompanyReferral(APITestMixin):
 
         request_data = {
             'subject': 'Test referral',
+            'notes': 'Test notes',
             'company': {
                 'id': CompanyFactory().pk,
             },
@@ -161,6 +162,7 @@ class TestAddCompanyReferral(APITestMixin):
                 {},
                 {
                     'company': ['This field is required.'],
+                    'notes': ['This field is required.'],
                     'recipient': ['This field is required.'],
                     'subject': ['This field is required.'],
                 },
@@ -183,7 +185,8 @@ class TestAddCompanyReferral(APITestMixin):
             ),
             pytest.param(
                 {
-                    # The value this field shouldn't be allowed to be an empty string
+                    # The value of these fields shouldn't be allowed to be an empty string
+                    'notes': '',
                     'subject': '',
 
                     # Provide values for other required fields (so we don't get errors for them)
@@ -195,6 +198,7 @@ class TestAddCompanyReferral(APITestMixin):
                     },
                 },
                 {
+                    'notes': ['This field may not be blank.'],
                     'subject': ['This field may not be blank.'],
                 },
                 id='non-blank-fields',
@@ -215,9 +219,11 @@ class TestAddCompanyReferral(APITestMixin):
         company = CompanyFactory()
         recipient = AdviserFactory()
         subject = 'Test referral'
+        notes = 'Test notes'
 
         request_data = {
             'subject': subject,
+            'notes': notes,
             'company': {
                 'id': company.pk,
             },
@@ -242,7 +248,7 @@ class TestAddCompanyReferral(APITestMixin):
             'created_on': format_date_or_datetime(FROZEN_DATETIME),
             'id': ANY,
             'interaction': None,
-            'notes': '',
+            'notes': notes,
             'recipient': format_expected_adviser(recipient),
             'status': CompanyReferral.Status.OUTSTANDING,
             'subject': subject,
