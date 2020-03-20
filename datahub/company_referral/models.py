@@ -12,9 +12,6 @@ class CompanyReferral(BaseModel):
     """
     An internal referral of a company, from one adviser (the creator of the referrer)
     to another (the recipient).
-
-    TODO:
-    - add a reason closed field
     """
 
     class Status(models.TextChoices):
