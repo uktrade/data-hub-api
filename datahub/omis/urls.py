@@ -20,7 +20,6 @@ internal_frontend_urls = [
 public_urls = [
     path('', include((order_urls.public_urls, 'order'), namespace='order')),
     path('', include((quote_urls.public_urls, 'quote'), namespace='quote')),
-    path('', include((invoice_urls.public_urls, 'invoice'), namespace='invoice')),
     path('', include((payment_urls.payment_public_urls, 'payment'), namespace='payment')),
     path(
         '',
@@ -29,4 +28,10 @@ public_urls = [
             namespace='payment-gateway-session',
         ),
     ),
+    path('', include((invoice_urls.legacy_public_urls, 'invoice'), namespace='invoice')),
+]
+
+# TODO: rename this to public_urls once all public urls have been migrated to Hawk
+hawk_public_urls = [
+    path('', include((invoice_urls.hawk_public_urls, 'invoice'), namespace='invoice')),
 ]
