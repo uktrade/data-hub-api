@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 
+from datahub.omis.quote.legacy_public_views import LegacyPublicQuoteViewSet
 from datahub.omis.quote.views import PublicQuoteViewSet, QuoteViewSet
-
 
 # internal frontend API
 internal_frontend_urls = [
@@ -25,8 +25,22 @@ internal_frontend_urls = [
     ),
 ]
 
-# public facing API
-public_urls = [
+# legacy public facing API
+legacy_public_urls = [
+    re_path(
+        r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/quote$',
+        LegacyPublicQuoteViewSet.as_view({'get': 'retrieve'}),
+        name='detail',
+    ),
+    re_path(
+        r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/quote/accept$',
+        LegacyPublicQuoteViewSet.as_view({'post': 'accept'}),
+        name='accept',
+    ),
+]
+
+# Hawk authenticated public facing API
+hawk_public_urls = [
     re_path(
         r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/quote$',
         PublicQuoteViewSet.as_view({'get': 'retrieve'}),
