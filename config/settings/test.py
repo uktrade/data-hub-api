@@ -104,6 +104,10 @@ HAWK_RECEIVER_CREDENTIALS = {
         'key': 'data-flow-api-key',
         'scopes': (HawkScope.data_flow_api, ),
     },
+    'omis-public-id': {
+        'key': 'omis-public-key',
+        'scopes': (HawkScope.public_omis,),
+    },
 }
 
 DOCUMENT_BUCKETS = {
