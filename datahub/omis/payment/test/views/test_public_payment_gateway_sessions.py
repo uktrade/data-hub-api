@@ -8,10 +8,7 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.core.test_utils import HawkAPITestClient
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.test.factories import (
-    OrderFactory,
-    OrderWithAcceptedQuoteFactory,
-)
+from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
 from datahub.omis.payment.constants import PaymentGatewaySessionStatus
 from datahub.omis.payment.govukpay import govuk_url
 from datahub.omis.payment.models import Payment, PaymentGatewaySession
