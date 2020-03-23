@@ -18,6 +18,10 @@ class SSOTokenDoesNotExist(Exception):
     """The token does not exist."""
 
 
+class SSOUserDoesNotExist(Exception):
+    """The token does not exist."""
+
+
 class IntrospectionSerializer(serializers.Serializer):
     """
     Serializer used only to validate introspection responses.
@@ -34,7 +38,12 @@ class IntrospectionSerializer(serializers.Serializer):
 def introspect_token(token):
     """Get details about an access token from the introspection endpoint in Staff SSO."""
     try:
-        return _request('post', 'o/introspect/', IntrospectionSerializer, data={'token': token})
+        return _request(
+            'post',
+            'o/introspect/',
+            response_serializer_class=IntrospectionSerializer,
+            data={'token': token},
+        )
     except SSORequestError as exc:
         # SSO returns a 401 if the token is invalid (non-existent)
         # So this is treated as a special case
@@ -43,7 +52,21 @@ def introspect_token(token):
         raise
 
 
-def _request(method, path, response_serializer_class, **kwargs):
+def get_user_by_email(email):
+    """
+    Look up details about a user in Staff SSO using an email address.
+
+    Any of a user's email addresses can be specified.
+    """
+    try:
+        return _request('get', 'api/v1/user/introspect/', params={'email': email})
+    except SSORequestError as exc:
+        if exc.response is not None and exc.response.status_code == status.HTTP_404_NOT_FOUND:
+            raise SSOUserDoesNotExist()
+        raise
+
+
+def _request(method, path, response_serializer_class=None, **kwargs):
     """
     Internal utility function to make a generic API request to Staff SSO.
 
@@ -61,6 +84,9 @@ def _request(method, path, response_serializer_class, **kwargs):
         response_data = response.json()
     except ValueError as exc:
         raise SSORequestError('SSO response parsing failed') from exc
+
+    if not response_serializer_class:
+        return response_data
 
     try:
         serializer = response_serializer_class(data=response_data)
