@@ -76,7 +76,7 @@ oauthlib==3.1.0           # via django-oauth-toolkit
 packaging==20.0           # via pytest, pytest-sugar
 parso==0.5.2              # via jedi
 pathtools==0.1.2          # via watchdog
-pep8-naming==0.9.1        # via -r requirements.in
+pep8-naming==0.10.0       # via -r requirements.in
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
 pip-tools==4.5.1          # via -r requirements.in
