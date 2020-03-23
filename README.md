@@ -321,10 +321,12 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `MI_DATABASE_SSLCERT` | No | base64 encoded client certificate for MI database connection. |
 | `MI_DATABASE_SSLKEY` | No | base64 encoded client private key for MI database connection. |
 | `MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about long transfer duration (default=600). |
+| `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `OMIS_PUBLIC_SECRET_ACCESS_KEY` | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication. |
 | `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |

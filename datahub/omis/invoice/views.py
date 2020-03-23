@@ -1,6 +1,12 @@
 from django.http import Http404
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
+from config.settings.types import HawkScope
+from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.hawk_receiver import (
+    HawkAuthentication,
+    HawkResponseSigningMixin,
+    HawkScopePermission,
+)
 from datahub.oauth.scopes import Scope
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.invoice.serializers import InvoiceSerializer
@@ -33,11 +39,12 @@ class InvoiceViewSet(BaseInvoiceViewSet):
     required_scopes = (Scope.internal_front_end,)
 
 
-class PublicInvoiceViewSet(BaseInvoiceViewSet):
-    """ViewSet for public facing API."""
+class PublicInvoiceViewSet(HawkResponseSigningMixin, BaseInvoiceViewSet):
+    """ViewSet for Hawk authenticated public facing API."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (Scope.public_omis_front_end,)
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission, )
+    required_hawk_scope = HawkScope.public_omis
 
     order_lookup_field = 'public_token'
     order_lookup_url_kwarg = 'public_token'

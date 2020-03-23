@@ -15,6 +15,7 @@ def get_expected_data_from_export_country_history(export_country_history):
         'country__name': export_country_history.country.name,
         'country__iso_alpha2_code': export_country_history.country.iso_alpha2_code,
         'history_date': format_date_or_datetime(export_country_history.history_date),
+        'history_id': str(export_country_history.history_id),
         'history_type': export_country_history.history_type,
         'status': export_country_history.status,
     }
@@ -61,8 +62,8 @@ class TestCompanyExportCountryHistoryDatasetView(BaseDatasetViewTest):
                 export_country_history_3,
                 export_country_history_4,
             ],
-            key=lambda x: x.id,
+            key=lambda x: x.history_id,
         ) + [export_country_history_1, export_country_history_2]
 
         for i in range(len(expected_list)):
-            assert response_results[i]['id'] == str(expected_list[i].id)
+            assert response_results[i]['history_id'] == str(expected_list[i].history_id)
