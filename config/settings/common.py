@@ -589,6 +589,12 @@ _add_hawk_credentials(
     (HawkScope.metadata, ),
 )
 
+_add_hawk_credentials(
+    'OMIS_PUBLIC_ACCESS_KEY_ID',
+    'OMIS_PUBLIC_SECRET_ACCESS_KEY',
+    (HawkScope.public_omis,),
+)
+
 # To read data from Activity Stream
 ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
 ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env('ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)

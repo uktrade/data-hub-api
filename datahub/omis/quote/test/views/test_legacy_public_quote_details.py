@@ -1,92 +1,20 @@
 import pytest
 from django.utils.timezone import now
 from freezegun import freeze_time
+from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
-from datahub.core.test_utils import HawkAPITestClient
+from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.test.factories import (
-    OrderFactory,
-)
-from datahub.omis.order.test.factories import OrderWithOpenQuoteFactory
+from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
 from datahub.omis.quote.models import TermsAndConditions
 from datahub.omis.quote.test.factories import QuoteFactory
 
 
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
-
-@pytest.fixture
-def public_omis_api_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the OMIS scope."""
-    hawk_api_client.set_credentials(
-        'omis-public-id',
-        'omis-public-key',
-    )
-    yield hawk_api_client
-
-
 class TestPublicGetQuote(APITestMixin):
     """Get public quote test case."""
-
-    def test_without_credentials(self, api_client):
-        """Test that making a request without credentials returns an error."""
-        order = OrderFactory()
-
-        url = reverse(
-            'api-v3:public-omis:quote:detail',
-            kwargs={'public_token': order.public_token},
-        )
-        response = api_client.post(url, data={})
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_without_scope(self, hawk_api_client):
-        """Test that making a request without the correct Hawk scope returns an error."""
-        order = OrderFactory()
-
-        hawk_api_client.set_credentials(
-            'test-id-without-scope',
-            'test-key-without-scope',
-        )
-        url = reverse(
-            'api-v3:public-omis:quote:detail',
-            kwargs={'public_token': order.public_token},
-        )
-        response = hawk_api_client.get(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_without_whitelisted_ip(self, public_omis_api_client):
-        """Test that making a request without the whitelisted client IP returns an error."""
-        order = OrderFactory()
-
-        url = reverse(
-            'api-v3:public-omis:quote:detail',
-            kwargs={'public_token': order.public_token},
-        )
-        public_omis_api_client.set_http_x_forwarded_for('1.1.1.1')
-        response = public_omis_api_client.get(url)
-
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
-    def test_verbs_not_allowed(self, verb, public_omis_api_client):
-        """Test that makes sure the other verbs are not allowed."""
-        order = OrderFactory(
-            quote=QuoteFactory(),
-            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
-        )
-
-        url = reverse(
-            'api-v3:public-omis:quote:detail',
-            kwargs={'public_token': order.public_token},
-        )
-        response = getattr(public_omis_api_client, verb)(url, json_={})
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
         'order_status',
@@ -97,7 +25,7 @@ class TestPublicGetQuote(APITestMixin):
             OrderStatus.COMPLETE,
         ),
     )
-    def test_get(self, order_status, public_omis_api_client):
+    def test_get(self, order_status):
         """Test a successful call to get a quote."""
         order = OrderFactory(
             quote=QuoteFactory(accepted_on=now()),
@@ -105,10 +33,14 @@ class TestPublicGetQuote(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:quote:detail',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
@@ -121,7 +53,7 @@ class TestPublicGetQuote(APITestMixin):
             'terms_and_conditions': TermsAndConditions.objects.first().content,
         }
 
-    def test_get_without_ts_and_cs(self, public_omis_api_client):
+    def test_get_without_ts_and_cs(self):
         """Test a successful call to get a quote without Ts and Cs."""
         order = OrderFactory(
             quote=QuoteFactory(accepted_on=now(), terms_and_conditions=None),
@@ -129,15 +61,19 @@ class TestPublicGetQuote(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:quote:detail',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['terms_and_conditions'] == ''
 
-    def test_get_draft_with_cancelled_quote(self, public_omis_api_client):
+    def test_get_draft_with_cancelled_quote(self):
         """Test getting a cancelled quote with order in draft is allowed."""
         order = OrderFactory(
             quote=QuoteFactory(cancelled_on=now()),
@@ -145,10 +81,14 @@ class TestPublicGetQuote(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:quote:detail',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
@@ -161,26 +101,34 @@ class TestPublicGetQuote(APITestMixin):
             'terms_and_conditions': TermsAndConditions.objects.first().content,
         }
 
-    def test_404_if_order_doesnt_exist(self, public_omis_api_client):
+    def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:quote:detail',
             kwargs={'public_token': ('1234-abcd-' * 5)},  # len(token) == 50
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_404_if_quote_doesnt_exist(self, public_omis_api_client):
+    def test_404_if_quote_doesnt_exist(self):
         """Test that if the quote doesn't exist, the endpoint returns 404."""
         order = OrderFactory(status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE)
         assert not order.quote
 
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:quote:detail',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -188,68 +136,78 @@ class TestPublicGetQuote(APITestMixin):
         'order_status',
         (OrderStatus.DRAFT, OrderStatus.CANCELLED),
     )
-    def test_404_if_in_disallowed_status(self, order_status, public_omis_api_client):
+    def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
         order = OrderFactory(status=order_status)
 
         url = reverse(
-            'api-v3:public-omis:quote:detail',
+            'api-v3:omis-public:order:detail',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    def test_verbs_not_allowed(self, verb):
+        """Test that makes sure the other verbs are not allowed."""
+        order = OrderFactory(
+            quote=QuoteFactory(),
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+        )
+
+        url = reverse(
+            'api-v3:omis-public:quote:detail',
+            kwargs={'public_token': order.public_token},
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = getattr(client, verb)(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    @pytest.mark.parametrize(
+        'scope',
+        (s.value for s in Scope if s != Scope.public_omis_front_end.value),
+    )
+    def test_403_if_scope_not_allowed(self, scope):
+        """Test that other oauth2 scopes are not allowed."""
+        order = OrderFactory(
+            quote=QuoteFactory(),
+            status=OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
+        )
+
+        url = reverse(
+            'api-v3:omis-public:quote:detail',
+            kwargs={'public_token': order.public_token},
+        )
+        client = self.create_api_client(
+            scope=scope,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 class TestAcceptOrder(APITestMixin):
     """Tests for accepting a quote."""
 
-    def test_without_credentials(self, api_client):
-        """Test that making a request without credentials returns an error."""
-        order = OrderFactory()
-
-        url = reverse(
-            'api-v3:public-omis:quote:accept',
-            kwargs={'public_token': order.public_token},
-        )
-        response = api_client.post(url, json_={})
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_without_scope(self, hawk_api_client):
-        """Test that making a request without the correct Hawk scope returns an error."""
-        order = OrderFactory()
-
-        hawk_api_client.set_credentials(
-            'test-id-without-scope',
-            'test-key-without-scope',
-        )
-        url = reverse(
-            'api-v3:public-omis:quote:accept',
-            kwargs={'public_token': order.public_token},
-        )
-        response = hawk_api_client.post(url, json_={})
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_without_whitelisted_ip(self, public_omis_api_client):
-        """Test that making a request without the whitelisted client IP returns an error."""
-        order = OrderFactory()
-
-        url = reverse(
-            'api-v3:public-omis:quote:accept',
-            kwargs={'public_token': order.public_token},
-        )
-        public_omis_api_client.set_http_x_forwarded_for('1.1.1.1')
-        response = public_omis_api_client.post(url, json_={})
-
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_404_if_order_doesnt_exist(self, public_omis_api_client):
+    def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
-            'api-v3:public-omis:quote:accept',
+            'api-v3:omis-public:quote:accept',
             kwargs={'public_token': ('1234-abcd-' * 5)},  # len(token) == 50
         )
-        response = public_omis_api_client.post(url, json_={})
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.post(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -262,12 +220,7 @@ class TestAcceptOrder(APITestMixin):
             (OrderStatus.COMPLETE, {}),
         ),
     )
-    def test_409_if_order_in_disallowed_status(
-        self,
-        disallowed_status,
-        quote_fields,
-        public_omis_api_client,
-    ):
+    def test_409_if_order_in_disallowed_status(self, disallowed_status, quote_fields):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
@@ -279,10 +232,14 @@ class TestAcceptOrder(APITestMixin):
         )
 
         url = reverse(
-            'api-v3:public-omis:quote:accept',
+            f'api-v3:omis-public:quote:accept',
             kwargs={'public_token': order.public_token},
         )
-        response = public_omis_api_client.post(url, json_={})
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
+        response = client.post(url)
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
@@ -292,18 +249,22 @@ class TestAcceptOrder(APITestMixin):
             ),
         }
 
-    def test_accept(self, public_omis_api_client):
+    def test_accept(self):
         """Test that a quote can get accepted."""
         order = OrderWithOpenQuoteFactory()
         quote = order.quote
 
         url = reverse(
-            'api-v3:public-omis:quote:accept',
+            f'api-v3:omis-public:quote:accept',
             kwargs={'public_token': order.public_token},
         )
 
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        )
         with freeze_time('2017-07-12 13:00'):
-            response = public_omis_api_client.post(url, json_={})
+            response = client.post(url)
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {
