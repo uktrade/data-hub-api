@@ -39,7 +39,7 @@ elasticsearch==6.8.0
 elasticsearch-dsl==6.3.1
 
 # Celery
-celery[redis]==4.4 # Pinned until this is released in 4.4.2 https://github.com/celery/celery/pull/5985
+celery[redis]==4.4.2
 billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of breakage in the past
 kombu==4.6.8  # Not used directly, but pinned as it has been a source of breakage in the past
 
