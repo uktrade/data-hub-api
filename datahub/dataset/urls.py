@@ -13,7 +13,10 @@ from datahub.dataset.company_future_interest_countries.views import (
 )
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
-from datahub.dataset.interaction.views import InteractionsDatasetView
+from datahub.dataset.interaction.views import (
+    InteractionsDatasetView,
+    InteractionsExportCountryDatasetView,
+)
 from datahub.dataset.investment_project.views import (
     InvestmentProjectsActivityDatasetView,
     InvestmentProjectsDatasetView,
@@ -43,6 +46,11 @@ urlpatterns = [
         name='company-future-interest-countries-dataset',
     ),
     path('interactions-dataset', InteractionsDatasetView.as_view(), name='interactions-dataset'),
+    path(
+        'interactions-export-country-dataset',
+        InteractionsExportCountryDatasetView.as_view(),
+        name='interactions-export-country-dataset',
+    ),
     path('teams-dataset', TeamsDatasetView.as_view(), name='teams-dataset'),
     path(
         'investment-projects-dataset',
