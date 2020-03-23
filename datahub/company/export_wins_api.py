@@ -12,6 +12,12 @@ api_client = APIClient(
 )
 
 
+class NoMatchIdException(Exception):
+    """
+    Base exception class for Export Wins API related errors.
+    """
+
+
 class ExportWinsAPIException(Exception):
     """
     Base exception class for Export Wins API related errors.
@@ -49,7 +55,7 @@ def get_export_wins(match_id):
 
     response = api_client.request(
         'GET',
-        f'api/v1/wins/{match_id}/',
+        f'wins/match/{match_id}/',
         timeout=3.0,
     )
     return response
@@ -61,10 +67,10 @@ def export_wins(company):
     Returns None when company matching service doesn't return a match id.
     Raises exception an requests.exceptions.HTTPError for status, timeout and a connection error.
     """
-    match_id_response = match_company(company)
-    match_id = match_id_response.get('match_id', None)
+    match_id_json = match_company(company).json()
+    match_id = match_id_json.get('match_id', None)
     if not match_id:
-        return None
+        raise NoMatchIdException('no match id')
 
     try:
         response = get_export_wins(match_id)

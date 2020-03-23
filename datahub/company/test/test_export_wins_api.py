@@ -2,6 +2,8 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from json import JSONEncoder
+
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
@@ -18,6 +20,33 @@ from datahub.company.export_wins_api import (
 )
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, HawkMockJSONResponse
+
+
+def mocked_requests_get(*args, **kwargs):
+    """Mocked company matchin service response"""
+    class MockResponse(JSONEncoder):
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def default(self, o):
+            return o.__dict__
+
+        def json(self):
+            return self.json_data
+
+    return MockResponse(
+        {
+            'matches': [
+                {
+                    'id': 'hello',
+                    'match_id': 1234,
+                    'similarity': '100000',
+                },
+            ],
+        },
+        200,
+    )
 
 
 class TestExportWinsApi(APITestMixin):
@@ -80,10 +109,10 @@ class TestExportWinsApi(APITestMixin):
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
             api_key=settings.EXPORT_WINS_HAWK_KEY,
+            response=mocked_requests_get(),
         )
-        match_id = 1
         matcher = requests_mock.post(
-            f'/api/v1/wins/{match_id}/',
+            f'wins/match/1/',
             status_code=status.HTTP_200_OK,
             text=dynamic_response,
         )
@@ -95,11 +124,29 @@ class TestExportWinsApi(APITestMixin):
         }
 
     @override_settings(EXPORT_WINS_SERVICE_BASE_URL=None)
-    def test_export_wins_api_missing_settings_error(self):
+    def test_export_wins_api_missing_settings_error(self, requests_mock):
         """
         Test when environment variables are not set an exception is thrown.
         """
         company = CompanyFactory()
+        dynamic_response = HawkMockJSONResponse(
+            api_id=settings.COMPANY_MATCHING_HAWK_ID,
+            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+            response={
+                'matches': [
+                    {
+                        'id': 'hello',
+                        'match_id': 1234,
+                        'similarity': '100000',
+                    },
+                ],
+            },
+        )
+        requests_mock.post(
+            '/api/v1/company/match/',
+            status_code=status.HTTP_200_OK,
+            text=dynamic_response,
+        )
         with pytest.raises(ImproperlyConfigured):
             export_wins(company)
 
@@ -136,7 +183,7 @@ class TestExportWinsApi(APITestMixin):
         """
         match_id = 1
         requests_mock.post(
-            f'/api/v1/wins/{match_id}/',
+            f'wins/match/{match_id}/',
             exc=request_exception,
         )
         company = CompanyFactory()
