@@ -19,12 +19,15 @@ class TestRefreshGrossValueAddedCommand:
     """Test refreshing gross value added values command."""
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,multiplier_value',
+        'investment_type,sector,business_activities,multiplier_value,foreign_equity_investment,'
+        'gross_value_added',
         (
             (
                 InvestmentTypeConstant.fdi.value.id,
                 None,
                 [],
+                None,
+                None,
                 None,
             ),
             (
@@ -34,6 +37,8 @@ class TestRefreshGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
                 '0.0581',
+                1000,
+                '58',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -42,24 +47,32 @@ class TestRefreshGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.sales.value.id,
                 ],
                 '0.0581',
+                1000,
+                '58',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [InvestmentBusinessActivityConstant.retail.value.id],
                 '0.0581',
+                1000,
+                '58',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
                 '0.0325',
+                1000,
+                '33',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
                 '0.0621',
+                1000,
+                '62',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -69,11 +82,26 @@ class TestRefreshGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
                 '0.0581',
+                1000,
+                '58',
+            ),
+            (
+                InvestmentTypeConstant.fdi.value.id,
+                SectorConstant.renewable_energy_wind.value.id,
+                [
+                    InvestmentBusinessActivityConstant.retail.value.id,
+                    InvestmentBusinessActivityConstant.other.value.id,
+                ],
+                '0.0581',
+                None,
+                None,
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
+                None,
+                1000,
                 None,
             ),
             (
@@ -82,6 +110,8 @@ class TestRefreshGrossValueAddedCommand:
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
+                None,
+                1000,
                 None,
             ),
         ),
@@ -92,6 +122,8 @@ class TestRefreshGrossValueAddedCommand:
         sector,
         business_activities,
         multiplier_value,
+        foreign_equity_investment,
+        gross_value_added,
     ):
         """Test populating Gross value added data."""
         with mock.patch(
@@ -102,7 +134,7 @@ class TestRefreshGrossValueAddedCommand:
                 sector_id=sector,
                 business_activities=business_activities,
                 investment_type_id=investment_type,
-                foreign_equity_investment=1000,
+                foreign_equity_investment=foreign_equity_investment,
             )
 
         assert not project.gva_multiplier
@@ -112,6 +144,11 @@ class TestRefreshGrossValueAddedCommand:
             assert not project.gva_multiplier
         else:
             assert project.gva_multiplier.multiplier == Decimal(multiplier_value)
+
+        if not gross_value_added:
+            assert not project.gross_value_added
+        else:
+            assert project.gross_value_added == Decimal(gross_value_added)
 
     def _run_command(self):
         cmd = refresh_gross_value_added_values.Command()
