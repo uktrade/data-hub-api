@@ -10,7 +10,7 @@ argh==0.26.2              # via watchdog
 asgiref==3.2.3            # via django
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
-billiard==3.6.2.0         # via -r requirements.in, celery
+billiard==3.6.3.0         # via -r requirements.in, celery
 boto3==1.12.26            # via -r requirements.in
 botocore==1.15.26         # via boto3, s3transfer
 celery[redis]==4.4        # via -r requirements.in
