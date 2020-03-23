@@ -28,7 +28,7 @@ statsd==3.3.0
 
 # Email
 mail-parser==3.12.0
-icalendar==4.0.4
+icalendar==4.0.5
 
 # REDIS
 django-redis==4.11.0

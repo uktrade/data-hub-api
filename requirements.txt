@@ -55,7 +55,7 @@ future==0.18.2            # via notifications-python-client
 gevent==1.4.0             # via -r requirements.in
 greenlet==0.4.15          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
-icalendar==4.0.4          # via -r requirements.in
+icalendar==4.0.5          # via -r requirements.in
 idna==2.8                 # via requests
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
