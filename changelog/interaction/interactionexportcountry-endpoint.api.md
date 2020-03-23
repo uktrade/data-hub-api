@@ -1,1 +1,1 @@
-Added a new api endpoint for the interactionexportcountry dataset
+Added a new api endpoint for the interactionexportcountry dataset. The url for the new endpoint is /v4/dataset/interactions-export-country-dataset.
