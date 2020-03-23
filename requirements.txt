@@ -101,7 +101,7 @@ pytest-xdist==1.31.0      # via -r requirements.in
 pytest==5.4.1             # via -r requirements.in, pytest-cov, pytest-django, pytest-forked, pytest-sugar, pytest-xdist
 python-dateutil==2.8.1    # via -r requirements.in, botocore, elasticsearch-dsl, faker, freezegun, icalendar
 pytz==2019.3              # via celery, django, icalendar
-pyyaml==5.3               # via -r requirements.in, watchdog
+pyyaml==5.3.1             # via -r requirements.in, watchdog
 redis==3.4.1              # via -r requirements.in, celery, django-redis
 requests-futures==1.0.0   # via piprot
 requests-hawk==1.0.1      # via -r requirements.in
