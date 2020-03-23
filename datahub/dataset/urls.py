@@ -13,10 +13,8 @@ from datahub.dataset.company_future_interest_countries.views import (
 )
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
-from datahub.dataset.interaction.views import (
-    InteractionsDatasetView,
-    InteractionsExportCountryDatasetView,
-)
+from datahub.dataset.interaction.views import InteractionsDatasetView
+from datahub.dataset.interaction_export_country.views import InteractionsExportCountryDatasetView
 from datahub.dataset.investment_project.views import (
     InvestmentProjectsActivityDatasetView,
     InvestmentProjectsDatasetView,
