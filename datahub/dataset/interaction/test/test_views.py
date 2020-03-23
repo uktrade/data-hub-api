@@ -77,7 +77,7 @@ def get_expected_data_from_interaction(interaction):
 
 
 def get_expected_data_from_interaction_export_country(interaction_export_country):
-    """Returns expected API response dictionary for an interaction_export_country"""    
+    """Returns expected API response dictionary for an interaction_export_country"""
     return {
         'country__iso_alpha2_code': interaction_export_country.country.iso_alpha2_code,
         'country__name': interaction_export_country.country.name,
