@@ -58,8 +58,17 @@ def get_user_by_email(email):
 
     Any of a user's email addresses can be specified.
     """
+    return _get_user(email=email)
+
+
+def get_user_by_email_user_id(email_user_id):
+    """Look up details about a user in Staff SSO using their unique email user ID."""
+    return _get_user(email_user_id=email_user_id)
+
+
+def _get_user(**params):
     try:
-        return _request('get', 'api/v1/user/introspect/', params={'email': email})
+        return _request('get', 'api/v1/user/introspect/', params=params)
     except SSORequestError as exc:
         if exc.response is not None and exc.response.status_code == status.HTTP_404_NOT_FOUND:
             raise SSOUserDoesNotExist()

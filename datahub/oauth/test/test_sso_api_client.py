@@ -8,6 +8,7 @@ from rest_framework import status
 
 from datahub.oauth.sso_api_client import (
     get_user_by_email,
+    get_user_by_email_user_id,
     introspect_token,
     SSORequestError,
     SSOTokenDoesNotExist,
@@ -136,3 +137,47 @@ class TestGetUserByEmail:
         requests_mock.get(request_url, json=FAKE_SSO_USER_DATA)
 
         assert get_user_by_email('email@email.test') == FAKE_SSO_USER_DATA
+
+
+class TestGetUserByEmailUserID:
+    """Tests for get_user_by_email_user_id()."""
+
+    @pytest.mark.parametrize(
+        'mock_kwargs,expected_exception',
+        (
+            (
+                {'status_code': status.HTTP_400_BAD_REQUEST},
+                SSORequestError('SSO request failed'),
+            ),
+            (
+                {'status_code': status.HTTP_404_NOT_FOUND},
+                SSOUserDoesNotExist(),
+            ),
+            (
+                {'exc': ConnectionError},
+                SSORequestError('SSO request failed'),
+            ),
+            (
+                {'text': '{"invalid-json}'},
+                SSORequestError('SSO response parsing failed'),
+            ),
+        ),
+    )
+    def test_error_handling(self, requests_mock, mock_kwargs, expected_exception):
+        """Test that various errors are handled as expected."""
+        params = {'email_user_id': 'test@id.test'}
+        request_url = f'{settings.STAFF_SSO_BASE_URL}api/v1/user/introspect/?{urlencode(params)}'
+        requests_mock.get(request_url, **mock_kwargs)
+
+        with pytest.raises(expected_exception.__class__) as excinfo:
+            get_user_by_email_user_id('test@id.test')
+
+        assert str(excinfo.value) == str(expected_exception)
+
+    def test_returns_data_on_success(self, requests_mock):
+        """Test that user data is returned on success."""
+        params = {'email_user_id': 'test@id.test'}
+        request_url = f'{settings.STAFF_SSO_BASE_URL}api/v1/user/introspect/?{urlencode(params)}'
+        requests_mock.get(request_url, json=FAKE_SSO_USER_DATA)
+
+        assert get_user_by_email_user_id('test@id.test') == FAKE_SSO_USER_DATA
