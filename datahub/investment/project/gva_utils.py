@@ -1,6 +1,6 @@
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 from logging import getLogger
-from math import ceil
 
 from django.utils.functional import cached_property
 
@@ -48,8 +48,11 @@ class GrossValueAddedCalculator:
         """Calculates the Gross Value Added (GVA) for an investment project."""
         if not self.investment_project.foreign_equity_investment or not self.gva_multiplier:
             return None
-        return ceil(
+        return Decimal(
             self.gva_multiplier.multiplier * self.investment_project.foreign_equity_investment,
+        ).quantize(
+            Decimal('1.'),
+            rounding=ROUND_HALF_UP,
         )
 
     def _get_gva_multiplier_for_investment_project(self):
