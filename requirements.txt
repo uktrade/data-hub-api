@@ -10,9 +10,9 @@ argh==0.26.2              # via watchdog
 asgiref==3.2.3            # via django
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
-billiard==3.6.2.0         # via -r requirements.in, celery
-boto3==1.12.21            # via -r requirements.in
-botocore==1.15.21         # via boto3, s3transfer
+billiard==3.6.3.0         # via -r requirements.in, celery
+boto3==1.12.26            # via -r requirements.in
+botocore==1.15.26         # via boto3, s3transfer
 celery[redis]==4.4        # via -r requirements.in
 certifi==2019.11.28       # via requests, sentry-sdk
 chardet==3.0.4            # via -r requirements.in, requests
@@ -64,7 +64,7 @@ ipython==7.13.0           # via -r requirements.in
 jedi==0.15.2              # via ipython
 jinja2==2.10.3            # via towncrier
 jmespath==0.9.4           # via boto3, botocore
-kombu==4.6.7              # via -r requirements.in, celery
+kombu==4.6.8              # via -r requirements.in, celery
 mail-parser==3.12.0       # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
