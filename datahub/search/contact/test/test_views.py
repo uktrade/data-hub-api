@@ -1,8 +1,10 @@
+
 import uuid
 from cgi import parse_header
 from csv import DictReader
 from io import StringIO
 from operator import attrgetter
+from unittest.mock import call, Mock
 
 import factory
 import pytest
@@ -12,6 +14,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.models import Contact, ContactPermission
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -28,6 +31,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionDITParticipantFactory,
@@ -58,6 +62,14 @@ def setup_data():
         ContactFactory(first_name='first', last_name='last'),
     ]
     yield contacts
+
+
+@pytest.fixture
+def consent_get_many_mock(monkeypatch):
+    """Mocks the consent service `consent.get_many` function"""
+    m = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_many', m)
+    yield m
 
 
 class TestSearch(APITestMixin):
@@ -572,6 +584,103 @@ class TestContactExportView(APITestMixin):
 
         actual_row_data = [dict(row) for row in reader]
         assert actual_row_data == format_csv_data(expected_row_data)
+
+    @pytest.mark.parametrize('accepts_dit_email_marketing', (True, False))
+    def test_export_with_consent_service(
+            self,
+            es_with_collector,
+            consent_get_many_mock,
+            accepts_dit_email_marketing,
+    ):
+        """Test export of contact search results with consent service flag enabled."""
+        default_contact_email = 'foo@bar.com'
+
+        ContactFactory.create_batch(
+            SearchContactExportAPIView.streaming_page_size + 1,
+            email=default_contact_email,
+
+        )
+        FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
+
+        es_with_collector.flush_and_refresh()
+
+        data = {}
+
+        url = reverse('api-v3:search:contact-export')
+
+        consent_get_many_mock.return_value = {default_contact_email: accepts_dit_email_marketing}
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Contacts - 2018-01-01-11-12-13.csv'},
+        )
+
+        contacts = Contact.objects.annotate(
+            computed_address_country_name=Coalesce(
+                'address_country__name',
+                'company__address_country__name',
+            ),
+        ).order_by(
+            'pk',
+        )
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
+
+        # E123 is ignored as there are seemingly unresolvable indentation errors in the dict below
+        expected_row_data = [  # noqa: E123
+            {
+                'Name': contact.name,
+                'Job title': contact.job_title,
+                'Date created': contact.created_on,
+                'Archived': contact.archived,
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}',
+                'Company': get_attr_or_none(contact, 'company.name'),
+                'Company sector': get_attr_or_none(contact, 'company.sector.name'),
+                'Company link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
+                'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
+                'Country':
+                    contact.company.address_country.name
+                    if contact.address_same_as_company
+                    else contact.address_country.name,
+                'Postcode':
+                    contact.company.address_postcode
+                    if contact.address_same_as_company
+                    else contact.address_postcode,
+                'Phone number':
+                    ' '.join((contact.telephone_countrycode, contact.telephone_number)),
+                'Email address': contact.email,
+                'Accepts DIT email marketing': accepts_dit_email_marketing,
+                'Date of latest interaction':
+                    max(contact.interactions.all(), key=attrgetter('date')).date
+                    if contact.interactions.all() else None,
+                'Teams of latest interaction':
+                    _format_interaction_team_names(
+                        max(contact.interactions.all(), key=attrgetter('date')),
+                    )
+                    if contact.interactions.exists() else None,
+                'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
+            }
+            for contact in contacts
+        ]
+
+        assert consent_get_many_mock.mock_calls == [
+            call([default_contact_email] * SearchContactExportAPIView.streaming_page_size),
+            call([default_contact_email]),
+        ]
+
+        actual_row_data = sorted(
+            [dict(row) for row in reader],
+            key=lambda x: x['Link'],  # ensure rows are sorted in same order as objects
+        )
+        formatted_expected_row_data = format_csv_data(expected_row_data)
+        for idx, row in enumerate(actual_row_data):
+            assert row == formatted_expected_row_data[idx]
 
 
 def _format_interaction_team_names(interaction):

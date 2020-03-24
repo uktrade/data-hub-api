@@ -1,6 +1,8 @@
 from django.db.models import Case, Max, Value, When
 from django.db.models.functions import NullIf
 
+from datahub.company import consent
+from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
     ConcatWS,
@@ -10,6 +12,7 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.contact import ContactSearchApp
@@ -75,6 +78,8 @@ class SearchContactAPIView(SearchContactAPIViewMixin, SearchAPIView):
 class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
+    streaming_page_size = 100
+
     db_sort_by_remappings = {
         'address_country.name': 'computed_country_name',
     }
@@ -125,3 +130,15 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'teams_of_latest_interaction': 'Teams of latest interaction',
         'created_by__dit_team__name': 'Created by team',
     }
+
+    def _enrich_page(self, data):
+        """
+        Get the marketing consent from the consent service
+        """
+        if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
+            emails = [item['email'] for item in data]
+            consent_lookups = consent.get_many(emails)
+            for item in data:
+                item['accepts_dit_email_marketing'] = consent_lookups.get(item['email'], False)
+
+        return data
