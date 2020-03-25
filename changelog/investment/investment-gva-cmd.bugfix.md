@@ -1,1 +1,0 @@
-The periodic task to refresh gross value added values has been updated to include projects that don't have a foreign equity investment value set.
