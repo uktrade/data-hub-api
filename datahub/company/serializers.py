@@ -8,8 +8,10 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
+from datahub.company import consent
 from datahub.company.constants import (
     BusinessTypeConstant,
+    GET_CONSENT_FROM_CONSENT_SERVICE,
     OneListTierID,
 )
 from datahub.company.models import (
@@ -47,6 +49,7 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -149,6 +152,19 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     archived_reason = serializers.CharField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
+
+    def to_representation(self, instance):
+        """
+        Convert instance to dict.
+
+        Optionally lookup from consent service if feature flag
+        is enabled.
+        """
+        representation = super().to_representation(instance)
+        if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
+            representation['accepts_dit_email_marketing'] = \
+                consent.get_one(representation['email'])
+        return representation
 
     class Meta:
         model = Contact

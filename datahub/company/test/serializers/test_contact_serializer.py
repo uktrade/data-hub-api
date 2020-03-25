@@ -3,9 +3,11 @@ from unittest.mock import Mock
 import pytest
 from freezegun import freeze_time
 
+from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.serializers import ContactSerializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -18,6 +20,14 @@ def update_contact_task_mock(monkeypatch):
     """Mocks the apply_async method of the update_contact_consent celery task"""
     m = Mock()
     monkeypatch.setattr('datahub.company.serializers.update_contact_consent.apply_async', m)
+    yield m
+
+
+@pytest.fixture
+def consent_get_one_mock(monkeypatch):
+    """Mocks the .get_one function of the `datahub.company.consent` module"""
+    m = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_one', m)
     yield m
 
 
@@ -129,4 +139,27 @@ class TestContactSerializer:
         update_contact_task_mock.assert_called_once_with(
             args=(data['email'], data['accepts_dit_email_marketing']),
             kwargs={'modified_at': FROZEN_TIME},
+        )
+
+    def test_to_representation_feature_flag_off(self, consent_get_one_mock):
+        """Ensure that when feature flag is off, the consent service is not called"""
+        FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=False)
+        contact = self._make_contact()
+        c = ContactSerializer(instance=contact, partial=True)
+        _ = c.data
+        assert not consent_get_one_mock.called
+
+    @pytest.mark.parametrize('val', (True, False))
+    def test_to_representation_feature_flag_on(self, consent_get_one_mock, val):
+        """
+        When feature flag enabled ensure that value returned
+        from consent service is reflected in `ContactSerializer.data`
+        """
+        consent_get_one_mock.return_value = val
+        FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
+        contact = self._make_contact()
+        c = ContactSerializer(instance=contact)
+        assert c.data['accepts_dit_email_marketing'] == val
+        consent_get_one_mock.assert_called_once_with(
+            c.instance.email,
         )
