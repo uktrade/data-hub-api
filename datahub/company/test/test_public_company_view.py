@@ -7,13 +7,7 @@ from rest_framework.reverse import reverse
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import Country
-from datahub.core.test_utils import format_date_or_datetime, HawkAPITestClient
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
+from datahub.core.test_utils import format_date_or_datetime
 
 
 @pytest.fixture

@@ -7,7 +7,7 @@ from django.core.exceptions import FieldDoesNotExist
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import format_date_or_datetime, HawkAPITestClient
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.interaction.models import ServiceAnswerOption
 from datahub.metadata import urls
 from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
@@ -16,12 +16,6 @@ from datahub.metadata.test.factories import ServiceFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
 
 
 @pytest.fixture
