@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
-from datahub.core.test_utils import HawkAPITestClient
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory,
@@ -13,22 +12,6 @@ from datahub.omis.order.test.factories import (
 from datahub.omis.order.test.factories import OrderWithOpenQuoteFactory
 from datahub.omis.quote.models import TermsAndConditions
 from datahub.omis.quote.test.factories import QuoteFactory
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
-
-@pytest.fixture
-def public_omis_api_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the OMIS scope."""
-    hawk_api_client.set_credentials(
-        'omis-public-id',
-        'omis-public-key',
-    )
-    yield hawk_api_client
 
 
 class TestPublicGetQuote(APITestMixin):
