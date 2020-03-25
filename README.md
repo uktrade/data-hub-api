@@ -321,10 +321,12 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `MI_DATABASE_SSLCERT` | No | base64 encoded client certificate for MI database connection. |
 | `MI_DATABASE_SSLKEY` | No | base64 encoded client private key for MI database connection. |
 | `MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about long transfer duration (default=600). |
+| `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `OMIS_PUBLIC_SECRET_ACCESS_KEY` | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication. |
 | `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
@@ -339,9 +341,10 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
 | `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
-| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (This setting is not yet in use.) |
-| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (This setting is not yet in use.) |
-| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (This setting is not yet in use.) |
+| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
+| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=False). |
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
