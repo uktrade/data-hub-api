@@ -1,3 +1,33 @@
+# Data Hub API 28.6.0 (2020-03-25)
+
+
+## Features
+
+- A new authentication class with SSO email user ID support was added. This is currently disabled by default.
+
+## Bug fixes
+
+- **Companies** `POST /v4/interaction/`: will now stop tracking export countries tagged with an interaction into export country history.
+- **Investment** The periodic task to refresh gross value added values has been updated to include projects that don't have a foreign equity investment value set.
+- **Investment** Gross Value Added (GVA) is now rounded to the nearest whole number.
+
+## Internal changes
+
+- **Advisers** Some internal utility functions for getting details of a user from Staff SSO were added. These will initially be used as part of enhanced admin site functionality.
+
+## API
+
+- **Companies** `POST /v4/company-referral`: The `notes` field in the request body is now required and can no longer be blank.
+- **OMIS** A new Hawk authenticated `GET /v3/public/omis/order/<public-token>/invoice` endpoint has been added.
+  The new endpoint is functionally the same as `GET /v3/omis/public/order/<public-token>/invoice`.
+- **OMIS** A new Hawk authenticated `GET /v3/public/omis/order/<public-token>` endpoint has been added.
+  The new endpoint is functionally the same as `GET /v3/omis/public/order/<public-token>`.
+- **OMIS** A new Hawk authenticated `GET /v3/public/omis/order/<public-token>/quote` and 
+  `POST /v3/public/omis/order/<public-token>/quote/accept` endpoints have been added.
+  The new endpoints are functionally the same as `GET /v3/omis/public/order/<public-token>/quote` 
+  and `POST /v3/omis/public/order/<public-token>/invoice/accept`.
+
+
 # Data Hub API 28.5.0 (2020-03-19)
 
 

@@ -67,7 +67,6 @@ def get_investment_projects_to_refresh_gva_values():
     """Get investment projects. returns: All projects that GVA can be calculated for."""
     return InvestmentProject.objects.filter(
         investment_type_id=InvestmentTypeConstant.fdi.value.id,
-        foreign_equity_investment__isnull=False,
     ).filter(
         Q(
             sector__isnull=False,

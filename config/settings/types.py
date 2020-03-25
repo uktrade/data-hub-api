@@ -14,3 +14,4 @@ class HawkScope(Enum):
     public_company = auto()
     data_flow_api = auto()
     metadata = auto()
+    public_omis = auto()

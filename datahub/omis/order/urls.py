@@ -2,6 +2,7 @@
 
 from django.urls import path, re_path
 
+from datahub.omis.order.legacy_public_views import LegacyPublicOrderViewSet
 from datahub.omis.order.views import (
     AssigneeView,
     OrderViewSet,
@@ -45,8 +46,17 @@ internal_frontend_urls = [
 ]
 
 
-# public facing API
-public_urls = [
+# legacy public facing API
+legacy_public_urls = [
+    re_path(
+        r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})$',
+        LegacyPublicOrderViewSet.as_view({'get': 'retrieve'}),
+        name='detail',
+    ),
+]
+
+# Hawk authenticated public facing API
+hawk_public_urls = [
     re_path(
         r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})$',
         PublicOrderViewSet.as_view({'get': 'retrieve'}),

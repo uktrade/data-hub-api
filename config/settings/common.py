@@ -269,7 +269,15 @@ else:
     STAFF_SSO_BASE_URL = None
     STAFF_SSO_AUTH_TOKEN = None
 
+STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC = env.bool(
+    'STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC',
+    default=False,
+)
 STAFF_SSO_REQUEST_TIMEOUT = env.int('STAFF_SSO_REQUEST_TIMEOUT', default=5)  # seconds
+STAFF_SSO_USER_TOKEN_CACHING_PERIOD = env.int(
+    'STAFF_SSO_USER_TOKEN_CACHING_PERIOD',
+    default=60 * 60,  # One hour
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -282,13 +290,18 @@ STATIC_ROOT = str(CONFIG_DIR('staticfiles'))
 STATIC_URL = '/static/'
 
 # DRF
+if STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC:
+    _default_authentication_class = 'datahub.oauth.auth.SSOIntrospectionAuthentication'
+else:
+    _default_authentication_class = 'oauth2_provider.contrib.rest_framework.OAuth2Authentication'
+
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication'
+        _default_authentication_class,
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
@@ -587,6 +600,12 @@ _add_hawk_credentials(
     'DATA_HUB_FRONTEND_ACCESS_KEY_ID',
     'DATA_HUB_FRONTEND_SECRET_ACCESS_KEY',
     (HawkScope.metadata, ),
+)
+
+_add_hawk_credentials(
+    'OMIS_PUBLIC_ACCESS_KEY_ID',
+    'OMIS_PUBLIC_SECRET_ACCESS_KEY',
+    (HawkScope.public_omis,),
 )
 
 # To read data from Activity Stream

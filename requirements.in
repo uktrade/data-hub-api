@@ -12,14 +12,14 @@ uritemplate==3.0.1  # required for DRF schema features
 whitenoise==5.0.1
 
 chardet==3.0.4
-pyyaml==5.3
+pyyaml==5.3.1
 python-dateutil==2.8.1
 
 # Persistency layer
 psycopg2==2.8.4
 psycogreen==1.0.2
 
-boto3==1.12.21
+boto3==1.12.26
 
 notifications-python-client==5.5.1
 
@@ -28,7 +28,7 @@ statsd==3.3.0
 
 # Email
 mail-parser==3.12.0
-icalendar==4.0.4
+icalendar==4.0.5
 
 # REDIS
 django-redis==4.11.0
@@ -39,9 +39,9 @@ elasticsearch==6.8.0
 elasticsearch-dsl==6.3.1
 
 # Celery
-celery[redis]==4.4 # Pinned until this is released in 4.4.2 https://github.com/celery/celery/pull/5985
-billiard==3.6.2.0  # Not used directly, but pinned as it has been a source of breakage in the past
-kombu==4.6.7  # Not used directly, but pinned as it has been a source of breakage in the past
+celery[redis]==4.4.2
+billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of breakage in the past
+kombu==4.6.8  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
 pytest==5.4.1
@@ -72,7 +72,7 @@ flake8-docstrings==1.5.0
 flake8-print==3.1.4
 flake8-quotes==2.1.1
 flake8-string-format==0.3.0
-pep8-naming==0.9.1
+pep8-naming==0.10.0
 pydocstyle==5.0.2
 
 gunicorn==20.0.4
@@ -80,5 +80,5 @@ gevent==1.4.0
 mohawk==1.1.0
 requests==2.23.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.14.2
+sentry_sdk==0.14.3
 requests-hawk==1.0.1
