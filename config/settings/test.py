@@ -170,6 +170,7 @@ ADMIN_OAUTH2_LOGOUT_PATH = 'http://sso-server/o/logout'
 CONSENT_SERVICE_BASE_URL = 'http://consent.service/'
 CONSENT_SERVICE_HAWK_ID = 'some-id'
 CONSENT_SERVICE_HAWK_KEY = 'some-secret'
+CONSENT_SERVICE_HAWK_VERIFY_RESPONSE = False
 
 COMPANY_MATCHING_SERVICE_BASE_URL = 'http://content.matching/'
 COMPANY_MATCHING_HAWK_ID = 'some-id'
