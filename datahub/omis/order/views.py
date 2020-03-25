@@ -1,10 +1,15 @@
 from django.http import Http404
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from config.settings.types import HawkScope
+from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.hawk_receiver import (
+    HawkAuthentication,
+    HawkScopePermission,
+)
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
@@ -71,12 +76,14 @@ class OrderViewSet(CoreViewSet):
 
 
 class PublicOrderViewSet(CoreViewSet):
-    """ViewSet for public facing order endpoint."""
+    """ViewSet for Hawk authenticated public facing order endpoint."""
+
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission, )
+    required_hawk_scope = HawkScope.public_omis
 
     lookup_field = 'public_token'
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(
         include_reopened=True,
