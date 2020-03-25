@@ -1,1 +1,0 @@
-Gross Value Added (GVA) is now rounded to the nearest whole number.
