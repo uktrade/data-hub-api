@@ -1,6 +1,9 @@
+from datahub.company import consent
+from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.models.contact import Contact
 from datahub.core.query_utils import get_full_name_expression
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.feature_flag.utils import is_feature_flag_active
 
 
 class ContactsDatasetView(BaseDatasetView):
@@ -40,3 +43,14 @@ class ContactsDatasetView(BaseDatasetView):
             'telephone_alternative',
             'telephone_number',
         )
+
+    def _enrich_data(self, data):
+        """
+        Get the marketing consent from the consent service
+        """
+        if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
+            emails = [item['email'] for item in data]
+            consent_lookups = consent.get_many(emails)
+            for item in data:
+                item['accepts_dit_email_marketing'] = consent_lookups.get(item['email'], False)
+        return data

@@ -26,7 +26,16 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
         dataset = self.get_dataset()
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
         return paginator.get_paginated_response(page)
+
+    def _enrich_data(self, dataset):
+        """
+        Hook for enriching the paged dataset before returning a response.
+        By default it does nothing but can be changed in subclasses to make
+        calls to external APIs if required.
+        """
+        return dataset
 
     def get_dataset(self):
         """Return a list of records"""
