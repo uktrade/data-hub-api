@@ -8,7 +8,18 @@ from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
 from datahub.omis.payment.models import PaymentGatewaySession
 from datahub.omis.payment.serializers import PaymentGatewaySessionSerializer
-from datahub.omis.payment.views import CreatePaymentGatewaySessionThrottle
+from datahub.omis.payment.views import BasePaymentViewSet, CreatePaymentGatewaySessionThrottle
+
+
+class LegacyPublicPaymentViewSet(BasePaymentViewSet):
+    """ViewSet for legacy public facing API."""
+
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    required_scopes = (Scope.public_omis_front_end,)
+
+    order_lookup_field = 'public_token'
+    order_lookup_url_kwarg = 'public_token'
+    order_queryset = Order.objects.publicly_accessible()
 
 
 class LegacyPublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):

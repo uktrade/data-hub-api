@@ -1,4 +1,3 @@
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -53,10 +52,11 @@ class PaymentViewSet(BasePaymentViewSet):
 
 
 class PublicPaymentViewSet(BasePaymentViewSet):
-    """ViewSet for public facing API."""
+    """ViewSet for Hawk authenticated public facing API."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (Scope.public_omis_front_end,)
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission, )
+    required_hawk_scope = HawkScope.public_omis
 
     order_lookup_field = 'public_token'
     order_lookup_url_kwarg = 'public_token'
