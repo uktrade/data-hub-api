@@ -1,13 +1,5 @@
 import pytest
 
-from datahub.core.test_utils import HawkAPITestClient
-
-
-@pytest.fixture
-def hawk_api_client():
-    """Hawk API client fixture."""
-    yield HawkAPITestClient()
-
 
 @pytest.fixture
 def data_flow_api_client(hawk_api_client):
