@@ -1,6 +1,9 @@
 from django.urls import path, re_path
 
-from datahub.omis.payment.legacy_public_views import LegacyPublicPaymentGatewaySessionViewSet
+from datahub.omis.payment.legacy_public_views import (
+    LegacyPublicPaymentGatewaySessionViewSet,
+    LegacyPublicPaymentViewSet,
+)
 from datahub.omis.payment.views import (
     PaymentViewSet,
     PublicPaymentGatewaySessionViewSet,
@@ -20,10 +23,10 @@ payment_internal_frontend_urls = [
 ]
 
 # public facing API
-payment_public_urls = [
+legacy_payment_public_urls = [
     re_path(
         r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/payment$',
-        PublicPaymentViewSet.as_view({'get': 'list'}),
+        LegacyPublicPaymentViewSet.as_view({'get': 'list'}),
         name='collection',
     ),
 ]
@@ -41,6 +44,14 @@ legacy_payment_gateway_session_public_urls = [
         ),
         LegacyPublicPaymentGatewaySessionViewSet.as_view({'get': 'retrieve'}),
         name='detail',
+    ),
+]
+
+hawk_payment_public_urls = [
+    re_path(
+        r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/payment$',
+        PublicPaymentViewSet.as_view({'get': 'list'}),
+        name='collection',
     ),
 ]
 
