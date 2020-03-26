@@ -7,7 +7,7 @@
 amqp==2.5.2               # via kombu
 apipkg==1.5               # via execnet
 argh==0.26.2              # via watchdog
-asgiref==3.2.6            # via django
+asgiref==3.2.7            # via django
 attrs==19.3.0             # via flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
