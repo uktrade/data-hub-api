@@ -24,7 +24,7 @@ public_urls = [
     path(
         '',
         include(
-            (payment_urls.payment_gateway_session_public_urls, 'payment-gateway-session'),
+            (payment_urls.legacy_payment_gateway_session_public_urls, 'payment-gateway-session'),
             namespace='payment-gateway-session',
         ),
     ),
@@ -35,5 +35,12 @@ public_urls = [
 hawk_public_urls = [
     path('', include((order_urls.hawk_public_urls, 'order'), namespace='order')),
     path('', include((quote_urls.hawk_public_urls, 'quote'), namespace='quote')),
+    path(
+        '',
+        include(
+            (payment_urls.hawk_payment_gateway_session_public_urls, 'payment-gateway-session'),
+            namespace='payment-gateway-session',
+        ),
+    ),
     path('', include((invoice_urls.hawk_public_urls, 'invoice'), namespace='invoice')),
 ]
