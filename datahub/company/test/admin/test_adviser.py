@@ -4,10 +4,13 @@ from django.urls import reverse
 from rest_framework import status
 
 from datahub.company.admin.adviser_forms import AddAdviserFromSSOForm, DUPLICATE_USER_MESSAGE
+from datahub.company.admin.constants import ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG
 from datahub.company.models import Advisor
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 
+changelist_url = reverse('admin:company_advisor_changelist')
 add_from_sso_url = reverse('admin:company_advisor_add-from-sso')
 
 
@@ -23,6 +26,43 @@ FAKE_SSO_USER_DATA = {
     'permitted_applications': [],
     'access_profiles': [],
 }
+
+
+class TestAdviserChangeListLinks(AdminTestMixin):
+    """Tests for customisations for the adviser admin change list links."""
+
+    @pytest.mark.parametrize(
+        'permission_codenames,enable_feature_flag,should_link_exist',
+        (
+            (['view_advisor'], True, False),
+            (['view_advisor', 'add_advisor'], True, True),
+            (['view_advisor', 'add_advisor'], False, False),
+        ),
+    )
+    def test_add_adviser_link_existence(
+        self,
+        permission_codenames,
+        enable_feature_flag,
+        should_link_exist,
+    ):
+        """
+        Test that there is a link to add an adviser from SSO if the user has the correct
+        permissions and the feature flag is enabled.
+        """
+        if enable_feature_flag:
+            FeatureFlagFactory(code=ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG)
+
+        user = create_test_user(
+            permission_codenames=permission_codenames,
+            password=self.PASSWORD,
+            is_staff=True,
+        )
+
+        client = self.create_client(user)
+        response = client.get(changelist_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        assert (add_from_sso_url in response.rendered_content) == should_link_exist
 
 
 @pytest.mark.usefixtures('mock_get_user_by_email', 'mock_get_user_by_email_user_id')
@@ -50,7 +90,7 @@ class TestAddAdviserFromSSO(AdminTestMixin):
         assert response['Location'] == self.login_url_with_redirect(add_from_sso_url)
 
     @pytest.mark.parametrize('http_method', ('get', 'post'))
-    def test_permission_denied_if_staff_and_without_ad_permission(self, http_method):
+    def test_permission_denied_if_staff_and_without_add_permission(self, http_method):
         """
         Test that the view returns a 403 response if the staff user does not have the
         add adviser permission.
