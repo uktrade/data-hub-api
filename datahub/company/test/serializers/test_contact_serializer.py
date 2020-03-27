@@ -155,7 +155,7 @@ class TestContactSerializer:
         When feature flag enabled ensure that value returned
         from consent service is reflected in `ContactSerializer.data`
         """
-        consent_get_one_mock.return_value = val
+        consent_get_one_mock.return_value = has_consented
         FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
         contact = self._make_contact()
         c = ContactSerializer(instance=contact)
