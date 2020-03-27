@@ -161,5 +161,5 @@ class TestContactSerializer:
         contact_serializer = ContactSerializer(instance=contact)
         assert contact_serializer.data['accepts_dit_email_marketing'] == has_consented
         consent_get_one_mock.assert_called_once_with(
-            c.instance.email,
+            contact_serializer.instance.email,
         )
