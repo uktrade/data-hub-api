@@ -18,9 +18,9 @@ FROZEN_TIME = '2020-03-13T14:21:24.367265+00:00'
 @pytest.fixture
 def update_contact_task_mock(monkeypatch):
     """Mocks the apply_async method of the update_contact_consent celery task"""
-    m = Mock()
-    monkeypatch.setattr('datahub.company.serializers.update_contact_consent.apply_async', m)
-    yield m
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.serializers.update_contact_consent.apply_async', mock)
+    yield mock
 
 
 @pytest.fixture
