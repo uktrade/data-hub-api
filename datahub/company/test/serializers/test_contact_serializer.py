@@ -149,8 +149,8 @@ class TestContactSerializer:
         _ = c.data
         assert not consent_get_one_mock.called
 
-    @pytest.mark.parametrize('val', (True, False))
-    def test_to_representation_feature_flag_on(self, consent_get_one_mock, val):
+    @pytest.mark.parametrize('has_consented', (True, False))
+    def test_to_representation_feature_flag_on(self, consent_get_one_mock, has_consented):
         """
         When feature flag enabled ensure that value returned
         from consent service is reflected in `ContactSerializer.data`
