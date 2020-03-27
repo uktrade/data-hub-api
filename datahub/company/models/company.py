@@ -243,6 +243,7 @@ class Company(ArchivableModel, BaseModel):
         default=False,
         help_text='Whether this company is to be investigated by DNB.',
     )
+    # TODO: Remove this once the API endpoint for creating D&B investigations is released
     dnb_investigation_data = JSONField(
         null=True,
         blank=True,
