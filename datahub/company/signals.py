@@ -36,6 +36,7 @@ def company_business_type_post_migrate(sender, **kwargs):
     load_constants_to_database(BusinessTypeConstant, BusinessType)
 
 
+# TODO: Remove this once the API endpoint for creating D&B investigations is released
 @receiver(
     post_save,
     sender=Company,

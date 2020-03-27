@@ -230,6 +230,7 @@ def format_dnb_company(dnb_company):
     }
 
 
+# TODO: Remove this once the D&B investigation endpoint has been released
 def format_dnb_company_investigation(data):
     """
     Format DNB company investigation payload to something
