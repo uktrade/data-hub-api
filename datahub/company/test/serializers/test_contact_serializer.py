@@ -26,9 +26,9 @@ def update_contact_task_mock(monkeypatch):
 @pytest.fixture
 def consent_get_one_mock(monkeypatch):
     """Mocks the .get_one function of the `datahub.company.consent` module"""
-    m = Mock()
-    monkeypatch.setattr('datahub.company.consent.get_one', m)
-    yield m
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_one', mock)
+    yield mock
 
 
 @freeze_time(FROZEN_TIME)
