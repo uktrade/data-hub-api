@@ -153,3 +153,43 @@ def investigation_payload():
         'sector': Sector.renewable_energy_wind.value.id,
         'uk_region': UKRegion.east_midlands.value.id,
     }
+
+
+@pytest.fixture
+def base_company_dict():
+    """
+    A basic dictionary of values for defaulted Company fields - this should be used
+    as a foundation for `model_to_dict` comparisons.
+    """
+    return {
+        'archived': False,
+        'archived_by': None,
+        'archived_on': None,
+        'archived_reason': None,
+        'company_number': None,
+        'description': None,
+        'dnb_investigation_id': None,
+        'dnb_investigation_data': None,
+        'duns_number': None,
+        'export_potential': None,
+        'export_to_countries': [],
+        'future_interest_countries': [],
+        'global_headquarters': None,
+        'global_ultimate_duns_number': None,
+        'great_profile_status': None,
+        'headquarter_type': None,
+        'is_number_of_employees_estimated': None,
+        'is_turnover_estimated': None,
+        'number_of_employees': None,
+        'one_list_account_owner': None,
+        'one_list_tier': None,
+        'pending_dnb_investigation': False,
+        'reference_code': '',
+        'sector': '',
+        'trading_names': [],
+        'transfer_reason': '',
+        'transferred_by': None,
+        'transferred_on': None,
+        'transferred_to': None,
+        'vat_number': '',
+    }
