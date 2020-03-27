@@ -8,6 +8,7 @@ from datahub.notification.constants import NotifyServiceName
 from datahub.notification.notify import notify_by_email
 
 
+# TODO: Remove this module once the D&B investigations endpoint has been released
 class Template(Enum):
     """
     GOV.UK notifications template ids.

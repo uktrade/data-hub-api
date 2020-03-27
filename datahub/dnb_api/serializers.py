@@ -175,6 +175,7 @@ class DUNSNumberSerializer(serializers.Serializer):
         return duns_number
 
 
+# TODO: Remove this once the D&B investigations endpoint has been released
 class DNBInvestigationDataSerializer(serializers.Serializer):
     """
     Serializer for DNBInvestigationData - a JSON field that contains
@@ -188,6 +189,7 @@ class DNBInvestigationDataSerializer(serializers.Serializer):
     )
 
 
+# TODO: Refactor this once the D&B investigations endpoint has been released
 class DNBCompanyInvestigationSerializer(CompanySerializer):
     """
     For creating Company record to be investigated by DNB.
