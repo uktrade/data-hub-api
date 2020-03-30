@@ -3,6 +3,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyExportCountryFactory
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.dataset.core.test import BaseDatasetViewTest
 
 
@@ -13,6 +14,8 @@ def get_expected_data_from_company_export_country(company_export_country):
         'company_id': str(company_export_country.company_id),
         'country__name': company_export_country.country.name,
         'country__iso_alpha2_code': company_export_country.country.iso_alpha2_code,
+        'created_on': format_date_or_datetime(company_export_country.created_on),
+        'modified_on': format_date_or_datetime(company_export_country.modified_on),
         'status': company_export_country.status,
     }
 
@@ -55,13 +58,11 @@ class TestCompanyExportCountryDatasetView(BaseDatasetViewTest):
 
         expected_list = sorted(
             [
-                company_export_country_1,
-                company_export_country_2,
                 company_export_country_3,
                 company_export_country_4,
             ],
             key=lambda x: x.id,
-        )
+        ) + [company_export_country_1, company_export_country_2]
 
         for i in range(len(expected_list)):
             assert response_results[i]['id'] == str(expected_list[i].id)
