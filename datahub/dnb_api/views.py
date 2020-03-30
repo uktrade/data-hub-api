@@ -19,11 +19,11 @@ from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
-    DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
+    LegacyDNBCompanyInvestigationSerializer,
 )
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
@@ -207,7 +207,9 @@ class DNBCompanyCreateView(APIView):
         )
 
 
-class DNBCompanyCreateInvestigationView(APIView):
+# TODO: Remove this API endpoint when the new company investigation proxy
+# endpoint is available
+class LegacyDNBCompanyCreateInvestigationView(APIView):
     """
     View for creating a company for DNB to investigate.
 
@@ -232,7 +234,7 @@ class DNBCompanyCreateInvestigationView(APIView):
         create a Company record in DataHub.
         """
         formatted_company_data = format_dnb_company_investigation(request.data)
-        company_serializer = DNBCompanyInvestigationSerializer(data=formatted_company_data)
+        company_serializer = LegacyDNBCompanyInvestigationSerializer(data=formatted_company_data)
 
         try:
             company_serializer.is_valid(raise_exception=True)

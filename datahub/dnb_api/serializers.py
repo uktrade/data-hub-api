@@ -176,7 +176,7 @@ class DUNSNumberSerializer(serializers.Serializer):
 
 
 # TODO: Remove this once the D&B investigations endpoint has been released
-class DNBInvestigationDataSerializer(serializers.Serializer):
+class LegacyDNBInvestigationDataSerializer(serializers.Serializer):
     """
     Serializer for DNBInvestigationData - a JSON field that contains
     auxuliary data needed for submitting to DNB for investigation.
@@ -190,7 +190,7 @@ class DNBInvestigationDataSerializer(serializers.Serializer):
 
 
 # TODO: Refactor this once the D&B investigations endpoint has been released
-class DNBCompanyInvestigationSerializer(CompanySerializer):
+class LegacyDNBCompanyInvestigationSerializer(CompanySerializer):
     """
     For creating Company record to be investigated by DNB.
 
@@ -209,7 +209,7 @@ class DNBCompanyInvestigationSerializer(CompanySerializer):
         """
         if dnb_investigation_data in (None, ''):
             return None
-        serializer = DNBInvestigationDataSerializer(data=dnb_investigation_data)
+        serializer = LegacyDNBInvestigationDataSerializer(data=dnb_investigation_data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
