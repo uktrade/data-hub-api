@@ -9,7 +9,7 @@ class UserEventAdmin(ViewOnlyAdmin):
     """Admin configuration for UserEvent."""
 
     list_display = ('timestamp', 'adviser', 'type', 'api_url_path')
-    list_filter = ('type', 'api_url_path')
+    list_filter = ('type',)
     list_select_related = ('adviser',)
     fields = (
         'id',
@@ -19,6 +19,7 @@ class UserEventAdmin(ViewOnlyAdmin):
         'api_url_path',
         'pretty_data',
     )
+    search_fields = ('^api_url_path', '=adviser__id')
     readonly_fields = fields
 
     def adviser_link(self, obj):
