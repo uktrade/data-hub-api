@@ -45,3 +45,12 @@ class TestRecordUserEvent:
         assert event.type == UserEventType.SEARCH_EXPORT
         assert event.api_url_path == 'test-path'
         assert event.data == expected_data
+
+    def test_can_override_adviser(self):
+        """Test that an explicitly provided adviser is used over the one in the request."""
+        adviser = AdviserFactory()
+        request = Mock(user=Mock(), path='test-path')
+        event = record_user_event(request, UserEventType.SEARCH_EXPORT, adviser=adviser)
+        event.refresh_from_db()
+
+        assert event.adviser == adviser
