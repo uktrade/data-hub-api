@@ -11,7 +11,8 @@ from rest_framework.views import APIView
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.oauth.auth import SSOIntrospectionAuthentication
-
+from datahub.user_event_log.constants import UserEventType
+from datahub.user_event_log.models import UserEvent
 
 FROZEN_DATETIME = datetime(2020, 1, 1, 0, tzinfo=utc)
 STAFF_SSO_INTROSPECT_URL = f'{settings.STAFF_SSO_BASE_URL}o/introspect/'
@@ -150,6 +151,13 @@ class TestSSOIntrospectionAuthentication:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {'content': 'introspection-test-view'}
 
+        user_events = list(UserEvent.objects.all())
+        assert len(user_events) == 1
+        user_event = user_events[0]
+        assert user_event.adviser == adviser
+        assert user_event.type == UserEventType.OAUTH_TOKEN_INTROSPECTION
+        assert user_event.api_url_path == '/test-path'
+
     def test_authenticates_if_token_is_cached(self, api_request_factory, requests_mock):
         """Test that authentication is successful if a valid, cached token is provided."""
         adviser = AdviserFactory(sso_email_user_id=EXAMPLE_SSO_EMAIL_USER_ID)
@@ -161,6 +169,8 @@ class TestSSOIntrospectionAuthentication:
         assert request.user == adviser
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {'content': 'introspection-test-view'}
+
+        assert not UserEvent.objects.exists()
 
     def test_caches_token_with_timeout_on_introspection(self, api_request_factory, requests_mock):
         """Test that after introspection, token data is cached with a timeout."""
@@ -205,7 +215,7 @@ class TestSSOIntrospectionAuthentication:
         adviser.refresh_from_db()
         assert adviser.sso_email_user_id == 'user_id@example.test'
 
-    def test_authenticates_if_user_is_inactive(self, api_request_factory, requests_mock):
+    def test_authentication_fails_if_user_is_inactive(self, api_request_factory, requests_mock):
         """Test that authentication fails when there is a matching but inactive user."""
         AdviserFactory(sso_email_user_id=EXAMPLE_SSO_EMAIL_USER_ID, is_active=False)
         requests_mock.post(STAFF_SSO_INTROSPECT_URL, json=_make_introspection_data())
