@@ -156,6 +156,11 @@ DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = ['notifyme@digital.trade.gov.uk']
 
 STAFF_SSO_BASE_URL = 'http://sso.test/'
 STAFF_SSO_AUTH_TOKEN = 'test-sso-token'
+# TODO: Remove this once SSOIntrospectionAuthentication is the default, django-oauth-toolkit
+# is removed and APITestMixin has been updated
+REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = [
+    'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+]
 
 ADMIN_OAUTH2_ENABLED = True
 ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
