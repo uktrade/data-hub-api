@@ -5,8 +5,8 @@ import pytest
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.serializers import (
-    DNBCompanyInvestigationSerializer,
     DNBCompanySerializer,
+    LegacyDNBCompanyInvestigationSerializer,
     SerializerNotPartial,
 )
 from datahub.dnb_api.utils import format_dnb_company_investigation
@@ -81,7 +81,7 @@ def test_investigation_serializer_valid(
             **investigation_payload_override,
         },
     )
-    serializer = DNBCompanyInvestigationSerializer(data=data)
+    serializer = LegacyDNBCompanyInvestigationSerializer(data=data)
     assert serializer.is_valid()
 
     company = serializer.save()
@@ -121,7 +121,7 @@ def test_investigation_serializer_null_fields_valid(
             investigation_payload_override,
         ),
     )
-    serializer = DNBCompanyInvestigationSerializer(data=data)
+    serializer = LegacyDNBCompanyInvestigationSerializer(data=data)
     assert serializer.is_valid()
 
     company = serializer.save()
@@ -154,7 +154,7 @@ def test_investigation_serializer_no_investigation_data_valid(
         ),
         investigation_data_override,
     )
-    serializer = DNBCompanyInvestigationSerializer(data=data)
+    serializer = LegacyDNBCompanyInvestigationSerializer(data=data)
     assert serializer.is_valid()
 
 
@@ -185,7 +185,7 @@ def test_investigation_serializer_null_fields_invalid(
             investigation_payload_override,
         ),
     )
-    serializer = DNBCompanyInvestigationSerializer(data=data)
+    serializer = LegacyDNBCompanyInvestigationSerializer(data=data)
     assert not serializer.is_valid()
     assert serializer.errors == {
         'non_field_errors': [
@@ -234,7 +234,7 @@ def test_investigation_serializer_invalid(
     """
     Test if DNBCompanyInvestigationSerializer fails given an invalid payload.
     """
-    serializer = DNBCompanyInvestigationSerializer(
+    serializer = LegacyDNBCompanyInvestigationSerializer(
         data=format_dnb_company_investigation(
             {**investigation_payload, **investigation_payload_override},
         ),
