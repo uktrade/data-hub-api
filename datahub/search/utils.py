@@ -47,13 +47,3 @@ def get_model_non_mapped_field_names(es_model):
 def serialise_mapping(mapping_dict):
     """Serialises a mapping as JSON."""
     return json.dumps(mapping_dict, sort_keys=True, separators=(',', ':')).encode('utf-8')
-
-
-def get_unique_values_and_exclude_nulls_from_list(data):
-    """
-    :param data: a list of values
-    :return: a list of none empty unique values
-    """
-    return list(
-        filter(None, set(data)),
-    )
