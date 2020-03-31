@@ -66,7 +66,7 @@ def get_basic_search_query(
         '_score',
         'id',
     ).source(
-        exclude=fields_to_exclude,
+        excludes=fields_to_exclude,
     )
 
     search.aggs.bucket(
