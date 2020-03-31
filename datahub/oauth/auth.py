@@ -54,7 +54,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
         user = _look_up_adviser(token_data)
-        if not user:
+        if not (user and user.is_active):
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
         return user, None

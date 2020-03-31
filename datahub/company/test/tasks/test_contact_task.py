@@ -5,7 +5,6 @@ import pytest
 from celery.exceptions import Retry
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
-from django.utils.timezone import now
 from requests import ConnectTimeout
 from rest_framework import status
 
@@ -46,7 +45,10 @@ class TestConsentServiceTask:
     @override_settings(
         CONSENT_SERVICE_BASE_URL=None,
     )
-    def test_with_flag_but_not_configured(self, update_consent_service_feature_flag):
+    def test_with_flag_but_not_configured(
+            self,
+            update_consent_service_feature_flag,
+    ):
         """
         Test that if feature flag is enabled, but environment variables are not set
         then task will throw exception
@@ -59,8 +61,8 @@ class TestConsentServiceTask:
         (
             ('example@example.com', True, None),
             ('example@example.com', False, None),
-            ('example@example.com', True, now()),
-            ('example@example.com', False, now()),
+            ('example@example.com', True, '2020-01-01-12:00:00Z'),
+            ('example@example.com', False, '2020-01-01-12:00:00Z'),
         ),
     )
     def test_task_makes_http_request(
@@ -88,7 +90,7 @@ class TestConsentServiceTask:
             'consents': ['email_marketing'] if accepts_dit_email_marketing else [],
         }
         if modified_at:
-            expected['modified_at'] = modified_at.isoformat()
+            expected['modified_at'] = modified_at
 
         assert matcher.last_request.json() == expected
 
@@ -118,7 +120,7 @@ class TestConsentServiceTask:
         assert mock_retry.call_args.kwargs['exc'].response.status_code == status_code
 
     @patch('datahub.company.tasks.contact.update_contact_consent.retry', side_effect=Retry)
-    @patch('datahub.company.tasks.contact.APIClient.request', side_effect=ConnectTimeout)
+    @patch('datahub.company.consent.APIClient.request', side_effect=ConnectTimeout)
     def test_task_retries_on_connect_timeout(
             self,
             mock_post,
@@ -134,7 +136,7 @@ class TestConsentServiceTask:
         assert isinstance(mock_retry.call_args.kwargs['exc'], ConnectTimeout)
 
     @patch('datahub.company.tasks.contact.update_contact_consent.retry', side_effect=Retry)
-    @patch('datahub.company.tasks.contact.APIClient.request', side_effect=Exception)
+    @patch('datahub.company.consent.APIClient.request', side_effect=Exception)
     def test_task_doesnt_retry_on_other_exception(
             self,
             mock_post,

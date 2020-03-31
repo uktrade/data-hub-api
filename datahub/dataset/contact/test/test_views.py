@@ -1,8 +1,11 @@
+from unittest.mock import Mock
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.test.factories import (
     ArchivedContactFactory,
     ContactFactory,
@@ -13,6 +16,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 
 def get_expected_data_from_contact(contact):
@@ -41,6 +45,14 @@ def get_expected_data_from_contact(contact):
         'telephone_alternative': contact.telephone_alternative,
         'telephone_number': contact.telephone_number,
     }
+
+
+@pytest.fixture
+def consent_get_many_mock(monkeypatch):
+    """Mocks the consent.get_many function"""
+    m = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_many', m)
+    yield m
 
 
 @pytest.mark.django_db
@@ -87,3 +99,30 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
                                        key=lambda item: item.pk) + [contact_1, contact_2]
         for index, contact in enumerate(expected_contact_list):
             assert contact.email == response_results[index]['email']
+
+    def test_makes_api_call_to_consent_service(
+            self,
+            data_flow_api_client,
+            consent_get_many_mock,
+    ):
+        """
+        Test that if consent feature flag is enabled then call is made to
+        the consent service and values from that are in the response.
+        """
+        FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
+        contact1 = ContactFactory(email='a@a.a')
+        contact2 = ContactFactory(email='b@b.b')
+        contact3 = ContactFactory(email='c@c.c')
+        consent_get_many_mock.return_value = {
+            contact1.email: True,
+            contact2.email: False,
+        }
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+        consent_get_many_mock.assert_called_once_with(
+            [contact1.email, contact2.email, contact3.email],
+        )
+        response_results = response.json()['results']
+        assert response_results[0]['accepts_dit_email_marketing']
+        assert not response_results[1]['accepts_dit_email_marketing']
+        assert not response_results[2]['accepts_dit_email_marketing']

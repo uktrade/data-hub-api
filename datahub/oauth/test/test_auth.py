@@ -19,7 +19,7 @@ EXAMPLE_SSO_EMAIL_USER_ID = 'user_id@example.test'
 
 
 class IntrospectionAuthView(APIView):
-    """View using Hawk authentication."""
+    """View using SSOIntrospectionAuthentication."""
 
     authentication_classes = (SSOIntrospectionAuthentication,)
     permission_classes = ()
@@ -204,6 +204,18 @@ class TestSSOIntrospectionAuthentication:
         # Check that the sso_email_user_id was set on the user
         adviser.refresh_from_db()
         assert adviser.sso_email_user_id == 'user_id@example.test'
+
+    def test_authenticates_if_user_is_inactive(self, api_request_factory, requests_mock):
+        """Test that authentication fails when there is a matching but inactive user."""
+        AdviserFactory(sso_email_user_id=EXAMPLE_SSO_EMAIL_USER_ID, is_active=False)
+        requests_mock.post(STAFF_SSO_INTROSPECT_URL, json=_make_introspection_data())
+
+        request = api_request_factory.get('/test-path', HTTP_AUTHORIZATION='Bearer token')
+        response = view(request)
+
+        assert not request.user
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.data == {'detail': 'Invalid authentication credentials.'}
 
     def test_authentication_fails_if_no_matching_user(self, api_request_factory, requests_mock):
         """Test that authentication fails when there is no matching adviser in Data Hub."""

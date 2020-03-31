@@ -8,6 +8,7 @@ NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG = 'notify-dnb-investigations'
 AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG = 'automatic-company-archive'
 EXPORT_COUNTRIES_FEATURE_FLAG = 'export-countries-switch'
 UPDATE_CONSENT_SERVICE_FEATURE_FLAG = 'update-consent-service'
+GET_CONSENT_FROM_CONSENT_SERVICE = 'get-consent-from-consent-service'
 
 CONSENT_SERVICE_EMAIL_CONSENT_TYPE = 'email_marketing'
 

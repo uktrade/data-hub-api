@@ -231,10 +231,19 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+    dnb_investigation_id = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True,
+        help_text=(
+            'The ID for a new company investigation with D&B. This ID is provided by dnb-service.'
+        ),
+    )
     pending_dnb_investigation = models.BooleanField(
         default=False,
         help_text='Whether this company is to be investigated by DNB.',
     )
+    # TODO: Remove this once the API endpoint for creating D&B investigations is released
     dnb_investigation_data = JSONField(
         null=True,
         blank=True,

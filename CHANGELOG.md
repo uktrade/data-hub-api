@@ -1,3 +1,56 @@
+# Data Hub API 28.7.0 (2020-03-31)
+
+
+## Removals
+
+- **Companies** The `delete_old_export_country_history` management command was removed as it’s no longer required.
+
+## Features
+
+- **Companies** A field `dnb_investigation_id` was added to the Company model in preparation
+  for adding a new company investigation API endpoint.
+
+## Bug fixes
+
+- The new authentication class with SSO email user ID support now correctly denies access for inactive users. This new authentication class continues to be currently disabled by default.
+
+## Internal changes
+
+- **Advisers** Some preparatory work was performed for new admin site functionality that will let advisers be added by looking up their details in Staff SSO.
+- **Companies** `.save` or `.update` using the ContactSerializer will trigger the `update_contact_consent`
+  celery task. This task is controlled by a feature flag UPDATE_CONSENT_SERVICE_FEATURE_FLAG
+  if that is not set this is essentially a no-op.
+- **Contacts** It is now possible to set `GET_CONSENT_FROM_CONSENT_SERVICE` feature flag to active
+  to enable looking up `Contact.accepts_dit_email_marketing` from central Consent
+  Service API when making a call to ContactsDataView
+  (`GET /v4/dataset/contacts-dataset`) which is used for exporting Data Hub's entire
+  list of contacts to Data Workspace.
+
+## API
+
+- **Companies** Added a new api endpoint for the company_export_country dataset. The new endpoint is accessed via a GET request to /v4/dataset/company-export-country-dataset.
+- **Interactions** Added a new api endpoint for the interactionexportcountry dataset. The new endpoint is accessed via a GET request to /v4/dataset/interactions-export-country-dataset.
+- **OMIS** The following new Hawk endpoints have been added:
+
+  `POST /v3/public/omis/order/<public-token>/payment-gateway-session`
+  `GET /v3/public/omis/order/<public-token>/payment-gateway-session/<session-id>` 
+
+  The new endpoints are functionally the same as their following counterparts:
+
+  `POST /v3/omis/public/order/<public-token>/payment-gateway-session`
+  `GET /v3/omis/public/order/<public-token>/payment-gateway-session/<session-id>`
+- **OMIS** A new Hawk authenticated `POST /v3/public/omis/order/<public-token>/payment` endpoint has been added.
+  The new endpoint is functionally the same as `POST /v3/omis/public/order/<public-token>/payment`.
+
+## Database schema
+
+- **Companies** A field `dnb_investigation_id` of type UUID was added to the `company_company` table.
+- The following additional indexes were added on the `user_event_log_userevent` table:
+
+  - `(type, adviser_id)`
+  - `(timestamp, type, adviser_id)`
+
+
 # Data Hub API 28.6.0 (2020-03-25)
 
 
