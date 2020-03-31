@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 
@@ -35,3 +37,19 @@ def dnb_response():
             },
         ],
     }
+
+
+@pytest.fixture
+def mock_get_user_by_email(monkeypatch):
+    """Mock get_user_by_email()."""
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.admin.adviser_forms.get_user_by_email', mock)
+    yield mock
+
+
+@pytest.fixture
+def mock_get_user_by_email_user_id(monkeypatch):
+    """Mock get_user_by_email_user_id()."""
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.admin.adviser_forms.get_user_by_email_user_id', mock)
+    yield mock
