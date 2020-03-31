@@ -2,8 +2,6 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
-from json import JSONEncoder
-
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
@@ -18,137 +16,23 @@ from datahub.company.export_wins_api import (
     ExportWinsAPIHTTPError,
     ExportWinsAPITimeoutError,
 )
-from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import APITestMixin, HawkMockJSONResponse
-
-
-def mocked_requests_get(*args, **kwargs):
-    """Mocked company matchin service response"""
-    class MockResponse(JSONEncoder):
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def default(self, o):
-            return o.__dict__
-
-        def json(self):
-            return self.json_data
-
-    return MockResponse(
-        {
-            'matches': [
-                {
-                    'id': 'hello',
-                    'match_id': 1234,
-                    'similarity': '100000',
-                },
-            ],
-        },
-        200,
-    )
 
 
 class TestExportWinsApi(APITestMixin):
     """
-    Tests functionality to obtain export wins for a company
+    Tests functionality to obtain export wins for a company,
     first by getting match if with a post to the company matching service
     and then getting export wins for from export wins API and error handling.
     """
 
-    @pytest.mark.parametrize(
-        'build_company,expected_result',
-        (
-            (
-                lambda: CompanyFactory(
-                    id='00000000-0000-0000-0000-000000000000',
-                    name='Name 1',
-                    company_number='00000000',
-                    duns_number='111111',
-                    address_postcode='W1',
-                    reference_code='22222',
-                ),
-                {
-                    'id': '00000000-0000-0000-0000-000000000000',
-                    'company_name': 'Name 1',
-                    'companies_house_id': '00000000',
-                    'duns_number': '111111',
-                    'postcode': 'W1',
-                    'cdms_ref': '22222',
-                },
-            ),
-            (
-                lambda: CompanyFactory(
-                    id='00000000-0000-0000-0000-000000000000',
-                    name='Name 1',
-                    company_number='00000000',
-                    duns_number=None,
-                    address_postcode='W1',
-                    reference_code='',
-                ),
-                {
-                    'id': '00000000-0000-0000-0000-000000000000',
-                    'company_name': 'Name 1',
-                    'companies_house_id': '00000000',
-                    'postcode': 'W1',
-                },
-            ),
-        ),
-    )
-    def _test_model_to_match_payload(
-        self,
-        requests_mock,
-        build_company,
-        expected_result,
-    ):
-        """
-        Test that the function maps the Company object to JSON correctly
-        also stripping out falsy values.
-        """
-        company = build_company()
-        dynamic_response = HawkMockJSONResponse(
-            api_id=settings.EXPORT_WINS_HAWK_ID,
-            api_key=settings.EXPORT_WINS_HAWK_KEY,
-            response=mocked_requests_get(),
-        )
-        matcher = requests_mock.post(
-            f'wins/match/1/',
-            status_code=status.HTTP_200_OK,
-            text=dynamic_response,
-        )
-        export_wins(company)
-
-        assert matcher.called_once
-        assert matcher.last_request.json() == {
-            'descriptions': [expected_result],
-        }
-
     @override_settings(EXPORT_WINS_SERVICE_BASE_URL=None)
-    def test_export_wins_api_missing_settings_error(self, requests_mock):
+    def test_export_wins_api_missing_settings_error(self):
         """
         Test when environment variables are not set an exception is thrown.
         """
-        company = CompanyFactory()
-        dynamic_response = HawkMockJSONResponse(
-            api_id=settings.COMPANY_MATCHING_HAWK_ID,
-            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
-            response={
-                'matches': [
-                    {
-                        'id': 'hello',
-                        'match_id': 1234,
-                        'similarity': '100000',
-                    },
-                ],
-            },
-        )
-        requests_mock.post(
-            '/api/v1/company/match/',
-            status_code=status.HTTP_200_OK,
-            text=dynamic_response,
-        )
         with pytest.raises(ImproperlyConfigured):
-            export_wins(company)
+            export_wins(1234)
 
     @pytest.mark.parametrize(
         'request_exception,expected_exception',
@@ -181,14 +65,13 @@ class TestExportWinsApi(APITestMixin):
         Test if there is an error connecting to export wins API
         the expected exception was thrown.
         """
-        match_id = 1
-        requests_mock.post(
-            f'wins/match/{match_id}/',
+        match_id = 1234
+        requests_mock.get(
+            f'/wins/match/{match_id}/',
             exc=request_exception,
         )
-        company = CompanyFactory()
         with pytest.raises(expected_exception):
-            export_wins(company)
+            export_wins(match_id)
 
     @pytest.mark.parametrize(
         'response_status',
@@ -208,13 +91,33 @@ class TestExportWinsApi(APITestMixin):
     ):
         """Test if the export wins api returns a status code that is not 200."""
         match_id = 1
-        requests_mock.post(
-            f'/api/v1/wins/{match_id}/',
+        requests_mock.get(
+            f'/wins/match/{match_id}/',
             status_code=response_status,
         )
-        company = CompanyFactory()
         with pytest.raises(
             ExportWinsAPIHTTPError,
             match=f'The Export Wins API returned an error status: {response_status}',
         ):
-            export_wins(company)
+            export_wins(match_id)
+
+    def test_get_call_invoked(
+        self,
+        requests_mock,
+    ):
+        """
+        Check GET call will be made
+        """
+        dynamic_response = HawkMockJSONResponse(
+            api_id=settings.EXPORT_WINS_HAWK_ID,
+            api_key=settings.EXPORT_WINS_HAWK_KEY,
+        )
+        match_id = 1234
+        matcher = requests_mock.get(
+            f'/wins/match/{match_id}/',
+            status_code=status.HTTP_200_OK,
+            text=dynamic_response,
+        )
+        export_wins(match_id)
+
+        assert matcher.called_once

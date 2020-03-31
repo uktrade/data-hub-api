@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
-from datahub.company.company_matching_api import match_company
 from datahub.core.api_client import APIClient, HawkAuth
 
 api_client = APIClient(
@@ -10,12 +9,6 @@ api_client = APIClient(
     HawkAuth(settings.EXPORT_WINS_HAWK_ID, settings.EXPORT_WINS_HAWK_KEY),
     raise_for_status=True,
 )
-
-
-class NoMatchIdException(Exception):
-    """
-    Base exception class for Export Wins API related errors.
-    """
 
 
 class ExportWinsAPIException(Exception):
@@ -51,7 +44,7 @@ def get_export_wins(match_id):
         settings.EXPORT_WINS_HAWK_ID,
         settings.EXPORT_WINS_HAWK_KEY,
     ]):
-        raise ImproperlyConfigured('The all COMPANY_MATCHING_SERVICE_* setting must be set')
+        raise ImproperlyConfigured('The all EXPORT_WINS_SERVICE* setting must be set')
 
     response = api_client.request(
         'GET',
@@ -61,17 +54,12 @@ def get_export_wins(match_id):
     return response
 
 
-def export_wins(company):
+def export_wins(match_id):
     """
-    Get all export wins for a given company.
-    Returns None when company matching service doesn't return a match id.
+    Get all export wins for a given the company match_id.
+
     Raises exception an requests.exceptions.HTTPError for status, timeout and a connection error.
     """
-    match_id_json = match_company(company).json()
-    match_id = match_id_json.get('match_id', None)
-    if not match_id:
-        raise NoMatchIdException('no match id')
-
     try:
         response = get_export_wins(match_id)
     except ConnectionError as exc:

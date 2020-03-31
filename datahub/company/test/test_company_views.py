@@ -1993,7 +1993,7 @@ class TestGetCompanyExportWins(APITestMixin):
         'permission_codenames,expected_status',
         (
             ([], status.HTTP_403_FORBIDDEN),
-            (['view_export_win'], status.HTTP_501_NOT_IMPLEMENTED),
+            (['view_export_win'], status.HTTP_200_OK),
         ),
     )
     def test_permission_checking(self, permission_codenames, expected_status):

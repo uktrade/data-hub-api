@@ -1,15 +1,31 @@
 """Company and related resources view sets."""
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Exists, Prefetch, Q
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
 from datahub.company.autocomplete import AutocompleteFilter
+from datahub.company.company_matching_api import (
+    CompanyMatchingServiceConnectionError,
+    CompanyMatchingServiceHTTPError,
+    CompanyMatchingServiceTimeoutError,
+    match_company,
+)
+from datahub.company.export_wins_api import (
+    export_wins,
+    ExportWinsAPIConnectionError,
+    ExportWinsAPIHTTPError,
+    ExportWinsAPITimeoutError,
+)
 from datahub.company.models import (
     Advisor,
     Company,
@@ -33,7 +49,7 @@ from datahub.company.serializers import (
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
-from datahub.core.exceptions import APINotImplementedException
+from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -42,6 +58,7 @@ from datahub.core.hawk_receiver import (
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
+from datahub.core.view_utils import enforce_request_content_type
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
@@ -358,11 +375,105 @@ class AdviserReadOnlyViewSetV1(
         return filtered_queryset
 
 
-@api_view(['GET'])
-@permission_classes([HasPermissions(f'company.{CompanyPermission.view_export_win}')])
-def export_wins_501_not_implemented(request, pk):
+class ExportWinsForCompanyView(APIView):
     """
-    Get company export wins.
-    The feature is not yet implemented.
+    View returning export wins for a company, retrieved from Export Wins
+    system, based on the match id obtained from Company Matching Service.
     """
-    raise APINotImplementedException('Retriving export wins in not yet implemented.')
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_export_win}',
+        ),
+    )
+
+    def _extract_match_id(self, response):
+        """
+        Extracts match id out of company matching response
+        {
+            "matches": [
+                {
+                    "id": "",
+                    "match_id": 1234,
+                    "similarity": "100000"
+                },
+            ]
+        }
+        """
+        return response.json()['matches'][0]['match_id']
+
+    def _extract_export_wins(self, response):
+        """
+        Extracts export wins results out of export wins reponse
+        [
+            {
+                "id": "c1428ed5-6154-4b17-aded-10a4c85a6431",
+                "date": "2016-05-25",
+                "created": "2020-02-18T15:36:02.782000Z",
+                "country": "CA",
+                "sector": 251,
+                "business_potential": 1,
+                "business_type": "",
+                "name_of_export": "food",
+                "officer": {
+                    "name": "lead officer name",
+                    "email": "",
+                    "team": {
+                        "type": "tcp",
+                        "sub_type": "tcp:12"
+                    }
+                },
+                "contact": {
+                    "name": "customer name",
+                    "email": "noname@commercialsoftware.co.uk",
+                    "job_title": "customer job title"
+                },
+                "value": {
+                    "export": {
+                        "value": 100,
+                        "breakdowns": [
+                            {
+                                "year": 2021,
+                                "value": 100
+                            }
+                        ]
+                    }
+                },
+                "customer": "Commercial Software Limited",
+                "response": null,
+                "hvc": {
+                    "code": "E24116",
+                    "name": "AER-01"
+                }
+            },
+        ]
+        """
+        return response.json()
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def get(self, request):
+        """
+        Proxy to Export Wins API for GET requests for given company's match id
+        is obtained from Company Matching Service
+        """
+        try:
+            matching_response = match_company(request.data)
+            match_id = self._extract_match_id(matching_response)
+            results = []
+            if match_id:
+                export_wins_reponse = export_wins(match_id)
+                results = self._extract_export_wins(export_wins_reponse)
+            return JsonResponse(results)
+
+        except (
+            CompanyMatchingServiceConnectionError,
+            CompanyMatchingServiceTimeoutError,
+            ExportWinsAPIConnectionError,
+            ExportWinsAPITimeoutError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        except (ExportWinsAPIHTTPError, CompanyMatchingServiceHTTPError) as exc:
+            raise APIBadRequestException(str(exc))
