@@ -38,5 +38,7 @@ class UserEvent(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['api_url_path', 'timestamp']),
+            models.Index(fields=['type', 'adviser']),
+            models.Index(fields=['timestamp', 'type', 'adviser']),
         ]
         ordering = ('-timestamp', '-pk')
