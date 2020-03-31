@@ -242,23 +242,33 @@ class DNBCompanyLinkSerializer(DUNSNumberSerializer):
     company_id = NestedRelatedField('company.Company', required=True)
 
 
-class AddressRequestSerializer(serializers.Serializer):
+class DNBAddressSerializer(serializers.Serializer):
     """
     Validate address and convert it to the format expected by dnb-service.
     """
 
-    line_1 = serializers.CharField(source='address_line_1', required=False)
+    line_1 = serializers.CharField(source='address_line_1')
     line_2 = serializers.CharField(source='address_line_2', required=False)
-    town = serializers.CharField(source='address_town', required=False)
+    town = serializers.CharField(source='address_town')
     county = serializers.CharField(source='address_county', required=False)
     postcode = serializers.CharField(source='address_postcode', required=False)
-    country = NestedRelatedField(model=CountryModel, source='address_country', required=False)
+    country = NestedRelatedField(model=CountryModel, source='address_country')
 
     def validate_country(self, country):
         """
         Return iso_alpha2_code only.
         """
         return country.iso_alpha2_code
+
+
+class AddressRequestSerializer(DNBAddressSerializer):
+    """
+    Validate address and convert it to the format expected by dnb-service.
+    """
+
+    line_1 = serializers.CharField(source='address_line_1', required=False)
+    town = serializers.CharField(source='address_town', required=False)
+    country = NestedRelatedField(model=CountryModel, source='address_country', required=False)
 
 
 class ChangeRequestSerializer(serializers.Serializer):
@@ -337,3 +347,49 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
             }
 
         return data
+
+
+class DNBCompanyInvestigationSerializer(serializers.Serializer):
+    """
+    Validate POST data for DNBCompanyInvestigationView and convert it to the format
+    expected by dnb-service.
+    """
+
+    company = NestedRelatedField(Company)
+    name = serializers.CharField(source='primary_name')
+    address = DNBAddressSerializer()
+    website = RelaxedURLField(
+        source='domain',
+        required=False,
+        allow_blank=True,
+    )
+    telephone_number = serializers.CharField(
+        required=False,
+        allow_blank=True,
+    )
+
+    def validate_website(self, website):
+        """
+        Change website to domain.
+        """
+        return urlparse(website).netloc
+
+    def validate(self, data):
+        """
+        Validate if either website or telephone_number is present.
+        """
+        data = super().validate(data)
+
+        if (
+            data.get('website') in (None, '')
+            and data.get('telephone_number') in (None, '')
+        ):
+            raise serializers.ValidationError(
+                'Either website or telephone_number must be provided.',
+            )
+
+        address_data = data.pop('address', {})
+        return {
+            **data,
+            **address_data,
+        }

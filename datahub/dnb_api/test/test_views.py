@@ -31,6 +31,7 @@ from datahub.metadata.models import Country
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
+DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'company-investigation/')
 
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
@@ -1748,3 +1749,223 @@ class TestCompanyChangeRequestView(APITestMixin):
                 'address_postcode': company.address_postcode,
             },
         }
+
+
+class TestCompanyInvestigationView(APITestMixin):
+    """
+    Test POST `/dnb/company-investigation` endpoint.
+    """
+
+    @pytest.mark.parametrize(
+        'content_type,expected_status_code',
+        (
+            (None, status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
+        ),
+    )
+    def test_content_type(
+        self,
+        content_type,
+        expected_status_code,
+    ):
+        """
+        Test that 406 is returned if Content Type is not application/json.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            content_type=content_type,
+        )
+
+        assert response.status_code == expected_status_code
+
+    def test_unauthenticated_not_authorised(self):
+        """
+        Ensure that a non-authenticated request gets a 401.
+        """
+        unauthorised_api_client = self.create_api_client()
+        unauthorised_api_client.credentials(Authorization='foo')
+
+        response = unauthorised_api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={},
+        )
+
+        assert response.status_code == 401
+
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            [],
+            [CompanyPermission.change_company],
+            [CompanyPermission.view_company],
+        ),
+    )
+    def test_no_permission(
+        self,
+        permissions,
+    ):
+        """
+        The endpoint should return 403 if the user does not have the necessary permissions.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={},
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_company_does_not_exist(self):
+        """
+        The endpoint should return 400 if the company when the given company ID does not exist.
+        """
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={
+                'company': '5cf5bf52-9497-465d-913b-f8fdc0331f41',
+                'name': 'Foo Bar LTD',
+                'address': {
+                    'line_1': '123 Fake Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'country': {
+                        'id': constants.Country.united_kingdom.value.id,
+                    },
+                    'postcode': 'W1 0TN',
+                },
+                'website': 'https://www.example.com',
+                'telephone_number': '+44 1234 567 890',
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company': [
+                'Invalid pk "5cf5bf52-9497-465d-913b-f8fdc0331f41" - object does not exist.',
+            ],
+        }
+
+    @pytest.mark.parametrize(
+        'investigation_request_overrides,expected_response',
+        (
+            # No name
+            (
+                {
+                    'name': None,
+                },
+                {
+                    'name': ['This field may not be null.'],
+                },
+            ),
+            # No address
+            (
+                {
+                    'address': None,
+                },
+                {
+                    'address': ['This field may not be null.'],
+                },
+            ),
+            # Address missing required fields
+            (
+                {
+                    'address': {
+                        'postcode': 'W1 0TN',
+                    },
+                },
+                {
+                    'address': {
+                        'line_1': ['This field is required.'],
+                        'town': ['This field is required.'],
+                        'country': ['This field is required.'],
+                    },
+                },
+            ),
+            # No website or phone number
+            (
+                {
+                    'website': '',
+                    'telephone_number': '',
+                },
+                {
+                    'non_field_errors': [
+                        'Either website or telephone_number must be provided.',
+                    ],
+                },
+            ),
+            # Invalid website
+            (
+                {
+                    'website': 'Foo Bar',
+                },
+                {
+                    'website': ['Enter a valid URL.'],
+                },
+            ),
+        ),
+    )
+    def test_invalid_fields(
+        self,
+        investigation_request_overrides,
+        expected_response,
+    ):
+        """
+        Test that invalid payload results in 400 and an appropriate error message.
+        """
+        company = CompanyFactory()
+        investigation_data = {
+            'company': company.id,
+            'name': 'Foo Bar LTD',
+            'address': {
+                'line_1': '123 Fake Street',
+                'line_2': 'Someplace',
+                'town': 'London',
+                'county': 'Greater London',
+                'country': {
+                    'id': constants.Country.united_kingdom.value.id,
+                },
+                'postcode': 'W1 0TN',
+            },
+            'website': 'https://www.example.com',
+            'telephone_number': '+44 1234 567 890',
+            **investigation_request_overrides,
+        }
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data=investigation_data,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_response
+
+    def test_valid(
+        self,
+        requests_mock,
+    ):
+        """
+        The endpoint should return a 501 status when it is hit with a valid payload.
+        """
+        company = CompanyFactory()
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
