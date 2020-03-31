@@ -19,6 +19,7 @@ from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
+    DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
     DNBMatchedCompanySerializer,
@@ -344,3 +345,29 @@ class DNBCompanyChangeRequestView(APIView):
             raise APIUpstreamException(str(exc))
 
         return Response(response)
+
+
+class DNBCompanyInvestigationView(APIView):
+    """
+    View for creating a new investigation to get D&B to investigate and create a company record.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
+        ),
+    )
+
+    @method_decorator(enforce_request_content_type('application/json'))
+    def post(self, request):
+        """
+        A wrapper around the investigation API endpoint for dnb-service.
+        """
+        investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
+        investigation_serializer.is_valid(raise_exception=True)
+
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
