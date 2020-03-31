@@ -1,13 +1,10 @@
-import itertools
 from functools import partial
 
 from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
-from elasticsearch_dsl import Completion
 
 from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
-from datahub.search.utils import get_unique_values_and_exclude_nulls_from_list
 
 DOC_TYPE = 'company'
 
@@ -21,59 +18,6 @@ def _adviser_field_with_indexed_id():
             'name': Text(index=False),
         },
     )
-
-
-def get_suggestions(db_company):
-    """
-    Returns a dictionary with the keys input and context.
-    input contains a list of fields used by the completion suggester to
-    find a record when using an autocomplete search.
-
-    https://www.elastic.co/guide/en/elasticsearch/
-    reference/current/search-suggesters-completion.html
-
-    Both the name and trading name of a company are added in full
-    and each word within the names are individually added.
-    Adding the full names should improve the precision of the search and
-    return the company the user is looking for sooner.
-    The parts of the names are added so when searching the order
-    of the search terms that are entered becomes irrelevant.
-
-    Optional weighting could be added here to boost particular suggestions.
-    See above link.
-
-    contexts contains a dictionary with any supported filters.
-
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/suggester-context.html
-
-    context - country a list of UUIDs of the countries where the company is based.
-    """
-    if db_company.archived:
-        return {}
-
-    names = [
-        db_company.name,
-        *db_company.trading_names,
-    ]
-
-    data = [
-        *itertools.chain(
-            *[name.split(' ') for name in names],
-        ),
-        *names,
-    ]
-
-    countries = [
-        db_company.registered_address_country_id,
-        db_company.address_country_id,
-    ]
-
-    return {
-        'input': get_unique_values_and_exclude_nulls_from_list(data),
-        'contexts': {
-            'country': get_unique_values_and_exclude_nulls_from_list(countries),
-        },
-    }
 
 
 class Company(BaseESModel):
@@ -117,18 +61,9 @@ class Company(BaseESModel):
     vat_number = Keyword(index=False)
     duns_number = Keyword()
     website = Text()
-    suggest = Completion(
-        contexts=[
-            {
-                'name': 'country',
-                'type': 'category',
-            },
-        ],
-    )
     latest_interaction_date = Date()
 
     COMPUTED_MAPPINGS = {
-        'suggest': get_suggestions,
         'address': partial(dict_utils.address_dict, prefix='address'),
         'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
         'one_list_group_global_account_manager': dict_utils.computed_field_function(
