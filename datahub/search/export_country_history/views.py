@@ -83,6 +83,6 @@ class ExportCountryHistoryView(SearchAPIView):
         base_query = super().get_base_query(request, validated_data)
 
         is_relevant_interaction = Term(were_countries_discussed=True)
-        is_relevant_history_entry = Term(_type=ExportCountryHistoryApp.name)
+        is_relevant_history_entry = Term(_document_type=ExportCountryHistoryApp.name)
 
         return base_query.filter(is_relevant_interaction | is_relevant_history_entry)
