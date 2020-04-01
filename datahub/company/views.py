@@ -1,8 +1,7 @@
 """Company and related resources view sets."""
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Exists, Prefetch, Q
-from django.http import JsonResponse
-from django.utils.decorators import method_decorator
+from django.http import Http404, JsonResponse
 from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import mixins, status, viewsets
@@ -466,11 +465,11 @@ class ExportWinsForCompanyView(RetrieveAPIView):
         try:
             matching_response = match_company(company)
             match_id = self._extract_match_id(matching_response)
-            results = {}
             if match_id:
                 export_wins_reponse = export_wins(match_id)
                 results = self._extract_export_wins(export_wins_reponse)
-            return JsonResponse(results)
+                return JsonResponse(results)
+            raise Http404
 
         except (
             CompanyMatchingServiceConnectionError,
