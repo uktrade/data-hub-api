@@ -334,7 +334,7 @@ def test_get_basic_search_query():
                 'should': [
                     {
                         'term': {
-                            '_type': 'contact',
+                            '_document_type': 'contact',
                         },
                     },
                 ],
@@ -343,7 +343,7 @@ def test_get_basic_search_query():
         'aggs': {
             'count_by_type': {
                 'terms': {
-                    'field': '_type',
+                    'field': '_document_type',
                 },
             },
         },

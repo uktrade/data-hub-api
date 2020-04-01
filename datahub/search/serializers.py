@@ -130,7 +130,7 @@ class _ESModelChoiceField(serializers.Field):
 
     def to_representation(self, value):
         """Translates a model to a model name."""
-        return value._doc_type.name
+        return value.get_app_name()
 
 
 class BasicSearchQuerySerializer(BaseSearchQuerySerializer):

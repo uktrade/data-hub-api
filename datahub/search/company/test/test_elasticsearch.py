@@ -391,7 +391,7 @@ def test_get_basic_search_query():
                 'should': [
                     {
                         'term': {
-                            '_type': 'company',
+                            '_document_type': 'company',
                         },
                     },
                 ],
@@ -400,7 +400,7 @@ def test_get_basic_search_query():
         'aggs': {
             'count_by_type': {
                 'terms': {
-                    'field': '_type',
+                    'field': '_document_type',
                 },
             },
         },
