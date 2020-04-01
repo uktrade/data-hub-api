@@ -9,7 +9,7 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
@@ -375,13 +375,13 @@ class AdviserReadOnlyViewSetV1(
         return filtered_queryset
 
 
-class ExportWinsForCompanyView(APIView):
+class ExportWinsForCompanyView(RetrieveAPIView):
     """
     View returning export wins for a company, retrieved from Export Wins
     system, based on the match id obtained from Company Matching Service.
     """
-
     required_scopes = (Scope.internal_front_end,)
+    queryset = Company.objects
     permission_classes = (
         IsAuthenticatedOrTokenHasScope,
         HasPermissions(
@@ -407,61 +407,66 @@ class ExportWinsForCompanyView(APIView):
     def _extract_export_wins(self, response):
         """
         Extracts export wins results out of export wins reponse
-        [
-            {
-                "id": "c1428ed5-6154-4b17-aded-10a4c85a6431",
-                "date": "2016-05-25",
-                "created": "2020-02-18T15:36:02.782000Z",
-                "country": "CA",
-                "sector": 251,
-                "business_potential": 1,
-                "business_type": "",
-                "name_of_export": "food",
-                "officer": {
-                    "name": "lead officer name",
-                    "email": "",
-                    "team": {
-                        "type": "tcp",
-                        "sub_type": "tcp:12"
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": "c1428ed5-6154-4b17-aded-10a4c85a6431",
+                    "date": "2016-05-25",
+                    "created": "2020-02-18T15:36:02.782000Z",
+                    "country": "CA",
+                    "sector": 251,
+                    "business_potential": 1,
+                    "business_type": "",
+                    "name_of_export": "food",
+                    "officer": {
+                        "name": "lead officer name",
+                        "email": "",
+                        "team": {
+                            "type": "tcp",
+                            "sub_type": "tcp:12"
+                        }
+                    },
+                    "contact": {
+                        "name": "customer name",
+                        "email": "noname@commercialsoftware.co.uk",
+                        "job_title": "customer job title"
+                    },
+                    "value": {
+                        "export": {
+                            "value": 100,
+                            "breakdowns": [
+                                {
+                                    "year": 2021,
+                                    "value": 100
+                                }
+                            ]
+                        }
+                    },
+                    "customer": "Commercial Software Limited",
+                    "response": null,
+                    "hvc": {
+                        "code": "E24116",
+                        "name": "AER-01"
                     }
                 },
-                "contact": {
-                    "name": "customer name",
-                    "email": "noname@commercialsoftware.co.uk",
-                    "job_title": "customer job title"
-                },
-                "value": {
-                    "export": {
-                        "value": 100,
-                        "breakdowns": [
-                            {
-                                "year": 2021,
-                                "value": 100
-                            }
-                        ]
-                    }
-                },
-                "customer": "Commercial Software Limited",
-                "response": null,
-                "hvc": {
-                    "code": "E24116",
-                    "name": "AER-01"
-                }
-            },
-        ]
+            ]
+        }
         """
         return response.json()
 
-    @method_decorator(enforce_request_content_type('application/json'))
-    def get(self, request):
+    def retrieve(self, request, *args, **kwargs):
         """
         Proxy to Export Wins API for GET requests for given company's match id
         is obtained from Company Matching Service
         """
+        company = self.get_object()
         try:
-            matching_response = match_company(request.data)
+            matching_response = match_company(company)
             match_id = self._extract_match_id(matching_response)
-            results = []
+            results = {}
             if match_id:
                 export_wins_reponse = export_wins(match_id)
                 results = self._extract_export_wins(export_wins_reponse)
