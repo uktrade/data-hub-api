@@ -712,7 +712,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
                                         'must': [
                                             {
                                                 'term': {
-                                                    '_type': search_app.name,
+                                                    '_document_type': search_app.name,
                                                 },
                                             },
                                         ],
@@ -731,7 +731,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
                 'should': [
                     {
                         'term': {
-                            '_type': search_app.name,
+                            '_document_type': search_app.name,
                         },
                     },
                 ],
@@ -740,7 +740,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
         'aggs': {
             'count_by_type': {
                 'terms': {
-                    'field': '_type',
+                    'field': '_document_type',
                 },
             },
         },
