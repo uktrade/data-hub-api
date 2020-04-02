@@ -58,3 +58,27 @@ class BaseDatasetViewTest:
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['next'] is not None
+
+    def test_pagination_can_be_controlled_by_client(self, data_flow_api_client):
+        """Test that pagination can be controlled by the client"""
+        self.factory.create_batch(2)
+        response_for_page_size_1 = data_flow_api_client.get(self.view_url, params={'page_size': 1})
+        response_for_page_size_2 = data_flow_api_client.get(self.view_url, params={'page_size': 2})
+        assert response_for_page_size_1.status_code == status.HTTP_200_OK
+        assert response_for_page_size_2.status_code == status.HTTP_200_OK
+        assert len(response_for_page_size_1.json()['results']) == 1
+        assert len(response_for_page_size_2.json()['results']) == 2
+
+    @mock.patch('datahub.dataset.core.pagination.DatasetCursorPagination.max_page_size', 2)
+    def test_pagination_respects_max_page_size(self, data_flow_api_client):
+        """Test that pagination conrolled by the client cannot bypass our own max page size"""
+        self.factory.create_batch(2)
+        response_for_page_size_1 = data_flow_api_client.get(self.view_url, params={'page_size': 1})
+        response_for_page_size_10 = data_flow_api_client.get(
+            self.view_url,
+            params={'page_size': 10},
+        )
+        assert response_for_page_size_1.status_code == status.HTTP_200_OK
+        assert response_for_page_size_10.status_code == status.HTTP_200_OK
+        assert len(response_for_page_size_1.json()['results']) == 1
+        assert len(response_for_page_size_10.json()['results']) == 2
