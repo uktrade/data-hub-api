@@ -1,0 +1,1 @@
+It‘s now possible to search for user events in the admin site by API URL path prefix and adviser ID. The user event API URL path field filter was also removed due to the large number of entries in this filter.
