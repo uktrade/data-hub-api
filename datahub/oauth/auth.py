@@ -1,5 +1,6 @@
 import time
 from logging import getLogger
+from typing import Optional, Tuple
 
 from django.conf import settings
 from django.core.cache import cache
@@ -8,6 +9,8 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from datahub.company.models import Advisor
 from datahub.oauth.sso_api_client import introspect_token, SSORequestError, SSOTokenDoesNotExist
+from datahub.user_event_log.constants import UserEventType
+from datahub.user_event_log.utils import record_user_event
 
 NO_CREDENTIALS_MESSAGE = 'Authentication credentials were not provided.'
 INCORRECT_CREDENTIALS_MESSAGE = 'Incorrect authentication credentials.'
@@ -49,7 +52,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
         if not token:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
-        token_data = _look_up_token(token)
+        token_data, was_cached = _look_up_token(token)
         if not token_data:
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
@@ -57,44 +60,51 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
         if not (user and user.is_active):
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
+        # Only record real (non-cached) introspections (otherwise we'd be recording every
+        # request)
+        if not was_cached:
+            record_user_event(request, UserEventType.OAUTH_TOKEN_INTROSPECTION, adviser=user)
+
         return user, None
 
 
-def _look_up_token(token):
+def _look_up_token(token) -> Tuple[Optional[dict], bool]:
     """
     Look up data about an access token.
 
     This first checks the cache, and falls back to querying Staff SSO if the token isn't cached.
+
+    :returns: a 2-tuple of: (token data, was the token cached)
     """
     cache_key = f'access_token:{token}'
     cached_token_data = cache.get(cache_key)
 
     if cached_token_data:
-        return cached_token_data
+        return cached_token_data, True
 
     try:
         token_data = introspect_token(token)
     except SSOTokenDoesNotExist:
-        return None
+        return None, False
     except SSORequestError:
         logger.exception('SSO introspection request failed')
-        return None
+        return None, False
 
     # This should not be possible as all valid tokens should be active
     if not token_data['active']:
         logger.warning('Introspected token was inactive')
-        return None
+        return None, False
 
     relative_expiry = _calculate_expiry(token_data['exp'])
 
     # This should not happen as expiry times should be in the future
     if relative_expiry <= 0:
         logger.warning('Introspected token has an expiry time in the past')
-        return None
+        return None, False
 
     cache.set(cache_key, token_data, timeout=relative_expiry)
 
-    return token_data
+    return token_data, False
 
 
 def _look_up_adviser(token_data):
