@@ -1,6 +1,6 @@
 from django.urls import path
 
-from datahub.interaction.views import InteractionViewSet
+from datahub.interaction.views import InteractionViewSet, MailViewSet
 
 collection = InteractionViewSet.as_view({
     'get': 'list',
@@ -28,5 +28,10 @@ urlpatterns = [
         'interaction/<uuid:pk>/unarchive',
         unarchive_item,
         name='unarchive-item',
+    ),
+    path(
+        'interaction/mail',
+        MailViewSet.as_view(),
+        name='mail',
     ),
 ]
