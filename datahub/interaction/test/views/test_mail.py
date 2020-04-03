@@ -5,6 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
+from datahub.core.test_utils import APITestMixin
 from datahub.interaction.email_processors.parsers import _get_top_company_from_contacts
 from datahub.interaction.email_processors.processors import _filter_contacts_to_single_company
 
@@ -12,7 +13,7 @@ from datahub.interaction.email_processors.processors import _filter_contacts_to_
 client = APIClient()
 
 
-class TestICALViewSet():
+class TestICALViewSet(APITestMixin):
     """
     Tests for the .ical views.
     """
@@ -70,7 +71,7 @@ class TestICALViewSet():
 
         data = response.json()
         # Subject is hard to test
-        data.pop('subject')
+        subject = data.pop('subject')
         company = _get_top_company_from_contacts(contacts)
         contacts = _filter_contacts_to_single_company(contacts, company)
 
@@ -83,3 +84,27 @@ class TestICALViewSet():
             'status': 'draft',
             'was_policy_feedback_provided': False,
         }
+
+        # try and create an interaction
+        response = self.api_client.post(
+            reverse('api-v3:interaction:collection'),
+            {
+                'kind': data['kind'],
+                'company': {
+                    'id': str(company.id),
+                },
+                'contacts': [
+                    {'id': str(contact.id)}
+                    for contact in contacts
+                ],
+                'date': date.split('T')[0],
+                'dit_participants': [
+                    {'adviser': {'id': adviser}}
+                    for adviser in data['dit_participants']
+                ],
+                'subject': subject,
+                'was_policy_feedback_provided': data['was_policy_feedback_provided'],
+                'status': 'draft',
+            },
+        )
+        assert response.status_code == 201
