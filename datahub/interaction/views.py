@@ -130,11 +130,11 @@ class MailViewSet(APIView):
         AllowAny,
     )
 
-    def get(self, request):
+    def post(self, request):
         """
         Receive an .ical file, parse it and return the
         parsed content in the response.
         """
-        message = mailparser.parse_from_string(request.query_params.get('message'))
+        message = mailparser.parse_from_string(request.data.get('message'))
         data = NoSaveProcessor().process_email(message)
         return Response(data)

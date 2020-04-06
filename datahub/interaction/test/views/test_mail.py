@@ -13,7 +13,7 @@ from datahub.interaction.email_processors.processors import _filter_contacts_to_
 client = APIClient()
 
 
-class TestICALViewSet(APITestMixin):
+class TestMailViewSet(APITestMixin):
     """
     Tests for the .ical views.
     """
@@ -63,7 +63,7 @@ class TestICALViewSet(APITestMixin):
         mailpath = PurePath(__file__).parent.parent / mailpath
         with open(mailpath, 'rb') as email_file:
             message = email_file.read()
-        response = client.get(
+        response = client.post(
             reverse('api-v3:interaction:mail'),
             data={'message': message},
         )
