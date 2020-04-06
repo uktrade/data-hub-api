@@ -29,7 +29,7 @@ django-oauth-toolkit==1.3.2  # via -r requirements.in
 django-pglocks==1.0.4     # via -r requirements.in
 django-redis==4.11.0      # via -r requirements.in
 django-reversion==3.0.7   # via -r requirements.in
-django==3.0.4             # via -r requirements.in, django-debug-toolbar, django-filter, django-mptt, django-oauth-toolkit, django-redis, django-reversion, djangorestframework
+django==3.0.5             # via -r requirements.in, django-debug-toolbar, django-filter, django-mptt, django-oauth-toolkit, django-redis, django-reversion, djangorestframework
 djangorestframework==3.11.0  # via -r requirements.in
 docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
