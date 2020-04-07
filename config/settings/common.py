@@ -608,6 +608,16 @@ _add_hawk_credentials(
     (HawkScope.public_omis,),
 )
 
+# Sending messages to Slack
+ENABLE_SLACK_MESSAGING = env.bool('ENABLE_SLACK_MESSAGING', default=False)
+if ENABLE_SLACK_MESSAGING:
+    SLACK_API_TOKEN = env('SLACK_API_TOKEN')
+    SLACK_MESSAGE_CHANNEL = env('SLACK_MESSAGE_CHANNEL')
+else:
+    SLACK_API_TOKEN = None
+    SLACK_MESSAGE_CHANNEL = None
+SLACK_TIMEOUT_SECONDS = 10
+
 # To read data from Activity Stream
 ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
 ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env('ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)

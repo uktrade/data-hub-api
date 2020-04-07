@@ -8,6 +8,7 @@ from django_pglocks import advisory_lock
 from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
+from datahub.core.realtime_messaging import send_realtime_message
 from datahub.core.utils import log_to_sentry
 from datahub.dnb_api.constants import FEATURE_FLAG_DNB_COMPANY_UPDATES
 from datahub.dnb_api.tasks.sync import logger
@@ -43,6 +44,12 @@ def _record_audit(update_results, producer_task, start_time):
         else:
             audit['failure_count'] += 1
     log_to_sentry('get_company_updates task completed.', extra=audit)
+    success_count, failure_count = audit['success_count'], audit['failure_count']
+    realtime_message = (
+        f'{producer_task.name} updated: {success_count}; '
+        f'failed to update: {failure_count}'
+    )
+    send_realtime_message(realtime_message)
 
 
 def _get_company_updates_from_api(last_updated_after, next_page, task):

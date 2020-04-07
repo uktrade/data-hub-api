@@ -7,6 +7,7 @@ from django_pglocks import advisory_lock
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models import Company
+from datahub.core.realtime_messaging import send_realtime_message
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
@@ -59,6 +60,8 @@ def _automatic_company_archive(limit, simulate):
         )
         logger.info(message)
 
+    return companies_to_be_archived.count()
+
 
 @shared_task(
     bind=True,
@@ -85,4 +88,5 @@ def automatic_company_archive(self, limit=1000, simulate=True):
             logger.info('Another instance of this task is already running.')
             return
 
-        _automatic_company_archive(limit, simulate)
+        archive_count = _automatic_company_archive(limit, simulate)
+        send_realtime_message(f'{self.name} archived: {archive_count}')

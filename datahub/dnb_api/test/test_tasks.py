@@ -493,11 +493,13 @@ class TestGetCompanyUpdates:
             kwargs=expected_kwargs,
         )
 
+    @mock.patch('datahub.dnb_api.tasks.update.send_realtime_message')
     @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data(
         self,
         mocked_log_to_sentry,
+        mocked_send_realtime_message,
         caplog,
         monkeypatch,
         dnb_company_updates_response_uk,
@@ -533,14 +535,20 @@ class TestGetCompanyUpdates:
                 'end_time': '2019-01-02T02:00:00+00:00',
             },
         )
-
+        expected_message = (
+            'datahub.dnb_api.tasks.update.get_company_updates '
+            'updated: 1; failed to update: 0'
+        )
+        mocked_send_realtime_message.assert_called_once_with(expected_message)
         assert 'get_company_updates total update count: 1' in caplog.text
 
+    @mock.patch('datahub.dnb_api.tasks.update.send_realtime_message')
     @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_partial_fields(
         self,
         mocked_log_to_sentry,
+        mocked_send_realtime_message,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -574,12 +582,19 @@ class TestGetCompanyUpdates:
                 'end_time': '2019-01-02T02:00:00+00:00',
             },
         )
+        expected_message = (
+            'datahub.dnb_api.tasks.update.get_company_updates '
+            'updated: 1; failed to update: 0'
+        )
+        mocked_send_realtime_message.assert_called_once_with(expected_message)
 
+    @mock.patch('datahub.dnb_api.tasks.update.send_realtime_message')
     @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
     @freeze_time('2019-01-02T2:00:00')
     def test_updates_with_update_company_from_dnb_data_with_failure(
         self,
         mocked_log_to_sentry,
+        mocked_send_realtime_message,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -619,6 +634,11 @@ class TestGetCompanyUpdates:
                 'end_time': '2019-01-02T02:00:00+00:00',
             },
         )
+        expected_message = (
+            'datahub.dnb_api.tasks.update.get_company_updates '
+            'updated: 1; failed to update: 1'
+        )
+        mocked_send_realtime_message.assert_called_once_with(expected_message)
 
 
 def test_get_company_updates_feature_flag_inactive_no_updates(

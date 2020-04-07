@@ -180,6 +180,55 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @pytest.mark.parametrize(
+        'created_on_delta, companies_to_create, expected_message',
+        (
+            (
+                relativedelta(),
+                1,
+                'datahub.company.tasks.automatic_company_archive archived: 0',
+            ),
+            (
+                relativedelta(months=3, days=1),
+                1,
+                'datahub.company.tasks.automatic_company_archive archived: 1',
+            ),
+            (
+                relativedelta(months=3, days=1),
+                3,
+                'datahub.company.tasks.automatic_company_archive archived: 3',
+            ),
+        ),
+    )
+    @freeze_time('2020-01-01-12:00:00')
+    def test_realtime_messages_sent(
+        self,
+        monkeypatch,
+        automatic_company_archive_feature_flag,
+        created_on_delta,
+        companies_to_create,
+        expected_message,
+    ):
+        """
+        Test that appropriate realtime messaging is sent which reflects the archiving
+        actions.
+        """
+        created_on = timezone.now() - created_on_delta
+        for _ in range(companies_to_create):
+            with freeze_time(created_on):
+                company = CompanyFactory()
+            CompanyInteractionFactory(
+                company=company,
+                date=timezone.now() - relativedelta(years=8, days=1),
+            )
+        mock_send_realtime_message = mock.Mock()
+        monkeypatch.setattr(
+            'datahub.company.tasks.company.send_realtime_message',
+            mock_send_realtime_message,
+        )
+        automatic_company_archive.apply_async(kwargs={'simulate': False})
+        mock_send_realtime_message.assert_called_once_with(expected_message)
+
+    @pytest.mark.parametrize(
         'modified_on_delta, expected_archived',
         (
             (relativedelta(), False),
