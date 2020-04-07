@@ -30,6 +30,9 @@ statsd==3.3.0
 mail-parser==3.12.0
 icalendar==4.0.5
 
+# Slack
+slackclient==2.5.0
+
 # REDIS
 django-redis==4.11.0
 redis==3.4.1

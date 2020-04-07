@@ -1,0 +1,1 @@
+The PyPI package "slackclient" was added to the requirements and a wrapper library `realtime_messaging` was created to abstract away its implementation.
