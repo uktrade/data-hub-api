@@ -1,0 +1,1 @@
+Two scheduled tasks - "automatic company archive" and "get company updates" - will now send summary messages to a Slack channel upon completion.
