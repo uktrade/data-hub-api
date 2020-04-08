@@ -48,6 +48,7 @@ class CompanyReferral(BaseModel):
         blank=True,
         on_delete=models.PROTECT,
         related_name='company_referral',
+        help_text=f"This should be filled in if the referral status is '{Status.COMPLETE.label}'.",
     )
     completed_by = models.ForeignKey(
         'company.Advisor',
@@ -55,8 +56,13 @@ class CompanyReferral(BaseModel):
         blank=True,
         on_delete=models.CASCADE,
         related_name='completed_referrals',
+        help_text=f"This should be filled in if the referral status is '{Status.COMPLETE.label}'.",
     )
-    completed_on = models.DateTimeField(null=True, blank=True)
+    completed_on = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=f"This should be filled in if the referral status is '{Status.COMPLETE.label}'.",
+    )
     subject = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     notes = models.TextField()
 

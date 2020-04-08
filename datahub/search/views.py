@@ -163,7 +163,7 @@ def _get_global_search_permission_filters(request):
             continue
 
         filter_args = app.get_permission_filters(request)
-        yield (app.es_model._doc_type.name, filter_args)
+        yield (app.es_model.get_app_name(), filter_args)
 
 
 class SearchAPIView(APIView):
