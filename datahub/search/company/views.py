@@ -18,12 +18,10 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.oauth.scopes import Scope
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
-    AutcompleteSearchCompanyQueryContextSerializer,
     PublicSearchCompanyQuerySerializer,
     SearchCompanyQuerySerializer,
 )
 from datahub.search.views import (
-    AutocompleteSearchListAPIView,
     register_v4_view,
     SearchAPIView,
     SearchExportAPIView,
@@ -36,7 +34,6 @@ class SearchCompanyAPIViewMixin:
     required_scopes = (Scope.internal_front_end,)
     search_app = CompanySearchApp
     serializer_class = SearchCompanyQuerySerializer
-    autocomplete_context_serializer_class = AutcompleteSearchCompanyQueryContextSerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }
@@ -218,23 +215,3 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
     }
-
-
-@register_v4_view(sub_path='autocomplete')
-class CompanyAutocompleteSearchListAPIView(
-    SearchCompanyAPIViewMixin,
-    AutocompleteSearchListAPIView,
-):
-    """Company autocomplete search view."""
-
-    document_fields = [
-        'id',
-        'name',
-        'trading_names',
-        'address',
-        'registered_address',
-    ]
-
-    def get_entities(self):
-        """Returns entities"""
-        return [self.search_app.es_model]
