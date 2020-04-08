@@ -60,17 +60,17 @@ def get_basic_search_query(
 
     search = search.post_filter(
         Bool(
-            should=Term(_type=entity._doc_type.name),
+            should=Term(_document_type=entity.get_app_name()),
         ),
     ).sort(
         '_score',
         'id',
     ).source(
-        exclude=fields_to_exclude,
+        excludes=fields_to_exclude,
     )
 
     search.aggs.bucket(
-        'count_by_type', 'terms', field='_type',
+        'count_by_type', 'terms', field='_document_type',
     )
 
     return search[offset:offset + limit]
@@ -214,7 +214,7 @@ def _build_global_permission_query(permission_filters_by_entity):
 
 def _build_global_permission_subqueries(permission_filters_by_entity):
     for entity, filter_args in permission_filters_by_entity.items():
-        query = Term(_type=entity)
+        query = Term(_document_type=entity)
         entity_condition = _build_entity_permission_query(filter_args)
 
         if entity_condition is not None:
