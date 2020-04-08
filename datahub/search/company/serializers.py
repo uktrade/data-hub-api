@@ -44,11 +44,3 @@ class PublicSearchCompanyQuerySerializer(EntitySearchQuerySerializer):
 
     archived = serializers.BooleanField(required=False)
     name = serializers.CharField(required=False)
-
-
-class AutcompleteSearchCompanyQueryContextSerializer(serializers.Serializer):
-    """Serializer used for the additional context filters for company autocomplete search."""
-
-    country = SingleOrListField(
-        child=StringUUIDField(allow_null=False), required=False,
-    )

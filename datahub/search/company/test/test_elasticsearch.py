@@ -264,16 +264,6 @@ def test_mapping(es):
                     },
                     'type': 'object',
                 },
-                'suggest': {
-                    'analyzer': 'simple',
-                    'max_input_length': 50,
-                    'preserve_position_increments': True,
-                    'preserve_separators': True,
-                    'type': 'completion',
-                    'contexts': [
-                        {'name': 'country', 'type': 'CATEGORY'},
-                    ],
-                },
                 'trading_names': {
                     'type': 'text',
                     'fields': {
@@ -562,7 +552,6 @@ def test_indexed_doc(es):
         'registered_address',
         'one_list_group_global_account_manager',
         'sector',
-        'suggest',
         'trading_names',
         'turnover_range',
         'uk_based',
