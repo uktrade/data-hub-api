@@ -1,3 +1,21 @@
+# Data Hub API 28.8.0 (2020-04-08)
+
+
+## Features
+
+- **Advisers** The 'SSO email user ID' field is now displayed when editing advisers on the admin site. This field is read-only until existing values have been filled in.
+- **Advisers** The new authentication class with SSO email user ID support now records user events whenever an introspection occurs. This new authentication class continues to be currently disabled by default.
+- **Advisers** It‘s now possible to search for user events in the admin site by API URL path prefix and adviser ID. The user event API URL path field filter was also removed due to the large number of entries in this filter.
+- **Companies** Two scheduled tasks - "automatic company archive" and "get company updates" - will now send summary messages to a Slack channel upon completion.
+
+## Internal changes
+
+- **Advisers** A new admin site page for adding an adviser by looking up their details in Staff SSO was added. This page is currently only linked to if a feature flag is enabled.
+- Global search queries were updated to use the `excludes` Elasticsearch search parameter instead of the deprecated `exclude` parameter.
+- The PyPI package "slackclient" was added to the requirements and a wrapper library `realtime_messaging` was created to abstract away its implementation.
+- Elasticsearch queries were updated to use the custom `_document_type` field instead of the deprecated `_type` field.
+
+
 # Data Hub API 28.7.0 (2020-03-31)
 
 
