@@ -150,7 +150,7 @@ def test_callback_without_access_code():
 def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_token):
     """Test that if SSO user is not found then no access is granted."""
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'email': 'some@email'}
+    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
 
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
 
@@ -189,7 +189,7 @@ def test_callback_requests_sso_profile_valid_non_staff_user_by_email(
     AdviserFactory(email='some@email', **flags)
 
     get_access_token.return_value = {'access_token': 'access-token'}
-    get_sso_user_profile.return_value = {'email': 'some@email'}
+    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
 
     request = get_request_with_session('/oauth/callback/?state=original&code=code')
     request.session['oauth.state'] = 'original'
@@ -211,10 +211,10 @@ def test_callback_requests_sso_profile_valid_email(get_sso_user_profile, get_acc
     Test that if SSO user has a matching email (and relevant flags), then the access is granted.
     """
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
-    adviser = AdviserFactory(email='some@email', is_staff=True, is_active=True)
+    adviser = AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'email': 'some@email'}
+    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
 
     request = get_request_with_session(f'/oauth/callback/?state={fake_state_id}&code=code')
 
@@ -233,10 +233,10 @@ def test_callback_requests_sso_profile_valid_email(get_sso_user_profile, get_acc
 def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
     """Test that successful login redirects user to `next_url`."""
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
-    AdviserFactory(email='some@email', is_staff=True, is_active=True)
+    AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'email': 'some@email'}
+    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
 
     request = get_request_with_session(
         f'/oauth/callback/?next=/some-location&state={fake_state_id}&code=code',
@@ -262,10 +262,10 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
 def test_callback_validates_next_url(get_sso_user_profile, get_access_token, dangerous_redirect):
     """Test that successful login redirects user to `next_url`."""
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
-    AdviserFactory(email='some@email', is_staff=True, is_active=True)
+    AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'email': 'some@email'}
+    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
 
     request = get_request_with_session(
         f'/oauth/callback/?next={dangerous_redirect}&state={fake_state_id}&code=code',
