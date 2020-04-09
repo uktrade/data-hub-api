@@ -548,7 +548,7 @@ class HawkMockJSONResponse:
             request.url,
             request.method,
             content=request.text,
-            content_type=request.headers['Content-Type'],
+            content_type=request.headers.get('Content-Type', ''),
         )
         receiver.respond(
             content=response,

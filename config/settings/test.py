@@ -180,3 +180,7 @@ CONSENT_SERVICE_HAWK_VERIFY_RESPONSE = False
 COMPANY_MATCHING_SERVICE_BASE_URL = 'http://content.matching/'
 COMPANY_MATCHING_HAWK_ID = 'some-id'
 COMPANY_MATCHING_HAWK_KEY = 'some-secret'
+
+EXPORT_WINS_SERVICE_BASE_URL = 'http://content.export-wins/'
+EXPORT_WINS_HAWK_ID = 'some-id'
+EXPORT_WINS_HAWK_KEY = 'some-secret'
