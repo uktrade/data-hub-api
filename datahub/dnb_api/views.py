@@ -27,6 +27,7 @@ from datahub.dnb_api.serializers import (
     LegacyDNBCompanyInvestigationSerializer,
 )
 from datahub.dnb_api.utils import (
+    create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequest,
@@ -370,4 +371,21 @@ class DNBCompanyInvestigationView(APIView):
         investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
         investigation_serializer.is_valid(raise_exception=True)
 
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        data = investigation_serializer.validated_data
+        company = data.pop('company')
+
+        try:
+            response = create_investigation(data)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        company.dnb_investigation_id = response['id']
+        company.pending_dnb_investigation = True
+        company.save()
+
+        return Response(response)

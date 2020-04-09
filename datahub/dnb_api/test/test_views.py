@@ -1946,9 +1946,33 @@ class TestCompanyInvestigationView(APITestMixin):
         requests_mock,
     ):
         """
-        The endpoint should return a 501 status when it is hit with a valid payload.
+        The endpoint should return 200 as well as a valid response when it is hit with a valid
+        payload.
         """
         company = CompanyFactory()
+        dnb_formatted_company_details = {
+            'primary_name': 'Joe Bloggs LTD',
+            'domain': 'www.example.com',
+            'telephone_number': '123456789',
+            'address_line_1': '23 Code Street',
+            'address_line_2': 'Someplace',
+            'address_town': 'London',
+            'address_county': 'Greater London',
+            'address_postcode': 'W1 0TN',
+            'address_country': 'GB',
+        }
+        dnb_response = {
+            'id': '11111111-2222-3333-4444-555555555555',
+            'status': 'pending',
+            'created_on': '2020-01-05T11:00:00',
+            'company_details': dnb_formatted_company_details,
+        }
+
+        requests_mock.post(
+            DNB_INVESTIGATION_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
 
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-investigation'),
@@ -1968,4 +1992,134 @@ class TestCompanyInvestigationView(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == dnb_response
+        assert requests_mock.last_request.json() == dnb_formatted_company_details
+        company.refresh_from_db()
+        assert str(company.dnb_investigation_id) == dnb_response['id']
+        assert company.pending_dnb_investigation is True
+
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+        ),
+    )
+    def test_dnb_service_error(
+        self,
+        requests_mock,
+        status_code,
+    ):
+        """
+        The  endpoint should return 502 if the upstream `dnb-service` returns an error.
+        """
+        company = CompanyFactory()
+        requests_mock.post(
+            DNB_INVESTIGATION_URL,
+            status_code=status_code,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_post_no_dnb_setting(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        company = CompanyFactory()
+
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.post(
+                reverse('api-v4:dnb-api:company-investigation'),
+                data={
+                    'company': company.id,
+                    'name': 'Joe Bloggs LTD',
+                    'website': 'https://www.example.com',
+                    'telephone_number': '123456789',
+                    'address': {
+                        'line_1': '23 Code Street',
+                        'line_2': 'Someplace',
+                        'town': 'London',
+                        'county': 'Greater London',
+                        'postcode': 'W1 0TN',
+                        'country': constants.Country.united_kingdom.value.id,
+                    },
+                },
+            )
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_request_error(
+        self,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we raise the
+        exception with an appropriate message.
+        """
+        company = CompanyFactory()
+        requests_mock.post(
+            DNB_INVESTIGATION_URL,
+            exc=request_exception,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY

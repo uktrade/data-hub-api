@@ -433,3 +433,41 @@ def request_changes(duns_number, changes):
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
+
+
+def _create_investigation(payload):
+    """
+    Submit change request to dnb-service.
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+    response = api_client.request(
+        'POST',
+        'company-investigation/',
+        json=payload,
+        timeout=3.0,
+    )
+    return response
+
+
+def create_investigation(investigation_data):
+    """
+    Submit change request for the company with the given duns_number
+    and changes to the dnb-service.
+    """
+    try:
+        dnb_response = _create_investigation(investigation_data)
+
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if not dnb_response.ok:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    return dnb_response.json()
