@@ -1,5 +1,5 @@
 ---
 applications:
 - buildpacks:
-  - https://github.com/cloudfoundry/python-buildpack.git#v1.7.5
+  - https://github.com/cloudfoundry/python-buildpack.git#v1.7.12
   stack: cflinuxfs3
