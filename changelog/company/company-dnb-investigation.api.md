@@ -27,7 +27,7 @@ Responds with:
     "status": "pending",
     "created_on": "2020-01-05T11:00:00",
     "company_details": {
-        "primary_name": 'Joe Bloggs LTD',
+        "primary_name": "Joe Bloggs LTD",
         "domain": "example.com", 
         "telephone_number": "123456789",
         "address_line_1": "23 Code Street",
