@@ -4,18 +4,20 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
+aiohttp==3.6.2            # via slackclient
 amqp==2.5.2               # via kombu
 apipkg==1.5               # via execnet
 argh==0.26.2              # via watchdog
 asgiref==3.2.7            # via django
-attrs==19.3.0             # via flake8-bugbear, pytest
+async-timeout==3.0.1      # via aiohttp
+attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
 boto3==1.12.36            # via -r requirements.in
 botocore==1.15.36         # via boto3, s3transfer
 celery[redis]==4.4.2      # via -r requirements.in
 certifi==2019.11.28       # via requests, sentry-sdk
-chardet==3.0.4            # via -r requirements.in, requests
+chardet==3.0.4            # via -r requirements.in, aiohttp, requests
 click==7.1.1              # via pip-tools, towncrier
 coverage==5.0.4           # via pytest-cov
 decorator==4.4.2          # via ipython, traitlets
@@ -56,7 +58,7 @@ gevent==1.4.0             # via -r requirements.in
 greenlet==0.4.15          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
 icalendar==4.0.5          # via -r requirements.in
-idna==2.9                 # via requests
+idna==2.9                 # via requests, yarl
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
@@ -71,6 +73,7 @@ mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
 monotonic==1.5            # via notifications-python-client
 more-itertools==8.2.0     # via pytest
+multidict==4.7.5          # via aiohttp, yarl
 notifications-python-client==5.5.1  # via -r requirements.in
 oauthlib==3.1.0           # via django-oauth-toolkit
 packaging==20.3           # via pytest
@@ -84,7 +87,7 @@ piprot==0.9.11            # via -r requirements.in
 pluggy==0.13.1            # via pytest
 prompt-toolkit==3.0.4     # via ipython
 psycogreen==1.0.2         # via -r requirements.in
-psycopg2==2.8.4           # via -r requirements.in
+psycopg2==2.8.5           # via -r requirements.in
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
@@ -126,6 +129,7 @@ watchdog[watchmedo]==0.10.2  # via -r requirements.in
 wcwidth==0.1.9            # via prompt-toolkit, pytest
 werkzeug==1.0.1           # via -r requirements.in
 whitenoise==5.0.1         # via -r requirements.in
+yarl==1.4.2               # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
