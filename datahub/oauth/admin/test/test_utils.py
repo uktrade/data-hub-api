@@ -93,7 +93,7 @@ def test_get_sso_user_profile(requests_mock):
     requests_mock.get(
         settings.ADMIN_OAUTH2_USER_PROFILE_PATH,
         status_code=status.HTTP_200_OK,
-        json={'email': 'what@email'},
+        json={'email': 'what@email', 'email_user_id': 'what-123@email'},
     )
 
     sso_user_profile = get_sso_user_profile('1234')
@@ -101,7 +101,7 @@ def test_get_sso_user_profile(requests_mock):
     assert requests_mock.call_count == 1
     assert requests_mock.request_history[-1].url == settings.ADMIN_OAUTH2_USER_PROFILE_PATH
 
-    assert sso_user_profile == {'email': 'what@email'}
+    assert sso_user_profile == {'email': 'what@email', 'email_user_id': 'what-123@email'}
 
 
 def test_get_sso_user_profile_error(requests_mock):
@@ -122,14 +122,14 @@ def test_get_adviser_by_sso_user_profile_no_staff_email_id():
     AdviserFactory(is_staff=True, is_active=True)
 
     with pytest.raises(AuthenticationFailed) as excinfo:
-        get_adviser_by_sso_user_profile({'sso_email_user_id': 'some-123@email'})
+        get_adviser_by_sso_user_profile({'email_user_id': 'some-123@email'})
     assert excinfo.value.detail == 'User not found.'
 
 
 def test_get_adviser_by_sso_user_profile_email_id():
-    """Test that adviser is returned if staff SSO user email id matches."""
+    """Test that adviser is returned if staff SSO email user id matches."""
     adviser = AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
-    sso_adviser = get_adviser_by_sso_user_profile({'sso_email_user_id': 'some-123@email'})
+    sso_adviser = get_adviser_by_sso_user_profile({'email_user_id': 'some-123@email'})
 
     assert sso_adviser.pk == adviser.pk
     assert sso_adviser.sso_email_user_id == 'some-123@email'
@@ -145,11 +145,11 @@ def test_get_adviser_by_sso_user_profile_email_id():
 )
 def test_get_adviser_by_sso_email_id_non_staff_or_active(flags):
     """
-    Test that AuthenticationFailed is raised if SSO email id matches and user has neither
+    Test that AuthenticationFailed is raised if SSO email user id matches and user has neither
     is_staff nor is_active flags set.
     """
     AdviserFactory(sso_email_user_id='some-123@email', **flags)
     with pytest.raises(AuthenticationFailed) as excinfo:
-        get_adviser_by_sso_user_profile({'sso_email_user_id': 'some-123@email'})
+        get_adviser_by_sso_user_profile({'email_user_id': 'some-123@email'})
 
     assert excinfo.value.detail == 'User not found.'

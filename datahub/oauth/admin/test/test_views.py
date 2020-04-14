@@ -150,7 +150,7 @@ def test_callback_without_access_code():
 def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_token):
     """Test that if SSO user is not found then no access is granted."""
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
+    get_sso_user_profile.return_value = {'email_user_id': 'some-123@email'}
 
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
 
@@ -176,20 +176,21 @@ def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_
         {'is_staff': False, 'is_active': False},
     ),
 )
-def test_callback_requests_sso_profile_valid_non_staff_user_by_email(
+def test_callback_requests_sso_profile_valid_non_staff_user(
     get_sso_user_profile,
     get_access_token,
     flags,
     caplog,
 ):
     """
-    Test that if SSO user has a matching email, but Data Hub user has `is_staff` or `is_active`
+    Test that if SSO user has a matching SSO email user ID,
+    but Data Hub user has `is_staff` or `is_active`
     flag not set, then the access is forbidden.
     """
-    AdviserFactory(email='some@email', **flags)
+    AdviserFactory(sso_email_user_id='some-123@email', **flags)
 
     get_access_token.return_value = {'access_token': 'access-token'}
-    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
+    get_sso_user_profile.return_value = {'email_user_id': 'some-123@email'}
 
     request = get_request_with_session('/oauth/callback/?state=original&code=code')
     request.session['oauth.state'] = 'original'
@@ -206,15 +207,16 @@ def test_callback_requests_sso_profile_valid_non_staff_user_by_email(
 @pytest.mark.usefixtures('local_memory_cache')
 @patch('datahub.oauth.admin.views.get_access_token')
 @patch('datahub.oauth.admin.views.get_sso_user_profile')
-def test_callback_requests_sso_profile_valid_email(get_sso_user_profile, get_access_token):
+def test_callback_requests_valid_sso_profile(get_sso_user_profile, get_access_token):
     """
-    Test that if SSO user has a matching email (and relevant flags), then the access is granted.
+    Test that if SSO user has a matching SSO email user id (and relevant flags),
+    then the access is granted.
     """
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
     adviser = AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
+    get_sso_user_profile.return_value = {'email_user_id': 'some-123@email'}
 
     request = get_request_with_session(f'/oauth/callback/?state={fake_state_id}&code=code')
 
@@ -236,7 +238,7 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
     AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
+    get_sso_user_profile.return_value = {'email_user_id': 'some-123@email'}
 
     request = get_request_with_session(
         f'/oauth/callback/?next=/some-location&state={fake_state_id}&code=code',
@@ -265,7 +267,7 @@ def test_callback_validates_next_url(get_sso_user_profile, get_access_token, dan
     AdviserFactory(sso_email_user_id='some-123@email', is_staff=True, is_active=True)
 
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
-    get_sso_user_profile.return_value = {'sso_email_user_id': 'some-123@email'}
+    get_sso_user_profile.return_value = {'email_user_id': 'some-123@email'}
 
     request = get_request_with_session(
         f'/oauth/callback/?next={dangerous_redirect}&state={fake_state_id}&code=code',
