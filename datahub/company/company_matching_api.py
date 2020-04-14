@@ -17,9 +17,9 @@ class CompanyMatchingServiceException(Exception):
     """
 
 
-class CompanyMatchingServiceHTTPError(Exception):
+class CompanyMatchingServiceHTTPError(CompanyMatchingServiceException):
     """
-    Base exception class for Company matching service related errors.
+    Exception for when Company matching service returns an http error status.
     """
 
 
