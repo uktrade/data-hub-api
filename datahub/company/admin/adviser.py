@@ -67,7 +67,6 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
             },
         ),
     )
-    readonly_fields = ('sso_email_user_id',)
     list_display = ('email', 'first_name', 'last_name', 'dit_team', 'is_active', 'is_staff')
     search_fields = (
         '=pk',
