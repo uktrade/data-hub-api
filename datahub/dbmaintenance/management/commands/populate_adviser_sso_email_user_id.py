@@ -3,7 +3,7 @@ from logging import getLogger
 from django.core.management import BaseCommand
 
 from datahub.company.models import Advisor
-from datahub.oauth.sso_api_client import get_user_by_email, SSOUserDoesNotExist
+from datahub.oauth.sso_api_client import get_user_by_email, SSORequestError, SSOUserDoesNotExist
 from datahub.search.signals import disable_search_signal_receivers
 
 logger = getLogger(__name__)
@@ -35,6 +35,7 @@ class Command(BaseCommand):
         """Main logic for the actual command."""
         is_simulation = options['simulate']
         num_skipped = 0
+        num_errored = 0
         num_updated = 0
 
         queryset = Advisor.objects.filter(is_active=True, sso_email_user_id__isnull=True)
@@ -44,6 +45,10 @@ class Command(BaseCommand):
             except SSOUserDoesNotExist:
                 logger.warning(f'No SSO user found for adviser ID {adviser.pk}')
                 num_skipped += 1
+                continue
+            except SSORequestError as exc:
+                logger.warning(f'SSO request error {exc} for adviser ID {adviser.pk}')
+                num_errored += 1
                 continue
 
             # Only do the update if the primary emails match (otherwise this is a
@@ -60,4 +65,6 @@ class Command(BaseCommand):
             logger.info(f'SSO email user ID updated for adviser ID {adviser.pk}')
             num_updated += 1
 
-        logger.info(f'{num_updated} advisers updated; {num_skipped} advisers skipped')
+        logger.info(f'{num_updated} advisers updated')
+        logger.info(f'{num_skipped} advisers skipped')
+        logger.info(f'{num_errored} advisers with errors')
