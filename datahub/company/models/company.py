@@ -448,7 +448,7 @@ class Company(ArchivableModel, BaseModel):
             },
         )
 
-        updated = None
+        updated = False
 
         if not created:
             if export_country.status != status and export_country.modified_on < record_date:
