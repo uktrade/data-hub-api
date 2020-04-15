@@ -674,6 +674,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         # check for duplicate countries
         export_countries = data.get('export_countries', [])
         countries = [item['country'] for item in export_countries]
+
         if len(countries) > len(set(countries)):
             raise serializers.ValidationError(self.error_messages['duplicate_export_country'])
 
@@ -690,6 +691,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         Adds/updates export countries related to a company within validated_export_countries.
         And removes existing ones that are not in the list.
         """
+
         for item in validated_export_countries:
             country = meta_models.Country.objects.get(id=item['country'].id)
             status = item['status']

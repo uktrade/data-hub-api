@@ -448,13 +448,16 @@ class Company(ArchivableModel, BaseModel):
             },
         )
 
+        updated = None
+
         if not created:
             if export_country.status != status and export_country.modified_on < record_date:
                 export_country.status = status
                 export_country.modified_by = adviser
                 export_country.save()
+                updated = True
 
-        if track_history:
+        if track_history and (created or updated):
             export_country_update_signal.send(
                 sender=CompanyExportCountry,
                 instance=export_country,

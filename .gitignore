@@ -77,5 +77,8 @@ import.sh
 docker-volumes/
 .env
 
+# local development
+venv
+
 # celery
 celerybeat-schedule
