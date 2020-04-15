@@ -1,0 +1,38 @@
+# This workflow publishes a release on GitHub when
+# a release PR is merged to master.
+#
+# The published release will appear on
+# https://github.com/uktrade/data-hub-api/releases
+
+name: Publish release
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  publish_release:
+    if: github.event.pull_request.merged && startsWith(github.event.pull_request.head.label, 'uktrade:release/')
+    name: Publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --progress-bar off -r scripts/requirements.txt -c requirements.txt
+
+      - name: Run publish release script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/publish_release.py
