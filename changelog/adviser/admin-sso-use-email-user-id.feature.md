@@ -1,1 +1,0 @@
-The (currently inactive) Staff SSO integration for Django was updated to use the SSO email user id to lookup users. This replaces lookup by primary email, which could change over time.
