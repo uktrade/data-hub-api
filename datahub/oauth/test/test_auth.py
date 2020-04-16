@@ -36,7 +36,7 @@ view = IntrospectionAuthView.as_view()
 def _make_introspection_data(**overrides):
     return {
         'active': True,
-        'username': 'username@example.test',
+        'username': 'email@example.test',
         'email_user_id': EXAMPLE_SSO_EMAIL_USER_ID,
         'exp': (FROZEN_DATETIME + timedelta(hours=10)).timestamp(),
         **overrides,
@@ -161,7 +161,11 @@ class TestSSOIntrospectionAuthentication:
     def test_authenticates_if_token_is_cached(self, api_request_factory, requests_mock):
         """Test that authentication is successful if a valid, cached token is provided."""
         adviser = AdviserFactory(sso_email_user_id=EXAMPLE_SSO_EMAIL_USER_ID)
-        cache.set('access_token:token', _make_introspection_data())
+        cached_data = {
+            'email': 'email@example.test',
+            'sso_email_user_id': EXAMPLE_SSO_EMAIL_USER_ID,
+        }
+        cache.set('access_token:token', cached_data)
 
         request = api_request_factory.get('/test-path', HTTP_AUTHORIZATION='Bearer token')
         response = view(request)
@@ -183,7 +187,10 @@ class TestSSOIntrospectionAuthentication:
         assert response.status_code == status.HTTP_200_OK
 
         # Check that the returned token data is cached
-        assert cache.get('access_token:token') == introspection_data
+        assert cache.get('access_token:token') == {
+            'email': introspection_data['username'],
+            'sso_email_user_id': introspection_data['email_user_id'],
+        }
 
         caching_period = settings.STAFF_SSO_USER_TOKEN_CACHING_PERIOD
         post_expiry_time = FROZEN_DATETIME + timedelta(seconds=caching_period)
