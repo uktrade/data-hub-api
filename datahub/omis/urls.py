@@ -18,13 +18,8 @@ internal_frontend_urls = [
 ]
 
 public_urls = [
-    path('', include((quote_urls.legacy_public_urls, 'quote'), namespace='quote')),
-]
-
-# TODO: rename this to public_urls once all public urls have been migrated to Hawk
-hawk_public_urls = [
     path('', include((order_urls.public_urls, 'order'), namespace='order')),
-    path('', include((quote_urls.hawk_public_urls, 'quote'), namespace='quote')),
+    path('', include((quote_urls.public_urls, 'quote'), namespace='quote')),
     path('', include((payment_urls.payment_public_urls, 'payment'), namespace='payment')),
     path(
         '',

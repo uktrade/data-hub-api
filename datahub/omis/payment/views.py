@@ -73,7 +73,7 @@ class CreatePaymentGatewaySessionThrottle(PathRateThrottle):
 
 
 class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
-    """Payment Gateway Session ViewSet for Hawk authenticated legacy public facing API."""
+    """Payment Gateway Session ViewSet for Hawk authenticated public facing API."""
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
     permission_classes = (HawkScopePermission,)
