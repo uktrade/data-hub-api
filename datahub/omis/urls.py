@@ -28,7 +28,6 @@ public_urls = [
             namespace='payment-gateway-session',
         ),
     ),
-    path('', include((invoice_urls.legacy_public_urls, 'invoice'), namespace='invoice')),
 ]
 
 # TODO: rename this to public_urls once all public urls have been migrated to Hawk
@@ -43,5 +42,5 @@ hawk_public_urls = [
             namespace='payment-gateway-session',
         ),
     ),
-    path('', include((invoice_urls.hawk_public_urls, 'invoice'), namespace='invoice')),
+    path('', include((invoice_urls.public_urls, 'invoice'), namespace='invoice')),
 ]
