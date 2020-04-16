@@ -263,6 +263,9 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
 | `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
+| `COMPANY_MATCHING_SERVICE_BASE_URL` | No | The base url of the company matching service (default=None). |
+| `COMPANY_MATCHING_HAWK_ID` | No | The hawk id to use when making a request to the company matching service (default=None). |
+| `COMPANY_MATCHING_HAWK_KEY` | No | The hawk key to use when making a request to the company matching service (default=None). |
 | `CONSENT_SERVICE_BASE_URL` | No | The base url of the consent service, to post email consent preferences to  (default=None). |
 | `CONSENT_SERVICE_HAWK_ID` | No | The hawk id to use when making a request to the consent service (default=None). |
 | `CONSENT_SERVICE_HAWK_KEY` | No | The hawk key to use when making a request to the consent service (default=None). |
@@ -298,7 +301,10 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ES_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
 | `ES_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
 | `ES_VERIFY_CERTS`  | No | |
-| `ES5_URL`  | Required if not using GOV.UK PaaS-supplied Elasticsearch. | |
+| `ES5_URL`  | No | Required if not using GOV.UK PaaS-supplied Elasticsearch. |
+| `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
+| `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |
+| `EXPORT_WINS_HAWK_KEY` | No | The hawk key to use when making a request to the Export Wins API (default=None). |
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |

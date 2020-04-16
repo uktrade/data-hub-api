@@ -1,0 +1,15 @@
+# The minimal subset of requirements needed for scripts
+# in this directory.
+#
+# All these requirements should also be specified in
+# /requirements.in.
+#
+# Note: This file is intended to be used by GitHub Actions
+# with the main requirements file used as a constraints file.
+# E.g.:
+#
+# pip install -r scripts/requirements.txt -c requirements.txt
+
+requests
+semantic_version
+towncrier

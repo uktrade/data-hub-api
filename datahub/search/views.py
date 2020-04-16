@@ -7,16 +7,14 @@ from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
-from datahub.core.exceptions import DataHubException
 from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_global_search_apps_as_mapping
-from datahub.search.execute_query import execute_autocomplete_query, execute_search_query
+from datahub.search.execute_query import execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
     SearchAndExportPermissions,
@@ -28,7 +26,6 @@ from datahub.search.query_builder import (
     limit_search_query,
 )
 from datahub.search.serializers import (
-    AutocompleteSearchQuerySerializer,
     BasicSearchQuerySerializer,
     EntitySearchQuerySerializer,
 )
@@ -365,58 +362,6 @@ class SearchExportAPIView(SearchAPIView):
         prefix = '-' if ordering.is_descending else ''
 
         return f'{prefix}{db_field}', 'pk'
-
-
-class AutocompleteSearchListAPIView(ListAPIView):
-    """Autocomplete search base list view for type ahead."""
-
-    search_app = None
-    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
-    document_fields = None
-    autocomplete_context_serializer_class = None
-
-    def list(self, request, *args, **kwargs):
-        """Executes the elasticsearch query"""
-        serializer = AutocompleteSearchQuerySerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-        validated_params = serializer.validated_data
-
-        self.check_permission_filters()
-        results = execute_autocomplete_query(
-            self.search_app.es_model,
-            validated_params['term'],
-            validated_params['limit'],
-            self.document_fields,
-            self.get_search_context(request.query_params),
-        )
-        return Response(data={
-            'count': len(results),
-            'results': [result['_source'].to_dict() for result in results],
-        })
-
-    def get_search_context(self, query_params):
-        """
-        Add context (filters) to the autocomplete search if provided.
-        """
-        if not self.autocomplete_context_serializer_class:
-            return {}
-        serializer = self.autocomplete_context_serializer_class(data=query_params)
-        serializer.is_valid()
-        return serializer.validated_data
-
-    def check_permission_filters(self):
-        """
-        Checks for permission filters associated with the search app
-        and if present raises an error.
-        """
-        permission_filters = self._get_permission_filters()
-        if permission_filters is not None:
-            raise DataHubException(
-                'Unable to apply filtering for autocomplete search request',
-            )
-
-    def _get_permission_filters(self):
-        return self.search_app.get_permission_filters(self.request)
 
 
 class ViewType(Enum):

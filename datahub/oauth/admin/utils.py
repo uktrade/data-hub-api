@@ -52,7 +52,11 @@ def get_sso_user_profile(access_token):
 def get_adviser_by_sso_user_profile(sso_user_profile):
     """Get adviser by sso user profile details."""
     try:
-        user = Advisor.objects.get(email=sso_user_profile['email'], is_staff=True, is_active=True)
+        user = Advisor.objects.get(
+            sso_email_user_id=sso_user_profile['email_user_id'],
+            is_staff=True,
+            is_active=True,
+        )
     except Advisor.DoesNotExist:
         raise AuthenticationFailed('User not found.')
 
