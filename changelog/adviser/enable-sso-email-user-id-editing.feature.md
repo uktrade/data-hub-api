@@ -1,0 +1,1 @@
+The `sso_email_user_id` used to be read-only in Django admin. It is now editable to support making the new email user ID-based introspection logic live.
