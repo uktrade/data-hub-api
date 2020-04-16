@@ -122,35 +122,6 @@ def get_search_by_entities_query(
     )
 
 
-def build_autocomplete_query(es_model, keyword_search, limit, fields_to_include, context):
-    """
-    Builds the query for autocomplete search and applies source filtering.
-
-    context  - if an autocomplete field supports completion contexts (filtering) then an optional
-    context dictionary of filters can be added to the completion search.
-    """
-    index = es_model.get_read_alias()
-    autocomplete_search = es_model.search(index=index)
-    autocomplete_search = _apply_source_filtering_to_query(
-        autocomplete_search,
-        fields_to_include=fields_to_include,
-    )
-
-    completion_dict = {
-        'field': 'suggest',
-        'size': limit,
-    }
-
-    if context:
-        completion_dict['contexts'] = context
-
-    return autocomplete_search.suggest(
-        'autocomplete',
-        keyword_search,
-        completion=completion_dict,
-    )
-
-
 def limit_search_query(query, offset=0, limit=100):
     """Limits search query to the page defined by offset and limit."""
     limit = _clip_limit(offset, limit)

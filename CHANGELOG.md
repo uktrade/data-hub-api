@@ -1,3 +1,71 @@
+# Data Hub API 29.0.0 (2020-04-16)
+
+
+## Removals
+
+- **Companies** The following deprecated endpoint was removed:
+
+  - `GET /v4/search/company/autocomplete`
+
+  This is because it‘s not in use and isn‘t compatible with Elasticsearch 7 in its current form.
+
+## Features
+
+- **Advisers** The (currently inactive) Staff SSO integration for Django was updated to use the SSO email user id to lookup users. This replaces lookup by primary email, which could change over time.
+- **Advisers** A new management command, `populate_adviser_sso_email_user_id`, was added. This fills in blank adviser SSO email user IDs by querying Staff SSO.
+
+  This is a temporary command and will be removed once no longer required.
+
+## Internal changes
+
+- Python was updated from version 3.8.1 to 3.8.2 in deployed environments.
+
+## API
+
+- **Companies** A new API endpoint was added for creating a DNB investigation; 
+  `POST /v4/dnb/company-investigation` takes company details and proxies 
+  them through to dnb-service e.g.
+
+  ```shell
+  curl -X POST https://datahub.api/v4/dnb/company-investigation -d '{
+    "company": "0fb3379c-341c-4da4-b825-bf8d47b26baa", # Data Hub company ID
+    "name": "Joe Bloggs LTD",
+    "website": "http://example.com", 
+    "telephone_number": "123456789",
+    "address": { 
+       "line_1": "23 Code Street",
+       "line_2": "Someplace",
+       "town": "London",
+       "county": "Greater London",
+       "postcode": "W1 0TN",
+       "country": "80756b9a-5d95-e211-a939-e4115bead28a",
+    }
+  }'
+  ```
+
+  Responds with:
+
+  ```json
+  {
+      "id": "11111111-2222-3333-4444-555555555555",
+      "status": "pending",
+      "created_on": "2020-01-05T11:00:00",
+      "company_details": {
+          "primary_name": "Joe Bloggs LTD",
+          "domain": "example.com", 
+          "telephone_number": "123456789",
+          "address_line_1": "23 Code Street",
+          "address_line_2": "Someplace",
+          "address_town": "London",
+          "address_county": "Greater London",
+          "address_postcode": "W1 0TN",
+          "address_country": "GB",
+      }
+  }
+  ```
+- `GET /v4/dataset/*`: enabled a `page_size` parameter that allows clients to change the default page size from 100, up to a maximum of 10,000.
+
+
 # Data Hub API 28.8.0 (2020-04-08)
 
 

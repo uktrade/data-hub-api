@@ -3,24 +3,9 @@ from logging import getLogger
 from django.conf import settings
 
 from datahub.core.utils import log_to_sentry
-from datahub.search.query_builder import build_autocomplete_query
 
 
 logger = getLogger(__name__)
-
-
-def execute_autocomplete_query(es_model, keyword_search, limit, fields_to_include, context):
-    """Executes the query for autocomplete search returning all suggested documents."""
-    autocomplete_search = build_autocomplete_query(
-        es_model,
-        keyword_search,
-        limit,
-        fields_to_include,
-        context,
-    )
-
-    results = autocomplete_search.execute()
-    return results.suggest.autocomplete[0].options
 
 
 def execute_search_query(query):
