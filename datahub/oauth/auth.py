@@ -3,11 +3,11 @@ from logging import getLogger
 from typing import Optional, Tuple
 
 from django.conf import settings
-from django.core.cache import cache
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
 from datahub.company.models import Advisor
+from datahub.oauth.cache import add_token_data_to_cache, get_token_data_from_cache
 from datahub.oauth.sso_api_client import introspect_token, SSORequestError, SSOTokenDoesNotExist
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
@@ -76,14 +76,13 @@ def _look_up_token(token) -> Tuple[Optional[dict], bool]:
 
     :returns: a 2-tuple of: (token data, was the token cached)
     """
-    cache_key = f'access_token:{token}'
-    cached_token_data = cache.get(cache_key)
+    cached_token_data = get_token_data_from_cache(token)
 
     if cached_token_data:
         return cached_token_data, True
 
     try:
-        token_data = introspect_token(token)
+        introspection_data = introspect_token(token)
     except SSOTokenDoesNotExist:
         return None, False
     except SSORequestError:
@@ -91,31 +90,35 @@ def _look_up_token(token) -> Tuple[Optional[dict], bool]:
         return None, False
 
     # This should not be possible as all valid tokens should be active
-    if not token_data['active']:
+    if not introspection_data['active']:
         logger.warning('Introspected token was inactive')
         return None, False
 
-    relative_expiry = _calculate_expiry(token_data['exp'])
+    relative_expiry = _calculate_expiry(introspection_data['exp'])
 
     # This should not happen as expiry times should be in the future
     if relative_expiry <= 0:
         logger.warning('Introspected token has an expiry time in the past')
         return None, False
 
-    cache.set(cache_key, token_data, timeout=relative_expiry)
+    cached_token_data = add_token_data_to_cache(
+        token,
+        introspection_data['username'],
+        introspection_data['email_user_id'],
+        relative_expiry,
+    )
+    return cached_token_data, False
 
-    return token_data, False
 
-
-def _look_up_adviser(token_data):
+def _look_up_adviser(cached_token_data):
     """
     Look up the adviser using data about an access token.
 
     This first tries to look up the adviser using the SSO email user ID, and falls
     back to using the email field if no match is found using the SSO email user ID.
     """
-    username = token_data['username']
-    sso_email_user_id = token_data['email_user_id']
+    email = cached_token_data['email']
+    sso_email_user_id = cached_token_data['sso_email_user_id']
 
     try:
         return _get_adviser(sso_email_user_id=sso_email_user_id)
@@ -126,7 +129,7 @@ def _look_up_adviser(token_data):
     # TODO: Remove the below logic once active users have sso_email_user_id set
     try:
         # Note: The email field uses CICharField so this lookup is case-insensitive
-        adviser = _get_adviser(email=username, sso_email_user_id__isnull=True)
+        adviser = _get_adviser(email=email, sso_email_user_id__isnull=True)
     except Advisor.DoesNotExist:
         return None
 
