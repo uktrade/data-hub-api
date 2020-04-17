@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+from datahub.search.models import DEFAULT_MAPPING_TYPE
+
 
 def create_mock_search_app(
         current_mapping_hash='mapping-hash',
@@ -29,17 +31,14 @@ def doc_exists(es_client, search_app, id_):
     """Checks if a document exists for a specified search app."""
     return es_client.exists(
         index=search_app.es_model.get_read_alias(),
-        doc_type=search_app.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=id_,
     )
 
 
 def doc_count(es_client, search_app):
     """Return a document count for a specified search app."""
-    response = es_client.count(
-        index=search_app.es_model.get_read_alias(),
-        doc_type=search_app.name,
-    )
+    response = es_client.count(index=search_app.es_model.get_read_alias())
     return response['count']
 
 
@@ -78,7 +77,7 @@ def get_documents_by_ids(es_client, app, ids):
     """Get given search app documents by supplied ids."""
     return es_client.mget(
         index=app.es_model.get_read_alias(),
-        doc_type=app.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         body={
             'ids': ids,
         },

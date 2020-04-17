@@ -738,9 +738,8 @@ def test_run(
 
     if has_search_app:
         search_app = get_search_app_by_model(model)
-        doc_type = search_app.name
         read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == total_model_records
+        assert es_with_signals.count(read_alias)['count'] == total_model_records
 
     assert model.objects.count() == total_model_records
 
@@ -752,7 +751,7 @@ def test_run(
     assert model.objects.count() == total_model_records - num_expired_records
 
     if has_search_app:
-        assert es_with_signals.count(read_alias, doc_type=doc_type)['count'] == (
+        assert es_with_signals.count(read_alias)['count'] == (
             total_model_records
             - num_expired_records
         )
@@ -808,7 +807,7 @@ def test_simulate(
     if has_search_app:
         search_app = get_search_app_by_model(model)
         read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
+        assert es_with_signals.count(read_alias)['count'] == 3
 
     assert model.objects.count() == 3
 
@@ -833,7 +832,7 @@ def test_simulate(
     assert model.objects.count() == 3
 
     if has_search_app:
-        assert es_with_signals.count(read_alias, doc_type=search_app.name)['count'] == 3
+        assert es_with_signals.count(read_alias)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)

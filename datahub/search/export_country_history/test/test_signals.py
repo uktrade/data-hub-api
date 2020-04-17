@@ -3,6 +3,7 @@ import pytest
 from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
 from datahub.search.export_country_history.apps import ExportCountryHistoryApp
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 
 pytestmark = pytest.mark.django_db
 
@@ -14,7 +15,7 @@ def test_new_export_country_history_synced(es_with_signals):
 
     assert es_with_signals.get(
         index=ExportCountryHistoryApp.es_model.get_write_index(),
-        doc_type=ExportCountryHistoryApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=company_export_country_history.pk,
     )
 
@@ -31,7 +32,7 @@ def test_updated_interaction_synced(es_with_signals):
 
     result = es_with_signals.get(
         index=ExportCountryHistoryApp.es_model.get_write_index(),
-        doc_type=ExportCountryHistoryApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=export_country_history.pk,
     )
 

@@ -9,6 +9,7 @@ from datahub.omis.order.test.factories import (
     OrderWithAcceptedQuoteFactory,
 )
 from datahub.search import elasticsearch
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.omis import OrderSearchApp
 from datahub.search.omis.models import Order as ESOrder
 
@@ -507,7 +508,7 @@ def test_indexed_doc(order_factory, es):
 
     indexed_order = es.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=OrderSearchApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
