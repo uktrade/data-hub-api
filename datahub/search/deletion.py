@@ -6,7 +6,8 @@ from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import get_search_app_by_model, get_search_apps
-from datahub.search.elasticsearch import bulk
+from datahub.search.elasticsearch import bulk, get_client
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.signals import SignalReceiver
 
 
@@ -157,10 +158,15 @@ def update_es_after_deletions():
 
 def delete_document(model, document_id, indices=None, ignore_404_responses=True):
     """Deletes specified model's document."""
+    client = get_client()
     if indices is None:
         indices = [model.get_write_alias()]
     ignored_response_statuses = (404,) if ignore_404_responses else ()
-    doc = model(_id=document_id)
 
     for index in indices:
-        doc.delete(index=index, ignore=ignored_response_statuses)
+        client.delete(
+            index=index,
+            id=document_id,
+            doc_type=DEFAULT_MAPPING_TYPE,
+            ignore=ignored_response_statuses,
+        )

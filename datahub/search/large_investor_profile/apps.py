@@ -3,16 +3,13 @@ from datahub.investment.investor_profile.models import (
 )
 from datahub.investment.investor_profile.permissions import InvestorProfilePermission
 from datahub.search.apps import SearchApp
-from datahub.search.large_investor_profile.models import (
-    DOC_TYPE as LARGE_INVESTOR_PROFILE_DOC_TYPE,
-    LargeInvestorProfile,
-)
+from datahub.search.large_investor_profile.models import LargeInvestorProfile
 
 
 class LargeInvestorProfileSearchApp(SearchApp):
     """SearchApp for large investor profile."""
 
-    name = LARGE_INVESTOR_PROFILE_DOC_TYPE
+    name = 'large-investor-profile'
     es_model = LargeInvestorProfile
     view_permissions = (f'investor_profile.{InvestorProfilePermission.view_investor_profile}',)
     export_permission = f'investor_profile.{InvestorProfilePermission.export}'

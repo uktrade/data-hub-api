@@ -12,6 +12,7 @@ from datahub.search.deletion import (
     delete_documents,
     update_es_after_deletions,
 )
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
@@ -25,9 +26,9 @@ def test_delete_documents(es_bulk, mock_es_client):
 
     index = 'test-index'
     es_docs = [
-        {'_type': 'model', '_id': 1},
-        {'_type': 'model', '_id': 2},
-        {'_type': 'model', '_id': 3},
+        {'_type': DEFAULT_MAPPING_TYPE, '_id': 1},
+        {'_type': DEFAULT_MAPPING_TYPE, '_id': 2},
+        {'_type': DEFAULT_MAPPING_TYPE, '_id': 3},
     ]
     delete_documents(index, es_docs)
 
@@ -60,7 +61,7 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
     )
 
     index = 'test-index'
-    es_docs = [{'_type': 'model', '_id': 1}]
+    es_docs = [{'_type': DEFAULT_MAPPING_TYPE, '_id': 1}]
 
     with pytest.raises(DataHubException) as excinfo:
         delete_documents(index, es_docs)
@@ -126,12 +127,12 @@ def test_collector(monkeypatch, es_with_signals):
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 0
-    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
+    assert es_with_signals.count(read_alias)['count'] == 1
 
     collector.delete_from_es()
 
     es_with_signals.indices.refresh()
-    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
+    assert es_with_signals.count(read_alias)['count'] == 0
 
 
 @pytest.mark.django_db
@@ -149,10 +150,10 @@ def test_update_es_after_deletions(es_with_signals):
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 1
-    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 1
+    assert es_with_signals.count(read_alias)['count'] == 1
 
     with update_es_after_deletions():
         obj.delete()
 
     es_with_signals.indices.refresh()
-    assert es_with_signals.count(read_alias, doc_type=SimpleModelSearchApp.name)['count'] == 0
+    assert es_with_signals.count(read_alias)['count'] == 0

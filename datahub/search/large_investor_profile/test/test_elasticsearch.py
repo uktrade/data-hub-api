@@ -9,7 +9,7 @@ from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.models import (
     LargeInvestorProfile as ESLargeInvestorProfile,
 )
-
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 
 pytestmark = pytest.mark.django_db
 
@@ -320,7 +320,7 @@ def test_indexed_doc(es):
 
     indexed_large_investor_profile = es.get(
         index=ESLargeInvestorProfile.get_write_index(),
-        doc_type=LargeInvestorProfileSearchApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=large_investor_profile.pk,
     )
 
