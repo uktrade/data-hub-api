@@ -1,3 +1,23 @@
+# Data Hub API 29.1.0 (2020-04-17)
+
+
+## Features
+
+- **Advisers** The `sso_email_user_id` used to be read-only in Django admin. It is now editable to support making the new email user ID-based introspection logic live.
+
+## API
+
+- **Companies** `GET /v4/dataset/company-export-to-countries-dataset` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `/v4/dataset/export-country-dataset` and `/v4/dataset/export-country-history-dataset` endpoints.
+- **Companies** `GET /v4/dataset/company-future-interest-countries-dataset` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `/v4/dataset/export-country-dataset` and `/v4/dataset/export-country-history-dataset` endpoints.
+- **Companies** A new endpoint, `GET /v4/company/<ID>/export-win`, was added to expose company's export wins.
+
+  This facilitates proxying the response from Export Wins API that gives a list of export wins for given company match id. Match id is obtained from Company Matching Service.
+
+
 # Data Hub API 29.0.0 (2020-04-16)
 
 
