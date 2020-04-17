@@ -163,6 +163,8 @@ Dependencies:
     ```shell
     ./manage.py createsuperuser
     ```
+    
+    (You can enter any valid email address as the username and SSO email user ID.)
 
 14. Start the server:
 
