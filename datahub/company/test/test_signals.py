@@ -4,6 +4,7 @@ from uuid import UUID
 import pytest
 from django.core.management.sql import emit_post_migrate_signal
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.timezone import now
 
 from datahub.company.constants import (
     BusinessTypeConstant,
@@ -20,7 +21,6 @@ from datahub.core.test_utils import random_obj_for_model
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import BusinessType, Country as CountryModel
 from datahub.notification.core import notify_gateway
-from django.utils.timezone import now
 
 pytestmark = pytest.mark.django_db
 
