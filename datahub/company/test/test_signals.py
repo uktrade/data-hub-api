@@ -4,6 +4,7 @@ from uuid import UUID
 import pytest
 from django.core.management.sql import emit_post_migrate_signal
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.timezone import now
 
 from datahub.company.constants import (
     BusinessTypeConstant,
@@ -16,6 +17,7 @@ from datahub.company.test.factories import (
     CompanyExportCountryHistoryFactory,
     CompanyFactory,
 )
+from datahub.core.test_utils import random_obj_for_model
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import BusinessType, Country as CountryModel
 from datahub.notification.core import notify_gateway
@@ -104,7 +106,7 @@ class TestExportCountryHistoryCustomSignals:
         sets up a corresponding history record.
         """
         company = CompanyFactory()
-        country = CountryModel.objects.order_by('name')[0]
+        country = random_obj_for_model(CountryModel)
         adviser = AdviserFactory()
         company.add_export_country(
             country,
@@ -128,7 +130,7 @@ class TestExportCountryHistoryCustomSignals:
         sets up a corresponding history record.
         """
         company = CompanyFactory()
-        country = CountryModel.objects.order_by('name')[0]
+        country = random_obj_for_model(CountryModel)
         adviser = AdviserFactory()
         export_country = CompanyExportCountryFactory(
             company=company,
@@ -148,25 +150,66 @@ class TestExportCountryHistoryCustomSignals:
         company.add_export_country(
             country,
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+            now(),
+            adviser,
+            True,
+        )
+        history = CompanyExportCountryHistory.objects.filter(
+            id=export_country.id,
+        ).order_by('history_date')
+
+        assert history.count() == 2
+        assert history[0].id == export_country.id
+        assert history[0].company == export_country.company
+        assert history[0].country == export_country.country
+        assert history[0].status == export_country.status
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
+        assert history[1].id == export_country.id
+        assert history[1].company == export_country.company
+        assert history[1].country == export_country.country
+        assert history[1].status == CompanyExportCountry.Status.CURRENTLY_EXPORTING
+        assert history[1].history_type == CompanyExportCountryHistory.HistoryType.UPDATE
+
+    def test_company_export_country_history_update_with_no_change(self):
+        """
+        Test that submitting an update for a CompanyExportCountry record
+        that doesn't change any field (i.e status) does not create
+        a history record.
+        """
+        company = CompanyFactory()
+        country = random_obj_for_model(CountryModel)
+        adviser = AdviserFactory()
+        export_country = CompanyExportCountryFactory(
+            company=company,
+            country=country,
+            status=CompanyExportCountry.Status.FUTURE_INTEREST,
+            created_by=adviser,
+        )
+        CompanyExportCountryHistoryFactory(
+            id=export_country.id,
+            company=export_country.company,
+            country=export_country.country,
+            status=export_country.status,
+            history_type=CompanyExportCountryHistory.HistoryType.INSERT,
+            history_user=export_country.created_by,
+        )
+        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
+        assert history.count() == 1
+        assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
+
+        # update it, but don't modify the status
+        company.add_export_country(
+            country,
+            CompanyExportCountry.Status.FUTURE_INTEREST,
             company.created_on,
             adviser,
             True,
         )
 
-        history = CompanyExportCountryHistory.objects.filter(
-            id=export_country.id,
-        ).order_by('history_date')
-        assert history.count() == 2
-        assert history[0].id == export_country.id
-        assert history[0].company == export_country.company
-        assert history[0].country == export_country.country
-        assert history[0].status == CompanyExportCountry.Status.FUTURE_INTEREST
+        # export country history records should be unchanged
+        history = CompanyExportCountryHistory.objects.filter(id=export_country.id)
+        assert history.count() == 1
         assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
-        assert history[1].id == export_country.id
-        assert history[1].company == export_country.company
-        assert history[1].country == export_country.country
-        assert history[1].status == export_country.status
-        assert history[1].history_type == CompanyExportCountryHistory.HistoryType.UPDATE
 
     def test_company_export_country_history_delete(self):
         """
@@ -174,7 +217,7 @@ class TestExportCountryHistoryCustomSignals:
         sets up a corresponding history record.
         """
         company = CompanyFactory()
-        country = CountryModel.objects.order_by('name')[0]
+        country = random_obj_for_model(CountryModel)
         adviser = AdviserFactory()
         export_country = CompanyExportCountryFactory(
             company=company,
