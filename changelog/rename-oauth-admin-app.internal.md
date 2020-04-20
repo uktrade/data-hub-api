@@ -1,0 +1,1 @@
+The `datahub.oauth.admin` Django app was renamed `datahub.oauth.admin_sso` as it was conflicting with the `datahub.oauth.admin` module.

@@ -8,17 +8,17 @@ from django.urls import reverse
 from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.oauth.admin.test.utils import (
+from datahub.oauth.admin_sso.test.utils import (
     extract_next_url_from_redirect_url,
     extract_next_url_from_url,
     get_request_with_session,
 )
-from datahub.oauth.admin.views import callback, login, logout
+from datahub.oauth.admin_sso.views import callback, login, logout
 
 pytestmark = pytest.mark.django_db
 
 
-@patch('datahub.oauth.admin.views.token_urlsafe')
+@patch('datahub.oauth.admin_sso.views.token_urlsafe')
 def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):
     """Tests that login view redirects to Staff SSO Auth URL."""
     _token_urlsafe.return_value = 'aZFsiJfbDLF9bwve8f2HTBeC1rCnhFUn4K6c_iq-wLo'
@@ -145,8 +145,8 @@ def test_callback_without_access_code():
     assert not request.user.is_authenticated
 
 
-@patch('datahub.oauth.admin.views.get_access_token')
-@patch('datahub.oauth.admin.views.get_sso_user_profile')
+@patch('datahub.oauth.admin_sso.views.get_access_token')
+@patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_token):
     """Test that if SSO user is not found then no access is granted."""
     get_access_token.return_value = {'access_token': 'access-token', 'expires_in': 3600}
@@ -166,8 +166,8 @@ def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_
     assert not request.user.is_authenticated
 
 
-@patch('datahub.oauth.admin.views.get_access_token')
-@patch('datahub.oauth.admin.views.get_sso_user_profile')
+@patch('datahub.oauth.admin_sso.views.get_access_token')
+@patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'flags',
     (
@@ -205,8 +205,8 @@ def test_callback_requests_sso_profile_valid_non_staff_user(
 
 
 @pytest.mark.usefixtures('local_memory_cache')
-@patch('datahub.oauth.admin.views.get_access_token')
-@patch('datahub.oauth.admin.views.get_sso_user_profile')
+@patch('datahub.oauth.admin_sso.views.get_access_token')
+@patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 def test_callback_requests_valid_sso_profile(get_sso_user_profile, get_access_token):
     """
     Test that if SSO user has a matching SSO email user id (and relevant flags),
@@ -230,8 +230,8 @@ def test_callback_requests_valid_sso_profile(get_sso_user_profile, get_access_to
     assert request.user == adviser
 
 
-@patch('datahub.oauth.admin.views.get_access_token')
-@patch('datahub.oauth.admin.views.get_sso_user_profile')
+@patch('datahub.oauth.admin_sso.views.get_access_token')
+@patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
     """Test that successful login redirects user to `next_url`."""
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
@@ -252,8 +252,8 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
 
 
 @pytest.mark.usefixtures('local_memory_cache')
-@patch('datahub.oauth.admin.views.get_access_token')
-@patch('datahub.oauth.admin.views.get_sso_user_profile')
+@patch('datahub.oauth.admin_sso.views.get_access_token')
+@patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'dangerous_redirect',
     (
