@@ -19,7 +19,7 @@ unversioned_urls = [
 
 
 if settings.ADMIN_OAUTH2_ENABLED:
-    from datahub.oauth.admin.views import callback as admin_oauth_callback
+    from datahub.oauth.admin_sso.views import callback as admin_oauth_callback
     unversioned_urls += [
         # This endpoint is used for Django Admin OAuth2 authentication
         path('admin/oauth/callback', admin_oauth_callback, name='admin_oauth_callback'),

@@ -13,7 +13,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 
-from datahub.oauth.admin.utils import (
+from datahub.oauth.admin_sso.utils import (
     build_redirect_uri,
     get_access_token,
     get_adviser_by_sso_user_profile,
