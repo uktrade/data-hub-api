@@ -2,7 +2,7 @@
 {% load i18n admin_urls %}
 
 {% block object-tools-items %}
-  {% if has_add_permission and show_add_from_sso %}
+  {% if has_add_permission %}
     <li>
       {% url cl.opts|admin_urlname:'add-from-sso' as add_from_sso_url %}
       <a href="{% add_preserved_filters add_from_sso_url is_popup to_field %}" class="addlink">
