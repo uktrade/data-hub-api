@@ -1,0 +1,1 @@
+The adviser search fields in the Django admin are updated to include `sso_email_user_id`. 

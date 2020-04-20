@@ -73,6 +73,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         'first_name',
         'last_name',
         'email',
+        'sso_email_user_id',
         '=dit_team__pk',
         'dit_team__name',
     )
