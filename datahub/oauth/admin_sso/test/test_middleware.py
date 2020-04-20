@@ -9,8 +9,8 @@ from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.utils import reverse_with_query_string
-from datahub.oauth.admin.middleware import OAuthSessionMiddleware
-from datahub.oauth.admin.test.utils import get_request_with_session
+from datahub.oauth.admin_sso.middleware import OAuthSessionMiddleware
+from datahub.oauth.admin_sso.test.utils import get_request_with_session
 
 pytestmark = pytest.mark.django_db
 
