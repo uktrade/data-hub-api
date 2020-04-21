@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.views.decorators.cache import never_cache
 
-from datahub.oauth.admin.views import login, logout
+from datahub.oauth.admin_sso.views import login, logout
 
 
 class OAuth2AdminSite(admin.AdminSite):

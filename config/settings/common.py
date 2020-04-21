@@ -47,7 +47,7 @@ ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
 # enabled at a time.
 if ADMIN_OAUTH2_ENABLED:
     _ADMIN_DJANGO_APP = []
-    _ADMIN_OAUTH2_APP = ['datahub.oauth.admin.apps.OAuthAdminConfig']
+    _ADMIN_OAUTH2_APP = ['datahub.oauth.admin_sso.apps.OAuthAdminConfig']
 else:
     _ADMIN_DJANGO_APP = ['django.contrib.admin']
     _ADMIN_OAUTH2_APP = []
@@ -248,7 +248,7 @@ if ADMIN_OAUTH2_ENABLED:
     authentication_middleware_index = MIDDLEWARE.index(authentication_middleware_label)
     MIDDLEWARE.insert(
         authentication_middleware_index + 1,
-        'datahub.oauth.admin.middleware.OAuthSessionMiddleware',
+        'datahub.oauth.admin_sso.middleware.OAuthSessionMiddleware',
     )
 
 # django-oauth-toolkit settings

@@ -4,9 +4,7 @@ from django.urls import path
 from reversion.admin import VersionAdmin
 
 from datahub.company.admin.adviser_forms import AddAdviserFromSSOForm
-from datahub.company.admin.constants import ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG
 from datahub.company.models import Advisor
-from datahub.feature_flag.utils import is_feature_flag_active
 
 
 @admin.register(Advisor)
@@ -73,25 +71,11 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         'first_name',
         'last_name',
         'email',
+        'sso_email_user_id',
         '=dit_team__pk',
         'dit_team__name',
     )
     ordering = ('email',)
-
-    def changelist_view(self, request, extra_context=None):
-        """
-        The changelist view.
-
-        Overridden to add the add adviser from SSO feature flag to the template context.
-
-        TODO: Remove this once the feature flag has been removed.
-        """
-        combined_extra_context = {
-            'show_add_from_sso':
-                is_feature_flag_active(ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG),
-            **(extra_context or {}),
-        }
-        return super().changelist_view(request, combined_extra_context)
 
     def get_urls(self):
         """
