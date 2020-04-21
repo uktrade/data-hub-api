@@ -33,7 +33,7 @@ class TestRawIdWidget:
             'related_url': '/admin/support/book/?_to_field=id',
             'widget': {
                 'attrs': {
-                    'class': 'vForeignKeyRawIdAdminField',
+                    'class': 'vUUIDField',
                 },
                 'is_hidden': False,
                 'name': 'test-widget',
@@ -63,7 +63,7 @@ class TestRawIdWidget:
             'related_url': f'{changelist_url}?_to_field=id',
             'widget': {
                 'attrs': {
-                    'class': 'vForeignKeyRawIdAdminField',
+                    'class': 'vUUIDField',
                 },
                 'is_hidden': False,
                 'name': 'test-widget',
@@ -93,7 +93,7 @@ class TestRawIdWidget:
             'related_url': f'{changelist_url}?_to_field=id',
             'widget': {
                 'attrs': {
-                    'class': 'vForeignKeyRawIdAdminField',
+                    'class': 'vUUIDField',
                 },
                 'is_hidden': False,
                 'name': 'test-widget',
