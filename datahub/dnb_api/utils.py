@@ -443,7 +443,7 @@ def _create_investigation(payload):
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
     response = api_client.request(
         'POST',
-        'company-investigation/',
+        'investigation/',
         json=payload,
         timeout=3.0,
     )
