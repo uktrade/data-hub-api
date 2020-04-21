@@ -1,1 +1,0 @@
-`Add adviser from SSO` is now visible in Django admin for Advisers, without needing a feature flag.
