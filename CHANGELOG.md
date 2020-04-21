@@ -1,3 +1,63 @@
+# Data Hub API 29.2.0 (2020-04-21)
+
+
+## Deprecations
+
+- **Companies** The field `export_to_countries` is deprecated and will be removed on or after 23 April. Please check the API and Database schema categories for more details.
+
+  It is replaced by the `export_countries` field.
+- **Companies** The field `future_interest_countries` is deprecated and will be removed on or after 23 April. Please check the API and Database schema categories for more details.
+
+  It is replaced by the `export_countries` field.
+- **OMIS** The following OMIS public endpoints have been deprecated and will be removed on or after 23rd April 2020:
+
+      GET /v3/omis/public/order/<public-token>
+      GET /v3/omis/public/order/<public-token>/invoice
+      POST /v3/omis/public/order/<public-token>/payment-gateway-session
+      GET /v3/omis/public/order/<public-token>/payment-gateway-session/<session-id>
+      POST /v3/omis/public/order/<public-token>/payment
+      GET /v3/omis/public/order/<public-token>/quote
+      POST /v3/omis/public/order/<public-token>/quote/accept
+
+  Those endpoints have been replaced by their Hawk authenticated counterparts.
+
+## Features
+
+- **Advisers** `Add adviser from SSO` is now visible in Django admin for Advisers, without needing a feature flag.
+- **Advisers** The adviser search fields in the Django admin are updated to include `sso_email_user_id`.
+- A new management command, `add_access_token`, was added. This can be used to add an access token for development purposes when `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` is turned on.
+
+## Bug fixes
+
+- **Companies** CompanyExportCountryHistory records are now only created when a new CompanyExportCountry is created or when the status has been updated.
+
+## Internal changes
+
+- Elasticsearch document indexing and deletion operations were updated to use the default mapping type alias. This is to allow us to stop using custom mapping type names (which are deprecated).
+- The caching logic in the new Staff SSO introspection authentication class was refactored. This new authentication class continues to be disabled by default.
+- The `datahub.oauth.admin` Django app was renamed `datahub.oauth.admin_sso` as it was conflicting with the `datahub.oauth.admin` module.
+
+## API
+
+- **Companies** `GET /v4/company`, `GET, PATCH /v4/company/{id}`, `POST /v3/search/company` and `POST /v4/search/company`:
+  the field `export_to_countries` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `export_countries` field.
+- **Companies** `GET /v4/company`, `GET, PATCH /v4/company/{id}`, `POST /v3/search/company` and `POST /v4/search/company`:
+  the field `future_interest_countries` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `export_countries` field.
+
+## Database schema
+
+- **Companies** The table `company_company_export_to_countries` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `currently_exporting` status in the `company_companyexportcountry` table.
+- **Companies** The table `company_company_future_interest_countries` is deprecated and will be removed on or after 23 April.
+
+  It is replaced by the `future_interest` status in the `company_companyexportcountry` table.
+
+
 # Data Hub API 29.1.0 (2020-04-17)
 
 

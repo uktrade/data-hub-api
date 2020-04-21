@@ -1,1 +1,0 @@
-CompanyExportCountryHistory records are now only created when a new CompanyExportCountry is created or when the status has been updated.
