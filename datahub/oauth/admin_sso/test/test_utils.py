@@ -7,10 +7,10 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.oauth.admin.test.utils import (
+from datahub.oauth.admin_sso.test.utils import (
     get_request_with_session,
 )
-from datahub.oauth.admin.utils import (
+from datahub.oauth.admin_sso.utils import (
     get_access_token,
     get_adviser_by_sso_user_profile,
     get_sso_user_profile,

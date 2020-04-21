@@ -2,6 +2,7 @@ import pytest
 
 from datahub.event.test.factories import EventFactory
 from datahub.search.event.apps import EventSearchApp
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 
 pytestmark = pytest.mark.django_db
 
@@ -13,7 +14,7 @@ def test_new_event_synced(es_with_signals):
 
     assert es_with_signals.get(
         index=EventSearchApp.es_model.get_write_index(),
-        doc_type=EventSearchApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=event.pk,
     )
 
@@ -28,7 +29,7 @@ def test_updated_event_synced(es_with_signals):
 
     result = es_with_signals.get(
         index=EventSearchApp.es_model.get_write_index(),
-        doc_type=EventSearchApp.name,
+        doc_type=DEFAULT_MAPPING_TYPE,
         id=event.pk,
     )
     assert result['_source']['name'] == new_name

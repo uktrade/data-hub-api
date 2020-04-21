@@ -4,11 +4,9 @@ from django.urls import reverse
 from rest_framework import status
 
 from datahub.company.admin.adviser_forms import AddAdviserFromSSOForm, DUPLICATE_USER_MESSAGE
-from datahub.company.admin.constants import ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG
 from datahub.company.models import Advisor
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 changelist_url = reverse('admin:company_advisor_changelist')
 add_from_sso_url = reverse('admin:company_advisor_add-from-sso')
@@ -32,26 +30,20 @@ class TestAdviserChangeListLinks(AdminTestMixin):
     """Tests for customisations for the adviser admin change list links."""
 
     @pytest.mark.parametrize(
-        'permission_codenames,enable_feature_flag,should_link_exist',
+        'permission_codenames,should_link_exist',
         (
-            (['view_advisor'], True, False),
-            (['view_advisor', 'add_advisor'], True, True),
-            (['view_advisor', 'add_advisor'], False, False),
+            (['view_advisor'], False),
+            (['view_advisor', 'add_advisor'], True),
         ),
     )
     def test_add_adviser_link_existence(
         self,
         permission_codenames,
-        enable_feature_flag,
         should_link_exist,
     ):
+        """Test that there is a link to add an adviser from SSO if the user has the correct
+        permissions.
         """
-        Test that there is a link to add an adviser from SSO if the user has the correct
-        permissions and the feature flag is enabled.
-        """
-        if enable_feature_flag:
-            FeatureFlagFactory(code=ADMIN_ADD_ADVISER_FROM_SSO_FEATURE_FLAG)
-
         user = create_test_user(
             permission_codenames=permission_codenames,
             password=self.PASSWORD,
