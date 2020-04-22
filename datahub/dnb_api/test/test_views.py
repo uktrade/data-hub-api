@@ -1941,13 +1941,13 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_response
 
-    def test_valid(
+    def test_valid_full_data(
         self,
         requests_mock,
     ):
         """
         The endpoint should return 200 as well as a valid response when it is hit with a valid
-        payload.
+        payload of full investigation details.
         """
         company = CompanyFactory()
         dnb_formatted_company_details = {
@@ -1989,6 +1989,58 @@ class TestCompanyInvestigationView(APITestMixin):
                     'town': 'London',
                     'county': 'Greater London',
                     'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
+                },
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == dnb_response
+        assert requests_mock.last_request.json() == dnb_formatted_company_details
+        company.refresh_from_db()
+        assert str(company.dnb_investigation_id) == dnb_response['id']
+        assert company.pending_dnb_investigation is True
+
+    def test_valid_minimum_data(
+        self,
+        requests_mock,
+    ):
+        """
+        The endpoint should return 200 as well as a valid response when it is hit with a valid
+        payload of the minimum required investigation details.
+        """
+        company = CompanyFactory()
+        dnb_formatted_company_details = {
+            'company_details': {
+                'primary_name': 'Joe Bloggs LTD',
+                'telephone_number': '123456789',
+                'address_line_1': '23 Code Street',
+                'address_town': 'London',
+                'address_country': 'GB',
+            },
+        }
+        dnb_response = {
+            'id': '11111111-2222-3333-4444-555555555555',
+            'status': 'pending',
+            'created_on': '2020-01-05T11:00:00',
+            **dnb_formatted_company_details,
+        }
+
+        requests_mock.post(
+            DNB_INVESTIGATION_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
+
+        response = self.api_client.post(
+            reverse('api-v4:dnb-api:company-investigation'),
+            data={
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'town': 'London',
                     'country': constants.Country.united_kingdom.value.id,
                 },
             },

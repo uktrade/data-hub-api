@@ -248,10 +248,10 @@ class DNBAddressSerializer(serializers.Serializer):
     """
 
     line_1 = serializers.CharField(source='address_line_1')
-    line_2 = serializers.CharField(source='address_line_2', required=False)
+    line_2 = serializers.CharField(source='address_line_2', required=False, allow_blank=True)
     town = serializers.CharField(source='address_town')
-    county = serializers.CharField(source='address_county', required=False)
-    postcode = serializers.CharField(source='address_postcode', required=False)
+    county = serializers.CharField(source='address_county', required=False, allow_blank=True)
+    postcode = serializers.CharField(source='address_postcode', required=False, allow_blank=True)
     country = NestedRelatedField(model=CountryModel, source='address_country')
 
     def validate_country(self, country):
