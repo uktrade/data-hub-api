@@ -371,8 +371,8 @@ class DNBCompanyInvestigationView(APIView):
         investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
         investigation_serializer.is_valid(raise_exception=True)
 
-        data = investigation_serializer.validated_data
-        company = data.pop('company')
+        data = {'company_details': investigation_serializer.validated_data}
+        company = data['company_details'].pop('company')
 
         try:
             response = create_investigation(data)
