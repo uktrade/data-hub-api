@@ -278,6 +278,7 @@ STAFF_SSO_USER_TOKEN_CACHING_PERIOD = env.int(
     'STAFF_SSO_USER_TOKEN_CACHING_PERIOD',
     default=60 * 60,  # One hour
 )
+ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW = env.bool('ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW', default=True)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
