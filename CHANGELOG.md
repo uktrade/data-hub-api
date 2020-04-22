@@ -1,3 +1,11 @@
+# Data Hub API 29.2.1 (2020-04-22)
+
+
+## Bug fixes
+
+- **Companies** The URL for the `dnb-service` create investigation endpoint was changed from `company-investigation/` to `investigation/`.
+
+
 # Data Hub API 29.2.0 (2020-04-21)
 
 
