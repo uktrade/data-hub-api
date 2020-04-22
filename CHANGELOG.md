@@ -1,3 +1,20 @@
+# Data Hub API 29.3.0 (2020-04-22)
+
+
+## Features
+
+- **Advisers** The `createsuperuser` management command now prompts for an SSO email user ID. It can be left blank when not needed.
+
+## Bug fixes
+
+- **Companies** The format for calls to the `dnb-service` create investigation endpoint was corrected.
+
+## API
+
+- **Companies** The `/v4/dnb/company-investigation` API endpoint was adjusted to allow blank
+  values for address `line_2`, `county` and `postcode`.
+
+
 # Data Hub API 29.2.1 (2020-04-22)
 
 
