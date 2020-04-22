@@ -99,7 +99,9 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     objects = AdviserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    # This allows the DJANGO_SUPERUSER_SSO_EMAIL_USER_ID environment variable to be used
+    # with the createsuperuser management command.
+    REQUIRED_FIELDS = ['sso_email_user_id']
 
     @cached_property
     def name(self):
