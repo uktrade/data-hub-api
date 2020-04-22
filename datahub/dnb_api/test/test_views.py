@@ -31,7 +31,7 @@ from datahub.metadata.models import Country
 
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
-DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'company-investigation/')
+DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'investigation/')
 
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
