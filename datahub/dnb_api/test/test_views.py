@@ -1951,21 +1951,23 @@ class TestCompanyInvestigationView(APITestMixin):
         """
         company = CompanyFactory()
         dnb_formatted_company_details = {
-            'primary_name': 'Joe Bloggs LTD',
-            'domain': 'www.example.com',
-            'telephone_number': '123456789',
-            'address_line_1': '23 Code Street',
-            'address_line_2': 'Someplace',
-            'address_town': 'London',
-            'address_county': 'Greater London',
-            'address_postcode': 'W1 0TN',
-            'address_country': 'GB',
+            'company_details': {
+                'primary_name': 'Joe Bloggs LTD',
+                'domain': 'www.example.com',
+                'telephone_number': '123456789',
+                'address_line_1': '23 Code Street',
+                'address_line_2': 'Someplace',
+                'address_town': 'London',
+                'address_county': 'Greater London',
+                'address_postcode': 'W1 0TN',
+                'address_country': 'GB',
+            },
         }
         dnb_response = {
             'id': '11111111-2222-3333-4444-555555555555',
             'status': 'pending',
             'created_on': '2020-01-05T11:00:00',
-            'company_details': dnb_formatted_company_details,
+            **dnb_formatted_company_details,
         }
 
         requests_mock.post(
