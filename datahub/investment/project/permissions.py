@@ -18,6 +18,7 @@ class _PermissionTemplate(StrEnum):
     associated = '{app_label}.{action}_associated_{model_name}'
     standard = '{app_label}.{action}_{model_name}'
     stage_to_won = '{app_label}.{action}_stage_to_won_{model_name}'
+    to_any_stage = '{app_label}.{action}_to_any_stage_{model_name}'
 
 
 class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
