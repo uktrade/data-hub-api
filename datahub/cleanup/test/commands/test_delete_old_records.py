@@ -54,7 +54,10 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.user.company_list.test.factories import CompanyListItemFactory
+from datahub.user.company_list.test.factories import (
+    CompanyListItemFactory,
+    PipelineItemFactory,
+)
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
@@ -73,6 +76,7 @@ MAPPING = {
         'implicitly_deletable_models': {
             'company_list.CompanyListItem',
             'investor_profile.LargeCapitalInvestorProfile',
+            'company_list.PipelineItem',
         },
         'expired_objects_kwargs': [
             {
@@ -121,6 +125,12 @@ MAPPING = {
             },
             {
                 'factory': CompanyListItemFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [{}],
+                'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': PipelineItemFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [{}],
                 'unexpired_objects_kwargs': [],
