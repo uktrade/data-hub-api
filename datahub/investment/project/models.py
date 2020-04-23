@@ -41,6 +41,12 @@ class InvestmentProjectPermission(StrEnum):
 
     change_stage_to_won_investment_project
 
+    Users with the following permission can change the stage of a project to any of the five
+    stages, either forwards or backwards. This permission will bypass the existing field validated
+    checks, meaning a project can be moved to a stage without the related fields being filled in.
+
+    change_to_any_stage_investmentproject
+
     The following codenames mean that the user can only view or change investment projects that
     they are associated with:
 
@@ -65,6 +71,7 @@ class InvestmentProjectPermission(StrEnum):
     change_all = 'change_all_investmentproject'
     change_associated = 'change_associated_investmentproject'
     change_stage_to_won = 'change_stage_to_won_investmentproject'
+    change_to_any_stage = 'change_to_any_stage_investmentproject'
     add = 'add_investmentproject'
     delete = 'delete_investmentproject'
     export = 'export_investmentproject'
@@ -521,6 +528,10 @@ class InvestmentProject(
             (
                 InvestmentProjectPermission.change_stage_to_won.value,
                 'Can change investment project stage to won',
+            ),
+            (
+                InvestmentProjectPermission.change_to_any_stage.value,
+                'Can change investment project to any stage',
             ),
         )
         default_permissions = (
