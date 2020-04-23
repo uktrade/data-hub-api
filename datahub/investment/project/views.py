@@ -4,13 +4,19 @@ from django.db.models import Prefetch
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.permissions import HasPermissions
 from datahub.core.viewsets import CoreViewSet
-from datahub.investment.project.models import InvestmentProject, InvestmentProjectTeamMember
+from datahub.investment.project.models import (
+    InvestmentProject,
+    InvestmentProjectPermission,
+    InvestmentProjectTeamMember,
+)
 from datahub.investment.project.permissions import (
     InvestmentProjectModelPermissions,
     InvestmentProjectTeamMemberModelPermissions,
@@ -20,6 +26,7 @@ from datahub.investment.project.permissions import (
 )
 from datahub.investment.project.serializers import (
     InvestmentActivitySerializer,
+    IProjectChangeStageSerializer,
     IProjectSerializer,
     IProjectTeamMemberSerializer,
 )
@@ -125,6 +132,29 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
             **super().get_serializer_context(),
             'current_user': self.request.user if self.request else None,
         }
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(f'investment.{InvestmentProjectPermission.change_to_any_stage}'),
+        ],
+        filter_backends=[],
+    )
+    def change_stage(self, request, *args, **kwargs):
+        """Change the stage of an investment project"""
+        instance = self.get_object()
+        serializer = IProjectChangeStageSerializer(
+            instance,
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.change_stage(user=self.request.user)
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class IProjectTeamMembersViewSet(CoreViewSet):
