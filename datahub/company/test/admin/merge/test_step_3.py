@@ -114,6 +114,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ('num_investment_projects', False),
             ('num_orders', True),
             ('num_referrals', False),
+            ('num_pipeline_items', False),
         ),
     )
     @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
@@ -139,6 +140,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         source_orders = list(source_company.orders.all())
         source_referrals = list(source_company.referrals.all())
         source_company_list_items = list(source_company.company_list_items.all())
+        source_pipeline_list_items = list(source_company.pipeline_list_items.all())
 
         source_investment_projects_by_field = {
             investment_project_field: list(
@@ -210,6 +212,15 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 f'{len(source_company_list_items)} {company_list_item_noun}',
             )
 
+        if len(source_pipeline_list_items) > 0:
+            pipeline_item_noun = _get_verbose_name(
+                len(source_pipeline_list_items),
+                PipelineItem,
+            )
+            merge_entries.append(
+                f'{len(source_pipeline_list_items)} {pipeline_item_noun}',
+            )
+
         merge_entries = ', '.join(merge_entries)
 
         match = re.match(
@@ -236,6 +247,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             *source_interactions,
             *source_orders,
             *source_referrals,
+            *source_pipeline_list_items,
         ]
         for obj in chain(
             source_non_project_related_objects,
