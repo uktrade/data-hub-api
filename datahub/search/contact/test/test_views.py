@@ -596,7 +596,7 @@ class TestContactExportView(APITestMixin):
         default_contact_email = 'foo@bar.com'
 
         ContactFactory.create_batch(
-            SearchContactExportAPIView.streaming_page_size + 1,
+            SearchContactExportAPIView.consent_page_size + 1,
             email=default_contact_email,
 
         )
@@ -670,7 +670,7 @@ class TestContactExportView(APITestMixin):
         ]
 
         assert consent_get_many_mock.mock_calls == [
-            call([default_contact_email] * SearchContactExportAPIView.streaming_page_size),
+            call([default_contact_email] * SearchContactExportAPIView.consent_page_size),
             call([default_contact_email]),
         ]
 
