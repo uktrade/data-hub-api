@@ -46,19 +46,10 @@ v3_urls = [
     path('', include((investment_urls, 'investment'), namespace='investment')),
     path('', include((search_urls.urls_v3, 'search'), namespace='search')),
     path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
-    # TODO: remove `omis/public` path, once all views have been migrated to Hawk
-    # and deprecation period has passed.
-    path(
-        'omis/public/',
-        include(
-            (omis_urls.public_urls, 'omis-public'),
-            namespace='omis-public',
-        ),
-    ),
     path(
         'public/omis/',
         include(
-            (omis_urls.hawk_public_urls, 'public-omis'),
+            (omis_urls.public_urls, 'public-omis'),
             namespace='public-omis',
         ),
     ),
