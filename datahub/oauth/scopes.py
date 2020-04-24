@@ -9,12 +9,10 @@ class Scope(StrEnum):
     """Defined OAuth scopes."""
 
     internal_front_end = 'data-hub:internal-front-end'
-    public_omis_front_end = 'data-hub:public-omis-front-end'
 
 
 SCOPES_DESCS = {
     Scope.internal_front_end.value: 'Endpoints used by the internal front end',
-    Scope.public_omis_front_end.value: 'Endpoints used by the OMIS public front end',
 }
 
 

@@ -1,3 +1,25 @@
+# Data Hub API 30.0.0 (2020-04-24)
+
+
+## Removals
+
+- **OMIS** The deprecated `GET /v3/omis/public/order/<public-token>/invoice` endpoint has been removed.
+- **OMIS** The deprecated `GET /v3/omis/public/order/<public-token>` endpoint has been removed.
+- **OMIS** The following deprecated endpoints have been removed:
+
+      POST /v3/omis/public/order/<public-token>/payment-gateway-session
+      GET /v3/omis/public/order/<public-token>/payment-gateway-session/<session-id>
+      POST /v3/omis/public/order/<public-token>/payment
+- **OMIS** The following deprecated endpoints have been removed:
+
+      GET /v3/omis/public/order/<public-token>/quote
+      POST /v3/omis/public/order/<public-token>/quote/accept
+
+## Features
+
+- **Companies** The maximum limit for number of inactive companies to be archived by the automatic-company-archive job has been bumped to 20000.
+
+
 # Data Hub API 29.3.0 (2020-04-22)
 
 
