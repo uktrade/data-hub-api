@@ -13,7 +13,10 @@ class SearchPermissions(BasePermission):
         """
         Return `True` if permission is granted `False` otherwise.
         """
-        return has_permissions_for_app(request, view.search_app, is_export=self.is_export)
+        if not (request.user and request.user.is_authenticated):
+            return False
+
+        return has_permissions_for_app(request.user, view.search_app, is_export=self.is_export)
 
 
 class SearchAndExportPermissions(SearchPermissions):
@@ -26,7 +29,7 @@ class SearchAndExportPermissions(SearchPermissions):
     is_export = True
 
 
-def has_permissions_for_app(request, search_app, is_export=False):
+def has_permissions_for_app(user, search_app, is_export=False):
     """
     Checks if the user has permission to search for records related to a search app.
 
@@ -36,9 +39,7 @@ def has_permissions_for_app(request, search_app, is_export=False):
     If is_export is True, the user must also have the permission in the export_permission
     attribute on the search app.
     """
-    user = request.user
-
-    has_view_permission = user and any(
+    has_view_permission = any(
         user.has_perm(permission) for permission in search_app.view_permissions
     )
 

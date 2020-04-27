@@ -15,7 +15,6 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
-from datahub.oauth.scopes import Scope
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
     PublicSearchCompanyQuerySerializer,
@@ -31,7 +30,6 @@ from datahub.search.views import (
 class SearchCompanyAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = CompanySearchApp
     serializer_class = SearchCompanyQuerySerializer
     es_sort_by_remappings = {
