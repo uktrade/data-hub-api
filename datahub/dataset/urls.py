@@ -8,12 +8,6 @@ from datahub.dataset.company_export_country.views import (
 from datahub.dataset.company_export_country_history.views import (
     CompanyExportCountryHistoryDatasetView,
 )
-from datahub.dataset.company_export_to_country.views import (
-    CompanyExportToCountriesDatasetView,
-)
-from datahub.dataset.company_future_interest_countries.views import (
-    CompanyFutureInterestCountriesDatasetView,
-)
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
 from datahub.dataset.interaction.views import InteractionsDatasetView
@@ -40,16 +34,6 @@ urlpatterns = [
         'company-export-country-history-dataset',
         CompanyExportCountryHistoryDatasetView.as_view(),
         name='company-export-country-history-dataset',
-    ),
-    path(
-        'company-export-to-countries-dataset',
-        CompanyExportToCountriesDatasetView.as_view(),
-        name='company-export-to-countries-dataset',
-    ),
-    path(
-        'company-future-interest-countries-dataset',
-        CompanyFutureInterestCountriesDatasetView.as_view(),
-        name='company-future-interest-countries-dataset',
     ),
     path('interactions-dataset', InteractionsDatasetView.as_view(), name='interactions-dataset'),
     path(
