@@ -217,7 +217,14 @@ class ExportPipelineItemViewSet(CoreViewSet):
         ExportPipelineItemAPIPermissions,
     )
     serializer_class = ExportPipelineItemSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_fields = ('adviser_id', 'status')
+    ordering = ('-created_on')
     queryset = get_export_pipeline_item_queryset()
+
     def initial(self, request, *args, **kwargs):
         """
         Raise an Http404 if user has no pipeline items.
@@ -231,4 +238,4 @@ class ExportPipelineItemViewSet(CoreViewSet):
 
     def get_queryset(self):
         """Get a query set filtered to the authenticated user's lists."""
-        return super().get_queryset().filter(adviser=self.request.user).order_by('-created_on')
+        return super().get_queryset().filter(adviser=self.request.user)
