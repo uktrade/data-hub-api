@@ -280,6 +280,18 @@
     - - delete_companylistitem
       - company_list
       - companylistitem
+    - - view_pipelineitem
+      - company_list
+      - pipelineitem
+    - - add_pipelineitem
+      - company_list
+      - pipelineitem
+    - - change_pipelineitem
+      - company_list
+      - pipelineitem
+    - - delete_pipelineitem
+      - company_list
+      - pipelineitem
     - - add_companyreferral
       - company_referral
       - companyreferral

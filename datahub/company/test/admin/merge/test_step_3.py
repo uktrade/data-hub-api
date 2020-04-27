@@ -32,7 +32,10 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.test.factories import CompanyListItemFactory
+from datahub.user.company_list.test.factories import (
+    CompanyListItemFactory,
+    PipelineItemFactory,
+)
 
 
 class TestConfirmMergeViewGet(AdminTestMixin):
@@ -355,6 +358,7 @@ def _company_factory(
         num_orders=0,
         num_referrals=0,
         num_company_list_items=0,
+        num_pipeline_items=0,
 ):
     """
     Factory for a company that has companies, interactions, investment projects and OMIS orders.
@@ -365,6 +369,7 @@ def _company_factory(
     CompanyReferralFactory.create_batch(num_referrals, company=company, contact=None)
     OrderFactory.create_batch(num_orders, company=company)
     CompanyListItemFactory.create_batch(num_company_list_items, company=company)
+    PipelineItemFactory.create_batch(num_pipeline_items, company=company)
 
     fields_iter = cycle(INVESTMENT_PROJECT_COMPANY_FIELDS)
     fields = islice(fields_iter, 0, num_investment_projects)
