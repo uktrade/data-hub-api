@@ -305,7 +305,6 @@ REST_FRAMEWORK = {
         _default_authentication_class,
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
     'DEFAULT_THROTTLE_RATES': {

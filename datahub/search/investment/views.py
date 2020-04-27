@@ -10,7 +10,6 @@ from datahub.core.query_utils import (
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
-from datahub.oauth.scopes import Scope
 from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.serializers import SearchInvestmentProjectQuerySerializer
 from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
@@ -19,7 +18,6 @@ from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAP
 class SearchInvestmentProjectAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = InvestmentSearchApp
     serializer_class = SearchInvestmentProjectQuerySerializer
     es_sort_by_remappings = {

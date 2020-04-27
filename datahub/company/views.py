@@ -7,7 +7,6 @@ from django.http import (
     JsonResponse,
 )
 from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
@@ -63,14 +62,12 @@ from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
-from datahub.oauth.scopes import Scope
 
 
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company view set."""
 
     serializer_class = CompanySerializer
-    required_scopes = (Scope.internal_front_end,)
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ('global_headquarters_id', 'global_ultimate_duns_number')
@@ -236,7 +233,6 @@ class OneListGroupCoreTeamViewSet(CoreViewSet):
     onelistcoreteammember permissions are ignored for now.
     """
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects
     serializer_class = OneListCoreTeamMemberSerializer
 
@@ -252,14 +248,12 @@ class OneListGroupCoreTeamViewSet(CoreViewSet):
 class CompanyAuditViewSet(AuditViewSet):
     """Company audit views."""
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects.all()
 
 
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Contact ViewSet v3."""
 
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
@@ -279,7 +273,6 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
 class ContactAuditViewSet(AuditViewSet):
     """Contact audit views."""
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = Contact.objects.all()
 
 
@@ -349,7 +342,6 @@ class AdviserReadOnlyViewSetV1(
 ):
     """Adviser GET only views."""
 
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = AdviserSerializer
     queryset = Advisor.objects.select_related(
         'dit_team',
@@ -384,10 +376,8 @@ class ExportWinsForCompanyView(APIView):
     Company Matching Service.
     """
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_export_win}',
         ),
