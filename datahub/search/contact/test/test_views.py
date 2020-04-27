@@ -67,9 +67,9 @@ def setup_data():
 @pytest.fixture
 def consent_get_many_mock(monkeypatch):
     """Mocks the consent service `consent.get_many` function"""
-    m = Mock()
-    monkeypatch.setattr('datahub.company.consent.get_many', m)
-    yield m
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_many', mock)
+    yield mock
 
 
 class TestSearch(APITestMixin):
@@ -678,9 +678,7 @@ class TestContactExportView(APITestMixin):
             [dict(row) for row in reader],
             key=lambda x: x['Link'],  # ensure rows are sorted in same order as objects
         )
-        formatted_expected_row_data = format_csv_data(expected_row_data)
-        for idx, row in enumerate(actual_row_data):
-            assert row == formatted_expected_row_data[idx]
+        assert actual_row_data == format_csv_data(expected_row_data)
 
 
 def _format_interaction_team_names(interaction):
