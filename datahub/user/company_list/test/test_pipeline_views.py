@@ -52,9 +52,9 @@ class TestGetPipelineItemView(APITestMixin):
         assert len(response_data['results']) == 1
 
         _assert_get_export_pipeline_items_response(
-          response_data['results'][0],
-          company,
-          item,
+            response_data['results'][0],
+            company,
+            item,
         )
 
     def test_can_retrieve_multiple_pipeline_items_in_desc_order(self):
@@ -84,20 +84,73 @@ class TestGetPipelineItemView(APITestMixin):
         assert len(response_data['results']) == 3
 
         _assert_get_export_pipeline_items_response(
-          response_data['results'][0],
-          company_3,
-          item_3,
+            response_data['results'][0],
+            company_3,
+            item_3,
         )
         _assert_get_export_pipeline_items_response(
-          response_data['results'][1],
-          company_2,
-          item_2,
+            response_data['results'][1],
+            company_2,
+            item_2,
         )
         _assert_get_export_pipeline_items_response(
-          response_data['results'][2],
-          company_1,
-          item_1,
+            response_data['results'][2],
+            company_1,
+            item_1,
         )
+
+    def test_can_filter_by_valid_status(self):
+        """Test that it can filter by status."""
+        PipelineItemFactory(
+            adviser=self.user,
+            company=CompanyFactory(),
+            status=PipelineItem.Status.WIN,
+        )
+        PipelineItemFactory(
+            adviser=self.user,
+            company=CompanyFactory(),
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'status': PipelineItem.Status.IN_PROGRESS},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['status'] == PipelineItem.Status.IN_PROGRESS
+
+    def test_returns_empty_list_when_filtering_non_existing_status(self):
+        """Test that it can filter by status."""
+        PipelineItemFactory(
+            adviser=self.user,
+            company=CompanyFactory(),
+            status=PipelineItem.Status.WIN,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'status': PipelineItem.Status.LEADS},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['results'] == []
+
+    def test_returns_400_when_filtering_with_invalid_status(self):
+        """Test that it can filter by status."""
+        PipelineItemFactory(
+            adviser=self.user,
+            company=CompanyFactory(),
+            status=PipelineItem.Status.WIN,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'status': 'invalid'},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_returns_404_when_specific_user_has_no_pipeline_items(self):
         """Test that another user's pipeline item can't be retrieved."""
@@ -109,7 +162,7 @@ class TestGetPipelineItemView(APITestMixin):
         """Test that only the users pipeline items can be retrieved."""
         company = CompanyFactory()
         PipelineItemFactory(company=company, status=PipelineItem.Status.IN_PROGRESS)
-        item = PipelineItemFactory(adviser=self.user, company=company, status=PipelineItem.Status.WIN)
+        PipelineItemFactory(adviser=self.user, company=company, status=PipelineItem.Status.WIN)
         response = self.api_client.get(pipeline_collection_url)
         assert response.status_code == status.HTTP_200_OK
 
@@ -120,12 +173,12 @@ class TestGetPipelineItemView(APITestMixin):
 
 def _assert_get_export_pipeline_items_response(response_data, company, item):
     assert response_data == {
-      'company': {
-          'id': str(company.pk),
-          'name': company.name,
-          'turnover': company.turnover,
-          'export_potential': company.export_potential,
-      },
-      'status': item.status,
-      'created_on': format_date_or_datetime(item.created_on),
+        'company': {
+            'id': str(company.pk),
+            'name': company.name,
+            'turnover': company.turnover,
+            'export_potential': company.export_potential,
+        },
+        'status': item.status,
+        'created_on': format_date_or_datetime(item.created_on),
     }
