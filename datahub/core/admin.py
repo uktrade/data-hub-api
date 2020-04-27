@@ -152,7 +152,7 @@ class RawIdWidget(forms.TextInput):
         query_string = urlencode(params)
 
         context['related_url'] = f'{related_url}?{query_string}'
-        context['widget']['attrs']['class'] = 'vForeignKeyRawIdAdminField'
+        context['widget']['attrs']['class'] = 'vUUIDField'
 
         title_format = gettext('Look up {verbose_name}')
         context['link_title'] = title_format.format(verbose_name=self.model._meta.verbose_name)
