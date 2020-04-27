@@ -105,17 +105,6 @@ class CompanyListItemAPIPermissions(DjangoModelPermissions):
     }
 
 
-class ExportPipelineItemAPIPermissions(DjangoModelPermissions):
-    """DRF permissions class for the export pipeline list item view."""
-
-    perms_map = {
-        'GET': [
-            f'company.{CompanyPermission.view_company}',
-            f'company_list.{PipelineItemPermissionCode.view_pipeline_item}',
-        ],
-    }
-
-
 class CompanyListItemViewSet(CoreViewSet):
     """A view set for returning the contents of a company list."""
 
@@ -153,33 +142,6 @@ class CompanyListItemViewSet(CoreViewSet):
         """Filter the query set to the items relating to the authenticated users."""
         queryset = super().filter_queryset(queryset)
         return queryset.filter(list__pk=self.kwargs['company_list_pk'])
-
-
-class ExportPipelineItemViewSet(CoreViewSet):
-    """A view set for returning the contents of a export pipeline list."""
-
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
-        ExportPipelineItemAPIPermissions,
-    )
-    serializer_class = ExportPipelineItemSerializer
-    queryset = get_export_pipeline_item_queryset()
-
-    def initial(self, request, *args, **kwargs):
-        """
-        Raise an Http404 if user has no pipeline items.
-        """
-        super().initial(request, *args, **kwargs)
-
-        if not PipelineItem.objects.filter(
-            adviser=self.request.user,
-        ).exists():
-            raise Http404()
-
-    def get_queryset(self):
-        """Get a query set filtered to the authenticated user's lists."""
-        return super().get_queryset().filter(adviser=self.request.user)
 
 
 class CompanyListItemAPIView(APIView):
@@ -244,3 +206,41 @@ class CompanyListItemAPIView(APIView):
         )
         self.check_object_permissions(request, obj)
         return obj
+
+
+class ExportPipelineItemAPIPermissions(DjangoModelPermissions):
+    """DRF permissions class for the export pipeline list item view."""
+
+    perms_map = {
+        'GET': [
+            f'company.{CompanyPermission.view_company}',
+            f'company_list.{PipelineItemPermissionCode.view_pipeline_item}',
+        ],
+    }
+
+
+class ExportPipelineItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a export pipeline list."""
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        ExportPipelineItemAPIPermissions,
+    )
+    serializer_class = ExportPipelineItemSerializer
+    queryset = get_export_pipeline_item_queryset()
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if user has no pipeline items.
+        """
+        super().initial(request, *args, **kwargs)
+
+        if not PipelineItem.objects.filter(
+            adviser=self.request.user,
+        ).exists():
+            raise Http404()
+
+    def get_queryset(self):
+        """Get a query set filtered to the authenticated user's lists."""
+        return super().get_queryset().filter(adviser=self.request.user)
