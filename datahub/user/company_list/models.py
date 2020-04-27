@@ -64,3 +64,50 @@ class CompanyListItem(BaseModel):
                 name='unique_list_and_company',
             ),
         ]
+
+
+class PipelineItemPermissionCode(StrEnum):
+    """PipelineItem permission codename constants."""
+
+    view_pipeline_item = 'view_pipelineitem'
+    add_pipeline_item = 'add_pipelineitem'
+    change_pipeline_item = 'change_pipelineitem'
+    delete_pipeline_item = 'delete_pipelineitem'
+
+
+class PipelineItem(BaseModel):
+    """
+    Model holding pipeline list items.
+    """
+
+    class Status(models.TextChoices):
+        LEADS = ('leads', 'Leads')
+        IN_PROGRESS = ('in_progress', 'In progress')
+        WIN = ('win', 'Win')
+
+    id = models.UUIDField(primary_key=True, default=uuid4)
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='pipeline_list_items',
+    )
+    adviser = models.ForeignKey(
+        'company.Advisor',
+        on_delete=models.CASCADE,
+    )
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=Status.choices,
+    )
+
+    def __str__(self):
+        """Human-friendly representation."""
+        return f'{self.company} - {self.adviser} - {self.status}'
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('adviser', 'company'),
+                name='unique_adviser_and_company',
+            ),
+        ]
