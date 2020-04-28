@@ -20,17 +20,16 @@ from datahub.user.company_list.models import (
     CompanyList,
     CompanyListItem,
     CompanyListItemPermissionCode,
-    PipelineItem,
     PipelineItemPermissionCode,
 )
 from datahub.user.company_list.queryset import (
     get_company_list_item_queryset,
-    get_export_pipeline_item_queryset,
+    get_pipeline_item_queryset,
 )
 from datahub.user.company_list.serializers import (
     CompanyListItemSerializer,
     CompanyListSerializer,
-    ExportPipelineItemSerializer,
+    PipelineItemSerializer,
 )
 
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
@@ -197,8 +196,8 @@ class CompanyListItemAPIView(APIView):
         return obj
 
 
-class ExportPipelineItemAPIPermissions(DjangoModelPermissions):
-    """DRF permissions class for the export pipeline list item view."""
+class PipelineItemAPIPermissions(DjangoModelPermissions):
+    """DRF permissions class for the pipeline list item view."""
 
     perms_map = {
         'GET': [
@@ -208,22 +207,18 @@ class ExportPipelineItemAPIPermissions(DjangoModelPermissions):
     }
 
 
-class ExportPipelineItemViewSet(CoreViewSet):
-    """A view set for returning the contents of a export pipeline list."""
+class PipelineItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a pipeline list."""
 
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
-        ExportPipelineItemAPIPermissions,
-    )
-    serializer_class = ExportPipelineItemSerializer
+    permission_classes = (PipelineItemAPIPermissions,)
+    serializer_class = PipelineItemSerializer
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
     )
     filterset_fields = ('status',)
     ordering = ('-created_on')
-    queryset = get_export_pipeline_item_queryset()
+    queryset = get_pipeline_item_queryset()
 
     def initial(self, request, *args, **kwargs):
         """
@@ -231,9 +226,7 @@ class ExportPipelineItemViewSet(CoreViewSet):
         """
         super().initial(request, *args, **kwargs)
 
-        if not PipelineItem.objects.filter(
-            adviser=self.request.user,
-        ).exists():
+        if not self.get_queryset().exists():
             raise Http404()
 
     def get_queryset(self):

@@ -51,7 +51,7 @@ class TestGetPipelineItemView(APITestMixin):
         response_data = response.json()
         assert len(response_data['results']) == 1
 
-        _assert_get_export_pipeline_items_response(
+        self._assert_get_pipeline_items_response(
             response_data['results'][0],
             company,
             item,
@@ -83,17 +83,17 @@ class TestGetPipelineItemView(APITestMixin):
         response_data = response.json()
         assert len(response_data['results']) == 3
 
-        _assert_get_export_pipeline_items_response(
+        self._assert_get_pipeline_items_response(
             response_data['results'][0],
             company_3,
             item_3,
         )
-        _assert_get_export_pipeline_items_response(
+        self._assert_get_pipeline_items_response(
             response_data['results'][1],
             company_2,
             item_2,
         )
-        _assert_get_export_pipeline_items_response(
+        self._assert_get_pipeline_items_response(
             response_data['results'][2],
             company_1,
             item_1,
@@ -170,15 +170,14 @@ class TestGetPipelineItemView(APITestMixin):
         assert len(response_data['results']) == 1
         assert response_data['results'][0]['status'] == PipelineItem.Status.WIN
 
-
-def _assert_get_export_pipeline_items_response(response_data, company, item):
-    assert response_data == {
-        'company': {
-            'id': str(company.pk),
-            'name': company.name,
-            'turnover': company.turnover,
-            'export_potential': company.export_potential,
-        },
-        'status': item.status,
-        'created_on': format_date_or_datetime(item.created_on),
-    }
+    def _assert_get_pipeline_items_response(self, response_data, company, item):
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+        }
