@@ -1,3 +1,36 @@
+# Data Hub API 31.0.0 (2020-04-28)
+
+
+## Removals
+
+- **Companies** The following deprecated dataset API endpoints have been removed from Data Hub API:
+
+  - `/v4/dataset/company-export-to-countries-dataset`
+  - `/v4/dataset/company-future-interest-countries-dataset`
+- The OAuth application scopes section was removed from the admin site as it’s no longer required as all OAuth client credentials endpoints have now been removed.
+
+## Features
+
+- A new admin site page, `/admin/add-access-token`, was added. This can be used to add an access token for development purposes when `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` is turned on.
+
+  This page can also be disabled using the `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` setting.
+
+## Database schema
+
+- **Advisers** A `company_list_pipelineitem` table was created with the following columns:
+
+    - `"id" uuid NOT NULL PRIMARY KEY`
+    - `"adviser_id" uuid NOT NULL`
+    - `"company_id" uuid NOT NULL`
+    - `"status" character varying(255) NOT NULL`
+    - `"created_on" timestamp with time zone NULL`
+    - `"modified_on" timestamp with time zone NULL`
+    - `"created_by_id" uuid NULL`
+    - `"modified_by_id" uuid NULL`
+
+  This table will store a list of companies advisers have added to their personal pipeline with a predefined status of Leads or In progress or Win.
+
+
 # Data Hub API 30.0.0 (2020-04-24)
 
 
