@@ -257,7 +257,6 @@ SSO_ENABLED = env.bool('SSO_ENABLED')
 
 OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND_CLASS': 'datahub.oauth.backend.ContentTypeAwareOAuthLibCore',
-    'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
 if SSO_ENABLED:
