@@ -221,7 +221,7 @@ class ExportPipelineItemViewSet(CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ('adviser_id', 'status')
+    filterset_fields = ('status',)
     ordering = ('-created_on')
     queryset = get_export_pipeline_item_queryset()
 
