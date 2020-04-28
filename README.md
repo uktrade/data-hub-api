@@ -222,22 +222,13 @@ The token should have the `data-hub:internal-front-end` scope. django-oauth-tool
 
 ## Granting access to machine-to-machine clients
 
-To give access to a machine-to-machine client that doesn't require user authentication:
+Pure machine-to-machine clients use Hawk authentication with separate credentials for each client.
 
-1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
+There are separate views for such clients as these views don’t expect `request.user` to be set.
 
-    * Client type: Confidential
-    * Authorization grant type: Client credentials
+Hawk credentials for each client are defined in settings below and each client is assigned scopes in `config/settings/common.py`.
 
-1. Define the required scopes for the app by adding a new record in the
-[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/)
-page with these details:
-    * Application: The application just created
-    * Scope: The required scopes
-
-The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-api/tree/develop/datahub/oauth/scopes.py).
-
-[Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
+These scopes define which views each client can access.  
 
 ## Deployment
 

@@ -3,7 +3,6 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -24,7 +23,7 @@ from datahub.investment.project.serializers import (
     IProjectSerializer,
     IProjectTeamMemberSerializer,
 )
-from datahub.oauth.scopes import Scope
+
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
@@ -32,10 +31,8 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 class IProjectAuditViewSet(AuditViewSet):
     """Investment Project audit views."""
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectModelPermissions,
         IsAssociatedToInvestmentProjectPermission,
     )
@@ -68,11 +65,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
     """
 
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectModelPermissions,
         IsAssociatedToInvestmentProjectPermission,
     )
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
@@ -137,11 +132,9 @@ class IProjectTeamMembersViewSet(CoreViewSet):
 
     non_existent_project_error_message = 'Specified investment project does not exist'
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectTeamMemberModelPermissions,
         IsAssociatedToInvestmentProjectTeamMemberPermission,
     )
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
     lookup_url_kwarg = 'adviser_pk'

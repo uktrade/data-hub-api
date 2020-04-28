@@ -6,13 +6,12 @@ from itertools import islice
 from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
-from datahub.oauth.scopes import Scope
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.execute_query import execute_search_query
 from datahub.search.permissions import (
@@ -105,9 +104,8 @@ SHARED_FIELDS_TO_EXCLUDE = ('_document_type',)
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (IsAuthenticated,)
 
-    required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
     schema = SearchBasicStubSchema()
 
@@ -156,7 +154,7 @@ def _get_global_search_permission_filters(request):
     Only global search entities that the user has access to are returned.
     """
     for app in get_global_search_apps_as_mapping().values():
-        if not has_permissions_for_app(request, app):
+        if not has_permissions_for_app(request.user, app):
             continue
 
         filter_args = app.get_permission_filters(request)
@@ -169,7 +167,7 @@ class SearchAPIView(APIView):
     schema = SearchStubSchema()
 
     search_app = None
-    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
+    permission_classes = (SearchPermissions,)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 
@@ -270,7 +268,7 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAndExportPermissions)
+    permission_classes = (SearchAndExportPermissions,)
     queryset = None
     field_titles = None
     db_sort_by_remappings = {}

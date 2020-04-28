@@ -11,14 +11,12 @@ from datahub.company_referral.serializers import (
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
-from datahub.oauth.scopes import Scope
 
 
 class CompanyReferralViewSet(CoreViewSet):
     """Company referral view set."""
 
     serializer_class = CompanyReferralSerializer
-    required_scopes = (Scope.internal_front_end,)
     queryset = CompanyReferral.objects.select_related(
         'company',
         'contact',

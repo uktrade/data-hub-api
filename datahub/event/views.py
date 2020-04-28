@@ -1,13 +1,11 @@
 from datahub.core.viewsets import CoreViewSet
 from datahub.event.models import Event
 from datahub.event.serializers import EventSerializer
-from datahub.oauth.scopes import Scope
 
 
 class EventViewSet(CoreViewSet):
     """Views for events."""
 
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = EventSerializer
     queryset = Event.objects.select_related(
         'address_country',
