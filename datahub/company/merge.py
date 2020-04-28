@@ -15,7 +15,7 @@ from datahub.core.model_helpers import get_related_fields, get_self_referential_
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
-from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
 
 # Merging is not allowed if the source company has any relations that aren't in
@@ -24,6 +24,7 @@ from datahub.user.company_list.models import CompanyListItem
 ALLOWED_RELATIONS_FOR_MERGING = {
     # These relations are moved to the target company on merge
     Company._meta.get_field('company_list_items').remote_field,
+    Company._meta.get_field('pipeline_list_items').remote_field,
     CompanyReferral.company.field,
     Contact.company.field,
     Interaction.company.field,
@@ -76,6 +77,15 @@ def _company_list_item_updater(list_item, field, target_company):
         _default_object_updater(list_item, field, target_company)
 
 
+def _pipeline_item_updater(pipeline_item, field, target_company):
+    # If there is already a pipeline item for the adviser for the target company
+    # delete this item instead as the same company can't be added for the same adviser again
+    if PipelineItem.objects.filter(adviser=pipeline_item.adviser, company=target_company).exists():
+        pipeline_item.delete()
+    else:
+        _default_object_updater(pipeline_item, field, target_company)
+
+
 class MergeConfiguration(NamedTuple):
     """Specifies how company merging should be handled for a particular related model."""
 
@@ -91,6 +101,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
     MergeConfiguration(Order, ('company',)),
     MergeConfiguration(CompanyListItem, ('company',), _company_list_item_updater),
+    MergeConfiguration(PipelineItem, ('company',), _pipeline_item_updater),
 ]
 
 

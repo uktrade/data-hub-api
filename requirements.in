@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.5
 psycogreen==1.0.2
 
-boto3==1.12.41
+boto3==1.12.46
 
 notifications-python-client==5.5.1
 
@@ -78,7 +78,7 @@ pep8-naming==0.10.0
 pydocstyle==5.0.2
 
 gunicorn==20.0.4
-gevent==1.5.0
+gevent==20.4.0
 mohawk==1.1.0
 requests==2.23.0
 requests_toolbelt==0.9.1
