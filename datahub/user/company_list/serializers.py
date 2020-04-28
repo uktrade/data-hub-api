@@ -1,8 +1,17 @@
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
 from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
+
+CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE = gettext_lazy(
+    "An archived company can't be added to the pipeline.",
+)
+COMPANY_ALREADY_EXISTS_IN_PIPELINE_MESSAGE = gettext_lazy(
+    'This company already exists in the pipeline for this user.',
+)
 
 
 class CompanyListSerializer(serializers.ModelSerializer):
@@ -60,7 +69,7 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
 
 
 class PipelineItemSerializer(serializers.ModelSerializer):
-    """Serialiser for pipeline list items."""
+    """Serialiser for pipeline item."""
 
     company = NestedRelatedField(
         Company,
@@ -68,11 +77,34 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         # call in the queryset module
         extra_fields=('name', 'turnover', 'export_potential'),
     )
+    adviser = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    def validate_company(self, company):
+        """Make sure company is not archived"""
+        if company.archived:
+            raise serializers.ValidationError(CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE)
+
+        return company
 
     class Meta:
         model = PipelineItem
         fields = (
+            'id',
             'company',
-            'created_on',
             'status',
+            'adviser',
+            'created_on',
         )
+        read_only_fields = (
+            'id',
+            'adviser',
+            'created_on',
+        )
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=PipelineItem.objects.all(),
+                fields=['company', 'adviser'],
+                message=COMPANY_ALREADY_EXISTS_IN_PIPELINE_MESSAGE,
+            ),
+        ]

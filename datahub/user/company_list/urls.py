@@ -48,6 +48,7 @@ urlpatterns = [
         PipelineItemViewSet.as_view(
             {
                 'get': 'list',
+                'post': 'create',
             },
         ),
         name='pipelineitem-collection',
