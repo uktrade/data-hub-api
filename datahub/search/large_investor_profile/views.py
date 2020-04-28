@@ -6,7 +6,6 @@ from datahub.core.query_utils import (
 from datahub.investment.investor_profile.models import (
     LargeCapitalInvestorProfile as DBLargeCapitalInvestorProfile,
 )
-from datahub.oauth.scopes import Scope
 from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.serializers import (
     SearchLargeInvestorProfileQuerySerializer,
@@ -17,7 +16,6 @@ from datahub.search.views import register_v4_view, SearchAPIView, SearchExportAP
 class SearchInvestorProfileAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = LargeInvestorProfileSearchApp
     serializer_class = SearchLargeInvestorProfileQuerySerializer
 

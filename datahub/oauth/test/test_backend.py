@@ -3,13 +3,12 @@ from urllib.parse import urlencode
 
 import pytest
 from django.conf import settings
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from datahub.core.test_utils import APITestMixin
 from datahub.core.viewsets import CoreViewSet
-from datahub.oauth.scopes import Scope
 
 
 @pytest.fixture
@@ -25,8 +24,7 @@ def oauth2_backend_class(monkeypatch):
 class RestrictedAccessViewSet(CoreViewSet):
     """DRF ViewSet to test authentication."""
 
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (IsAuthenticated,)
 
 
 class TestContentTypeAwareOAuthLibCore(APITestMixin):
@@ -88,7 +86,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
         if expected_authorized:
             create.return_value = Response(data={'result': True})
         data = {
-            'access_token': self.get_token(Scope.internal_front_end),
+            'access_token': self.get_token(),
         }
         request = api_request_factory.post(
             '/',

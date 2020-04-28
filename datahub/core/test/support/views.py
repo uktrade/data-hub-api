@@ -1,5 +1,5 @@
 from django.template.response import TemplateResponse
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -18,7 +18,6 @@ from datahub.core.test.support.serializers import (
     PermissionModelSerializer,
 )
 from datahub.core.viewsets import CoreViewSet
-from datahub.oauth.test.scopes import TestScope
 
 MAX_UPLOAD_SIZE = 50
 
@@ -26,8 +25,7 @@ MAX_UPLOAD_SIZE = 50
 class MyDisableableModelViewset(CoreViewSet):
     """MyDisableableModel view set."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    required_scopes = (TestScope.test_scope_1,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = MyDisableableModelSerializer
     queryset = MyDisableableModel.objects.all()
 
@@ -36,7 +34,6 @@ class PermissionModelViewset(CoreViewSet):
     """PermissionModel view set."""
 
     serializer_class = PermissionModelSerializer
-    required_scopes = ()
     queryset = PermissionModel.objects.all()
 
 

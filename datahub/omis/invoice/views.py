@@ -7,7 +7,6 @@ from datahub.core.hawk_receiver import (
     HawkResponseSigningMixin,
     HawkScopePermission,
 )
-from datahub.oauth.scopes import Scope
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.invoice.serializers import InvoiceSerializer
 from datahub.omis.order.constants import OrderStatus
@@ -35,8 +34,6 @@ class BaseInvoiceViewSet(BaseNestedOrderViewSet):
 
 class InvoiceViewSet(BaseInvoiceViewSet):
     """Invoice ViewSet."""
-
-    required_scopes = (Scope.internal_front_end,)
 
 
 class PublicInvoiceViewSet(HawkResponseSigningMixin, BaseInvoiceViewSet):

@@ -1,13 +1,12 @@
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.oauth.scopes import Scope
 
 
 class ActivityFeedView(APIView):
@@ -21,8 +20,7 @@ class ActivityFeedView(APIView):
     it returns an empty list.
     """
 
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (IsAuthenticated,)
 
     ACTIVITY_MODELS_PERMISSIONS_REQUIRED = (
         'company_referral.view_companyreferral',
