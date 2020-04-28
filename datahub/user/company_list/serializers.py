@@ -59,8 +59,8 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
         )
 
 
-class ExportPipelineItemSerializer(serializers.ModelSerializer):
-    """Serialiser for export pipeline list items."""
+class PipelineItemSerializer(serializers.ModelSerializer):
+    """Serialiser for pipeline list items."""
 
     company = NestedRelatedField(
         Company,

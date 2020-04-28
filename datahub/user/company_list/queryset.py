@@ -66,9 +66,9 @@ def get_company_list_item_queryset():
     )
 
 
-def get_export_pipeline_item_queryset():
+def get_pipeline_item_queryset():
     """
-    Returns a query set used by ExportPipelineItemViewSet.
+    Returns a query set used by PipelineItemViewSet.
     """
     return PipelineItem.objects.select_related('company').only(
         # Only select the fields we need to reduce data transfer time for large lists

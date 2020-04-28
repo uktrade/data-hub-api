@@ -1,4 +1,4 @@
-A new endpoint, `/v4/company-list/pipelineitem-collection`, was added to expose all export pipeline items for a given user. There is also the possibility of filtering the result by status. The following structure will be returned when a call is made to this endpoint:
+A new endpoint `/v4/pipeline-item`, was added to expose all pipeline items for a given user. Filterable fields are: `status` and order by fields are: `created_on` (desc). The following structure will be returned when a call is made to this endpoint:
 
  ```json
  ...
