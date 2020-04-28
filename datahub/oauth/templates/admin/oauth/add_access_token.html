@@ -1,0 +1,47 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static datahub_extras %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {% trans 'Add access token' %}
+</div>
+{% endblock %}
+
+{% block content %}
+  <p>
+    {% blocktrans %}
+      Use this form to create a temporary access token to use with the API.
+    {% endblocktrans %}
+  </p>
+
+  <form action="" method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="fieldWrapper">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div>
+      <input type="submit" value="{% trans 'Save' %}">
+    </div>
+  </form>
+{% endblock %}

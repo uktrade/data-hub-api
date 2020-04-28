@@ -12,6 +12,7 @@ unversioned_urls = [
     path('admin/', admin.site.urls),
     path('', include('datahub.admin_report.urls')),
     path('', include('datahub.investment.project.report.urls')),
+    path('', include('datahub.oauth.admin.urls')),
     path('ping.xml', ping, name='ping'),
     path('token/', TokenView.as_view(), name='token'),
     path('whoami/', who_am_i, name='who_am_i'),

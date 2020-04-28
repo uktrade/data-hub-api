@@ -154,6 +154,7 @@ DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
 
 DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = ['notifyme@digital.trade.gov.uk']
 
+ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW = True
 STAFF_SSO_BASE_URL = 'http://sso.test/'
 STAFF_SSO_AUTH_TOKEN = 'test-sso-token'
 # TODO: Remove this once SSOIntrospectionAuthentication is the default, django-oauth-toolkit
