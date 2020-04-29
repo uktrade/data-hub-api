@@ -153,10 +153,11 @@ DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
 
 STAFF_SSO_BASE_URL = 'http://sso.test/'
 STAFF_SSO_AUTH_TOKEN = 'test-sso-token'
+STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC = True
 # TODO: Remove this once SSOIntrospectionAuthentication is the default, django-oauth-toolkit
 # is removed and APITestMixin has been updated
 REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = [
-    'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    'datahub.oauth.auth.SSOIntrospectionAuthentication',
 ]
 
 ADMIN_OAUTH2_ENABLED = True
