@@ -65,7 +65,7 @@ class TestDNBAPICommon(APITestMixin):
         requests_mock.post(DNB_SEARCH_URL)
 
         unauthorised_api_client = self.create_api_client()
-        unauthorised_api_client.credentials(Authorization='foo')
+        unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
 
         response = unauthorised_api_client.post(
             url,
@@ -1783,7 +1783,7 @@ class TestCompanyInvestigationView(APITestMixin):
         Ensure that a non-authenticated request gets a 401.
         """
         unauthorised_api_client = self.create_api_client()
-        unauthorised_api_client.credentials(Authorization='foo')
+        unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
 
         response = unauthorised_api_client.post(
             reverse('api-v4:dnb-api:company-investigation'),

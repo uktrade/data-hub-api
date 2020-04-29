@@ -27,8 +27,8 @@ This project uses Docker compose to setup and run all the necessary components. 
     cp sample.env .env
     ```
 
-    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_EMAIL`
-    should be the same as MOCK_SSO_USERNAME in the frontend's .env file.
+    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID`
+    should be the same as MOCK_SSO_EMAIL_USER_ID in mock-sso’s .env file.
 
 3.  Build and run the necessary containers for the required environment:
 
@@ -215,10 +215,8 @@ flake8
 The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure the API as follows to use with the front end:
 
 * `SSO_ENABLED`: `True`
-* `RESOURCE_SERVER_INTROSPECTION_URL`: URL of the [RFC 7662](https://tools.ietf.org/html/rfc7662) introspection endpoint (should be the same server the front end is using). This is provided by a [Staff SSO](https://github.com/uktrade/staff-sso) instance.
-* `RESOURCE_SERVER_AUTH_TOKEN`: Access token for the introspection server.
-
-The token should have the `data-hub:internal-front-end` scope. django-oauth-toolkit will create a user corresponding to the token if one does not already exist.
+* `STAFF_SSO_BASE_URL`: URL of a [Staff SSO](https://github.com/uktrade/staff-sso) or [Mock SSO](https://github.com/uktrade/mock-sso) instance. This should be the same server the front end is configured to use.
+* `STAFF_SSO_AUTH_TOKEN`: Access token for Staff SSO.
 
 ## Granting access to machine-to-machine clients
 
@@ -345,7 +343,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
 | `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
 | `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
-| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=False). |
+| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=True). |
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
