@@ -18,5 +18,4 @@ DEFAULT_SERVICE_NAME = NotifyServiceName.datahub
 NOTIFY_KEYS = {
     NotifyServiceName.datahub: 'DATAHUB_NOTIFICATION_API_KEY',
     NotifyServiceName.omis: 'OMIS_NOTIFICATION_API_KEY',
-    NotifyServiceName.dnb_investigation: 'DNB_INVESTIGATION_NOTIFICATION_API_KEY',
 }
