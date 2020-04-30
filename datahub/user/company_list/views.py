@@ -20,7 +20,6 @@ from datahub.user.company_list.models import (
     CompanyList,
     CompanyListItem,
     CompanyListItemPermissionCode,
-    PipelineItemPermissionCode,
 )
 from datahub.user.company_list.queryset import (
     get_company_list_item_queryset,
@@ -196,21 +195,9 @@ class CompanyListItemAPIView(APIView):
         return obj
 
 
-class PipelineItemAPIPermissions(DjangoModelPermissions):
-    """DRF permissions class for the pipeline list item view."""
-
-    perms_map = {
-        'GET': [
-            f'company.{CompanyPermission.view_company}',
-            f'company_list.{PipelineItemPermissionCode.view_pipeline_item}',
-        ],
-    }
-
-
 class PipelineItemViewSet(CoreViewSet):
     """A view set for returning the contents of a pipeline list."""
 
-    permission_classes = (PipelineItemAPIPermissions,)
     serializer_class = PipelineItemSerializer
     filter_backends = (
         DjangoFilterBackend,

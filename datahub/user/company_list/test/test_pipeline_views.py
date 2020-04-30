@@ -23,8 +23,7 @@ class TestGetPipelineItemView(APITestMixin):
         'permission_codenames,expected_status',
         (
             ([], status.HTTP_403_FORBIDDEN),
-            (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
-            (['view_company', 'view_pipelineitem'], status.HTTP_200_OK),
+            (['view_pipelineitem'], status.HTTP_200_OK),
         ),
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
