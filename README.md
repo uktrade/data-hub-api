@@ -126,7 +126,7 @@ Dependencies:
     create database datahub;
     create database mi;
     ```
-    
+
     (Most Django apps use the `datahub` database. The `mi` database is used only by the `mi_dashboard` Django app.)
 
 9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
@@ -153,8 +153,8 @@ Dependencies:
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
     ```
-    
-    Note that this will queue Celery tasks to index the created records in Elasticsearch, 
+
+    Note that this will queue Celery tasks to index the created records in Elasticsearch,
     and hence the loaded records won‘t be returned by search endpoints until Celery is
     started and the queued tasks have run.
 
@@ -163,7 +163,7 @@ Dependencies:
     ```shell
     ./manage.py createsuperuser
     ```
-    
+
     (You can enter any valid email address as the username and SSO email user ID.)
 
 14. Start the server:
@@ -282,8 +282,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `DNB_AUTOMATIC_UPDATE_LIMIT` | No | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set. |
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
-| `DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS` | No | Email addresses for recipients that should receive DNB company investigation notifications. |
-| `DNB_INVESTIGATION_NOTIFICATION_API_KEY` | No | GOVUK notify API key to use for sending DNB company investigation notifications. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |

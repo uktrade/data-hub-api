@@ -145,16 +145,12 @@ ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = 'some-outgoing-id'
 ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = 'some-outgoing-secret'
 
 DATAHUB_NOTIFICATION_API_KEY = None
-DNB_INVESTIGATION_NOTIFICATION_API_KEY = None
 
 DNB_SERVICE_BASE_URL = 'http://dnb.service/api/'
 DNB_SERVICE_TOKEN = 'dnbtoken1234'
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = 'support@datahub.com'
 
-DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = ['notifyme@digital.trade.gov.uk']
-
-ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW = True
 STAFF_SSO_BASE_URL = 'http://sso.test/'
 STAFF_SSO_AUTH_TOKEN = 'test-sso-token'
 # TODO: Remove this once SSOIntrospectionAuthentication is the default, django-oauth-toolkit
