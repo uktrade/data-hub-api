@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
-from datahub.user.company_list.models import CompanyList, CompanyListItem
+from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
 
 
 class CompanyListSerializer(serializers.ModelSerializer):
@@ -56,4 +56,23 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
             'company',
             'created_on',
             'latest_interaction',
+        )
+
+
+class PipelineItemSerializer(serializers.ModelSerializer):
+    """Serialiser for pipeline list items."""
+
+    company = NestedRelatedField(
+        Company,
+        # If this list of fields is changed, update the equivalent list in the QuerySet.only()
+        # call in the queryset module
+        extra_fields=('name', 'turnover', 'export_potential'),
+    )
+
+    class Meta:
+        model = PipelineItem
+        fields = (
+            'company',
+            'created_on',
+            'status',
         )

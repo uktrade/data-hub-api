@@ -21,9 +21,15 @@ from datahub.user.company_list.models import (
     CompanyListItem,
     CompanyListItemPermissionCode,
 )
-from datahub.user.company_list.queryset import get_company_list_item_queryset
-from datahub.user.company_list.serializers import CompanyListItemSerializer
-from datahub.user.company_list.serializers import CompanyListSerializer
+from datahub.user.company_list.queryset import (
+    get_company_list_item_queryset,
+    get_pipeline_item_queryset,
+)
+from datahub.user.company_list.serializers import (
+    CompanyListItemSerializer,
+    CompanyListSerializer,
+    PipelineItemSerializer,
+)
 
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
     "An archived company can't be added to a company list.",
@@ -187,3 +193,29 @@ class CompanyListItemAPIView(APIView):
         )
         self.check_object_permissions(request, obj)
         return obj
+
+
+class PipelineItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a pipeline list."""
+
+    serializer_class = PipelineItemSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_fields = ('status',)
+    ordering = ('-created_on')
+    queryset = get_pipeline_item_queryset()
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Raise an Http404 if user has no pipeline items.
+        """
+        super().initial(request, *args, **kwargs)
+
+        if not self.get_queryset().exists():
+            raise Http404()
+
+    def get_queryset(self):
+        """Get a query set filtered to the authenticated user's lists."""
+        return super().get_queryset().filter(adviser=self.request.user)
