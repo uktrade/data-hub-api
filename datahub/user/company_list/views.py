@@ -196,7 +196,7 @@ class CompanyListItemAPIView(APIView):
 
 
 class PipelineItemViewSet(CoreViewSet):
-    """A view set for returning the contents of a pipeline list."""
+    """A view set for returning the contents of a pipeline item and to add a new one."""
 
     serializer_class = PipelineItemSerializer
     filter_backends = (
@@ -207,15 +207,6 @@ class PipelineItemViewSet(CoreViewSet):
     ordering = ('-created_on')
     queryset = get_pipeline_item_queryset()
 
-    def initial(self, request, *args, **kwargs):
-        """
-        Raise an Http404 if user has no pipeline items.
-        """
-        super().initial(request, *args, **kwargs)
-
-        if not self.get_queryset().exists():
-            raise Http404()
-
     def get_queryset(self):
-        """Get a query set filtered to the authenticated user's lists."""
+        """Get a query set filtered to the authenticated user's pipeline items."""
         return super().get_queryset().filter(adviser=self.request.user)
