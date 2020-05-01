@@ -12,7 +12,6 @@ from datahub.core.hawk_receiver import (
 )
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
-from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.serializers import (
     CancelOrderSerializer,
@@ -27,7 +26,6 @@ from datahub.omis.order.serializers import (
 class OrderViewSet(CoreViewSet):
     """Order ViewSet"""
 
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = OrderSerializer
     queryset = Order.objects.select_related(
         'company',
@@ -98,7 +96,6 @@ class SubscriberListView(APIView):
 
     # queryset is used only by DjangoCrudPermissions (to get the model for the view)
     queryset = OrderSubscriber.objects.all()
-    required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
         """
@@ -154,7 +151,6 @@ class AssigneeView(APIView):
     # queryset is used only by DjangoCrudPermissions (to get the model for the view)
     queryset = OrderAssignee.objects.all()
     FORCE_DELETE_PARAM = 'force-delete'
-    required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
         """

@@ -7,7 +7,6 @@ from datahub.core.query_utils import (
     get_full_name_expression,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
-from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order as DBOrder
 from datahub.omis.order.query_utils import get_lead_order_assignee_name_subquery
 from datahub.omis.payment.constants import RefundStatus
@@ -20,7 +19,6 @@ from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAP
 class SearchOrderAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = OrderSearchApp
     serializer_class = SearchOrderQuerySerializer
 

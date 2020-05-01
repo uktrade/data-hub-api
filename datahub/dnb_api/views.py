@@ -3,7 +3,6 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
@@ -38,7 +37,6 @@ from datahub.dnb_api.utils import (
     request_changes,
     search_dnb,
 )
-from datahub.oauth.scopes import Scope
 
 
 logger = logging.getLogger(__name__)
@@ -49,9 +47,7 @@ class DNBCompanySearchView(APIView):
     View for searching DNB companies.
     """
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
         ),
@@ -155,9 +151,7 @@ class DNBCompanyCreateView(APIView):
     View for creating datahub company from DNB data.
     """
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
             f'company.{CompanyPermission.add_company}',
@@ -221,9 +215,7 @@ class LegacyDNBCompanyCreateInvestigationView(APIView):
     less or more readable code.
     """
 
-    required_scopes = (Scope.internal_front_end, )
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
             f'company.{CompanyPermission.add_company}',
@@ -266,9 +258,7 @@ class DNBCompanyLinkView(APIView):
     View for linking a company to a DNB record.
     """
 
-    required_scopes = (Scope.internal_front_end, )
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
             f'company.{CompanyPermission.change_company}',
@@ -317,10 +307,7 @@ class DNBCompanyChangeRequestView(APIView):
     View for requesting change/s to DNB companies.
     """
 
-    required_scopes = (Scope.internal_front_end,)
-
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
             f'company.{CompanyPermission.change_company}',
@@ -353,10 +340,7 @@ class DNBCompanyInvestigationView(APIView):
     View for creating a new investigation to get D&B to investigate and create a company record.
     """
 
-    required_scopes = (Scope.internal_front_end,)
-
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
             f'company.{CompanyPermission.change_company}',

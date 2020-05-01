@@ -27,6 +27,7 @@ class CompanyListItemFactory(factory.django.DjangoModelFactory):
 class PipelineItemFactory(factory.django.DjangoModelFactory):
     """Factory for a pipeline item"""
 
+    name = factory.Faker('name')
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS

@@ -1,6 +1,5 @@
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from datahub.documents.views import BaseEntityDocumentModelViewSet
 from datahub.investment.project.evidence.models import EvidenceDocument
@@ -10,7 +9,6 @@ from datahub.investment.project.evidence.permissions import (
 )
 from datahub.investment.project.evidence.serializers import EvidenceDocumentSerializer
 from datahub.investment.project.models import InvestmentProject
-from datahub.oauth.scopes import Scope
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
@@ -20,9 +18,7 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
 
     non_existent_project_error_message = 'Specified investment project does not exist'
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         EvidenceDocumentModelPermissions,
         IsAssociatedToInvestmentProjectEvidenceDocumentPermission,
     )

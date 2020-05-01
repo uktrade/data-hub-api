@@ -257,7 +257,6 @@ SSO_ENABLED = env.bool('SSO_ENABLED')
 
 OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND_CLASS': 'datahub.oauth.backend.ContentTypeAwareOAuthLibCore',
-    'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
 if SSO_ENABLED:
@@ -271,7 +270,7 @@ else:
 
 STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC = env.bool(
     'STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC',
-    default=False,
+    default=True,
 )
 STAFF_SSO_REQUEST_TIMEOUT = env.int('STAFF_SSO_REQUEST_TIMEOUT', default=5)  # seconds
 STAFF_SSO_USER_TOKEN_CACHING_PERIOD = env.int(
@@ -305,7 +304,6 @@ REST_FRAMEWORK = {
         _default_authentication_class,
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
     'DEFAULT_THROTTLE_RATES': {
@@ -680,9 +678,7 @@ for environ_name in domain_environ_names:
     )
 
 DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
-DNB_INVESTIGATION_NOTIFICATION_API_KEY = env('DNB_INVESTIGATION_NOTIFICATION_API_KEY', default=None)
 
-DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS = env.list('DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS', default=[])
 DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 DNB_SERVICE_TIMEOUT = 15

@@ -1,4 +1,3 @@
-from datahub.oauth.scopes import Scope
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.search_support.simplemodel.serializers import SearchSimpleModelSerializer
@@ -8,7 +7,6 @@ from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAP
 class SearchSimpleModelAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = SimpleModelSearchApp
     serializer_class = SearchSimpleModelSerializer
     es_sort_by_remappings = {

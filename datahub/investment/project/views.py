@@ -3,15 +3,21 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.permissions import HasPermissions
+from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
-from datahub.investment.project.models import InvestmentProject, InvestmentProjectTeamMember
+from datahub.investment.project.models import (
+    InvestmentProject,
+    InvestmentProjectPermission,
+    InvestmentProjectTeamMember,
+)
 from datahub.investment.project.permissions import (
     InvestmentProjectModelPermissions,
     InvestmentProjectTeamMemberModelPermissions,
@@ -21,10 +27,11 @@ from datahub.investment.project.permissions import (
 )
 from datahub.investment.project.serializers import (
     InvestmentActivitySerializer,
+    IProjectChangeStageSerializer,
     IProjectSerializer,
     IProjectTeamMemberSerializer,
 )
-from datahub.oauth.scopes import Scope
+
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
@@ -32,10 +39,8 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 class IProjectAuditViewSet(AuditViewSet):
     """Investment Project audit views."""
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectModelPermissions,
         IsAssociatedToInvestmentProjectPermission,
     )
@@ -68,11 +73,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
     """
 
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectModelPermissions,
         IsAssociatedToInvestmentProjectPermission,
     )
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
@@ -131,17 +134,39 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
             'current_user': self.request.user if self.request else None,
         }
 
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(f'investment.{InvestmentProjectPermission.change_to_any_stage}'),
+        ],
+        filter_backends=[],
+        schema=StubSchema(),
+    )
+    def change_stage(self, request, *args, **kwargs):
+        """Change the stage of an investment project"""
+        instance = self.get_object()
+        serializer = IProjectChangeStageSerializer(
+            instance,
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.change_stage(user=self.request.user)
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK,
+        )
+
 
 class IProjectTeamMembersViewSet(CoreViewSet):
     """Investment project team member views."""
 
     non_existent_project_error_message = 'Specified investment project does not exist'
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InvestmentProjectTeamMemberModelPermissions,
         IsAssociatedToInvestmentProjectTeamMemberPermission,
     )
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
     lookup_url_kwarg = 'adviser_pk'

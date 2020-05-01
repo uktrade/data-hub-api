@@ -27,8 +27,8 @@ This project uses Docker compose to setup and run all the necessary components. 
     cp sample.env .env
     ```
 
-    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_EMAIL`
-    should be the same as MOCK_SSO_USERNAME in the frontend's .env file.
+    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID`
+    should be the same as MOCK_SSO_EMAIL_USER_ID in mock-sso’s .env file.
 
 3.  Build and run the necessary containers for the required environment:
 
@@ -126,7 +126,7 @@ Dependencies:
     create database datahub;
     create database mi;
     ```
-    
+
     (Most Django apps use the `datahub` database. The `mi` database is used only by the `mi_dashboard` Django app.)
 
 9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
@@ -153,8 +153,8 @@ Dependencies:
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
     ```
-    
-    Note that this will queue Celery tasks to index the created records in Elasticsearch, 
+
+    Note that this will queue Celery tasks to index the created records in Elasticsearch,
     and hence the loaded records won‘t be returned by search endpoints until Celery is
     started and the queued tasks have run.
 
@@ -163,7 +163,7 @@ Dependencies:
     ```shell
     ./manage.py createsuperuser
     ```
-    
+
     (You can enter any valid email address as the username and SSO email user ID.)
 
 14. Start the server:
@@ -215,29 +215,18 @@ flake8
 The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure the API as follows to use with the front end:
 
 * `SSO_ENABLED`: `True`
-* `RESOURCE_SERVER_INTROSPECTION_URL`: URL of the [RFC 7662](https://tools.ietf.org/html/rfc7662) introspection endpoint (should be the same server the front end is using). This is provided by a [Staff SSO](https://github.com/uktrade/staff-sso) instance.
-* `RESOURCE_SERVER_AUTH_TOKEN`: Access token for the introspection server.
-
-The token should have the `data-hub:internal-front-end` scope. django-oauth-toolkit will create a user corresponding to the token if one does not already exist.
+* `STAFF_SSO_BASE_URL`: URL of a [Staff SSO](https://github.com/uktrade/staff-sso) or [Mock SSO](https://github.com/uktrade/mock-sso) instance. This should be the same server the front end is configured to use.
+* `STAFF_SSO_AUTH_TOKEN`: Access token for Staff SSO.
 
 ## Granting access to machine-to-machine clients
 
-To give access to a machine-to-machine client that doesn't require user authentication:
+Pure machine-to-machine clients use Hawk authentication with separate credentials for each client.
 
-1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
+There are separate views for such clients as these views don’t expect `request.user` to be set.
 
-    * Client type: Confidential
-    * Authorization grant type: Client credentials
+Hawk credentials for each client are defined in settings below and each client is assigned scopes in `config/settings/common.py`.
 
-1. Define the required scopes for the app by adding a new record in the
-[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/)
-page with these details:
-    * Application: The application just created
-    * Scope: The required scopes
-
-The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-api/tree/develop/datahub/oauth/scopes.py).
-
-[Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
+These scopes define which views each client can access.  
 
 ## Deployment
 
@@ -291,8 +280,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `DNB_AUTOMATIC_UPDATE_LIMIT` | No | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set. |
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
-| `DNB_INVESTIGATION_NOTIFICATION_RECIPIENTS` | No | Email addresses for recipients that should receive DNB company investigation notifications. |
-| `DNB_INVESTIGATION_NOTIFICATION_API_KEY` | No | GOVUK notify API key to use for sending DNB company investigation notifications. |
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
@@ -356,7 +343,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
 | `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
 | `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). (Used only when STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC=True). |
-| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=False). |
+| `STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC` | No | Whether to enable the new Staff SSO token introspection logic with email user ID support (default=True). |
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |

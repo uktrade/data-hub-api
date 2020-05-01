@@ -8,7 +8,7 @@ from datahub.core.query_utils import (
     JSONBBuildObject,
 )
 from datahub.interaction.models import Interaction, InteractionDITParticipant
-from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
 
 def get_company_list_item_queryset():
@@ -63,6 +63,21 @@ def get_company_list_item_queryset():
         'company__archived',
         'company__name',
         'company__trading_names',
+    )
+
+
+def get_pipeline_item_queryset():
+    """
+    Returns a query set used by PipelineItemViewSet.
+    """
+    return PipelineItem.objects.select_related('company').only(
+        # Only select the fields we need to reduce data transfer time for large lists
+        # (in particular, companies have a lot of fields which are not needed here)
+        'id',
+        'company__id',
+        'company__name',
+        'company__turnover',
+        'company__export_potential',
     )
 
 

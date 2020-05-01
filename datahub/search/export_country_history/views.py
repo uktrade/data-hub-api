@@ -1,9 +1,7 @@
 from elasticsearch_dsl.query import Term
-from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
 from datahub.core.permissions import HasPermissions
 from datahub.interaction.models import InteractionPermission
-from datahub.oauth.scopes import Scope
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
 from datahub.search.interaction.models import Interaction
@@ -14,11 +12,9 @@ from datahub.search.views import register_v4_view, SearchAPIView
 class ExportCountryHistoryView(SearchAPIView):
     """Export country history search view."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = ExportCountryHistoryApp
 
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         # Note: This search view does not use SearchPermissions, as it requires multiple
         # permissions
         HasPermissions(

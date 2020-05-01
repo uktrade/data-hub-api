@@ -1,6 +1,6 @@
 import json
 from collections.abc import Mapping, Sequence
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 from operator import attrgetter
 from secrets import token_hex
@@ -17,13 +17,12 @@ from django.test.client import Client
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
-from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
-from datahub.oauth.scopes import Scope
+from datahub.oauth.cache import add_token_data_to_cache
 
 
 class HawkAPITestClient:
@@ -128,6 +127,7 @@ def create_test_user(permission_codenames=(), password=None, **user_attrs):
         'first_name': factory.Faker('first_name').generate({}),
         'last_name': factory.Faker('last_name').generate({}),
         'email': factory.Faker('email').generate({}),
+        'sso_email_user_id': factory.Faker('email').generate({'domain': 'id.test'}),
         'date_joined': now(),
     }
     user_defaults.update(user_attrs)
@@ -193,7 +193,10 @@ class AdminTestMixin:
 class APITestMixin:
     """All the tests using the DB and accessing end points behind auth should use this class."""
 
-    pytestmark = pytest.mark.django_db  # use db
+    pytestmark = [
+        pytest.mark.django_db,
+        pytest.mark.usefixtures('local_memory_cache'),
+    ]
 
     @property
     def user(self):
@@ -202,54 +205,36 @@ class APITestMixin:
             self._user = get_default_test_user()
         return self._user
 
-    def get_token(self, *scopes, grant_type=Application.GRANT_PASSWORD, user=None):
+    def get_token(self, user=None):
         """Get access token for user test."""
         if not hasattr(self, '_tokens'):
             self._tokens = {}
 
-        if user is None and grant_type != Application.GRANT_CLIENT_CREDENTIALS:
+        if user is None:
             user = self.user
 
-        scope = ' '.join(scopes)
+        token_cache_key = user.sso_email_user_id
 
-        token_cache_key = (user.email if user else None, scope)
         if token_cache_key not in self._tokens:
-            self._tokens[token_cache_key] = AccessToken.objects.create(
-                user=user,
-                application=self.get_application(grant_type),
-                token=token_hex(16),
-                expires=now() + timedelta(hours=1),
-                scope=scope,
-            )
+            token = token_hex(16)
+            add_token_data_to_cache(token, user.email, user.sso_email_user_id, None)
+            self._tokens[token_cache_key] = token
+
         return self._tokens[token_cache_key]
 
     @property
     def api_client(self):
         """An API client with data-hub:internal-front-end scope."""
-        if not hasattr(self, '_client'):
+        if not hasattr(self, '_api_client'):
             self._api_client = self.create_api_client()
         return self._api_client
 
-    def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes,
-                          grant_type=Application.GRANT_PASSWORD, user=None):
+    def create_api_client(self, user=None):
         """Creates an API client associated with an OAuth token with the specified scope."""
-        token = self.get_token(scope, *additional_scopes, grant_type=grant_type, user=user)
+        token = self.get_token(user=user)
         client = APIClient()
-        client.credentials(Authorization=f'Bearer {token}')
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         return client
-
-    def get_application(self, grant_type=Application.GRANT_PASSWORD):
-        """Return a test application with the specified grant type."""
-        if not hasattr(self, '_applications'):
-            self._applications = {}
-
-        if grant_type not in self._applications:
-            self._applications[grant_type] = Application.objects.create(
-                client_type=Application.CLIENT_CONFIDENTIAL,
-                authorization_grant_type=grant_type,
-                name=f'Test client ({grant_type})',
-            )
-        return self._applications[grant_type]
 
 
 def format_date_or_datetime(value):

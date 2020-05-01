@@ -1,3 +1,93 @@
+# Data Hub API 31.1.0 (2020-05-01)
+
+
+## Removals
+
+- **Companies** The `notify_dnb_investigation_post_save` signal on Company model was removed along with associated tests and settings. This was used to trigger an email notification for new company investigations.
+
+## Deprecations
+
+- The `oauth_oauthapplicationscope` database table is deprecated and will be removed on or after 5 May 2020.
+
+## Features
+
+- **Advisers** The new SSO authentication logic is now enabled by default.
+
+  This means that, when logging into Data Hub, users are now identified using their unique SSO email user ID instead of their primary email address.
+
+  'OAuth token introspection' events are now logged on the User events page in the admin site whenever Data Hub API checks in with Staff SSO to get details about a user’s access token.
+- **Investment** To allow the investment verification team to move projects between stages in the front end, rather than in Django Admin, a new endpoint `v3/investment/<uuid:pk>/update-stage` accepts post requests from users with new permission `change_to_any_stage_investmentproject` to change a project between any of the five stages. The status of the project is also updated if moving from or to the 'won' stage.
+- A new endpoint `/v4/pipeline-item`, was added to expose all pipeline items for a given user. Filterable fields are: `status` and order by fields are: `created_on` (desc). The following structure will be returned when a call is made to this endpoint:
+
+   ```json
+   ...
+      [
+          {
+              "company": {
+                  "id": 123,
+                  "name": "Name",
+                  "turnover": 123,
+                  "export_potential": "Low",
+              },
+              "status": "win",
+              "created_on": date,
+          },
+          ...
+      ]
+    ```
+- OAuth scopes are no longer used. This is because all machine-to-machine clients have been migrated to Hawk, and OAuth scopes are therefore no longer needed.
+
+## Internal changes
+
+- The custom `ApplicationScopesBackend` OAuth scopes back end was removed as it’s no longer required.
+
+## API
+
+- **Advisers** `POST /v4/pipeline-item`
+
+  Expects a POST with JSON:
+
+  ```
+  {
+       'company': '<company.pk>',
+       'status': '<pipeline_status>'
+  }
+  ```
+
+  and returns 201 with following response upon success:
+
+  ```
+  {
+      {
+          'id': '<company.pk>',
+          'name': '<company.name>',
+          'export_potential': '<company.export_potential>',
+          'turnover': '<company.turnover>'
+      },
+      'status': '<pipeline_status>',
+      'created_on': '<created datetime>'
+  }
+  ```
+
+  It can raise:
+
+  - 401 for unauthenticated request
+  - 403 if the user doesn't have enough permissions
+  - 400 if the company is archived, company already exists for the user, company doesn't exist or status is not one of the predefined.
+- **Advisers**
+
+  New field `name` is now exposed in the result of `GET /v4/pipeline-item`.
+
+  `POST /v4/pipeline-item` will now take `name` field along with other fields when creating a new pipeline item. Validation error will not be raised when an entry already exists with that company for the user.
+- **Investment** In Swagger, the documentation for the `/v3/investment/{id}/update-stage` endpoint now shows the stub schema, instead of wrongly displaying the fields from the `IProjectSerializer`.
+
+## Database schema
+
+- **Advisers**
+
+  New nullable char field `name` was added to the `company_list_pipelineitem` model to hold name of the item and unique reference was removed so that user can add the same company multiple times to track multiple projects.
+
+
 # Data Hub API 31.0.0 (2020-04-28)
 
 

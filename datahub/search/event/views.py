@@ -1,4 +1,3 @@
-from datahub.oauth.scopes import Scope
 from datahub.search.event import EventSearchApp
 from datahub.search.event.serializers import SearchEventQuerySerializer
 from datahub.search.views import register_v3_view, SearchAPIView
@@ -7,7 +6,6 @@ from datahub.search.views import register_v3_view, SearchAPIView
 class SearchEventAPIViewMixin:
     """Defines common settings."""
 
-    required_scopes = (Scope.internal_front_end,)
     search_app = EventSearchApp
     serializer_class = SearchEventQuerySerializer
     es_sort_by_remappings = {

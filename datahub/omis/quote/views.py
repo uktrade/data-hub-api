@@ -9,7 +9,6 @@ from datahub.core.hawk_receiver import (
     HawkResponseSigningMixin,
     HawkScopePermission,
 )
-from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
 from datahub.omis.quote.models import Quote
@@ -36,7 +35,6 @@ class BaseQuoteViewSet(BaseNestedOrderViewSet):
 class QuoteViewSet(BaseQuoteViewSet):
     """Quote ViewSet."""
 
-    required_scopes = (Scope.internal_front_end,)
     serializer_class = QuoteSerializer
 
     def preview(self, request, *args, **kwargs):
