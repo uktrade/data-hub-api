@@ -40,6 +40,8 @@ archive_item = IProjectViewSet.as_action_view('archive')
 
 unarchive_item = IProjectViewSet.as_action_view('unarchive')
 
+update_stage_of_item = IProjectViewSet.as_action_view('change_stage')
+
 
 urlpatterns = [
     path(
@@ -76,6 +78,11 @@ urlpatterns = [
         'investment/<uuid:pk>/audit',
         audit_item,
         name='audit-item',
+    ),
+    path(
+        'investment/<uuid:pk>/update-stage',
+        update_stage_of_item,
+        name='update-stage-of-item',
     ),
     path(
         'investment/<uuid:project_pk>/',
