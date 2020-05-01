@@ -20,51 +20,37 @@ dit_east_midlands_id = '9010dd28-9798-e211-a939-e4115bead28a'
 
 dit_staff_user = Advisor.objects.create_user(
     email='dit_staff@datahub.com',
+    sso_email_user_id='dit_staff@id.test',
     first_name='DIT',
     last_name='Staff',
     dit_team_id=dit_east_midlands_id,
-)
-
-AccessToken.objects.create(
-    user=dit_staff_user,
-    token='ditStaffToken',
-    expires=now() + datetime.timedelta(days=1),
-    scope='data-hub:internal-front-end',
 )
 
 welsh_government_id = 'bc85aa17-fabd-e511-88b6-e4115bead28a'
 
 da_staff_user = Advisor.objects.create_user(
     email='da_staff@datahub.com',
+    sso_email_user_id='da_staff@id.test',
     first_name='DA',
     last_name='Staff',
     dit_team_id=welsh_government_id,
-)
-
-AccessToken.objects.create(
-    user=da_staff_user,
-    token='daStaffToken',
-    expires=now() + datetime.timedelta(days=1),
-    scope='data-hub:internal-front-end',
 )
 
 heart_of_the_south_west_lep_id = '08d987f8-6525-e511-b6bc-e4115bead28a'
 
 lep_staff_user = Advisor.objects.create_user(
     email='lep_staff@datahub.com',
+    sso_email_user_id='lep_staff@id.test',
     first_name='LEP',
     last_name='Staff',
     dit_team_id=heart_of_the_south_west_lep_id,
 )
 
-AccessToken.objects.create(
-    user=lep_staff_user,
-    token='lepStaffToken',
-    expires=now() + datetime.timedelta(days=1),
-    scope='data-hub:internal-front-end',
-)
 " | /app/manage.py shell
 
+python /app/manage.py add_access_token --skip-checks --hours 24 --token ditStaffToken dit_staff@id.test
+python /app/manage.py add_access_token --skip-checks --hours 24 --token daStaffToken da_staff@id.test
+python /app/manage.py add_access_token --skip-checks --hours 24 --token lepStaffToken lep_staff@id.test
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput

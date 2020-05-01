@@ -1,13 +1,17 @@
+from datetime import timedelta
 from unittest.mock import patch
 from urllib.parse import urlencode
 
 import pytest
 from django.conf import settings
+from django.utils.timezone import now
+from oauth2_provider.admin import AccessToken
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.core.viewsets import CoreViewSet
 
 
@@ -24,6 +28,7 @@ def oauth2_backend_class(monkeypatch):
 class RestrictedAccessViewSet(CoreViewSet):
     """DRF ViewSet to test authentication."""
 
+    authentication_classes = (OAuth2Authentication,)
     permission_classes = (IsAuthenticated,)
 
 
@@ -55,7 +60,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
             # sending invalid JSON
             data=b'{"what": "cat}',
             content_type='application/json',
-            Authorization=token,
+            HTTP_AUTHORIZATION=token,
         )
         my_view = RestrictedAccessViewSet.as_view(
             actions={'post': 'create'},
@@ -85,8 +90,15 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
         """Tests that the request is being parsed if the auth token is in the form."""
         if expected_authorized:
             create.return_value = Response(data={'result': True})
+
+        user = create_test_user()
+        access_token = AccessToken.objects.create(
+            token='test-token',
+            expires=now() + timedelta(days=365),
+            user=user,
+        )
         data = {
-            'access_token': self.get_token(),
+            'access_token': access_token.token,
         }
         request = api_request_factory.post(
             '/',
