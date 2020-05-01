@@ -4,6 +4,7 @@ from datahub.user.company_list.views import (
     CompanyListItemAPIView,
     CompanyListItemViewSet,
     CompanyListViewSet,
+    PipelineItemViewSet,
 )
 
 urlpatterns = [
@@ -41,5 +42,15 @@ urlpatterns = [
         'company-list/<uuid:company_list_pk>/item/<uuid:company_pk>',
         CompanyListItemAPIView.as_view(),
         name='item-detail',
+    ),
+    path(
+        'pipeline-item',
+        PipelineItemViewSet.as_view(
+            {
+                'get': 'list',
+                'post': 'create',
+            },
+        ),
+        name='pipelineitem-collection',
     ),
 ]

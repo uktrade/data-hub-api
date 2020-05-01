@@ -9,7 +9,6 @@ from datahub.core.hawk_receiver import (
     HawkScopePermission,
 )
 from datahub.core.throttling import PathRateThrottle
-from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
@@ -35,8 +34,6 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
 
 class PaymentViewSet(BasePaymentViewSet):
     """Payment ViewSet."""
-
-    required_scopes = (Scope.internal_front_end,)
 
     def create_list(self, request, *args, **kwargs):
         """Create a list of payments."""

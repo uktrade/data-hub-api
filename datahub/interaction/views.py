@@ -1,5 +1,4 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 from rest_framework.filters import OrderingFilter
 
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -11,15 +10,12 @@ from datahub.interaction.permissions import (
 )
 from datahub.interaction.queryset import get_interaction_queryset
 from datahub.interaction.serializers import InteractionSerializer
-from datahub.oauth.scopes import Scope
 
 
 class InteractionViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Interaction ViewSet v3."""
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         InteractionModelPermissions,
         IsAssociatedToInvestmentProjectInteractionPermission,
     )

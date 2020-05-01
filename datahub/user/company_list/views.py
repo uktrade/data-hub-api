@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 from rest_framework import serializers, status
 from rest_framework.filters import OrderingFilter
 from rest_framework.mixins import DestroyModelMixin
@@ -17,15 +16,20 @@ from rest_framework.views import APIView
 from datahub.company.models import Company, CompanyPermission
 from datahub.core.query_utils import get_aggregate_subquery
 from datahub.core.viewsets import CoreViewSet
-from datahub.oauth.scopes import Scope
 from datahub.user.company_list.models import (
     CompanyList,
     CompanyListItem,
     CompanyListItemPermissionCode,
 )
-from datahub.user.company_list.queryset import get_company_list_item_queryset
-from datahub.user.company_list.serializers import CompanyListItemSerializer
-from datahub.user.company_list.serializers import CompanyListSerializer
+from datahub.user.company_list.queryset import (
+    get_company_list_item_queryset,
+    get_pipeline_item_queryset,
+)
+from datahub.user.company_list.serializers import (
+    CompanyListItemSerializer,
+    CompanyListSerializer,
+    PipelineItemSerializer,
+)
 
 CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
     "An archived company can't be added to a company list.",
@@ -45,7 +49,6 @@ class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
     - retrieving details of a single list
     """
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = CompanyList.objects.annotate(
         item_count=get_aggregate_subquery(CompanyList, Count('items')),
     )
@@ -100,11 +103,7 @@ class CompanyListItemAPIPermissions(DjangoModelPermissions):
 class CompanyListItemViewSet(CoreViewSet):
     """A view set for returning the contents of a company list."""
 
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
-        CompanyListItemAPIPermissions,
-    )
+    permission_classes = (CompanyListItemAPIPermissions,)
     serializer_class = CompanyListItemSerializer
     filter_backends = (OrderingFilter,)
     # Note that we want null to be treated as the oldest value when sorting by
@@ -141,11 +140,7 @@ class CompanyListItemAPIView(APIView):
     A view for adding a company to a selected list of companies that belongs to a user.
     """
 
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
-        CompanyListItemAPIPermissions,
-    )
+    permission_classes = (CompanyListItemAPIPermissions,)
     # Note: A query set is required for CompanyListItemPermissions
     queryset = CompanyListItem.objects.all()
     serializer_class = CompanyListItemSerializer
@@ -198,3 +193,20 @@ class CompanyListItemAPIView(APIView):
         )
         self.check_object_permissions(request, obj)
         return obj
+
+
+class PipelineItemViewSet(CoreViewSet):
+    """A view set for returning the contents of a pipeline item and to add a new one."""
+
+    serializer_class = PipelineItemSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_fields = ('status',)
+    ordering = ('-created_on')
+    queryset = get_pipeline_item_queryset()
+
+    def get_queryset(self):
+        """Get a query set filtered to the authenticated user's pipeline items."""
+        return super().get_queryset().filter(adviser=self.request.user)

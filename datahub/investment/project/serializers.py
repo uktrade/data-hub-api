@@ -153,6 +153,27 @@ SPI_FIELDS = (
 ALL_FIELDS = CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS + SPI_FIELDS
 
 
+def _get_updated_status(instance, data):
+    """Updates the project status when the stage changes to or from Won."""
+    old_stage = instance.stage if instance else None
+    new_stage = data.get('stage')
+
+    if not new_stage or new_stage == old_stage:
+        return None
+
+    combiner = DataCombiner(instance=instance, update_data=data)
+    new_status = combiner.get_value('status')
+
+    if str(new_stage.id) == InvestmentProjectStage.won.value.id:
+        return InvestmentProject.Status.WON
+    elif (
+        old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
+        and new_status == InvestmentProject.Status.WON
+    ):
+        return InvestmentProject.Status.ONGOING
+    return None
+
+
 class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team members when nested in the main investment
     project object.
@@ -398,7 +419,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         self._check_if_investment_project_can_be_moved_to_verify_win(data)
         self._check_if_investment_project_can_be_moved_to_won(data)
         self._validate_for_stage(data)
-        self._update_status(data)
+
+        update_status = _get_updated_status(instance=self.instance, data=data)
+        if update_status:
+            data['status'] = update_status
+
         self._track_project_manager_request(data)
         return data
 
@@ -479,25 +504,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         return not validate(
             instance=instance, fields=TEAM_FIELDS, next_stage=True,
         )
-
-    def _update_status(self, data):
-        """Updates the project status when the stage changes to or from Won."""
-        old_stage = self.instance.stage if self.instance else None
-        new_stage = data.get('stage')
-
-        if not new_stage or new_stage == old_stage:
-            return
-
-        combiner = DataCombiner(instance=self.instance, update_data=data)
-        new_status = combiner.get_value('status')
-
-        if str(new_stage.id) == InvestmentProjectStage.won.value.id:
-            data['status'] = InvestmentProject.Status.WON
-        elif (
-            old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
-            and new_status == InvestmentProject.Status.WON
-        ):
-            data['status'] = InvestmentProject.Status.ONGOING
 
     class Meta:
         model = InvestmentProject
@@ -604,3 +610,24 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
+
+
+class IProjectChangeStageSerializer(serializers.Serializer):
+    """Serializer for changing the stage of an investment project."""
+
+    stage = NestedRelatedField(meta_models.InvestmentProjectStage)
+
+    def change_stage(self, user):
+        """
+        Change the stage of a project and update the status if moving from
+        or to 'won'.
+        """
+        data = self.validated_data
+        new_stage = self.validated_data['stage'].id
+        update_status = _get_updated_status(instance=self.instance, data=data)
+        if update_status:
+            self.instance.status = update_status
+        self.instance.stage_id = new_stage
+        self.instance.modified_by = user
+        self.instance.save()
+        return self.instance

@@ -29,7 +29,7 @@ class TestPermissions(APITestMixin):
             '/',
             data={},
             content_type='application/json',
-            Authorization=f'Bearer {token}',
+            HTTP_AUTHORIZATION=f'Bearer {token}',
         )
         my_view = PermissionModelViewset.as_view(
             actions={'get': 'list'},
@@ -49,7 +49,7 @@ class TestPermissions(APITestMixin):
             '/',
             data={},
             content_type='application/json',
-            Authorization=f'Bearer {token}',
+            HTTP_AUTHORIZATION=f'Bearer {token}',
         )
         my_view = PermissionModelViewset.as_view(
             actions={'get': 'list'},
@@ -70,7 +70,7 @@ class TestPermissions(APITestMixin):
             '/',
             data={},
             content_type='application/json',
-            Authorization=f'Bearer {token}',
+            HTTP_AUTHORIZATION=f'Bearer {token}',
         )
         my_view = PermissionModelViewset.as_view(
             actions={'get': 'list'},

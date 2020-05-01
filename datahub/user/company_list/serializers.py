@@ -1,8 +1,16 @@
+from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
-from datahub.user.company_list.models import CompanyList, CompanyListItem
+from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
+
+CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE = gettext_lazy(
+    "An archived company can't be added to the pipeline.",
+)
+COMPANY_ALREADY_EXISTS_IN_PIPELINE_MESSAGE = gettext_lazy(
+    'This company already exists in the pipeline for this user.',
+)
 
 
 class CompanyListSerializer(serializers.ModelSerializer):
@@ -56,4 +64,39 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
             'company',
             'created_on',
             'latest_interaction',
+        )
+
+
+class PipelineItemSerializer(serializers.ModelSerializer):
+    """Serialiser for pipeline item."""
+
+    company = NestedRelatedField(
+        Company,
+        # If this list of fields is changed, update the equivalent list in the QuerySet.only()
+        # call in the queryset module
+        extra_fields=('name', 'turnover', 'export_potential'),
+    )
+    adviser = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    def validate_company(self, company):
+        """Make sure company is not archived"""
+        if company.archived:
+            raise serializers.ValidationError(CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE)
+
+        return company
+
+    class Meta:
+        model = PipelineItem
+        fields = (
+            'id',
+            'company',
+            'name',
+            'status',
+            'adviser',
+            'created_on',
+        )
+        read_only_fields = (
+            'id',
+            'adviser',
+            'created_on',
         )

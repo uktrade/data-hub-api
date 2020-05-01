@@ -458,7 +458,7 @@ class TestCreateView(APITestMixin):
         assert response_data['intermediate_company']['id'] == str(intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
-        assert response_data['status'] == 'ongoing'  # default status
+        assert response_data['status'] == InvestmentProject.Status.ONGOING  # default status
         assert len(response_data['client_contacts']) == 2
         assert Counter(contact['id'] for contact in response_data[
             'client_contacts']) == Counter(str(contact.id) for contact in contacts)
@@ -1507,7 +1507,7 @@ class TestPartialUpdateView(APITestMixin):
             'id': constants.InvestmentProjectStage.won.value.id,
             'name': constants.InvestmentProjectStage.won.value.name,
         }
-        assert response_data['status'] == 'won'
+        assert response_data['status'] == InvestmentProject.Status.WON
 
     def test_change_stage_to_won_by_unauthorised_user(self):
         """
@@ -1576,7 +1576,88 @@ class TestPartialUpdateView(APITestMixin):
             'id': constants.InvestmentProjectStage.verify_win.value.id,
             'name': constants.InvestmentProjectStage.verify_win.value.name,
         }
-        assert response_data['status'] == 'ongoing'
+        assert response_data['status'] == InvestmentProject.Status.ONGOING
+
+    def test_move_project_between_non_consecutive_stages_by_unauthorised_user(self):
+        """
+        Tests moving a project back a stage, from active to prospect, by
+        an unauthorised user.
+        """
+        project = ActiveInvestmentProjectFactory()
+        url = reverse('api-v3:investment:update-stage-of-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+            },
+        }
+        response = self.api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_move_project_between_non_consecutive_stages_by_unauthenticated_user(self, api_client):
+        """
+        Test that a 401 is returned if an unauthenticated user makes
+        a request to the update-stage endpoint.
+        """
+        project = ActiveInvestmentProjectFactory()
+        url = reverse('api-v3:investment:update-stage-of-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+            },
+        }
+        response = api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'project_factory,new_stage,expected_status',
+        (
+            (
+                ActiveInvestmentProjectFactory,
+                constants.InvestmentProjectStage.prospect.value,
+                InvestmentProject.Status.ONGOING,
+            ),
+            (
+                InvestmentProjectFactory,
+                constants.InvestmentProjectStage.won.value,
+                InvestmentProject.Status.WON,
+            ),
+        ),
+    )
+    def test_move_project_between_non_consecutive_stages(
+        self,
+        project_factory,
+        new_stage,
+        expected_status,
+    ):
+        """
+        Tests moving a project back a stage or forward multiple stages.
+        """
+        project = project_factory()
+        url = reverse('api-v3:investment:update-stage-of-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': new_stage.id,
+            },
+        }
+        adviser, api_client = _create_user_and_api_client(
+            self,
+            TeamFactory(),
+            [
+                InvestmentProjectPermission.change_to_any_stage,
+                InvestmentProjectPermission.change_all,
+            ],
+        )
+
+        response = api_client.post(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['stage'] == {
+            'id': new_stage.id,
+            'name': new_stage.name,
+        }
+        assert response_data['status'] == expected_status
+        instance = InvestmentProject.objects.get(pk=project.pk)
+        assert instance.modified_by == adviser
 
     def test_change_stage_log(self):
         """Tests change of the project stage is being logged."""

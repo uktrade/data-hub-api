@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -24,7 +23,6 @@ from datahub.investment.project.proposition.serializers import (
     PropositionDocumentSerializer,
     PropositionSerializer,
 )
-from datahub.oauth.scopes import Scope
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
@@ -36,9 +34,7 @@ class PropositionViewSet(CoreViewSet):
 
     non_existent_project_error_message = 'Specified investment project does not exist'
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         PropositionModelPermissions,
         IsAssociatedToInvestmentProjectPropositionPermission,
     )
@@ -139,9 +135,7 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
 
     non_existent_proposition_error_message = 'Specified proposition does not exist'
 
-    required_scopes = (Scope.internal_front_end,)
     permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
         PropositionDocumentModelPermissions,
         IsAssociatedToInvestmentProjectPropositionDocumentPermission,
     )
