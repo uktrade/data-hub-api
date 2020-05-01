@@ -14,8 +14,8 @@ class SSORequestError(Exception):
         self.response = response
 
 
-class SSOTokenDoesNotExist(Exception):
-    """The token does not exist."""
+class SSOInvalidToken(Exception):
+    """The token does not exist or has expired."""
 
 
 class SSOUserDoesNotExist(Exception):
@@ -30,15 +30,15 @@ class IntrospectionSerializer(serializers.Serializer):
     """
 
     active = serializers.BooleanField()
-    username = serializers.CharField()
-    email_user_id = serializers.EmailField()
-    exp = serializers.IntegerField()
+    username = serializers.CharField(required=False)
+    email_user_id = serializers.EmailField(required=False)
+    exp = serializers.IntegerField(required=False)
 
 
 def introspect_token(token):
     """Get details about an access token from the introspection endpoint in Staff SSO."""
     try:
-        return _request(
+        token_data = _request(
             'post',
             'o/introspect/',
             response_serializer_class=IntrospectionSerializer,
@@ -48,8 +48,14 @@ def introspect_token(token):
         # SSO returns a 401 if the token is invalid (non-existent)
         # So this is treated as a special case
         if exc.response is not None and exc.response.status_code == status.HTTP_401_UNAUTHORIZED:
-            raise SSOTokenDoesNotExist()
+            raise SSOInvalidToken()
         raise
+
+    # This happens if the token exists but has expired
+    if not token_data['active']:
+        raise SSOInvalidToken()
+
+    return token_data
 
 
 def get_user_by_email(email):
