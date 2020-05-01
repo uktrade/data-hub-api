@@ -8,7 +8,11 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from datahub.company.models import Advisor
 from datahub.oauth.cache import add_token_data_to_cache, get_token_data_from_cache
-from datahub.oauth.sso_api_client import introspect_token, SSORequestError, SSOTokenDoesNotExist
+from datahub.oauth.sso_api_client import (
+    introspect_token,
+    SSOInvalidToken,
+    SSORequestError,
+)
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
 
@@ -83,15 +87,10 @@ def _look_up_token(token) -> Tuple[Optional[dict], bool]:
 
     try:
         introspection_data = introspect_token(token)
-    except SSOTokenDoesNotExist:
+    except SSOInvalidToken:
         return None, False
     except SSORequestError:
         logger.exception('SSO introspection request failed')
-        return None, False
-
-    # This should not be possible as all valid tokens should be active
-    if not introspection_data['active']:
-        logger.warning('Introspected token was inactive')
         return None, False
 
     relative_expiry = _calculate_expiry(introspection_data['exp'])
