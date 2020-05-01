@@ -1,0 +1,1 @@
+In Swagger, the documentation for the `/v3/investment/{id}/update-stage` endpoint now shows the stub schema, instead of wrongly displaying the fields from the `IProjectSerializer`. 
