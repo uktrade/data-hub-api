@@ -270,7 +270,7 @@ else:
 
 STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC = env.bool(
     'STAFF_SSO_USE_NEW_INTROSPECTION_LOGIC',
-    default=False,
+    default=True,
 )
 STAFF_SSO_REQUEST_TIMEOUT = env.int('STAFF_SSO_REQUEST_TIMEOUT', default=5)  # seconds
 STAFF_SSO_USER_TOKEN_CACHING_PERIOD = env.int(
