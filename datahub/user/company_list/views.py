@@ -203,7 +203,7 @@ class PipelineItemViewSet(CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ('status',)
+    filterset_fields = ('status', 'company_id')
     ordering = ('-created_on')
     queryset = get_pipeline_item_queryset()
 
