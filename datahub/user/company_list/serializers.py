@@ -1,6 +1,5 @@
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
@@ -91,6 +90,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'company',
+            'name',
             'status',
             'adviser',
             'created_on',
@@ -100,11 +100,3 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'adviser',
             'created_on',
         )
-
-        validators = [
-            UniqueTogetherValidator(
-                queryset=PipelineItem.objects.all(),
-                fields=['company', 'adviser'],
-                message=COMPANY_ALREADY_EXISTS_IN_PIPELINE_MESSAGE,
-            ),
-        ]

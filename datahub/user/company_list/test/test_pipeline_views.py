@@ -184,6 +184,7 @@ class TestGetPipelineItemView(APITestMixin):
                 'export_potential': company.export_potential,
             },
             'id': str(item.id),
+            'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
         }
@@ -216,6 +217,7 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': str(company.pk),
+                'name': 'project name',
                 'status': pipeline_status,
             },
         )
@@ -294,6 +296,7 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': str(company.pk),
+                'name': 'project name',
                 'status': pipeline_status,
             },
         )
@@ -303,6 +306,7 @@ class TestAddPipelineItemView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
+            'name': 'project name',
             'company': {
                 'id': str(company.pk),
                 'name': company.name,
@@ -320,8 +324,45 @@ class TestAddPipelineItemView(APITestMixin):
         assert pipeline_item.created_by == self.user
         assert pipeline_item.modified_by == self.user
 
-    def test_adding_existing_company_to_the_user(self):
-        """Test that same company can't be added to the same user again."""
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_successfully_create_a_pipeline_item_no_name(self):
+        """Test that a pipeline item can be created even if name is not given."""
+        company = CompanyFactory()
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'name': None,
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'export_potential': company.export_potential,
+                'turnover': company.turnover,
+            },
+            'status': pipeline_status,
+            'created_on': '2017-04-19T15:25:30.986208Z',
+        }
+
+        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
+
+        # adviser should be set to the authenticated user
+        assert pipeline_item.adviser == self.user
+        assert pipeline_item.created_by == self.user
+        assert pipeline_item.modified_by == self.user
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_add_pipeline_item_with_same_company_as_existing_to_the_user(self):
+        """Test that a pipeline item with same company can be added to the same user again."""
         company = CompanyFactory()
         PipelineItemFactory(company=company, adviser=self.user)
 
@@ -329,12 +370,56 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': str(company.pk),
+                'name': 'project name',
                 'status': PipelineItem.Status.IN_PROGRESS,
             },
         )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'non_field_errors': ['This company already exists in the pipeline for this user.'],
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'name': 'project name',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'export_potential': company.export_potential,
+                'turnover': company.turnover,
+            },
+            'status': 'in_progress',
+            'created_on': '2017-04-19T15:25:30.986208Z',
+        }
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_adding_existing_company_with_same_pipeline_item_name(self):
+        """Test that same company can be added to the same pipeline item name."""
+        company = CompanyFactory()
+        PipelineItemFactory(
+            company=company,
+            adviser=self.user,
+            name='project name',
+        )
+
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': PipelineItem.Status.IN_PROGRESS,
+            },
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'name': 'project name',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'export_potential': company.export_potential,
+                'turnover': company.turnover,
+            },
+            'status': 'in_progress',
+            'created_on': '2017-04-19T15:25:30.986208Z',
         }
 
     def test_with_archived_company(self):
@@ -345,6 +430,7 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': str(company.pk),
+                'name': 'project name',
                 'status': PipelineItem.Status.IN_PROGRESS,
             },
         )
@@ -360,6 +446,7 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': dummy_company_id,
+                'name': 'project name',
                 'status': PipelineItem.Status.IN_PROGRESS,
             },
         )
@@ -379,6 +466,7 @@ class TestAddPipelineItemView(APITestMixin):
             pipeline_collection_url,
             data={
                 'company': str(company.pk),
+                'name': 'project name',
                 'status': PipelineItem.Status.IN_PROGRESS,
             },
         )

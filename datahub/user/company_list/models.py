@@ -66,15 +66,6 @@ class CompanyListItem(BaseModel):
         ]
 
 
-class PipelineItemPermissionCode(StrEnum):
-    """PipelineItem permission codename constants."""
-
-    view_pipeline_item = 'view_pipelineitem'
-    add_pipeline_item = 'add_pipelineitem'
-    change_pipeline_item = 'change_pipelineitem'
-    delete_pipeline_item = 'delete_pipelineitem'
-
-
 class PipelineItem(BaseModel):
     """
     Model holding pipeline list items.
@@ -99,15 +90,12 @@ class PipelineItem(BaseModel):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=Status.choices,
     )
+    name = models.CharField(
+        null=True,
+        blank=True,
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+    )
 
     def __str__(self):
         """Human-friendly representation."""
-        return f'{self.company} - {self.adviser} - {self.status}'
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('adviser', 'company'),
-                name='unique_adviser_and_company',
-            ),
-        ]
+        return f'{self.company} - {self.name} - {self.status}'
