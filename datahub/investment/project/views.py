@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
+from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.models import (
     InvestmentProject,
@@ -140,6 +141,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
             HasPermissions(f'investment.{InvestmentProjectPermission.change_to_any_stage}'),
         ],
         filter_backends=[],
+        schema=StubSchema(),
     )
     def change_stage(self, request, *args, **kwargs):
         """Change the stage of an investment project"""
