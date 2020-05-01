@@ -566,3 +566,135 @@ class TestAddPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
+
+
+class TestPatchPipelineItemView(APITestMixin):
+    """Tests for patching a pipeline item."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        url = self._pipeline_item_detail_url(uuid4())
+        response = api_client.patch(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
+            (['change_pipelineitem'], status.HTTP_200_OK),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        item = PipelineItemFactory(adviser=user)
+        url = self._pipeline_item_detail_url(item.pk)
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.patch(
+            url,
+            data={
+                'status': 'leads',
+            },
+        )
+        assert response.status_code == expected_status
+
+    @pytest.mark.parametrize(
+        'request_data,expected_errors',
+        (
+            pytest.param(
+                {
+                    'status': None,
+                },
+                {
+                    'status': ['This field may not be null.'],
+                },
+                id='status is null',
+            ),
+            pytest.param(
+                {
+                    'status': '',
+                },
+                {
+                    'status': ['"" is not a valid choice.'],
+                },
+                id='status is not a valid choice',
+            ),
+            pytest.param(
+                {
+                    'status': 'invalid',
+                },
+                {
+                    'status': ['"invalid" is not a valid choice.'],
+                },
+                id='status is not a valid choice',
+            ),
+        ),
+    )
+    def test_validation(self, request_data, expected_errors):
+        """Test validation."""
+        item = PipelineItemFactory(adviser=self.user)
+        url = self._pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(url, data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_errors
+
+    def test_patch_a_pipeline_item(self):
+        """Test that status of a pipeline item can be patched."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = self._pipeline_item_detail_url(item.pk)
+        new_status = PipelineItem.Status.LEADS
+        response = self.api_client.patch(
+            url,
+            data={
+                'status': new_status,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': new_status,
+            'created_on': format_date_or_datetime(item.created_on),
+        }
+
+    def test_cannot_patch_other_users_item(self):
+        """Test that cannot patch other users item."""
+        item = PipelineItemFactory()
+        url = self._pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={
+                'status': PipelineItem.Status.LEADS,
+            },
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_returns_404_no_item_to_patch(self):
+        """Test that 404 is returned when no item."""
+        url = self._pipeline_item_detail_url(uuid4())
+        response = self.api_client.patch(
+            url,
+            data={
+                'status': PipelineItem.Status.WIN,
+            },
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def _pipeline_item_detail_url(self, item_pk):
+        return reverse('api-v4:company-list:pipelineitem-detail', kwargs={'pk': item_pk})
