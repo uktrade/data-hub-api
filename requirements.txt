@@ -82,7 +82,7 @@ pathtools==0.1.2          # via watchdog
 pep8-naming==0.10.0       # via -r requirements.in
 pexpect==4.8.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pip-tools==4.5.1          # via -r requirements.in
+pip-tools==5.1.1          # via -r requirements.in
 piprot==0.9.11            # via -r requirements.in
 pluggy==0.13.1            # via pytest
 prompt-toolkit==3.0.4     # via ipython
@@ -132,4 +132,5 @@ whitenoise==5.0.1         # via -r requirements.in
 yarl==1.4.2               # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
+# pip
 # setuptools
