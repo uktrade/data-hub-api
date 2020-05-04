@@ -210,3 +210,17 @@ class PipelineItemViewSet(CoreViewSet):
     def get_queryset(self):
         """Get a query set filtered to the authenticated user's pipeline items."""
         return super().get_queryset().filter(adviser=self.request.user)
+
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Raise a validation error if anything else other than allowed fields is updated.
+        """
+        allowed_fields = ['status']
+        fields = list(request.data.keys())
+        field_delta = list(set(fields) - set(allowed_fields))
+        formated_fields = ', '.join(field_delta)
+        if field_delta:
+            raise serializers.ValidationError(
+                f'"{formated_fields}" is not allowed to be updated.',
+            )
+        return super().partial_update(request, *args, **kwargs)
