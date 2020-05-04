@@ -1,3 +1,17 @@
+# Data Hub API 31.2.0 (2020-05-04)
+
+
+## Bug fixes
+
+- An unhandled exception no longer occurs when an expired access token is encountered during SSO token introspection.
+
+## API
+
+- **Advisers** # /v4/pipeline-item
+
+  New filter on `company` is now added to  `GET /v4/pipeline-item` list API endpoint.
+
+
 # Data Hub API 31.1.0 (2020-05-01)
 
 
