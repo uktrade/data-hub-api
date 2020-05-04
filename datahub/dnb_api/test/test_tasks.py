@@ -341,12 +341,11 @@ class TestGetCompanyUpdates:
         ),
     )
     @freeze_time('2019-01-02T2:00:00')
-    def test_updates(self, monkeypatch, caplog, data, fields_to_update):
+    def test_updates(self, monkeypatch, data, fields_to_update):
         """
         Test if the update_company task is called with the right parameters for all the records
         spread across pages.
         """
-        caplog.set_level('INFO')
         mock_get_company_update_page = mock.Mock(
             side_effect=lambda _, next_page: data[next_page],
         )
@@ -388,8 +387,6 @@ class TestGetCompanyUpdates:
             args=({'baz': 3},),
             kwargs=expected_kwargs,
         )
-
-        assert 'get_company_updates total update count: 3' in caplog.text
 
     @pytest.mark.parametrize(
         'lock_acquired, call_count',
@@ -500,7 +497,6 @@ class TestGetCompanyUpdates:
         self,
         mocked_log_to_sentry,
         mocked_send_realtime_message,
-        caplog,
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
@@ -508,7 +504,6 @@ class TestGetCompanyUpdates:
         Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when all fields are updated.
         """
-        caplog.set_level('INFO')
         company = CompanyFactory(duns_number='123456789')
         mock_get_company_update_page = mock.Mock(
             return_value=dnb_company_updates_response_uk,
@@ -540,7 +535,6 @@ class TestGetCompanyUpdates:
             'updated: 1; failed to update: 0'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
-        assert 'get_company_updates total update count: 1' in caplog.text
 
     @mock.patch('datahub.dnb_api.tasks.update.send_realtime_message')
     @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
