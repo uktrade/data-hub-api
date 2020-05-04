@@ -97,7 +97,7 @@ class TestSSOIntrospectionAuthentication:
                     'status_code': status.HTTP_401_UNAUTHORIZED,
                     'json': {'active': False},
                 },
-                id='invalid-token',
+                id='non-existent-token',
             ),
             pytest.param(
                 {
@@ -106,13 +106,12 @@ class TestSSOIntrospectionAuthentication:
                 },
                 id='inactive-response',
             ),
-            # Should not happen in reality
             pytest.param(
                 {
                     'status_code': status.HTTP_200_OK,
-                    'json': _make_introspection_data(active=False),
+                    'json': {'active': False},
                 },
-                id='inactive-token',
+                id='expired-token',
             ),
             # Should not happen in reality
             pytest.param(
