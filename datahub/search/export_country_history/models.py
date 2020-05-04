@@ -1,9 +1,7 @@
 from elasticsearch_dsl import Date, Keyword
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
-
-DOC_TYPE = 'export-country-history'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 class ExportCountryHistory(BaseESModel):
@@ -35,7 +33,7 @@ class ExportCountryHistory(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE

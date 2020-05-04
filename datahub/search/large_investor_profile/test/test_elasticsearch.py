@@ -18,10 +18,10 @@ def test_mapping(es):
     """Test the ES mapping for a large capital investor profile."""
     mapping = Mapping.from_es(
         LargeInvestorProfileSearchApp.es_model.get_write_index(),
-        LargeInvestorProfileSearchApp.name,
+        DEFAULT_MAPPING_TYPE,
     )
     assert mapping.to_dict() == {
-        'large-investor-profile': {
+        DEFAULT_MAPPING_TYPE: {
             'properties': {
                 '_document_type': {
                     'type': 'keyword',

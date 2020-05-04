@@ -2,10 +2,7 @@ from elasticsearch_dsl import Keyword
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
-
-
-DOC_TYPE = 'relatedmodel'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 class ESRelatedModel(BaseESModel):
@@ -20,10 +17,10 @@ class ESRelatedModel(BaseESModel):
 
     SEARCH_FIELDS = ('simpleton.name',)
 
-    class Meta:
-        """Model configuration."""
-
-        doc_type = DOC_TYPE
-
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
+
+    class Meta:
+        """Default document meta data."""
+
+        doc_type = DEFAULT_MAPPING_TYPE
