@@ -638,7 +638,9 @@ class TestPatchPipelineItemView(APITestMixin):
                 {
                     'name': 'Bat',
                 },
-                ['"name" is not allowed to be updated.'],
+                {
+                    'name': ['field not allowed to be update.'],
+                },
                 id='name is not allowed to be updated',
             ),
             pytest.param(
@@ -646,7 +648,9 @@ class TestPatchPipelineItemView(APITestMixin):
                     'name': 'Man',
                     'status': 'win',
                 },
-                ['"name" is not allowed to be updated.'],
+                {
+                    'name': ['field not allowed to be update.'],
+                },
                 id='name is not allowed to be updated',
             ),
         ),
@@ -744,7 +748,7 @@ class TestGetPipelineItemView(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == expected_status
 
-    def test_returns_404_if_list_doesnt_exist(self):
+    def test_returns_404_if_pipeline_item_doesnt_exist(self):
         """Test that a 404 is returned if the pipeline item doesn't exist."""
         url = _pipeline_item_detail_url(uuid4())
         response = self.api_client.get(url)
