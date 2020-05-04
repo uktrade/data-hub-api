@@ -13,8 +13,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.1.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.12.46            # via -r requirements.in
-botocore==1.15.46         # via boto3, s3transfer
+boto3==1.13.1             # via -r requirements.in
+botocore==1.16.1          # via boto3, s3transfer
 celery[redis]==4.4.2      # via -r requirements.in
 certifi==2019.11.28       # via requests, sentry-sdk
 chardet==3.0.4            # via -r requirements.in, aiohttp, requests
