@@ -480,6 +480,16 @@
       - companyexportcountry
   model: auth.group
 - fields:
+    name: Global account managers
+    permissions:
+    - - change_one_list_tier_and_global_account_manager
+      - company
+      - company
+    - - change_one_list_core_team_member
+      - company
+      - company
+  model: auth.group
+- fields:
     name: Regional account managers
     permissions:
     - - change_regional_account_manager
@@ -539,6 +549,14 @@
     name: International Trade Team
   model: metadata.teamrole
   pk: 5e329c18-6095-e211-a939-e4115bead28a
+- fields:
+    disabled_on: null
+    groups:
+    - - DIT_staff
+    - - Global account managers
+    name: Global Account Manager
+  model: metadata.teamrole
+  pk: 8f53cc74-ffa4-4613-89b1-4b65b4fba1ba
 - fields:
     disabled_on: null
     groups:
