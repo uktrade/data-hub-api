@@ -6,7 +6,7 @@ from django.conf import settings
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 from datahub.search.test.utils import create_mock_search_app
 
 SAMPLE_APP_NAME = 'sample'
@@ -16,10 +16,10 @@ class SampleModel(BaseESModel):
     """Sample (dummy) search model."""
 
     class Meta:
-        doc_type = SAMPLE_APP_NAME
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = SAMPLE_APP_NAME
+        doc_type = DEFAULT_MAPPING_TYPE
 
 
 class SampleSearchApp(SearchApp):
@@ -65,7 +65,7 @@ def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client, sample_
     migrate_app(sample_search_app)
 
     expected_index_name = (
-        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-7c4194a0f6eaa2cee1dda9df1dfc2856'
+        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-091a1c3a42f7e9fb3ff69b49a7b45881'
     )
     assert mock_client.indices.create.call_args_list == [
         call(index=expected_index_name, body=ANY),
