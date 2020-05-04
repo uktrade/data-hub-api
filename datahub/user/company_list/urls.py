@@ -58,6 +58,7 @@ urlpatterns = [
         PipelineItemViewSet.as_view(
             {
                 'patch': 'partial_update',
+                'get': 'retrieve',
             },
         ),
         name='pipelineitem-detail',
