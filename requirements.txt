@@ -62,7 +62,7 @@ idna==2.9                 # via requests, yarl
 incremental==17.5.0       # via towncrier
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.13.0           # via -r requirements.in
+ipython==7.14.0           # via -r requirements.in
 jedi==0.16.0              # via ipython
 jinja2==2.11.1            # via towncrier
 jmespath==0.9.5           # via boto3, botocore
