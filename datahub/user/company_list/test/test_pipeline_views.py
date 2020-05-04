@@ -102,7 +102,22 @@ class TestGetPipelineItemView(APITestMixin):
             item_1,
         )
 
-    def test_can_filter_by_valid_status(self):
+    @pytest.mark.parametrize(
+        'request_data,count',
+        (
+            pytest.param(
+                {'status': PipelineItem.Status.IN_PROGRESS},
+                1,
+                id='valid status',
+            ),
+            pytest.param(
+                {'status': PipelineItem.Status.LEADS},
+                0,
+                id='non existent status',
+            ),
+        ),
+    )
+    def test_can_filter_by_valid_status(self, request_data, count):
         """Test that it can filter by status."""
         PipelineItemFactory(
             adviser=self.user,
@@ -117,29 +132,12 @@ class TestGetPipelineItemView(APITestMixin):
 
         response = self.api_client.get(
             pipeline_collection_url,
-            data={'status': PipelineItem.Status.IN_PROGRESS},
+            data=request_data,
         )
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert len(response_data['results']) == 1
-        assert response_data['results'][0]['status'] == PipelineItem.Status.IN_PROGRESS
-
-    def test_returns_empty_list_when_filtering_non_existing_status(self):
-        """Test that it can filter by status."""
-        PipelineItemFactory(
-            adviser=self.user,
-            company=CompanyFactory(),
-            status=PipelineItem.Status.WIN,
-        )
-
-        response = self.api_client.get(
-            pipeline_collection_url,
-            data={'status': PipelineItem.Status.LEADS},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['results'] == []
+        assert len(response_data['results']) == count
 
     def test_returns_400_when_filtering_with_invalid_status(self):
         """Test that it can filter by status."""
@@ -152,6 +150,103 @@ class TestGetPipelineItemView(APITestMixin):
         response = self.api_client.get(
             pipeline_collection_url,
             data={'status': 'invalid'},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_can_filter_by_company(self):
+        """Test that it can filter by company."""
+        company_1 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_1,
+            status=PipelineItem.Status.WIN,
+        )
+        company_2 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_2,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'company_id': company_1.id},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+
+    def test_can_filter_by_non_existent_company(self):
+        """Test that it can filter by company that is not in pipeline items."""
+        company_1 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_1,
+            status=PipelineItem.Status.WIN,
+        )
+        company_2 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_2,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        company_3 = CompanyFactory()
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'company_id': company_3.id},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 0
+
+    def test_can_filter_by_company_and_status(self):
+        """Test that it can filter by company and status works."""
+        company_1 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_1,
+            status=PipelineItem.Status.WIN,
+        )
+        company_2 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_2,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={
+                'status': PipelineItem.Status.WIN,
+                'company_id': company_1.id,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+
+    def test_returns_400_when_filtering_with_invalid_company(self):
+        """Test that it can filter by company that doesn't exist gives an error."""
+        company_1 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_1,
+            status=PipelineItem.Status.WIN,
+        )
+        company_2 = CompanyFactory()
+        PipelineItemFactory(
+            adviser=self.user,
+            company=company_2,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'company_id': str(uuid4())},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
