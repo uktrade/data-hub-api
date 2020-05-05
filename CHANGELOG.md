@@ -1,3 +1,12 @@
+# Data Hub API 31.3.0 (2020-05-05)
+
+
+## Internal changes
+
+- **Companies** The logging of total available company updates in `dnb-service` has been removed from Data Hub API because this feature is going to be deprecated from the `dnb-service`.
+- Elasticsearch indexes now use the default mapping type name of `_doc` rather than custom names. This change has been made because custom mapping type names are deprecated.
+
+
 # Data Hub API 31.2.0 (2020-05-04)
 
 
