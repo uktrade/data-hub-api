@@ -18,10 +18,10 @@ pytestmark = pytest.mark.django_db
 
 def test_mapping(es):
     """Test the ES mapping for an order."""
-    mapping = Mapping.from_es(OrderSearchApp.es_model.get_write_index(), OrderSearchApp.name)
+    mapping = Mapping.from_es(OrderSearchApp.es_model.get_write_index(), DEFAULT_MAPPING_TYPE)
 
     assert mapping.to_dict() == {
-        'order': {
+        DEFAULT_MAPPING_TYPE: {
             'dynamic': 'false',
             'properties': {
                 '_document_type': {
