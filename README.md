@@ -210,6 +210,24 @@ To run the linter:
 flake8
 ```
 
+### Obtaining an API access token
+
+You can obtain an access token for local development work in one of two ways:
+
+- by running `./manage.py add_access_token <SSO email user ID>` with the SSO
+  email user ID of an existing adviser (run 
+  `./manage.py add_access_token --help` for a list of options)
+- using the form on `http://localhost:8000/admin/add-access-token/`
+
+(If you’re using Docker, an access token will be created automatically if 
+certain environment variables are set. See `sample.env` for more details.)
+
+This access token can be used with most endpoints by setting an 
+`Authorization` header value of `Bearer <access token>`. 
+
+Note that machine-to-machine endpoints (such as those under `/v4/metadata/`) 
+instead use Hawk authentication and request signing.
+
 ## Granting access to the front end
 
 The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure the API as follows to use with the front end:
