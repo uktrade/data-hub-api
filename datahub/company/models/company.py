@@ -43,6 +43,13 @@ class CompanyPermission(StrEnum):
     # Indicates that the user can assign regional One List account managers to companies
     change_regional_account_manager = 'change_regional_account_manager'
 
+    # Indicates that the user can assign One List tier and global account manager to companies
+    change_one_list_tier_and_global_account_manager = (
+        'change_one_list_tier_and_global_account_manager'
+    )
+    # Indicates that the user can change core team members associated with the company
+    change_one_list_core_team_member = 'change_one_list_core_team_member'
+
 
 class ExportExperienceCategory(BaseConstantModel):
     """Export experience category."""
@@ -297,6 +304,14 @@ class Company(ArchivableModel, BaseModel):
             (
                 CompanyPermission.change_regional_account_manager.value,
                 'Can change regional account manager',
+            ),
+            (
+                CompanyPermission.change_one_list_tier_and_global_account_manager.value,
+                'Can change one list tier and global account manager',
+            ),
+            (
+                CompanyPermission.change_one_list_core_team_member.value,
+                'Can change one list core team member associated with company',
             ),
             (CompanyPermission.view_export_win.value, 'Can view company export win'),
         )
