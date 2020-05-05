@@ -1,10 +1,7 @@
 from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
-
-
-DOC_TYPE = 'event'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 class Event(BaseESModel):
@@ -69,7 +66,7 @@ class Event(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
