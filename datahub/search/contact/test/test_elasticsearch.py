@@ -2,6 +2,7 @@ from elasticsearch_dsl import Mapping
 
 from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.models import Contact as ESContact
+from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entities_query,
@@ -13,11 +14,11 @@ def test_mapping(es):
     """Test the ES mapping for a contact."""
     mapping = Mapping.from_es(
         ContactSearchApp.es_model.get_write_index(),
-        ContactSearchApp.name,
+        DEFAULT_MAPPING_TYPE,
     )
 
     assert mapping.to_dict() == {
-        'contact': {
+        DEFAULT_MAPPING_TYPE: {
             'properties': {
                 '_document_type': {
                     'type': 'keyword',

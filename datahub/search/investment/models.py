@@ -2,10 +2,7 @@ from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Obj
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
-
-
-DOC_TYPE = 'investment_project'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 def _related_investment_project_field():
@@ -187,7 +184,7 @@ class InvestmentProject(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
