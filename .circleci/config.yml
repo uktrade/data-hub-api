@@ -42,8 +42,6 @@ job_defaults: &job_defaults
     AWS_SECRET_ACCESS_KEY: bar
     DEFAULT_BUCKET: baz
     SSO_ENABLED: 'True'
-    RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
-    RESOURCE_SERVER_AUTH_TOKEN: sso-token
     STAFF_SSO_BASE_URL: http://sso.invalid/
     STAFF_SSO_AUTH_TOKEN: sso-token
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
