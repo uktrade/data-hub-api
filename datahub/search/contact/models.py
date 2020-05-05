@@ -3,10 +3,7 @@ from elasticsearch_dsl import Boolean, Date, Keyword, Text
 from datahub.search import dict_utils
 from datahub.search import fields
 from datahub.search.contact import dict_utils as contact_dict_utils
-from datahub.search.models import BaseESModel
-
-
-DOC_TYPE = 'contact'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 class Contact(BaseESModel):
@@ -90,7 +87,7 @@ class Contact(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE

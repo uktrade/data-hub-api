@@ -17,10 +17,10 @@ def test_mapping(es):
     """Test the ES mapping for a company."""
     mapping = Mapping.from_es(
         CompanySearchApp.es_model.get_write_index(),
-        CompanySearchApp.name,
+        DEFAULT_MAPPING_TYPE,
     )
     assert mapping.to_dict() == {
-        'company': {
+        DEFAULT_MAPPING_TYPE: {
             'dynamic': 'false',
             'properties': {
                 '_document_type': {

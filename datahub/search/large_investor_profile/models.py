@@ -2,10 +2,7 @@ from elasticsearch_dsl import Date, Keyword, Long
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
-
-
-DOC_TYPE = 'large-investor-profile'
+from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
 
 
 def _get_adviser_list(col):
@@ -87,7 +84,7 @@ class LargeInvestorProfile(BaseESModel):
     class Meta:
         """Default document meta data."""
 
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
 
     class Index:
-        doc_type = DOC_TYPE
+        doc_type = DEFAULT_MAPPING_TYPE
