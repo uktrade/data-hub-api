@@ -1,3 +1,42 @@
+# Data Hub API 31.4.0 (2020-05-06)
+
+
+## Removals
+
+- **Advisers** The deprecated `oauth_oauthapplicationscope` database table was removed.
+- **Advisers** The legacy Staff SSO authentication logic was removed as the new logic is now being used in production.
+- **Advisers** The `populate_adviser_sso_email_user_id` management command was removed as it’s no longer needed.
+
+## Deprecations
+
+- The `/token/` endpoint is deprecated and will be removed on or after 12 May 2020. This is because OAuth client credentials grants are no longer in use.
+
+## Features
+
+- **Companies** New permissions, `change_one_list_tier_and_global_account_manager` and `change_one_list_core_team_member`, were added. These permissions currently have no effect and will be used as part of upcoming functionality.
+
+  In the test data, these permission is assigned to teams with the `Global Account Manager` role.
+
+## API
+
+- A new endpoint `/v4/pipeline-item/uuid`, was added to allow the frontend to `GET` or `PATCH` a pipeline item by uuid. Logic has been added to ensure that only the status can be patched. A 400 will be thrown if any field other than status is sent in the `PATCH` request. The below is the response returned from the `GET`. 
+
+
+   ```json
+   ...
+      {
+          "company": {
+              "id": 123,
+              "name": "Name",
+              "turnover": 123,
+              "export_potential": "Low",
+          },
+          "status": "win",
+          "created_on": date,
+      }
+    ```
+
+
 # Data Hub API 31.3.0 (2020-05-05)
 
 

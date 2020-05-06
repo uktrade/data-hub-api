@@ -53,4 +53,14 @@ urlpatterns = [
         ),
         name='pipelineitem-collection',
     ),
+    path(
+        'pipeline-item/<uuid:pk>',
+        PipelineItemViewSet.as_view(
+            {
+                'patch': 'partial_update',
+                'get': 'retrieve',
+            },
+        ),
+        name='pipelineitem-detail',
+    ),
 ]

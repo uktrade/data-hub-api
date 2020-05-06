@@ -70,6 +70,11 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
 class PipelineItemSerializer(serializers.ModelSerializer):
     """Serialiser for pipeline item."""
 
+    default_error_messages = {
+        'field_cannot_be_updated': gettext_lazy(
+            'field not allowed to be update.',
+        ),
+    }
     company = NestedRelatedField(
         Company,
         # If this list of fields is changed, update the equivalent list in the QuerySet.only()
@@ -84,6 +89,22 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE)
 
         return company
+
+    def validate(self, data):
+        """
+        Raise a validation error if anything else other than allowed fields is updated.
+        """
+        if self.partial and self.instance:
+            allowed_fields = {'status'}
+            fields = data.keys()
+            extra_fields = fields - allowed_fields
+            if extra_fields:
+                errors = {
+                    field: self.error_messages['field_cannot_be_updated']
+                    for field in extra_fields
+                }
+                raise serializers.ValidationError(errors)
+        return data
 
     class Meta:
         model = PipelineItem
