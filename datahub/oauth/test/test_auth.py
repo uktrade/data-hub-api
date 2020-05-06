@@ -198,29 +198,6 @@ class TestSSOIntrospectionAuthentication:
         with freeze_time(post_expiry_time):
             assert not cache.get('access_token:token')
 
-    def test_falls_back_to_email_field(self, api_request_factory, requests_mock):
-        """
-        Test that advisers are looked up using the email field when a match using
-        sso_email_user_id is not found, and the adviser's sso_email_user_id is updated.
-        """
-        adviser = AdviserFactory(email='email@email.test', sso_email_user_id=None)
-
-        requests_mock.post(
-            STAFF_SSO_INTROSPECT_URL,
-            json=_make_introspection_data(username='email@email.test'),
-        )
-
-        request = api_request_factory.get('/test-path', HTTP_AUTHORIZATION='Bearer token')
-        response = view(request)
-
-        assert request.user == adviser
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {'content': 'introspection-test-view'}
-
-        # Check that the sso_email_user_id was set on the user
-        adviser.refresh_from_db()
-        assert adviser.sso_email_user_id == 'user_id@example.test'
-
     def test_authentication_fails_if_user_is_inactive(self, api_request_factory, requests_mock):
         """Test that authentication fails when there is a matching but inactive user."""
         AdviserFactory(sso_email_user_id=EXAMPLE_SSO_EMAIL_USER_ID, is_active=False)
