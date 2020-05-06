@@ -1,0 +1,1 @@
+The `/token/` endpoint is deprecated and will be removed on or after 12 May 2020. This is because OAuth client credentials grants are no longer in use. 
