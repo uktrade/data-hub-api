@@ -516,7 +516,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_names',
             'company_number',
             'vat_number',
-            'website',
             'business_type',
             'employee_range',
             'turnover_range',
