@@ -50,7 +50,6 @@ from datahub.core.validators import (
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -577,7 +576,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
 class SelfAssignAccountManagerSerializer(serializers.Serializer):
     """
-    Serialiser for assigning an interaction trade adviser as the account manager of a
+    Serialiser for assigning an international trade adviser as the account manager of a
     company.
     """
 
@@ -618,9 +617,20 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
         return self.instance
 
 
-class RemoveAccountManagerSerializer(serializers.Serializer):
+class _RemoveCompanyFromOneListSerializer(serializers.Serializer):
     """
-    Serialiser for removing an interaction trade adviser as the account manager of a
+    Serialiser for removing company from One list.
+    """
+
+    def save(self, by):
+        """Unset the company's One List account manager and tier."""
+        self.instance.remove_from_one_list(by)
+        return self.instance
+
+
+class RemoveAccountManagerSerializer(_RemoveCompanyFromOneListSerializer):
+    """
+    Serialiser for removing an international trade adviser as the account manager of a
     company.
     """
 
@@ -642,9 +652,88 @@ class RemoveAccountManagerSerializer(serializers.Serializer):
 
         return attrs
 
-    def save(self, by):
-        """Unset the company's One List account manager and tier."""
-        self.instance.remove_from_one_list(by)
+
+class RemoveCompanyFromOneListSerializer(_RemoveCompanyFromOneListSerializer):
+    """Serialiser for removing company from One List."""
+
+    excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
+    default_error_messages = {
+        'cannot_remove_lead_ita':
+            gettext_lazy(
+                'It`s not possible to remove a lead ITA from a company using'
+                'One List admin functionality',
+            ),
+    }
+
+    def validate(self, attrs):
+        """Validate that the change of One List account manager and tier is allowed."""
+        attrs = super().validate(attrs)
+
+        if self.instance.one_list_tier_id == self.excluded_one_list_tier_id:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_remove_lead_ita'],
+                code='cannot_remove_lead_ita',
+            )
+
+        return attrs
+
+
+class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer):
+    """
+    Serializer for assigning One List tier and global account manager to a company.
+    """
+
+    excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
+
+    default_error_messages = {
+        'cannot_assign_subsidiary_to_one_list':
+            gettext_lazy('A subsidiary cannot be on One List.'),
+        'cannot_assign_company_one_list_tier':
+            gettext_lazy('A company can only have this One List tier assigned by ITA.'),
+        'cannot_change_company_with_current_one_list_tier':
+            gettext_lazy('A company on this One List tier can only be changed by ITA.'),
+    }
+
+    one_list_tier = NestedRelatedField(OneListTier)
+    global_account_manager = NestedRelatedField(Advisor)
+
+    def validate_one_list_tier(self, one_list_tier):
+        """Validates new One List tier."""
+        if one_list_tier and one_list_tier.id == self.excluded_one_list_tier_id:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_assign_company_one_list_tier'],
+                code='cannot_assign_company_one_list_tier',
+            )
+        return one_list_tier
+
+    def validate(self, attrs):
+        """
+        Validate that given one list tier and global account manager can be assigned to a company.
+        """
+        attrs = super().validate(attrs)
+
+        if self.instance.global_headquarters:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_assign_subsidiary_to_one_list'],
+                code='cannot_assign_subsidiary_to_one_list',
+            )
+
+        old_one_list_tier = self.instance.one_list_tier
+        if old_one_list_tier and old_one_list_tier.id == self.excluded_one_list_tier_id:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_company_with_current_one_list_tier'],
+                code='cannot_change_company_with_current_one_list_tier',
+            )
+
+        return attrs
+
+    def save(self, adviser):
+        """Update company One List account manager and tier."""
+        self.instance.assign_one_list_account_manager_and_tier(
+            self.validated_data['global_account_manager'],
+            self.validated_data['one_list_tier'],
+            adviser,
+        )
         return self.instance
 
 

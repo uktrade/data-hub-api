@@ -40,11 +40,13 @@ from datahub.company.queryset import (
 )
 from datahub.company.serializers import (
     AdviserSerializer,
+    AssignOneListTierAndGlobalAccountManagerSerializer,
     CompanySerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
     RemoveAccountManagerSerializer,
+    RemoveCompanyFromOneListSerializer,
     SelfAssignAccountManagerSerializer,
     UpdateExportDetailsSerializer,
 )
@@ -161,6 +163,60 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         instance = self.get_object()
         serializer = RemoveAccountManagerSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def assign_one_list_tier_and_global_account_manager(self, request, *args, **kwargs):
+        """
+        Assign One List tier and Global Account Manager.
+
+        This endpoint enables a user with correct permissions to assign company one list tier
+        and global account manager except when company is on
+        'Tier D - Interaction Trade Adviser Accounts'.
+
+        One List tier and Global Account Manager cannot be assigned to a subsidiary.
+        """
+        instance = self.get_object()
+        serializer = AssignOneListTierAndGlobalAccountManagerSerializer(
+            instance=instance,
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def remove_from_one_list(self, request, *args, **kwargs):
+        """
+        Remove company from One List.
+
+        The operation is not allowed if the company is on
+        'Tier D - Interaction Trade Adviser Accounts'.
+        """
+        instance = self.get_object()
+        serializer = RemoveCompanyFromOneListSerializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
