@@ -47,7 +47,7 @@ billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of br
 kombu==4.6.8  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==5.4.1
+pytest==5.4.2
 pytest-django==3.9.0
 pytest-cov==2.8.1
 pytest-xdist==1.32.0
