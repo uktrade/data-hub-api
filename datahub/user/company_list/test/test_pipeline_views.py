@@ -12,7 +12,6 @@ from datahub.user.company_list.test.factories import PipelineItemFactory
 
 pipeline_collection_url = reverse('api-v4:company-list:pipelineitem-collection')
 
-
 def _pipeline_item_detail_url(item_pk):
     return reverse('api-v4:company-list:pipelineitem-detail', kwargs={'pk': item_pk})
 
@@ -634,25 +633,6 @@ class TestPatchPipelineItemView(APITestMixin):
                 },
                 id='status is not a valid choice',
             ),
-            pytest.param(
-                {
-                    'name': 'Bat',
-                },
-                {
-                    'name': ['field not allowed to be update.'],
-                },
-                id='name is not allowed to be updated',
-            ),
-            pytest.param(
-                {
-                    'name': 'Man',
-                    'status': 'win',
-                },
-                {
-                    'name': ['field not allowed to be update.'],
-                },
-                id='name is not allowed to be updated',
-            ),
         ),
     )
     def test_validation(self, request_data, expected_errors):
@@ -664,7 +644,51 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_errors
 
+    def test_validate_only_allowed_fields_can_be_updated(self):
+        """Test validation."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(adviser=self.user)
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(url, data={'company': company.pk})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'company': ['field not allowed to be update.']}
+
     def test_patch_a_pipeline_item(self):
+        """Test that status and name of a pipeline item can be patched."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        new_status = PipelineItem.Status.LEADS
+        new_name = 'BATMAN'
+        response = self.api_client.patch(
+            url,
+            data={
+                'status': new_status,
+                'name': new_name,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': new_name,
+            'status': new_status,
+            'created_on': format_date_or_datetime(item.created_on),
+        }
+
+    def test_can_patch_an_individual_field(self):
         """Test that status of a pipeline item can be patched."""
         company = CompanyFactory()
         item = PipelineItemFactory(
@@ -674,6 +698,7 @@ class TestPatchPipelineItemView(APITestMixin):
         )
         url = _pipeline_item_detail_url(item.pk)
         new_status = PipelineItem.Status.LEADS
+        new_name = 'BATMAN'
         response = self.api_client.patch(
             url,
             data={
