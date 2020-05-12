@@ -4,6 +4,11 @@ import pytest
 from django.core.management import call_command
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.dnb_api.utils import (
+    DNBServiceConnectionError,
+    DNBServiceError,
+    DNBServiceTimeoutError,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -30,6 +35,49 @@ def test_no_companies_no_investigations_created(mock_create_investigation):
     """
     call_command('submit_legacy_dnb_investigations')
     assert mock_create_investigation.call_count == 0
+
+
+@pytest.mark.parametrize(
+    'error',
+    (
+        DNBServiceConnectionError(),
+        DNBServiceError('Internal server error', 500),
+        DNBServiceTimeoutError(),
+    ),
+)
+def test_error_handling(mock_create_investigation, caplog, error):
+    """
+    Test that the management command logs errors as expected.
+    """
+    investigation_id = '12222222-2222-3333-4444-555555555555'
+    # Mock the utility to return one successful response and raise one error
+    mock_create_investigation.side_effect = [
+        {'id': investigation_id},
+        error,
+    ]
+
+    legacy_investigation_companies = [
+        CompanyFactory(
+            pending_dnb_investigation=True,
+            website='',
+            dnb_investigation_data={'telephone_number': '1234'},
+        ),
+        CompanyFactory(
+            pending_dnb_investigation=True,
+            website=None,
+            dnb_investigation_data={'telephone_number': '5678'},
+        ),
+    ]
+
+    call_command('submit_legacy_dnb_investigations')
+
+    for company in legacy_investigation_companies:
+        company.refresh_from_db()
+
+    assert mock_create_investigation.call_count == len(legacy_investigation_companies)
+    assert str(legacy_investigation_companies[0].dnb_investigation_id) == investigation_id
+    assert legacy_investigation_companies[1].dnb_investigation_id is None
+    assert error.__class__.__name__ in caplog.text
 
 
 def test_legacy_investigations_submitted(mock_create_investigation):

@@ -38,13 +38,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        Run the celery task.
+        Submit investigations matching criteria to dnb-service.
         """
         companies = Company.objects.filter(
             Q(website='') | Q(website=None),
             pending_dnb_investigation=True,
             dnb_investigation_id=None,
-        )
+        ).order_by('created_on')
         for company in companies:
             if not (
                 company.dnb_investigation_data
@@ -69,6 +69,7 @@ class Command(BaseCommand):
             if options['simulate']:
                 logger.info(f'[SIMULATE] {message}')
                 continue
+
             logger.info(message)
 
             # NOTE: there is some duplication here with
@@ -81,7 +82,8 @@ class Command(BaseCommand):
                 DNBServiceTimeoutError,
                 DNBServiceError,
             ) as exc:
-                logger.error(str(exc))
+                logger.exception(str(exc))
+                continue
 
             company.dnb_investigation_id = response['id']
             company.save()
