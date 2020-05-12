@@ -72,32 +72,39 @@ def request_match_companies(json_body):
     return response
 
 
-def _format_company_for_post(company):
+def _format_company_for_post(companies):
     """Format the Company model to json for the POST body."""
-    description = {
-        'id': str(company.id),
-        'company_name': company.name,
-        'companies_house_id': company.company_number,
-        'duns_number': company.duns_number,
-        'postcode': company.address_postcode,
-        'cdms_ref': company.reference_code,
-    }
+    descriptions = [
+        {
+            'id': str(company.id),
+            'company_name': company.name,
+            'companies_house_id': company.company_number,
+            'duns_number': company.duns_number,
+            'postcode': company.address_postcode,
+            'cdms_ref': company.reference_code,
+        }
+        for company in companies
+    ]
 
     return {
         'descriptions': [
-            {key: value for key, value in description.items() if value},
+            {
+                key: value
+                for key, value in description.items() if value
+            }
+            for description in descriptions
         ],
     }
 
 
-def match_company(company):
+def match_company(companies):
     """
-    Get a company match from a Company object return a response from the company
+    Get match id for all Company objects and return response from the company
     matching service.
     Raises exception an requests.exceptions.HTTPError for status, timeout and a connection error.
     """
     try:
-        response = request_match_companies(_format_company_for_post(company))
+        response = request_match_companies(_format_company_for_post(companies))
     except ConnectionError as exc:
         error_message = 'Encountered an error connecting to Company matching service'
         raise CompanyMatchingServiceConnectionError(error_message) from exc
