@@ -10,8 +10,8 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.company_matching_api import CompanyMatchingServiceHTTPError
 from datahub.company.constants import BusinessTypeConstant
+from datahub.company.merge import merge_companies
 from datahub.company.models import (
     Company,
     CompanyExportCountry,
@@ -2097,9 +2097,26 @@ class TestGetCompanyExportWins(APITestMixin):
         api_client = self.create_api_client(user=user)
         company = CompanyFactory()
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
-        with pytest.raises(CompanyMatchingServiceHTTPError):
-            response = api_client.get(url)
-            assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def _get_matching_service_response(self, match_ids):
+        company_matching_reponse = {
+            'matches': [
+                {
+                    'id': 1,
+                    'match_id': match_id,
+                    'similarity': '100000',
+                }
+                for match_id in match_ids
+            ],
+        }
+        company_dynamic_response = HawkMockJSONResponse(
+            api_id=settings.COMPANY_MATCHING_HAWK_ID,
+            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+            response=company_matching_reponse,
+        )
+        return company_dynamic_response
 
     @pytest.mark.parametrize(
         'response_status',
@@ -2115,28 +2132,14 @@ class TestGetCompanyExportWins(APITestMixin):
     )
     def test_export_wins_upstream_error_conditions(self, requests_mock, response_status):
         """Test export wins service error conditions."""
-        company_matching_reponse = {
-            'matches': [
-                {
-                    'id': 1,
-                    'match_id': 1,
-                    'similarity': '100000',
-                },
-            ],
-        }
-        company_dynamic_response = HawkMockJSONResponse(
-            api_id=settings.COMPANY_MATCHING_HAWK_ID,
-            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
-            response=company_matching_reponse,
-        )
         requests_mock.post(
             '/api/v1/company/match/',
             status_code=200,
-            text=company_dynamic_response,
+            text=self._get_matching_service_response([1]),
         )
 
         requests_mock.get(
-            '/wins/match/1/',
+            '/wins/match?match_id=1',
             status_code=response_status,
         )
 
@@ -2172,24 +2175,10 @@ class TestGetCompanyExportWins(APITestMixin):
         requests_mock,
     ):
         """Test get wins in a successful scenario."""
-        company_matching_reponse = {
-            'matches': [
-                {
-                    'id': 1,
-                    'match_id': 1,
-                    'similarity': '100000',
-                },
-            ],
-        }
-        company_dynamic_response = HawkMockJSONResponse(
-            api_id=settings.COMPANY_MATCHING_HAWK_ID,
-            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
-            response=company_matching_reponse,
-        )
         requests_mock.post(
             '/api/v1/company/match/',
             status_code=200,
-            text=company_dynamic_response,
+            text=self._get_matching_service_response([1]),
         )
 
         export_wins_response = {
@@ -2240,7 +2229,7 @@ class TestGetCompanyExportWins(APITestMixin):
             response=export_wins_response,
         )
         requests_mock.get(
-            '/wins/match/1/',
+            '/wins/match?match_id=1',
             status_code=200,
             text=export_wins_dynamic_response,
         )
@@ -2253,6 +2242,134 @@ class TestGetCompanyExportWins(APITestMixin):
         api_client = self.create_api_client(user=user)
         company = CompanyFactory()
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json() == export_wins_response
+
+    def test_get_export_wins_one_merged_company_success(
+        self,
+        requests_mock,
+    ):
+        """Test get wins for both source and target, when a company was merged."""
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+        user = create_test_user(
+            permission_codenames=(
+                CompanyPermission.view_export_win,
+            ),
+        )
+        merge_companies(source_company, target_company, user)
+
+        requests_mock.register_uri(
+            'POST',
+            '/api/v1/company/match/',
+            [
+                {'text': self._get_matching_service_response([1, 2]), 'status_code': 200},
+            ],
+        )
+
+        export_wins_response = {
+            'count': 2,
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'id': 'e3013078-7b3e-4359-83d9-cd003a515521',
+                    'date': '2016-05-25',
+                    'created': '2020-02-18T15:36:02.782000Z',
+                    'country': 'CA',
+                },
+                {
+                    'id': 'e3013078-7b3e-4359-83d9-cd003a515234',
+                    'date': '2016-07-25',
+                    'created': '2020-04-18T15:36:02.782000Z',
+                    'country': 'US',
+                },
+            ],
+        }
+        export_wins_dynamic_response = HawkMockJSONResponse(
+            api_id=settings.EXPORT_WINS_HAWK_ID,
+            api_key=settings.EXPORT_WINS_HAWK_KEY,
+            response=export_wins_response,
+        )
+        requests_mock.get(
+            '/wins/match?match_id=1,2',
+            status_code=200,
+            text=export_wins_dynamic_response,
+        )
+
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v4:company:export-win', kwargs={'pk': target_company.id})
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json() == export_wins_response
+
+    def test_get_export_wins_multiple_merged_companies_success(
+        self,
+        requests_mock,
+    ):
+        """
+        Test get wins for all source companies and target,
+        when a company was merged.
+        """
+        source_company_1 = CompanyFactory()
+        target_company = CompanyFactory()
+        user = create_test_user(
+            permission_codenames=(
+                CompanyPermission.view_export_win,
+            ),
+        )
+        merge_companies(source_company_1, target_company, user)
+
+        source_company_2 = CompanyFactory()
+        merge_companies(source_company_2, target_company, user)
+
+        requests_mock.register_uri(
+            'POST',
+            '/api/v1/company/match/',
+            [
+                {'text': self._get_matching_service_response([1, 2, 3]), 'status_code': 200},
+            ],
+        )
+
+        export_wins_response = {
+            'count': 3,
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'id': 'e3013078-7b3e-4359-83d9-cd003a515521',
+                    'date': '2016-05-25',
+                    'created': '2020-02-18T15:36:02.782000Z',
+                    'country': 'CA',
+                },
+                {
+                    'id': 'e3013078-7b3e-4359-83d9-cd003a515234',
+                    'date': '2016-07-25',
+                    'created': '2020-04-18T15:36:02.782000Z',
+                    'country': 'US',
+                },
+                {
+                    'id': 'e3013078-7b3e-4359-83d9-cd003a515456',
+                    'date': '2016-09-25',
+                    'created': '2020-12-18T15:36:02.782000Z',
+                    'country': 'BL',
+                },
+            ],
+        }
+        export_wins_dynamic_response = HawkMockJSONResponse(
+            api_id=settings.EXPORT_WINS_HAWK_ID,
+            api_key=settings.EXPORT_WINS_HAWK_KEY,
+            response=export_wins_response,
+        )
+        requests_mock.get(
+            '/wins/match?match_id=1,2,3',
+            status_code=200,
+            text=export_wins_dynamic_response,
+        )
+
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v4:company:export-win', kwargs={'pk': target_company.id})
         response = api_client.get(url)
         assert response.status_code == 200
         assert response.json() == export_wins_response

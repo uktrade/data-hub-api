@@ -32,7 +32,7 @@ class TestExportWinsApi(APITestMixin):
         Test when environment variables are not set an exception is thrown.
         """
         with pytest.raises(ImproperlyConfigured):
-            get_export_wins(1234)
+            get_export_wins([1234])
 
     @pytest.mark.parametrize(
         'request_exception,expected_exception',
@@ -67,11 +67,11 @@ class TestExportWinsApi(APITestMixin):
         """
         match_id = 1234
         requests_mock.get(
-            f'/wins/match/{match_id}/',
+            f'/wins/match?match_id={match_id}',
             exc=request_exception,
         )
         with pytest.raises(expected_exception):
-            get_export_wins(match_id)
+            get_export_wins([match_id])
 
     @pytest.mark.parametrize(
         'response_status',
@@ -92,16 +92,16 @@ class TestExportWinsApi(APITestMixin):
         """Test if the export wins api returns a status code that is not 200."""
         match_id = 1
         requests_mock.get(
-            f'/wins/match/{match_id}/',
+            f'/wins/match?match_id={match_id}',
             status_code=response_status,
         )
         with pytest.raises(
             ExportWinsAPIHTTPError,
             match=f'The Export Wins API returned an error status: {response_status}',
         ):
-            get_export_wins(match_id)
+            get_export_wins([match_id])
 
-    def test_get_call_invoked(
+    def test_get_call_invoked_one_match_id(
         self,
         requests_mock,
     ):
@@ -114,10 +114,30 @@ class TestExportWinsApi(APITestMixin):
         )
         match_id = 1234
         matcher = requests_mock.get(
-            f'/wins/match/{match_id}/',
+            f'/wins/match?match_id={match_id}',
             status_code=status.HTTP_200_OK,
             text=dynamic_response,
         )
-        get_export_wins(match_id)
+        get_export_wins([match_id])
+
+        assert matcher.called_once
+
+    def test_get_call_invoked_multiple_match_ids(
+        self,
+        requests_mock,
+    ):
+        """
+        Check GET call will be made
+        """
+        dynamic_response = HawkMockJSONResponse(
+            api_id=settings.EXPORT_WINS_HAWK_ID,
+            api_key=settings.EXPORT_WINS_HAWK_KEY,
+        )
+        matcher = requests_mock.get(
+            f'/wins/match?match_id=1234,2345',
+            status_code=status.HTTP_200_OK,
+            text=dynamic_response,
+        )
+        get_export_wins([1234, 2345])
 
         assert matcher.called_once
