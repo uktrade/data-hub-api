@@ -12,6 +12,7 @@ from datahub.user.company_list.test.factories import PipelineItemFactory
 
 pipeline_collection_url = reverse('api-v4:company-list:pipelineitem-collection')
 
+
 def _pipeline_item_detail_url(item_pk):
     return reverse('api-v4:company-list:pipelineitem-detail', kwargs={'pk': item_pk})
 
@@ -645,7 +646,7 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.json() == expected_errors
 
     def test_validate_only_allowed_fields_can_be_updated(self):
-        """Test validation."""
+        """Test that any other field other than status or name throws a 400"""
         company = CompanyFactory()
         item = PipelineItemFactory(adviser=self.user)
         url = _pipeline_item_detail_url(item.pk)
@@ -698,7 +699,6 @@ class TestPatchPipelineItemView(APITestMixin):
         )
         url = _pipeline_item_detail_url(item.pk)
         new_status = PipelineItem.Status.LEADS
-        new_name = 'BATMAN'
         response = self.api_client.patch(
             url,
             data={
