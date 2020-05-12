@@ -999,7 +999,6 @@ class TestUpdateCompany(APITestMixin):
                 'postcode': 'new registered address postcode',
                 'country': Country.azerbaijan.value.id,
             },
-            'website': 'new website',
             'business_type': BusinessTypeConstant.community_interest_company.value.id,
             'employee_range': EmployeeRange.range_1_to_9.value.id,
             'turnover_range': TurnoverRange.range_33_5_plus.value.id,

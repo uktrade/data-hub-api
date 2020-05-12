@@ -10,7 +10,7 @@ ALL_DNB_UPDATED_SERIALIZER_FIELDS = (
     'is_number_of_employees_estimated',
     'turnover',
     'is_turnover_estimated',
-    # TODO: Uncomment when D&B fix their data
+    # TODO: Uncomment when D&B fix their data and add to CompanySerializer.dnb_read_only_fields
     # 'website',
     'global_ultimate_duns_number',
     'company_number',
@@ -36,7 +36,7 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     'is_number_of_employees_estimated',
     'turnover',
     'is_turnover_estimated',
-    # TODO: Uncomment when D&B fix their data
+    # TODO: Uncomment when D&B fix their data and add to CompanySerializer.dnb_read_only_fields
     # 'website',
     'global_ultimate_duns_number',
     'company_number',
