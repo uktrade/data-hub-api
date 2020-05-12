@@ -376,16 +376,18 @@ class ExportWinsForCompanyView(APIView):
     Company Matching Service.
     """
 
-    queryset = Company.objects
+    queryset = Company.objects.prefetch_related(
+        'trasnferred_from',
+    )
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_export_win}',
         ),
     )
 
-    def _extract_match_id(self, response):
+    def _extract_match_ids(self, response):
         """
-        Extracts match id out of company matching response
+        Extracts match id out of company matching response.
         {
             'matches': [
                 {
@@ -397,58 +399,12 @@ class ExportWinsForCompanyView(APIView):
         }
         """
         matches = response.json().get('matches', [])
-        if len(matches) == 0:
-            return None
 
-        return matches[0].get('match_id', None)
-
-    def _extract_export_wins(self, response):
-        """
-        Extracts export wins results out of export wins reponse
-        {
-            'count': 1,
-            'next': null,
-            'previous': null,
-            'results': [
-                {
-                    'id': 'e3013078-7b3e-4359-83d9-cd003a515521',
-                    'date': '2016-05-25',
-                    'created': '2020-02-18T15:36:02.782000Z',
-                    'country': 'CA',
-                    'sector': 251,
-                    'business_potential': 1,
-                    'business_type': '',
-                    'name_of_export': '',
-                    'officer': {
-                        'name': 'lead officer name',
-                        'email': '',
-                        'team': {
-                            'type': 'tcp',
-                            'sub_type': 'tcp:12'
-                        }
-                    },
-                    'contact': {
-                        'name': 'customer name',
-                        'email': 'noname@somecompany.com',
-                        'job_title': 'customer job title'
-                    },
-                    'value': {
-                        'export': {
-                            'value': 100000,
-                            'breakdowns': []
-                        }
-                    },
-                    'customer': 'Some Company Limited',
-                    'response': null,
-                    'hvc': {
-                        'code': 'E24116',
-                        'name': 'AER-01'
-                    }
-                },
-            ]
-        }
-        """
-        return response.json()
+        match_ids = [
+            match['match_id']
+            for match in matches if match.get('match_id', None)
+        ]
+        return match_ids
 
     def _get_company(self, company_pk):
         """
@@ -460,22 +416,42 @@ class ExportWinsForCompanyView(APIView):
         except Company.DoesNotExist:
             raise Http404
 
+    def _get_match_ids(self, target_company):
+        """
+        Returns match ids matching the company and
+        all companies that were merged into it, if there are any.
+        """
+        match_ids = list()
+        companies = [target_company]
+        for company in target_company.transferred_from.all():
+            companies.append(company)
+
+        matching_response = match_company(companies)
+        match_ids = self._extract_match_ids(matching_response)
+
+        if len(match_ids) == 0:
+            raise Http404
+
+        return match_ids
+
+    def _get_export_wins(self, match_ids):
+        """
+        Returns export wins matching each match id
+        within the list of match ids supplied.
+        """
+        response = get_export_wins(match_ids)
+        return response.json()
+
     def get(self, request, pk, format=None):
         """
         Proxy to Export Wins API for GET requests for given company's match id
-        is obtained from Company Matching Service
+        is obtained from Company Matching Service.
         """
         company = self._get_company(pk)
-        matching_response = match_company(company)
         try:
-            matching_response = match_company(company)
-            match_id = self._extract_match_id(matching_response)
-            if not match_id:
-                raise Http404
-
-            export_wins_reponse = get_export_wins(match_id)
-            results = self._extract_export_wins(export_wins_reponse)
-            return JsonResponse(results)
+            match_ids = self._get_match_ids(company)
+            export_wins_results = self._get_export_wins(match_ids)
+            return JsonResponse(export_wins_results)
 
         except (
             CompanyMatchingServiceConnectionError,
