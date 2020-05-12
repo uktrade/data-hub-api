@@ -117,6 +117,10 @@ def test_legacy_investigations_submitted(mock_create_investigation):
         website='',
         dnb_investigation_id='11111111-2222-3333-4444-555555555555',
     )
+    CompanyFactory(
+        pending_dnb_investigation=True,
+        dnb_investigation_data={},
+    )
     call_command('submit_legacy_dnb_investigations')
     assert mock_create_investigation.call_count == len(legacy_investigation_companies)
 
