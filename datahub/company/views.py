@@ -49,6 +49,7 @@ from datahub.company.serializers import (
     RemoveCompanyFromOneListSerializer,
     SelfAssignAccountManagerSerializer,
     UpdateExportDetailsSerializer,
+    UpdateOneListCoreTeamMembersSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
@@ -217,6 +218,29 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         instance = self.get_object()
         serializer = RemoveCompanyFromOneListSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=['patch'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def update_one_list_core_team(self, request, *args, **kwargs):
+        """Updates core team for the company."""
+        instance = self.get_object()
+        serializer = UpdateOneListCoreTeamMembersSerializer(
+            instance=instance,
+            data=request.data,
+            partial=True,
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
