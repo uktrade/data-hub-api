@@ -85,7 +85,7 @@ class TestCompanyMatchingApi(APITestMixin):
             status_code=status.HTTP_200_OK,
             text=dynamic_response,
         )
-        match_company(company)
+        match_company([company])
 
         assert matcher.called_once
         assert matcher.last_request.json() == {
@@ -99,7 +99,7 @@ class TestCompanyMatchingApi(APITestMixin):
         """
         company = CompanyFactory()
         with pytest.raises(ImproperlyConfigured):
-            match_company(company)
+            match_company([company])
 
     @pytest.mark.parametrize(
         'request_exception,expected_exception',
@@ -138,7 +138,7 @@ class TestCompanyMatchingApi(APITestMixin):
         )
         company = CompanyFactory()
         with pytest.raises(expected_exception):
-            match_company(company)
+            match_company([company])
 
     @pytest.mark.parametrize(
         'response_status',
@@ -166,4 +166,4 @@ class TestCompanyMatchingApi(APITestMixin):
             CompanyMatchingServiceHTTPError,
             match=f'The Company matching service returned an error status: {response_status}',
         ):
-            match_company(company)
+            match_company([company])
