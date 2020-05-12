@@ -95,7 +95,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         Raise a validation error if anything else other than allowed fields is updated.
         """
         if self.partial and self.instance:
-            allowed_fields = {'status'}
+            allowed_fields = {'status', 'name'}
             fields = data.keys()
             extra_fields = fields - allowed_fields
             if extra_fields:
