@@ -3,12 +3,26 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import CompanyPermission
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.company.test.factories import (
-    AdviserFactory,
-    CompanyFactory,
     OneListCoreTeamMemberFactory,
 )
-from datahub.core.test_utils import APITestMixin
+from datahub.company.test.utils import random_non_ita_one_list_tier
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+)
+
+
+@pytest.fixture
+def one_list_company():
+    """Get One List company."""
+    yield CompanyFactory(
+        global_headquarters=None,
+        one_list_tier=random_non_ita_one_list_tier(),
+        one_list_account_owner=AdviserFactory(),
+    )
 
 
 class TestOneListGroupCoreTeam(APITestMixin):
@@ -187,3 +201,140 @@ class TestOneListGroupCoreTeam(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestUpdateOneListCoreTeam(APITestMixin):
+    """
+    Tests for updating the Core Team of One List company.
+
+    (Implemented in CompanyViewSet.remove_from_one_list().)
+    """
+
+    @staticmethod
+    def _get_url(company):
+        return reverse(
+            'api-v4:company:update-one-list-core-team',
+            kwargs={
+                'pk': company.pk,
+            },
+        )
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if no credentials are provided."""
+        company = CompanyFactory()
+        url = self._get_url(company)
+        response = api_client.patch(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames',
+        (
+            (),
+            (CompanyPermission.change_company,),
+            (CompanyPermission.change_regional_account_manager,),
+        ),
+    )
+    def test_returns_403_if_without_permission(self, permission_codenames):
+        """
+        Test that a 403 is returned if the user does not have all of the required
+        permissions.
+        """
+        company = CompanyFactory()
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        api_client = self.create_api_client(user=user)
+        url = self._get_url(company)
+
+        response = api_client.patch(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'existing_team_count,new_team_count',
+        (
+            (0, 2),
+            (2, 2),
+            (2, 0),
+        ),
+    )
+    def test_can_update_core_team_members(
+        self,
+        one_list_company,
+        one_list_editor,
+        existing_team_count,
+        new_team_count,
+    ):
+        """Test that core team members can be updated."""
+        api_client = self.create_api_client(user=one_list_editor)
+        url = self._get_url(one_list_company)
+
+        if existing_team_count:
+            team_member_advisers = AdviserFactory.create_batch(existing_team_count)
+            OneListCoreTeamMemberFactory.create_batch(
+                len(team_member_advisers),
+                company=one_list_company,
+                adviser=factory.Iterator(team_member_advisers),
+            )
+
+        old_core_team_members = [
+            core_team_member.adviser.id
+            for core_team_member in one_list_company.one_list_core_team_members.all()
+        ]
+
+        new_core_team_members = [
+            adviser.id for adviser in AdviserFactory.create_batch(2)
+        ] if new_team_count else []
+
+        response = api_client.patch(
+            url,
+            {
+                'core_team_members':
+                [
+                    {
+                        'adviser': adviser_id,
+                    } for adviser_id in new_core_team_members
+                ],
+            },
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        core_team_members = [
+            core_team_member.adviser.id
+            for core_team_member in one_list_company.one_list_core_team_members.all()
+        ]
+
+        assert core_team_members != old_core_team_members
+        assert core_team_members == new_core_team_members
+
+    def test_cannot_update_duplicate_core_team_members(self, one_list_company, one_list_editor):
+        """Test that duplicate team members cannot be updated."""
+        api_client = self.create_api_client(user=one_list_editor)
+        url = self._get_url(one_list_company)
+
+        adviser_id = str(AdviserFactory().id)
+        response = api_client.patch(
+            url,
+            {
+                'core_team_members':
+                [
+                    {
+                        'adviser': adviser_id,
+                    },
+                ] * 2,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'core_team_members':
+            [
+                {
+                    'adviser':
+                    [
+                        'You cannot add the same adviser more than once.',
+                    ],
+                },
+                {
+                    'adviser': [
+                        'You cannot add the same adviser more than once.',
+                    ],
+                },
+            ],
+        }

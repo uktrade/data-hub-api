@@ -1,3 +1,4 @@
+from collections import Counter
 from functools import partial
 from operator import not_
 from uuid import UUID
@@ -20,6 +21,7 @@ from datahub.company.models import (
     Contact,
     ContactPermission,
     ExportExperienceCategory,
+    OneListCoreTeamMember,
     OneListTier,
 )
 from datahub.company.tasks import update_contact_consent
@@ -870,6 +872,107 @@ class PublicCompanySerializer(CompanySerializer):
         )
         permissions = {}
         read_only_fields = fields
+
+
+class AdviserListSerializer(serializers.ListSerializer):
+    """Adviser list serialiser that adds validation for duplicates."""
+
+    default_error_messages = {
+        'duplicate_adviser': gettext_lazy(
+            'You cannot add the same adviser more than once.',
+        ),
+    }
+
+    def run_validation(self, data=serializers.empty):
+        """
+        Validates that there are no duplicate advisers.
+
+        Unfortunately, overriding validate() results in a error dict being returned and the errors
+        being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
+        the expected behaviour of an error list being returned, with each entry corresponding
+        to each item in the request body).
+        """
+        value = super().run_validation(data)
+        counts = Counter(adviser['adviser'] for adviser in value)
+
+        if len(counts) == len(value):
+            return value
+
+        errors = []
+        for item in value:
+            item_errors = {}
+
+            if counts[item['adviser']] > 1:
+                item_errors['adviser'] = [self.error_messages['duplicate_adviser']]
+
+            errors.append(item_errors)
+
+        raise serializers.ValidationError(errors)
+
+
+class UniqueAdvisersBaseSerializer(serializers.ModelSerializer):
+    """Base serialiser to use with models holding advisers."""
+
+    adviser = NestedAdviserField()
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """Initialises a many=True instance of the serialiser with a custom list serialiser."""
+        child = cls(context=kwargs.get('context'))
+        return AdviserListSerializer(child=child, *args, **kwargs)
+
+    class Meta:
+        # Explicitly set validator as extra protection against a unique together validator being
+        # added.
+        # (UniqueTogetherValidator would not function correctly when multiple items are being
+        # updated at once.)
+        validators = []
+
+
+class OneListCoreTeamMemberModelSerializer(UniqueAdvisersBaseSerializer):
+    """One List Core Team Member model serializer."""
+
+    adviser = NestedAdviserField()
+    company = NestedRelatedField(Company, read_only=True)
+
+    class Meta(UniqueAdvisersBaseSerializer.Meta):
+        model = OneListCoreTeamMember
+        fields = ('adviser', 'company')
+
+
+class UpdateOneListCoreTeamMembersSerializer(serializers.Serializer):
+    """
+    One List Core Team Members update serialier.
+
+    This serialiser is being used by the core team update view.
+    """
+
+    core_team_members = OneListCoreTeamMemberModelSerializer(many=True)
+
+    @transaction.atomic
+    def save(self, adviser):
+        """Save it"""
+        core_team_members = self.validated_data.pop('core_team_members', [])
+        self._update_core_team_members(self.instance, core_team_members, adviser)
+
+    def _update_core_team_members(self, company, validated_core_team_members, adviser):
+        """
+        Adds/updates core team members of a company within validated_core_team_members.
+        And removes existing ones that are not in the list.
+        """
+        for item in validated_core_team_members:
+            company.add_one_list_core_team_member(item['adviser'])
+
+        existing_adviser_ids = [
+            item.adviser.id for item in company.one_list_core_team_members.all()
+        ]
+        new_core_team_member_ids = [item['adviser'].id for item in validated_core_team_members]
+        existing_adviser_ids_delta = list(
+            set(existing_adviser_ids) - set(new_core_team_member_ids),
+        )
+
+        for adviser_id in existing_adviser_ids_delta:
+            company.delete_one_list_core_team_member(adviser_id)
 
 
 class OneListCoreTeamMemberSerializer(serializers.Serializer):

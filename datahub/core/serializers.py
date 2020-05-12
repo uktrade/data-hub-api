@@ -12,7 +12,6 @@ from rest_framework.fields import ReadOnlyField, UUIDField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
