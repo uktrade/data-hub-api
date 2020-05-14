@@ -34,6 +34,12 @@ company_remove_account_manager = CompanyViewSet.as_action_view(
     'remove_account_manager',
 )
 
+company_assign_one_list_tier_and_global_account_manager = CompanyViewSet.as_action_view(
+    'assign_one_list_tier_and_global_account_manager',
+)
+
+company_remove_from_one_list = CompanyViewSet.as_action_view('remove_from_one_list')
+
 update_export_detail = CompanyViewSet.as_action_view(
     'update_export_detail',
 )
@@ -61,6 +67,16 @@ urls = [
         'company/<uuid:pk>/remove-account-manager',
         company_remove_account_manager,
         name='remove-account-manager',
+    ),
+    path(
+        'company/<uuid:pk>/assign-one-list-tier-and-global-account-manager',
+        company_assign_one_list_tier_and_global_account_manager,
+        name='assign-one-list-tier-and-global-account-manager',
+    ),
+    path(
+        'company/<uuid:pk>/remove-from-one-list',
+        company_remove_from_one_list,
+        name='remove-from-one-list',
     ),
     path(
         'company/<uuid:pk>/one-list-group-core-team',
