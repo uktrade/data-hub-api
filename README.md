@@ -313,6 +313,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_KEY` | No | The hawk key to use when making a request to the Export Wins API (default=None). |
+| `EXTRA_DJANGO_APPS`  | Yes | Additional Django apps to load (comma-separated). Can be used to reverse the migrations of a removed third-party app (see comment in config/settings/common.py for more detail). |
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
 | `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
