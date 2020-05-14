@@ -45,7 +45,7 @@ class Command(BaseCommand):
             pending_dnb_investigation=True,
             dnb_investigation_id=None,
         ).order_by('created_on')
-        for company in companies:
+        for company in companies.iterator():
             if not (
                 company.dnb_investigation_data
                 and company.dnb_investigation_data.get('telephone_number')
@@ -86,4 +86,4 @@ class Command(BaseCommand):
                 continue
 
             company.dnb_investigation_id = response['id']
-            company.save()
+            company.save(update_fields=['dnb_investigation_id'])
