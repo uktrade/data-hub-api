@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.utils.timezone import now
 
 from datahub.user_event_log.constants import UserEventType
 
@@ -18,7 +19,9 @@ class UserEvent(models.Model):
     """
 
     id = models.BigAutoField(primary_key=True)
-    timestamp = models.DateTimeField(auto_now=True, db_index=True)
+    # Note: This does not use auto_add_now=True so that the timestamp can be
+    # overridden if needed
+    timestamp = models.DateTimeField(db_index=True, default=now, editable=False)
     adviser = models.ForeignKey(
         'company.Advisor',
         on_delete=models.CASCADE,
@@ -28,7 +31,12 @@ class UserEvent(models.Model):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=UserEventType.choices,
     )
-    api_url_path = models.CharField(verbose_name='API URL path', max_length=5000, db_index=True)
+    api_url_path = models.CharField(
+        blank=True,
+        verbose_name='API URL path',
+        max_length=5000,
+        db_index=True,
+    )
     data = JSONField(null=True, encoder=DjangoJSONEncoder)
 
     def __str__(self):
