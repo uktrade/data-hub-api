@@ -1,1 +1,0 @@
-For existing endpoint `/v4/pipeline-item/uuid`, extend the logic to allow field `name` to be updated on the `PATCH` method. After this change, both `name` and `status` will be allowed to be updated. If we attempt to update any other field other than the allowed fields, the endpoint should still throw a `400`.
