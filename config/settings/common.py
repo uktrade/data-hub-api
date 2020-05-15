@@ -115,7 +115,23 @@ MI_APPS = [
     'datahub.mi_dashboard',
 ]
 
+# Can be used as a way to load a third-party app that has been removed from the
+# default INSTALLED_APPS list so its migrations can be reversed without them
+# being automatically reapplied.
+#
+# E.g.:
+# EXTRA_DJANGO_APPS=oauth2_provider ./manage.py migrate oauth2_provider zero
+#
+# Check the plan first if doing this using e.g.:
+# EXTRA_DJANGO_APPS=oauth2_provider ./manage.py migrate --plan oauth2_provider zero
+EXTRA_DJANGO_APPS = env.list('EXTRA_DJANGO_APPS', default=[])
+
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + MI_APPS
+
+if set(EXTRA_DJANGO_APPS) & set(INSTALLED_APPS):
+    raise ImproperlyConfigured('EXTRA_DJANGO_APPS should not overlap with the default app list')
+
+INSTALLED_APPS += EXTRA_DJANGO_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
