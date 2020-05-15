@@ -1,6 +1,6 @@
 import factory
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.user.company_list.models import PipelineItem
 
 
@@ -31,6 +31,7 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
+    contact = factory.SubFactory(ContactFactory)
 
     class Meta:
         model = 'company_list.PipelineItem'

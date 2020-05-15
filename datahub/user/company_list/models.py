@@ -5,6 +5,7 @@ from django.db import models
 
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
+from datahub.metadata import models as metadata_models
 
 
 class CompanyList(BaseModel):
@@ -76,6 +77,11 @@ class PipelineItem(BaseModel):
         IN_PROGRESS = ('in_progress', 'In progress')
         WIN = ('win', 'Win')
 
+    class LikelihoodToWin(models.IntegerChoices):
+        LOW = 1
+        MEDIUM = 2
+        HIGH = 3
+
     id = models.UUIDField(primary_key=True, default=uuid4)
     company = models.ForeignKey(
         'company.Company',
@@ -95,6 +101,22 @@ class PipelineItem(BaseModel):
         blank=True,
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
     )
+    contact = models.ForeignKey(
+        'company.Contact',
+        blank=True, null=True,
+        on_delete=models.CASCADE,
+        related_name='pipeline_items',
+    )
+    sector = models.ForeignKey(
+        metadata_models.BusinessType, blank=True, null=True,
+        on_delete=models.SET_NULL,
+    )
+    potential_value = models.BigIntegerField(blank=True, null=True)
+    likelihood_to_win = models.IntegerField(
+        blank=True, null=True,
+        choices=LikelihoodToWin.choices,
+    )
+    expected_win_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         """Human-friendly representation."""
