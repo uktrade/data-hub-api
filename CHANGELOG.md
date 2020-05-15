@@ -1,3 +1,46 @@
+# Data Hub API 31.5.0 (2020-05-15)
+
+
+## Features
+
+- **Advisers** A `migrate_legacy_introspections` management command was added for creating user event records from legacy access token objects.
+
+  This is a temporary command to use once. It will allow us to retain information used for reporting after we remove Django OAuth Toolkit and its associated models.
+- **Companies** The `website` field of D&B companies is now editable via the API
+- **Companies** A django management command `submit_legacy_dnb_investigations` was added to submit
+  remaining unsubmitted legacy investigations to D&B.  Companies are eligible
+  for submission through this command if they were created using the legacy
+  investigations API endpoint, have a telephone number recorded in `dnb_investigation_data`
+  and do not have a `website` set. Companies created through the legacy investigation endpoint
+  that do have a `website` have already been sent through to D&B outside of Data Hub.
+
+  This work enables us to deprecate and remove the `dnb_investigation_data` field
+  on Company.
+
+## Internal changes
+
+- A setting was added to conditionally load Django apps so that there's a reliable way to reverse the migrations of a third-party Django app.
+
+## API
+
+- **Companies** A new `POST /v4/company/<company-id>/assign-one-list-tier-and-global-account-manager` endpoint to assign One List tier
+  and a global account manager to Company has been added. Adviser with correct permissions can assign any tier except
+  `Tier D - International Trade Adviser Accounts`.
+
+  The endpoint expects following JSON body:
+
+  ```
+  {
+      "one_list_tier": <One List tier UUID>,
+      "global_account_manager": <adviser ID>
+  }
+  ```
+- **Companies** A new `POST /v4/company/<company-id>/remove-from-one-list` endpoint to remove Company from One List has been added.
+  Adviser with correct permissions can remove a Company from One List, except if the
+  Company is on `Tier D - International Trade Adviser Accounts` tier.
+- For existing endpoint `/v4/pipeline-item/uuid`, extend the logic to allow field `name` to be updated on the `PATCH` method. After this change, both `name` and `status` will be allowed to be updated. If we attempt to update any other field other than the allowed fields, the endpoint should still throw a `400`.
+
+
 # Data Hub API 31.4.1 (2020-05-12)
 
 
