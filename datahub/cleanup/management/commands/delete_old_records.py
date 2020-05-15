@@ -90,6 +90,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('investment_projects'): (),
                 Contact._meta.get_field('orders'): (),
                 Contact._meta.get_field('referrals'): (),
+                Contact._meta.get_field('pipeline_items'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
             },
         ),

@@ -5,6 +5,7 @@ from django.db import models
 
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
+from datahub.metadata import models as metadata_models
 
 
 class CompanyList(BaseModel):
@@ -76,6 +77,11 @@ class PipelineItem(BaseModel):
         IN_PROGRESS = ('in_progress', 'In progress')
         WIN = ('win', 'Win')
 
+    class LikelihoodToWin(models.IntegerChoices):
+        LOW = 1
+        MEDIUM = 2
+        HIGH = 3
+
     id = models.UUIDField(primary_key=True, default=uuid4)
     company = models.ForeignKey(
         'company.Company',
@@ -85,15 +91,43 @@ class PipelineItem(BaseModel):
     adviser = models.ForeignKey(
         'company.Advisor',
         on_delete=models.CASCADE,
+        help_text='Owner of the pipeline item',
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=Status.choices,
+        help_text='Item status within the pipeline',
     )
     name = models.CharField(
         null=True,
         blank=True,
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        help_text='Name to represent the item within the pipeline',
+    )
+    contact = models.ForeignKey(
+        'company.Contact',
+        blank=True, null=True,
+        on_delete=models.CASCADE,
+        related_name='pipeline_items',
+        help_text='Preferred company contact',
+    )
+    sector = models.ForeignKey(
+        metadata_models.Sector, blank=True, null=True,
+        on_delete=models.SET_NULL,
+        help_text='Sector in which the proposal is being worked on',
+    )
+    potential_value = models.DecimalField(
+        blank=True, null=True, max_digits=19, decimal_places=0,
+        help_text='Potential value (£) of the proposal',
+    )
+    likelihood_to_win = models.IntegerField(
+        blank=True, null=True,
+        choices=LikelihoodToWin.choices,
+        help_text='How likely the user thinks this proposal will result in success',
+    )
+    expected_win_date = models.DateField(
+        blank=True, null=True,
+        help_text='Approximate expected date for this proposal to succeed',
     )
 
     def __str__(self):
