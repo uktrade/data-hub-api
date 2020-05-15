@@ -13,7 +13,6 @@ python /app/manage.py loadinitialmetadata
 echo "import datetime
 from django.contrib.auth.models import Group
 from django.utils.timezone import now
-from oauth2_provider.models import AccessToken
 from datahub.company.models import Advisor
 
 dit_east_midlands_id = '9010dd28-9798-e211-a939-e4115bead28a'
