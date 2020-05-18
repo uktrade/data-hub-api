@@ -441,6 +441,16 @@ if REDIS_BASE_URL:
                 'simulate': False,
             }
         },
+        # The purpose of the following is to keep us posted on the backlog of
+        # companies that are eligible for automatic archiving
+        'simulate_automatic_company_archive': {
+            'task': 'datahub.company.tasks.automatic_company_archive',
+            'schedule': crontab(minute=0, hour=19),
+            'kwargs': {
+                'limit': 20000,
+                'simulate': True,
+            }
+        },
     }
 
     if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):
