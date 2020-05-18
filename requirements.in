@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.5
 psycogreen==1.0.2
 
-boto3==1.13.6
+boto3==1.13.11
 
 notifications-python-client==5.5.1
 
@@ -35,7 +35,7 @@ slackclient==2.5.0
 
 # REDIS
 django-redis==4.11.0
-redis==3.5.1
+redis==3.5.2
 
 # ES
 elasticsearch==6.8.1
@@ -72,7 +72,7 @@ flake8-debugger==3.2.1
 flake8-import-order==0.18.1
 flake8-docstrings==1.5.0
 flake8-print==3.1.4
-flake8-quotes==3.0.0
+flake8-quotes==3.2.0
 flake8-string-format==0.3.0
 pep8-naming==0.10.0
 pydocstyle==5.0.2
@@ -82,4 +82,4 @@ gevent==20.5.0
 mohawk==1.1.0
 requests==2.23.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.14.3
+sentry_sdk==0.14.4

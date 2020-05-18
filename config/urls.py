@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
-from oauth2_provider.views import TokenView
 
 from config import api_urls
 from config.api_docs_urls import api_docs_urls
@@ -14,7 +13,6 @@ unversioned_urls = [
     path('', include('datahub.investment.project.report.urls')),
     path('', include('datahub.oauth.admin.urls')),
     path('ping.xml', ping, name='ping'),
-    path('token/', TokenView.as_view(), name='token'),
     path('whoami/', who_am_i, name='who_am_i'),
 ]
 
