@@ -75,7 +75,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'field not allowed to be update.',
         ),
         'field_cannot_be_added': gettext_lazy(
-            'field not allowed to be added for the given status.',
+            'field not allowed for the given status.',
         ),
     }
     company = NestedRelatedField(
@@ -96,6 +96,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """
         Raise a validation error if anything else other than allowed fields is updated.
+        Raise a validation error is forbidden fields are present during a create.
         """
         if self.partial and self.instance:
             allowed_fields = {'status', 'name'}
@@ -107,17 +108,26 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                     for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
-        
+
         if self.create:
-            forbidden_fields_per_status = {
-                PipelineItem.Status.WIN: {'likelihood_to_win', 'potential_value'},
-                PipelineItem.Status.LEADS: {'likelihood_to_win', 'potential_value', 'sector'},
+            status_forbidden_fields = {
+                PipelineItem.Status.WIN: {
+                    'likelihood_to_win',
+                    'potential_value',
+                    'expected_win_date',
+                },
+                PipelineItem.Status.LEADS: {
+                    'likelihood_to_win',
+                    'potential_value',
+                    'expected_win_date',
+                    'sector',
+                },
             }
             errors = {
                 field: self.error_messages['field_cannot_be_added']
-                for field in forbidden_fields_per_status.get(data['status'], {}) if field in data
+                for field in status_forbidden_fields.get(data['status'], {}) if field in data
             }
-            if errors: 
+            if errors:
                 raise serializers.ValidationError(errors)
         return data
 

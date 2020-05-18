@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timedelta
 from uuid import uuid4
 
 import pytest
@@ -5,8 +7,9 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
+from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory, ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
 from datahub.user.company_list.test.factories import PipelineItemFactory
 
@@ -414,6 +417,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -424,8 +432,8 @@ class TestAddPipelineItemView(APITestMixin):
         assert pipeline_item.modified_by == self.user
 
     @freeze_time('2017-04-19 15:25:30.986208')
-    def test_successfully_create_a_pipeline_item_no_name(self):
-        """Test that a pipeline item can be created even if name is not given."""
+    def test_successfully_create_a_pipeline_item_no_optional_fields(self):
+        """Test that a pipeline item can be created with no optional field provided."""
         company = CompanyFactory()
         pipeline_status = PipelineItem.Status.LEADS
         response = self.api_client.post(
@@ -450,6 +458,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -486,6 +499,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
     @freeze_time('2017-04-19 15:25:30.986208')
@@ -519,6 +537,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
     def test_with_archived_company(self):
@@ -570,6 +593,99 @@ class TestAddPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
+
+    def test_cant_add_win_pipeline_item_with_forbidden_fields(self):
+        """Test creating a win pipeline item with forbidden fields."""
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory()
+
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': PipelineItem.Status.WIN,
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': datetime.now() + timedelta(days=90),
+                'potential_value': 1000,
+                'contact': str(contact.pk),
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'likelihood_to_win': ['field not allowed for the given status.'],
+            'potential_value': ['field not allowed for the given status.'],
+            'expected_win_date': ['field not allowed for the given status.'],
+        }
+
+    def test_cant_create_a_lead_pipeline_item_with_forbidden_fields(self):
+        """Test creating a lead pipeline item with forbidden fields."""
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory()
+
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': PipelineItem.Status.LEADS,
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': datetime.now() + timedelta(days=90),
+                'potential_value': 1000,
+                'contact': str(contact.pk),
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'likelihood_to_win': ['field not allowed for the given status.'],
+            'potential_value': ['field not allowed for the given status.'],
+            'expected_win_date': ['field not allowed for the given status.'],
+            'sector': ['field not allowed for the given status.'],
+        }
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_can_create_a_in_progress_pipeline_item_with_all_fields(self):
+        """Test create a in progress pipeline item with no field restriction."""
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory()
+
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': PipelineItem.Status.IN_PROGRESS,
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2017-04-19T15:25:30.986208Z',
+                'potential_value': 1000,
+                'contact': str(contact.pk),
+            },
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'name': 'project name',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'export_potential': company.export_potential,
+                'turnover': company.turnover,
+            },
+            'status': PipelineItem.Status.IN_PROGRESS,
+            'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': str(contact.pk),
+            'sector': str(sector.pk),
+            'potential_value': 1000,
+            'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+            'expected_win_date': '2017-04-19T15:25:30.986208Z',
+        }
 
 
 class TestPatchPipelineItemView(APITestMixin):
