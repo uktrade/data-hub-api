@@ -74,6 +74,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         'field_cannot_be_updated': gettext_lazy(
             'field not allowed to be update.',
         ),
+        'field_cannot_be_added': gettext_lazy(
+            'field not allowed to be added for the given status.',
+        ),
     }
     company = NestedRelatedField(
         Company,
@@ -104,6 +107,18 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                     for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
+        
+        if self.create:
+            forbidden_fields_per_status = {
+                PipelineItem.Status.WIN: {'likelihood_to_win', 'potential_value'},
+                PipelineItem.Status.LEADS: {'likelihood_to_win', 'potential_value', 'sector'},
+            }
+            errors = {
+                field: self.error_messages['field_cannot_be_added']
+                for field in forbidden_fields_per_status.get(data['status'], {}) if field in data
+            }
+            if errors: 
+                raise serializers.ValidationError(errors)
         return data
 
     class Meta:
@@ -115,6 +130,11 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'status',
             'adviser',
             'created_on',
+            'contact',
+            'sector',
+            'potential_value',
+            'likelihood_to_win',
+            'expected_win_date',
         )
         read_only_fields = (
             'id',
