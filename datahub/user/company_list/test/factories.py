@@ -1,6 +1,10 @@
+from datetime import datetime
+from datetime import timedelta
+
 import factory
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
 
 
@@ -32,6 +36,10 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
     contact = factory.SubFactory(ContactFactory)
+    sector = SectorFactory()
+    potential_value = 1000000
+    likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
+    expected_win_date = datetime.now() + timedelta(months=6)
 
     class Meta:
         model = 'company_list.PipelineItem'
