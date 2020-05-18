@@ -1,3 +1,18 @@
+# Data Hub API 32.0.0 (2020-05-18)
+
+
+## Removals
+
+- **Advisers** The `migrate_legacy_introspections` management command was removed as it’s been used and is no longer required.
+- The deprecated `/token/` endpoint was removed.
+
+## Internal changes
+
+- Some unneeded references to the `oauth2_provider` package (from Django OAuth Toolkit) were removed
+  in preparation for the removal of Django OAuth Toolkit.
+- All `oauth` app database migrations were squashed. The old migrations will be removed once the squashed migration has been applied to all environments.
+
+
 # Data Hub API 31.5.0 (2020-05-15)
 
 
