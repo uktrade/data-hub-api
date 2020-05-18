@@ -29,6 +29,7 @@ from datahub.omis.order.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
+from datahub.user.company_list.test.factories import PipelineItemFactory
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
@@ -50,6 +51,7 @@ MAPPINGS = {
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
+            (PipelineItemFactory, 'contact'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),

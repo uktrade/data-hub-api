@@ -35,11 +35,11 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
-    contact = factory.SubFactory(ContactFactory)
-    sector = SectorFactory()
+    contact = factory.SubFactory(ContactFactory, company=factory.SelfAttribute('..company'))
+    sector = factory.SubFactory(SectorFactory)
     potential_value = 1000000
     likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
-    expected_win_date = datetime.now() + timedelta(months=6)
+    expected_win_date = datetime.now() + timedelta(days=180)
 
     class Meta:
         model = 'company_list.PipelineItem'

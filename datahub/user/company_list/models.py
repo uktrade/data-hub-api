@@ -108,7 +108,7 @@ class PipelineItem(BaseModel):
         related_name='pipeline_items',
     )
     sector = models.ForeignKey(
-        metadata_models.BusinessType, blank=True, null=True,
+        metadata_models.Sector, blank=True, null=True,
         on_delete=models.SET_NULL,
     )
     potential_value = models.BigIntegerField(blank=True, null=True)
