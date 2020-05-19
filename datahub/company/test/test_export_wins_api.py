@@ -134,7 +134,7 @@ class TestExportWinsApi(APITestMixin):
             api_key=settings.EXPORT_WINS_HAWK_KEY,
         )
         matcher = requests_mock.get(
-            f'/wins/match?match_id=1234,2345',
+            '/wins/match?match_id=1234,2345',
             status_code=status.HTTP_200_OK,
             text=dynamic_response,
         )
