@@ -99,7 +99,6 @@ class PipelineItem(BaseModel):
         help_text='Item status within the pipeline',
     )
     name = models.CharField(
-        null=True,
         blank=True,
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         help_text='Name to represent the item within the pipeline',
