@@ -132,7 +132,7 @@ MAPPING = {
             {
                 'factory': PipelineItemFactory,
                 'field': 'company',
-                'expired_objects_kwargs': [{}],
+                'expired_objects_kwargs': [{'contact': None}],
                 'unexpired_objects_kwargs': [],
             },
             {
@@ -328,6 +328,17 @@ MAPPING = {
             {
                 'factory': QuoteFactory,
                 'field': 'accepted_by',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': PipelineItemFactory,
+                'field': 'contact',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
