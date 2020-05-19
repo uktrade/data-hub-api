@@ -1,1 +1,0 @@
-Help text was added to the admin site for the 'Interaction', 'Completed on' and 'Completed by' company referral fields.
