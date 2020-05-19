@@ -113,28 +113,14 @@ def _look_up_adviser(cached_token_data):
     """
     Look up the adviser using data about an access token.
 
-    This first tries to look up the adviser using the SSO email user ID, and falls
-    back to using the email field if no match is found using the SSO email user ID.
+    The adviser is looked up using its SSO email user ID.
     """
-    email = cached_token_data['email']
     sso_email_user_id = cached_token_data['sso_email_user_id']
 
     try:
         return _get_adviser(sso_email_user_id=sso_email_user_id)
     except Advisor.DoesNotExist:
-        pass
-
-    # No match on sso_email_user_id – fall back to looking up using the email field
-    # TODO: Remove the below logic once active users have sso_email_user_id set
-    try:
-        # Note: The email field uses CICharField so this lookup is case-insensitive
-        adviser = _get_adviser(email=email, sso_email_user_id__isnull=True)
-    except Advisor.DoesNotExist:
         return None
-
-    adviser.sso_email_user_id = sso_email_user_id
-    adviser.save(update_fields=('sso_email_user_id',))
-    return adviser
 
 
 def _calculate_expiry(timestamp):
