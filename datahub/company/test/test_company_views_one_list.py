@@ -2,6 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
+from reversion.models import Version
 
 from datahub.company.constants import OneListTierID
 from datahub.company.models import CompanyPermission, OneListTier
@@ -123,6 +124,12 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert company.one_list_account_owner == global_account_manager
         assert company.one_list_tier_id == new_one_list_tier.pk
         assert company.modified_by == one_list_editor
+
+        # Check that object version is stored correctly
+        versions = Version.objects.get_for_object(company)
+        assert versions.count() == 1
+        assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
+        assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
     @pytest.mark.parametrize(
         'company_factory,adviser_id_fn,new_one_list_tier_id_fn,expected_errors',
