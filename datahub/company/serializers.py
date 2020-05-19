@@ -731,7 +731,7 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
         """Update company One List account manager and tier."""
         self.instance.assign_one_list_account_manager_and_tier(
             self.validated_data['global_account_manager'],
-            self.validated_data['one_list_tier'],
+            self.validated_data['one_list_tier'].id,
             adviser,
         )
         return self.instance
