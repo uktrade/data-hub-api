@@ -1,0 +1,204 @@
+- model: metadata.service
+  pk: ea87262c-dca6-4df2-8351-11cbd6620fc4
+  fields:
+    disabled_on: ~
+    order: 205.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Accountants'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 804eff41-d807-42a2-9900-443046c254ee
+  fields:
+    disabled_on: ~
+    order: 215.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Banks'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: bb9024e0-61ff-4fd7-acd3-61e12614b776
+  fields:
+    disabled_on: ~
+    order: 225.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'British Business Bank'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: e722cad1-8caf-4f3c-957a-d6ef753088a8
+  fields:
+    disabled_on: ~
+    order: 235.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Chambers of Commerce'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 1a41446a-ec87-4256-ae6c-c658df023d88
+  fields:
+    disabled_on: ~
+    order: 245.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Combined Authorities'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 96c87c0c-c58b-414f-9718-290895e21c2f
+  fields:
+    disabled_on: ~
+    order: 255.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Consultancies'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: cab605ce-5f50-4790-9378-1c8a056f7e5a
+  fields:
+    disabled_on: ~
+    order: 260.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'County Councils'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: cf0175f0-e425-4582-955a-1f9d14567e5e
+  fields:
+    disabled_on: ~
+    order: 265.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'FSB'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: d045c2e1-d218-4aa2-901a-8ae9d6e5b9a9
+  fields:
+    disabled_on: ~
+    order: 270.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Growth Hubs'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 8e204e69-adad-4bd6-a14d-b1f95b6c499d
+  fields:
+    disabled_on: ~
+    order: 275.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Investment Services Team'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: b7869852-af3f-4661-8844-60545f304960
+  fields:
+    disabled_on: ~
+    order: 280.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Key Account Managers'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: 8fd3720c-512e-4984-b4bb-bef233c719bc
+  fields:
+    disabled_on: ~
+    order: 285.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Lawyers'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: c10d61ab-cf3a-4ef9-b94a-267c1dbbd5c3
+  fields:
+    disabled_on: ~
+    order: 290.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'LEPs'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: ee36397c-18fd-47c5-9d90-bf316db82593
+  fields:
+    disabled_on: ~
+    order: 295.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Make UK'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service
+  pk: f8a3d592-eb06-422b-b554-915f014b7819
+  fields:
+    disabled_on: ~
+    order: 203.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Other'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction"]
+- model: metadata.service # Replacing EiG National referral
+  pk: e7238b26-653c-e711-8a1f-e4115bead28a
+  fields:
+    disabled_on: ~
+    order: 240.0
+    contexts: ["event", "export_interaction"]
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'DIT Marketing Campaigns'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2020-05-26T00:00:00'
+    order: 230.0
+    contexts: ["export_interaction"]
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'Other Inbound Export Referral'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
