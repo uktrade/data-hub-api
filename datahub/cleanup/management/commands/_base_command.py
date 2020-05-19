@@ -73,10 +73,10 @@ class BaseCleanupCommand(BaseCommand):
                     logger.info(f'{deletion_model}: {model_deletion_count}')
 
                 if is_simulation:
-                    logger.info(f'Rolling back deletions...')
+                    logger.info('Rolling back deletions...')
                     raise SimulationRollback()
         except SimulationRollback:
-            logger.info(f'Deletions rolled back')
+            logger.info('Deletions rolled back')
 
     def _print_queries(self, model, qs):
         # relationships that would get deleted in cascade

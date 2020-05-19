@@ -23,10 +23,10 @@ def mi_investment_project_etl_pipeline(self):
     """
     Completes MI dashboard feed.
     """
-    with advisory_lock(f'leeloo-mi_investment_project_etl_pipeline', wait=False) as lock_held:
+    with advisory_lock('leeloo-mi_investment_project_etl_pipeline', wait=False) as lock_held:
         if not lock_held:
             logger.warning(
-                f'Another mi_dashboard_feed task is in progress. Aborting...',
+                'Another mi_dashboard_feed task is in progress. Aborting...',
             )
             return
 
