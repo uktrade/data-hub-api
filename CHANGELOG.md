@@ -455,6 +455,7 @@
 - **Advisers** The new authentication class with SSO email user ID support now records user events whenever an introspection occurs. This new authentication class continues to be currently disabled by default.
 - **Advisers** It‘s now possible to search for user events in the admin site by API URL path prefix and adviser ID. The user event API URL path field filter was also removed due to the large number of entries in this filter.
 - **Companies** Two scheduled tasks - "automatic company archive" and "get company updates" - will now send summary messages to a Slack channel upon completion.
+- **Companies** Help text was added to the admin site for the 'Interaction', 'Completed on' and 'Completed by' company referral fields.
 
 ## Internal changes
 
