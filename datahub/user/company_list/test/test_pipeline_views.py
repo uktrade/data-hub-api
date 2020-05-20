@@ -157,6 +157,9 @@ class TestGetPipelineItemsView(APITestMixin):
             data={'status': 'invalid'},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'status': ['Select a valid choice. invalid is not one of the available choices.'],
+        }
 
     def test_can_filter_by_company(self):
         """Test that it can filter by company."""
@@ -419,13 +422,115 @@ class TestAddPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['This field is required.'],
+        }
+
+    def test_validate_non_existent_contact(self):
+        """Test that non existent contact adding results in error"""
+        company = CompanyFactory()
+        dummy_contact_id = str(uuid4())
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+                'name': 'project name',
+                'contact': dummy_contact_id,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'contact': [f'Invalid pk "{dummy_contact_id}" - object does not exist.'],
+        }
+
+    def test_validate_contact_belongs_to_company(self):
+        """Test that contact being added belongs to company"""
+        company = CompanyFactory()
+        contact = ContactFactory()
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+                'name': 'project name',
+                'contact': str(contact.pk),
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'contact': ['Contact does not belong to company.'],
+        }
+
+    def test_validate_non_existent_sector(self):
+        """Test that non existent sector adding results in error"""
+        company = CompanyFactory()
+        dummy_sector_id = str(uuid4())
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+                'name': 'project name',
+                'sector': dummy_sector_id,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'sector': [f'Invalid pk "{dummy_sector_id}" - object does not exist.'],
+        }
 
     @freeze_time('2017-04-19 15:25:30.986208')
-    def test_successfully_create_a_pipeline_item(self):
-        """Test that a pipeline item can be created."""
+    def test_successfully_create_a_pipeline_item_partial_data(self):
+        """Test that a pipeline item can be created with minimal data."""
+        company = CompanyFactory()
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': pipeline_status,
+            },
+        )
+        response_data = response.json()
+        assert response.status_code == status.HTTP_201_CREATED
+
+        assert response_data == {
+            'id': response_data['id'],
+            'name': 'project name',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'export_potential': company.export_potential,
+                'turnover': company.turnover,
+            },
+            'status': pipeline_status,
+            'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
+        }
+
+        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
+
+        # adviser should be set to the authenticated user
+        assert pipeline_item.adviser == self.user
+        assert pipeline_item.created_by == self.user
+        assert pipeline_item.modified_by == self.user
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_successfully_create_a_pipeline_item_full_data(self):
+        """Test that a pipeline item can be created with all fields."""
         company = CompanyFactory()
         sector = SectorFactory()
-        contact = ContactFactory()
+        contact = ContactFactory(company=company)
 
         pipeline_status = PipelineItem.Status.LEADS
         response = self.api_client.post(
@@ -441,9 +546,9 @@ class TestAddPipelineItemView(APITestMixin):
                 'potential_value': 1000,
             },
         )
+        response_data = response.json()
         assert response.status_code == status.HTTP_201_CREATED
 
-        response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
             'name': 'project name',
@@ -750,8 +855,38 @@ class TestPatchPipelineItemView(APITestMixin):
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
         }
 
-    def test_can_patch_an_individual_field(self):
-        """Test that status of a pipeline item can be patched."""
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            pytest.param(
+                'status',
+                PipelineItem.Status.LEADS,
+                id='patch status',
+            ),
+            pytest.param(
+                'name',
+                'new name',
+                id='patch name',
+            ),
+            pytest.param(
+                'potential_value',
+                '20000000',
+                id='patch potential_value',
+            ),
+            pytest.param(
+                'likelihood_to_win',
+                PipelineItem.LikelihoodToWin.HIGH,
+                id='patch likelihood_to_win',
+            ),
+            pytest.param(
+                'expected_win_date',
+                '2021-04-19',
+                id='patch expected_win_date',
+            ),
+        ),
+    )
+    def test_can_patch_an_individual_field_values(self, field, value):
+        """Test that each field of a pipeline item can be patched."""
         company = CompanyFactory()
         item = PipelineItemFactory(
             adviser=self.user,
@@ -759,33 +894,107 @@ class TestPatchPipelineItemView(APITestMixin):
             status=PipelineItem.Status.WIN,
         )
         url = _pipeline_item_detail_url(item.pk)
-        new_status = PipelineItem.Status.LEADS
         response = self.api_client.patch(
             url,
-            data={
-                'status': new_status,
-            },
+            data={field: value},
         )
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert response_data == {
-            'company': {
-                'id': str(company.pk),
-                'name': company.name,
-                'turnover': company.turnover,
-                'export_potential': company.export_potential,
-            },
-            'id': str(item.id),
-            'name': item.name,
-            'status': new_status,
-            'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
-            'potential_value': str(item.potential_value),
-            'likelihood_to_win': item.likelihood_to_win,
-            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+        assert response_data[field] == value
+
+    def test_cannot_patch_non_existent_sector(self):
+        """Test that non existent sector can't be patched."""
+        company = CompanyFactory()
+        dummy_sector_id = str(uuid4())
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'sector': dummy_sector_id},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'sector': [f'Invalid pk "{dummy_sector_id}" - object does not exist.'],
         }
+
+    def test_can_patch_sector_field(self):
+        """Test that sector can be patched."""
+        company = CompanyFactory()
+        sector = SectorFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'sector': str(sector.id)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['sector'] == str(sector.id)
+
+    def test_can_patch_contact_field(self):
+        """Test that contact can be patched."""
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': str(contact.id)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['contact'] == str(contact.id)
+
+    def test_cannot_patch_non_existent_contact(self):
+        """Test that non existent contact can't be patched."""
+        company = CompanyFactory()
+        dummy_contact_id = str(uuid4())
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': dummy_contact_id},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'contact': [f'Invalid pk "{dummy_contact_id}" - object does not exist.'],
+        }
+
+    def test_cannot_patch_other_company_contact(self):
+        """Test that contact can be patched."""
+        company = CompanyFactory()
+        contact = ContactFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': str(contact.id)},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'contact': ['Contact does not belong to company.']}
 
     def test_cannot_patch_other_users_item(self):
         """Test that cannot patch other users item."""

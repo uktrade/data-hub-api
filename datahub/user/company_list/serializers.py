@@ -1,16 +1,9 @@
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.models import Company
+from datahub.company.models import Company, Contact
 from datahub.core.serializers import NestedRelatedField
 from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
-
-CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE = gettext_lazy(
-    "An archived company can't be added to the pipeline.",
-)
-COMPANY_ALREADY_EXISTS_IN_PIPELINE_MESSAGE = gettext_lazy(
-    'This company already exists in the pipeline for this user.',
-)
 
 
 class CompanyListSerializer(serializers.ModelSerializer):
@@ -71,10 +64,13 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     """Serialiser for pipeline item."""
 
     default_error_messages = {
+        'archived_company': gettext_lazy("An archived company can't be added to the pipeline."),
         'field_cannot_be_updated': gettext_lazy('field not allowed to be update.'),
         'field_cannot_be_empty': gettext_lazy('This field may not be blank.'),
         'field_is_required': gettext_lazy('This field is required.'),
+        'contact_company_mismatch': gettext_lazy('Contact does not belong to company.'),
     }
+
     company = NestedRelatedField(
         Company,
         # If this list of fields is changed, update the equivalent list in the QuerySet.only()
@@ -86,7 +82,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     def validate_company(self, company):
         """Make sure company is not archived"""
         if company.archived:
-            raise serializers.ValidationError(CANT_ADD_ARCHIVED_COMPANY_TO_PIPELINE_MESSAGE)
+            raise serializers.ValidationError(
+                self.error_messages['archived_company'],
+            )
 
         return company
 
@@ -98,18 +96,46 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             )
         return name
 
+    def validate_contact(self, contact):
+        """Vaidate contact belongs to company"""
+        if self.instance and contact not in self.instance.company.contacts.all():
+            raise serializers.ValidationError(
+                self.error_messages['contact_company_mismatch'],
+            )
+        return contact
+
     def validate(self, data):
         """
-        Raise a validation error if anything else other than allowed fields is updated.
+        Raise a validation error if:
+        - anything else other than allowed fields is updated.
+        - name field is empty when editing.
+        - contact doesn't belong to the company being added
         """
         if self.instance is None:
             if (data.get('name') in (None, '')):
                 raise serializers.ValidationError(
                     self.error_messages['field_is_required'],
                 )
+            if data.get('contact') and data.get('company'):
+                if not Contact.objects.filter(
+                    id=data.get('contact').id, company__id=data.get('company').id,
+                ).exists():
+                    raise serializers.ValidationError(
+                        {
+                            'contact': self.error_messages['contact_company_mismatch'],
+                        },
+                    )
 
         if self.partial and self.instance:
-            allowed_fields = {'status', 'name'}
+            allowed_fields = {
+                'status',
+                'name',
+                'contact',
+                'sector',
+                'potential_value',
+                'likelihood_to_win',
+                'expected_win_date',
+            }
             fields = data.keys()
             extra_fields = fields - allowed_fields
             if extra_fields:
@@ -118,6 +144,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                     for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
+
         return data
 
     class Meta:
