@@ -197,7 +197,7 @@ class DNBCompanyCreateView(APIView):
             dnb_modified_on=now(),
         )
 
-        statsd.incr(f'dnb.create.company')
+        statsd.incr('dnb.create.company')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
@@ -247,7 +247,7 @@ class LegacyDNBCompanyCreateInvestigationView(APIView):
             pending_dnb_investigation=True,
         )
 
-        statsd.incr(f'dnb.create.investigation')
+        statsd.incr('dnb.create.investigation')
         return Response(
             company_serializer.to_representation(datahub_company),
         )

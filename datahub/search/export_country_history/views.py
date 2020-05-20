@@ -18,7 +18,7 @@ class ExportCountryHistoryView(SearchAPIView):
         # Note: This search view does not use SearchPermissions, as it requires multiple
         # permissions
         HasPermissions(
-            f'company.view_companyexportcountry',
+            'company.view_companyexportcountry',
             f'interaction.{InteractionPermission.view_all}',
         ),
     )

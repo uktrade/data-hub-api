@@ -290,7 +290,7 @@ class TestCancelOrder(APITestMixin):
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
-            f'api-v3:omis:quote:cancel',
+            'api-v3:omis:quote:cancel',
             kwargs={'order_pk': uuid.uuid4()},
         )
         response = self.api_client.post(url)
@@ -316,7 +316,7 @@ class TestCancelOrder(APITestMixin):
         )
 
         url = reverse(
-            f'api-v3:omis:quote:cancel',
+            'api-v3:omis:quote:cancel',
             kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
@@ -334,7 +334,7 @@ class TestCancelOrder(APITestMixin):
         order = OrderFactory()
 
         url = reverse(
-            f'api-v3:omis:quote:cancel',
+            'api-v3:omis:quote:cancel',
             kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
@@ -347,7 +347,7 @@ class TestCancelOrder(APITestMixin):
         quote = order.quote
 
         url = reverse(
-            f'api-v3:omis:quote:cancel',
+            'api-v3:omis:quote:cancel',
             kwargs={'order_pk': order.pk},
         )
         with freeze_time('2017-07-12 13:00') as mocked_now:

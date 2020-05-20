@@ -535,8 +535,7 @@ class TestContactExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
 
-        # E123 is ignored as there are seemingly unresolvable indentation errors in the dict below
-        expected_row_data = [  # noqa: E123
+        expected_row_data = [
             {
                 'Name': contact.name,
                 'Job title': contact.job_title,
@@ -563,11 +562,9 @@ class TestContactExportView(APITestMixin):
                 'Date of latest interaction':
                     max(contact.interactions.all(), key=attrgetter('date')).date
                     if contact.interactions.all() else None,
-                'Teams of latest interaction':
-                    _format_interaction_team_names(
-                        max(contact.interactions.all(), key=attrgetter('date')),
-                    )
-                    if contact.interactions.exists() else None,
+                'Teams of latest interaction': _format_interaction_team_names(
+                    max(contact.interactions.all(), key=attrgetter('date')),
+                ) if contact.interactions.exists() else None,
                 'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
             }
             for contact in sorted_contacts

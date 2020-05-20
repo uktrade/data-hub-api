@@ -226,7 +226,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         permission_classes=[
             HasPermissions(
                 f'company.{CompanyPermission.change_company}',
-                f'company.change_companyexportcountry',
+                'company.change_companyexportcountry',
             ),
         ],
         detail=True,

@@ -63,7 +63,7 @@ class CSVBaseCommand(BaseCommand):
 
     def handle(self, *args, **options):
         """Process the CSV file."""
-        logger.info(f'Started')
+        logger.info('Started')
 
         result = self._handle(*args, **options)
 

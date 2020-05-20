@@ -225,7 +225,7 @@ class LegacyDNBCompanyInvestigationSerializer(CompanySerializer):
             and investigation_data.get('telephone_number') in (None, '')
         ):
             raise serializers.ValidationError(
-                f'Either website or telephone_number must be provided.',
+                'Either website or telephone_number must be provided.',
             )
 
         return data
@@ -323,7 +323,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
         """
         if not changes:
             raise serializers.ValidationError(
-                f'No changes submitted.',
+                'No changes submitted.',
             )
         return changes
 
