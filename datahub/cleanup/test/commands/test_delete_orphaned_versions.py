@@ -145,8 +145,8 @@ def test_delete_revisions_without_versions(caplog):
     assert Version.objects.count() == 0
     assert Revision.objects.count() == 0
 
-    assert f'reversion.Version: 1' in caplog.text
-    assert f'reversion.Revision: 1' in caplog.text
+    assert 'reversion.Version: 1' in caplog.text
+    assert 'reversion.Revision: 1' in caplog.text
 
 
 @pytest.mark.django_db

@@ -201,7 +201,7 @@ class InteractionCSVImportAdmin:
     def _complete_response(self, request, token, counts_by_status):
         return self._template_response(
             request,
-            f'admin/interaction/interaction/import_complete.html',
+            'admin/interaction/interaction/import_complete.html',
             PAGE_TITLE,
             token=token,
             download_timeout_mins=CACHE_VALUE_TIMEOUT // timedelta(minutes=1),

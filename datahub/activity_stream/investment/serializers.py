@@ -23,7 +23,7 @@ class IProjectCreatedSerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': project_id,
-                'type': [f'dit:InvestmentProject'],
+                'type': ['dit:InvestmentProject'],
                 'startTime': instance.created_on,
                 'name': instance.name,
                 'dit:investmentType': {
