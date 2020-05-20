@@ -361,19 +361,33 @@ class TestAddPipelineItemView(APITestMixin):
             ),
             pytest.param(
                 {
+                    'name': None,
+                },
+                {
+                    'company': ['This field is required.'],
+                    'status': ['This field is required.'],
+                    'name': ['This field may not be null.'],
+                },
+                id='company and status are omitted and name is null',
+            ),
+            pytest.param(
+                {
                     'company': '',
                     'status': '',
+                    'name': '',
                 },
                 {
                     'company': ['This field may not be null.'],
                     'status': ['"" is not a valid choice.'],
+                    'name': ['This field may not be blank.'],
                 },
-                id='company and status are empty strings',
+                id='company, status and name are empty strings',
             ),
             pytest.param(
                 {
                     'company': '',
                     'status': PipelineItem.Status.LEADS,
+                    'name': 'project name',
                 },
                 {
                     'company': ['This field may not be null.'],
@@ -391,6 +405,20 @@ class TestAddPipelineItemView(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_errors
+
+    def test_validate_name(self):
+        """Test that a pipeline item cannot be created without name."""
+        company = CompanyFactory()
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @freeze_time('2017-04-19 15:25:30.986208')
     def test_successfully_create_a_pipeline_item(self):
@@ -432,47 +460,6 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': str(1000),
             'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
             'expected_win_date': '2019-04-19',
-        }
-
-        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
-
-        # adviser should be set to the authenticated user
-        assert pipeline_item.adviser == self.user
-        assert pipeline_item.created_by == self.user
-        assert pipeline_item.modified_by == self.user
-
-    @freeze_time('2017-04-19 15:25:30.986208')
-    def test_successfully_create_a_pipeline_item_no_name(self):
-        """Test that a pipeline item can be created even if name is not given."""
-        company = CompanyFactory()
-        pipeline_status = PipelineItem.Status.LEADS
-        response = self.api_client.post(
-            pipeline_collection_url,
-            data={
-                'company': str(company.pk),
-                'status': pipeline_status,
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        response_data = response.json()
-        assert response_data == {
-            'id': response_data['id'],
-            'name': None,
-            'company': {
-                'id': str(company.pk),
-                'name': company.name,
-                'export_potential': company.export_potential,
-                'turnover': company.turnover,
-            },
-            'status': pipeline_status,
-            'created_on': '2017-04-19T15:25:30.986208Z',
-            'contact': None,
-            'sector': None,
-            'potential_value': None,
-            'likelihood_to_win': None,
-            'expected_win_date': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -666,6 +653,42 @@ class TestPatchPipelineItemView(APITestMixin):
                     'status': ['"invalid" is not a valid choice.'],
                 },
                 id='status is not a valid choice',
+            ),
+            pytest.param(
+                {
+                    'company': None,
+                },
+                {
+                    'company': ['This field may not be null.'],
+                },
+                id='company is not  null',
+            ),
+            pytest.param(
+                {
+                    'company': '',
+                },
+                {
+                    'company': ['This field may not be null.'],
+                },
+                id='company is not a empty string',
+            ),
+            pytest.param(
+                {
+                    'name': None,
+                },
+                {
+                    'name': ['This field may not be null.'],
+                },
+                id='name is not  null',
+            ),
+            pytest.param(
+                {
+                    'name': '',
+                },
+                {
+                    'name': ['This field may not be blank.'],
+                },
+                id='name is not a empty string',
             ),
         ),
     )
