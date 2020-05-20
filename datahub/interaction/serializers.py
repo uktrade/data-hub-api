@@ -1,4 +1,3 @@
-from collections import Counter
 from functools import partial
 from operator import not_
 
@@ -8,7 +7,11 @@ from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
-from datahub.company.serializers import NestedAdviserField, NestedAdviserWithEmailAndTeamField
+from datahub.company.serializers import (
+    NestedAdviserField,
+    NestedAdviserWithEmailAndTeamField,
+    UniqueAdvisersBaseSerializer,
+)
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
@@ -42,68 +45,20 @@ from datahub.metadata.models import Country, Service, Team
 from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
-class InteractionDITParticipantListSerializer(serializers.ListSerializer):
-    """Interaction DIT participant list serialiser that adds validation for duplicates."""
-
-    default_error_messages = {
-        'duplicate_adviser': gettext_lazy(
-            'You cannot add the same adviser more than once.',
-        ),
-    }
-
-    def run_validation(self, data=serializers.empty):
-        """
-        Validates that there are no duplicate advisers.
-
-        Unfortunately, overriding validate() results in a error dict being returned and the errors
-        being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
-        the expected behaviour of an error list being returned, with each entry corresponding
-        to each item in the request body).
-        """
-        value = super().run_validation(data)
-        counts = Counter(dit_participant['adviser'] for dit_participant in value)
-
-        if len(counts) == len(value):
-            return value
-
-        errors = []
-        for item in value:
-            item_errors = {}
-
-            if counts[item['adviser']] > 1:
-                item_errors['adviser'] = [self.error_messages['duplicate_adviser']]
-
-            errors.append(item_errors)
-
-        raise serializers.ValidationError(errors)
-
-
-class InteractionDITParticipantSerializer(serializers.ModelSerializer):
+class InteractionDITParticipantSerializer(UniqueAdvisersBaseSerializer):
     """
     Interaction DIT participant serialiser.
 
     Used as a field in InteractionSerializer.
     """
 
-    adviser = NestedAdviserField()
     # team is read-only as it is set from the adviser when a participant is added to
     # an interaction
     team = NestedRelatedField(Team, read_only=True)
 
-    @classmethod
-    def many_init(cls, *args, **kwargs):
-        """Initialises a many=True instance of the serialiser with a custom list serialiser."""
-        child = cls(context=kwargs.get('context'))
-        return InteractionDITParticipantListSerializer(child=child, *args, **kwargs)
-
-    class Meta:
+    class Meta(UniqueAdvisersBaseSerializer.Meta):
         model = InteractionDITParticipant
         fields = ('adviser', 'team')
-        # Explicitly set validator as extra protection against a unique together validator being
-        # added.
-        # (UniqueTogetherValidator would not function correctly when multiple items are being
-        # updated at once.)
-        validators = []
 
 
 class InteractionExportCountrySerializer(serializers.ModelSerializer):
