@@ -29,7 +29,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         # mock call to GOV.UK Pay
         requests_mock.register_uri(
             'GET',
-            re.compile(govuk_url(f'payments/*')),
+            re.compile(govuk_url('payments/*')),
             json={'state': {'status': 'failed'}},
         )
 

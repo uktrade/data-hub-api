@@ -922,7 +922,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             },
         )
         statsd_mock.incr.assert_called_with(
-            f'dnb.create.company',
+            'dnb.create.company',
         )
 
 
@@ -1080,7 +1080,7 @@ class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
             data=investigation_payload,
         )
         statsd_mock.incr.assert_called_with(
-            f'dnb.create.investigation',
+            'dnb.create.investigation',
         )
 
 

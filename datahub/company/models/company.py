@@ -446,6 +446,14 @@ class Company(ArchivableModel, BaseModel):
         self.one_list_tier = None
         self.save()
 
+    def add_one_list_core_team_member(self, adviser):
+        """Add Core team member to the company."""
+        OneListCoreTeamMember.objects.get_or_create(adviser=adviser, company=self)
+
+    def delete_one_list_core_team_member(self, adviser):
+        """Remove Core Team member from the company."""
+        OneListCoreTeamMember.objects.filter(adviser=adviser, company=self).delete()
+
     def add_export_country(self, country, status, record_date, adviser, track_history=False):
         """
         Add a company export_country, if it doesn't exist.

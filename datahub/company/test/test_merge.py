@@ -194,7 +194,7 @@ class TestDuplicateCompanyMerger:
                 {
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
+                    Contact: {'company': 3},
                     Interaction: {'company': 0},
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
@@ -276,7 +276,7 @@ class TestDuplicateCompanyMerger:
             ('num_interactions', True),
             ('num_orders', True),
             ('num_referrals', False),
-            ('num_pipeline_items', False),
+            ('num_pipeline_items', True),
         ),
     )
     @pytest.mark.parametrize('num_related_objects', (0, 1, 3))

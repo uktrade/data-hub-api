@@ -2,34 +2,17 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
+from reversion.models import Version
 
 from datahub.company.constants import OneListTierID
 from datahub.company.models import CompanyPermission, OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, SubsidiaryFactory
+from datahub.company.test.utils import random_non_ita_one_list_tier
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
     random_obj_for_model,
-    random_obj_for_queryset,
 )
-
-
-@pytest.fixture
-def one_list_editor():
-    """An adviser with permission to change one list company."""
-    permission_codenames = [
-        CompanyPermission.change_company,
-        CompanyPermission.change_one_list_tier_and_global_account_manager,
-    ]
-
-    return create_test_user(permission_codenames=permission_codenames, dit_team=None)
-
-
-def _random_non_ita_one_list_tier():
-    queryset = OneListTier.objects.exclude(
-        pk=OneListTierID.tier_d_international_trade_advisers.value,
-    )
-    return random_obj_for_queryset(queryset)
 
 
 class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
@@ -84,7 +67,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
             pytest.param(
                 lambda: CompanyFactory(
                     one_list_account_owner=AdviserFactory(),
-                    one_list_tier=_random_non_ita_one_list_tier(),
+                    one_list_tier=random_non_ita_one_list_tier(),
                 ),
                 id='existing-global-account-manager',
             ),
@@ -106,7 +89,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         api_client = self.create_api_client(user=one_list_editor)
         url = self._get_url(company)
 
-        new_one_list_tier = _random_non_ita_one_list_tier()
+        new_one_list_tier = random_non_ita_one_list_tier()
 
         global_account_manager = AdviserFactory()
 
@@ -123,6 +106,12 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert company.one_list_account_owner == global_account_manager
         assert company.one_list_tier_id == new_one_list_tier.pk
         assert company.modified_by == one_list_editor
+
+        # Check that object version is stored correctly
+        versions = Version.objects.get_for_object(company)
+        assert versions.count() == 1
+        assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
+        assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
     @pytest.mark.parametrize(
         'company_factory,adviser_id_fn,new_one_list_tier_id_fn,expected_errors',
@@ -150,7 +139,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                     global_headquarters__one_list_account_owner=AdviserFactory(),
                 ),
                 lambda: AdviserFactory().pk,
-                lambda: _random_non_ita_one_list_tier().pk,
+                lambda: random_non_ita_one_list_tier().pk,
                 {
                     api_settings.NON_FIELD_ERRORS_KEY: [
                         'A subsidiary cannot be on One List.',
@@ -164,7 +153,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                     one_list_account_owner=AdviserFactory(),
                 ),
                 lambda: AdviserFactory().pk,
-                lambda: _random_non_ita_one_list_tier().pk,
+                lambda: random_non_ita_one_list_tier().pk,
                 {
                     api_settings.NON_FIELD_ERRORS_KEY: [
                         'A company on this One List tier can only be changed by ITA.',
@@ -174,7 +163,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
             ),
             pytest.param(
                 lambda: CompanyFactory(
-                    one_list_tier=_random_non_ita_one_list_tier(),
+                    one_list_tier=random_non_ita_one_list_tier(),
                     one_list_account_owner=AdviserFactory(),
                 ),
                 lambda: AdviserFactory().pk,
@@ -267,7 +256,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
             pytest.param(
                 lambda: CompanyFactory(
                     one_list_account_owner=AdviserFactory(),
-                    one_list_tier_id=_random_non_ita_one_list_tier().pk,
+                    one_list_tier_id=random_non_ita_one_list_tier().pk,
                 ),
                 id='existing-one-list-assignment',
             ),
