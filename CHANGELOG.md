@@ -1,3 +1,60 @@
+# Data Hub API 32.1.0 (2020-05-21)
+
+
+## Features
+
+- **Advisers** The SSO authentication logic no longer falls back to using the primary email address of a user when there is no match using the SSO email user ID. This is because all genuinely active advisers in Data Hub should now have an SSO email user ID set.
+
+## Bug fixes
+
+- **Companies** A bug in `POST /v4/company/<company-id>/assign-one-list-tier-and-global-account-manager` endpoint that 
+  resulted in incorrect version being saved has been fixed.
+
+## API
+
+- **Advisers** Pipeline item's `name` field is now a required in `POST /v4/pipeline-item` API endpoint.
+
+  Pipeline item's `name` field can't be updated to null or empty string with `PATCH /v4/pipeline-item/uuid` API endpoint.
+- **Companies** A new `PATCH /v4/company/<company-id>/update-one-list-core-team` endpoint to update the Core Team of One List company 
+  has been added. Adviser with correct permissions can update Core Team of a company.
+
+  Example request body:
+
+  ```
+  {
+    "core_team_members": [
+      {
+        "adviser": <adviser_1_uuid>
+      },
+      {
+        "adviser": <adviser_2_uuid>
+      }, 
+      ...
+    ]
+  }
+  ```
+
+  Successful request should expect empty response with 204 (no content) HTTP status.
+- For existing endpoint `/v4/pipeline-item`, add additional 5 fields that can be seen below. All of these fields are optional and nullable at this stage so no additional validation required. The api should be able to create a pipeline item with or without any of these fields.
+
+  - `"contact_id" uuid NULL`
+  - `"sector_id" uuid NULL`
+  - `"potential_value" biginteger NULL`
+  - `"likelihood_to_win" int NULL`
+  - `"expected_win_date" timestamp with time zone NULL`
+
+## Database schema
+
+- **Advisers** Several new fields are added to `company_list_pipelineitem` table as part of next iteration of Pipelines:
+
+  - `"contact_id" uuid NULL`
+  - `"sector_id" uuid NULL`
+  - `"potential_value" biginteger NULL`
+  - `"likelihood_to_win" int NULL`
+  - `"expected_win_date" timestamp with time zone NULL`
+- **Advisers** The `name` field of `company_list_pipelineitem` table is now a mandatory field as part of next iteration of Pipelines.
+
+
 # Data Hub API 32.0.0 (2020-05-18)
 
 
