@@ -1,1 +1,0 @@
-The SSO authentication logic no longer falls back to using the primary email address of a user when there is no match using the SSO email user ID. This is because all genuinely active advisers in Data Hub should now have an SSO email user ID set.
