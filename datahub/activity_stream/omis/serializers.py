@@ -19,7 +19,7 @@ class OMISOrderAddedSerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': order_id,
-                'type': [f'dit:OMISOrder'],
+                'type': ['dit:OMISOrder'],
                 'startTime': instance.created_on,
                 'name': instance.reference,
                 'attributedTo': [

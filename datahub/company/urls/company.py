@@ -48,6 +48,10 @@ one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
     'get': 'list',
 })
 
+update_one_list_core_team = CompanyViewSet.as_action_view(
+    'update_one_list_core_team',
+)
+
 public_company_item = PublicCompanyViewSet.as_view({
     'get': 'retrieve',
 })
@@ -82,6 +86,11 @@ urls = [
         'company/<uuid:pk>/one-list-group-core-team',
         one_list_group_core_team,
         name='one-list-group-core-team',
+    ),
+    path(
+        'company/<uuid:pk>/update-one-list-core-team',
+        update_one_list_core_team,
+        name='update-one-list-core-team',
     ),
     path(
         'company/<uuid:pk>/export-detail',

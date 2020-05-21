@@ -71,9 +71,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     """Serialiser for pipeline item."""
 
     default_error_messages = {
-        'field_cannot_be_updated': gettext_lazy(
-            'field not allowed to be update.',
-        ),
+        'field_cannot_be_updated': gettext_lazy('field not allowed to be update.'),
+        'field_cannot_be_empty': gettext_lazy('This field may not be blank.'),
+        'field_is_required': gettext_lazy('This field is required.'),
     }
     company = NestedRelatedField(
         Company,
@@ -90,10 +90,24 @@ class PipelineItemSerializer(serializers.ModelSerializer):
 
         return company
 
+    def validate_name(self, name):
+        """Make sure name is not blank"""
+        if not name:
+            raise serializers.ValidationError(
+                self.error_messages['field_cannot_be_empty'],
+            )
+        return name
+
     def validate(self, data):
         """
         Raise a validation error if anything else other than allowed fields is updated.
         """
+        if self.instance is None:
+            if (data.get('name') in (None, '')):
+                raise serializers.ValidationError(
+                    self.error_messages['field_is_required'],
+                )
+
         if self.partial and self.instance:
             allowed_fields = {'status', 'name'}
             fields = data.keys()
@@ -115,6 +129,11 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'status',
             'adviser',
             'created_on',
+            'contact',
+            'sector',
+            'potential_value',
+            'likelihood_to_win',
+            'expected_win_date',
         )
         read_only_fields = (
             'id',

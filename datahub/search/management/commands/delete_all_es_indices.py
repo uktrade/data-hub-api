@@ -42,7 +42,7 @@ Are you sure you want to do this?
         indices = sorted(item['index'] for item in index_statistics)
 
         if not indices:
-            logger.info(f'No matching Elasticsearch indices to delete!')
+            logger.info('No matching Elasticsearch indices to delete!')
             return
 
         formatted_index_list = '\n'.join(indices)

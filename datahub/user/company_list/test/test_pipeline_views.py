@@ -5,8 +5,9 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory
+from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactory, ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
 from datahub.user.company_list.test.factories import PipelineItemFactory
 
@@ -286,6 +287,11 @@ class TestGetPipelineItemsView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'contact': str(item.contact.pk),
+            'sector': str(item.sector.pk),
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
         }
 
 
@@ -355,19 +361,33 @@ class TestAddPipelineItemView(APITestMixin):
             ),
             pytest.param(
                 {
+                    'name': None,
+                },
+                {
+                    'company': ['This field is required.'],
+                    'status': ['This field is required.'],
+                    'name': ['This field may not be null.'],
+                },
+                id='company and status are omitted and name is null',
+            ),
+            pytest.param(
+                {
                     'company': '',
                     'status': '',
+                    'name': '',
                 },
                 {
                     'company': ['This field may not be null.'],
                     'status': ['"" is not a valid choice.'],
+                    'name': ['This field may not be blank.'],
                 },
-                id='company and status are empty strings',
+                id='company, status and name are empty strings',
             ),
             pytest.param(
                 {
                     'company': '',
                     'status': PipelineItem.Status.LEADS,
+                    'name': 'project name',
                 },
                 {
                     'company': ['This field may not be null.'],
@@ -386,10 +406,27 @@ class TestAddPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_errors
 
+    def test_validate_name(self):
+        """Test that a pipeline item cannot be created without name."""
+        company = CompanyFactory()
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'status': pipeline_status,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
     @freeze_time('2017-04-19 15:25:30.986208')
     def test_successfully_create_a_pipeline_item(self):
         """Test that a pipeline item can be created."""
         company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory()
+
         pipeline_status = PipelineItem.Status.LEADS
         response = self.api_client.post(
             pipeline_collection_url,
@@ -397,9 +434,13 @@ class TestAddPipelineItemView(APITestMixin):
                 'company': str(company.pk),
                 'name': 'project name',
                 'status': pipeline_status,
+                'contact': str(contact.pk),
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2019-04-19',
+                'potential_value': 1000,
             },
         )
-
         assert response.status_code == status.HTTP_201_CREATED
 
         response_data = response.json()
@@ -414,42 +455,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
-        }
-
-        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
-
-        # adviser should be set to the authenticated user
-        assert pipeline_item.adviser == self.user
-        assert pipeline_item.created_by == self.user
-        assert pipeline_item.modified_by == self.user
-
-    @freeze_time('2017-04-19 15:25:30.986208')
-    def test_successfully_create_a_pipeline_item_no_name(self):
-        """Test that a pipeline item can be created even if name is not given."""
-        company = CompanyFactory()
-        pipeline_status = PipelineItem.Status.LEADS
-        response = self.api_client.post(
-            pipeline_collection_url,
-            data={
-                'company': str(company.pk),
-                'status': pipeline_status,
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        response_data = response.json()
-        assert response_data == {
-            'id': response_data['id'],
-            'name': None,
-            'company': {
-                'id': str(company.pk),
-                'name': company.name,
-                'export_potential': company.export_potential,
-                'turnover': company.turnover,
-            },
-            'status': pipeline_status,
-            'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': str(contact.pk),
+            'sector': str(sector.pk),
+            'potential_value': str(1000),
+            'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+            'expected_win_date': '2019-04-19',
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -486,6 +496,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
     @freeze_time('2017-04-19 15:25:30.986208')
@@ -519,6 +534,11 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'contact': None,
+            'sector': None,
+            'potential_value': None,
+            'likelihood_to_win': None,
+            'expected_win_date': None,
         }
 
     def test_with_archived_company(self):
@@ -634,6 +654,42 @@ class TestPatchPipelineItemView(APITestMixin):
                 },
                 id='status is not a valid choice',
             ),
+            pytest.param(
+                {
+                    'company': None,
+                },
+                {
+                    'company': ['This field may not be null.'],
+                },
+                id='company is not  null',
+            ),
+            pytest.param(
+                {
+                    'company': '',
+                },
+                {
+                    'company': ['This field may not be null.'],
+                },
+                id='company is not a empty string',
+            ),
+            pytest.param(
+                {
+                    'name': None,
+                },
+                {
+                    'name': ['This field may not be null.'],
+                },
+                id='name is not  null',
+            ),
+            pytest.param(
+                {
+                    'name': '',
+                },
+                {
+                    'name': ['This field may not be blank.'],
+                },
+                id='name is not a empty string',
+            ),
         ),
     )
     def test_validation(self, request_data, expected_errors):
@@ -687,6 +743,11 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
+            'contact': str(item.contact.pk),
+            'sector': str(item.sector.pk),
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
         }
 
     def test_can_patch_an_individual_field(self):
@@ -719,6 +780,11 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': item.name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
+            'contact': str(item.contact.pk),
+            'sector': str(item.sector.pk),
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
         }
 
     def test_cannot_patch_other_users_item(self):
@@ -800,6 +866,11 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'contact': str(item.contact.pk),
+            'sector': str(item.sector.pk),
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
         }
 
     def test_cannot_get_another_users_list(self):

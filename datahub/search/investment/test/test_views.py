@@ -1123,8 +1123,7 @@ class TestInvestmentProjectExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchInvestmentExportAPIView.field_titles.values())
 
-        # E123 is ignored as there are seemingly unresolvable indentation errors in the dict below
-        expected_row_data = [  # noqa: E123
+        expected_row_data = [
             {
                 'Date created': project.created_on,
                 'Project reference': project.project_code,
@@ -1154,19 +1153,19 @@ class TestInvestmentProjectExportView(APITestMixin):
                     join_attr_values(
                         project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
                         'adviser.name',
-                    ),
+                    ),  # noqa: E123
                 'Delivery partners':
                     join_attr_values(
                         project.delivery_partners.order_by('name'),
-                    ),
+                    ),  # noqa: E123
                 'Possible UK regions':
                     join_attr_values(
                         project.uk_region_locations.order_by('name'),
-                    ),
+                    ),  # noqa: E123
                 'Actual UK regions':
                     join_attr_values(
                         project.actual_uk_regions.order_by('name'),
-                    ),
+                    ),  # noqa: E123
                 'Specific investment programme':
                     get_attr_or_none(project, 'specific_programme.name'),
                 'Referral source activity':

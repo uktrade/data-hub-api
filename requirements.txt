@@ -37,7 +37,6 @@ docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
 elasticsearch-dsl==6.3.1  # via -r requirements.in
 elasticsearch==6.8.1      # via -r requirements.in, elasticsearch-dsl
-entrypoints==0.3          # via flake8
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.12.0       # via -r requirements.in
 faker==4.0.2              # via factory-boy
@@ -51,7 +50,7 @@ flake8-polyfill==1.0.2    # via pep8-naming
 flake8-print==3.1.4       # via -r requirements.in
 flake8-quotes==3.2.0      # via -r requirements.in
 flake8-string-format==0.3.0  # via -r requirements.in
-flake8==3.7.9             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
+flake8==3.8.1             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
 freezegun==0.3.15         # via -r requirements.in
 future==0.18.2            # via notifications-python-client
 gevent==20.5.0            # via -r requirements.in
@@ -90,9 +89,9 @@ psycogreen==1.0.2         # via -r requirements.in
 psycopg2==2.8.5           # via -r requirements.in
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
-pycodestyle==2.5.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
+pycodestyle==2.6.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
 pydocstyle==5.0.2         # via -r requirements.in, flake8-docstrings
-pyflakes==2.1.1           # via flake8
+pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
 pyparsing==2.4.6          # via packaging
