@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.db import models
 
-from datahub.core.models import BaseModel
+from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
 
@@ -67,7 +67,7 @@ class CompanyListItem(BaseModel):
         ]
 
 
-class PipelineItem(BaseModel):
+class PipelineItem(ArchivableModel, BaseModel):
     """
     Model holding pipeline list items.
     """
