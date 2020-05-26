@@ -73,7 +73,7 @@ mohawk==1.1.0             # via -r requirements.in
 monotonic==1.5            # via notifications-python-client
 more-itertools==8.2.0     # via pytest
 multidict==4.7.5          # via aiohttp, yarl
-notifications-python-client==5.5.1  # via -r requirements.in
+notifications-python-client==5.6.0  # via -r requirements.in
 oauthlib==3.1.0           # via django-oauth-toolkit
 packaging==20.3           # via pytest
 parso==0.6.2              # via jedi
