@@ -68,7 +68,6 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'django_extensions',
     'reversion',
-    'oauth2_provider',
     'django_filters',
     'mptt',
 ]

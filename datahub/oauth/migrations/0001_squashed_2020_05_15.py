@@ -4,13 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('oauth', '0001_add_oauth_app_scope'),
-        ('oauth', '0002_add_scope_existing_apps'),
-        ('oauth', '0003_add_data_hub_to_scopes'),
-        ('oauth', '0004_remove_application_scope_model'),
-    ]
-
     initial = True
 
     dependencies = []
