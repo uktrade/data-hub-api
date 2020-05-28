@@ -1,1 +1,0 @@
- The squashed `oauth` migration `0001_squashed_2020_05_15` was transitioned to a normal migration and the migrations it replaced were removed.
