@@ -290,8 +290,14 @@ class TestGetPipelineItemsView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
@@ -560,8 +566,14 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
-            'contact': str(contact.pk),
-            'sector': str(sector.pk),
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name,
+            },
+            'sector': {
+                'id': str(sector.pk),
+                'segment': sector.segment,
+            },
             'potential_value': str(1000),
             'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
             'expected_win_date': '2019-04-19',
@@ -848,8 +860,14 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
@@ -939,7 +957,7 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert response_data['sector'] == str(sector.id)
+        assert response_data['sector']['id'] == str(sector.id)
 
     def test_can_patch_contact_field(self):
         """Test that contact can be patched."""
@@ -958,7 +976,7 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert response_data['contact'] == str(contact.id)
+        assert response_data['contact']['id'] == str(contact.id)
 
     def test_cannot_patch_non_existent_contact(self):
         """Test that non existent contact can't be patched."""
@@ -1075,8 +1093,14 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
