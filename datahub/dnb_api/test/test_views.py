@@ -2001,9 +2001,18 @@ class TestCompanyInvestigationView(APITestMixin):
         assert str(company.dnb_investigation_id) == dnb_response['id']
         assert company.pending_dnb_investigation is True
 
+    @pytest.mark.parametrize(
+        'missing_field_data_hub, missing_field_dnb_service',
+        (
+            ('website', 'domain'),
+            ('telephone_number', 'telephone_number'),
+        ),
+    )
     def test_valid_minimum_data(
         self,
         requests_mock,
+        missing_field_data_hub,
+        missing_field_dnb_service,
     ):
         """
         The endpoint should return 200 as well as a valid response when it is hit with a valid
@@ -2014,11 +2023,13 @@ class TestCompanyInvestigationView(APITestMixin):
             'company_details': {
                 'primary_name': 'Joe Bloggs LTD',
                 'telephone_number': '123456789',
+                'domain': 'joe.com',
                 'address_line_1': '23 Code Street',
                 'address_town': 'London',
                 'address_country': 'GB',
             },
         }
+        dnb_formatted_company_details['company_details'].pop(missing_field_dnb_service)
         dnb_response = {
             'id': '11111111-2222-3333-4444-555555555555',
             'status': 'pending',
@@ -2032,18 +2043,22 @@ class TestCompanyInvestigationView(APITestMixin):
             json=dnb_response,
         )
 
+        payload = {
+            'company': company.id,
+            'name': 'Joe Bloggs LTD',
+            'telephone_number': '123456789',
+            'website': 'https://joe.com',
+            'address': {
+                'line_1': '23 Code Street',
+                'town': 'London',
+                'country': constants.Country.united_kingdom.value.id,
+            },
+        }
+        payload.pop(missing_field_data_hub)
+
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-investigation'),
-            data={
-                'company': company.id,
-                'name': 'Joe Bloggs LTD',
-                'telephone_number': '123456789',
-                'address': {
-                    'line_1': '23 Code Street',
-                    'town': 'London',
-                    'country': constants.Country.united_kingdom.value.id,
-                },
-            },
+            data=payload,
         )
 
         assert response.status_code == status.HTTP_200_OK
