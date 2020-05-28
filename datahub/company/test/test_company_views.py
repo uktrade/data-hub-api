@@ -2446,6 +2446,7 @@ class TestAddCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
+        assert response_data['pending_dnb_investigation']
         actual_response = {
             field_name: response_data[field_name]
             for field_name in expected_response
@@ -2630,3 +2631,48 @@ class TestAddCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_error
+
+    def test_post_create_stub(self):
+        """
+        Ensure that this endpoint will provide a good drop in replacement for our V1 company
+        investigation API endpoint.
+        """
+        payload = {
+            'business_type': BusinessTypeConstant.company.value.id,
+            'name': 'Test Company',
+            'address': {
+                'line_1': 'Foo',
+                'line_2': 'Bar',
+                'town': 'Baz',
+                'county': 'Qux',
+                'country': {
+                    'id': Country.united_kingdom.value.id,
+                },
+                'postcode': 'AB5 XY2',
+            },
+            'sector': random_obj_for_model(Sector).id,
+            'uk_region': UKRegion.east_midlands.value.id,
+        }
+        response = self.api_client.post(
+            reverse('api-v4:company:collection'),
+            data=payload,
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        company = Company.objects.get(
+            pk=response.json()['id'],
+        )
+        assert company.pending_dnb_investigation
+        assert company.created_by == self.user
+        assert company.modified_by == self.user
+        assert company.name == payload['name']
+        assert company.address_1 == payload['address']['line_1']
+        assert company.address_2 == payload['address']['line_2']
+        assert company.address_town == payload['address']['town']
+        assert company.address_county == payload['address']['county']
+        assert company.address_postcode == payload['address']['postcode']
+        assert str(company.address_country.id) == payload['address']['country']['id']
+        assert str(company.business_type.id) == payload['business_type']
+        assert company.sector.id == payload['sector']
+        assert str(company.uk_region.id) == payload['uk_region']
