@@ -1,3 +1,35 @@
+# Data Hub API 32.2.0 (2020-05-28)
+
+
+## Deprecations
+
+- **Contacts** The `accepts_dit_email_marketing` field is deprecated and will be removed from the following contact endpoints:
+  - GET /v3/contact
+  - GET /v4/company
+  - GET /v4/company/{id}
+  - PATCH /v4/company/{id}
+  - POST /v3/contact/{id}/archive
+  - POST /v3/contact/{id}/unarchive
+
+  These end points will keep the `accepts_dit_email_marketing` field as the FE relies on it.
+  - POST /v3/contact 
+  - GET /v3/contact/{id}
+  - PATCH /v3/contact/{id}
+
+## Internal changes
+
+- The `oauth2_provider` Django app from Django OAuth Toolkit is no longer loaded as it’s no longer used.
+- The squashed `oauth` migration `0001_squashed_2020_05_15` was transitioned to a normal migration and the migrations it replaced were removed.
+
+## API
+
+- **Advisers** New fields that were added to `company_list_pipelineitem` table as part of next iteration of Pipelines, are now editable on `PATCH /v4/pipeline-item/uuid` API endpoint.
+
+## Database schema
+
+- **Advisers** Add `ArchivableModel` to `company_list_pipelineitem` to allow the user to set the archive status of a `pipelineitem`.
+
+
 # Data Hub API 32.1.0 (2020-05-21)
 
 
