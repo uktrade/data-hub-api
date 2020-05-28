@@ -6,7 +6,7 @@ from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company
-from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
@@ -58,38 +58,6 @@ class TestCompanyVersioning(APITestMixin):
         assert version.field_dict['name'] == 'Acme'
         assert version.field_dict['trading_names'] == ['Trading name']
         assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
-
-    def test_promoting_a_ch_company_creates_a_new_version(self):
-        """Test that promoting a CH company to full company creates a new version."""
-        assert Version.objects.count() == 0
-        CompaniesHouseCompanyFactory(company_number=1234567890)
-
-        response = self.api_client.post(
-            reverse('api-v4:company:collection'),
-            data={
-                'name': 'Acme',
-                'company_number': 1234567890,
-                'business_type': BusinessTypeConstant.company.value.id,
-                'sector': random_obj_for_model(Sector).id,
-                'address': {
-                    'line_1': '75 Stramford Road',
-                    'town': 'London',
-                    'country': {
-                        'id': Country.united_kingdom.value.id,
-                    },
-                },
-                'uk_region': UKRegion.england.value.id,
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        company = Company.objects.get(pk=response.json()['id'])
-
-        # check version created
-        assert Version.objects.get_for_object(company).count() == 1
-        version = Version.objects.get_for_object(company).first()
-        assert version.field_dict['company_number'] == '1234567890'
 
     def test_add_400_doesnt_create_a_new_version(self):
         """Test that if the endpoint returns 400, no version is created."""
