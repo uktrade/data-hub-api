@@ -1,0 +1,1 @@
+The `Sector` model is now tracked by reversion.
