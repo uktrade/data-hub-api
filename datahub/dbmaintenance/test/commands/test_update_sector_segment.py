@@ -91,10 +91,12 @@ def test_non_existent_sector(s3_stubber, caplog):
     ]
 
 
-def test_no_change(s3_stubber):
+def test_no_change(s3_stubber, caplog):
     """Test that the command ignores records that haven't changed
     or records with incorrect current values.
     """
+    caplog.set_level('WARNING')
+
     old_sectors = ['sector_1_old', 'sector_2_old', 'sector_3_old']
     new_sectors = ['sector_1_new', 'sector_2_new', 'sector_3_new']
 
@@ -126,6 +128,10 @@ def test_no_change(s3_stubber):
 
     for sector in sectors:
         sector.refresh_from_db()
+
+    assert f'Not updating sector {sectors[1]} as its segment has not changed' in caplog.text
+    assert f'Not updating sector {sectors[2]} as its segment has not changed' in caplog.text
+    assert len(caplog.records) == 2
 
     assert [sector.segment for sector in sectors] == [
         new_sectors[0], old_sectors[1], old_sectors[2],

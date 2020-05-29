@@ -21,6 +21,7 @@ class Command(CSVBaseCommand):
         new_sector_segment = parse_limited_string(row['new_sector_segment'])
 
         if any([sector.segment != old_sector_segment, sector.segment == new_sector_segment]):
+            logger.warning(f'Not updating sector {sector} as its segment has not changed')
             return
 
         sector.segment = new_sector_segment
