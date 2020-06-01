@@ -9,7 +9,10 @@ from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactor
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
-from datahub.user.company_list.test.factories import PipelineItemFactory
+from datahub.user.company_list.test.factories import (
+    ArchivedPipelineItemFactory,
+    PipelineItemFactory,
+)
 
 pipeline_collection_url = reverse('api-v4:company-list:pipelineitem-collection')
 
@@ -301,6 +304,9 @@ class TestGetPipelineItemsView(APITestMixin):
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
 
@@ -522,6 +528,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -550,6 +559,9 @@ class TestAddPipelineItemView(APITestMixin):
                 'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
                 'expected_win_date': '2019-04-19',
                 'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
             },
         )
         response_data = response.json()
@@ -577,6 +589,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': str(1000),
             'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
             'expected_win_date': '2019-04-19',
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -618,6 +633,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @freeze_time('2017-04-19 15:25:30.986208')
@@ -656,6 +674,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     def test_with_archived_company(self):
@@ -871,6 +892,9 @@ class TestPatchPipelineItemView(APITestMixin):
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @pytest.mark.parametrize(
@@ -1104,6 +1128,46 @@ class TestGetPipelineItemView(APITestMixin):
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
+        }
+
+    def test_can_get_an_archived_pipeline_item(self):
+        """Test that details of a single archived item can be retrieved."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(adviser=self.user, company=company)
+        url = _pipeline_item_detail_url(item.pk)
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': True,
+            'archived_on': format_date_or_datetime(item.archived_on),
+            'archived_reason': str(item.archived_reason),
         }
 
     def test_cannot_get_another_users_list(self):
