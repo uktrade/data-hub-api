@@ -1,4 +1,5 @@
 import factory
+from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.metadata.test.factories import SectorFactory
@@ -32,7 +33,9 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
-    contact = factory.SubFactory(ContactFactory, company=factory.SelfAttribute('..company'))
+    contact = factory.SubFactory(
+        ContactFactory, company=factory.SelfAttribute('..company'),
+    )
     sector = factory.SubFactory(SectorFactory)
     potential_value = 1000000
     likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
@@ -40,3 +43,11 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company_list.PipelineItem'
+
+
+class ArchivedPipelineItemFactory(PipelineItemFactory):
+    """Factory for an archived pipeline item"""
+
+    archived = True
+    archived_on = factory.Faker('past_datetime', tzinfo=utc)
+    archived_reason = factory.Faker('sentence')
