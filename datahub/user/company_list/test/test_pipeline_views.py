@@ -916,13 +916,28 @@ class TestPatchPipelineItemView(APITestMixin):
                 id='patch potential_value',
             ),
             pytest.param(
+                'potential_value',
+                None,
+                id='patch potential_value_null',
+            ),
+            pytest.param(
                 'likelihood_to_win',
                 PipelineItem.LikelihoodToWin.HIGH,
                 id='patch likelihood_to_win',
             ),
             pytest.param(
+                'likelihood_to_win',
+                None,
+                id='patch likelihood_to_win_null',
+            ),
+            pytest.param(
                 'expected_win_date',
                 '2021-04-19',
+                id='patch expected_win_date',
+            ),
+            pytest.param(
+                'expected_win_date',
+                None,
                 id='patch expected_win_date',
             ),
         ),
@@ -983,6 +998,24 @@ class TestPatchPipelineItemView(APITestMixin):
         response_data = response.json()
         assert response_data['sector']['id'] == str(sector.id)
 
+    def test_can_patch_sector_field_to_null(self):
+        """Test that sector can be patched to null."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'sector': None},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['sector'] is None
+
     def test_can_patch_contact_field(self):
         """Test that contact can be patched."""
         company = CompanyFactory()
@@ -1001,6 +1034,24 @@ class TestPatchPipelineItemView(APITestMixin):
 
         response_data = response.json()
         assert response_data['contact']['id'] == str(contact.id)
+
+    def test_can_patch_contact_field_null(self):
+        """Test that contact can be patched back to null."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': None},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['contact'] is None
 
     def test_cannot_patch_non_existent_contact(self):
         """Test that non existent contact can't be patched."""
