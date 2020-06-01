@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
 from datahub.core.serializers import NestedRelatedField
+from datahub.metadata import models as metadata_models
 from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
 
 
@@ -78,6 +79,16 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         extra_fields=('name', 'turnover', 'export_potential'),
     )
     adviser = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    sector = NestedRelatedField(
+        metadata_models.Sector,
+        extra_fields=('id', 'segment'),
+        required=False,
+    )
+    contact = NestedRelatedField(
+        Contact,
+        extra_fields=('id', 'name'),
+        required=False,
+    )
 
     def validate_company(self, company):
         """Make sure company is not archived"""
@@ -161,6 +172,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'potential_value',
             'likelihood_to_win',
             'expected_win_date',
+            'archived',
+            'archived_on',
+            'archived_reason',
         )
         read_only_fields = (
             'id',
