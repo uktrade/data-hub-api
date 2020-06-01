@@ -172,6 +172,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'potential_value',
             'likelihood_to_win',
             'expected_win_date',
+            'archived',
+            'archived_on',
+            'archived_reason',
         )
         read_only_fields = (
             'id',
