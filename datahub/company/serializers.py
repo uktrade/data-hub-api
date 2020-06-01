@@ -441,6 +441,16 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
+    def create(self, validated_data):
+        """
+        Override create method to ensure that all Company objects created through this serializer
+        have pending_dnb_investigation=True. This ensures that we always mark Company records based
+        on untrusted data in a consistent way.
+        """
+        if not validated_data.get('duns_number'):
+            validated_data['pending_dnb_investigation'] = True
+        return Company.objects.create(**validated_data)
+
     class Meta:
         model = Company
         fields = (
