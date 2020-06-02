@@ -586,6 +586,50 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         }
 
 
+class AssignRegionalAccountManagerSerializer(serializers.Serializer):
+    """
+    Serialiser for assigning an international trade adviser as the account manager of a
+    company.
+    """
+
+    target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
+    default_error_messages = {
+        'cannot_change_account_manager_of_one_list_subsidiary':
+            gettext_lazy("A lead adviser can't be set on a subsidiary of a One List company."),
+        'cannot_change_account_manager_for_other_one_list_tiers':
+            gettext_lazy("A lead adviser can't be set for companies on this One List tier."),
+    }
+    regional_account_manager = NestedRelatedField(Advisor)
+
+    def validate(self, attrs):
+        """Validate that the change of One List account manager and tier is allowed."""
+        attrs = super().validate(attrs)
+        global_headquarters = self.instance.global_headquarters
+
+        if global_headquarters and global_headquarters.one_list_tier_id:
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_account_manager_of_one_list_subsidiary'],
+                code='cannot_change_account_manager_of_one_list_subsidiary',
+            )
+
+        if self.instance.one_list_tier_id not in (None, self.target_one_list_tier_id):
+            raise serializers.ValidationError(
+                self.error_messages['cannot_change_account_manager_for_other_one_list_tiers'],
+                code='cannot_change_account_manager_for_other_one_list_tiers',
+            )
+
+        return attrs
+
+    def save(self, adviser):
+        """Update the company's One List account manager and tier."""
+        self.instance.assign_one_list_account_manager_and_tier(
+            self.validated_data['regional_account_manager'],
+            self.target_one_list_tier_id,
+            adviser,
+        )
+        return self.instance
+
+
 class SelfAssignAccountManagerSerializer(serializers.Serializer):
     """
     Serialiser for assigning an international trade adviser as the account manager of a
