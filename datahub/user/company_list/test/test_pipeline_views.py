@@ -9,7 +9,10 @@ from datahub.company.test.factories import ArchivedCompanyFactory, CompanyFactor
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
-from datahub.user.company_list.test.factories import PipelineItemFactory
+from datahub.user.company_list.test.factories import (
+    ArchivedPipelineItemFactory,
+    PipelineItemFactory,
+)
 
 pipeline_collection_url = reverse('api-v4:company-list:pipelineitem-collection')
 
@@ -290,11 +293,20 @@ class TestGetPipelineItemsView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
 
@@ -516,6 +528,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -544,6 +559,9 @@ class TestAddPipelineItemView(APITestMixin):
                 'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
                 'expected_win_date': '2019-04-19',
                 'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
             },
         )
         response_data = response.json()
@@ -560,11 +578,20 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
-            'contact': str(contact.pk),
-            'sector': str(sector.pk),
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name,
+            },
+            'sector': {
+                'id': str(sector.pk),
+                'segment': sector.segment,
+            },
             'potential_value': str(1000),
             'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
             'expected_win_date': '2019-04-19',
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
@@ -606,6 +633,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @freeze_time('2017-04-19 15:25:30.986208')
@@ -644,6 +674,9 @@ class TestAddPipelineItemView(APITestMixin):
             'potential_value': None,
             'likelihood_to_win': None,
             'expected_win_date': None,
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     def test_with_archived_company(self):
@@ -848,11 +881,20 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
         }
 
     @pytest.mark.parametrize(
@@ -874,13 +916,28 @@ class TestPatchPipelineItemView(APITestMixin):
                 id='patch potential_value',
             ),
             pytest.param(
+                'potential_value',
+                None,
+                id='patch potential_value_null',
+            ),
+            pytest.param(
                 'likelihood_to_win',
                 PipelineItem.LikelihoodToWin.HIGH,
                 id='patch likelihood_to_win',
             ),
             pytest.param(
+                'likelihood_to_win',
+                None,
+                id='patch likelihood_to_win_null',
+            ),
+            pytest.param(
                 'expected_win_date',
                 '2021-04-19',
+                id='patch expected_win_date',
+            ),
+            pytest.param(
+                'expected_win_date',
+                None,
                 id='patch expected_win_date',
             ),
         ),
@@ -939,7 +996,25 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert response_data['sector'] == str(sector.id)
+        assert response_data['sector']['id'] == str(sector.id)
+
+    def test_can_patch_sector_field_to_null(self):
+        """Test that sector can be patched to null."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'sector': None},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['sector'] is None
 
     def test_can_patch_contact_field(self):
         """Test that contact can be patched."""
@@ -958,7 +1033,25 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert response_data['contact'] == str(contact.id)
+        assert response_data['contact']['id'] == str(contact.id)
+
+    def test_can_patch_contact_field_null(self):
+        """Test that contact can be patched back to null."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+        )
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': None},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['contact'] is None
 
     def test_cannot_patch_non_existent_contact(self):
         """Test that non existent contact can't be patched."""
@@ -1075,11 +1168,57 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
-            'contact': str(item.contact.pk),
-            'sector': str(item.sector.pk),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': None,
+        }
+
+    def test_can_get_an_archived_pipeline_item(self):
+        """Test that details of a single archived item can be retrieved."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(adviser=self.user, company=company)
+        url = _pipeline_item_detail_url(item.pk)
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': True,
+            'archived_on': format_date_or_datetime(item.archived_on),
+            'archived_reason': str(item.archived_reason),
         }
 
     def test_cannot_get_another_users_list(self):

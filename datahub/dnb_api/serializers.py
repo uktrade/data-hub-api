@@ -381,7 +381,7 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
         data = super().validate(data)
 
         if (
-            data.get('website') in (None, '')
+            data.get('domain') in (None, '')
             and data.get('telephone_number') in (None, '')
         ):
             raise serializers.ValidationError(

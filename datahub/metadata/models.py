@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from datahub.core import reversion
 from datahub.core.exceptions import DataHubException
 from datahub.core.fields import MultipleChoiceField
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, DisableableModel
@@ -47,6 +48,7 @@ class SectorCluster(BaseConstantModel):
     """Sector cluster."""
 
 
+@reversion.register_base_model()
 class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
     """Company sector."""
 

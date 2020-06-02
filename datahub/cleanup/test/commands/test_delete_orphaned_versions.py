@@ -24,6 +24,7 @@ from datahub.investment.investor_profile.test.factories import LargeCapitalInves
 from datahub.investment.project.test.factories import (
     InvestmentActivityFactory, InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
+from datahub.metadata.test.factories import SectorFactory
 
 
 MAPPINGS = {
@@ -38,6 +39,7 @@ MAPPINGS = {
     'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory,
     'investment.InvestmentActivity': InvestmentActivityFactory,
     'investor_profile.LargeCapitalInvestorProfile': LargeCapitalInvestorProfileFactory,
+    'metadata.Sector': SectorFactory,
 }
 
 
