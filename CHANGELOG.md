@@ -1,3 +1,87 @@
+# Data Hub API 33.0.0 (2020-06-02)
+
+
+## Removals
+
+- **Companies** The `submit_legacy_dnb_investigations` management command was removed
+  after successfully using it to migrate D&B investigation data to dnb-service.
+
+## Features
+
+- **Interactions** The options for `Enquiry or Referral Received` have been updated with new ITA services catalogue.
+- The `Sector` model is now tracked by reversion.
+- An `update_sector_segment` management command was added for renaming sector segments.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## Bug fixes
+
+- **Advisers** `PATCH /v4/pipeline-item` is now changed to allow `Sector` and `Contact` fields can be set to back to null from any value.
+
+## Internal changes
+
+- The dependency Django OAuth Toolkit was removed as it’s no longer required.
+
+## API
+
+- **Advisers** New fields `archived, `archived_on` and `archived_reason` are now exposed in the result of `GET /v4/pipeline-item`.
+- **Companies** The endpoint `POST /v4/dnb/company-create-investigation` is deprecated and will be removed on or after 15 June.
+
+  It is replaced by `POST /v4/company/` which creates a stub Company record with `pending_dnb_investigation=True` and `POST /v4/dnb/company_investigation/` which creates a new investigation in `dnb-service`.
+- **Companies** The create company endpoint `POST /v4/company` was re-instated. This allows clients to create
+  stub Company records - i.e. Company records that are not matched with D&B records.
+  Companies created with this endpoint are created with `pending_dnb_investigation=True`.
+
+  The endpoint should be called with a POST body of the following format:
+  ```
+  {
+      'business_type': <uuid>,
+      'name': 'Test Company',
+      'address': {
+          'line_1': 'Foo',
+          'line_2': 'Bar',
+          'town': 'Baz',
+          'county': 'Qux',
+          'country': {
+              'id': <uuid>,
+          },
+          'postcode': 'AB5 XY2',
+      },
+      'sector': <uuid>,
+      'uk_region': <uuid>,
+  }
+  ```
+- For existing endpoint `/v4/pipeline-item`, ensure that contact and sector segment are set to nestedRelatedFields so that we get the contact name and sector segment alongside with their ids. These fields are optional so no extra logic is present in this change.
+
+  previous response:
+  ```
+  ...
+  "contact": "uuid",
+  "sector": "uuid",
+  ...
+  ```
+
+  current response:
+  ```
+  ...
+  "contact": {
+    "id": "uuid",
+    "name": "name"
+  },
+  "sector": {
+    "id": "uuid",
+    "segment": "segment"
+  },
+  ...
+  ```
+
+## Database schema
+
+- **Companies** The column `company_company.dnb_investigation_data` is deprecated and will be removed from the database on or after 15 June.
+
+  All pending investigations data have been ported to `dnb-service`.
+
+
 # Data Hub API 32.2.0 (2020-05-28)
 
 
