@@ -8,12 +8,13 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 120s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -timeout 120s
     env_file: .env
     depends_on:
       - postgres
       - mi-postgres
       - es
+      - es-apm
       - redis
       - celery
     command: /app/start.sh
@@ -23,7 +24,7 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://redis:6379 -timeout 180s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -timeout 180s
     env_file: .env
     command: watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A config -l info -Q celery -B
 
@@ -46,6 +47,17 @@ services:
     restart: always
     ports:
       - "9200:9200"
+
+  es-apm:
+    image: docker.elastic.co/apm/apm-server:7.7.1
+    restart: always
+    ports:
+      - "8200:8200"
+    command: >
+       apm-server -e
+         -E output.elasticsearch.hosts=["es:9200"]
+    depends_on:
+      - es
 
   redis:
     image: redis:3.2

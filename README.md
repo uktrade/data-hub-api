@@ -309,6 +309,11 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ES_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
 | `ES_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
 | `ES_VERIFY_CERTS`  | No | |
+| `ES_APM_ENABLED` | Yes | Enables Elasticsearch APM agent when is True. |
+| `ES_APM_SERVICE_NAME` | Yes, if ES_APM_ENABLED | A name of the running service. Must match following regexp: ^[a-zA-Z0-9 _-]+$. |
+| `ES_APM_SECRET_TOKEN` | Yes, if ES_APM_ENABLED | A secret token used to authorise requests to the APM server. |
+| `ES_APM_SERVER_URL` | Yes, if ES_APM_ENABLED | The URL of the Elasticsearch APM server. |
+| `ES_APM_ENVIRONMENT`| Yes, if ES_APM_ENABLED | A name of the environment the service is running, for example: `develop`. |
 | `ES5_URL`  | No | Required if not using GOV.UK PaaS-supplied Elasticsearch. |
 | `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |

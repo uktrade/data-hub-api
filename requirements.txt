@@ -16,7 +16,7 @@ billiard==3.6.3.0         # via -r requirements.in, celery
 boto3==1.13.24            # via -r requirements.in
 botocore==1.16.24         # via boto3, s3transfer
 celery[redis]==4.4.2      # via -r requirements.in
-certifi==2019.11.28       # via requests, sentry-sdk
+certifi==2019.11.28       # via elastic-apm, requests, sentry-sdk
 chardet==3.0.4            # via -r requirements.in, aiohttp, requests
 click==7.1.1              # via pip-tools, towncrier
 coverage==5.0.4           # via pytest-cov
@@ -34,6 +34,7 @@ django==3.0.7             # via -r requirements.in, django-debug-toolbar, django
 djangorestframework==3.11.0  # via -r requirements.in
 docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
+elastic-apm==5.6.0        # via -r requirements.in
 elasticsearch-dsl==6.3.1  # via -r requirements.in
 elasticsearch==6.8.1      # via -r requirements.in, elasticsearch-dsl
 execnet==1.7.1            # via pytest-xdist
@@ -120,7 +121,7 @@ toml==0.10.0              # via towncrier
 towncrier==19.2.0         # via -r requirements.in
 traitlets==4.3.3          # via ipython
 uritemplate==3.0.1        # via -r requirements.in
-urllib3==1.25.8           # via botocore, elasticsearch, requests, sentry-sdk
+urllib3==1.25.8           # via botocore, elastic-apm, elasticsearch, requests, sentry-sdk
 vine==1.3.0               # via amqp, celery
 watchdog[watchmedo]==0.10.2  # via -r requirements.in
 wcwidth==0.1.9            # via prompt-toolkit, pytest
