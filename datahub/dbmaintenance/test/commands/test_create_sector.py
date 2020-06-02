@@ -207,6 +207,62 @@ def test_non_existent_parent(s3_stubber, caplog):
     assert [str(sectors[0].pk), str(sectors[1].pk)] == sector_pks[:2]
     assert [sectors[0].segment, sectors[1].segment] == segments[:2]
     assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [
+        sectors[0].parent,
+        sectors[1].parent,
+    ] == [parent_sector, parent_sector]
+
+
+def test_non_existent_sector_cluster(s3_stubber, caplog):
+    """Test that the command logs an error when sector cluster PK does not exist."""
+    caplog.set_level('ERROR')
+
+    sector_pks = [
+        '00000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000003',
+    ]
+    segments = ['segment_1', 'segment_2', 'segment_3']
+    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
+    SectorClusterFactory.create_batch(
+        3,
+        name=factory.Iterator(clusters),
+    )
+    parent_sector = SectorFactory()
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,segment,sector_cluster,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},bla,{parent_sector.pk}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('create_sector', bucket, object_key)
+
+    sectors = Sector.objects.filter(pk__in=sector_pks)
+
+    assert 'SectorCluster matching query does not exist' in caplog.text
+    assert len(caplog.records) == 1
+
+    assert [str(sectors[0].pk), str(sectors[1].pk)] == sector_pks[:2]
+    assert [sectors[0].segment, sectors[1].segment] == segments[:2]
+    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [
+        sectors[0].parent,
+        sectors[1].parent,
+    ] == [parent_sector, parent_sector]
 
 
 def test_simulate(s3_stubber):

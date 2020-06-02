@@ -22,14 +22,14 @@ class Command(CSVBaseCommand):
 
         sector = Sector(pk=pk, segment=segment)
 
-        if simulate:
-            return
-
         if sector_cluster:
-            sector_cluster_obj, _ = SectorCluster.objects.get_or_create(name=sector_cluster)
+            sector_cluster_obj = SectorCluster.objects.get(name=sector_cluster)
             sector.sector_cluster = sector_cluster_obj
         if parent_pk:
             sector.parent = Sector.objects.get(pk=parent_pk)
+
+        if simulate:
+            return
 
         with reversion.create_revision():
             sector.save(update_fields=('segment',))
