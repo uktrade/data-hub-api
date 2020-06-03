@@ -1,2 +1,3 @@
-A flaky test was fixed which would infrequently fail when the value for
-'Other team members' was not following the expected ordering.
+The ordering was made consistent for the value of 'Other team members' in the
+investment project export view.  This was resulting in a seemingly flaky test
+case.
