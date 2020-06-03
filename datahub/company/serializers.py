@@ -256,6 +256,16 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         return super().update(instance, validated_data)
 
 
+class ContactDetailSerializer(ContactSerializer):
+    """ This is the same as the ContactSerializer except it includes
+    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser """
+
+    class Meta(ContactSerializer.Meta):
+        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
+       
+        
+
+
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
     """
     Export country serializer holding `Country` and its status.
