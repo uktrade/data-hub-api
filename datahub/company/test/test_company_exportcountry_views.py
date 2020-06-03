@@ -602,4 +602,3 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert delete_history.count() == 1
         assert delete_history[0].country == country
         assert delete_history[0].history_user == new_user
-
