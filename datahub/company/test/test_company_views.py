@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.merge import merge_companies
 from datahub.company.models import (
     Company,
     OneListTier,
@@ -24,15 +23,9 @@ from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
     format_date_or_datetime,
-<<<<<<< HEAD
-    HawkMockJSONResponse,
     random_obj_for_model,
 )
-from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.models import Sector
-=======
-)
->>>>>>> moving export country tests and export wins tests out of company file into their own files for clarity
 from datahub.metadata.test.factories import TeamFactory
 
 
