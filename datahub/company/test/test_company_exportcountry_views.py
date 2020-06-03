@@ -64,7 +64,6 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         """
         Standard action for updating the model with
         the given data and returning the actual response
-
         :param self: current class scope
         :param new_countries: countries to be added to the model
         :param field: model field to update
@@ -603,3 +602,4 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert delete_history.count() == 1
         assert delete_history[0].country == country
         assert delete_history[0].history_user == new_user
+
