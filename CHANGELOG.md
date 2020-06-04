@@ -1,3 +1,20 @@
+# Data Hub API 33.1.0 (2020-06-04)
+
+
+## Features
+
+- **Investment** The `change-stage-to-won` investment project permission was removed
+  to reflect the move to using the new `change-to-any-stage` permission
+  instead. This new permission allows users to set investment projects
+  to the 'won' stage.
+
+## Internal changes
+
+- **Investment** The ordering was made consistent for the value of 'Other team members' in the
+  investment project export view.  This was resulting in a seemingly flaky test
+  case.
+
+
 # Data Hub API 33.0.0 (2020-06-02)
 
 
