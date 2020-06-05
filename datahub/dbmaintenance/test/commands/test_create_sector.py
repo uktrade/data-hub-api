@@ -48,6 +48,7 @@ def test_happy_path(s3_stubber):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
     assert [
@@ -60,6 +61,60 @@ def test_happy_path(s3_stubber):
         sectors[1].parent,
         sectors[2].parent,
     ] == [parent_sector, parent_sector, parent_sector]
+
+
+def test_duplicate_sector(s3_stubber, caplog):
+    """Test that the command logs an error when the sector PK already exists."""
+    caplog.set_level('ERROR')
+
+    sector_pks = [
+        '00000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000003',
+    ]
+    segments = ['segment_1', 'segment_2', 'segment_3']
+    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
+    SectorClusterFactory.create_batch(
+        3,
+        name=factory.Iterator(clusters),
+    )
+    parent_sector = SectorFactory()
+    duplicate_sector = SectorFactory(id=sector_pks[2])
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,segment,sector_cluster,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
+{duplicate_sector.pk},{segments[2]},{clusters[2]},{parent_sector.pk}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('create_sector', bucket, object_key)
+
+    sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 3
+
+    assert f'Key (id)=({duplicate_sector.pk}) already exists' in caplog.text
+    assert len(caplog.records) == 1
+
+    assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
+    assert [sectors[0].segment, sectors[1].segment] == segments[:2]
+    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [
+        sectors[0].parent,
+        sectors[1].parent,
+    ] == [parent_sector, parent_sector]
 
 
 def test_blank_parent(s3_stubber):
@@ -99,6 +154,7 @@ def test_blank_parent(s3_stubber):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
     assert [
@@ -150,6 +206,7 @@ def test_blank_sector_cluster(s3_stubber):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
     assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
@@ -200,6 +257,7 @@ def test_non_existent_parent(s3_stubber, caplog):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 2
 
     assert 'Sector matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
@@ -252,6 +310,7 @@ def test_non_existent_sector_cluster(s3_stubber, caplog):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 2
 
     assert 'SectorCluster matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
@@ -342,6 +401,7 @@ def test_audit_log(s3_stubber):
     call_command('create_sector', bucket, object_key)
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
+    assert len(sectors) == 3
 
     for sector in sectors:
         versions = Version.objects.get_for_object(sector)
