@@ -72,6 +72,7 @@ def get_expected_data_from_interaction(interaction):
         'service_delivery': get_attr_or_none(interaction, 'service.name'),
         'subject': interaction.subject,
         'theme': interaction.theme,
+        'were_countries_discussed': interaction.were_countries_discussed,
     }
 
 
