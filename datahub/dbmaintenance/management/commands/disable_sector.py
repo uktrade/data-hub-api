@@ -1,10 +1,9 @@
 from logging import getLogger
 
 import reversion
-from django.utils.timezone import now
 
 from datahub.dbmaintenance.management.base import CSVBaseCommand
-from datahub.dbmaintenance.utils import parse_uuid
+from datahub.dbmaintenance.utils import parse_datetime, parse_uuid
 from datahub.metadata.models import Sector
 
 
@@ -17,17 +16,15 @@ class Command(CSVBaseCommand):
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
         pk = parse_uuid(row['id'])
+        disabled_on = parse_datetime(row['disabled_on'])
         sector = Sector.objects.get(pk=pk)
 
-        if sector.get_children():
-            logger.warning(f'Not disabling sector {sector} as it has children')
-            return
+        for descendant in sector.get_descendants(include_self=True):
+            descendant.disabled_on = disabled_on
 
-        sector.disabled_on = now()
+            if simulate:
+                return
 
-        if simulate:
-            return
-
-        with reversion.create_revision():
-            sector.save(update_fields=('disabled_on',))
-            reversion.set_comment('Sector disable.')
+            with reversion.create_revision():
+                descendant.save(update_fields=('disabled_on',))
+                reversion.set_comment('Sector disable.')

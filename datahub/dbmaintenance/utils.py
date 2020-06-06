@@ -1,6 +1,7 @@
 from django.conf import settings
 from rest_framework.fields import (
-    BooleanField, CharField, ChoiceField, DateField, DecimalField, EmailField, UUIDField,
+    BooleanField, CharField, ChoiceField, DateField,
+    DateTimeField, DecimalField, EmailField, UUIDField,
 )
 
 
@@ -12,6 +13,11 @@ def parse_bool(value):
 def parse_date(value):
     """Parses a date from a string."""
     return _parse_value(value, DateField())
+
+
+def parse_datetime(value):
+    """Parses a datetime from a string."""
+    return _parse_value(value, DateTimeField())
 
 
 def parse_decimal(value, max_digits=19, decimal_places=2):
