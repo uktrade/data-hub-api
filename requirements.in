@@ -34,7 +34,7 @@ slackclient==2.6.2
 
 # REDIS
 django-redis==4.12.1
-redis==3.5.2
+redis==3.5.3
 
 # ES
 elasticsearch==6.8.1
