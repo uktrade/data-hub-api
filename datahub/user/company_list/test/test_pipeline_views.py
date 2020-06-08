@@ -21,6 +21,14 @@ def _pipeline_item_detail_url(item_pk):
     return reverse('api-v4:company-list:pipelineitem-detail', kwargs={'pk': item_pk})
 
 
+def _pipeline_item_archive_url(item_pk):
+    return reverse('api-v4:company-list:pipelineitem-archive', kwargs={'pk': item_pk})
+
+
+def _pipeline_item_unarchive_url(item_pk):
+    return reverse('api-v4:company-list:pipelineitem-unarchive', kwargs={'pk': item_pk})
+
+
 class TestGetPipelineItemsView(APITestMixin):
     """Tests for getting pipeline items."""
 
@@ -1111,6 +1119,142 @@ class TestPatchPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestArchivePipelineItemView(APITestMixin):
+    """Test archive and unarchive pipeline item."""
+
+    def test_archive_without_reason(self):
+        """Test pipeline item archive won't work without reason."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.post(
+            url,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        assert response.data == {
+            'reason': ['This field is required.'],
+        }
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_archive_with_reason(self):
+        """Test pipeline item archive."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.post(
+            url,
+            data={'reason': 'foo'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': True,
+            'archived_on': '2017-04-19T15:25:30.986208Z',
+            'archived_reason': 'foo',
+        }
+
+    def test_archive_wrong_method(self):
+        """Test that GET requests to the archive endpoint fail."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.get(
+            url,
+        )
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    def test_unarchive(self):
+        """Test pipeline item unarchive."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_unarchive_url(item.pk)
+        response = self.api_client.post(
+            url,
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': '',
+        }
+
+    def test_unarchive_wrong_method(self):
+        """Test that GET requests to the unarchive endpoint fail."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_unarchive_url(item.pk)
+        response = self.api_client.get(
+            url,
+        )
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 class TestGetPipelineItemView(APITestMixin):
