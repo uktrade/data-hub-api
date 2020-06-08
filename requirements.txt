@@ -5,7 +5,7 @@
 #    pip-compile --output-file=requirements.txt requirements.in
 #
 aiohttp==3.6.2            # via slackclient
-amqp==2.5.2               # via kombu
+amqp==2.6.0               # via kombu
 apipkg==1.5               # via execnet
 argh==0.26.2              # via watchdog
 asgiref==3.2.7            # via django
@@ -64,7 +64,7 @@ ipython==7.15.0           # via -r requirements.in
 jedi==0.16.0              # via ipython
 jinja2==2.11.1            # via towncrier
 jmespath==0.9.5           # via boto3, botocore
-kombu==4.6.8              # via -r requirements.in, celery
+kombu==4.6.10             # via -r requirements.in, celery
 mail-parser==3.12.0       # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
