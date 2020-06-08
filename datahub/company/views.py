@@ -43,6 +43,7 @@ from datahub.company.serializers import (
     AssignOneListTierAndGlobalAccountManagerSerializer,
     AssignRegionalAccountManagerSerializer,
     CompanySerializer,
+    ContactDetailSerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
@@ -377,6 +378,15 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     )
     filterset_fields = ['company_id']
     ordering = ('-created_on',)
+
+    def get_serializer_class(self):
+        """
+        Overwrites the built in get_serializer_class method in order
+        to return the ContactDetailSerializer if certain actions are called.
+        """
+        if self.action in ('create', 'retrieve', 'partial_update'):
+            return ContactDetailSerializer
+        return super().get_serializer_class()
 
     def get_additional_data(self, create):
         """Set adviser to the user on model instance creation."""
