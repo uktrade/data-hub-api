@@ -63,4 +63,18 @@ urlpatterns = [
         ),
         name='pipelineitem-detail',
     ),
+    path(
+        'pipeline-item/<uuid:pk>/archive',
+        PipelineItemViewSet.as_action_view(
+            'archive',
+        ),
+        name='pipelineitem-archive',
+    ),
+    path(
+        'pipeline-item/<uuid:pk>/unarchive',
+        PipelineItemViewSet.as_action_view(
+            'unarchive',
+        ),
+        name='pipelineitem-unarchive',
+    ),
 ]
