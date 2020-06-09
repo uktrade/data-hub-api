@@ -24,7 +24,10 @@ class Command(CSVBaseCommand):
             logger.warning(f'Not updating sector {sector} as its parent has not changed')
             return
 
-        new_parent = Sector.objects.get(pk=new_parent_pk)
+        if new_parent_pk:
+            new_parent = Sector.objects.get(pk=new_parent_pk)
+        else:
+            new_parent = None
 
         if simulate:
             return
