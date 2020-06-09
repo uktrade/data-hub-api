@@ -82,12 +82,12 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(
         metadata_models.Sector,
         extra_fields=('id', 'segment'),
-        required=False,
+        required=False, allow_null=True,
     )
     contact = NestedRelatedField(
         Contact,
         extra_fields=('id', 'name'),
-        required=False,
+        required=False, allow_null=True,
     )
 
     def validate_company(self, company):
@@ -108,8 +108,11 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         return name
 
     def validate_contact(self, contact):
-        """Vaidate contact belongs to company"""
-        if self.instance and contact not in self.instance.company.contacts.all():
+        """
+        Vaidate contact belongs to company
+        when its provided.
+        """
+        if contact and self.instance and contact not in self.instance.company.contacts.all():
             raise serializers.ValidationError(
                 self.error_messages['contact_company_mismatch'],
             )
@@ -146,6 +149,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                 'potential_value',
                 'likelihood_to_win',
                 'expected_win_date',
+                'archived',
+                'archived_on',
+                'archived_reason',
             }
             fields = data.keys()
             extra_fields = fields - allowed_fields

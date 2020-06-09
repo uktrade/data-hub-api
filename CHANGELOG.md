@@ -1,3 +1,141 @@
+# Data Hub API 33.3.0 (2020-06-09)
+
+
+## Bug fixes
+
+- **Companies** The following endpoint `PATCH /v4/company/<company-id>/update-one-list-core-team` expected user to have incorrect
+  permission. It has been corrected so that a user needs `change_company` and `change_one_list_core_team_member`
+  permissions to access it.
+
+## Internal changes
+
+- The support for Elasticsearch APM, an application monitoring system has been added, so that we can gain quality
+  insights about the app's performance correlated with actual requests.
+
+
+# Data Hub API 33.2.0 (2020-06-08)
+
+
+## Features
+
+- **Companies** A new endpoint `POST /v4/company/<company-id>/assign-regional-account-manager` has been added to allow users with `company.change_company and company.change_regional_account_manager` permissions to change the account manager of companies in the `Tier D - International Trade Advisers` One List Tier.
+
+  Example request body:
+  ```
+  { 
+      "regional_account_manager": <adviser_uuid>
+  }
+  ```
+
+  A successful request should expect an empty response with 204 (no content) HTTP status.
+
+## API
+
+- **Advisers** Pipeline items can now be archived (with a reason) and unarchived through the `POST /v4/pipeline-item/<uuid:pk>/archive` and `POST /v4/pipeline-item/<uuid:pk>/unarchive` endpoints.
+- For existing endpoint `interactions-dataset`, add `were_countries_discussed` field to the dataset which will be used to filter for interactions when creating data cuts.
+
+
+# Data Hub API 33.1.0 (2020-06-04)
+
+
+## Features
+
+- **Investment** The `change-stage-to-won` investment project permission was removed
+  to reflect the move to using the new `change-to-any-stage` permission
+  instead. This new permission allows users to set investment projects
+  to the 'won' stage.
+
+## Internal changes
+
+- **Investment** The ordering was made consistent for the value of 'Other team members' in the
+  investment project export view.  This was resulting in a seemingly flaky test
+  case.
+
+
+# Data Hub API 33.0.0 (2020-06-02)
+
+
+## Removals
+
+- **Companies** The `submit_legacy_dnb_investigations` management command was removed
+  after successfully using it to migrate D&B investigation data to dnb-service.
+
+## Features
+
+- **Interactions** The options for `Enquiry or Referral Received` have been updated with new ITA services catalogue.
+- The `Sector` model is now tracked by reversion.
+- An `update_sector_segment` management command was added for renaming sector segments.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## Bug fixes
+
+- **Advisers** `PATCH /v4/pipeline-item` is now changed to allow `Sector` and `Contact` fields can be set to back to null from any value.
+
+## Internal changes
+
+- The dependency Django OAuth Toolkit was removed as it’s no longer required.
+
+## API
+
+- **Advisers** New fields `archived, `archived_on` and `archived_reason` are now exposed in the result of `GET /v4/pipeline-item`.
+- **Companies** The endpoint `POST /v4/dnb/company-create-investigation` is deprecated and will be removed on or after 15 June.
+
+  It is replaced by `POST /v4/company/` which creates a stub Company record with `pending_dnb_investigation=True` and `POST /v4/dnb/company_investigation/` which creates a new investigation in `dnb-service`.
+- **Companies** The create company endpoint `POST /v4/company` was re-instated. This allows clients to create
+  stub Company records - i.e. Company records that are not matched with D&B records.
+  Companies created with this endpoint are created with `pending_dnb_investigation=True`.
+
+  The endpoint should be called with a POST body of the following format:
+  ```
+  {
+      'business_type': <uuid>,
+      'name': 'Test Company',
+      'address': {
+          'line_1': 'Foo',
+          'line_2': 'Bar',
+          'town': 'Baz',
+          'county': 'Qux',
+          'country': {
+              'id': <uuid>,
+          },
+          'postcode': 'AB5 XY2',
+      },
+      'sector': <uuid>,
+      'uk_region': <uuid>,
+  }
+  ```
+- For existing endpoint `/v4/pipeline-item`, ensure that contact and sector segment are set to nestedRelatedFields so that we get the contact name and sector segment alongside with their ids. These fields are optional so no extra logic is present in this change.
+
+  previous response:
+  ```
+  ...
+  "contact": "uuid",
+  "sector": "uuid",
+  ...
+  ```
+
+  current response:
+  ```
+  ...
+  "contact": {
+    "id": "uuid",
+    "name": "name"
+  },
+  "sector": {
+    "id": "uuid",
+    "segment": "segment"
+  },
+  ...
+  ```
+
+## Database schema
+
+- **Companies** The column `company_company.dnb_investigation_data` is deprecated and will be removed from the database on or after 15 June.
+
+  All pending investigations data have been ported to `dnb-service`.
+
+
 # Data Hub API 32.2.0 (2020-05-28)
 
 

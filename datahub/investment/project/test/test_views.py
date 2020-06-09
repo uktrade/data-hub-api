@@ -1496,7 +1496,7 @@ class TestPartialUpdateView(APITestMixin):
             TeamFactory(),
             [
                 InvestmentProjectPermission.change_all,
-                InvestmentProjectPermission.change_stage_to_won,
+                InvestmentProjectPermission.change_to_any_stage,
             ],
         )
 
@@ -1548,7 +1548,7 @@ class TestPartialUpdateView(APITestMixin):
             TeamFactory(),
             [
                 InvestmentProjectPermission.change_all,
-                InvestmentProjectPermission.change_stage_to_won,
+                InvestmentProjectPermission.change_to_any_stage,
             ],
         )
         adviser.save()

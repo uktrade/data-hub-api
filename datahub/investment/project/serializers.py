@@ -462,7 +462,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         # Investment Verification Team can only move a project to won
         if self.instance and 'stage' in data:
             current_user = self.context['current_user']
-            permission_name = f'investment.{InvestmentProjectPermission.change_stage_to_won}'
+            permission_name = f'investment.{InvestmentProjectPermission.change_to_any_stage}'
             if (
                 str(data['stage'].id) == InvestmentProjectStage.won.value.id
                 and self.instance.stage.order < data['stage'].order
