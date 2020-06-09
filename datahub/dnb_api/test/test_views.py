@@ -1760,7 +1760,7 @@ class TestCompanyChangeRequestView(APITestMixin):
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
         ),
     )
-    def test_content_type(
+    def test_content_type_for_get(
         self,
         content_type,
         expected_status_code,
@@ -1774,6 +1774,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         )
 
         assert response.status_code == expected_status_code
+
 
 class TestCompanyInvestigationView(APITestMixin):
     """

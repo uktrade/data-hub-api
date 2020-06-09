@@ -333,7 +333,7 @@ class DNBCompanyChangeRequestView(APIView):
             raise APIUpstreamException(str(exc))
 
         return Response(response)
-    
+
     @method_decorator(enforce_request_content_type('application/json'))
     def get(self, request):
         """
@@ -353,6 +353,7 @@ class DNBCompanyChangeRequestView(APIView):
             raise APIUpstreamException(str(exc))
 
         return Response(response)
+
 
 class DNBCompanyInvestigationView(APIView):
     """
