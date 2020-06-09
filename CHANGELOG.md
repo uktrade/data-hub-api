@@ -1,3 +1,25 @@
+# Data Hub API 33.2.0 (2020-06-08)
+
+
+## Features
+
+- **Companies** A new endpoint `POST /v4/company/<company-id>/assign-regional-account-manager` has been added to allow users with `company.change_company and company.change_regional_account_manager` permissions to change the account manager of companies in the `Tier D - International Trade Advisers` One List Tier.
+
+  Example request body:
+  ```
+  { 
+      "regional_account_manager": <adviser_uuid>
+  }
+  ```
+
+  A successful request should expect an empty response with 204 (no content) HTTP status.
+
+## API
+
+- **Advisers** Pipeline items can now be archived (with a reason) and unarchived through the `POST /v4/pipeline-item/<uuid:pk>/archive` and `POST /v4/pipeline-item/<uuid:pk>/unarchive` endpoints.
+- For existing endpoint `interactions-dataset`, add `were_countries_discussed` field to the dataset which will be used to filter for interactions when creating data cuts.
+
+
 # Data Hub API 33.1.0 (2020-06-04)
 
 
