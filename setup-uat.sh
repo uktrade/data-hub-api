@@ -3,7 +3,7 @@
 # on circleCI. For more information about how this is used please see
 # https://github.com/uktrade/data-hub-frontend#continuous-integration
 
-dockerize -wait ${POSTGRES_URL} -wait ${MI_POSTGRES_URL} -wait ${ES5_URL} -timeout 120s
+dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379
 python /app/manage.py migrate
 python /app/manage.py migrate --database mi
 python /app/manage.py migrate_es

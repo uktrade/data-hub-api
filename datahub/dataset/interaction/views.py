@@ -68,4 +68,5 @@ class InteractionsDatasetView(BaseDatasetView):
             'service_delivery',
             'subject',
             'theme',
+            'were_countries_discussed',
         )

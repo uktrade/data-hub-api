@@ -360,6 +360,33 @@
     created_on: '2017-03-05T12:00:00Z'
     modified_on: '2018-07-06T15:44:56Z'
 
+- model: company.company
+  pk: 3cb006bb-c8bd-4062-bc8c-c086273b84e1
+  fields:
+    company_number: 88818
+    name: Empty UK Region Ltd
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+    - 35afd8d0-5d95-e211-a939-e4115bead28a
+    - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+    - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    address_1: 82 Stafford Rd
+    address_town: Madrid
+    address_postcode: SE28 5KB
+    address_country: 86756b9a-5d95-e211-a939-e4115bead28a  # Spain
+    registered_address_1: 82 Stafford Rd
+    registered_address_town: Madrid
+    registered_address_postcode: SE28 5KB
+    registered_address_country: 86756b9a-5d95-e211-a939-e4115bead28a  # Spain
+    uk_region: null
+    description: This is a dummy company for testing empty uk region
+    created_on: '2020-05-05T12:00:00Z'
+    modified_on: '2020-05-05T12:00:00Z'
+
 - model: company.onelistcoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
   fields:
@@ -1592,6 +1619,77 @@
     interaction: 4e5c8f03-32b3-45cf-85b7-533033cd3d4c
     adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
     team: bc85aa17-fabd-e511-88b6-e4115bead28a
+
+- model: interaction.interaction
+  pk: 29e88fe2-d19a-4626-94e2-3eee719fa30d
+  fields:
+    theme: other
+    kind: interaction
+    status: draft
+    date: '2030-06-05T00:00:00Z'
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    subject: Sample upcoming interaction
+    notes: This is a dummy interaction for testing
+    was_policy_feedback_provided: false
+    created_on: '2017-06-05T00:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
+
+- model: interaction.interactionditparticipant
+  pk: 15
+  fields:
+    interaction: 29e88fe2-d19a-4626-94e2-3eee719fa30d
+    adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    team: 197c51d4-9698-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: e411f38a-29f4-4637-938b-f389cb05e2bd
+  fields:
+    theme: other
+    kind: interaction
+    status: draft
+    date: '2019-06-05T00:00:00Z'
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    subject: Sample incomplete interaction
+    notes: This is a dummy interaction for testing
+    was_policy_feedback_provided: false
+    created_on: '2017-06-05T00:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
+
+- model: interaction.interactionditparticipant
+  pk: 16
+  fields:
+    interaction: e411f38a-29f4-4637-938b-f389cb05e2bd
+    adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    team: 197c51d4-9698-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: e4b32d49-f486-4c2b-945d-560a00273f23
+  fields:
+    theme: other
+    kind: interaction
+    status: draft
+    date: '2030-06-05T00:00:00Z'
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    subject: Sample cancelled interaction
+    notes: This is a dummy interaction for testing
+    was_policy_feedback_provided: false
+    created_on: '2017-06-05T00:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
+    archived_on: '2019-06-05T00:00:00Z'
+    archived_reason: 'Client cancelled'
+
+- model: interaction.interactionditparticipant
+  pk: 17
+  fields:
+    interaction: e4b32d49-f486-4c2b-945d-560a00273f23
+    adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    team: 197c51d4-9698-e211-a939-e4115bead28a
 
 - model: event.event
   pk: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
