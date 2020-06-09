@@ -41,6 +41,7 @@ from datahub.company.queryset import (
 from datahub.company.serializers import (
     AdviserSerializer,
     AssignOneListTierAndGlobalAccountManagerSerializer,
+    AssignRegionalAccountManagerSerializer,
     CompanySerializer,
     ContactSerializer,
     OneListCoreTeamMemberSerializer,
@@ -107,6 +108,41 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector',
         Prefetch('export_countries', queryset=get_export_country_queryset()),
     )
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[
+            HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_regional_account_manager}',
+            ),
+        ],
+        schema=StubSchema(),
+    )
+    def assign_regional_account_manager(self, request, *args, **kwargs):
+        """
+        Sets the company to be an international trade adviser-managed One List company, and
+        assigns the requested user as the account manager.
+
+        This means:
+
+        - setting the One List tier to 'Tier D - Interaction Trade Adviser Accounts' (using the
+        tier ID, not the name)
+        - setting the requested user as the One List account manager (overwriting the
+        existing value)
+
+        The operation is not allowed if:
+
+        - the company is a subsidiary of a One List company
+        - the company is already a One List company on a different tier (i.e. not 'Tier D -
+        Interaction Trade Adviser Accounts')
+        """
+        instance = self.get_object()
+        serializer = AssignRegionalAccountManagerSerializer(instance=instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=['post'],
@@ -228,7 +264,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         permission_classes=[
             HasPermissions(
                 f'company.{CompanyPermission.change_company}',
-                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+                f'company.{CompanyPermission.change_one_list_core_team_member}',
             ),
         ],
         schema=StubSchema(),
