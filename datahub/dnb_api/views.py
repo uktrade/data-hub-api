@@ -333,7 +333,26 @@ class DNBCompanyChangeRequestView(APIView):
             raise APIUpstreamException(str(exc))
 
         return Response(response)
+    
+    @method_decorator(enforce_request_content_type('application/json'))
+    def get(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
+        change_request_serializer.is_valid(raise_exception=True)
 
+        try:
+            response = request_changes(**change_request_serializer.validated_data)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        return Response(response)
 
 class DNBCompanyInvestigationView(APIView):
     """
