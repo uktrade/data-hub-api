@@ -52,6 +52,12 @@ else:
     _ADMIN_DJANGO_APP = ['django.contrib.admin']
     _ADMIN_OAUTH2_APP = []
 
+ES_APM_ENABLED = env.bool('ES_APM_ENABLED')
+
+_ES_APM_APP = []
+if ES_APM_ENABLED:
+    _ES_APM_APP.append('elasticapm.contrib.django')
+
 # Application definition
 
 DJANGO_APPS = [
@@ -65,6 +71,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    *_ES_APM_APP,
     'rest_framework',
     'django_extensions',
     'reversion',
@@ -717,3 +724,12 @@ COMPANY_MATCHING_HAWK_KEY = env('COMPANY_MATCHING_HAWK_KEY', default=None)
 EXPORT_WINS_SERVICE_BASE_URL = env('EXPORT_WINS_SERVICE_BASE_URL', default=None)
 EXPORT_WINS_HAWK_ID = env('EXPORT_WINS_HAWK_ID', default=None)
 EXPORT_WINS_HAWK_KEY = env('EXPORT_WINS_HAWK_KEY', default=None)
+
+
+if ES_APM_ENABLED:
+    ELASTIC_APM = {
+      'SERVICE_NAME': env('ES_APM_SERVICE_NAME'),
+      'SECRET_TOKEN': env('ES_APM_SECRET_TOKEN'),
+      'SERVER_URL': env('ES_APM_SERVER_URL'),
+      'ENVIRONMENT': env('ES_APM_ENVIRONMENT'),
+    }
