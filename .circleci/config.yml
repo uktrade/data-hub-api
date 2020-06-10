@@ -8,6 +8,9 @@ job_defaults: &job_defaults
     es_image:
       type: string
 
+    es_apm_image:
+      type: string
+
     postgres_image:
       type: string
 
@@ -47,6 +50,11 @@ job_defaults: &job_defaults
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
     DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
     DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
+    ES_APM_ENABLED: 'True'
+    ES_APM_SERVICE_NAME: datahub
+    ES_APM_SECRET_TOKEN:
+    ES_APM_SERVER_URL: http://localhost:8200
+    ES_APM_ENVIRONMENT: 'circleci'
 
   working_directory: ~/app
 
@@ -54,6 +62,9 @@ job_defaults: &job_defaults
     - image: <<parameters.python_image>>
 
     - image: <<parameters.es_image>>
+
+    - image: <<parameters.es_apm_image>>
+      command: ["apm-server", "-e", "-E", "output.elasticsearch.hosts=[\"localhost:9200\"]"]
 
     - image: <<parameters.postgres_image>>
       name: postgres
@@ -121,3 +132,4 @@ workflows:
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
+          es_apm_image: docker.elastic.co/apm/apm-server:7.7.1
