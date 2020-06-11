@@ -17,14 +17,13 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         segment = parse_limited_string(row['segment'])
-        sector_cluster = parse_limited_string(row['sector_cluster'], max_length=None)
+        sector_cluster_pk = parse_uuid(row['sector_cluster_id'])
         parent_pk = parse_uuid(row['parent_id'])
 
         sector = Sector(pk=pk, segment=segment)
 
-        if sector_cluster:
-            sector_cluster_obj = SectorCluster.objects.get(name=sector_cluster)
-            sector.sector_cluster = sector_cluster_obj
+        if sector_cluster_pk:
+            sector.sector_cluster = SectorCluster.objects.get(pk=sector_cluster_pk)
         if parent_pk:
             sector.parent = Sector.objects.get(pk=parent_pk)
 

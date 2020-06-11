@@ -19,19 +19,18 @@ def test_happy_path(s3_stubber):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},{clusters[2]},{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},{clusters[2].pk},{parent_sector.pk}
 """
 
     s3_stubber.add_response(
@@ -52,9 +51,9 @@ def test_happy_path(s3_stubber):
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
     assert [
-        sectors[0].sector_cluster.name,
-        sectors[1].sector_cluster.name,
-        sectors[2].sector_cluster.name,
+        sectors[0].sector_cluster,
+        sectors[1].sector_cluster,
+        sectors[2].sector_cluster,
     ] == clusters
     assert [
         sectors[0].parent,
@@ -73,20 +72,19 @@ def test_duplicate_sector(s3_stubber, caplog):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
     duplicate_sector = SectorFactory(id=sector_pks[2])
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{duplicate_sector.pk},{segments[2]},{clusters[2]},{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{duplicate_sector.pk},{segments[2]},{clusters[2].pk},{parent_sector.pk}
 """
 
     s3_stubber.add_response(
@@ -110,7 +108,7 @@ def test_duplicate_sector(s3_stubber, caplog):
 
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment] == segments[:2]
-    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [sectors[0].sector_cluster, sectors[1].sector_cluster] == clusters[:2]
     assert [
         sectors[0].parent,
         sectors[1].parent,
@@ -125,19 +123,18 @@ def test_blank_parent(s3_stubber):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},{clusters[2]},
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},{clusters[2].pk},
 """
 
     s3_stubber.add_response(
@@ -158,9 +155,9 @@ def test_blank_parent(s3_stubber):
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
     assert [
-        sectors[0].sector_cluster.name,
-        sectors[1].sector_cluster.name,
-        sectors[2].sector_cluster.name,
+        sectors[0].sector_cluster,
+        sectors[1].sector_cluster,
+        sectors[2].sector_cluster,
     ] == clusters
     assert [
         sectors[0].parent,
@@ -177,18 +174,17 @@ def test_blank_sector_cluster(s3_stubber):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
 {sector_pks[2]},{segments[2]},,{parent_sector.pk}
 """
 
@@ -209,7 +205,7 @@ def test_blank_sector_cluster(s3_stubber):
     assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
-    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [sectors[0].sector_cluster, sectors[1].sector_cluster] == clusters[:2]
     assert not sectors[2].sector_cluster
     assert [
         sectors[0].parent,
@@ -228,19 +224,18 @@ def test_non_existent_parent(s3_stubber, caplog):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},{clusters[2]},00000000-0000-0000-0000-000000000000
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},{clusters[2].pk},00000000-0000-0000-0000-000000000000
 """
 
     s3_stubber.add_response(
@@ -264,7 +259,7 @@ def test_non_existent_parent(s3_stubber, caplog):
 
     assert [str(sectors[0].pk), str(sectors[1].pk)] == sector_pks[:2]
     assert [sectors[0].segment, sectors[1].segment] == segments[:2]
-    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [sectors[0].sector_cluster, sectors[1].sector_cluster] == clusters[:2]
     assert [
         sectors[0].parent,
         sectors[1].parent,
@@ -281,19 +276,18 @@ def test_non_existent_sector_cluster(s3_stubber, caplog):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},bla,{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},00000000-0000-0000-0000-000000000000,{parent_sector.pk}
 """
 
     s3_stubber.add_response(
@@ -317,7 +311,7 @@ def test_non_existent_sector_cluster(s3_stubber, caplog):
 
     assert [str(sectors[0].pk), str(sectors[1].pk)] == sector_pks[:2]
     assert [sectors[0].segment, sectors[1].segment] == segments[:2]
-    assert [sectors[0].sector_cluster.name, sectors[1].sector_cluster.name] == clusters[:2]
+    assert [sectors[0].sector_cluster, sectors[1].sector_cluster] == clusters[:2]
     assert [
         sectors[0].parent,
         sectors[1].parent,
@@ -332,19 +326,18 @@ def test_simulate(s3_stubber):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},{clusters[2]},{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},{clusters[2].pk},{parent_sector.pk}
 """
 
     s3_stubber.add_response(
@@ -372,19 +365,18 @@ def test_audit_log(s3_stubber):
         '00000000-0000-0000-0000-000000000003',
     ]
     segments = ['segment_1', 'segment_2', 'segment_3']
-    clusters = ['cluster_1', 'cluster_2', 'cluster_3']
-    SectorClusterFactory.create_batch(
+    clusters = SectorClusterFactory.create_batch(
         3,
-        name=factory.Iterator(clusters),
+        name=factory.Iterator(['cluster_1', 'cluster_2', 'cluster_3']),
     )
     parent_sector = SectorFactory()
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,segment,sector_cluster,parent_id
-{sector_pks[0]},{segments[0]},{clusters[0]},{parent_sector.pk}
-{sector_pks[1]},{segments[1]},{clusters[1]},{parent_sector.pk}
-{sector_pks[2]},{segments[2]},{clusters[2]},{parent_sector.pk}
+    csv_content = f"""id,segment,sector_cluster_id,parent_id
+{sector_pks[0]},{segments[0]},{clusters[0].pk},{parent_sector.pk}
+{sector_pks[1]},{segments[1]},{clusters[1].pk},{parent_sector.pk}
+{sector_pks[2]},{segments[2]},{clusters[2].pk},{parent_sector.pk}
 """
 
     s3_stubber.add_response(
