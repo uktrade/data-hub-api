@@ -76,26 +76,21 @@ class TestGetPipelineItemsView(APITestMixin):
             item,
         )
 
-    def test_can_retrieve_multiple_pipeline_items_in_desc_order(self):
-        """Test that details of multiple pipeline items can be retrieved."""
-        company_1 = CompanyFactory()
-        company_2 = CompanyFactory()
-        company_3 = CompanyFactory()
-        item_1 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_1,
-            status=PipelineItem.Status.WIN,
-        )
-        item_2 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_2,
-            status=PipelineItem.Status.IN_PROGRESS,
-        )
-        item_3 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_3,
-            status=PipelineItem.Status.LEADS,
-        )
+    @pytest.fixture
+    def items(self):
+        """Set up items test fixtures."""
+        names = ('ABC', 'BCA', 'CAB')
+        data = []
+        with freeze_time('Jan 14th, 2020', auto_tick_seconds=15):
+            for name in names:
+                data.append(PipelineItemFactory(
+                    adviser=self.user,
+                    name=name,
+                ))
+            return data
+
+    def test_default_is_sorted_by_created_on_desc(self, items):
+        """Test the response is sorted by created on descending by default."""
         response = self.api_client.get(pipeline_collection_url)
         assert response.status_code == status.HTTP_200_OK
 
@@ -104,18 +99,159 @@ class TestGetPipelineItemsView(APITestMixin):
 
         self._assert_get_pipeline_items_response(
             response_data['results'][0],
-            company_3,
-            item_3,
+            items[2].company,
+            items[2],
         )
         self._assert_get_pipeline_items_response(
             response_data['results'][1],
-            company_2,
-            item_2,
+            items[1].company,
+            items[1],
         )
         self._assert_get_pipeline_items_response(
             response_data['results'][2],
-            company_1,
-            item_1,
+            items[0].company,
+            items[0],
+        )
+
+    def test_can_sort_by_created_on_asc(self, items):
+        """Test the response can be sorted by created on ascending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'created_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[2].company,
+            items[2],
+        )
+
+    def test_can_sort_by_modified_on_desc(self, items):
+        """Test the response can be sorted by modified on descending."""
+        item = items[1]
+        item.name = 'modified'
+        item.save()
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': '-modified_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[0].company,
+            items[0],
+        )
+
+    def test_can_sort_by_modified_on_ascending(self, items):
+        """Test the response can be sorted by modified on ascending."""
+        item = items[1]
+        item.name = 'modified'
+        item.save()
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'modified_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[1].company,
+            items[1],
+        )
+
+    def test_can_sort_by_name_descending(self, items):
+        """Test the response can be sorted by name decending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'name'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[2].company,
+            items[2],
+        )
+
+    def test_can_sort_by_name_ascending(self, items):
+        """Test the response can be sorted by name ascending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': '-name'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[0].company,
+            items[0],
         )
 
     @pytest.mark.parametrize(
@@ -301,6 +437,7 @@ class TestGetPipelineItemsView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -531,6 +668,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -586,6 +724,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': {
                 'id': str(contact.pk),
                 'name': contact.name,
@@ -636,6 +775,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -677,6 +817,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -923,6 +1064,7 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1228,6 +1370,7 @@ class TestArchivePipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1284,6 +1427,7 @@ class TestArchivePipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1370,6 +1514,7 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1407,6 +1552,7 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
