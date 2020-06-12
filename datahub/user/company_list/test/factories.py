@@ -2,6 +2,7 @@ import factory
 from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.core.test.factories import to_many_field
 from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
 
@@ -40,6 +41,14 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     potential_value = 1000000
     likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
     expected_win_date = factory.Faker('future_date', end_date='+3y')
+
+    @to_many_field
+    def contacts(self):
+        """
+        Contacts field.
+        Defaults to the contact from the contact field.
+        """
+        return [self.contact] if self.contact else []
 
     class Meta:
         model = 'company_list.PipelineItem'

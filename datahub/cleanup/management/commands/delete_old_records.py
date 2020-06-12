@@ -91,6 +91,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('orders'): (),
                 Contact._meta.get_field('referrals'): (),
                 Contact._meta.get_field('pipeline_items'): (),
+                Contact._meta.get_field('pipeline_items_m2m'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
             },
         ),

@@ -737,6 +737,40 @@ class TestAddPipelineItemView(APITestMixin):
         )
         assert response.status_code == status.HTTP_201_CREATED
 
+    def test_contact_copied_to_contacts(self):
+        """
+        Test that the value provided in the contact field is copied to contacts when a
+        PipelineItem is created.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory(company=company)
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': pipeline_status,
+                'contact': str(contact.pk),
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2019-04-19',
+                'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
+            },
+        )
+        response_data = response.json()
+        assert response.status_code == status.HTTP_201_CREATED
+
+        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
+        assert pipeline_item.contact == contact
+        assert list(pipeline_item.contacts.all()) == [contact]
+
 
 class TestPatchPipelineItemView(APITestMixin):
     """Tests for patching a pipeline item."""
@@ -1096,6 +1130,30 @@ class TestPatchPipelineItemView(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'contact': ['Contact does not belong to company.']}
+
+    def test_contact_copied_to_contacts(self):
+        """
+        Test that the value provided in the contact field is copied to contacts when a
+        pipeline item is updated.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+            contacts=[],
+        )
+        new_contact = ContactFactory(company=company)
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': str(new_contact.id)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        item.refresh_from_db()
+        assert item.contact == new_contact
+        assert list(item.contacts.all()) == [new_contact]
 
     def test_cannot_patch_other_users_item(self):
         """Test that cannot patch other users item."""
