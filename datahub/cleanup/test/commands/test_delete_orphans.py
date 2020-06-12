@@ -11,7 +11,10 @@ from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.cleanup.query_utils import get_relations_to_delete
-from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
+from datahub.cleanup.test.commands.factories import (
+    PipelineItemFactoryWithoutContacts,
+    ShallowInvestmentProjectFactory,
+)
 from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
@@ -29,7 +32,6 @@ from datahub.omis.order.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.user.company_list.test.factories import PipelineItemFactory
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
@@ -51,7 +53,8 @@ MAPPINGS = {
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
-            (PipelineItemFactory, 'contact'),
+            (PipelineItemFactoryWithoutContacts, 'contact'),
+            (PipelineItemFactoryWithoutContacts, 'contacts'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
