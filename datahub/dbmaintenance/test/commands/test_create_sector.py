@@ -46,7 +46,7 @@ def test_happy_path(s3_stubber):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
@@ -100,7 +100,7 @@ def test_duplicate_sector(s3_stubber, caplog):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 3
 
     assert f'Key (id)=({duplicate_sector.pk}) already exists' in caplog.text
@@ -150,7 +150,7 @@ def test_blank_parent(s3_stubber):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
@@ -201,7 +201,7 @@ def test_blank_sector_cluster(s3_stubber):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 3
     assert [str(sectors[0].pk), str(sectors[1].pk), str(sectors[2].pk)] == sector_pks
     assert [sectors[0].segment, sectors[1].segment, sectors[2].segment] == segments
@@ -251,7 +251,7 @@ def test_non_existent_parent(s3_stubber, caplog):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 2
 
     assert 'Sector matching query does not exist' in caplog.text
@@ -303,7 +303,7 @@ def test_non_existent_sector_cluster(s3_stubber, caplog):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 2
 
     assert 'SectorCluster matching query does not exist' in caplog.text
@@ -353,7 +353,7 @@ def test_simulate(s3_stubber):
 
     call_command('create_sector', bucket, object_key, simulate=True)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert not sectors
 
 
@@ -392,7 +392,7 @@ def test_audit_log(s3_stubber):
 
     call_command('create_sector', bucket, object_key)
 
-    sectors = Sector.objects.filter(pk__in=sector_pks)
+    sectors = Sector.objects.filter(pk__in=sector_pks).order_by('pk')
     assert len(sectors) == 3
 
     for sector in sectors:
