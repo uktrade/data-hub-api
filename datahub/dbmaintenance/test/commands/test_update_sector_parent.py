@@ -13,17 +13,17 @@ pytestmark = pytest.mark.django_db
 def test_happy_path(s3_stubber):
     """Test that the command updates the specified records."""
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(
@@ -64,17 +64,17 @@ def test_non_existent_sector(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(
@@ -120,17 +120,17 @@ def test_non_existent_sector_parent(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(
@@ -171,20 +171,20 @@ def test_non_existent_sector_parent(s3_stubber, caplog):
     ]
 
 
-def test_sector_root_node(s3_stubber):
-    """Test that the command changes the sector to a root node if no parent is provided."""
+def test_child_node_to_root_node(s3_stubber):
+    """Test that the command changes a child node to a root node if no parent is provided."""
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         2,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(
@@ -221,6 +221,56 @@ def test_sector_root_node(s3_stubber):
     assert not sectors[2].parent
 
 
+def test_root_node_to_child_node(s3_stubber):
+    """Test that the command changes a root node to a child node if parent is provided."""
+    sectors = ['sector_1', 'sector_2', 'section_3']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+
+    old_parents = SectorFactory.create_batch(
+        2,
+        segment=factory.Iterator(old_parent_segments),
+    )
+    old_parents.append(None)
+
+    new_parents = SectorFactory.create_batch(
+        3,
+        segment=factory.Iterator(new_parent_segments),
+    )
+
+    sectors = SectorFactory.create_batch(
+        3,
+        segment=factory.Iterator(sectors),
+        parent=factory.Iterator(old_parents),
+    )
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,old_parent_id,new_parent_id
+{sectors[0].pk},{old_parents[0].pk},{new_parents[0].pk}
+{sectors[1].pk},{old_parents[1].pk},{new_parents[1].pk}
+{sectors[2].pk},,{new_parents[2].pk}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('update_sector_parent', bucket, object_key)
+
+    for sector in sectors:
+        sector.refresh_from_db()
+
+    assert [sector.parent.pk for sector in sectors] == [parent.pk for parent in new_parents]
+
+
 def test_no_change(s3_stubber, caplog):
     """Test that the command ignores records that haven't changed
     or records with incorrect current values.
@@ -228,17 +278,17 @@ def test_no_change(s3_stubber, caplog):
     caplog.set_level('WARNING')
 
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(
@@ -283,17 +333,17 @@ def test_no_change(s3_stubber, caplog):
 def test_simulate(s3_stubber):
     """Test that the command simulates updates if --simulate is passed in."""
     sectors = ['sector_1', 'sector_2', 'section_3']
-    old_parents = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
-    new_parents = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
+    old_parent_segments = ['sector_1_parent_old', 'sector_2_parent_old', 'sector_3_parent_old']
+    new_parent_segments = ['sector_1_parent_new', 'sector_2_parent_new', 'sector_3_parent_new']
 
     old_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(old_parents),
+        segment=factory.Iterator(old_parent_segments),
     )
 
     new_parents = SectorFactory.create_batch(
         3,
-        segment=factory.Iterator(new_parents),
+        segment=factory.Iterator(new_parent_segments),
     )
 
     sectors = SectorFactory.create_batch(

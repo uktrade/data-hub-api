@@ -20,7 +20,9 @@ class Command(CSVBaseCommand):
         old_parent_pk = parse_uuid(row['old_parent_id'])
         new_parent_pk = parse_uuid(row['new_parent_id'])
 
-        if any([sector.parent.pk != old_parent_pk, sector.parent.pk == new_parent_pk]):
+        if sector.parent and any(
+            [sector.parent.pk != old_parent_pk, sector.parent.pk == new_parent_pk],
+        ):
             logger.warning(f'Not updating sector {sector} as its parent has not changed')
             return
 
