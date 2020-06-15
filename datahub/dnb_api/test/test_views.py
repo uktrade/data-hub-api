@@ -1753,28 +1753,6 @@ class TestCompanyChangeRequestView(APITestMixin):
     """
     Test GET `/dnb/company-change-request` endpoint.
     """
-    @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
-            (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-        ),
-    )
-    def test_content_type_for_get(
-        self,
-        content_type,
-        expected_status_code,
-    ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
-        """
-        response = self.api_client.get(
-            reverse('api-v4:dnb-api:company-change-request'),
-            content_type=content_type,
-        )
-
-        assert response.status_code == expected_status_code
-
     # TODO: Test that a change request comes back properly
 
     @pytest.mark.parametrize(
@@ -1811,7 +1789,6 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         response = self.api_client.get(
             reverse('api-v4:dnb-api:company-change-request'),
-            # content_type='application/json',
             data={
                 'duns_number': '123456789',
                 'status': 'pending',

@@ -361,6 +361,8 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
         validators=(integer_validator,),
     )
 
+    status = serializers.CharField(max_length=100)
+
     def validate_duns_number(self, duns_number):
         """
         Validate duns_number.
@@ -373,7 +375,7 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
             )
         self.company = company
         return duns_number
-   
+
     def validate_status(self, status):
         if status != 'pending' or status != 'submitted':
             raise serializers.ValidationError(
