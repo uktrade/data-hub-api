@@ -1775,6 +1775,51 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         assert response.status_code == expected_status_code
 
+    # TODO: Test that a change request comes back properly
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_get_request_error(
+        self,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we raise the
+        exception with an appropriate message.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.get(
+            DNB_CHANGE_REQUEST_URL,
+            exc=request_exception,
+        )
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            # content_type='application/json',
+            data={
+                'duns_number': '123456789',
+                'status': 'pending',
+            },
+        )
+        print(response)
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
 
 class TestCompanyInvestigationView(APITestMixin):
     """
