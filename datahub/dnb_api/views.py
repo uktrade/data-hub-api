@@ -336,13 +336,16 @@ class DNBCompanyChangeRequestView(APIView):
 
         return Response(response)
 
+    @method_decorator(enforce_request_content_type('application/json'))
     def get(self, request):
         """
         A thin wrapper around the dnb-service change request API.
         """
-        change_request_serializer = DNBGetCompanyChangeRequestSerializer(
-            data=request.query_params,
-        )
+
+        duns_number = request.query_params.get('duns_number', None)
+        status = request.query_params.get('status', None)
+
+        change_request_serializer = DNBGetCompanyChangeRequestSerializer(duns_number, status)
         change_request_serializer.is_valid(raise_exception=True)
 
         try:
