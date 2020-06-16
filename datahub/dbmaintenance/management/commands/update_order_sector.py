@@ -6,13 +6,22 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 from datahub.metadata.models import Sector
 from datahub.omis.order.models import Order
-
+from datahub.search.signals import disable_search_signal_receivers
 
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
     """Command to update Order.sector."""
+
+    @disable_search_signal_receivers(Order)
+    def _handle(self, *args, **options):
+        """
+        Disables search signal receivers for orders.
+        Avoid queuing huge number of Celery tasks for syncing orders to Elasticsearch.
+        (Syncing can be manually performed afterwards using sync_es if required.)
+        """
+        return super()._handle(*args, **options)
 
     def _process_row(self, row, simulate=False, overwrite=False, **options):
         """Process a single row."""
