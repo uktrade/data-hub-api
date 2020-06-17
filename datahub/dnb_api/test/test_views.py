@@ -1789,9 +1789,8 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         response = self.api_client.get(
             reverse('api-v4:dnb-api:company-change-request'),
+            {'duns_number': '123456789', 'status': 'pending'},
             content_type='application/json',
-            duns_number='123456789',
-            status='pending',
         )
         print(response.json())
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
