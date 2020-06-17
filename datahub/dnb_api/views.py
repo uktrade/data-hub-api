@@ -343,9 +343,10 @@ class DNBCompanyChangeRequestView(APIView):
         duns_number = request.query_params.get('duns_number', None)
         status = request.query_params.get('status', None)
 
-        print(request.body)
+        change_request_serializer = DNBGetCompanyChangeRequestSerializer(
+            data={'duns_number': duns_number, 'status': status},
+        )
 
-        change_request_serializer = DNBGetCompanyChangeRequestSerializer(duns_number, status)
         change_request_serializer.is_valid(raise_exception=True)
 
         try:
@@ -357,7 +358,7 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceError,
         ) as exc:
             raise APIUpstreamException(str(exc))
-        
+
         return Response(response)
 
 

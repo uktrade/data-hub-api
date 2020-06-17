@@ -351,9 +351,9 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
 
 class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
     """
-    Validate GET data for DNBCompanyChangeRequestView and convert it to the format
-    expected by dnb-service.
+    Validate GET data for DNBCompanyChangeRequestView
     """
+
     duns_number = serializers.CharField(
         max_length=9,
         min_length=9,
@@ -375,6 +375,9 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
         return duns_number
 
     def validate_status(self, status):
+        """
+        Validate status
+        """
         if status == 'pending' or status == 'submitted':
             return status
         else:
