@@ -204,7 +204,7 @@ class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ('status', 'company_id')
+    filterset_fields = ('status', 'company_id', 'archived')
     ordering = ('-created_on')
     ordering_fields = ('created_on', 'modified_on', 'name')
     queryset = get_pipeline_item_queryset()
