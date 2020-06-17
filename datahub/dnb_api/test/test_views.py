@@ -1782,7 +1782,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         exception with an appropriate message.
         """
         CompanyFactory(duns_number='123456789')
-        requests_mock.get(
+        requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
             exc=request_exception,
         )
@@ -1793,7 +1793,7 @@ class TestCompanyChangeRequestView(APITestMixin):
             duns_number='123456789',
             status='pending',
         )
-        print(response.query_params)
+        print(response.json())
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
 
