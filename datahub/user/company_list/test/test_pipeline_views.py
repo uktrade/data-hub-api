@@ -449,10 +449,79 @@ class TestGetPipelineItemsView(APITestMixin):
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
-            'archived': False,
+            'archived': item.archived,
             'archived_on': None,
             'archived_reason': None,
         }
+
+    def test_can_filter_by_archived(self):
+        """Test that it can filter by archived."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'archived': True},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['archived'] is True
+
+    def test_can_filter_by_not_archived(self):
+        """Test that it can filter by archived."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'archived': False},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['archived'] is False
+
+    def test_no_archive_filter_returns_all_results(self):
+        """Test archived and non archived are returned when archive filter is not present."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 2
+        assert response_data['results'][0]['archived'] is False
+        assert response_data['results'][1]['archived'] is True
 
 
 class TestAddPipelineItemView(APITestMixin):
