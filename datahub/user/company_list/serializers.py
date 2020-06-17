@@ -176,6 +176,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'status',
             'adviser',
             'created_on',
+            'modified_on',
             'contact',
             'sector',
             'potential_value',
