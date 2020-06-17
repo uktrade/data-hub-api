@@ -162,6 +162,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                 }
                 raise serializers.ValidationError(errors)
 
+        if 'contact' in data and data.get('contact'):
+            data['contacts'] = [data['contact']]
+
         return data
 
     class Meta:
