@@ -33,6 +33,7 @@ def get_expected_data_from_contact(contact):
         'archived': contact.archived,
         'archived_on': format_date_or_datetime(contact.archived_on),
         'company_id': str(contact.company_id) if contact.company_id is not None else None,
+        'created_by_id': str(contact.created_by_id) if contact.created_by is not None else None,
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
         'email_alternative': contact.email_alternative,
