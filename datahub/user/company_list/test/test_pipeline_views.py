@@ -21,6 +21,14 @@ def _pipeline_item_detail_url(item_pk):
     return reverse('api-v4:company-list:pipelineitem-detail', kwargs={'pk': item_pk})
 
 
+def _pipeline_item_archive_url(item_pk):
+    return reverse('api-v4:company-list:pipelineitem-archive', kwargs={'pk': item_pk})
+
+
+def _pipeline_item_unarchive_url(item_pk):
+    return reverse('api-v4:company-list:pipelineitem-unarchive', kwargs={'pk': item_pk})
+
+
 class TestGetPipelineItemsView(APITestMixin):
     """Tests for getting pipeline items."""
 
@@ -68,26 +76,21 @@ class TestGetPipelineItemsView(APITestMixin):
             item,
         )
 
-    def test_can_retrieve_multiple_pipeline_items_in_desc_order(self):
-        """Test that details of multiple pipeline items can be retrieved."""
-        company_1 = CompanyFactory()
-        company_2 = CompanyFactory()
-        company_3 = CompanyFactory()
-        item_1 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_1,
-            status=PipelineItem.Status.WIN,
-        )
-        item_2 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_2,
-            status=PipelineItem.Status.IN_PROGRESS,
-        )
-        item_3 = PipelineItemFactory(
-            adviser=self.user,
-            company=company_3,
-            status=PipelineItem.Status.LEADS,
-        )
+    @pytest.fixture
+    def items(self):
+        """Set up items test fixtures."""
+        names = ('ABC', 'BCA', 'CAB')
+        data = []
+        with freeze_time('Jan 14th, 2020', auto_tick_seconds=15):
+            for name in names:
+                data.append(PipelineItemFactory(
+                    adviser=self.user,
+                    name=name,
+                ))
+            return data
+
+    def test_default_is_sorted_by_created_on_desc(self, items):
+        """Test the response is sorted by created on descending by default."""
         response = self.api_client.get(pipeline_collection_url)
         assert response.status_code == status.HTTP_200_OK
 
@@ -96,18 +99,159 @@ class TestGetPipelineItemsView(APITestMixin):
 
         self._assert_get_pipeline_items_response(
             response_data['results'][0],
-            company_3,
-            item_3,
+            items[2].company,
+            items[2],
         )
         self._assert_get_pipeline_items_response(
             response_data['results'][1],
-            company_2,
-            item_2,
+            items[1].company,
+            items[1],
         )
         self._assert_get_pipeline_items_response(
             response_data['results'][2],
-            company_1,
-            item_1,
+            items[0].company,
+            items[0],
+        )
+
+    def test_can_sort_by_created_on_asc(self, items):
+        """Test the response can be sorted by created on ascending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'created_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[2].company,
+            items[2],
+        )
+
+    def test_can_sort_by_modified_on_desc(self, items):
+        """Test the response can be sorted by modified on descending."""
+        item = items[1]
+        item.name = 'modified'
+        item.save()
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': '-modified_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[0].company,
+            items[0],
+        )
+
+    def test_can_sort_by_modified_on_ascending(self, items):
+        """Test the response can be sorted by modified on ascending."""
+        item = items[1]
+        item.name = 'modified'
+        item.save()
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'modified_on'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[1].company,
+            items[1],
+        )
+
+    def test_can_sort_by_name_descending(self, items):
+        """Test the response can be sorted by name decending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': 'name'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[0].company,
+            items[0],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[2].company,
+            items[2],
+        )
+
+    def test_can_sort_by_name_ascending(self, items):
+        """Test the response can be sorted by name ascending."""
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'sortby': '-name'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 3
+
+        self._assert_get_pipeline_items_response(
+            response_data['results'][0],
+            items[2].company,
+            items[2],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][1],
+            items[1].company,
+            items[1],
+        )
+        self._assert_get_pipeline_items_response(
+            response_data['results'][2],
+            items[0].company,
+            items[0],
         )
 
     @pytest.mark.parametrize(
@@ -293,6 +437,7 @@ class TestGetPipelineItemsView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -304,10 +449,79 @@ class TestGetPipelineItemsView(APITestMixin):
             'potential_value': str(item.potential_value),
             'likelihood_to_win': item.likelihood_to_win,
             'expected_win_date': format_date_or_datetime(item.expected_win_date),
-            'archived': False,
+            'archived': item.archived,
             'archived_on': None,
             'archived_reason': None,
         }
+
+    def test_can_filter_by_archived(self):
+        """Test that it can filter by archived."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'archived': True},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['archived'] is True
+
+    def test_can_filter_by_not_archived(self):
+        """Test that it can filter by archived."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+            data={'archived': False},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['archived'] is False
+
+    def test_no_archive_filter_returns_all_results(self):
+        """Test archived and non archived are returned when archive filter is not present."""
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.WIN,
+            archived=True,
+        )
+
+        PipelineItemFactory(
+            adviser=self.user,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+
+        response = self.api_client.get(
+            pipeline_collection_url,
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['results']) == 2
+        assert response_data['results'][0]['archived'] is False
+        assert response_data['results'][1]['archived'] is True
 
 
 class TestAddPipelineItemView(APITestMixin):
@@ -523,6 +737,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -578,6 +793,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': {
                 'id': str(contact.pk),
                 'name': contact.name,
@@ -628,6 +844,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -669,6 +886,7 @@ class TestAddPipelineItemView(APITestMixin):
             },
             'status': 'in_progress',
             'created_on': '2017-04-19T15:25:30.986208Z',
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
             'sector': None,
             'potential_value': None,
@@ -728,6 +946,40 @@ class TestAddPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
+
+    def test_contact_copied_to_contacts(self):
+        """
+        Test that the value provided in the contact field is copied to contacts when a
+        PipelineItem is created.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory(company=company)
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': pipeline_status,
+                'contact': str(contact.pk),
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2019-04-19',
+                'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
+            },
+        )
+        response_data = response.json()
+        assert response.status_code == status.HTTP_201_CREATED
+
+        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
+        assert pipeline_item.contact == contact
+        assert list(pipeline_item.contacts.all()) == [contact]
 
 
 class TestPatchPipelineItemView(APITestMixin):
@@ -881,6 +1133,7 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1089,6 +1342,30 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'contact': ['Contact does not belong to company.']}
 
+    def test_contact_copied_to_contacts(self):
+        """
+        Test that the value provided in the contact field is copied to contacts when a
+        pipeline item is updated.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+            contacts=[],
+        )
+        new_contact = ContactFactory(company=company)
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': str(new_contact.id)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        item.refresh_from_db()
+        assert item.contact == new_contact
+        assert list(item.contacts.all()) == [new_contact]
+
     def test_cannot_patch_other_users_item(self):
         """Test that cannot patch other users item."""
         item = PipelineItemFactory()
@@ -1111,6 +1388,144 @@ class TestPatchPipelineItemView(APITestMixin):
             },
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestArchivePipelineItemView(APITestMixin):
+    """Test archive and unarchive pipeline item."""
+
+    def test_archive_without_reason(self):
+        """Test pipeline item archive won't work without reason."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.post(
+            url,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        assert response.data == {
+            'reason': ['This field is required.'],
+        }
+
+    @freeze_time('2017-04-19 15:25:30.986208')
+    def test_archive_with_reason(self):
+        """Test pipeline item archive."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.post(
+            url,
+            data={'reason': 'foo'},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': True,
+            'archived_on': '2017-04-19T15:25:30.986208Z',
+            'archived_reason': 'foo',
+        }
+
+    def test_archive_wrong_method(self):
+        """Test that GET requests to the archive endpoint fail."""
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_archive_url(item.pk)
+        response = self.api_client.get(
+            url,
+        )
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    def test_unarchive(self):
+        """Test pipeline item unarchive."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_unarchive_url(item.pk)
+        response = self.api_client.post(
+            url,
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data == {
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+                'turnover': company.turnover,
+                'export_potential': company.export_potential,
+            },
+            'id': str(item.id),
+            'name': item.name,
+            'status': item.status,
+            'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
+            'contact': {
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            },
+            'sector': {
+                'id': str(item.sector.pk),
+                'segment': item.sector.segment,
+            },
+            'potential_value': str(item.potential_value),
+            'likelihood_to_win': item.likelihood_to_win,
+            'expected_win_date': format_date_or_datetime(item.expected_win_date),
+            'archived': False,
+            'archived_on': None,
+            'archived_reason': '',
+        }
+
+    def test_unarchive_wrong_method(self):
+        """Test that GET requests to the unarchive endpoint fail."""
+        company = CompanyFactory()
+        item = ArchivedPipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.IN_PROGRESS,
+        )
+        url = _pipeline_item_unarchive_url(item.pk)
+        response = self.api_client.get(
+            url,
+        )
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 class TestGetPipelineItemView(APITestMixin):
@@ -1168,6 +1583,7 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1205,6 +1621,7 @@ class TestGetPipelineItemView(APITestMixin):
             'name': item.name,
             'status': item.status,
             'created_on': format_date_or_datetime(item.created_on),
+            'modified_on': format_date_or_datetime(item.modified_on),
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,

@@ -103,12 +103,20 @@ class PipelineItem(ArchivableModel, BaseModel):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         help_text='Name to represent the item within the pipeline',
     )
+    # TODO: contact is being replaced with contacts, and contact will be removed once the
+    # migration to a to-many field is complete
     contact = models.ForeignKey(
         'company.Contact',
         blank=True, null=True,
         on_delete=models.CASCADE,
         related_name='pipeline_items',
         help_text='Preferred company contact',
+    )
+    contacts = models.ManyToManyField(
+        'company.Contact',
+        blank=True, null=True,
+        related_name='pipeline_items_m2m',
+        help_text='Preferred company contacts',
     )
     sector = models.ForeignKey(
         metadata_models.Sector, blank=True, null=True,

@@ -1,3 +1,93 @@
+# Data Hub API 33.4.0 (2020-06-18)
+
+
+## Removals
+
+- **Contacts** The `accepts_dit_email_marketing` field has now been removed from the following end points: 
+  - GET /v3/contact
+  - GET /v4/company
+  - GET /v4/company/{id}
+  - PATCH /v4/company/{id}
+  - POST /v3/contact/{id}/archive
+  - POST /v3/contact/{id}/unarchive
+
+  The end points that still retain this field include: 
+  - POST /v3/contact 
+  - GET /v3/contact/{id}
+  - PATCH /v3/contact/{id}
+
+## Deprecations
+
+- The field `contact` is deprecated. Please check the API and Database schema
+  categories for more details.
+
+## Features
+
+- A `create_sector` management command was added for creating sectors and attaching them to a parent.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## Internal changes
+
+- A new environment variable `ES_APM_SERVER_TIMEOUT` has been added so that the requests to Elasticsearch APM could be
+  cancelled if taking longer than specified time. The default value is `20s`.
+- Ignore existing fixtures when rerunning the setup-uat script
+
+  It will allow developers to rerun setup-uat.sh script without the need to clear the entire DB.
+
+## API
+
+- **Advisers** It's now possible to filter pipeline results by archived as well as status and company_id on `GET /v4/pipeline-item`.
+- **Advisers** Pipeline items can now be sorted by `created_on`, `modified_on` and `name`, and the `modified_on` field is now also exposed from the `GET /v4/pipeline-item` endpoint.
+- `GET,PATCH /v4/pipeline-item/<uuid:pk>` and `GET,POST /v4/pipeline-item`:
+  the field `contact` is deprecated and will be removed on or after 19 June 2020.
+
+## Database schema
+
+- **Advisers** The table ``company_list_pipelineitem_contacts`` with columns ``("id" serial NOT NULL PRIMARY KEY, "pipelineitem_id" uuid NOT NULL, "contact_id" uuid NOT NULL)`` was added. This is a many-to-many table linking pipeline item with contacts, that will eventually replace ``company_list_pipelineitem.contact_id`` field.
+
+  The table had not been fully populated with data yet; continue to use ``company_list_pipelineitem.contact_id`` for the time being.
+- The column `pipelineitem.contact` is deprecated and will be removed
+  on or after 19 June 2020.
+
+
+# Data Hub API 33.3.0 (2020-06-09)
+
+
+## Bug fixes
+
+- **Companies** The following endpoint `PATCH /v4/company/<company-id>/update-one-list-core-team` expected user to have incorrect
+  permission. It has been corrected so that a user needs `change_company` and `change_one_list_core_team_member`
+  permissions to access it.
+
+## Internal changes
+
+- The support for Elasticsearch APM, an application monitoring system has been added, so that we can gain quality
+  insights about the app's performance correlated with actual requests.
+
+
+# Data Hub API 33.2.0 (2020-06-08)
+
+
+## Features
+
+- **Companies** A new endpoint `POST /v4/company/<company-id>/assign-regional-account-manager` has been added to allow users with `company.change_company and company.change_regional_account_manager` permissions to change the account manager of companies in the `Tier D - International Trade Advisers` One List Tier.
+
+  Example request body:
+  ```
+  { 
+      "regional_account_manager": <adviser_uuid>
+  }
+  ```
+
+  A successful request should expect an empty response with 204 (no content) HTTP status.
+
+## API
+
+- **Advisers** Pipeline items can now be archived (with a reason) and unarchived through the `POST /v4/pipeline-item/<uuid:pk>/archive` and `POST /v4/pipeline-item/<uuid:pk>/unarchive` endpoints.
+- For existing endpoint `interactions-dataset`, add `were_countries_discussed` field to the dataset which will be used to filter for interactions when creating data cuts.
+
+
 # Data Hub API 33.1.0 (2020-06-04)
 
 

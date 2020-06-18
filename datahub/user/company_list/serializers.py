@@ -149,6 +149,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                 'potential_value',
                 'likelihood_to_win',
                 'expected_win_date',
+                'archived',
+                'archived_on',
+                'archived_reason',
             }
             fields = data.keys()
             extra_fields = fields - allowed_fields
@@ -158,6 +161,9 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                     for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
+
+        if 'contact' in data and data.get('contact'):
+            data['contacts'] = [data['contact']]
 
         return data
 
@@ -170,6 +176,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'status',
             'adviser',
             'created_on',
+            'modified_on',
             'contact',
             'sector',
             'potential_value',

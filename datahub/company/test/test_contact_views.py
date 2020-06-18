@@ -26,7 +26,6 @@ class TestAddContact(APITestMixin):
     def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(
             url,
@@ -579,6 +578,90 @@ class TestContactList(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_all_details(self):
+        """Test response matches the inputted details when getting all contacts."""
+        company = CompanyFactory()
+        contact = ContactFactory(
+            title_id=constants.Title.admiral_of_the_fleet.value.id,
+            first_name='Oratio',
+            last_name='Nelson',
+            job_title='Head of Sales',
+            company=company,
+            email='foo@bar.com',
+            email_alternative='foo2@bar.com',
+            primary=True,
+            adviser=self.user,
+            telephone_countrycode='+44',
+            telephone_number='123456789',
+            telephone_alternative='987654321',
+            address_same_as_company=False,
+            address_1='Foo st.',
+            address_2='adr 2',
+            address_town='London',
+            address_county='London',
+            address_country_id=constants.Country.united_kingdom.value.id,
+            address_postcode='SW1A1AA',
+            notes='lorem ipsum',
+        )
+
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 1,
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'address_1': 'Foo st.',
+                    'address_2': 'adr 2',
+                    'address_country': {
+                        'id': constants.Country.united_kingdom.value.id,
+                        'name': constants.Country.united_kingdom.value.name,
+                    },
+                    'address_county': 'London',
+                    'address_postcode': 'SW1A1AA',
+                    'address_same_as_company': False,
+                    'address_town': 'London',
+                    'adviser': {
+                        'id': str(self.user.pk),
+                        'first_name': self.user.first_name,
+                        'last_name': self.user.last_name,
+                        'name': self.user.name,
+                    },
+                    'archived': False,
+                    'archived_by': None,
+                    'archived_documents_url_path': contact.archived_documents_url_path,
+                    'archived_on': None,
+                    'archived_reason': None,
+                    'company': {
+                        'id': str(company.pk),
+                        'name': company.name,
+                    },
+                    'created_on': '2017-04-18T13:25:30.986208Z',
+                    'email': 'foo@bar.com',
+                    'email_alternative': 'foo2@bar.com',
+                    'first_name': 'Oratio',
+                    'job_title': 'Head of Sales',
+                    'last_name': 'Nelson',
+                    'modified_on': '2017-04-18T13:25:30.986208Z',
+                    'name': 'Oratio Nelson',
+                    'notes': 'lorem ipsum',
+                    'primary': True,
+                    'telephone_alternative': '987654321',
+                    'telephone_countrycode': '+44',
+                    'telephone_number': '123456789',
+                    'id': str(contact.pk),
+                    'title': {
+                        'id': constants.Title.admiral_of_the_fleet.value.id,
+                        'name': constants.Title.admiral_of_the_fleet.value.name,
+                    },
+                },
+            ],
+        }
 
     def test_all_without_view_document_permission(self):
         """Test getting all contacts without view document permission."""

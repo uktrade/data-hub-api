@@ -14,6 +14,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from datahub.company.models import Company, CompanyPermission
+from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.query_utils import get_aggregate_subquery
 from datahub.core.viewsets import CoreViewSet
 from datahub.user.company_list.models import (
@@ -195,7 +196,7 @@ class CompanyListItemAPIView(APIView):
         return obj
 
 
-class PipelineItemViewSet(CoreViewSet):
+class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet):
     """A view set for returning the contents of a pipeline item and to add a new one."""
 
     serializer_class = PipelineItemSerializer
@@ -203,8 +204,9 @@ class PipelineItemViewSet(CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ('status', 'company_id')
+    filterset_fields = ('status', 'company_id', 'archived')
     ordering = ('-created_on')
+    ordering_fields = ('created_on', 'modified_on', 'name')
     queryset = get_pipeline_item_queryset()
 
     def get_queryset(self):

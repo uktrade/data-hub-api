@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from freezegun import freeze_time
 
-from datahub.company.serializers import ContactSerializer
+from datahub.company.serializers import ContactDetailSerializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 
@@ -40,7 +40,7 @@ class TestContactSerializer:
         is called.
         """
         contact = self._make_contact()
-        c = ContactSerializer(instance=contact)
+        c = ContactDetailSerializer(instance=contact)
         data = {
             'email': 'bar@foo.com',
             'accepts_dit_email_marketing': True,
@@ -61,7 +61,7 @@ class TestContactSerializer:
         is called with partial data.
         """
         contact = self._make_contact()
-        c = ContactSerializer(instance=contact, partial=True)
+        c = ContactDetailSerializer(instance=contact, partial=True)
         data = {
             'accepts_dit_email_marketing': True,
         }
@@ -81,7 +81,7 @@ class TestContactSerializer:
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
-        c = ContactSerializer(instance=contact, partial=True)
+        c = ContactDetailSerializer(instance=contact, partial=True)
         data = {
             'last_name': 'Nelson1',
         }
@@ -123,7 +123,7 @@ class TestContactSerializer:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = ContactSerializer(data=data)
+        c = ContactDetailSerializer(data=data)
         c.is_valid(raise_exception=True)
         c.create(c.validated_data)
         update_contact_task_mock.assert_called_once_with(
