@@ -20,6 +20,11 @@ pytestmark = pytest.mark.django_db
 
 FROZEN_TIME = '2020-03-13T14:21:24.367265+00:00'
 
+request = Mock(headers={
+    'x-b3-traceid': '123',
+    'x-b3-spanid': '456',
+})
+
 
 @pytest.fixture
 def update_contact_task_mock(monkeypatch):
@@ -46,15 +51,20 @@ class TestContactSerializer:
         is called.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact)
-
+        c = ContactDetailSerializer(
+            instance=contact,
+            context={'request': request},
+        )
         c.update(c.instance, {
             'email': 'bar@foo.com',
             'accepts_dit_email_marketing': True,
         })
         update_contact_task_mock.assert_called_once_with(
             args=('bar@foo.com', True),
-            kwargs={'modified_at': FROZEN_TIME},
+            kwargs={
+                'modified_at': FROZEN_TIME,
+                'zipkin_headers': request.headers,
+            },
         )
 
     def test_serializer_update_partial_call_task(
@@ -73,7 +83,7 @@ class TestContactSerializer:
         })
         update_contact_task_mock.assert_called_once_with(
             args=(c.instance.email, True),
-            kwargs={'modified_at': FROZEN_TIME},
+            kwargs={'modified_at': FROZEN_TIME, 'zipkin_headers': {}},
         )
 
     def test_serializer_update_partial_not_call_task(
@@ -128,12 +138,15 @@ class TestContactSerializer:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = ContactDetailSerializer(data=data)
+        c = ContactDetailSerializer(data=data, context={'request': request})
         c.is_valid(raise_exception=True)
         c.create(c.validated_data)
         update_contact_task_mock.assert_called_once_with(
             args=(data['email'], data['accepts_dit_email_marketing']),
-            kwargs={'modified_at': FROZEN_TIME},
+            kwargs={
+                'modified_at': FROZEN_TIME,
+                'zipkin_headers': request.headers,
+            },
         )
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))

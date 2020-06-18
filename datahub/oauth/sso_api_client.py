@@ -36,7 +36,7 @@ class IntrospectionSerializer(serializers.Serializer):
     exp = serializers.IntegerField(required=False)
 
 
-def introspect_token(token):
+def introspect_token(token, request=None):
     """Get details about an access token from the introspection endpoint in Staff SSO."""
     try:
         token_data = _request(
@@ -44,6 +44,7 @@ def introspect_token(token):
             'o/introspect/',
             response_serializer_class=IntrospectionSerializer,
             data={'token': token},
+            request=request,
         )
     except SSORequestError as exc:
         # SSO returns a 401 if the token is invalid (non-existent)
@@ -59,18 +60,18 @@ def introspect_token(token):
     return token_data
 
 
-def get_user_by_email(email):
+def get_user_by_email(email, request=None):
     """
     Look up details about a user in Staff SSO using an email address.
 
     Any of a user's email addresses can be specified.
     """
-    return _get_user(email=email)
+    return _get_user(email=email, request=request)
 
 
-def get_user_by_email_user_id(email_user_id):
+def get_user_by_email_user_id(email_user_id, request=None):
     """Look up details about a user in Staff SSO using their unique email user ID."""
-    return _get_user(email_user_id=email_user_id)
+    return _get_user(email_user_id=email_user_id, request=request)
 
 
 def _get_user(**params):
@@ -82,14 +83,19 @@ def _get_user(**params):
         raise
 
 
-def _request(method, path, response_serializer_class=None, **kwargs):
+def _request(method, path, response_serializer_class=None, request=None, **kwargs):
     """
     Internal utility function to make a generic API request to Staff SSO.
 
     As this deals with authentication, this aims to be more robust than might be the case
     for other API requests.
     """
-    api_client = _get_api_client()
+    api_client = APIClient(
+        settings.STAFF_SSO_BASE_URL,
+        TokenAuth(settings.STAFF_SSO_AUTH_TOKEN, token_keyword='Bearer'),
+        default_timeout=settings.STAFF_SSO_REQUEST_TIMEOUT,
+        request=request,
+    )
 
     try:
         response = api_client.request(method, path, **kwargs)
@@ -113,11 +119,3 @@ def _request(method, path, response_serializer_class=None, **kwargs):
         raise SSORequestError('SSO response validation failed') from exc
 
     return serializer.validated_data
-
-
-def _get_api_client():
-    return APIClient(
-        settings.STAFF_SSO_BASE_URL,
-        TokenAuth(settings.STAFF_SSO_AUTH_TOKEN, token_keyword='Bearer'),
-        default_timeout=settings.STAFF_SSO_REQUEST_TIMEOUT,
-    )

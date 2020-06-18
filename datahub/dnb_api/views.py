@@ -60,7 +60,10 @@ class DNBCompanySearchView(APIView):
         with Data Hub company details if the company exists (and can be matched)
         on Data Hub.
         """
-        upstream_response = search_dnb(request.data)
+        upstream_response = search_dnb(
+            query_params=request.data,
+            request=request,
+        )
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
@@ -168,7 +171,7 @@ class DNBCompanyCreateView(APIView):
         duns_number = duns_serializer.validated_data['duns_number']
 
         try:
-            dnb_company = get_company(duns_number)
+            dnb_company = get_company(duns_number, request)
 
         except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponse) as exc:
             raise APIUpstreamException(str(exc))

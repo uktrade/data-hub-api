@@ -56,7 +56,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
         if not token:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
-        token_data, was_cached = _look_up_token(token)
+        token_data, was_cached = _look_up_token(token, request)
         if not token_data:
             raise AuthenticationFailed(INVALID_CREDENTIALS_MESSAGE)
 
@@ -72,7 +72,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
         return user, None
 
 
-def _look_up_token(token) -> Tuple[Optional[dict], bool]:
+def _look_up_token(token, request) -> Tuple[Optional[dict], bool]:
     """
     Look up data about an access token.
 
@@ -86,7 +86,7 @@ def _look_up_token(token) -> Tuple[Optional[dict], bool]:
         return cached_token_data, True
 
     try:
-        introspection_data = introspect_token(token)
+        introspection_data = introspect_token(token, request)
     except SSOInvalidToken:
         return None, False
     except SSORequestError:
