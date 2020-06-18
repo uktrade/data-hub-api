@@ -2,7 +2,7 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import (
     integer_validator,
     MaxLengthValidator,
@@ -249,11 +249,6 @@ class Company(ArchivableModel, BaseModel):
     pending_dnb_investigation = models.BooleanField(
         default=False,
         help_text='Whether this company is to be investigated by DNB.',
-    )
-    # TODO: Remove this once the API endpoint for creating D&B investigations is released
-    dnb_investigation_data = JSONField(
-        null=True,
-        blank=True,
     )
     export_potential = models.CharField(
         max_length=MAX_LENGTH,
