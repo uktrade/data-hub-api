@@ -55,7 +55,7 @@ class ActivityFeedView(APIView):
             content_type=upstream_response.headers.get('content-type'),
         )
 
-    def _get_upstream_response(self, request):
+    def _get_upstream_response(self, request=None):
         hawk_auth = HawkAuth(
             settings.ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID,
             settings.ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY,
@@ -65,6 +65,7 @@ class ActivityFeedView(APIView):
         api_client = APIClient(
             api_url=settings.ACTIVITY_STREAM_OUTGOING_URL,
             auth=hawk_auth,
+            request=request,
             raise_for_status=False,
             default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
         )

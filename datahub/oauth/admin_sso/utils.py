@@ -12,7 +12,7 @@ from datahub.core.api_client import APIClient, TokenAuth
 logger = logging.getLogger(__name__)
 
 
-def get_access_token(code, redirect_uri):
+def get_access_token(code, redirect_uri, request=None):
     """Fetch OAuth2 access token from remote server."""
     oauth_params = {
         'code': code,
@@ -21,7 +21,7 @@ def get_access_token(code, redirect_uri):
         'client_secret': settings.ADMIN_OAUTH2_CLIENT_SECRET,
         'redirect_uri': redirect_uri,
     }
-    response = _get_api_client().request(
+    response = _get_api_client(request=request).request(
         'POST',
         settings.ADMIN_OAUTH2_TOKEN_FETCH_PATH,
         params=oauth_params,
@@ -88,11 +88,12 @@ def build_redirect_uri(request, location):
     return absolute_uri
 
 
-def _get_api_client(token=None):
+def _get_api_client(token=None, request=None):
     token = TokenAuth(token, 'Bearer') if token else None
     return APIClient(
         settings.ADMIN_OAUTH2_BASE_URL,
         auth=token,
         raise_for_status=True,
         default_timeout=settings.ADMIN_OAUTH2_REQUEST_TIMEOUT,
+        request=request,
     )
