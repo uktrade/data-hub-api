@@ -176,7 +176,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'telephone_alternative',
             'email_alternative',
             'notes',
-            'accepts_dit_email_marketing',
             'archived',
             'archived_documents_url_path',
             'archived_on',
@@ -209,6 +208,16 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
+
+
+class ContactDetailSerializer(ContactSerializer):
+    """
+    This is the same as the ContactSerializer except it includes
+    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
+    """
+
+    class Meta(ContactSerializer.Meta):
+        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
 
     def _notify_consent_service(self, validated_data):
         """
