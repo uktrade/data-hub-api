@@ -1753,7 +1753,6 @@ class TestCompanyChangeRequestView(APITestMixin):
     """
     Test GET `/dnb/company-change-request` endpoint.
     """
-    # TODO: Test that a change request comes back properly
 
     @pytest.mark.parametrize(
         'request_exception, expected_exception, expected_message',
@@ -1793,6 +1792,98 @@ class TestCompanyChangeRequestView(APITestMixin):
             content_type='application/json',
         )
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @pytest.mark.parametrize(
+        'change_request,dnb_request,dnb_response',
+        (
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'postcode': 'W1 0TN',
+                            'country': {
+                                'id': constants.Country.united_kingdom.value.id,
+                            },
+                        },
+                        'number_of_employees': 100,
+                        'turnover': 1000,
+                    },
+                },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+            ),
+        ),
+    )
+    def test_that_pending_request_returns_correctly(
+        self,
+        requests_mock,
+        change_request,
+        dnb_request,
+        dnb_response,
+    ):
+        """
+        Test that pending change requests stored in the dnb-service can be
+        retrieved correctly.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.get(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            {'duns_number': '123456789', 'status': 'pending'},
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == dnb_response
 
 
 class TestCompanyInvestigationView(APITestMixin):
