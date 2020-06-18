@@ -376,7 +376,7 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
 
     def validate_status(self, status):
         """
-        Validate status
+        Validate status.
         """
         if status == 'pending' or status == 'submitted':
             return status
