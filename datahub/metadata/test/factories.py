@@ -87,6 +87,15 @@ class ReferralSourceMarketingFactory(factory.django.DjangoModelFactory):
         model = 'metadata.ReferralSourceMarketing'
 
 
+class SectorClusterFactory(factory.django.DjangoModelFactory):
+    """SectorCluster factory."""
+
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'metadata.SectorCluster'
+
+
 class SectorFactory(factory.django.DjangoModelFactory):
     """Sector factory."""
 
