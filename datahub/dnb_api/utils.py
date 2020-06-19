@@ -230,18 +230,6 @@ def format_dnb_company(dnb_company):
     }
 
 
-# TODO: Remove this once the D&B investigation endpoint has been released
-def format_dnb_company_investigation(data):
-    """
-    Format DNB company investigation payload to something
-    DNBCompanyInvestigationSerlizer can parse.
-    """
-    data['dnb_investigation_data'] = {
-        'telephone_number': data.pop('telephone_number', None),
-    }
-    return data
-
-
 def update_company_from_dnb(
     dh_company,
     dnb_company,

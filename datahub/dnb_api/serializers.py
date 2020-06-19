@@ -189,51 +189,6 @@ class LegacyDNBInvestigationDataSerializer(serializers.Serializer):
     )
 
 
-# TODO: Refactor this once the D&B investigations endpoint has been released
-class LegacyDNBCompanyInvestigationSerializer(CompanySerializer):
-    """
-    For creating Company record to be investigated by DNB.
-
-    Sets `dnb_investigation_data`.
-    """
-
-    dnb_investigation_data = serializers.JSONField(
-        required=False,
-        allow_null=True,
-        write_only=True,
-    )
-
-    def validate_dnb_investigation_data(self, dnb_investigation_data):
-        """
-        Check if dnb_investigation_data is valid.
-        """
-        if dnb_investigation_data in (None, ''):
-            return None
-        serializer = LegacyDNBInvestigationDataSerializer(data=dnb_investigation_data)
-        serializer.is_valid(raise_exception=True)
-        return serializer.validated_data
-
-    def validate(self, data):
-        """
-        Validate if either website or telephone_number is present.
-        """
-        data = super().validate(data)
-        investigation_data = data.get('dnb_investigation_data') or {}
-
-        if (
-            data.get('website') in (None, '')
-            and investigation_data.get('telephone_number') in (None, '')
-        ):
-            raise serializers.ValidationError(
-                'Either website or telephone_number must be provided.',
-            )
-
-        return data
-
-    class Meta(CompanySerializer.Meta):
-        fields = CompanySerializer.Meta.fields + ('dnb_investigation_data', )
-
-
 class DNBCompanyLinkSerializer(DUNSNumberSerializer):
     """
     Validate POST data for DNBCompanyLinkView.
