@@ -15,9 +15,10 @@ class TeamsDatasetView(BaseDatasetView):
     def get_dataset(self):
         """Returns list of Teams Dataset records"""
         return Team.objects.values(
+            'country__name',
+            'disabled_on',
             'id',
             'name',
             'role__name',
             'uk_region__name',
-            'country__name',
         )
