@@ -6,7 +6,6 @@ from datahub.dnb_api.views import (
     DNBCompanyInvestigationView,
     DNBCompanyLinkView,
     DNBCompanySearchView,
-    LegacyDNBCompanyCreateInvestigationView,
 )
 
 urlpatterns = [
@@ -19,11 +18,6 @@ urlpatterns = [
         'company-create',
         DNBCompanyCreateView.as_view(),
         name='company-create',
-    ),
-    path(
-        'company-create-investigation',
-        LegacyDNBCompanyCreateInvestigationView.as_view(),
-        name='company-create-investigation',
     ),
     path(
         'company-link',
