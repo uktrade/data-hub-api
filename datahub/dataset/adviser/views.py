@@ -18,6 +18,7 @@ class AdvisersDatasetView(BaseDatasetView):
             'id',
             'date_joined',
             'first_name',
+            'last_login',
             'last_name',
             'telephone_number',
             'contact_email',

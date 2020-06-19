@@ -29,6 +29,7 @@ class OMISDatasetView(BaseDatasetView):
             'completed_on',
             'contact_id',
             'created_by__dit_team_id',
+            'created_by_id',
             'created_on',
             'delivery_date',
             'id',
