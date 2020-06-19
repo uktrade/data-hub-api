@@ -37,8 +37,9 @@ CANT_ADD_ARCHIVED_COMPANY_MESSAGE = gettext_lazy(
 )
 
 CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE = gettext_lazy(
-    "Only archived pipeline item can be deleted.",
+    'Only archived pipeline item can be deleted.',
 )
+
 
 class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
     """
@@ -201,6 +202,7 @@ class CompanyListItemAPIView(APIView):
 
 class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet, DestroyModelMixin):
     """A view set for returning the contents of a pipeline item and to add a new one."""
+
     serializer_class = PipelineItemSerializer
     filter_backends = (
         DjangoFilterBackend,
@@ -216,9 +218,11 @@ class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet, DestroyModelMixin
         return super().get_queryset().filter(adviser=self.request.user)
 
     def perform_destroy(self, instance):
-        if instance.archived == False:
+        """Perform destroy validation ensuring that the instance is archived before deleting"""
+        if not instance.archived:
             errors = {
-               api_settings.NON_FIELD_ERRORS_KEY: CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE,
+                api_settings.NON_FIELD_ERRORS_KEY: CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE,
             }
+
             raise serializers.ValidationError(errors)
         return instance.delete()

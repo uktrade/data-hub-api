@@ -1683,7 +1683,7 @@ class TestDeletePipelineItemView(APITestMixin):
 
     def test_can_delete_a_pipeline_item_when_archived(self):
         """Test that an item can be deleted.."""
-        item = ArchivedPipelineItemFactory(adviser=self.user, )
+        item = ArchivedPipelineItemFactory(adviser=self.user)
         url = _pipeline_item_detail_url(item.pk)
 
         response = self.api_client.delete(url)
