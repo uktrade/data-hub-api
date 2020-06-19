@@ -24,7 +24,6 @@ from datahub.dnb_api.serializers import (
     DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
-    LegacyDNBCompanyInvestigationSerializer,
 )
 from datahub.dnb_api.utils import (
     create_investigation,
@@ -200,56 +199,6 @@ class DNBCompanyCreateView(APIView):
         )
 
         statsd.incr('dnb.create.company')
-        return Response(
-            company_serializer.to_representation(datahub_company),
-        )
-
-
-# TODO: Remove this API endpoint when the new company investigation proxy
-# endpoint is available
-class LegacyDNBCompanyCreateInvestigationView(APIView):
-    """
-    View for creating a company for DNB to investigate.
-
-    This view is not inheriting from CoreViewSet because
-    `format_dnb_company_investigation` mutates `request.data`
-    which when shoehorned into CoreViewSet does not result in
-    less or more readable code.
-    """
-
-    permission_classes = (
-        HasPermissions(
-            f'company.{CompanyPermission.view_company}',
-            f'company.{CompanyPermission.add_company}',
-        ),
-    )
-
-    def post(self, request):
-        """
-        Given a minimal set of fields that may be necessary for DNB investigation,
-        create a Company record in DataHub.
-        """
-        formatted_company_data = format_dnb_company_investigation(request.data)
-        company_serializer = LegacyDNBCompanyInvestigationSerializer(data=formatted_company_data)
-
-        try:
-            company_serializer.is_valid(raise_exception=True)
-        except serializers.ValidationError:
-            message = 'Company investigation payload failed serializer validation'
-            extra_data = {
-                'formatted_dnb_company_data': formatted_company_data,
-                'dh_company_serializer_errors': company_serializer.errors,
-            }
-            logger.error(message, extra=extra_data)
-            raise
-
-        datahub_company = company_serializer.save(
-            created_by=request.user,
-            modified_by=request.user,
-            pending_dnb_investigation=True,
-        )
-
-        statsd.incr('dnb.create.investigation')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
