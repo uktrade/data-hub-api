@@ -7,6 +7,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from requests.exceptions import HTTPError
 
 from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
 from datahub.core.api_client import APIClient, HawkAuth
@@ -22,7 +23,6 @@ CONSENT_SERVICE_READ_TIMEOUT = 30.0
 def _get_client():
     """
     Get configured API client for the consent service,
-
     _api_client could've just been set as a top level attribute
     of this module but that makes testing harder as the settings are
     loaded at `import` time rather than at run time. Which breaks test
@@ -81,24 +81,31 @@ def update_consent(email_address, accepts_dit_email_marketing, modified_at=None)
 def get_many(emails):
     """
     Bulk lookup consent for a list of emails
-
     :param emails: List of email addresses
     :return: dict of email address to consent status
     """
     body = {
         'emails': emails,
     }
+    api_client = _get_client()
 
-    response = _get_client().request(
-        'POST',
-        CONSENT_SERVICE_PERSON_PATH_LOOKUP,
-        json=body,
-        params={'limit': len(emails)},
-    )
-    return {
-        result['email']: CONSENT_SERVICE_EMAIL_CONSENT_TYPE in result['consents']
-        for result in response.json()['results']
-    }
+    try:
+        response = api_client.request(
+            'POST',
+            CONSENT_SERVICE_PERSON_PATH_LOOKUP,
+            json=body,
+            params={'limit': len(emails)},
+        )
+        response.raise_for_status()
+        return {
+            result['email']: CONSENT_SERVICE_EMAIL_CONSENT_TYPE in result['consents']
+            for result in response.json()['results']
+        }
+    except HTTPError:
+        return {
+            email: False
+            for email in emails
+        }
 
 
 def get_one(email):

@@ -88,3 +88,63 @@ class TestConsentClient:
         result = consent.update_consent('foo@bar.com', accepts_marketing)
         assert result is None
         assert matcher.called_once
+
+    def test_consent_flag_false_when_service_fails_get_one(self, requests_mock):
+        """
+        When the feature flag is enabled, but the Consent Service is down,
+        It returns an email with false as the value.
+        """
+        requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            json={
+                'results': [
+                    {
+                        'email': 'foo@bar.com',
+                        'consents': [
+                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                        ],
+                    },
+                ],
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+        response = consent.get_one('foo@bar.com')
+        assert response is False
+
+    def test_consent_flag_false_when_service_fails_get_many(self, requests_mock):
+        """
+        When the feature flag is enabled, but the Consent Service is down,
+        It returns a dictionary of emails with False as the value.
+        """
+        requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            json={
+                'results': [
+                    {
+                        'email': 'foo1@bar.com',
+                        'consents': [
+                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                        ],
+                    },
+                    {
+                        'email': 'foo2@bar.com',
+                        'consents': [
+                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                        ],
+                    },
+                    {
+                        'email': 'foo3@bar.com',
+                        'consents': [
+                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                        ],
+                    },
+                ],
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+        emails = ['foo1@bar.com', 'foo2@bar.com', 'foo3@bar.com']
+        response = consent.get_many(emails)
+        assert response == {email: False for email in emails}
