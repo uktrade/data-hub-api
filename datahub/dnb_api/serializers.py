@@ -359,7 +359,7 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
         min_length=9,
         validators=(integer_validator,),
     )
-    status = serializers.CharField(max_length=100)
+    status = serializers.ChoiceField(choices=['pending', 'submitted'])
 
     def validate_duns_number(self, duns_number):
         """
@@ -373,17 +373,6 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
             )
         self.company = company
         return duns_number
-
-    def validate_status(self, status):
-        """
-        Validate status.
-        """
-        if status == 'pending' or status == 'submitted':
-            return status
-        else:
-            raise serializers.ValidationError(
-                'Status must be either submitted or pending.',
-            )
 
 
 class DNBCompanyInvestigationSerializer(serializers.Serializer):
