@@ -1754,7 +1754,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'status': 'pending',
                 },
                 {
-                    'duns_number': ['"something invalid" is not a valid choice.'],
+                    'duns_number': ['Enter a valid integer.', 'Ensure this field has no more than 9 characters.'],
                 },
             ),
             # Invalid status
