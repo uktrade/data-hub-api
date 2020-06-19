@@ -33,7 +33,6 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
-    format_dnb_company_investigation,
     get_change_request,
     get_company,
     request_changes,
