@@ -1923,7 +1923,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'status': 'something invalid',
                 },
                 {
-                    'duns_number': ['"something invalid" is not a valid choice.'],
+                    'status': ['"something invalid" is not a valid choice.'],
                 },
             ),
         ),
