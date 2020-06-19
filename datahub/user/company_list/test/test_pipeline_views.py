@@ -1681,6 +1681,14 @@ class TestDeletePipelineItemView(APITestMixin):
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_only_owner_of_item_can_delete_pipeline_item(self):
+        """Test that a 404 is returned if the user is not the items owner."""
+        item = ArchivedPipelineItemFactory()
+        url = _pipeline_item_detail_url(item.pk)
+
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     def test_can_delete_a_pipeline_item_when_archived(self):
         """Test that an item can be deleted.."""
         item = ArchivedPipelineItemFactory(adviser=self.user)
