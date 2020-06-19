@@ -1645,3 +1645,57 @@ class TestGetPipelineItemView(APITestMixin):
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestDeletePipelineItemView(APITestMixin):
+    """Tests for deleting a single pipeline item."""
+
+    def test_returns_401_if_unauthenticated(self, api_client):
+        """Test that a 401 is returned if the user is unauthenticated."""
+        url = _pipeline_item_detail_url(uuid4())
+
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize(
+        'permission_codenames,expected_status',
+        (
+            ([], status.HTTP_403_FORBIDDEN),
+            (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
+            (['delete_pipelineitem'], status.HTTP_204_NO_CONTENT),
+        ),
+    )
+    def test_permission_checking(self, permission_codenames, expected_status, api_client):
+        """Test that the expected status is returned for various user permissions."""
+        user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
+        item = ArchivedPipelineItemFactory(adviser=user)
+        url = _pipeline_item_detail_url(item.pk)
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
+        assert response.status_code == expected_status
+
+    def test_returns_404_if_pipeline_item_doesnt_exist(self):
+        """Test that a 404 is returned if the pipeline item doesn't exist."""
+        url = _pipeline_item_detail_url(uuid4())
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_can_delete_a_pipeline_item_when_archived(self):
+        """Test that an item can be deleted.."""
+        item = ArchivedPipelineItemFactory(adviser=self.user, )
+        url = _pipeline_item_detail_url(item.pk)
+
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_400_if_pipeline_item_is_not_archived(self):
+        """Test that an item can be deleted.."""
+        item = PipelineItemFactory(adviser=self.user)
+        url = _pipeline_item_detail_url(item.pk)
+
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': 'Only archived pipeline item can be deleted.',
+        }
