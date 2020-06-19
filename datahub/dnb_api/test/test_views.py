@@ -1885,6 +1885,69 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == dnb_response
 
+    @pytest.mark.parametrize(
+        'change_request,expected_response',
+        (
+            # No duns_number
+            (
+                {
+                    'status': 'pending',
+                },
+                {
+                    'duns_number': ['This field may not be null.'],
+                },
+            ),
+            # No status
+            (
+                {
+                    'duns_number': '123456789',
+                },
+                {
+                    'status': ['This field may not be null.'],
+                },
+            ),
+            # Invalid duns_number
+            (
+                {
+                    'duns_number': 'something invalid',
+                    'status': 'pending',
+                },
+                {
+                    'duns_number': ['"something invalid" is not a valid choice.'],
+                },
+            ),
+            # Invalid status
+            (
+                {
+                    'duns_number': '123456789',
+                    'status': 'something invalid',
+                },
+                {
+                    'duns_number': ['"something invalid" is not a valid choice.'],
+                },
+            ),
+        ),
+    )
+    def test_invalid_fields_for_get(
+        self,
+        change_request,
+        expected_response,
+    ):
+        """
+        Test that invalid payload results in 400 and an appropriate
+        error message.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            change_request,
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_response
+
 
 class TestCompanyInvestigationView(APITestMixin):
     """
