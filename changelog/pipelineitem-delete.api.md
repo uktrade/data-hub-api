@@ -1,0 +1,1 @@
+For `/v4/pipeline-item/<uuid:pk>>` url, added support to the `DELETE` method. Logic has been added to ensure that only archived pipeline items can be deleted. If a pipeline item is not archived and a delete is attempted, the api will return bad request http status 400.
