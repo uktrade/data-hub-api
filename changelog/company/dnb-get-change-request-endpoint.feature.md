@@ -1,1 +1,0 @@
-The `company-change-request` endpoint has been expanded to allow the retrieval of pending change requests from the `dnb-service`. In order to do this a new serializer and utility function have been added.
