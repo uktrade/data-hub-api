@@ -169,7 +169,6 @@ def base_company_dict():
         'company_number': None,
         'description': None,
         'dnb_investigation_id': None,
-        'dnb_investigation_data': None,
         'duns_number': None,
         'export_potential': None,
         'export_to_countries': [],

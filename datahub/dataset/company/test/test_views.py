@@ -23,8 +23,14 @@ def get_expected_data_from_company(company):
         'address_town': company.address_town,
         'archived': company.archived,
         'archived_on': format_date_or_datetime(company.archived_on),
+        'archived_reason': company.archived_reason,
         'business_type__name': get_attr_or_none(company, 'business_type.name'),
         'company_number': company.company_number,
+        'created_by_id': (
+            str(company.created_by_id)
+            if company.created_by is not None
+            else None
+        ),
         'created_on': format_date_or_datetime(company.created_on),
         'description': company.description,
         'duns_number': company.duns_number,
@@ -87,6 +93,9 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
     def test_success(self, data_flow_api_client, company_factory):
         """Test that endpoint returns with expected data for a single company"""
         company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.save()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
