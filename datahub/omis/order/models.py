@@ -11,6 +11,7 @@ from django.utils.timezone import now, utc
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
+from datahub.core import reversion
 from datahub.core.models import (
     BaseConstantModel,
     BaseModel,
@@ -85,6 +86,7 @@ class OrderPermission(StrEnum):
     export = 'export_order'
 
 
+@reversion.register_base_model()
 class Order(BaseModel):
     """
     Details regarding an OMIS Order.
