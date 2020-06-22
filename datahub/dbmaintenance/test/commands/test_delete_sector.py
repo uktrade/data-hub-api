@@ -1,4 +1,5 @@
 from io import BytesIO
+from unittest import mock
 
 import factory
 import pytest
@@ -221,3 +222,41 @@ def test_simulate(s3_stubber):
 
     sectors = Sector.objects.filter(pk__in=sector_pks)
     assert [str(sector.pk) for sector in sectors] == sector_pks
+
+
+@mock.patch(
+    'datahub.dbmaintenance.management.commands.delete_sector.get_unreferenced_objects_query',
+)
+def test_get_unreferenced_objects_query(get_unreferenced_objects_query, s3_stubber):
+    """Test that the get_unreferenced_objects_query function is only called once per file."""
+    sector_pks = [
+        '00000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000003',
+    ]
+    sectors = SectorFactory.create_batch(
+        3,
+        id=factory.Iterator(sector_pks),
+    )
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id
+{sectors[0].pk}
+{sectors[1].pk}
+{sectors[2].pk}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('delete_sector', bucket, object_key)
+    assert get_unreferenced_objects_query.call_count == 1
