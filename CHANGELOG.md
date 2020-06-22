@@ -1,3 +1,45 @@
+# Data Hub API 34.0.0 (2020-06-22)
+
+
+## Removals
+
+- **Companies** The field `dnb_investigation_data` was removed from the API, from the Django admin and from the model definition. The database column will be deleted with the next release.
+
+  All pending investigations data have been ported to `dnb-service`.
+
+## Features
+
+- **Advisers** `GET /adviser/`: A new query parameter, `dit_team__role`, was added. This filters results to 
+  advisers within a particular DIT team role, using ID lookup.
+
+  For example, `GET /adviser/?dit_team__role=<UUID>` returns
+  advisers that are in 'International Trade Team' roles.
+- **Companies** The `company-change-request` endpoint has been expanded to allow the retrieval of pending change requests from the `dnb-service`. In order to do this a new serializer and utility function have been added.
+- **OMIS** The `Order` model is now tracked by reversion.
+- An `update_order_sector` management command was added for updating an order's sector.
+
+  This will be initially used to map OMIS orders to their new sectors after a sector migration exercise is carried out.
+- An `update_sector_parent` management command was added for moving sectors to new parents.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## API
+
+- **Advisers** `GET /v4/dataset/advisers-dataset`: The field `last_login` was added to the advisers dataset endpoint
+- **Companies** `GET /v4/dataset/companies-dataset`: 2 new fields were added to the companies dataset response:
+  - `archived_reason`
+  - `created_by_id`
+- **Companies** The endpoint `POST /v4/dnb/company-create-investigation` has been removed from the `data-hub-api`.
+
+  It is replaced by `POST /v4/company/` which creates a stub Company record with `pending_dnb_investigation=True` and `POST /v4/dnb/company_investigation/` which creates a new investigation in `dnb-service`.
+- **Contacts** `GET /v4/dataset/contacts-dataset`: The field `created_by_id` was added to the contacts dataset endpoint
+- **Events** `GET /v4/dataset/events-dataset`: 2 new fields were added to the events dataset response:
+  - `created_by_id`
+  - `disabled_on`
+- **OMIS** `GET /v4/dataset/omis-dataset`: The field `created_by_id` was added to the omis dataset endpoint
+- `GET /v4/dataset/teams-dataset`: The field `disabled_on` was added to the teams dataset endpoint
+
+
 # Data Hub API 33.4.0 (2020-06-18)
 
 
