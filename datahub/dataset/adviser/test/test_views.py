@@ -16,6 +16,7 @@ def get_expected_data_from_adviser(adviser):
         'id': str(adviser.id),
         'date_joined': format_date_or_datetime(adviser.date_joined),
         'first_name': adviser.first_name,
+        'last_login': format_date_or_datetime(adviser.last_login),
         'last_name': adviser.last_name,
         'telephone_number': adviser.telephone_number,
         'contact_email': adviser.contact_email,

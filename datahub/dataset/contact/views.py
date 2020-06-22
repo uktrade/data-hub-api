@@ -31,6 +31,7 @@ class ContactsDatasetView(BaseDatasetView):
             'archived',
             'archived_on',
             'company_id',
+            'created_by_id',
             'created_on',
             'email',
             'email_alternative',
