@@ -21,6 +21,7 @@ from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
+    DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
 )
@@ -31,6 +32,7 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
+    get_change_request,
     get_company,
     request_changes,
     search_dnb,
@@ -272,6 +274,31 @@ class DNBCompanyChangeRequestView(APIView):
 
         try:
             response = request_changes(**change_request_serializer.validated_data)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        return Response(response)
+
+    def get(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        duns_number = request.query_params.get('duns_number', None)
+        status = request.query_params.get('status', None)
+
+        change_request_serializer = DNBGetCompanyChangeRequestSerializer(
+            data={'duns_number': duns_number, 'status': status},
+        )
+
+        change_request_serializer.is_valid(raise_exception=True)
+
+        try:
+            response = get_change_request(**change_request_serializer.validated_data)
 
         except (
             DNBServiceConnectionError,
