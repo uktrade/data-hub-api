@@ -32,6 +32,7 @@ def get_expected_data_from_order(order):
         'completed_on': format_date_or_datetime(order.completed_on),
         'contact_id': str(order.contact_id),
         'created_by__dit_team_id': str(order.created_by.dit_team_id),
+        'created_by_id': str(order.created_by_id) if order.created_by is not None else None,
         'created_on': format_date_or_datetime(order.created_on),
         'delivery_date': format_date_or_datetime(order.delivery_date),
         'id': str(order.id),

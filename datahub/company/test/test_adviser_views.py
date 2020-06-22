@@ -8,7 +8,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.metadata.test.factories import TeamFactory
+from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
 
 class AdviserPermissionConfig(NamedTuple):
@@ -164,6 +164,34 @@ class TestAdviser(APITestMixin):
         actual_ids = Counter(str(adviser.pk) for adviser in matching_advisers)
         expected_ids = Counter(result['id'] for result in response_data['results'])
         assert actual_ids == expected_ids
+
+    def test_filter_by_dit_team__role(self):
+        """Test the `dit_team__role` filter"""
+        role = TeamRoleFactory(name='Role')
+        adviser = AdviserFactory(dit_team=TeamFactory(role=role))
+
+        api_client = self.create_api_client(user=self.user)
+        url = reverse('api-v1:advisor-list')
+
+        unfiltered_response = api_client.get(url)
+        assert unfiltered_response.status_code == status.HTTP_200_OK
+        unfiltered_response_data = unfiltered_response.json()
+
+        assert unfiltered_response_data['count'] == 2
+
+        filtered_response = api_client.get(
+            url,
+            data={
+                'dit_team__role': str(role.pk),
+            },
+        )
+        assert filtered_response.status_code == status.HTTP_200_OK
+        filtered_response_data = filtered_response.json()
+
+        assert filtered_response_data['count'] == 1
+
+        result = filtered_response_data['results'][0]
+        assert result['id'] == str(adviser.pk)
 
     @pytest.mark.parametrize(
         'terms,expected_results',
