@@ -25,6 +25,7 @@ from datahub.investment.project.test.factories import (
     InvestmentActivityFactory, InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
 from datahub.metadata.test.factories import SectorFactory
+from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.test.factories import PipelineItemFactory
 
 
@@ -42,6 +43,7 @@ MAPPINGS = {
     'investment.InvestmentActivity': InvestmentActivityFactory,
     'investor_profile.LargeCapitalInvestorProfile': LargeCapitalInvestorProfileFactory,
     'metadata.Sector': SectorFactory,
+    'order.Order': OrderFactory,
 }
 
 
