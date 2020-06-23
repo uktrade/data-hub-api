@@ -34,10 +34,10 @@ class Command(CSVBaseCommand):
             [
                 investment_project.sector.pk != old_sector_id,
                 investment_project.sector.pk == new_sector_id,
-            ]
+            ],
         ):
             logger.warning(
-                f'Not updating investment project {investment_project} as its',
+                f'Not updating InvestmentProject {investment_project} as its '
                 'sector has not changed',
             )
             return
