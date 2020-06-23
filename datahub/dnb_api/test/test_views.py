@@ -43,7 +43,6 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     (
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
-        reverse('api-v4:dnb-api:company-create-investigation'),
         reverse('api-v4:dnb-api:company-link'),
         reverse('api-v4:dnb-api:company-change-request'),
     ),
@@ -926,164 +925,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
 
-class TestDNBCompanyCreateInvestigationAPI(APITestMixin):
-    """
-    Tests for dnb-company-create-investigation endpoint.
-    """
-
-    @pytest.mark.parametrize(
-        'investigation_override',
-        (
-            {},
-            {'telephone_number': None},
-            {'website': None},
-        ),
-    )
-    def test_post(
-            self,
-            investigation_payload,
-            investigation_override,
-    ):
-        """
-        Test if we can post the unhappy path data to create a
-        Company record with `pending_dnb_investigation` set to
-        True.
-        """
-        payload = {
-            **investigation_payload,
-            **investigation_override,
-        }
-        response = self.api_client.post(
-            reverse('api-v4:dnb-api:company-create-investigation'),
-            data=payload,
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        company = Company.objects.get(
-            pk=response.json()['id'],
-        )
-        assert company.pending_dnb_investigation
-        assert company.created_by == self.user
-        assert company.modified_by == self.user
-        assert company.name == payload['name']
-        assert company.website == payload['website']
-        assert company.dnb_investigation_data == {
-            'telephone_number': payload['telephone_number'],
-        }
-        assert company.address_1 == payload['address']['line_1']
-        assert company.address_2 == payload['address']['line_2']
-        assert company.address_town == payload['address']['town']
-        assert company.address_county == payload['address']['county']
-        assert company.address_postcode == payload['address']['postcode']
-        assert str(company.address_country.id) == payload['address']['country']['id']
-        assert str(company.business_type.id) == payload['business_type']
-        assert str(company.sector.id) == payload['sector']
-        assert str(company.uk_region.id) == payload['uk_region']
-
-    @pytest.mark.parametrize(
-        'investigation_override, expected_error',
-        (
-            # Website and telephone_number cannot both be null
-            (
-                {'website': None, 'telephone_number': None},
-                {'non_field_errors': ['Either website or telephone_number must be provided.']},
-            ),
-            # If website is specified, it should be a valid URL
-            (
-                {'website': 'test'},
-                {'website': ['Enter a valid URL.']},
-            ),
-            # Other fields that are required and enforced by CompanySerializer
-            (
-                {'name': None},
-                {'name': ['This field may not be null.']},
-            ),
-            (
-                {'business_type': None},
-                {'business_type': ['This field is required.']},
-            ),
-            (
-                {'address': None},
-                {'address': ['This field may not be null.']},
-            ),
-            (
-                {'sector': None},
-                {'sector': ['This field is required.']},
-            ),
-            (
-                {'uk_region': None},
-                {'uk_region': ['This field is required.']},
-            ),
-        ),
-    )
-    def test_post_invalid(
-            self,
-            investigation_payload,
-            investigation_override,
-            expected_error,
-    ):
-        """
-        Test if we post invalid data to the create-company-investigation
-        endpoint, we get an error.
-        """
-        payload = {
-            **investigation_payload,
-            **investigation_override,
-        }
-        response = self.api_client.post(
-            reverse('api-v4:dnb-api:company-create-investigation'),
-            data=payload,
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == expected_error
-
-    @pytest.mark.parametrize(
-        'permissions',
-        (
-            [],
-            [CompanyPermission.add_company],
-            [CompanyPermission.view_company],
-        ),
-    )
-    def test_post_no_permission(
-        self,
-        permissions,
-    ):
-        """
-        Create-company-investigation endpoint should return 403 if the user does not
-        have the necessary permissions.
-        """
-        user = create_test_user(permission_codenames=permissions)
-        api_client = self.create_api_client(user=user)
-        response = api_client.post(
-            reverse('api-v4:dnb-api:company-create-investigation'),
-            data={},
-        )
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_monitoring_create(
-        self,
-        monkeypatch,
-        investigation_payload,
-    ):
-        """
-        Test that the right counter is incremented when a stub company
-        gets created for investigation by DNB.
-        """
-        statsd_mock = Mock()
-        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
-        self.api_client.post(
-            reverse('api-v4:dnb-api:company-create-investigation'),
-            data=investigation_payload,
-        )
-        statsd_mock.incr.assert_called_with(
-            'dnb.create.investigation',
-        )
-
-
 class TestCompanyLinkView(APITestMixin):
     """
     Test POST `/dnb/company-link` endpoint.
@@ -1749,6 +1590,207 @@ class TestCompanyChangeRequestView(APITestMixin):
                 'address_postcode': company.address_postcode,
             },
         }
+
+    """
+    Test GET `/dnb/company-change-request` endpoint.
+    """
+
+    @pytest.mark.parametrize(
+        'request_exception, expected_exception, expected_message',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+        ),
+    )
+    def test_get_request_error(
+        self,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we raise the
+        exception with an appropriate message.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.get(
+            DNB_CHANGE_REQUEST_URL,
+            exc=request_exception,
+        )
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            {'duns_number': '123456789', 'status': 'pending'},
+            content_type='application/json',
+        )
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @pytest.mark.parametrize(
+        'change_request,dnb_request,dnb_response',
+        (
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'postcode': 'W1 0TN',
+                            'country': {
+                                'id': constants.Country.united_kingdom.value.id,
+                            },
+                        },
+                        'number_of_employees': 100,
+                        'turnover': 1000,
+                    },
+                },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
+                    },
+                },
+            ),
+        ),
+    )
+    def test_that_pending_request_returns_correctly(
+        self,
+        requests_mock,
+        change_request,
+        dnb_request,
+        dnb_response,
+    ):
+        """
+        Test that pending change requests stored in the dnb-service can be
+        retrieved correctly.
+        """
+        CompanyFactory(duns_number='123456789')
+        requests_mock.get(
+            DNB_CHANGE_REQUEST_URL,
+            status_code=status.HTTP_201_CREATED,
+            json=dnb_response,
+        )
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            {'duns_number': '123456789', 'status': 'pending'},
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == dnb_response
+
+    @pytest.mark.parametrize(
+        'change_request,expected_response',
+        (
+            # No duns_number
+            (
+                {
+                    'status': 'pending',
+                },
+                {
+                    'duns_number': ['This field may not be null.'],
+                },
+            ),
+            # No status
+            (
+                {
+                    'duns_number': '123456789',
+                },
+                {
+                    'status': ['This field may not be null.'],
+                },
+            ),
+            # Invalid duns_number
+            (
+                {
+                    'duns_number': 'something invalid',
+                    'status': 'pending',
+                },
+                {
+                    'duns_number': [
+                        'Enter a valid integer.',
+                        'Ensure this field has no more than 9 characters.',
+                    ],
+                },
+            ),
+            # Invalid status
+            (
+                {
+                    'duns_number': '123456789',
+                    'status': 'something invalid',
+                },
+                {
+                    'status': ['"something invalid" is not a valid choice.'],
+                },
+            ),
+        ),
+    )
+    def test_invalid_fields_for_get(
+        self,
+        change_request,
+        expected_response,
+    ):
+        """
+        Test that invalid payload results in 400 and an appropriate
+        error message.
+        """
+        CompanyFactory(duns_number='123456789')
+
+        response = self.api_client.get(
+            reverse('api-v4:dnb-api:company-change-request'),
+            change_request,
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == expected_response
 
 
 class TestCompanyInvestigationView(APITestMixin):
