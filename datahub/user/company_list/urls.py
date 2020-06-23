@@ -59,6 +59,7 @@ urlpatterns = [
             {
                 'patch': 'partial_update',
                 'get': 'retrieve',
+                'delete': 'destroy',
             },
         ),
         name='pipelineitem-detail',

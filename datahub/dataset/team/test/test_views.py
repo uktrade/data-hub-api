@@ -2,6 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.metadata.models import Team
 from datahub.metadata.test.factories import TeamFactory
@@ -10,11 +11,12 @@ from datahub.metadata.test.factories import TeamFactory
 def get_expected_data_from_team(team):
     """Returns team data as a dictionary"""
     return {
+        'country__name': team.country.name,
+        'disabled_on': format_date_or_datetime(team.disabled_on),
         'id': str(team.id),
         'name': team.name,
         'role__name': team.role.name,
         'uk_region__name': team.uk_region.name,
-        'country__name': team.country.name,
     }
 
 

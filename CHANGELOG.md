@@ -1,3 +1,99 @@
+# Data Hub API 34.0.0 (2020-06-22)
+
+
+## Removals
+
+- **Companies** The field `dnb_investigation_data` was removed from the API, from the Django admin and from the model definition. The database column will be deleted with the next release.
+
+  All pending investigations data have been ported to `dnb-service`.
+
+## Features
+
+- **Advisers** `GET /adviser/`: A new query parameter, `dit_team__role`, was added. This filters results to 
+  advisers within a particular DIT team role, using ID lookup.
+
+  For example, `GET /adviser/?dit_team__role=<UUID>` returns
+  advisers that are in 'International Trade Team' roles.
+- **Companies** The `company-change-request` endpoint has been expanded to allow the retrieval of pending change requests from the `dnb-service`. In order to do this a new serializer and utility function have been added.
+- **OMIS** The `Order` model is now tracked by reversion.
+- An `update_order_sector` management command was added for updating an order's sector.
+
+  This will be initially used to map OMIS orders to their new sectors after a sector migration exercise is carried out.
+- An `update_sector_parent` management command was added for moving sectors to new parents.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## API
+
+- **Advisers** `GET /v4/dataset/advisers-dataset`: The field `last_login` was added to the advisers dataset endpoint
+- **Companies** `GET /v4/dataset/companies-dataset`: 2 new fields were added to the companies dataset response:
+  - `archived_reason`
+  - `created_by_id`
+- **Companies** The endpoint `POST /v4/dnb/company-create-investigation` has been removed from the `data-hub-api`.
+
+  It is replaced by `POST /v4/company/` which creates a stub Company record with `pending_dnb_investigation=True` and `POST /v4/dnb/company_investigation/` which creates a new investigation in `dnb-service`.
+- **Contacts** `GET /v4/dataset/contacts-dataset`: The field `created_by_id` was added to the contacts dataset endpoint
+- **Events** `GET /v4/dataset/events-dataset`: 2 new fields were added to the events dataset response:
+  - `created_by_id`
+  - `disabled_on`
+- **OMIS** `GET /v4/dataset/omis-dataset`: The field `created_by_id` was added to the omis dataset endpoint
+- `GET /v4/dataset/teams-dataset`: The field `disabled_on` was added to the teams dataset endpoint
+- For `/v4/pipeline-item/<uuid:pk>>` url, added support to the `DELETE` method. Logic has been added to ensure that only archived pipeline items can be deleted. If a pipeline item is not archived and a delete is attempted, the api will return bad request http status 400.
+
+
+# Data Hub API 33.4.0 (2020-06-18)
+
+
+## Removals
+
+- **Contacts** The `accepts_dit_email_marketing` field has now been removed from the following end points: 
+  - GET /v3/contact
+  - GET /v4/company
+  - GET /v4/company/{id}
+  - PATCH /v4/company/{id}
+  - POST /v3/contact/{id}/archive
+  - POST /v3/contact/{id}/unarchive
+
+  The end points that still retain this field include: 
+  - POST /v3/contact 
+  - GET /v3/contact/{id}
+  - PATCH /v3/contact/{id}
+
+## Deprecations
+
+- The field `contact` is deprecated. Please check the API and Database schema
+  categories for more details.
+
+## Features
+
+- A `create_sector` management command was added for creating sectors and attaching them to a parent.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sector segments.
+
+## Internal changes
+
+- A new environment variable `ES_APM_SERVER_TIMEOUT` has been added so that the requests to Elasticsearch APM could be
+  cancelled if taking longer than specified time. The default value is `20s`.
+- Ignore existing fixtures when rerunning the setup-uat script
+
+  It will allow developers to rerun setup-uat.sh script without the need to clear the entire DB.
+
+## API
+
+- **Advisers** It's now possible to filter pipeline results by archived as well as status and company_id on `GET /v4/pipeline-item`.
+- **Advisers** Pipeline items can now be sorted by `created_on`, `modified_on` and `name`, and the `modified_on` field is now also exposed from the `GET /v4/pipeline-item` endpoint.
+- `GET,PATCH /v4/pipeline-item/<uuid:pk>` and `GET,POST /v4/pipeline-item`:
+  the field `contact` is deprecated and will be removed on or after 19 June 2020.
+
+## Database schema
+
+- **Advisers** The table ``company_list_pipelineitem_contacts`` with columns ``("id" serial NOT NULL PRIMARY KEY, "pipelineitem_id" uuid NOT NULL, "contact_id" uuid NOT NULL)`` was added. This is a many-to-many table linking pipeline item with contacts, that will eventually replace ``company_list_pipelineitem.contact_id`` field.
+
+  The table had not been fully populated with data yet; continue to use ``company_list_pipelineitem.contact_id`` for the time being.
+- The column `pipelineitem.contact` is deprecated and will be removed
+  on or after 19 June 2020.
+
+
 # Data Hub API 33.3.0 (2020-06-09)
 
 

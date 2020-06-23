@@ -460,6 +460,7 @@ class AdviserFilter(FilterSet):
         model = Advisor
         fields = {
             'is_active': ('exact',),
+            'dit_team__role': ('exact',),
         }
 
 
