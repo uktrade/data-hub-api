@@ -1,1 +1,1 @@
-New adviser being added to the test fixtures now allows us to run a full end to end test around managing a lead ITA.
+A new adviser has been added to the test fixtures. This adviser will be used in frontend end-to-end tests for managing a lead ITA.
