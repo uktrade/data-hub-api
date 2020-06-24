@@ -658,6 +658,7 @@ class InvestmentProjectCode(models.Model):
     project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
 
 
+@reversion.register_base_model()
 class InvestmentSector(models.Model):
     """Investment Sector a link between a DIT Sector and an FDI SIC Grouping."""
 
