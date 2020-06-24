@@ -23,7 +23,7 @@ class Command(CSVBaseCommand):
         """
         return super()._handle(*args, **options)
 
-    def _process_row(self, row, simulate=False, overwrite=False, **options):
+    def _process_row(self, row, simulate=False, **options):
         """Process a single row."""
         pk = parse_uuid(row['id'])
         company = Company.objects.get(pk=pk)
