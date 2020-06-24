@@ -230,18 +230,6 @@ def format_dnb_company(dnb_company):
     }
 
 
-# TODO: Remove this once the D&B investigation endpoint has been released
-def format_dnb_company_investigation(data):
-    """
-    Format DNB company investigation payload to something
-    DNBCompanyInvestigationSerlizer can parse.
-    """
-    data['dnb_investigation_data'] = {
-        'telephone_number': data.pop('telephone_number', None),
-    }
-    return data
-
-
 def update_company_from_dnb(
     dh_company,
     dnb_company,
@@ -417,6 +405,49 @@ def request_changes(duns_number, changes):
             {
                 'duns_number': duns_number,
                 'changes': changes,
+            },
+        )
+
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if not dnb_response.ok:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    return dnb_response.json()
+
+
+def _get_change_request(payload):
+    """
+    Get change request from dnb-service.
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+    response = api_client.request(
+        'GET',
+        'change-request/',
+        json=payload,
+        timeout=3.0,
+    )
+    return response
+
+
+def get_change_request(duns_number, status):
+    """
+    Get a change request for the company with the given duns_number
+    and status from the dnb-service.
+    """
+    try:
+        dnb_response = _get_change_request(
+            {
+                'duns_number': duns_number,
+                'status': status,
             },
         )
 

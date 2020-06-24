@@ -21,9 +21,9 @@ from datahub.dnb_api.serializers import (
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
+    DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
-    LegacyDNBCompanyInvestigationSerializer,
 )
 from datahub.dnb_api.utils import (
     create_investigation,
@@ -32,7 +32,7 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequest,
     DNBServiceInvalidResponse,
     DNBServiceTimeoutError,
-    format_dnb_company_investigation,
+    get_change_request,
     get_company,
     request_changes,
     search_dnb,
@@ -203,56 +203,6 @@ class DNBCompanyCreateView(APIView):
         )
 
 
-# TODO: Remove this API endpoint when the new company investigation proxy
-# endpoint is available
-class LegacyDNBCompanyCreateInvestigationView(APIView):
-    """
-    View for creating a company for DNB to investigate.
-
-    This view is not inheriting from CoreViewSet because
-    `format_dnb_company_investigation` mutates `request.data`
-    which when shoehorned into CoreViewSet does not result in
-    less or more readable code.
-    """
-
-    permission_classes = (
-        HasPermissions(
-            f'company.{CompanyPermission.view_company}',
-            f'company.{CompanyPermission.add_company}',
-        ),
-    )
-
-    def post(self, request):
-        """
-        Given a minimal set of fields that may be necessary for DNB investigation,
-        create a Company record in DataHub.
-        """
-        formatted_company_data = format_dnb_company_investigation(request.data)
-        company_serializer = LegacyDNBCompanyInvestigationSerializer(data=formatted_company_data)
-
-        try:
-            company_serializer.is_valid(raise_exception=True)
-        except serializers.ValidationError:
-            message = 'Company investigation payload failed serializer validation'
-            extra_data = {
-                'formatted_dnb_company_data': formatted_company_data,
-                'dh_company_serializer_errors': company_serializer.errors,
-            }
-            logger.error(message, extra=extra_data)
-            raise
-
-        datahub_company = company_serializer.save(
-            created_by=request.user,
-            modified_by=request.user,
-            pending_dnb_investigation=True,
-        )
-
-        statsd.incr('dnb.create.investigation')
-        return Response(
-            company_serializer.to_representation(datahub_company),
-        )
-
-
 class DNBCompanyLinkView(APIView):
     """
     View for linking a company to a DNB record.
@@ -324,6 +274,31 @@ class DNBCompanyChangeRequestView(APIView):
 
         try:
             response = request_changes(**change_request_serializer.validated_data)
+
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        return Response(response)
+
+    def get(self, request):
+        """
+        A thin wrapper around the dnb-service change request API.
+        """
+        duns_number = request.query_params.get('duns_number', None)
+        status = request.query_params.get('status', None)
+
+        change_request_serializer = DNBGetCompanyChangeRequestSerializer(
+            data={'duns_number': duns_number, 'status': status},
+        )
+
+        change_request_serializer.is_valid(raise_exception=True)
+
+        try:
+            response = get_change_request(**change_request_serializer.validated_data)
 
         except (
             DNBServiceConnectionError,
