@@ -1,3 +1,0 @@
-An `update_investment_project_sector_disabled_signals` management command was added for updating an investment project's sector.
-
-This will be initially used to map investment projects to their new sectors after a sector migration exercise is carried out. This behaves in a similar way to the existing `update_investment_project_sector` command but with all investment project related Elasticsearch signals disabled. This is to avoid queuing a huge number of Celery tasks for syncing investment projects to Elasticsearch.
