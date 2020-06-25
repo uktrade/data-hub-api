@@ -26,6 +26,7 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.test.factories import SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.user.company_list.test.factories import PipelineItemFactory
 
 
 MAPPINGS = {
@@ -33,6 +34,7 @@ MAPPINGS = {
     'company.Company': CompanyFactory,
     'company.CompanyExportCountry': CompanyExportCountryFactory,
     'company.Contact': ContactFactory,
+    'company_list.PipelineItem': PipelineItemFactory,
     'event.Event': EventFactory,
     'interaction.Interaction': CompanyInteractionFactory,
     'interaction.InteractionExportCountry': InteractionExportCountryFactory,
