@@ -1101,6 +1101,7 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'company': ['field not allowed to be update.']}
 
+    @freeze_time('2017-04-19 15:25:30.986208')
     def test_patch_a_pipeline_item(self):
         """Test that status and name of a pipeline item can be patched."""
         company = CompanyFactory()
@@ -1133,7 +1134,7 @@ class TestPatchPipelineItemView(APITestMixin):
             'name': new_name,
             'status': new_status,
             'created_on': format_date_or_datetime(item.created_on),
-            'modified_on': format_date_or_datetime(item.modified_on),
+            'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': {
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
@@ -1305,6 +1306,20 @@ class TestPatchPipelineItemView(APITestMixin):
 
         response_data = response.json()
         assert response_data['contact'] is None
+
+    def test_modified_on_is_updated(self):
+        """Test that modified on is updated."""
+        item = PipelineItemFactory(adviser=self.user)
+        url = _pipeline_item_detail_url(item.pk)
+        response = self.api_client.patch(
+            url,
+            data={'contact': None},
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert format_date_or_datetime(response_data['modified_on']) > \
+            format_date_or_datetime(item.modified_on)
 
     def test_cannot_patch_non_existent_contact(self):
         """Test that non existent contact can't be patched."""
