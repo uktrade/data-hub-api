@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """Command to delete a new InvestmentSector object."""
+    """Command to delete an InvestmentSector object."""
 
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
@@ -34,4 +34,4 @@ class Command(CSVBaseCommand):
 
         with reversion.create_revision():
             matches.delete()
-            reversion.set_comment('InvestmentSector creation.')
+            reversion.set_comment('InvestmentSector deletion.')
