@@ -1,0 +1,1 @@
+Moved news fragment "pipeline-item-tracked-by-reversion.feature.md" into the root directory of changelog as the release would not include the feature [2985](https://github.com/uktrade/data-hub-api/pull/2985)
