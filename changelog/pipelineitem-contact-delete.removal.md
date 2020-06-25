@@ -1,0 +1,1 @@
+The field `contact` was removed from the pipeline item endpoints.
