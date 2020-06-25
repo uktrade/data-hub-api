@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -166,6 +167,16 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             data['contacts'] = [data['contact']]
 
         return data
+
+    def update(self, instance, validated_data):
+        """
+        Update modified_on field with current date time
+        during PATCH transactions
+        """
+        if self.partial:
+            self.instance.modified_on = now().isoformat()
+
+        return super().update(instance, validated_data)
 
     class Meta:
         model = PipelineItem
