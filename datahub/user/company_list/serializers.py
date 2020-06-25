@@ -173,7 +173,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         Update modified_on field with current date time
         during PATCH transactions
         """
-        if self.partial:
+        if self.partial and self.instance:
             self.instance.modified_on = now().isoformat()
 
         return super().update(instance, validated_data)
