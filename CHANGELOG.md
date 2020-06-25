@@ -1,3 +1,27 @@
+# Data Hub API 34.1.0 (2020-06-25)
+
+
+## Features
+
+- A `delete_sector` management command was added for deleting sectors that are no longer used.
+
+  This will be initially run as part of a large sector migration exercise involving the renaming, moving and splitting of sectors. As a result of this migration many sectors will no longer be required and should therefore be deleted to avoid them showing up on the front end.
+- The `PipelineItem` model is now tracked by reversion.
+- An `update_company_sector_disabled_signals` management command was added for updating a company's sector.
+
+  This will be initially used to map companies to their new sectors after a sector migration exercise is carried out. This behaves in a similar way to the existing `update_company_sector` command but with all company related Elasticsearch signals disabled. This is to avoid queuing a huge number of Celery tasks for syncing companies to Elasticsearch.
+- An `update_investment_project_sector_disabled_signals` management command was added for updating an investment project's sector.
+
+  This will be initially used to map investment projects to their new sectors after a sector migration exercise is carried out. This behaves in a similar way to the existing `update_investment_project_sector` command but with all investment project related Elasticsearch signals disabled. This is to avoid queuing a huge number of Celery tasks for syncing investment projects to Elasticsearch.
+- An `update_pipline_item_sector` management command was added for updating a pipeline item's sector.
+
+  This will be initially used to map pipeline items to their new sectors after a sector migration exercise is carried out.
+
+## Internal changes
+
+- Two new advisers have been added to the test fixtures. These advisers will be used in the frontend end-to-end tests for managing a lead ITA.
+
+
 # Data Hub API 34.0.0 (2020-06-22)
 
 

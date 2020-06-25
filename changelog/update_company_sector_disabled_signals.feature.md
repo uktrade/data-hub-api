@@ -1,3 +1,0 @@
-An `update_company_sector_disabled_signals` management command was added for updating a company's sector.
-
-This will be initially used to map companies to their new sectors after a sector migration exercise is carried out. This behaves in a similar way to the existing `update_company_sector` command but with all company related Elasticsearch signals disabled. This is to avoid queuing a huge number of Celery tasks for syncing companies to Elasticsearch.
