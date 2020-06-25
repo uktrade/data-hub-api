@@ -1,4 +1,20 @@
 - model: company.advisor
+  pk: 4345a608e-84a4-11e6-ea22-56b6b649961
+  fields:
+    email: Sarah.Gates@example.com
+    first_name: Sarah
+    last_name: Gates
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+
+- model: company.advisor
+  pk: 453a608e-84a4-11e6-ea22-56b6b6499622
+  fields:
+    email: Harold.Jones@example.com
+    first_name: Harold
+    last_name: Jones
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+
+- model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
   fields:
     email: Puck.Head@example.com
