@@ -1,5 +1,5 @@
 - model: company.advisor
-  pk: 4345a608e-84a4-11e6-ea22-56b6b6499611
+  pk: 4345a608e-84a4-11e6-ea22-56b6b649961
   fields:
     email: Sarah.Gates@example.com
     first_name: Sarah
