@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Company
 from datahub.core.serializers import NestedRelatedField
 from datahub.metadata import models as metadata_models
 from datahub.user.company_list.models import CompanyList, CompanyListItem, PipelineItem
@@ -69,7 +69,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         'field_cannot_be_updated': gettext_lazy('field not allowed to be update.'),
         'field_cannot_be_empty': gettext_lazy('This field may not be blank.'),
         'field_is_required': gettext_lazy('This field is required.'),
-        'contact_company_mismatch': gettext_lazy('Contact does not belong to company.'),
     }
 
     company = NestedRelatedField(
@@ -82,11 +81,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(
         metadata_models.Sector,
         extra_fields=('id', 'segment'),
-        required=False, allow_null=True,
-    )
-    contact = NestedRelatedField(
-        Contact,
-        extra_fields=('id', 'name'),
         required=False, allow_null=True,
     )
 
@@ -107,44 +101,22 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             )
         return name
 
-    def validate_contact(self, contact):
-        """
-        Vaidate contact belongs to company
-        when its provided.
-        """
-        if contact and self.instance and contact not in self.instance.company.contacts.all():
-            raise serializers.ValidationError(
-                self.error_messages['contact_company_mismatch'],
-            )
-        return contact
-
     def validate(self, data):
         """
         Raise a validation error if:
         - anything else other than allowed fields is updated.
         - name field is empty when editing.
-        - contact doesn't belong to the company being added
         """
         if self.instance is None:
             if (data.get('name') in (None, '')):
                 raise serializers.ValidationError(
                     self.error_messages['field_is_required'],
                 )
-            if data.get('contact') and data.get('company'):
-                if not Contact.objects.filter(
-                    id=data.get('contact').id, company__id=data.get('company').id,
-                ).exists():
-                    raise serializers.ValidationError(
-                        {
-                            'contact': self.error_messages['contact_company_mismatch'],
-                        },
-                    )
 
         if self.partial and self.instance:
             allowed_fields = {
                 'status',
                 'name',
-                'contact',
                 'sector',
                 'potential_value',
                 'likelihood_to_win',
@@ -162,9 +134,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                 }
                 raise serializers.ValidationError(errors)
 
-        if 'contact' in data and data.get('contact'):
-            data['contacts'] = [data['contact']]
-
         return data
 
     class Meta:
@@ -177,7 +146,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'adviser',
             'created_on',
             'modified_on',
-            'contact',
             'sector',
             'potential_value',
             'likelihood_to_win',
