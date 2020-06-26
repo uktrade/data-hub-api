@@ -1,0 +1,1 @@
+For endpoint `/v4/pipeline-item/<uuid:pk>`, field `modified_on` will now be updated with the current datetime stamp whenever a PATCH transaction occurrs.
