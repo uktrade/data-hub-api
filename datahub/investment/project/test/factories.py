@@ -26,8 +26,19 @@ from datahub.investment.project.constants import (
     LikelihoodToLand,
     SpecificProgramme,
 )
-from datahub.investment.project.models import InvestmentDeliveryPartner, InvestmentProject
+from datahub.investment.project.models import (
+    InvestmentDeliveryPartner,
+    InvestmentProject,
+)
 from datahub.metadata.models import UKRegion
+from datahub.metadata.test.factories import SectorFactory
+
+
+class FDISICGroupingFactory(factory.django.DjangoModelFactory):
+    """FIDSICGrouping factory."""
+
+    class Meta:
+        model = 'investment.FDISICGrouping'
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
@@ -85,6 +96,16 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentProject'
+
+
+class InvestmentSectorFactory(factory.django.DjangoModelFactory):
+    """InvestmentSector factory."""
+
+    sector = factory.SubFactory(SectorFactory)
+    fdi_sic_grouping = factory.SubFactory(FDISICGroupingFactory)
+
+    class Meta:
+        model = 'investment.InvestmentSector'
 
 
 class FDIInvestmentProjectFactory(InvestmentProjectFactory):
