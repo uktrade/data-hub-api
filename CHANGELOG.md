@@ -1,3 +1,17 @@
+# Data Hub API 34.2.0 (2020-06-26)
+
+
+## Features
+
+- **Investment** A management command was added for creating/deleting investment sectors defined in datahub/investment/project/models.py.
+
+  This will be initially used to update investment sectors that are changing due to the sector migration project.
+
+## API
+
+- For endpoint `/v4/pipeline-item/<uuid:pk>`, field `modified_on` will now be updated with the current datetime stamp whenever a PATCH transaction occurrs.
+
+
 # Data Hub API 34.1.0 (2020-06-25)
 
 
