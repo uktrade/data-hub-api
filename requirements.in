@@ -63,7 +63,7 @@ pip-tools==4.5.1
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==19.2.0
-watchdog[watchmedo]==0.10.2
+watchdog[watchmedo]==0.10.3
 
 # Code static analysis
 flake8==3.8.3
