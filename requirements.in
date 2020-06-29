@@ -46,7 +46,7 @@ elastic-apm==5.7.0
 # Celery
 celery[redis]==4.4.5
 billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of breakage in the past
-kombu==4.6.10  # Not used directly, but pinned as it has been a source of breakage in the past
+kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
 pytest==5.4.3
