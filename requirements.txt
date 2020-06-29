@@ -15,7 +15,7 @@ backcall==0.1.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
 boto3==1.14.12            # via -r requirements.in
 botocore==1.17.12         # via boto3, s3transfer
-celery[redis]==4.4.5      # via -r requirements.in
+celery[redis]==4.4.6      # via -r requirements.in
 certifi==2019.11.28       # via elastic-apm, requests, sentry-sdk
 chardet==3.0.4            # via -r requirements.in, aiohttp, requests
 click==7.1.1              # via pip-tools, towncrier
