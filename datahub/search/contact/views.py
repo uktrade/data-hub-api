@@ -145,16 +145,17 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         row_chunks = slice_iterable_into_chunks(rows, self.consent_page_size)
         for chunk in row_chunks:
             """
-            Loop over the chucks and extract the email and item.
+            Loop over the chunks and extract the email and item.
             Save the item because the iterator cannot be used twice.
             """
             rows = list(chunk)
-            # Peform constent lookup on estmails POST request
+            # Peform constent lookup on emails POST request
             consent_lookups = consent.get_many(
                 [row['email'] for row in rows],
             )
             for row in rows:
-                # Add constent to accepts_dit_email_marketing and yield the modified result.
+                # Assign contact consent boolean to accepts_dit_email_marketing
+                # and yield modified result.
                 row['accepts_dit_email_marketing'] = consent_lookups.get(row['email'], False)
                 yield row
 
