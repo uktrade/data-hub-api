@@ -1,4 +1,3 @@
-
 import uuid
 from cgi import parse_header
 from csv import DictReader
