@@ -70,9 +70,11 @@ def get_pipeline_item_queryset():
     """
     Returns a query set used by PipelineItemViewSet.
     """
-    return PipelineItem.objects.select_related('company').only(
-        # Only select the fields we need to reduce data transfer time for large lists
-        # (in particular, companies have a lot of fields which are not needed here)
+    return PipelineItem.objects.select_related(
+        'company',
+    ).prefetch_related(
+        'contacts',
+    ).only(
         'id',
         'company__id',
         'company__name',
