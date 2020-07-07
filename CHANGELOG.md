@@ -1,3 +1,21 @@
+# Data Hub API 34.3.0 (2020-07-07)
+
+
+## Bug fixes
+
+- **Companies** Error handling has now been added to the `datahub/company/consent.py` file's `get_many()` function. 
+  This change will be active when the Legal Basis API intergration is completed.
+  If the API returns a 500 error when retrieving contact marketing preferences, 
+  the contact's marketing preferences will be defaulted to False.
+
+## API
+
+- **Advisers** `contacts` field was added to `GET /v4/pipeline-item/` and `PATCH /v4/pipeline-item/<UUID>` as an array field to replace the existing `contact` field.
+
+  The `contact` and `contacts` field will mirror each other (except that `contact` will only return a single contact).
+- **Companies** A new company referrals dataset endpoint (`GET /v4/dataset/company-referrals-dataset`) was added to be consumed by data-flow and used in data-workspace.
+
+
 # Data Hub API 34.2.0 (2020-06-26)
 
 
