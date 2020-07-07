@@ -442,6 +442,10 @@ class TestGetPipelineItemsView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
@@ -671,25 +675,6 @@ class TestAddPipelineItemView(APITestMixin):
             'contact': [f'Invalid pk "{dummy_contact_id}" - object does not exist.'],
         }
 
-    def test_validate_contact_belongs_to_company(self):
-        """Test that contact being added belongs to company"""
-        company = CompanyFactory()
-        contact = ContactFactory()
-        pipeline_status = PipelineItem.Status.LEADS
-        response = self.api_client.post(
-            pipeline_collection_url,
-            data={
-                'company': str(company.pk),
-                'status': pipeline_status,
-                'name': 'project name',
-                'contact': str(contact.pk),
-            },
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'contact': ['Contact does not belong to company.'],
-        }
-
     def test_validate_non_existent_sector(self):
         """Test that non existent sector adding results in error"""
         company = CompanyFactory()
@@ -739,6 +724,7 @@ class TestAddPipelineItemView(APITestMixin):
             'created_on': '2017-04-19T15:25:30.986208Z',
             'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
+            'contacts': [],
             'sector': None,
             'potential_value': None,
             'likelihood_to_win': None,
@@ -798,6 +784,10 @@ class TestAddPipelineItemView(APITestMixin):
                 'id': str(contact.pk),
                 'name': contact.name,
             },
+            'contacts': [{
+                'id': str(contact.pk),
+                'name': contact.name,
+            }],
             'sector': {
                 'id': str(sector.pk),
                 'segment': sector.segment,
@@ -846,6 +836,7 @@ class TestAddPipelineItemView(APITestMixin):
             'created_on': '2017-04-19T15:25:30.986208Z',
             'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
+            'contacts': [],
             'sector': None,
             'potential_value': None,
             'likelihood_to_win': None,
@@ -888,6 +879,7 @@ class TestAddPipelineItemView(APITestMixin):
             'created_on': '2017-04-19T15:25:30.986208Z',
             'modified_on': '2017-04-19T15:25:30.986208Z',
             'contact': None,
+            'contacts': [],
             'sector': None,
             'potential_value': None,
             'likelihood_to_win': None,
@@ -980,6 +972,78 @@ class TestAddPipelineItemView(APITestMixin):
         pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
         assert pipeline_item.contact == contact
         assert list(pipeline_item.contacts.all()) == [contact]
+
+    def test_contacts_copied_to_contact(self):
+        """
+        Test that the value provided in the contacts field is copied to contact when an
+        interaction is created.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contacts = ContactFactory.create_batch(2, company=company)
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': pipeline_status,
+                'contacts': [{
+                    'id': contact.pk,
+                } for contact in contacts],
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2019-04-19',
+                'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
+            },
+        )
+        response_data = response.json()
+        assert response.status_code == status.HTTP_201_CREATED
+
+        pipeline_item = PipelineItem.objects.get(pk=response_data['id'])
+        assert pipeline_item.contact == contacts[0]
+        assert set(pipeline_item.contacts.all()) == set(contacts)
+
+    def test_providing_contact_and_contacts_returns_an_error(self):
+        """
+        Test that if both contact and contacts are provided, an error is returned.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        sector = SectorFactory()
+        contact = ContactFactory(company=company)
+
+        pipeline_status = PipelineItem.Status.LEADS
+        response = self.api_client.post(
+            pipeline_collection_url,
+            data={
+                'company': str(company.pk),
+                'name': 'project name',
+                'status': pipeline_status,
+                'contact': {
+                    'id': contact.pk,
+                },
+                'contacts': [{
+                    'id': contact.pk,
+                }],
+                'sector': str(sector.pk),
+                'likelihood_to_win': PipelineItem.LikelihoodToWin.LOW,
+                'expected_win_date': '2019-04-19',
+                'potential_value': 1000,
+                'archived': False,
+                'archived_on': None,
+                'archived_reason': None,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['Only one of contact and contacts should be provided.'],
+        }
 
 
 class TestPatchPipelineItemView(APITestMixin):
@@ -1139,6 +1203,10 @@ class TestPatchPipelineItemView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
@@ -1340,22 +1408,35 @@ class TestPatchPipelineItemView(APITestMixin):
             'contact': [f'Invalid pk "{dummy_contact_id}" - object does not exist.'],
         }
 
-    def test_cannot_patch_other_company_contact(self):
-        """Test that contact can be patched."""
+    def test_providing_contact_and_contacts_returns_an_error(self):
+        """
+        Test that if both contact and contacts are provided, an error is returned.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
         company = CompanyFactory()
-        contact = ContactFactory()
         item = PipelineItemFactory(
             adviser=self.user,
             company=company,
             status=PipelineItem.Status.WIN,
+            contacts=[],
         )
+        new_contact = ContactFactory(company=company)
+
         url = _pipeline_item_detail_url(item.pk)
-        response = self.api_client.patch(
-            url,
-            data={'contact': str(contact.id)},
-        )
+        data = {
+            'contact': {
+                'id': new_contact.pk,
+            },
+            'contacts': [{
+                'id': new_contact.pk,
+            }],
+        }
+        response = self.api_client.patch(url, data=data)
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'contact': ['Contact does not belong to company.']}
+        assert response.json() == {
+            'non_field_errors': ['Only one of contact and contacts should be provided.'],
+        }
 
     def test_contact_copied_to_contacts(self):
         """
@@ -1380,6 +1461,34 @@ class TestPatchPipelineItemView(APITestMixin):
         item.refresh_from_db()
         assert item.contact == new_contact
         assert list(item.contacts.all()) == [new_contact]
+
+    def test_contacts_copied_to_contact(self):
+        """
+        Test that the value provided in the contacts field is copied to contact when a
+        pipeline item is updated.
+        TODO: remove once the contacts field has fully replaced the contact field.
+        """
+        company = CompanyFactory()
+        item = PipelineItemFactory(
+            adviser=self.user,
+            company=company,
+            status=PipelineItem.Status.WIN,
+            contacts=[],
+        )
+        new_contacts = ContactFactory.create_batch(2, company=company)
+
+        url = _pipeline_item_detail_url(item.pk)
+        data = {
+            'contacts': [{
+                'id': contact.pk,
+            } for contact in new_contacts],
+        }
+        response = self.api_client.patch(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        item.refresh_from_db()
+        assert item.contact == new_contacts[0]
+        assert set(item.contacts.all()) == set(new_contacts)
 
     def test_cannot_patch_other_users_item(self):
         """Test that cannot patch other users item."""
@@ -1459,6 +1568,10 @@ class TestArchivePipelineItemView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
@@ -1516,6 +1629,10 @@ class TestArchivePipelineItemView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
@@ -1603,6 +1720,10 @@ class TestGetPipelineItemView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
@@ -1641,6 +1762,10 @@ class TestGetPipelineItemView(APITestMixin):
                 'id': str(item.contact.pk),
                 'name': item.contact.name,
             },
+            'contacts': [{
+                'id': str(item.contact.pk),
+                'name': item.contact.name,
+            }],
             'sector': {
                 'id': str(item.sector.pk),
                 'segment': item.sector.segment,
