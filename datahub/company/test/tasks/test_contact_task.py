@@ -23,12 +23,12 @@ def update_consent_service_feature_flag():
     yield FeatureFlagFactory(code=UPDATE_CONSENT_SERVICE_FEATURE_FLAG)
 
 
-def generate_hawk_response(json):
+def generate_hawk_response(payload):
     """Mocks HAWK server validation for content."""
     return HawkMockJSONResponse(
         api_id=settings.COMPANY_MATCHING_HAWK_ID,
         api_key=settings.COMPANY_MATCHING_HAWK_KEY,
-        response=json,
+        response=payload,
     )
 
 

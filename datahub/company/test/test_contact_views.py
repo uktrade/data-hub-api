@@ -2,21 +2,42 @@ from datetime import date
 
 import pytest
 import reversion
+from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
+from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
+from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
+from datahub.company.constants import (
+    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+    GET_CONSENT_FROM_CONSENT_SERVICE,
+)
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+    HawkMockJSONResponse,
+)
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.test.factories import TeamFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture()
+def get_consent_from_api_feature_flag():
+    """
+    Creates the get consent from consent service feature flag.
+    """
+    yield FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE)
 
 
 class TestAddContact(APITestMixin):
@@ -556,6 +577,108 @@ class TestViewContact(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert 'archived_documents_url_path' not in response.json()
+
+    @pytest.mark.parametrize('accepts_marketing', (True, False))
+    def test_accepts_dit_email_marketing_consent_service(
+        self,
+        get_consent_from_api_feature_flag,
+        accepts_marketing,
+        requests_mock,
+    ):
+        """
+        Tests accepts_dit_email_marketing field is populated from the consent service.
+        This is behind the feature flag GET_CONSENT_FROM_CONSENT_SERVICE.
+        """
+        contact = ContactFactory(
+            accepts_dit_email_marketing=False,
+        )
+        hawk_response = HawkMockJSONResponse(
+            api_id=settings.COMPANY_MATCHING_HAWK_ID,
+            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+            response={
+                'results': [{
+                    'email': contact.email,
+                    'consents': [
+                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                    ] if accepts_marketing else [],
+                }],
+            },
+        )
+        requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            status_code=200,
+            text=hawk_response,
+        )
+        api_client = self.create_api_client()
+
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        response = api_client.get(url)
+
+        assert requests_mock.call_count == 1
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['accepts_dit_email_marketing'] == accepts_marketing
+
+    @pytest.mark.parametrize(
+        'response_status',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ),
+    )
+    def test_accepts_dit_email_marketing_consent_service_http_error(
+        self,
+        get_consent_from_api_feature_flag,
+        response_status,
+        requests_mock,
+    ):
+        """Tests accepts_dit_email_marketing field return false if there is an error."""
+        contact = ContactFactory()
+        requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            status_code=response_status,
+        )
+        api_client = self.create_api_client()
+
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        response = api_client.get(url)
+
+        assert requests_mock.call_count == 1
+        assert response.json()['accepts_dit_email_marketing'] is False
+
+    @pytest.mark.parametrize(
+        'exceptions',
+        (
+            ConnectionError,
+            ConnectTimeout,
+            ReadTimeout,
+        ),
+    )
+    def test_accepts_dit_email_marketing_consent_service_error(
+        self,
+        get_consent_from_api_feature_flag,
+        exceptions,
+        requests_mock,
+    ):
+        """Tests accepts_dit_email_marketing field return false if there is an error."""
+        contact = ContactFactory()
+        requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            exc=exceptions,
+        )
+        api_client = self.create_api_client()
+
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        response = api_client.get(url)
+
+        assert requests_mock.call_count == 1
+        assert response.json()['accepts_dit_email_marketing'] is False
 
 
 class TestContactList(APITestMixin):
