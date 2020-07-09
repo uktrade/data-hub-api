@@ -1,3 +1,11 @@
+# Data Hub API 34.4.0 (2020-07-09)
+
+
+## Features
+
+- **Companies** A new management command, `update_company_created_on`, was added to allow the correction of legacy Company records which exist in Data Hub without a `created_on` value.
+
+
 # Data Hub API 34.3.0 (2020-07-07)
 
 
