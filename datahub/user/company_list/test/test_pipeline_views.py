@@ -931,6 +931,7 @@ class TestAddPipelineItemView(APITestMixin):
         )
         assert response.status_code == status.HTTP_201_CREATED
 
+
 class TestPatchPipelineItemView(APITestMixin):
     """Tests for patching a pipeline item."""
 

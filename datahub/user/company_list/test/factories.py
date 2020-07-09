@@ -1,7 +1,7 @@
 import factory
 from django.utils.timezone import utc
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test.factories import to_many_field
 from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem

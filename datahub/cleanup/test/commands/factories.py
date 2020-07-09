@@ -1,6 +1,5 @@
 from datahub.core.test.factories import to_many_field
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.user.company_list.test.factories import PipelineItemFactory
 
 
 class ShallowInvestmentProjectFactory(InvestmentProjectFactory):
