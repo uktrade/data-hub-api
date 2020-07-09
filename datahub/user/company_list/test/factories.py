@@ -34,9 +34,6 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
-    contact = factory.SubFactory(
-        ContactFactory, company=factory.SelfAttribute('..company'),
-    )
     sector = factory.SubFactory(SectorFactory)
     potential_value = 1000000
     likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
@@ -46,9 +43,8 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     def contacts(self):
         """
         Contacts field.
-        Defaults to the contact from the contact field.
         """
-        return [self.contact] if self.contact else []
+        return []
 
     class Meta:
         model = 'company_list.PipelineItem'
