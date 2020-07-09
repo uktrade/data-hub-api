@@ -7,7 +7,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
 from datahub.core.api_client import APIClient, HawkAuth
@@ -18,6 +18,30 @@ CONSENT_SERVICE_PERSON_PATH = 'api/v1/person/'
 CONSENT_SERVICE_PERSON_PATH_LOOKUP = f'{CONSENT_SERVICE_PERSON_PATH}bulk_lookup/'
 CONSENT_SERVICE_CONNECT_TIMEOUT = 5.0
 CONSENT_SERVICE_READ_TIMEOUT = 30.0
+
+
+class ConsentAPIException(Exception):
+    """
+    Base exception class for Consent API related errors.
+    """
+
+
+class ConsentAPIHTTPError(ConsentAPIException):
+    """
+    Exception for all HTTP errors.
+    """
+
+
+class ConsentAPITimeoutError(ConsentAPIException):
+    """
+    Exception for when a timeout was encountered when connecting to Consent API.
+    """
+
+
+class ConsentAPIConnectionError(ConsentAPIException):
+    """
+    Exception for when an error was encountered when connecting to Consent API.
+    """
 
 
 def _get_client():
@@ -95,15 +119,21 @@ def get_many(emails):
             json=body,
             params={'limit': len(emails)},
         )
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to Consent API'
+        logger.error(error_message, exc)
+        raise ConsentAPIConnectionError(error_message) from exc
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with Consent API'
+        logger.error(error_message, exc)
+        raise ConsentAPITimeoutError(error_message) from exc
     except HTTPError as exc:
-        status = exc.response.status_code
-        if status >= 500:
-            return {
-                email: False
-                for email in emails
-            }
-        else:
-            raise
+        error_message = (
+            'The Consent API returned an error status: '
+            f'{exc.response.status_code}',
+        )
+        logger.error(error_message, exc)
+        raise ConsentAPIHTTPError(error_message) from exc
 
     return {
         result['email']: CONSENT_SERVICE_EMAIL_CONSENT_TYPE in result['consents']
