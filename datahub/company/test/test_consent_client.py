@@ -5,6 +5,16 @@ from rest_framework import status
 
 from datahub.company import consent as consent
 from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
+from datahub.core.test_utils import HawkMockJSONResponse
+
+
+def generate_hawk_response(json):
+    """Mocks HAWK server validation for content."""
+    return HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=json,
+    )
 
 
 class TestConsentClient:
@@ -20,16 +30,14 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            json={
-                'results': [
-                    {
-                        'email': 'foo@bar.com',
-                        'consents': [
-                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-                        ] if accepts_marketing else [],
-                    },
-                ],
-            },
+            text=generate_hawk_response({
+                'results': [{
+                    'email': 'foo@bar.com',
+                    'consents': [
+                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                    ] if accepts_marketing else [],
+                }],
+            }),
             status_code=status.HTTP_200_OK,
         )
         resp = consent.get_one('foo@bar.com')
@@ -48,7 +56,7 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            json={
+            text=generate_hawk_response({
                 'results': [
                     {
                         'email': email,
@@ -57,7 +65,7 @@ class TestConsentClient:
                         ] if accepts_marketing else [],
                     } for email in emails
                 ],
-            },
+            }),
             status_code=status.HTTP_200_OK,
         )
         resp = consent.get_many(emails)
@@ -75,7 +83,7 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH}',
-            json={
+            text=generate_hawk_response({
                 'consents': [
                     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
                 ],
@@ -83,7 +91,7 @@ class TestConsentClient:
                 'email': 'foo@bar.com',
                 'phone': '',
                 'key_type': 'email',
-            },
+            }),
             status_code=status.HTTP_201_CREATED,
         )
         result = consent.update_consent('foo@bar.com', accepts_marketing)

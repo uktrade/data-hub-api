@@ -41,7 +41,6 @@ def _get_client():
     _auth = HawkAuth(
         api_id=settings.CONSENT_SERVICE_HAWK_ID,
         api_key=settings.CONSENT_SERVICE_HAWK_KEY,
-        verify_response=settings.CONSENT_SERVICE_HAWK_VERIFY_RESPONSE,
     )
 
     _api_client = APIClient(
