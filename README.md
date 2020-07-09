@@ -210,6 +210,12 @@ To run the linter:
 flake8
 ```
 
+There is also a pre-commit hook for Flake8. To install this, run:
+
+```shell
+make setup-flake8-hook
+```
+
 ### Obtaining an API access token
 
 You can obtain an access token for local development work in one of two ways:
