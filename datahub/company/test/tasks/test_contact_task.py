@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from celery.exceptions import Retry
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from requests import ConnectTimeout
@@ -10,6 +11,7 @@ from rest_framework import status
 
 from datahub.company.constants import UPDATE_CONSENT_SERVICE_FEATURE_FLAG
 from datahub.company.tasks import update_contact_consent
+from datahub.core.test_utils import HawkMockJSONResponse
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 
@@ -19,6 +21,15 @@ def update_consent_service_feature_flag():
     Creates the consent service feature flag.
     """
     yield FeatureFlagFactory(code=UPDATE_CONSENT_SERVICE_FEATURE_FLAG)
+
+
+def generate_hawk_response(json):
+    """Mocks HAWK server validation for content."""
+    return HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=json,
+    )
 
 
 @pytest.mark.django_db
@@ -77,7 +88,7 @@ class TestConsentServiceTask:
         Ensure correct http request with correct payload is generated when task
         executes.
         """
-        matcher = requests_mock.post('/api/v1/person/', json={},
+        matcher = requests_mock.post('/api/v1/person/', text=generate_hawk_response({}),
                                      status_code=status.HTTP_201_CREATED)
         update_contact_consent(
             email_address,
@@ -113,7 +124,11 @@ class TestConsentServiceTask:
         """
         Test to ensure that celery retries on request exceptions like 5xx, 404
         """
-        matcher = requests_mock.post('/api/v1/person/', json={}, status_code=status_code)
+        matcher = requests_mock.post(
+            '/api/v1/person/',
+            text=generate_hawk_response({}),
+            status_code=status_code,
+        )
         with pytest.raises(Retry):
             update_contact_consent('example@example.com', True)
         assert matcher.called_once
