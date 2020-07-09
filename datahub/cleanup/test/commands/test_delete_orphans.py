@@ -12,7 +12,6 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.cleanup.test.commands.factories import (
-    PipelineItemFactory,
     ShallowInvestmentProjectFactory,
 )
 from datahub.company.test.factories import (
@@ -32,7 +31,7 @@ from datahub.omis.order.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-
+from datahub.user.company_list.test.factories import PipelineItemFactory
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 """
