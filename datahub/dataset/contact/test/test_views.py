@@ -51,9 +51,9 @@ def get_expected_data_from_contact(contact):
 @pytest.fixture
 def consent_get_many_mock(monkeypatch):
     """Mocks the consent.get_many function"""
-    m = Mock()
-    monkeypatch.setattr('datahub.company.consent.get_many', m)
-    yield m
+    mock = Mock()
+    monkeypatch.setattr('datahub.company.consent.get_many', mock)
+    yield mock
 
 
 @pytest.mark.django_db
