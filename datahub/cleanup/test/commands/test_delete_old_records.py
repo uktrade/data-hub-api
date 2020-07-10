@@ -24,7 +24,6 @@ from datahub.cleanup.management.commands.delete_old_records import (
     ORDER_MODIFIED_ON_CUT_OFF,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
-from datahub.cleanup.test.commands.factories import PipelineItemFactoryWithoutContacts
 from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
@@ -131,13 +130,7 @@ MAPPING = {
                 'unexpired_objects_kwargs': [],
             },
             {
-                'factory': PipelineItemFactoryWithoutContacts,
-                'field': 'company',
-                'expired_objects_kwargs': [{'contact': None}],
-                'unexpired_objects_kwargs': [],
-            },
-            {
-                'factory': PipelineItemFactoryWithoutContacts,
+                'factory': PipelineItemFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [{'contacts': None}],
                 'unexpired_objects_kwargs': [],
@@ -345,7 +338,7 @@ MAPPING = {
             },
             {
                 'factory': PipelineItemFactory,
-                'field': 'contact',
+                'field': 'contacts',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {

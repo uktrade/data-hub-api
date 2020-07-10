@@ -1,7 +1,6 @@
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
-from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, Contact
 from datahub.core.serializers import NestedRelatedField
@@ -63,32 +62,6 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
         )
 
 
-class _ManyRelatedAsSingleItemField(NestedRelatedField):
-    """
-    Serialiser field that makes a to-many field behave like a to-one field.
-
-    Use for temporary backwards compatibility when migrating a to-one field to be a to-many field
-    (so that a to-one field can be emulated using a to-many field).
-
-    This isn't intended to be used in any other way as if the to-many field contains multiple
-    items, only one of them will be returned, and all of them will overwritten on updates.
-
-    TODO Remove this once contact has been removed from pipeline items.
-    """
-
-    def run_validation(self, data=serializers.empty):
-        """Validate a user-provided value and return the internal value (converted to a list)."""
-        validated_value = super().run_validation(data)
-        return [validated_value] if validated_value else []
-
-    def to_representation(self, value):
-        """Converts a query set to a dict representation of the first item in the query set."""
-        if not value.exists():
-            return None
-
-        return super().to_representation(value.first())
-
-
 class PipelineItemSerializer(serializers.ModelSerializer):
     """Serialiser for pipeline item."""
 
@@ -97,9 +70,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         'field_cannot_be_updated': gettext_lazy('field not allowed to be update.'),
         'field_cannot_be_empty': gettext_lazy('This field may not be blank.'),
         'field_is_required': gettext_lazy('This field is required.'),
-        'one_contact_field': gettext_lazy(
-            'Only one of contact and contacts should be provided.',
-        ),
     }
 
     company = NestedRelatedField(
@@ -113,13 +83,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         metadata_models.Sector,
         extra_fields=('id', 'segment'),
         required=False, allow_null=True,
-    )
-    contact = _ManyRelatedAsSingleItemField(
-        Contact,
-        extra_fields=('id', 'name'),
-        source='contacts',
-        required=False,
-        allow_null=True,
     )
     contacts = NestedRelatedField(
         Contact,
@@ -146,23 +109,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             )
         return name
 
-    def to_internal_value(self, data):
-        """
-        Checks that contact and contacts haven't both been provided.
-        Note: On serialisers, to_internal_value() is called before validate().
-
-        TODO Remove once contact removed from the API.
-        """
-        if 'contact' in data and 'contacts' in data:
-            error = {
-                api_settings.NON_FIELD_ERRORS_KEY: [
-                    self.error_messages['one_contact_field'],
-                ],
-            }
-            raise serializers.ValidationError(error, code='one_contact_field')
-
-        return super().to_internal_value(data)
-
     def validate(self, data):
         """
         Raise a validation error if:
@@ -180,7 +126,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             allowed_fields = {
                 'status',
                 'name',
-                'contact',
                 'contacts',
                 'sector',
                 'potential_value',
@@ -198,16 +143,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
                     for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
-
-        # Ensure that we have backwards compatibility
-        # by copying the first contact in `contacts` field
-        # to the `contact` field to ensure we support the FE (which only supports
-        # a single contact rather than multiple).
-        # Once the FE can support multiple contacts we can remove the below.
-        # TODO Remove following deprecation period.
-        if 'contacts' in data:
-            contacts = data['contacts']
-            data['contact'] = contacts[0] if contacts else None
 
         return data
 
@@ -231,7 +166,6 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             'adviser',
             'created_on',
             'modified_on',
-            'contact',
             'contacts',
             'sector',
             'potential_value',
