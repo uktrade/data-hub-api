@@ -1,7 +1,7 @@
 import factory
 from django.utils.timezone import utc
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test.factories import to_many_field
 from datahub.metadata.test.factories import SectorFactory
 from datahub.user.company_list.models import PipelineItem
@@ -34,9 +34,6 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     adviser = factory.SubFactory(AdviserFactory)
     status = PipelineItem.Status.LEADS
-    contact = factory.SubFactory(
-        ContactFactory, company=factory.SelfAttribute('..company'),
-    )
     sector = factory.SubFactory(SectorFactory)
     potential_value = 1000000
     likelihood_to_win = PipelineItem.LikelihoodToWin.MEDIUM
@@ -46,9 +43,8 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
     def contacts(self):
         """
         Contacts field.
-        Defaults to the contact from the contact field.
         """
-        return [self.contact] if self.contact else []
+        return []
 
     class Meta:
         model = 'company_list.PipelineItem'
