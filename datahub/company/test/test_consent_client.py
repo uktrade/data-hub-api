@@ -1,10 +1,20 @@
 import pytest
 from django.conf import settings
-from requests.exceptions import ConnectionError, HTTPError, Timeout
+from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 
 from datahub.company import consent as consent
 from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
+from datahub.core.test_utils import HawkMockJSONResponse
+
+
+def generate_hawk_response(payload):
+    """Mocks HAWK server validation for content."""
+    return HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=payload,
+    )
 
 
 class TestConsentClient:
@@ -20,16 +30,14 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            json={
-                'results': [
-                    {
-                        'email': 'foo@bar.com',
-                        'consents': [
-                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-                        ] if accepts_marketing else [],
-                    },
-                ],
-            },
+            text=generate_hawk_response({
+                'results': [{
+                    'email': 'foo@bar.com',
+                    'consents': [
+                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                    ] if accepts_marketing else [],
+                }],
+            }),
             status_code=status.HTTP_200_OK,
         )
         resp = consent.get_one('foo@bar.com')
@@ -48,7 +56,7 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            json={
+            text=generate_hawk_response({
                 'results': [
                     {
                         'email': email,
@@ -57,7 +65,7 @@ class TestConsentClient:
                         ] if accepts_marketing else [],
                     } for email in emails
                 ],
-            },
+            }),
             status_code=status.HTTP_200_OK,
         )
         resp = consent.get_many(emails)
@@ -75,7 +83,7 @@ class TestConsentClient:
         matcher = requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH}',
-            json={
+            text=generate_hawk_response({
                 'consents': [
                     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
                 ],
@@ -83,7 +91,7 @@ class TestConsentClient:
                 'email': 'foo@bar.com',
                 'phone': '',
                 'key_type': 'email',
-            },
+            }),
             status_code=status.HTTP_201_CREATED,
         )
         result = consent.update_consent('foo@bar.com', accepts_marketing)
@@ -93,73 +101,24 @@ class TestConsentClient:
     @pytest.mark.parametrize(
         'response_status',
         (
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            status.HTTP_502_BAD_GATEWAY,
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            status.HTTP_504_GATEWAY_TIMEOUT,
-        ),
-    )
-    def test_get_one_consent_is_false_when_service_5xx_errors(
-            self,
-            requests_mock,
-            response_status,
-    ):
-        """
-        When the Consent Service is down with a 5XX error,
-        It returns an email with false as the value.
-        """
-        requests_mock.post(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            status_code=response_status,
-        )
-        response = consent.get_one('foo@bar.com')
-        assert response is False
-
-    @pytest.mark.parametrize(
-        'response_status',
-        (
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            status.HTTP_502_BAD_GATEWAY,
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            status.HTTP_504_GATEWAY_TIMEOUT,
-        ),
-    )
-    def test_get_many_consent_is_false_when_service_5xx_errors(
-        self,
-        requests_mock,
-        response_status,
-    ):
-        """
-        When the Consent Service is down with a 5XX error,
-        It returns a dictionary of emails with false as their values.
-        """
-        requests_mock.post(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            status_code=response_status,
-        )
-        emails = ['foo1@bar.com', 'foo2@bar.com', 'foo3@bar.com']
-        response = consent.get_many(emails)
-        assert response == {email: False for email in emails}
-
-    @pytest.mark.parametrize(
-        'response_status',
-        (
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            status.HTTP_504_GATEWAY_TIMEOUT,
         ),
     )
-    def test_get_one_raises_exception_when_service_4xx_errors(
+    def test_get_one_raises_exception_when_service_http_errors(
         self,
         requests_mock,
         response_status,
     ):
         """
-        When the Consent Service responds with a 4XX error, It raises a HTTPError.
+        When the Consent Service responds with a http error, It raises a HTTPError.
         """
         requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
@@ -167,7 +126,7 @@ class TestConsentClient:
             status_code=response_status,
         )
 
-        with pytest.raises(HTTPError):
+        with pytest.raises(consent.ConsentAPIHTTPError):
             consent.get_one('foo@bar.com')
 
     @pytest.mark.parametrize(
@@ -178,15 +137,19 @@ class TestConsentClient:
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status.HTTP_502_BAD_GATEWAY,
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            status.HTTP_504_GATEWAY_TIMEOUT,
         ),
     )
-    def test_get_many_raises_exception_when_service_4xx_errors(
+    def test_get_many_raises_exception_when_service_http_errors(
         self,
         requests_mock,
         response_status,
     ):
         """
-        When the Consent Service responds with a 4XX error, It raises a HTTPError.
+        When the Consent Service responds with a http error, It raises a HTTPError.
         """
         requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
@@ -194,54 +157,56 @@ class TestConsentClient:
             status_code=response_status,
         )
         emails = ['foo1@bar.com', 'foo2@bar.com', 'foo3@bar.com']
-        with pytest.raises(HTTPError):
+        with pytest.raises(consent.ConsentAPIHTTPError):
             consent.get_many(emails)
 
     @pytest.mark.parametrize(
-        'request_exception',
+        'exceptions',
         (
-            ConnectionError,
-            Timeout,
+            (ConnectionError, consent.ConsentAPIConnectionError),
+            (Timeout, consent.ConsentAPITimeoutError),
         ),
     )
     def test_get_many_raises_exception_on_connection_or_timeout_error(
         self,
         requests_mock,
-        request_exception,
+        exceptions,
     ):
         """
         When the Consent Service responds with a 4XX error, It raises
         a ConnectionError or a Timeout Error
         """
+        (request_exception, consent_exception) = exceptions
         requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=request_exception,
         )
         emails = ['foo1@bar.com', 'foo2@bar.com', 'foo3@bar.com']
-        with pytest.raises(request_exception):
+        with pytest.raises(consent_exception):
             consent.get_many(emails)
 
     @pytest.mark.parametrize(
-        'request_exception',
+        'exceptions',
         (
-            ConnectionError,
-            Timeout,
+            (ConnectionError, consent.ConsentAPIConnectionError),
+            (Timeout, consent.ConsentAPITimeoutError),
         ),
     )
     def test_get_one_raises_exception_on_connection_or_timeout_error(
         self,
         requests_mock,
-        request_exception,
+        exceptions,
     ):
         """
         When the Consent Service responds with a 4XX error, It raises
         a ConnectionError or a Timeout Error
         """
+        (request_exception, consent_exception) = exceptions
         requests_mock.post(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=request_exception,
         )
-        with pytest.raises(request_exception):
+        with pytest.raises(consent_exception):
             consent.get_one('foo@bar.com')
