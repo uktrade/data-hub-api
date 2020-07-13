@@ -1,3 +1,27 @@
+# Data Hub API 35.0.0 (2020-07-13)
+
+
+## Internal changes
+
+- **Contacts** It is now possible to look up contact consent to email marketing from central Consent
+  Service API if `GET_CONSENT_FROM_CONSENT_SERVICE` feature flag is
+  active for the `ContactViewSet` retrieve action (`GET /v3/contact/<uuid:pk>`) endpoint.
+- **Contacts** For the Contacts CSV export endpoint (`GET /v3/search/contact/export`), this
+  makes it possible to get the `accepts_dit_email_marketing`
+  field from the Consent Service API. It will only lookup from the consent service if
+  the feature flag is enabled, otherwise no change.
+
+## API
+
+- **Advisers** `contact` field is now removed from all `pipeline-item` endpoints, namely: `GET /v4/pipeline-item/`, `POST /v4/pipeline-item/`, `GET /v4/pipeline-item/<UUID>` and `PATCH /v4/pipeline-item/<UUID>`.
+
+  `contacts` field fully replaces `contact` field.
+
+## Database schema
+
+- **Advisers** The field `contact` was removed from the `pipeline-item` API and from the model definition. The database column will be deleted with the next release.
+
+
 # Data Hub API 34.4.0 (2020-07-09)
 
 
