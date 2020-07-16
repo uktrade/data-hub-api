@@ -1,1 +1,0 @@
-It's now possible to skip the Elastic APM docker container when running tests. If the `ES_APM_ENABLED` variable is set to `False` dockerize will not wait for the container to start.
