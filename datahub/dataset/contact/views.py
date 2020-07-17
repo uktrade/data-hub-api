@@ -50,7 +50,7 @@ class ContactsDatasetView(BaseDatasetView):
         Get the marketing consent from the consent service
         """
         if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
-            emails = [item['email'] for item in data]
+            emails = [item['email'] for item in data if item['email']]
             consent_lookups = consent.get_many(emails)
             for item in data:
                 item['accepts_dit_email_marketing'] = consent_lookups.get(item['email'], False)
