@@ -14,8 +14,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.14.20            # via -r requirements.in
-botocore==1.17.20         # via boto3, s3transfer
+boto3==1.14.23            # via -r requirements.in
+botocore==1.17.23         # via boto3, s3transfer
 celery[redis]==4.4.6      # via -r requirements.in
 certifi==2020.6.20        # via elastic-apm, requests, sentry-sdk
 cfgv==3.1.0               # via pre-commit
@@ -26,7 +26,7 @@ decorator==4.4.2          # via ipython, traitlets
 distlib==0.3.1            # via virtualenv
 django-debug-toolbar==2.2  # via -r requirements.in
 django-environ==0.4.5     # via -r requirements.in
-django-extensions==3.0.2  # via -r requirements.in
+django-extensions==3.0.3  # via -r requirements.in
 django-filter==2.3.0      # via -r requirements.in
 django-js-asset==1.2.2    # via django-mptt
 django-mptt==0.11.0       # via -r requirements.in
@@ -37,7 +37,7 @@ django==3.0.8             # via -r requirements.in, django-debug-toolbar, django
 djangorestframework==3.11.0  # via -r requirements.in
 docopt==0.6.2             # via notifications-python-client
 docutils==0.15.2          # via botocore
-elastic-apm==5.8.0        # via -r requirements.in
+elastic-apm==5.8.1        # via -r requirements.in
 elasticsearch-dsl==6.3.1  # via -r requirements.in
 elasticsearch==6.8.1      # via -r requirements.in, elasticsearch-dsl
 execnet==1.7.1            # via pytest-xdist

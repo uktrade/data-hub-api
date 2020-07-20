@@ -1,3 +1,11 @@
+# Data Hub API 35.0.2 (2020-07-20)
+
+
+## Bug fixes
+
+- **Contacts** In 2016, a change was made to the models which made emails mandatory for contacts. Prior to this, over 40,000 contacts had been created with no emails attached to them. Data-Flow periodically sends requests to the Consent Service for a list of contacts' marketing preferences. When one of these contact's empty emails gets included in the request, it breaks the Consent Service. To fix this, a filter has been added in the viewset Data-Flow uses, to prevent empty email strings from being sent to the Consent Service.
+
+
 # Data Hub API 35.0.1 (2020-07-16)
 
 
