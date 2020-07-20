@@ -127,3 +127,29 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         assert response_results[0]['accepts_dit_email_marketing']
         assert not response_results[1]['accepts_dit_email_marketing']
         assert not response_results[2]['accepts_dit_email_marketing']
+
+    def test_removes_empty_emails_before_calling_consent_service(
+            self,
+            data_flow_api_client,
+            consent_get_many_mock,
+    ):
+        """
+        Test that empty email strings are removed before making a call to the Consent Service.
+        Before 2016, emails for contacts were not mandatory, so there are around 40,000
+        records with no emails. Filtering has been added to make sure that the
+        Consent Service is not called with these empty emails.
+        """
+        FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
+        contact1 = ContactFactory(email='a@a.a')
+        contact2 = ContactFactory(email='')
+        contact3 = ContactFactory(email='c@c.c')
+        consent_get_many_mock.return_value = {
+            contact1.email: True,
+            contact2.email: True,
+            contact3.email: False,
+        }
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+        consent_get_many_mock.assert_called_once_with(
+            [contact1.email, contact3.email],
+        )

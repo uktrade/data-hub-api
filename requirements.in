@@ -2,7 +2,7 @@
 django==3.0.8
 djangorestframework==3.11.0
 django-environ==0.4.5
-django-extensions==3.0.2
+django-extensions==3.0.3
 django-filter==2.3.0
 django-reversion==3.0.7
 django-pglocks==1.0.4
@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.5
 psycogreen==1.0.2
 
-boto3==1.14.20
+boto3==1.14.23
 
 notifications-python-client==5.6.0
 
@@ -41,7 +41,7 @@ elasticsearch==6.8.1
 elasticsearch-dsl==6.3.1
 
 # ES APM
-elastic-apm==5.8.0
+elastic-apm==5.8.1
 
 # Celery
 celery[redis]==4.4.6
