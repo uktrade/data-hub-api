@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+import factory.fuzzy
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -111,9 +112,9 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         the consent service and values from that are in the response.
         """
         FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
-        contact1 = ContactFactory(email='a@a.a')
-        contact2 = ContactFactory(email='b@b.b')
-        contact3 = ContactFactory(email='c@c.c')
+        contact1 = ContactFactory(email=factory.Faker('email'))
+        contact2 = ContactFactory(email=factory.Faker('email'))
+        contact3 = ContactFactory(email=factory.Faker('email'))
         consent_get_many_mock.return_value = {
             contact1.email: True,
             contact2.email: False,
@@ -128,7 +129,7 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         assert not response_results[1]['accepts_dit_email_marketing']
         assert not response_results[2]['accepts_dit_email_marketing']
 
-    def test_removes_empty_emails_before_calling_consent_service(
+    def test_removes_invalid_emails_before_calling_consent_service(
             self,
             data_flow_api_client,
             consent_get_many_mock,
@@ -140,16 +141,30 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         Consent Service is not called with these empty emails.
         """
         FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE, is_active=True)
-        contact1 = ContactFactory(email='a@a.a')
+        contact1 = ContactFactory(email=factory.Faker('email'))
         contact2 = ContactFactory(email='')
-        contact3 = ContactFactory(email='c@c.c')
+        contact3 = ContactFactory(email=factory.Faker('email'))
+        contact4 = ContactFactory(email='cc@c-c')
         consent_get_many_mock.return_value = {
             contact1.email: True,
-            contact2.email: True,
-            contact3.email: False,
+            contact3.email: True,
         }
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         consent_get_many_mock.assert_called_once_with(
             [contact1.email, contact3.email],
         )
+        response_results = response.json()['results']
+        assert len(response_results) == 4
+
+        assert response_results[0]['accepts_dit_email_marketing']
+        assert response_results[0]['email'] == contact1.email
+
+        assert not response_results[1]['accepts_dit_email_marketing']
+        assert response_results[1]['email'] == contact2.email
+
+        assert response_results[2]['accepts_dit_email_marketing']
+        assert response_results[2]['email'] == contact3.email
+
+        assert not response_results[3]['accepts_dit_email_marketing']
+        assert response_results[3]['email'] == contact4.email
