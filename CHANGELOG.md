@@ -1,3 +1,12 @@
+# Data Hub API 35.0.3 (2020-07-23)
+
+
+## Bug fixes
+
+- **Contacts** The following endpoint `GET /v4/dataset/contacts-dataset` returns an error 500 when the `GET_CONSENT_FROM_CONSENT_SERVICE` is active. This is due to emails not be valid in the database.
+This bugfix will strip out invalid emails before sending emails as payload.
+
+
 # Data Hub API 35.0.2 (2020-07-20)
 
 
