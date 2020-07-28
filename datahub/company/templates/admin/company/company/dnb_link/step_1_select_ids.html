@@ -27,9 +27,9 @@
     {% csrf_token %}
 
     {% for field in form %}
-      <div class="fieldWrapper">
+      <div class="fieldWrapper form-row">
         {{ field.errors }}
-        {{ field.label_tag }} {{ field }}
+        <label class="aligned">{{ field.label_tag }}</label> {{ field }}
         {% if field.help_text %}
         <p class="help">{{ field.help_text|safe }}</p>
         {% endif %}
