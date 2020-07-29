@@ -44,6 +44,22 @@ class ConsentAPIConnectionError(ConsentAPIException):
     """
 
 
+class CaseInsensitiveDict(dict):
+    """Inherit dict class to make keys case insitive."""
+
+    def __setitem__(self, key, value):
+        """Tranform key to lower case when setting an item."""
+        super().__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        """Tranform key to lower case when getting an item."""
+        return super().__getitem__(key.lower())
+
+    def get(self, key, default=False):
+        """Tranform key to lower case when getting an item using a dict get method."""
+        return super().get(key.lower(), default)
+
+
 def _get_client():
     """
     Get configured API client for the consent service,
@@ -88,7 +104,7 @@ def update_consent(email_address, accepts_dit_email_marketing, modified_at=None)
         'consents': [
             CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
         ] if accepts_dit_email_marketing else [],
-        'email': email_address,
+        'email': email_address.lower(),
     }
 
     if modified_at:
@@ -106,9 +122,32 @@ def get_many(emails):
     Bulk lookup consent for a list of emails
     :param emails: List of email addresses
     :return: dict of email address to consent status
+
+    Below is a sample of the data shape.
+    {
+        "count": 1,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": 1486081,
+                "consents": [
+                    "email_marketing"
+                ],
+                "modified_at": "2020-07-27T11:54:51.796358Z",
+                "key": "",
+                "email": "example@example.com",
+                "phone": "",
+                "key_type": "email",
+                "created_at": "2020-07-27T11:54:51.874350Z",
+                "current": true
+                }
+            ]
+        }
+    }
     """
     body = {
-        'emails': emails,
+        'emails': [email.lower() for email in emails],
     }
     api_client = _get_client()
 
@@ -135,10 +174,11 @@ def get_many(emails):
         logger.error(error_message, exc)
         raise ConsentAPIHTTPError(error_message) from exc
 
-    return {
+    results = {
         result['email']: CONSENT_SERVICE_EMAIL_CONSENT_TYPE in result['consents']
         for result in response.json()['results']
     }
+    return CaseInsensitiveDict(results)
 
 
 def get_one(email):

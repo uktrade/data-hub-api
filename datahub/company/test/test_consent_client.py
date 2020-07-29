@@ -76,6 +76,59 @@ class TestConsentClient:
         assert matcher.last_request.json() == {'emails': emails}
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
+    def test_get_one_normalises_emails(self, requests_mock, accepts_marketing):
+        """
+        Try to get consent status for a single email address
+        """
+        matcher = requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            text=generate_hawk_response({
+                'results': [{
+                    'email': 'foo@bar.com',
+                    'consents': [
+                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                    ] if accepts_marketing else [],
+                }],
+            }),
+            status_code=status.HTTP_200_OK,
+        )
+        resp = consent.get_one('FOO@BAR.COM')
+        assert resp == accepts_marketing
+
+        assert matcher.called_once
+        assert matcher.last_request.query == 'limit=1'
+        assert matcher.last_request.json() == {'emails': ['foo@bar.com']}
+
+    @pytest.mark.parametrize('emails', ([], ['foo@bar.com'], ['bar@foo.com', 'foo@bar.com']))
+    @pytest.mark.parametrize('accepts_marketing', (True, False))
+    def test_get_many_normalises_emails(self, requests_mock, accepts_marketing, emails):
+        """
+        Try to get consent status for a list of email addresses
+        """
+        matcher = requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            text=generate_hawk_response({
+                'results': [
+                    {
+                        'email': email,
+                        'consents': [
+                            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                        ] if accepts_marketing else [],
+                    } for email in emails
+                ],
+            }),
+            status_code=status.HTTP_200_OK,
+        )
+        resp = consent.get_many([email.upper() for email in emails])
+        assert resp == {email: accepts_marketing for email in emails}
+
+        assert matcher.called_once
+        assert matcher.last_request.query == f'limit={len(emails)}'
+        assert matcher.last_request.json() == {'emails': emails}
+
+    @pytest.mark.parametrize('accepts_marketing', (True, False))
     def test_update(self, requests_mock, accepts_marketing):
         """
         Try to update consent status
