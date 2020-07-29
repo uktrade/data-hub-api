@@ -1,1 +1,0 @@
-A bug was resolved that resulted in emails stored in mixed casing was not found by the consent service. This is because the consent service will transform saved data into lowercase. With this fix datahub will transform the emails to lowercase when performing a lookup.
