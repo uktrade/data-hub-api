@@ -116,6 +116,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'is_turnover_estimated',
                     'one_list_tier',
                     'one_list_account_owner',
+                    'dnb_investigation_id',
                 ),
             },
         ),
@@ -195,6 +196,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'id',
         'company_number',
         'duns_number',
+        'dnb_investigation_id',
     )
     raw_id_fields = (
         'global_headquarters',
