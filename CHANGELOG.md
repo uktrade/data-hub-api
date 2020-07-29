@@ -1,3 +1,15 @@
+# Data Hub API 35.1.0 (2020-07-29)
+
+
+## Features
+
+- It's now possible to search for the `Company` via `investigation ID` in the Django admin for matching companies and duns number
+
+## Bug fixes
+
+- **Contacts** A bug was resolved that resulted in emails stored in mixed casing was not found by the consent service. This is because the consent service will transform saved data into lowercase. With this fix datahub will transform the emails to lowercase when performing a lookup.
+
+
 # Data Hub API 35.0.3 (2020-07-23)
 
 
