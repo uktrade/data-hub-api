@@ -1,4 +1,3 @@
-import logging
 from unittest.mock import patch
 
 import pytest
@@ -9,18 +8,8 @@ from django.test import override_settings
 from requests import ConnectTimeout
 from rest_framework import status
 
-from datahub.company.constants import UPDATE_CONSENT_SERVICE_FEATURE_FLAG
 from datahub.company.tasks import update_contact_consent
 from datahub.core.test_utils import HawkMockJSONResponse
-from datahub.feature_flag.test.factories import FeatureFlagFactory
-
-
-@pytest.fixture()
-def update_consent_service_feature_flag():
-    """
-    Creates the consent service feature flag.
-    """
-    yield FeatureFlagFactory(code=UPDATE_CONSENT_SERVICE_FEATURE_FLAG)
 
 
 def generate_hawk_response(payload):
@@ -39,26 +28,11 @@ class TestConsentServiceTask:
     DIT consent service / legal basis API
     """
 
-    def test_no_feature_flag(
-            self,
-            caplog,
-    ):
-        """
-        Test that if the feature flag is not enabled, the
-        task will not run.
-        """
-        caplog.set_level(logging.INFO, logger='datahub.company.tasks.contact')
-        update_contact_consent.apply_async(args=('example@exmaple.com', True))
-        assert caplog.messages == [
-            f'Feature flag "{UPDATE_CONSENT_SERVICE_FEATURE_FLAG}" is not active, exiting.',
-        ]
-
     @override_settings(
         CONSENT_SERVICE_BASE_URL=None,
     )
-    def test_with_flag_but_not_configured(
+    def test_not_configured_error(
             self,
-            update_consent_service_feature_flag,
     ):
         """
         Test that if feature flag is enabled, but environment variables are not set
@@ -78,7 +52,6 @@ class TestConsentServiceTask:
     )
     def test_task_makes_http_request(
             self,
-            update_consent_service_feature_flag,
             requests_mock,
             email_address,
             accepts_dit_email_marketing,
@@ -117,7 +90,6 @@ class TestConsentServiceTask:
     def test_task_retries_on_request_exceptions(
             self,
             mock_retry,
-            update_consent_service_feature_flag,
             requests_mock,
             status_code,
     ):
@@ -140,7 +112,6 @@ class TestConsentServiceTask:
             self,
             mock_post,
             mock_retry,
-            update_consent_service_feature_flag,
     ):
         """
         Test to ensure that celery retries on connect timeout
@@ -156,7 +127,6 @@ class TestConsentServiceTask:
             self,
             mock_post,
             mock_retry,
-            update_consent_service_feature_flag,
     ):
         """
         Test to ensure that celery raises on non-requests exception
