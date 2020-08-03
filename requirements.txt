@@ -79,7 +79,7 @@ monotonic==1.5            # via notifications-python-client
 more-itertools==8.4.0     # via pytest
 multidict==4.7.6          # via aiohttp, yarl
 nodeenv==1.4.0            # via pre-commit
-notifications-python-client==5.6.0  # via -r requirements.in
+notifications-python-client==5.7.0  # via -r requirements.in
 packaging==20.4           # via pytest
 parso==0.7.0              # via jedi
 pathtools==0.1.2          # via watchdog
