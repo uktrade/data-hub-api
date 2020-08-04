@@ -1,0 +1,1 @@
+The `UPDATE_CONSENT_SERVICE_FEATURE_FLAG` feature flag has now been removed. This flag was used to activate or deactivate `create`, `retrieve`, `partial_update` actions on `v3/contact/<uuid> `(ContactViewSet) to trigger the update_contact_consent celery task. This feature will remain active and no longer configurable with a feature flag.
