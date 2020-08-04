@@ -13,7 +13,6 @@ from reversion.models import Version
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-    GET_CONSENT_FROM_CONSENT_SERVICE,
 )
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
@@ -25,28 +24,49 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     HawkMockJSONResponse,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.test.factories import TeamFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture()
-def get_consent_from_api_feature_flag():
-    """
-    Creates the get consent from consent service feature flag.
-    """
-    yield FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE)
+def generate_hawk_response(response):
+    """Mocks HAWK server validation for content."""
+    return HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=response,
+    )
+
+
+@pytest.fixture
+def get_consent_fixture(requests_mock):
+    """Mock get call to consent service."""
+    yield lambda response: requests_mock.post(
+        f'{settings.CONSENT_SERVICE_BASE_URL}'
+        f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+        status_code=200,
+        text=generate_hawk_response(response),
+    )
 
 
 class TestAddContact(APITestMixin):
     """Add contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_with_manual_address(self):
+    def test_with_manual_address(self, get_consent_fixture):
         """Test add with manual address."""
         company = CompanyFactory()
+        get_consent_fixture({
+            'results': [
+                {
+                    'consents': [
+                        'email_marketing',
+                    ],
+                    'email': 'foo@bar.com',
+                },
+            ],
+        })
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(
             url,
@@ -581,13 +601,11 @@ class TestViewContact(APITestMixin):
     @pytest.mark.parametrize('accepts_marketing', (True, False))
     def test_accepts_dit_email_marketing_consent_service(
         self,
-        get_consent_from_api_feature_flag,
         accepts_marketing,
         requests_mock,
     ):
         """
         Tests accepts_dit_email_marketing field is populated from the consent service.
-        This is behind the feature flag GET_CONSENT_FROM_CONSENT_SERVICE.
         """
         contact = ContactFactory(
             accepts_dit_email_marketing=False,
@@ -632,7 +650,6 @@ class TestViewContact(APITestMixin):
     )
     def test_accepts_dit_email_marketing_consent_service_http_error(
         self,
-        get_consent_from_api_feature_flag,
         response_status,
         requests_mock,
     ):
@@ -661,7 +678,6 @@ class TestViewContact(APITestMixin):
     )
     def test_accepts_dit_email_marketing_consent_service_error(
         self,
-        get_consent_from_api_feature_flag,
         exceptions,
         requests_mock,
     ):
