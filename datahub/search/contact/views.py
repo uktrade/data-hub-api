@@ -79,6 +79,14 @@ class SearchContactAPIView(SearchContactAPIViewMixin, SearchAPIView):
 class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
 
+    def _is_valid_email(self, value):
+        """Validate if emails are valid and return a boolean flag."""
+        try:
+            validate_email(value)
+            return True
+        except ValidationError:
+            return False
+
     consent_page_size = 100
 
     db_sort_by_remappings = {
@@ -151,7 +159,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
             rows = list(chunk)
             # Peform constent lookup on emails POST request
             consent_lookups = consent.get_many(
-                [row['email'] for row in rows],
+                [row['email'] for row in rows if self._is_valid_email(row['email'])],
             )
             for row in rows:
                 # Assign contact consent boolean to accepts_dit_email_marketing
