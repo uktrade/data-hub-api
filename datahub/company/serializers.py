@@ -211,28 +211,33 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
+class ConsentMarketingField(serializers.BooleanField):
+
+    def to_internal_value(self, data):
+        """Validate boolean on incoming data."""
+        return {
+            'accepts_dit_email_marketing': super().to_internal_value(data),
+        }
+
+    def to_representation(self, value):
+        """Lookup from consent service api/"""
+        try:
+            representation = consent.get_one(value.email)
+        except consent.ConsentAPIException:
+            representation = False
+        return representation
+
+
 class ContactDetailSerializer(ContactSerializer):
     """
     This is the same as the ContactSerializer except it includes
     accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
     """
 
+    accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
+
     class Meta(ContactSerializer.Meta):
         fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
-
-    def to_representation(self, instance):
-        """
-        Convert instance to dict.
-        Optionally lookup from consent service if feature flag
-        is enabled.
-        """
-        representation = super().to_representation(instance)
-        try:
-            representation['accepts_dit_email_marketing'] = \
-                consent.get_one(representation['email'])
-        except consent.ConsentAPIException:
-            representation['accepts_dit_email_marketing'] = False
-        return representation
 
     def _notify_consent_service(self, validated_data):
         """
@@ -244,14 +249,16 @@ class ContactDetailSerializer(ContactSerializer):
         if 'accepts_dit_email_marketing' not in validated_data:
             # If no consent value in request body
             return
-
+        accepts_dit_email_marketing = validated_data['accepts_dit_email_marketing']
+        # Remove the accepts_dit_email_marketing from validated_data
+        del validated_data['accepts_dit_email_marketing']
         # If consent value in POST, notify
         combiner = DataCombiner(self.instance, validated_data)
         transaction.on_commit(
             lambda: update_contact_consent.apply_async(
                 args=(
                     combiner.get_value('email'),
-                    validated_data['accepts_dit_email_marketing'],
+                    accepts_dit_email_marketing,
                 ),
                 kwargs={
                     'modified_at': now().isoformat(),

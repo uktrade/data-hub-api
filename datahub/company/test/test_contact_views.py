@@ -339,7 +339,6 @@ class TestEditContact(APITestMixin):
                 address_country_id=constants.Country.united_kingdom.value.id,
                 address_postcode='SW1A1AA',
                 notes='lorem ipsum',
-                accepts_dit_email_marketing=False,
             )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
@@ -527,7 +526,6 @@ class TestViewContact(APITestMixin):
             address_country_id=constants.Country.united_kingdom.value.id,
             address_postcode='SW1A1AA',
             notes='lorem ipsum',
-            accepts_dit_email_marketing=False,
         )
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -607,9 +605,7 @@ class TestViewContact(APITestMixin):
         """
         Tests accepts_dit_email_marketing field is populated from the consent service.
         """
-        contact = ContactFactory(
-            accepts_dit_email_marketing=False,
-        )
+        contact = ContactFactory()
         hawk_response = HawkMockJSONResponse(
             api_id=settings.COMPANY_MATCHING_HAWK_ID,
             api_key=settings.COMPANY_MATCHING_HAWK_KEY,
