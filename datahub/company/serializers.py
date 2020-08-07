@@ -212,6 +212,11 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 
 
 class ConsentMarketingField(serializers.BooleanField):
+    """
+    ConsentMarketingField will lookup consent data.
+    The model that this fields is used must have an email field
+    BooleanField is subclassed here for validation.
+    """
 
     def to_internal_value(self, data):
         """Validate boolean on incoming data."""
