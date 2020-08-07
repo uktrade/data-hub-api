@@ -10,7 +10,6 @@ class Contact(BaseESModel):
     """Elasticsearch representation of Contact model."""
 
     id = Keyword()
-    accepts_dit_email_marketing = Boolean()
     address_1 = Text()
     address_2 = Text()
     address_town = fields.NormalizedKeyword()

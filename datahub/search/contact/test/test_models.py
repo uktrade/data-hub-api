@@ -44,7 +44,6 @@ def test_contact_dbmodel_to_dict(es):
         'telephone_alternative',
         'email_alternative',
         'notes',
-        'accepts_dit_email_marketing',
         'company_sector',
         'company_uk_region',
     }
