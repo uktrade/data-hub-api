@@ -12,7 +12,6 @@ from rest_framework import serializers
 from datahub.company import consent
 from datahub.company.constants import (
     BusinessTypeConstant,
-    GET_CONSENT_FROM_CONSENT_SERVICE,
     OneListTierID,
 )
 from datahub.company.models import (
@@ -51,7 +50,6 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -229,12 +227,11 @@ class ContactDetailSerializer(ContactSerializer):
         is enabled.
         """
         representation = super().to_representation(instance)
-        if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
-            try:
-                representation['accepts_dit_email_marketing'] = \
-                    consent.get_one(representation['email'])
-            except consent.ConsentAPIException:
-                representation['accepts_dit_email_marketing'] = False
+        try:
+            representation['accepts_dit_email_marketing'] = \
+                consent.get_one(representation['email'])
+        except consent.ConsentAPIException:
+            representation['accepts_dit_email_marketing'] = False
         return representation
 
     def _notify_consent_service(self, validated_data):
