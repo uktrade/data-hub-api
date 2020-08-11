@@ -1,0 +1,1 @@
+The `GET_CONSENT_FROM_CONSENT_SERVICE` feature flag has now been removed. This flag was used to activate or deactivate consent lookup from the consent service on `v3/contact/<uuid> `(ContactViewSet). This feature will remain active and no longer configurable with a feature flag.
