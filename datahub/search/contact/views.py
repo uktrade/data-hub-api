@@ -1,8 +1,9 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db.models import Case, Max, Value, When
 from django.db.models.functions import NullIf
 
 from datahub.company import consent
-from datahub.company.constants import GET_CONSENT_FROM_CONSENT_SERVICE
 from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
     ConcatWS,
@@ -13,7 +14,6 @@ from datahub.core.query_utils import (
     get_top_related_expression_subquery,
 )
 from datahub.core.utils import slice_iterable_into_chunks
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.contact import ContactSearchApp
@@ -78,6 +78,14 @@ class SearchContactAPIView(SearchContactAPIViewMixin, SearchAPIView):
 @register_v3_view(sub_path='export')
 class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView):
     """Company search export view."""
+
+    def _is_valid_email(self, value):
+        """Validate if emails are valid and return a boolean flag."""
+        try:
+            validate_email(value)
+            return True
+        except ValidationError:
+            return False
 
     consent_page_size = 100
 
@@ -151,7 +159,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
             rows = list(chunk)
             # Peform constent lookup on emails POST request
             consent_lookups = consent.get_many(
-                [row['email'] for row in rows],
+                [row['email'] for row in rows if self._is_valid_email(row['email'])],
             )
             for row in rows:
                 # Assign contact consent boolean to accepts_dit_email_marketing
@@ -162,6 +170,4 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
     def _get_rows(self, ids, search_ordering):
         """Get row queryset for constent service if the feature flag is enabled."""
         rows = super()._get_rows(ids, search_ordering)
-        if is_feature_flag_active(GET_CONSENT_FROM_CONSENT_SERVICE):
-            return self._add_consent_response(rows)
-        return rows
+        return self._add_consent_response(rows)
