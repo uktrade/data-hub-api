@@ -7,7 +7,6 @@ from freezegun import freeze_time
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-    GET_CONSENT_FROM_CONSENT_SERVICE,
 )
 from datahub.company.serializers import ContactDetailSerializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -15,7 +14,6 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     HawkMockJSONResponse,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -29,14 +27,6 @@ def update_contact_task_mock(monkeypatch):
     m = Mock()
     monkeypatch.setattr('datahub.company.serializers.update_contact_consent.apply_async', m)
     yield m
-
-
-@pytest.fixture
-def get_consent_from_api_feature_flag():
-    """
-    Creates the get consent from consent service feature flag.
-    """
-    yield FeatureFlagFactory(code=GET_CONSENT_FROM_CONSENT_SERVICE)
 
 
 @freeze_time(FROZEN_TIME)
@@ -150,10 +140,9 @@ class TestContactSerializer:
         )
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_to_representation_feature_flag_on(
+    def test_to_representation(
         self,
         requests_mock,
-        get_consent_from_api_feature_flag,
         accepts_marketing,
     ):
         """
@@ -182,23 +171,3 @@ class TestContactSerializer:
         contact_serialized = ContactDetailSerializer(instance=contact)
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1
-
-    @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_to_representation_feature_flag_off(
-        self,
-        requests_mock,
-        accepts_marketing,
-    ):
-        """
-        Test accepts_dit_email_marketing fields is populated by the db
-        and no calls are made to the consent service when the feature flag is disabled.
-        """
-        contact = self._make_contact(accepts_dit_email_marketing=accepts_marketing)
-        requests_mock.post(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            status_code=200,
-        )
-        contact_serialized = ContactDetailSerializer(instance=contact)
-        assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
-        assert requests_mock.called is False
