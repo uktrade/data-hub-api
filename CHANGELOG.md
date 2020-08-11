@@ -1,3 +1,16 @@
+# Data Hub API 35.2.0 (2020-08-11)
+
+
+## Internal changes
+
+- **Contacts** The `GET_CONSENT_FROM_CONSENT_SERVICE` feature flag has now been removed. This flag was used to activate or deactivate consent lookup from the consent service on `v3/contact/<uuid> `(ContactViewSet). This feature will remain active and no longer configurable with a feature flag.
+- **Contacts** The `UPDATE_CONSENT_SERVICE_FEATURE_FLAG` feature flag has now been removed. This flag was used to activate or deactivate `create`, `retrieve`, `partial_update` actions on `v3/contact/<uuid> `(ContactViewSet) to trigger the update_contact_consent celery task. This feature will remain active and no longer configurable with a feature flag.
+
+## API
+
+- **Contacts** `GET /v4/dataset/contacts-dataset`: The field `accepts_dit_email_marketing` was removed from the contacts dataset endpoint. It is no longer required by Data Workflow.
+
+
 # Data Hub API 35.1.0 (2020-07-29)
 
 
