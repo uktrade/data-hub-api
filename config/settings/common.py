@@ -10,14 +10,13 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import base64
 import os
 import stat
-from datetime import timedelta
-from datetime import datetime
-from pytz import utc  # Note: importing django.utils.timezone.utc would cause a circular import
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
 import environ
 from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
+from pytz import utc  # Note: importing django.utils.timezone.utc would cause a circular import
 
 from config.settings.types import HawkScope
 from datahub.core.constants import InvestmentProjectStage
@@ -452,6 +451,14 @@ if REDIS_BASE_URL:
         'simulate_automatic_company_archive': {
             'task': 'datahub.company.tasks.automatic_company_archive',
             'schedule': crontab(minute=0, hour=19),
+            'kwargs': {
+                'limit': 20000,
+                'simulate': True,
+            }
+        },
+        'simulate_automatic_contact_archive': {
+            'task': 'datahub.company.tasks.automatic_contact_archive',
+            'schedule': crontab(minute=0, hour=21, day_of_week='SAT'),
             'kwargs': {
                 'limit': 20000,
                 'simulate': True,
