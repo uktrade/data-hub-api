@@ -14,7 +14,7 @@ logger = get_task_logger(__name__)
 def _automatic_contact_archive(limit=1000, simulate=False):
     contacts_to_be_archived = Contact.objects.filter(
         archived=False, company__archived=True,
-    )[:limit]
+    ).prefetch_related('company')[:limit]
 
     for contact in contacts_to_be_archived:
         message = f'Automatically archived contact: {contact.id}'
@@ -22,7 +22,8 @@ def _automatic_contact_archive(limit=1000, simulate=False):
             logger.info(f'[SIMULATION] {message}')
             continue
         contact.archived = True
-        contact.archived_reason = 'Record was automatically archived due to inactivity'
+        contact.archived_reason = f'Record was automatically archived due to the company ' \
+                                  f'"{contact.company.name}" being archived'
         contact.archived_on = timezone.now()
         contact.save(
             update_fields=[
