@@ -56,6 +56,7 @@ class SearchInvestmentProjectAPIViewMixin:
         'stage': 'stage.id',
         'likelihood_to_land': 'likelihood_to_land.id',
         'uk_region_location': 'uk_region_locations.id',
+        'country_investment_originates_from': 'country_investment_originates_from.id',
     }
 
     COMPOSITE_FILTERS = {
@@ -71,10 +72,6 @@ class SearchInvestmentProjectAPIViewMixin:
             'sector.ancestors.id',
         ],
         'investor_company_country': [
-            'investor_company_country.id',
-            'country_investment_originates_from.id',
-        ],
-        'country_investment_originates_from': [
             'investor_company_country.id',
             'country_investment_originates_from.id',
         ],
@@ -137,6 +134,8 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         'name': 'Project name',
         'investor_company__name': 'Investor company',
         'investor_company__address_town': 'Investor company town or city',
+        # TODO: the source field below should be replaced with `country_investment_originates_from`
+        # once it has been populated
         'investor_company__address_country__name': 'Country of origin',
         'investment_type__name': 'Investment type',
         'status_name': 'Status',
