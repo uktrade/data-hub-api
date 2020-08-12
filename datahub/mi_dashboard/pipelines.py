@@ -191,6 +191,8 @@ class ETLInvestmentProjects(ETLBase):
                 'investor_company__address_country__overseas_region__name',
             ),
             country_url=get_country_url(),
+            # TODO: this should be sourcing data from `country_investment_originates_from` once
+            # that column is fully populated.
             investor_company_country=get_empty_string_if_null_expression(
                 'investor_company__address_country__name',
             ),

@@ -472,6 +472,11 @@ class TestCreateView(APITestMixin):
         # GVA Multiplier for Retail & wholesale trade - 2019 - 0.0581 * 1000
         assert response_data['gross_value_added'] == '58'
 
+        assert (
+            response_data['country_investment_originates_from']['id']
+            == str(investor_company.address_country.id)
+        )
+
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
         url = reverse('api-v3:investment:investment-collection')
