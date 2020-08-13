@@ -134,7 +134,7 @@ virtualenv==20.0.25       # via pre-commit
 watchdog[watchmedo]==0.10.3  # via -r requirements.in
 wcwidth==0.2.5            # via prompt-toolkit, pytest
 werkzeug==1.0.1           # via -r requirements.in
-whitenoise==5.1.0         # via -r requirements.in
+whitenoise==5.2.0         # via -r requirements.in
 yarl==1.4.2               # via aiohttp
 zope.event==4.4           # via gevent
 zope.interface==5.1.0     # via gevent
