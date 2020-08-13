@@ -254,9 +254,8 @@ class ContactDetailSerializer(ContactSerializer):
         if 'accepts_dit_email_marketing' not in validated_data:
             # If no consent value in request body
             return
-        accepts_dit_email_marketing = validated_data['accepts_dit_email_marketing']
         # Remove the accepts_dit_email_marketing from validated_data
-        del validated_data['accepts_dit_email_marketing']
+        accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
         # If consent value in POST, notify
         combiner = DataCombiner(self.instance, validated_data)
         transaction.on_commit(
