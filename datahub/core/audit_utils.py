@@ -1,5 +1,4 @@
-from django.core.exceptions import ValidationError
-from django.db import models
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 
 
 def diff_versions(model_meta, old_version, new_version):
@@ -46,7 +45,7 @@ def _get_field_or_none(model_meta, db_column_name):
     """Gets a model field for a given model meta, if the field cannot be found returns None."""
     try:
         return model_meta.get_field(db_column_name)
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         return None
 
 
