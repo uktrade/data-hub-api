@@ -1,0 +1,6 @@
+A new Celery task called `automatic_contact_archive` was added to Data Hub API.
+
+This task would run every Saturday at 9pm in *simulation mode* with an upper limit of a *20000 contacts*. In simulation mode, this task would log the IDs of the contacts that would have been automatically archived using the following criteria:
+
+- Are not yet archived
+- Are attached to archived companies
