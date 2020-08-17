@@ -159,19 +159,19 @@ def get_many(emails):
             params={'limit': len(emails)},
         )
     except ConnectionError as exc:
+        logger.error(exc)
         error_message = 'Encountered an error connecting to Consent API'
-        logger.error(error_message, exc)
         raise ConsentAPIConnectionError(error_message) from exc
     except Timeout as exc:
+        logger.error(exc)
         error_message = 'Encountered a timeout interacting with Consent API'
-        logger.error(error_message, exc)
         raise ConsentAPITimeoutError(error_message) from exc
     except HTTPError as exc:
+        logger.error(exc)
         error_message = (
             'The Consent API returned an error status: '
             f'{exc.response.status_code}',
         )
-        logger.error(error_message, exc)
         raise ConsentAPIHTTPError(error_message) from exc
 
     results = {
