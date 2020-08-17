@@ -1,3 +1,25 @@
+# Data Hub API 35.3.0 (2020-08-17)
+
+
+## Features
+
+- **Contacts** A new Celery task called `automatic_contact_archive` was added to Data Hub API.
+
+  This task would run every Saturday at 9pm in *simulation mode* with an upper limit of a *20000 contacts*. In simulation mode, this task would log the IDs of the contacts that would have been automatically archived using the following criteria:
+
+  - Are not yet archived
+  - Are attached to archived companies
+- **Investment** When a new Investment Project is created, the `country_investment_originates_from` is now populated from the
+  corresponding Investor Company `address_country` field.
+- **Investment** A new command `update_country_of_origin` has been added to update all Investment Projects'
+  `country_investment_originates_from` column with corresponding Investor Company address country.
+
+## Bug fixes
+
+- **Investment** The `country_investment_originates_from` search filter has been updated, so now it only filters Investment Projects
+  by a field of its own name.
+
+
 # Data Hub API 35.2.0 (2020-08-11)
 
 
