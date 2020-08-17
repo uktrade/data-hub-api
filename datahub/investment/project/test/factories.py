@@ -58,6 +58,11 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     stage_id = InvestmentProjectStage.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
+    country_investment_originates_from = factory.Maybe(
+        factory.SelfAttribute('investor_company'),
+        factory.SelfAttribute('investor_company.address_country'),
+        None,
+    )
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     likelihood_to_land_id = LikelihoodToLand.high.value.id
