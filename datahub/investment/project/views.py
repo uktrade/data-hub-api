@@ -83,6 +83,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         'client_relationship_manager__dit_team',
         'client_relationship_manager',
         'country_lost_to',
+        'country_investment_originates_from',
         'fdi_type',
         'intermediate_company',
         'investment_type',

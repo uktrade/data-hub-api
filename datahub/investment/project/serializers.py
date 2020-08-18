@@ -416,6 +416,8 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             # Required for validation as DRF does not allow defaults for read-only fields
             data['allow_blank_possible_uk_regions'] = False
 
+            self._store_investor_company_details(data)
+
         self._check_if_investment_project_can_be_moved_to_verify_win(data)
         self._check_if_investment_project_can_be_moved_to_won(data)
         self._validate_for_stage(data)
@@ -439,6 +441,13 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             and (self.instance is None or self.instance.project_manager_requested_on is None)
         ):
             data['project_manager_requested_on'] = now()
+
+    def _store_investor_company_details(self, data):
+        # Store investor company details used for reporting
+        # Investor company details may change over time, that's why we need to keep the details
+        # at the time of investment project creation
+        investor_company = data['investor_company']
+        data['country_investment_originates_from'] = investor_company.address_country
 
     def _check_if_investment_project_can_be_moved_to_verify_win(self, data):
         # only project manager or project assurance adviser can move a project to verify win

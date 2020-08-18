@@ -1,5 +1,6 @@
 from logging import getLogger
 
+import reversion
 from celery import shared_task
 from django.db.models import Q
 
@@ -8,7 +9,6 @@ from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
 )
 from datahub.investment.project.models import GVAMultiplier, InvestmentProject
-
 
 logger = getLogger(__name__)
 
@@ -77,3 +77,33 @@ def get_investment_projects_to_refresh_gva_values():
             ],
         ),
     )
+
+
+def get_investment_projects_for_country_of_origin_update():
+    """
+    Get investment projects that do not have set country of origin and have
+    investor company assigned.
+    """
+    return InvestmentProject.objects.select_related(
+        'investor_company__address_country',
+    ).filter(
+        country_investment_originates_from__isnull=True,
+        investor_company__isnull=False,
+    )
+
+
+@shared_task(
+    queue='long-running',
+)
+def update_country_of_origin_for_investment_projects():
+    """
+    Loops over all investment projects that do not have country of origin updated and
+    copy address country value from the corresponding investor company.
+    """
+    investment_projects = get_investment_projects_for_country_of_origin_update()
+    for project in investment_projects.iterator():
+        with reversion.create_revision():
+            project.country_investment_originates_from = project.investor_company.address_country
+            project.save(update_fields=['country_investment_originates_from'])
+
+            reversion.set_comment('Automated country of origin update.')

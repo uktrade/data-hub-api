@@ -238,6 +238,8 @@ class IProjectAbstract(models.Model):
     @property
     def investor_company_country(self):
         """The country of the investor company."""
+        # TODO: this property should be removed once country investment originates from is
+        # fully populated
         if self.investor_company:
             return self.investor_company.address_country
         return None

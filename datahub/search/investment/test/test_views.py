@@ -525,6 +525,22 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'delayed project'
 
+    def test_search_investment_project_country_investment_originates_from_filter(self, setup_data):
+        """Tests country investment originates from filter."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'country_investment_originates_from': constants.Country.united_states.value.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['name'] == 'abc defg'
+
     def test_search_investment_project_investor_country_when_investment_origin_set(
         self, setup_data,
     ):
