@@ -1,3 +1,11 @@
+# Data Hub API 35.4.0 (2020-08-19)
+
+
+## Removals
+
+- **Contacts** The field `company_contact.accepts_dit_email_marketing` was removed from the API, from the Django admin and from the model definition. The database column will be deleted with the next release.
+
+
 # Data Hub API 35.3.0 (2020-08-17)
 
 
