@@ -168,6 +168,22 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
                 yield row
 
     def _get_rows(self, ids, search_ordering):
-        """Get row queryset for constent service if the feature flag is enabled."""
-        rows = super()._get_rows(ids, search_ordering)
+        """
+        Get row queryset for constent service.
+
+        This populates accepts_dit_email_marketing field from the consent service and
+        removes the accepts_dit_email_marketing from the field query because the field is not in
+        the db.
+        """
+        db_ordering = self._translate_search_ordering_to_django_ordering(search_ordering)
+        field_titles = self.field_titles.copy()
+        del field_titles['accepts_dit_email_marketing']
+        rows = self.queryset.filter(
+            pk__in=ids,
+        ).order_by(
+            *db_ordering,
+        ).values(
+            *field_titles,
+        ).iterator()
+
         return self._add_consent_response(rows)
