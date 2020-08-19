@@ -81,9 +81,6 @@ class Contact(ArchivableModel, BaseModel):
         help_text='Legacy field. File browser path to the archived documents for this contact.',
     )
 
-    # Marketing preferences
-    accepts_dit_email_marketing = models.BooleanField(default=False)
-
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)

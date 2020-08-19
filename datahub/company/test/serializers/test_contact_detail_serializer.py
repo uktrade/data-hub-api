@@ -36,10 +36,8 @@ class TestContactSerializer:
     consent service correctly.
     """
 
-    def _make_contact(self, accepts_dit_email_marketing=False):
-        contact = ContactFactory(
-            accepts_dit_email_marketing=accepts_dit_email_marketing,
-        )
+    def _make_contact(self):
+        contact = ContactFactory()
         return contact
 
     def test_serializer_update_call_task(self, update_contact_task_mock, synchronous_on_commit):
@@ -49,13 +47,13 @@ class TestContactSerializer:
         """
         contact = self._make_contact()
         c = ContactDetailSerializer(instance=contact)
-        data = {
+
+        c.update(c.instance, {
             'email': 'bar@foo.com',
             'accepts_dit_email_marketing': True,
-        }
-        c.update(c.instance, data)
+        })
         update_contact_task_mock.assert_called_once_with(
-            args=(data['email'], data['accepts_dit_email_marketing']),
+            args=('bar@foo.com', True),
             kwargs={'modified_at': FROZEN_TIME},
         )
 
@@ -70,12 +68,11 @@ class TestContactSerializer:
         """
         contact = self._make_contact()
         c = ContactDetailSerializer(instance=contact, partial=True)
-        data = {
+        c.update(c.instance, {
             'accepts_dit_email_marketing': True,
-        }
-        c.update(c.instance, data)
+        })
         update_contact_task_mock.assert_called_once_with(
-            args=(c.instance.email, data['accepts_dit_email_marketing']),
+            args=(c.instance.email, True),
             kwargs={'modified_at': FROZEN_TIME},
         )
 
