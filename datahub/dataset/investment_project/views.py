@@ -88,6 +88,7 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'client_relationship_manager_id',
             'client_requirements',
             'competing_countries',
+            'country_investment_originates_from_id',
             'created_by_id',
             'created_on',
             'delivery_partner_names',

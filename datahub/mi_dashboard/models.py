@@ -41,6 +41,8 @@ class MIInvestmentProject(models.Model):
     number_new_jobs_with_zero = models.IntegerField(null=True)
     number_safeguarded_jobs = models.IntegerField(null=True)
     number_safeguarded_jobs_with_zero = models.IntegerField(null=True)
+    # This field should be called `country_investment_originates_from`, but originally that value
+    # came from the linked investor_company.
     investor_company_country = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     stage_name = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     sector_name = models.TextField(null=True, blank=True)
