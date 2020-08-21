@@ -4,7 +4,6 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, FieldError
 
-from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country, FDIValue, Sector, SectorCluster, UKRegion
 from datahub.dbmaintenance.utils import parse_uuid
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -135,14 +134,12 @@ def test_project_fdi_value(fdi_value_id, expected):
         (None, ''),
     ),
 )
-def test_investor_company_country(country_id, expected):
-    """Tests that if investor country is not set investor_company_country is empty."""
-    investor_company = CompanyFactory(
-        address_country_id=country_id,
-    )
-    InvestmentProjectFactory(
-        investor_company=investor_company,
-    )
+def test_country_of_origin(country_id, expected):
+    """
+    Tests that investor_company_country is populated when country_investment_originates_from
+    is set.
+    """
+    InvestmentProjectFactory(country_investment_originates_from_id=country_id)
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
     updated, created = etl.load()
@@ -160,13 +157,8 @@ def test_investor_company_country(country_id, expected):
     ),
 )
 def test_country_url(country_id):
-    """Tests that if investor country is not set country url is empty."""
-    investor_company = CompanyFactory(
-        address_country_id=country_id,
-    )
-    InvestmentProjectFactory(
-        investor_company=investor_company,
-    )
+    """Tests that if country investment originates from is not set country url is empty."""
+    InvestmentProjectFactory(country_investment_originates_from_id=country_id)
     etl = ETLInvestmentProjects(destination=MIInvestmentProject)
 
     updated, created = etl.load()

@@ -1117,6 +1117,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                     one_list_account_owner=AdviserFactory(),
                 ),
             ),
+            country_investment_originates_from_id=constants.Country.japan.value.id,
         )
 
         es_with_collector.flush_and_refresh()
@@ -1147,7 +1148,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Investor company': project.investor_company.name,
                 'Investor company town or city': project.investor_company.address_town,
                 'Country of origin':
-                    get_attr_or_none(project, 'investor_company.address_country.name'),
+                    get_attr_or_none(project, 'country_investment_originates_from.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
