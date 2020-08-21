@@ -36,7 +36,6 @@ from datahub.metadata.models import Country
 
 pytestmark = pytest.mark.django_db
 
-
 DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
 DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
 
@@ -83,12 +82,12 @@ def test_get_company_dnb_service_error(
         (
             ConnectionError,
             DNBServiceConnectionError,
-            'Encountered an error connecting to DNB service',
+            'DNB service unavailable',
         ),
         (
             ConnectTimeout,
             DNBServiceConnectionError,
-            'Encountered an error connecting to DNB service',
+            'DNB service unavailable',
         ),
         (
             Timeout,
@@ -121,9 +120,7 @@ def test_get_company_dnb_service_request_error(
     with pytest.raises(expected_exception) as e:
         get_company('123456789')
 
-    assert e.value.args[0] == expected_message
-    assert len(caplog.records) == 1
-    assert caplog.records[0].getMessage() == expected_message
+    assert str(e.value) == str(expected_message)
 
 
 @pytest.mark.parametrize(
@@ -473,12 +470,12 @@ class TestGetCompanyUpdatePage:
             (
                 ConnectionError,
                 DNBServiceConnectionError,
-                'Encountered an error connecting to DNB service',
+                'DNB service unavailable',
             ),
             (
                 ConnectTimeout,
                 DNBServiceConnectionError,
-                'Encountered an error connecting to DNB service',
+                'DNB service unavailable',
             ),
             (
                 Timeout,
@@ -513,8 +510,6 @@ class TestGetCompanyUpdatePage:
             get_company_update_page(last_updated_after='foo')
 
         assert str(excinfo.value) == expected_message
-        assert len(caplog.records) == 1
-        assert caplog.records[0].getMessage() == expected_message
 
 
 class TestRollbackDNBCompanyUpdate:

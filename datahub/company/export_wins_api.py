@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from requests.exceptions import ConnectionError, HTTPError, Timeout
+from requests.exceptions import HTTPError, Timeout
 
 from datahub.core.api_client import APIClient, HawkAuth
+from datahub.core.exceptions import APIBadGatewayException
 
 api_client = APIClient(
-    settings.EXPORT_WINS_SERVICE_BASE_URL,
-    HawkAuth(settings.EXPORT_WINS_HAWK_ID, settings.EXPORT_WINS_HAWK_KEY),
+    api_url=settings.EXPORT_WINS_SERVICE_BASE_URL,
+    auth=HawkAuth(settings.EXPORT_WINS_HAWK_ID, settings.EXPORT_WINS_HAWK_KEY),
     raise_for_status=True,
+    default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
 )
 
 
@@ -66,8 +68,8 @@ def get_export_wins(match_ids):
     """
     try:
         response = fetch_export_wins(match_ids)
-    except ConnectionError as exc:
-        error_message = 'Encountered an error connecting to Export Wins API'
+    except APIBadGatewayException as exc:
+        error_message = 'Export Wins API service unavailable'
         raise ExportWinsAPIConnectionError(error_message) from exc
     except Timeout as exc:
         error_message = 'Encountered a timeout interacting with Export Wins API'

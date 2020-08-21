@@ -62,7 +62,7 @@ class TestIntrospectToken:
             ),
             (
                 {'exc': ConnectionError},
-                SSORequestError('SSO request failed'),
+                SSORequestError('SSO service unavailable'),
             ),
             (
                 {'text': '{"invalid-json}'},
@@ -118,7 +118,7 @@ class TestGetUserByEmail:
             ),
             (
                 {'exc': ConnectionError},
-                SSORequestError('SSO request failed'),
+                SSORequestError('SSO service unavailable'),
             ),
             (
                 {'text': '{"invalid-json}'},
@@ -162,7 +162,7 @@ class TestGetUserByEmailUserID:
             ),
             (
                 {'exc': ConnectionError},
-                SSORequestError('SSO request failed'),
+                SSORequestError('SSO service unavailable'),
             ),
             (
                 {'text': '{"invalid-json}'},

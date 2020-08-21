@@ -1,10 +1,12 @@
 from logging import getLogger
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 from mohawk import Sender
 from requests.auth import AuthBase
+from requests.exceptions import ConnectionError
 
+from datahub.core.exceptions import APIBadGatewayException
 
 logger = getLogger(__name__)
 
@@ -70,6 +72,7 @@ def _make_response_verifier(sender):
                 content=response.content,
                 content_type=response.headers['Content-Type'],
             )
+
     return verify_response
 
 
@@ -105,14 +108,20 @@ class APIClient:
         if self._accept:
             headers['Accept'] = self._accept
 
-        response = requests.request(
-            method,
-            url,
-            auth=self._auth,
-            headers=headers,
-            timeout=timeout,
-            **kwargs,
-        )
+        try:
+            response = requests.request(
+                method,
+                url,
+                auth=self._auth,
+                headers=headers,
+                timeout=timeout,
+                **kwargs,
+            )
+        except ConnectionError as e:
+            logger.exception(e)
+            raise APIBadGatewayException(
+                f'Upstream service unavailable: {urlparse(url).netloc}',
+            ) from e
         logger.info(f'Response received: {response.status_code} {method.upper()} {url}')
         if self._raise_for_status:
             response.raise_for_status()

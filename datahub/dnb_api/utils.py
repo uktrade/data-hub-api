@@ -10,6 +10,7 @@ from reversion.models import Version
 
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
+from datahub.core.exceptions import APIBadGatewayException
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
@@ -17,7 +18,6 @@ from datahub.dnb_api.constants import (
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import Country
-
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +108,8 @@ def get_company(duns_number):
     """
     try:
         dnb_response = search_dnb({'duns_number': duns_number})
-    except ConnectionError as exc:
-        error_message = 'Encountered an error connecting to DNB service'
+    except APIBadGatewayException as exc:
+        error_message = 'DNB service unavailable'
         logger.error(error_message)
         raise DNBServiceConnectionError(error_message) from exc
     except Timeout as exc:
@@ -322,12 +322,10 @@ def get_company_update_page(last_updated_after, next_page=None):
             url,
             **request_kwargs,
         )
-
-    except ConnectionError as exc:
-        error_message = 'Encountered an error connecting to DNB service'
+    except APIBadGatewayException as exc:
+        error_message = 'DNB service unavailable'
         logger.error(error_message)
         raise DNBServiceConnectionError(error_message) from exc
-
     except Timeout as exc:
         error_message = 'Encountered a timeout interacting with DNB service'
         logger.error(error_message)
@@ -407,9 +405,8 @@ def request_changes(duns_number, changes):
                 'changes': changes,
             },
         )
-
-    except ConnectionError as exc:
-        error_message = 'Encountered an error connecting to DNB service'
+    except APIBadGatewayException as exc:
+        error_message = 'DNB service unavailable'
         raise DNBServiceConnectionError(error_message) from exc
 
     except Timeout as exc:
