@@ -22,6 +22,7 @@ def get_expected_data_from_adviser(adviser):
         'contact_email': adviser.contact_email,
         'dit_team_id': str(adviser.dit_team.id),
         'is_active': adviser.is_active,
+        'sso_email_user_id': adviser.sso_email_user_id,
     }
 
 

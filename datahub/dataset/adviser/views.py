@@ -24,4 +24,5 @@ class AdvisersDatasetView(BaseDatasetView):
             'contact_email',
             'dit_team_id',
             'is_active',
+            'sso_email_user_id',
         )
