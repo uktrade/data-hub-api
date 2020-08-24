@@ -1,3 +1,19 @@
+# Data Hub API 35.5.0 (2020-08-24)
+
+
+## Features
+
+- **Advisers** A new field `sso_email_user_id` has been added to the Advisers dataset view.
+- **Investment** A new field `country_investment_originates_from` has been added to the Investment dataset view.
+- **Investment** The Investment Project download now sources the country of origin from `country_investment_originates_from` instead
+  of the `address_country` of the linked `investor_company`.
+- **Investment** The `investor_company_country` column in the MI dashboard pipeline now uses `country_investment_originates_from`.
+
+## Bug fixes
+
+- ElasticSearch client was breaking when serializing `PurePosixPath` into json.
+
+
 # Data Hub API 35.4.0 (2020-08-19)
 
 
