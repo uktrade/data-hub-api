@@ -18,7 +18,7 @@ from datahub.omis.quote.constants import (
 )
 
 
-QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
+QUOTE_TEMPLATE = str(PurePath(__file__).parent / 'templates/content.md')
 
 
 def escape_markdown(content, escape_html=True):

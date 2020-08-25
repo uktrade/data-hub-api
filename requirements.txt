@@ -14,8 +14,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.14.43            # via -r requirements.in
-botocore==1.17.43         # via boto3, s3transfer
+boto3==1.14.47            # via -r requirements.in
+botocore==1.17.47         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.6.20        # via elastic-apm, requests, sentry-sdk
 cfgv==3.1.0               # via pre-commit
@@ -90,14 +90,14 @@ pickleshare==0.7.5        # via ipython
 pip-tools==4.5.1          # via -r requirements.in
 piprot==0.9.11            # via -r requirements.in
 pluggy==0.13.1            # via pytest
-pre-commit==2.6.0         # via -r requirements.in
+pre-commit==2.7.1         # via -r requirements.in
 prompt-toolkit==3.0.5     # via ipython
 psycogreen==1.0.2         # via -r requirements.in
 psycopg2==2.8.5           # via -r requirements.in
 ptyprocess==0.6.0         # via pexpect
 py==1.9.0                 # via pytest
 pycodestyle==2.6.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
-pydocstyle==5.0.2         # via -r requirements.in, flake8-docstrings
+pydocstyle==5.1.0         # via -r requirements.in, flake8-docstrings
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
