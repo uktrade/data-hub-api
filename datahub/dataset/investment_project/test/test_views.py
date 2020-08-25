@@ -113,6 +113,10 @@ def get_expected_data_from_project(project):
         'country_investment_originates_from_id': str_or_none(
             project.country_investment_originates_from_id,
         ),
+        'country_investment_originates_from__name': get_attr_or_none(
+            project,
+            'country_investment_originates_from.name',
+        ),
         'created_by_id': str_or_none(project.created_by_id),
         'created_on': format_date_or_datetime(project.created_on),
         'delivery_partner_names': (
