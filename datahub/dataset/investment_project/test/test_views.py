@@ -110,6 +110,9 @@ def get_expected_data_from_project(project):
             [country.name for country in project.competitor_countries.order_by('name')]
             if project.competitor_countries.exists() else [None]
         ),
+        'country_investment_originates_from_id': str_or_none(
+            project.country_investment_originates_from_id,
+        ),
         'created_by_id': str_or_none(project.created_by_id),
         'created_on': format_date_or_datetime(project.created_on),
         'delivery_partner_names': (
