@@ -1,3 +1,11 @@
+# Data Hub API 35.6.0 (2020-09-01)
+
+
+## Features
+
+- **Investment** A new field `country_investment_originates_from` has been added to the InvestmentProjects dataset view.
+
+
 # Data Hub API 35.5.0 (2020-08-24)
 
 
