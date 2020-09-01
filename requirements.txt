@@ -14,8 +14,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.14.47            # via -r requirements.in
-botocore==1.17.47         # via boto3, s3transfer
+boto3==1.14.52            # via -r requirements.in
+botocore==1.17.52         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.6.20        # via elastic-apm, requests, sentry-sdk
 cfgv==3.1.0               # via pre-commit
@@ -67,7 +67,7 @@ incremental==17.5.0       # via towncrier
 iniconfig==1.0.1          # via pytest
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.17.0           # via -r requirements.in
+ipython==7.18.1           # via -r requirements.in
 jedi==0.17.1              # via ipython
 jinja2==2.11.2            # via towncrier
 jmespath==0.10.0          # via boto3, botocore
@@ -97,7 +97,7 @@ psycopg2==2.8.5           # via -r requirements.in
 ptyprocess==0.6.0         # via pexpect
 py==1.9.0                 # via pytest
 pycodestyle==2.6.0        # via flake8, flake8-debugger, flake8-import-order, flake8-print
-pydocstyle==5.1.0         # via -r requirements.in, flake8-docstrings
+pydocstyle==5.1.1         # via -r requirements.in, flake8-docstrings
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
@@ -120,7 +120,7 @@ semantic_version==2.8.5   # via -r requirements.in
 sentry_sdk==0.16.5        # via -r requirements.in
 simplejson==3.17.0        # via mail-parser
 six==1.14.0               # via django-pglocks, elasticsearch-dsl, flake8-print, freezegun, mail-parser, mohawk, packaging, pip-tools, piprot, pytest-xdist, python-dateutil, requests-mock, traitlets, virtualenv
-slackclient==2.8.0        # via -r requirements.in
+slackclient==2.8.1        # via -r requirements.in
 snowballstemmer==2.0.0    # via pydocstyle
 sqlparse==0.3.1           # via django, django-debug-toolbar
 statsd==3.3.0             # via -r requirements.in
