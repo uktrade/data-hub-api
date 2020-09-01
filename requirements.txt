@@ -67,7 +67,7 @@ incremental==17.5.0       # via towncrier
 iniconfig==1.0.1          # via pytest
 ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.17.0           # via -r requirements.in
+ipython==7.18.1           # via -r requirements.in
 jedi==0.17.1              # via ipython
 jinja2==2.11.2            # via towncrier
 jmespath==0.10.0          # via boto3, botocore
