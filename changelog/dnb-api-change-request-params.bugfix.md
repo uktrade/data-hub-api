@@ -1,0 +1,1 @@
+Parameters are now passed in query string for `GET` request when calling `change-request` endpoint in DnB service.
