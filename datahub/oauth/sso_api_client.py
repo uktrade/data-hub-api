@@ -3,6 +3,7 @@ from requests import RequestException
 from rest_framework import serializers, status
 
 from datahub.core.api_client import APIClient, TokenAuth
+from datahub.core.exceptions import APIBadGatewayException
 
 
 class SSORequestError(Exception):
@@ -92,6 +93,8 @@ def _request(method, path, response_serializer_class=None, **kwargs):
 
     try:
         response = api_client.request(method, path, **kwargs)
+    except APIBadGatewayException as exc:
+        raise SSORequestError('SSO service unavailable') from exc
     except RequestException as exc:
         raise SSORequestError('SSO request failed', response=exc.response) from exc
 

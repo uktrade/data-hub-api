@@ -39,6 +39,14 @@ class APIUpstreamException(APIException):
     default_code = 'bad_gateway'
 
 
+class APIBadGatewayException(APIException):
+    """DRF Exception for the 502 status code."""
+
+    status_code = status.HTTP_502_BAD_GATEWAY
+    default_detail = _('Bad Gateway.')
+    default_code = 'bad_gateway'
+
+
 class APINotImplementedException(APIException):
     """DRF Exception for the 501 status code."""
 
