@@ -423,7 +423,7 @@ def request_changes(duns_number, changes):
     return dnb_response.json()
 
 
-def _get_change_request(payload):
+def _get_change_request(params):
     """
     Get change request from dnb-service.
     """
@@ -432,7 +432,7 @@ def _get_change_request(payload):
     response = api_client.request(
         'GET',
         'change-request/',
-        json=payload,
+        params=params,
         timeout=3.0,
     )
     return response
