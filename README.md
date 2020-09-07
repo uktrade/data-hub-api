@@ -203,6 +203,33 @@ To run the tests in parallel, pass `-n <number of processes>` to `./tests.sh`. F
 ./tests.sh -n 4
 ```
 
+By default all tests are executed. To skip tests that should not run under certain conditions ie. are dependent on external services, use a marker `excluded` or a marker that start with `excluded_`. 
+
+```python
+import pytest
+
+@pytest.mark.excluded
+class TestClass:
+    def test_1(self):
+        ...
+
+@pytest.mark.excluded
+def test_1():
+    ...
+
+@pytest.mark.excluded_dependent_on_redis
+def test_2():
+    ...
+```
+
+To exclude such tests from running use one of the options below:
+
+```shell
+pytest --skip-excluded
+pytest -m excluded_dependent_on_redis
+pytest -m "excluded_x or excluded_y"
+pytest -m "not (excluded_x or excluded_y)"
+```
 
 To run the linter:
 
