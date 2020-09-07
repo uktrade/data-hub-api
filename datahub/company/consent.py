@@ -7,10 +7,11 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from requests.exceptions import ConnectionError, HTTPError, Timeout
+from requests.exceptions import HTTPError, Timeout
 
 from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
 from datahub.core.api_client import APIClient, HawkAuth
+from datahub.core.exceptions import APIBadGatewayException
 
 logger = logging.getLogger(__name__)
 
@@ -48,15 +49,15 @@ class CaseInsensitiveDict(dict):
     """Inherit dict class to make keys case insitive."""
 
     def __setitem__(self, key, value):
-        """Tranform key to lower case when setting an item."""
+        """Transform key to lower case when setting an item."""
         super().__setitem__(key.lower(), value)
 
     def __getitem__(self, key):
-        """Tranform key to lower case when getting an item."""
+        """Transform key to lower case when getting an item."""
         return super().__getitem__(key.lower())
 
     def get(self, key, default=False):
-        """Tranform key to lower case when getting an item using a dict get method."""
+        """Transform key to lower case when getting an item using a dict get method."""
         return super().get(key.lower(), default)
 
 
@@ -158,18 +159,18 @@ def get_many(emails):
             json=body,
             params={'limit': len(emails)},
         )
-    except ConnectionError as exc:
+    except APIBadGatewayException as exc:
         logger.error(exc)
-        error_message = 'Encountered an error connecting to Consent API'
+        error_message = 'Encountered an error connecting to Legal Basis API'
         raise ConsentAPIConnectionError(error_message) from exc
     except Timeout as exc:
         logger.error(exc)
-        error_message = 'Encountered a timeout interacting with Consent API'
+        error_message = 'Encountered a timeout interacting with Legal Basis API'
         raise ConsentAPITimeoutError(error_message) from exc
     except HTTPError as exc:
         logger.error(exc)
         error_message = (
-            'The Consent API returned an error status: '
+            'The Legal Basis API returned an error status: '
             f'{exc.response.status_code}',
         )
         raise ConsentAPIHTTPError(error_message) from exc
