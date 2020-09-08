@@ -470,3 +470,25 @@ def formatted_dnb_company(dnb_response_uk):
     Get formatted DNB company data.
     """
     return format_dnb_company(dnb_response_uk['results'][0])
+
+
+def pytest_addoption(parser):
+    """Adds a new flag to pytest to skip excluded tests"""
+    parser.addoption(
+        '--skip-excluded', '--se',
+        action='store_true',
+        default=False,
+        help='Skip excluded tests from running',
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip excluded tests"""
+    if config.getoption('--skip-excluded') is False:
+        return
+    for item in items:
+        if any([
+            m.name == 'excluded' or m.name.startswith('excluded_')
+            for m in item.iter_markers()
+        ]):
+            item.add_marker(pytest.mark.skip(reason='Test marked as excluded'))

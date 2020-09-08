@@ -245,17 +245,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
     'datahub.core.auth.TeamModelPermissionsBackend'
 ]
 
-
 # OAuth2 settings to authenticate Django admin users
 
 if ADMIN_OAUTH2_ENABLED:
-    ADMIN_OAUTH2_REQUEST_TIMEOUT = 15
+    ADMIN_OAUTH2_REQUEST_TIMEOUT = 15  # seconds
     ADMIN_OAUTH2_TOKEN_BYTE_LENGTH = 64
     ADMIN_OAUTH2_BASE_URL = env('ADMIN_OAUTH2_BASE_URL')
     ADMIN_OAUTH2_TOKEN_FETCH_PATH = env('ADMIN_OAUTH2_TOKEN_FETCH_PATH')
@@ -319,7 +317,6 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-
 # Swagger UI resources used in the Swagger UI view
 # (used in config/api_docs_urls.py and datahub/core/templates/core/docs/swagger-ui.html)
 #
@@ -339,6 +336,8 @@ SWAGGER_UI_JS = {
 
 
 APPEND_SLASH = False
+
+DEFAULT_SERVICE_TIMEOUT = float(env('DEFAULT_SERVICE_TIMEOUT', default=5.0))  # seconds
 
 # MPTT
 
@@ -404,7 +403,6 @@ if REDIS_BASE_URL:
         }
     }
 
-
 if REDIS_BASE_URL:
     REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
     is_rediss = REDIS_BASE_URL.startswith('rediss://')
@@ -469,14 +467,14 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):
         CELERY_BEAT_SCHEDULE['dnb_heirarchies_backfill'] = {
             'task': 'datahub.dnb_api.tasks.sync.sync_outdated_companies_with_dnb',
-            'schedule': crontab(minute=0, hour=1,),
+            'schedule': crontab(minute=0, hour=1, ),
             'kwargs': {
                 # Backfill companies which were last updated before 25 October 2019 -
                 # this is when we started recording the `global_ultimate_duns_number` field
                 'dnb_modified_on_before': datetime(
                     year=2019, month=10, day=24, hour=23, minute=59, second=59, tzinfo=utc,
                 ),
-                'fields_to_update': ['global_ultimate_duns_number',],
+                'fields_to_update': ['global_ultimate_duns_number', ],
                 'limit': env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
                 'simulate': False,
             },
@@ -503,7 +501,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': 30.0, # Every 30 seconds
+            'schedule': 30.0,  # Every 30 seconds
         }
 
     CELERY_WORKER_LOG_FORMAT = (
@@ -572,7 +570,7 @@ OMIS_PUBLIC_ORDER_URL = f'{OMIS_PUBLIC_BASE_URL}/{{public_token}}'
 # GOV.UK PAY
 GOVUK_PAY_URL = env('GOVUK_PAY_URL', default='')
 GOVUK_PAY_AUTH_TOKEN = env('GOVUK_PAY_AUTH_TOKEN', default='')
-GOVUK_PAY_TIMEOUT = 15  # in seconds
+GOVUK_PAY_TIMEOUT = 15  # seconds
 GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
 GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 
@@ -604,25 +602,25 @@ def _add_hawk_credentials(id_env_name, key_env_name, scopes):
 _add_hawk_credentials(
     'ACTIVITY_STREAM_ACCESS_KEY_ID',
     'ACTIVITY_STREAM_SECRET_ACCESS_KEY',
-    (HawkScope.activity_stream, ),
+    (HawkScope.activity_stream,),
 )
 
 _add_hawk_credentials(
     'MARKET_ACCESS_ACCESS_KEY_ID',
     'MARKET_ACCESS_SECRET_ACCESS_KEY',
-    (HawkScope.public_company, HawkScope.metadata, ),
+    (HawkScope.public_company, HawkScope.metadata,),
 )
 
 _add_hawk_credentials(
     'DATA_FLOW_API_ACCESS_KEY_ID',
     'DATA_FLOW_API_SECRET_ACCESS_KEY',
-    (HawkScope.data_flow_api, ),
+    (HawkScope.data_flow_api,),
 )
 
 _add_hawk_credentials(
     'DATA_HUB_FRONTEND_ACCESS_KEY_ID',
     'DATA_HUB_FRONTEND_SECRET_ACCESS_KEY',
-    (HawkScope.metadata, ),
+    (HawkScope.metadata,),
 )
 
 _add_hawk_credentials(
@@ -639,7 +637,7 @@ if ENABLE_SLACK_MESSAGING:
 else:
     SLACK_API_TOKEN = None
     SLACK_MESSAGE_CHANNEL = None
-SLACK_TIMEOUT_SECONDS = 10
+SLACK_TIMEOUT_SECONDS = 10  # seconds
 
 # To read data from Activity Stream
 ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
@@ -705,7 +703,7 @@ DATAHUB_NOTIFICATION_API_KEY = env('DATAHUB_NOTIFICATION_API_KEY', default=None)
 
 DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
-DNB_SERVICE_TIMEOUT = 15
+DNB_SERVICE_TIMEOUT = 15  # seconds
 DNB_AUTOMATIC_UPDATE_LIMIT = env.int('DNB_AUTOMATIC_UPDATE_LIMIT', default=None)
 
 # Legal Basis / Consent Service
@@ -730,7 +728,6 @@ COMPANY_MATCHING_HAWK_KEY = env('COMPANY_MATCHING_HAWK_KEY', default=None)
 EXPORT_WINS_SERVICE_BASE_URL = env('EXPORT_WINS_SERVICE_BASE_URL', default=None)
 EXPORT_WINS_HAWK_ID = env('EXPORT_WINS_HAWK_ID', default=None)
 EXPORT_WINS_HAWK_KEY = env('EXPORT_WINS_HAWK_KEY', default=None)
-
 
 if ES_APM_ENABLED:
     ELASTIC_APM = {

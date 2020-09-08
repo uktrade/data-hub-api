@@ -63,9 +63,10 @@ class ActivityFeedView(APIView):
         )
 
         api_client = APIClient(
-            settings.ACTIVITY_STREAM_OUTGOING_URL,
-            hawk_auth,
+            api_url=settings.ACTIVITY_STREAM_OUTGOING_URL,
+            auth=hawk_auth,
             raise_for_status=False,
+            default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
         )
         return api_client.request(
             request.method,

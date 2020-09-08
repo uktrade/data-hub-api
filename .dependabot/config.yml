@@ -3,13 +3,3 @@ update_configs:
   - package_manager: "python"
     directory: "/"
     update_schedule: "weekly"
-    default_reviewers:
-    - "elcct"
-    - "sekharpanja"
-    - "adamledwards"
-    - "mcbhenwood"
-    - "debitan"
-    - "rachaelcodes"
-    - "mforner13"
-    - "cgsunkel"
-    - "pipporaimondi"
