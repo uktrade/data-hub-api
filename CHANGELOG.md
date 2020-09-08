@@ -1,3 +1,15 @@
+# Data Hub API 35.7.0 (2020-09-08)
+
+
+## Bug fixes
+
+- Parameters are now passed in query string for `GET` request when calling `change-request` endpoint in DnB service.
+
+## Internal changes
+
+- Option for excluding and isolating tests was added to test suite. It is now possible to flag and exclude tests that are dependent on specific conditions.
+
+
 # Data Hub API 35.6.0 (2020-09-01)
 
 
