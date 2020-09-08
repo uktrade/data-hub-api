@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from requests.exceptions import ConnectionError, HTTPError, Timeout
+from requests.exceptions import HTTPError, Timeout
 
 from datahub.core.api_client import APIClient, HawkAuth
+from datahub.core.exceptions import APIBadGatewayException
 
 api_client = APIClient(
-    settings.COMPANY_MATCHING_SERVICE_BASE_URL,
-    HawkAuth(settings.COMPANY_MATCHING_HAWK_ID, settings.COMPANY_MATCHING_HAWK_KEY),
+    api_url=settings.COMPANY_MATCHING_SERVICE_BASE_URL,
+    auth=HawkAuth(settings.COMPANY_MATCHING_HAWK_ID, settings.COMPANY_MATCHING_HAWK_KEY),
     raise_for_status=True,
+    default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
 )
 
 
@@ -105,7 +107,7 @@ def match_company(companies):
     """
     try:
         response = request_match_companies(_format_company_for_post(companies))
-    except ConnectionError as exc:
+    except APIBadGatewayException as exc:
         error_message = 'Encountered an error connecting to Company matching service'
         raise CompanyMatchingServiceConnectionError(error_message) from exc
     except Timeout as exc:
