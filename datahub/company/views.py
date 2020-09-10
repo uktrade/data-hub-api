@@ -543,17 +543,16 @@ class ExportWinsForCompanyView(APIView):
         except Company.DoesNotExist:
             raise Http404
 
-    def _get_match_ids(self, target_company):
+    def _get_match_ids(self, target_company, request=None):
         """
         Returns match ids matching the company and
         all companies that were merged into it, if there are any.
         """
-        match_ids = list()
         companies = [target_company]
         for company in target_company.transferred_from.all():
             companies.append(company)
 
-        matching_response = match_company(companies)
+        matching_response = match_company(companies, request)
         match_ids = self._extract_match_ids(matching_response)
 
         if len(match_ids) == 0:
@@ -561,24 +560,16 @@ class ExportWinsForCompanyView(APIView):
 
         return match_ids
 
-    def _get_export_wins(self, match_ids):
-        """
-        Returns export wins matching each match id
-        within the list of match ids supplied.
-        """
-        response = get_export_wins(match_ids)
-        return response.json()
-
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         """
         Proxy to Export Wins API for GET requests for given company's match id
         is obtained from Company Matching Service.
         """
         company = self._get_company(pk)
         try:
-            match_ids = self._get_match_ids(company)
-            export_wins_results = self._get_export_wins(match_ids)
-            return JsonResponse(export_wins_results)
+            match_ids = self._get_match_ids(company, request)
+            export_wins_results = get_export_wins(match_ids, request)
+            return JsonResponse(export_wins_results.json())
 
         except (
             CompanyMatchingServiceConnectionError,

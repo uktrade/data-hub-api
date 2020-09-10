@@ -151,6 +151,34 @@ class TestConsentClient:
         assert result is None
         assert matcher.called_once
 
+    def test_forward_zipkin_headers(self, requests_mock):
+        """
+        Forward zipkin headers from origin request to the API call
+        """
+        headers = {
+            'x-b3-traceid': '123',
+            'x-b3-spanid': '456',
+        }
+        matcher = requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{consent.CONSENT_SERVICE_PERSON_PATH}',
+            text=generate_hawk_response({
+                'consents': [
+                    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                ],
+                'modified_at': '2020-03-12T15:33:50.907000Z',
+                'email': 'foo@bar.com',
+                'phone': '',
+                'key_type': 'email',
+            }),
+            status_code=status.HTTP_201_CREATED,
+        )
+        result = consent.update_consent('foo@bar.com', False, None,
+                                        headers=headers)
+        assert result is None
+        assert headers.items() <= matcher.last_request.headers.items()
+        assert matcher.called_once
+
     @pytest.mark.parametrize(
         'response_status',
         (
