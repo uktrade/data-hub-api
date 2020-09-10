@@ -84,7 +84,7 @@ def callback(request):
 
     try:
         redirect_uri = build_redirect_uri(request, reverse('admin_oauth_callback'))
-        access_token_data = get_access_token(code, redirect_uri)
+        access_token_data = get_access_token(code, redirect_uri, request)
         sso_user_profile = get_sso_user_profile(access_token_data['access_token'])
         user = get_adviser_by_sso_user_profile(sso_user_profile)
     except AuthenticationFailed as exc:

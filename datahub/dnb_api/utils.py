@@ -21,13 +21,6 @@ from datahub.metadata.models import Country
 
 logger = logging.getLogger(__name__)
 
-api_client = APIClient(
-    settings.DNB_SERVICE_BASE_URL,
-    TokenAuth(settings.DNB_SERVICE_TOKEN),
-    raise_for_status=False,
-    default_timeout=settings.DNB_SERVICE_TIMEOUT,
-)
-
 
 class DNBServiceException(Exception):
     """
@@ -78,7 +71,7 @@ class RevisionNotFoundError(Exception):
     """
 
 
-def search_dnb(query_params):
+def search_dnb(query_params, request=None):
     """
     Queries the dnb-service with the given query_params. E.g.:
 
@@ -87,6 +80,9 @@ def search_dnb(query_params):
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    api_client = _get_api_client(request)
+
     response = api_client.request(
         'POST',
         'companies/search/',
@@ -97,7 +93,7 @@ def search_dnb(query_params):
     return response
 
 
-def get_company(duns_number):
+def get_company(duns_number, request=None):
     """
     Pull data for the company with the given duns_number from DNB and
     returns a dict formatted for use with serializer of type CompanySerializer.
@@ -289,7 +285,7 @@ def update_company_from_dnb(
         reversion.set_comment(update_comment)
 
 
-def get_company_update_page(last_updated_after, next_page=None):
+def get_company_update_page(last_updated_after, next_page=None, request=None):
     """
     Get the given company updates page from the dnb-service.
 
@@ -317,6 +313,7 @@ def get_company_update_page(last_updated_after, next_page=None):
         url = 'companies/'
 
     try:
+        api_client = _get_api_client(request)
         response = api_client.request(
             'GET',
             url,
@@ -378,12 +375,14 @@ def rollback_dnb_company_update(
         company.save(update_fields=fields)
 
 
-def _request_changes(payload):
+def _request_changes(payload, request=None):
     """
     Submit change request to dnb-service.
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    api_client = _get_api_client(request)
     response = api_client.request(
         'POST',
         'change-request/',
@@ -393,7 +392,7 @@ def _request_changes(payload):
     return response
 
 
-def request_changes(duns_number, changes):
+def request_changes(duns_number, changes, request=None):
     """
     Submit change request for the company with the given duns_number
     and changes to the dnb-service.
@@ -404,6 +403,7 @@ def request_changes(duns_number, changes):
                 'duns_number': duns_number,
                 'changes': changes,
             },
+            request=request,
         )
     except APIBadGatewayException as exc:
         error_message = 'DNB service unavailable'
@@ -420,12 +420,13 @@ def request_changes(duns_number, changes):
     return dnb_response.json()
 
 
-def _get_change_request(params):
+def _get_change_request(params, request=None):
     """
     Get change request from dnb-service.
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+    api_client = _get_api_client(request)
     response = api_client.request(
         'GET',
         'change-request/',
@@ -435,7 +436,7 @@ def _get_change_request(params):
     return response
 
 
-def get_change_request(duns_number, status):
+def get_change_request(duns_number, status, request=None):
     """
     Get a change request for the company with the given duns_number
     and status from the dnb-service.
@@ -446,6 +447,7 @@ def get_change_request(duns_number, status):
                 'duns_number': duns_number,
                 'status': status,
             },
+            request,
         )
 
     except ConnectionError as exc:
@@ -463,12 +465,14 @@ def get_change_request(duns_number, status):
     return dnb_response.json()
 
 
-def _create_investigation(payload):
+def _create_investigation(payload, request=None):
     """
     Submit change request to dnb-service.
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    api_client = _get_api_client(request)
     response = api_client.request(
         'POST',
         'investigation/',
@@ -478,13 +482,13 @@ def _create_investigation(payload):
     return response
 
 
-def create_investigation(investigation_data):
+def create_investigation(investigation_data, request=None):
     """
     Submit change request for the company with the given duns_number
     and changes to the dnb-service.
     """
     try:
-        dnb_response = _create_investigation(investigation_data)
+        dnb_response = _create_investigation(investigation_data, request)
 
     except ConnectionError as exc:
         error_message = 'Encountered an error connecting to DNB service'
@@ -499,3 +503,13 @@ def create_investigation(investigation_data):
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
+
+
+def _get_api_client(request=None):
+    return APIClient(
+        settings.DNB_SERVICE_BASE_URL,
+        TokenAuth(settings.DNB_SERVICE_TOKEN),
+        raise_for_status=False,
+        default_timeout=settings.DNB_SERVICE_TIMEOUT,
+        request=request,
+    )
