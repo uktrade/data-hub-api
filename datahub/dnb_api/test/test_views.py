@@ -1635,33 +1635,20 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     @pytest.mark.parametrize(
-        'change_request,dnb_request,dnb_response',
+        'dnb_request,dnb_response',
         (
             (
-                # change_request
-                {
-                    'duns_number': '123456789',
-                    'changes': {
-                        'name': 'Foo Bar',
-                        'trading_names': ['Foo Bar INC'],
-                        'website': 'https://example.com',
-                        'address': {
-                            'line_1': '123 Fake Street',
-                            'line_2': 'Foo',
-                            'town': 'London',
-                            'county': 'Greater London',
-                            'postcode': 'W1 0TN',
-                            'country': {
-                                'id': constants.Country.united_kingdom.value.id,
-                            },
-                        },
-                        'number_of_employees': 100,
-                        'turnover': 1000,
-                    },
-                },
                 # dnb_request
                 {
                     'duns_number': '123456789',
+                    'status': 'pending',
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
                     'changes': {
                         'primary_name': 'Foo Bar',
                         'trading_names': ['Foo Bar INC'],
@@ -1675,6 +1662,12 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'employee_number': 100,
                         'annual_sales': 1000,
                     },
+                },
+            ),
+            (
+                # dnb_request
+                {
+                    'duns_number': '123456789',
                 },
                 # dnb_response
                 {
@@ -1702,7 +1695,6 @@ class TestCompanyChangeRequestView(APITestMixin):
     def test_that_pending_request_returns_correctly(
         self,
         requests_mock,
-        change_request,
         dnb_request,
         dnb_response,
     ):
@@ -1710,7 +1702,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that pending change requests stored in the dnb-service can be
         retrieved correctly.
         """
-        CompanyFactory(duns_number='123456789')
+        CompanyFactory(duns_number=dnb_request['duns_number'])
         requests_mock.get(
             DNB_CHANGE_REQUEST_URL,
             status_code=status.HTTP_201_CREATED,
@@ -1719,7 +1711,7 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         response = self.api_client.get(
             reverse('api-v4:dnb-api:company-change-request'),
-            {'duns_number': '123456789', 'status': 'pending'},
+            data=dnb_request,
             content_type='application/json',
         )
 
@@ -1736,15 +1728,6 @@ class TestCompanyChangeRequestView(APITestMixin):
                 },
                 {
                     'duns_number': ['This field may not be null.'],
-                },
-            ),
-            # No status
-            (
-                {
-                    'duns_number': '123456789',
-                },
-                {
-                    'status': ['This field may not be null.'],
                 },
             ),
             # Invalid duns_number
