@@ -314,7 +314,11 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
         min_length=9,
         validators=(integer_validator,),
     )
-    status = serializers.ChoiceField(choices=['pending', 'submitted'])
+    status = serializers.ChoiceField(
+        choices=['pending', 'submitted'],
+        required=False,
+        allow_null=True,
+    )
 
     def validate_duns_number(self, duns_number):
         """
