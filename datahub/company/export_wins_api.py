@@ -5,13 +5,6 @@ from requests.exceptions import HTTPError, Timeout
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
-api_client = APIClient(
-    api_url=settings.EXPORT_WINS_SERVICE_BASE_URL,
-    auth=HawkAuth(settings.EXPORT_WINS_HAWK_ID, settings.EXPORT_WINS_HAWK_KEY),
-    raise_for_status=True,
-    default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
-)
-
 
 class ExportWinsAPIException(Exception):
     """
@@ -37,7 +30,7 @@ class ExportWinsAPIConnectionError(ExportWinsAPIException):
     """
 
 
-def fetch_export_wins(match_ids):
+def fetch_export_wins(match_ids, request=None):
     """
     Queries the Export Wins API with the given list of match ids.
     Export Wins API takes either a single match id or comma separated
@@ -51,15 +44,23 @@ def fetch_export_wins(match_ids):
         raise ImproperlyConfigured('The all EXPORT_WINS_SERVICE* setting must be set')
 
     match_ids_str = ','.join(list(map(str, match_ids)))
-    response = api_client.request(
+
+    api_client = APIClient(
+        api_url=settings.EXPORT_WINS_SERVICE_BASE_URL,
+        auth=HawkAuth(settings.EXPORT_WINS_HAWK_ID,
+                      settings.EXPORT_WINS_HAWK_KEY),
+        raise_for_status=True,
+        default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
+    )
+
+    return api_client.request(
         'GET',
         f'wins/match?match_id={match_ids_str}',
         timeout=3.0,
     )
-    return response
 
 
-def get_export_wins(match_ids):
+def get_export_wins(match_ids, request=None):
     """
     Get all export wins for all given company match_ids.
 
@@ -67,7 +68,7 @@ def get_export_wins(match_ids):
     Raises exception an requests.exceptions.HTTPError for status, timeout and a connection error.
     """
     try:
-        response = fetch_export_wins(match_ids)
+        response = fetch_export_wins(match_ids, request)
     except APIBadGatewayException as exc:
         error_message = 'Export Wins API service unavailable'
         raise ExportWinsAPIConnectionError(error_message) from exc

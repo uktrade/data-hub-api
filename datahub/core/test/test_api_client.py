@@ -185,3 +185,20 @@ class TestAPIClient:
             headers=headers,
         )
         assert headers.items() <= response.request.headers.items()
+
+    def test_zipkin_headers_are_forwarded(self, requests_mock):
+        """Tests that zipkin headers from the origin request are forwarded."""
+        api_url = 'http://test/v1/'
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
+
+        request = Mock(headers={
+            'x-b3-traceid': '123',
+            'x-b3-spanid': '456',
+        })
+
+        api_client = APIClient(api_url, request=request)
+        response = api_client.request(
+            'GET',
+            'path/to/item',
+        )
+        assert request.headers.items() <= response.request.headers.items()

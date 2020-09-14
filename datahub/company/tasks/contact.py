@@ -42,7 +42,10 @@ def _automatic_contact_archive(limit=1000, simulate=False):
     autoretry_for=(requests.exceptions.RequestException,),
     retry_backoff=30,
 )
-def update_contact_consent(email_address, accepts_dit_email_marketing, modified_at=None):
+def update_contact_consent(email_address,
+                           accepts_dit_email_marketing,
+                           modified_at=None,
+                           **kwargs):
     """
     Update consent preferences.
     """
@@ -50,6 +53,7 @@ def update_contact_consent(email_address, accepts_dit_email_marketing, modified_
         email_address,
         accepts_dit_email_marketing,
         modified_at=modified_at,
+        **kwargs,
     )
 
 

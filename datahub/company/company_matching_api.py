@@ -5,13 +5,6 @@ from requests.exceptions import HTTPError, Timeout
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
-api_client = APIClient(
-    api_url=settings.COMPANY_MATCHING_SERVICE_BASE_URL,
-    auth=HawkAuth(settings.COMPANY_MATCHING_HAWK_ID, settings.COMPANY_MATCHING_HAWK_KEY),
-    raise_for_status=True,
-    default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
-)
-
 
 class CompanyMatchingServiceException(Exception):
     """
@@ -37,7 +30,7 @@ class CompanyMatchingServiceConnectionError(CompanyMatchingServiceException):
     """
 
 
-def request_match_companies(json_body):
+def request_match_companies(json_body, request=None):
     """
     Queries the company matching service with the given json_body. E.g.:
     {
@@ -65,13 +58,20 @@ def request_match_companies(json_body):
     ]):
         raise ImproperlyConfigured('The all COMPANY_MATCHING_SERVICE_* setting must be set')
 
-    response = api_client.request(
+    api_client = APIClient(
+        api_url=settings.COMPANY_MATCHING_SERVICE_BASE_URL,
+        auth=HawkAuth(settings.COMPANY_MATCHING_HAWK_ID,
+                      settings.COMPANY_MATCHING_HAWK_KEY),
+        raise_for_status=True,
+        default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
+        request=request,
+    )
+    return api_client.request(
         'POST',
         'api/v1/company/match/',
         json=json_body,
         timeout=3.0,
     )
-    return response
 
 
 def _format_company_for_post(companies):
@@ -99,14 +99,17 @@ def _format_company_for_post(companies):
     }
 
 
-def match_company(companies):
+def match_company(companies, request=None):
     """
     Get match id for all Company objects and return response from the company
     matching service.
     Raises exception an requests.exceptions.HTTPError for status, timeout and a connection error.
     """
     try:
-        response = request_match_companies(_format_company_for_post(companies))
+        response = request_match_companies(
+            _format_company_for_post(companies),
+            request,
+        )
     except APIBadGatewayException as exc:
         error_message = 'Encountered an error connecting to Company matching service'
         raise CompanyMatchingServiceConnectionError(error_message) from exc
