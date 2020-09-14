@@ -55,7 +55,7 @@ def update_from_dnb(model_admin, request, object_id):
         raise SuspiciousOperation()
 
     try:
-        dnb_company = get_company(dh_company.duns_number)
+        dnb_company = get_company(dh_company.duns_number, request)
 
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'

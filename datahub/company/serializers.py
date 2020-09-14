@@ -30,6 +30,7 @@ from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
 )
+from datahub.core.api_client import get_zipkin_headers
 from datahub.core.constants import Country
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
@@ -258,6 +259,7 @@ class ContactDetailSerializer(ContactSerializer):
         accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
         # If consent value in POST, notify
         combiner = DataCombiner(self.instance, validated_data)
+        request = self.context.get('request', None)
         transaction.on_commit(
             lambda: update_contact_consent.apply_async(
                 args=(
@@ -266,6 +268,7 @@ class ContactDetailSerializer(ContactSerializer):
                 ),
                 kwargs={
                     'modified_at': now().isoformat(),
+                    'zipkin_headers': get_zipkin_headers(request),
                 },
             ),
         )

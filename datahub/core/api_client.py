@@ -89,6 +89,7 @@ class APIClient:
         accept=DEFAULT_ACCEPT,
         default_timeout=None,
         raise_for_status=True,
+        request=None,
     ):
         """Initialises the API client."""
         self._api_url = api_url
@@ -96,6 +97,7 @@ class APIClient:
         self._accept = accept
         self._default_timeout = default_timeout
         self._raise_for_status = raise_for_status
+        self._request = request
 
     def request(self, method, path, **kwargs):
         """Makes an HTTP request."""
@@ -107,6 +109,8 @@ class APIClient:
         headers = kwargs.pop('headers', {})
         if self._accept:
             headers['Accept'] = self._accept
+        if self._request:
+            headers.update(get_zipkin_headers(self._request))
 
         try:
             response = requests.request(
@@ -126,3 +130,23 @@ class APIClient:
         if self._raise_for_status:
             response.raise_for_status()
         return response
+
+
+def get_zipkin_headers(request):
+    """
+    Parsers the request object and extracts Zipkin headers.
+
+    :param request: The request object
+    """
+    if not request:
+        return {}
+
+    keys = [
+        'x-b3-traceid',
+        'x-b3-spanid',
+    ]
+    headers = {
+        key: request.headers.get(key)
+        for key in keys if key in request.headers
+    }
+    return headers

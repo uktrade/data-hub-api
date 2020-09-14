@@ -61,7 +61,7 @@ class CaseInsensitiveDict(dict):
         return super().get(key.lower(), default)
 
 
-def _get_client():
+def _get_client(request=None):
     """
     Get configured API client for the consent service,
     _api_client could've just been set as a top level attribute
@@ -88,11 +88,13 @@ def _get_client():
         settings.CONSENT_SERVICE_BASE_URL,
         auth=_auth,
         default_timeout=(CONSENT_SERVICE_CONNECT_TIMEOUT, CONSENT_SERVICE_READ_TIMEOUT),
+        request=request,
     )
     return _api_client
 
 
-def update_consent(email_address, accepts_dit_email_marketing, modified_at=None):
+def update_consent(email_address, accepts_dit_email_marketing, modified_at=None,
+                   **kwargs):
     """
     Update marketing consent for an email address
     :param email_address: email address you want to update marketing consent for
@@ -115,6 +117,7 @@ def update_consent(email_address, accepts_dit_email_marketing, modified_at=None)
         'post',
         CONSENT_SERVICE_PERSON_PATH,
         json=body,
+        **kwargs,
     )
 
 

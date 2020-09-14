@@ -51,9 +51,9 @@ def _link_company_with_dnb(dh_company_id, duns_number, user, error_url):
         raise AdminException([message], error_url)
 
 
-def _get_company(duns_number, error_url):
+def _get_company(duns_number, error_url, request=None):
     try:
-        return get_company(duns_number)
+        return get_company(duns_number, request)
 
     except DNBServiceInvalidRequest:
         message = 'No matching company found in D&B database.'
@@ -102,7 +102,7 @@ def dnb_link_review_changes(model_admin, request):
         )
         return HttpResponseRedirect(company_change_page)
 
-    dnb_company = _get_company(duns_number, company_list_page)
+    dnb_company = _get_company(duns_number, company_list_page, request)
 
     return TemplateResponse(
         request,
