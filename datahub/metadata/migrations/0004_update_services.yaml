@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 4c434df3-e7c7-4afb-ba79-7f354995600f
+  fields:
+    disabled_on:
+    order: 622.0
+    segment: Field Force Phase 2 call
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction"]
+    lft: 3
+    rght: 4
+    tree_id: 2
+    level: 1
