@@ -1,3 +1,15 @@
+# Data Hub API 35.8.0 (2020-09-14)
+
+
+## Internal changes
+
+- Zipkin headers coming from the API client will be now forwarded to any services called via APIClient.
+
+## API
+
+- It's now possible to query change requests without passing `status` parameter.
+
+
 # Data Hub API 35.7.0 (2020-09-08)
 
 
