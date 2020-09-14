@@ -60,7 +60,7 @@ future==0.18.2            # via notifications-python-client
 gevent==20.6.2            # via -r requirements.in
 greenlet==0.4.16          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
-icalendar==4.0.6          # via -r requirements.in
+icalendar==4.0.7          # via -r requirements.in
 identify==1.4.21          # via pre-commit
 idna==2.10                # via requests, yarl
 incremental==17.5.0       # via towncrier
