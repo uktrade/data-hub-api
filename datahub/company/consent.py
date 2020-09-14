@@ -113,11 +113,16 @@ def update_consent(email_address, accepts_dit_email_marketing, modified_at=None,
     if modified_at:
         body['modified_at'] = modified_at
 
+    headers = {
+        **kwargs.get('headers', {}),
+        **kwargs.get('zipkin_headers', {}),
+    }
+
     _get_client().request(
         'post',
         CONSENT_SERVICE_PERSON_PATH,
         json=body,
-        **kwargs,
+        headers=headers,
     )
 
 
