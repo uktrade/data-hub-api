@@ -1,3 +1,11 @@
+# Data Hub API 35.8.1 (2020-09-15)
+
+
+## Bug fixes
+
+- Parameters were being propagated through celery tasks into `requests.request` method causing errors.
+
+
 # Data Hub API 35.8.0 (2020-09-14)
 
 
