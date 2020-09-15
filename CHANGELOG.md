@@ -1,3 +1,11 @@
+# Data Hub API 35.9.0 (2020-09-15)
+
+
+## Features
+
+- Add service type `Field Force Phase 2 call` to Export Interaction catalogue so it could be filtered in django admin.
+
+
 # Data Hub API 35.8.1 (2020-09-15)
 
 
