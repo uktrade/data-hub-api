@@ -103,7 +103,7 @@ pygments==2.6.1           # via ipython
 pyjwt==1.7.1              # via notifications-python-client
 pyparsing==2.4.7          # via packaging
 pytest-cov==2.10.1        # via -r requirements.in
-pytest-django==3.9.0      # via -r requirements.in
+pytest-django==3.10.0     # via -r requirements.in
 pytest-forked==1.2.0      # via pytest-xdist
 pytest-xdist==2.1.0       # via -r requirements.in
 pytest==6.0.2             # via -r requirements.in, pytest-cov, pytest-django, pytest-forked, pytest-xdist
