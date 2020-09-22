@@ -57,7 +57,7 @@ ipython==7.18.1
 factory-boy==3.0.1
 freezegun==1.0.0
 requests-mock==1.8.0
-django-debug-toolbar==2.2
+django-debug-toolbar==3.1
 werkzeug==1.0.1  # Required by runserver_plus - useful for local dev
 pip-tools==4.5.1
 piprot==0.9.11
