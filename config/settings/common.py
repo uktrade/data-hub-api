@@ -114,6 +114,7 @@ LOCAL_APPS = [
     'datahub.user_event_log',
     'datahub.activity_feed',
     'datahub.dataset',
+    'datahub.testfixtureapi',
 ]
 
 MI_APPS = [
@@ -737,3 +738,6 @@ if ES_APM_ENABLED:
         'ENVIRONMENT': env('ES_APM_ENVIRONMENT'),
         'SERVER_TIMEOUT': env('ES_APM_SERVER_TIMEOUT', default='20s'),
     }
+
+
+ALLOW_TEST_FIXTURE_SETUP = env('ALLOW_TEST_FIXTURE_SETUP', default=False)
