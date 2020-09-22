@@ -120,7 +120,7 @@ semantic_version==2.8.5   # via -r requirements.in
 sentry_sdk==0.17.4        # via -r requirements.in
 simplejson==3.17.0        # via mail-parser
 six==1.14.0               # via django-pglocks, elasticsearch-dsl, flake8-print, mail-parser, mohawk, packaging, pip-tools, piprot, python-dateutil, requests-mock, traitlets, virtualenv
-slackclient==2.8.2        # via -r requirements.in
+slackclient==2.9.0        # via -r requirements.in
 snowballstemmer==2.0.0    # via pydocstyle
 sqlparse==0.3.1           # via django, django-debug-toolbar
 statsd==3.3.0             # via -r requirements.in
