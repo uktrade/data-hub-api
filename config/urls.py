@@ -32,6 +32,12 @@ if settings.DEBUG:
     ]
 
 
+if settings.ALLOW_TEST_FIXTURE_SETUP:
+    unversioned_urls += [
+        path('', include('datahub.testfixtureapi.urls', namespace='testfixtureapi')),
+    ]
+
+
 urlpatterns = [
     # V1 has actually no version in the URL
     path('', include((api_urls.v1_urls, 'api'), namespace='api-v1')),
