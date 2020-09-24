@@ -176,3 +176,5 @@ COMPANY_MATCHING_HAWK_KEY = 'some-secret'
 EXPORT_WINS_SERVICE_BASE_URL = 'http://content.export-wins/'
 EXPORT_WINS_HAWK_ID = 'some-id'
 EXPORT_WINS_HAWK_KEY = 'some-secret'
+
+ALLOW_TEST_FIXTURE_SETUP = True
