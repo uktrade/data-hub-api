@@ -56,8 +56,8 @@ flake8-string-format==0.3.0  # via -r requirements.in
 flake8==3.8.3             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
 freezegun==1.0.0          # via -r requirements.in
 future==0.18.2            # via notifications-python-client
-gevent==20.6.2            # via -r requirements.in
-greenlet==0.4.16          # via gevent
+gevent==20.9.0            # via -r requirements.in
+greenlet==0.4.17          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
 icalendar==4.0.7          # via -r requirements.in
 identify==1.4.21          # via pre-commit
