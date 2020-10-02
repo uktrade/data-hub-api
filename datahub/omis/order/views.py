@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -261,6 +262,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
         }
 
 
+@login_required
 def omis_order_stats(request):
     """
     Spike work for D3 please not for production
