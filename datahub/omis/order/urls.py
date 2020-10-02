@@ -4,6 +4,7 @@ from django.urls import path, re_path
 
 from datahub.omis.order.views import (
     AssigneeView,
+    omis_order_stats,
     OrderViewSet,
     PublicOrderViewSet,
     SubscriberListView,
@@ -41,6 +42,11 @@ internal_frontend_urls = [
         'order/<uuid:order_pk>/assignee',
         AssigneeView.as_view(),
         name='assignee',
+    ),
+    path(
+        'order/status',
+        omis_order_stats,
+        name='status',
     ),
 ]
 

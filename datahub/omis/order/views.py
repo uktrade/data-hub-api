@@ -259,3 +259,31 @@ class BaseNestedOrderViewSet(CoreViewSet):
             'order': self.get_order(),
             'current_user': self.request.user if self.request else None,
         }
+
+
+def omis_order_stats(request):
+    """
+    Spike work for D3 please not for production
+    """
+    from django.http import JsonResponse
+    from django.db.models import Count
+    from datahub.omis.order.constants import OrderStatus
+
+    all_status = Order.objects.filter(assignees__adviser=request.user).values('status')
+    total = len(all_status)
+
+    count = all_status.annotate(Count('status'))
+    order_status_count = {
+        status_count['status']: status_count['status__count'] for status_count in count
+    }
+
+    json = {
+        order_status.value: {
+            'percent': order_status_count.get(order_status.value) * 100 / total
+            if order_status_count.get(order_status.value) else 0,
+            'label': order_status.label,
+            'count': order_status_count.get(order_status.value)
+            if order_status_count.get(order_status.value) else 0,
+        } for order_status in OrderStatus
+    }
+    return JsonResponse(json)
