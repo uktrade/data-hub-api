@@ -1,7 +1,7 @@
-from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -262,30 +262,37 @@ class BaseNestedOrderViewSet(CoreViewSet):
         }
 
 
-@login_required
-def omis_order_stats(request):
+class OmisOrderStats(APIView):
     """
-    Spike work for D3 please not for production
+    A view that returns the count of omiss order users in JSON.
     """
-    from django.http import JsonResponse
-    from django.db.models import Count
-    from datahub.omis.order.constants import OrderStatus
 
-    all_status = Order.objects.filter(assignees__adviser=request.user).values('status')
-    total = len(all_status)
+    renderer_classes = [JSONRenderer]
 
-    count = all_status.annotate(Count('status'))
-    order_status_count = {
-        status_count['status']: status_count['status__count'] for status_count in count
-    }
+    queryset = Order.objects.all()
 
-    json = {
-        order_status.value: {
-            'percent': order_status_count.get(order_status.value) * 100 / total
-            if order_status_count.get(order_status.value) else 0,
-            'label': order_status.label,
-            'count': order_status_count.get(order_status.value)
-            if order_status_count.get(order_status.value) else 0,
-        } for order_status in OrderStatus
-    }
-    return JsonResponse(json)
+    def get(self, request):
+        """
+        Spike work for D3 please not for production
+        """
+        from django.db.models import Count
+        from datahub.omis.order.constants import OrderStatus
+
+        all_status = self.queryset.filter(assignees__adviser=request.user).values('status')
+        total = len(all_status)
+
+        count = all_status.annotate(Count('status'))
+        order_status_count = {
+            status_count['status']: status_count['status__count'] for status_count in count
+        }
+
+        json = {
+            order_status.value: {
+                'percent': order_status_count.get(order_status.value) * 100 / total
+                if order_status_count.get(order_status.value) else 0,
+                'label': order_status.label,
+                'count': order_status_count.get(order_status.value)
+                if order_status_count.get(order_status.value) else 0,
+            } for order_status in OrderStatus
+        }
+        return Response(json)
