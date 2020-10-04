@@ -40,7 +40,7 @@ elastic-apm==5.9.0        # via -r requirements.in
 elasticsearch-dsl==6.3.1  # via -r requirements.in
 elasticsearch==6.8.1      # via -r requirements.in, elasticsearch-dsl
 execnet==1.7.1            # via pytest-xdist
-factory-boy==3.0.1        # via -r requirements.in
+factory-boy==3.1.0        # via -r requirements.in
 faker==4.1.1              # via factory-boy
 filelock==3.0.12          # via virtualenv
 flake8-blind-except==0.1.1  # via -r requirements.in
