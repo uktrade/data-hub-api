@@ -85,4 +85,4 @@ gevent==20.9.0
 mohawk==1.1.0
 requests==2.24.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.17.8
+sentry_sdk==0.18.0
