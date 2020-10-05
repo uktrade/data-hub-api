@@ -6,7 +6,6 @@ from operator import attrgetter
 from secrets import token_hex
 from unittest import mock
 
-import factory
 import mohawk
 import pytest
 from django.contrib.auth import get_user_model, REDIRECT_FIELD_NAME
@@ -17,6 +16,7 @@ from django.test.client import Client
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
+from faker import Faker
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
@@ -123,11 +123,12 @@ def create_test_user(permission_codenames=(), password=None, **user_attrs):
         applied to the user
     :param user_attrs: any user attribute
     """
+    faker = Faker()
     user_defaults = {
-        'first_name': factory.Faker('first_name').generate({}),
-        'last_name': factory.Faker('last_name').generate({}),
-        'email': factory.Faker('email').generate({}),
-        'sso_email_user_id': factory.Faker('email').generate({'domain': 'id.test'}),
+        'first_name': faker.first_name(),
+        'last_name': faker.last_name(),
+        'email': faker.email(),
+        'sso_email_user_id': faker.email(domain='id.test'),
         'date_joined': now(),
     }
     user_defaults.update(user_attrs)
