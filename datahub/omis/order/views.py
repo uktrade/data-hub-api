@@ -275,24 +275,39 @@ class OmisOrderStats(APIView):
         """
         Spike work for D3 please not for production
         """
-        from django.db.models import Count
+        from datahub.company.models import Company
         from datahub.omis.order.constants import OrderStatus
+        from datahub.omis.quote.models import Quote
+        from datahub.omis.quote.serializers import QuoteSerializer
 
-        all_status = self.queryset.filter(assignees__adviser=request.user).values('status')
+        all_status = self.queryset.filter(assignees__adviser=request.user).values(
+            'status', 'id', 'reference', 'company_id', 'delivery_date',
+        )
         total = len(all_status)
 
-        count = all_status.annotate(Count('status'))
-        order_status_count = {
-            status_count['status']: status_count['status__count'] for status_count in count
-        }
+        response = {}
 
-        json = {
-            order_status.value: {
-                'percent': order_status_count.get(order_status.value) * 100 / total
-                if order_status_count.get(order_status.value) else 0,
+        def get_quote(order_number):
+            try:
+                return QuoteSerializer(Quote.objects.get(order=order_number)).data
+            except Quote.DoesNotExist:
+                return None
+
+        for order_status in OrderStatus:
+            orders = all_status.filter(status=order_status)
+            response[order_status.value] = {
+                'percent': len(orders) * 100 / total if total else 0,
                 'label': order_status.label,
-                'count': order_status_count.get(order_status.value)
-                if order_status_count.get(order_status.value) else 0,
-            } for order_status in OrderStatus
-        }
-        return Response(json)
+                'count': len(orders),
+                'items': list(
+                    map(lambda o: ({
+                        'id': o['id'],
+                        'reference': o['reference'],
+                        'delivery_date': o['delivery_date'],
+                        'quote': get_quote(o['id']),
+                        'company_name': Company.objects.get(id=o['company_id']).name,
+                    }), orders),
+                ),
+            }
+
+        return Response(response)
