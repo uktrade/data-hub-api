@@ -336,6 +336,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
+| `ENABLE_MAILBOX_PROCESSING` | No | True or False.  Whether or not to activate the celery beat task for mailbox processing |
 | `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
@@ -366,6 +367,10 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
 | `ENABLE_MI_DASHBOARD_FEED` | No | Whether to enable daily MI dashboard feed (default=False). |
+| `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
+| `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
+| `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
+| `MAILBOX_BUCKET` | No | S3 bucket for mailbox storage. |
 | `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
 | `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
