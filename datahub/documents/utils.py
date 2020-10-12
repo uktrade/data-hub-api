@@ -103,3 +103,9 @@ def perform_delete_document(document_pk):
         client.delete_object(Bucket=bucket_name, Key=document.path)
 
     document.delete()
+
+
+def delete_document(bucket_id, document_key):
+    """Deletes document in S3 bucket."""
+    client = get_s3_client_for_bucket(bucket_id=bucket_id)
+    client.delete_object(Bucket=get_bucket_name(bucket_id=bucket_id), Key=document_key)
