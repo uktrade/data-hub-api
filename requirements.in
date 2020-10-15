@@ -1,9 +1,9 @@
 # Django and django related
-django==3.1.1
+django==3.1.2
 djangorestframework==3.11.1
 django-environ==0.4.5
 django-extensions==3.0.9
-django-filter==2.3.0
+django-filter==2.4.0
 django-reversion==3.0.8
 django-pglocks==1.0.4
 django-mptt==0.11.0
@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.15.2
+boto3==1.15.16
 
 notifications-python-client==5.7.0
 
@@ -30,7 +30,7 @@ mail-parser==3.12.0
 icalendar==4.0.7
 
 # Slack
-slackclient==2.9.0
+slackclient==2.9.2
 
 # REDIS
 django-redis==4.12.1
@@ -41,7 +41,7 @@ elasticsearch==6.8.1
 elasticsearch-dsl==6.3.1
 
 # ES APM
-elastic-apm==5.8.1
+elastic-apm==5.9.0
 
 # Celery
 celery[redis]==4.4.7
@@ -49,15 +49,15 @@ billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of br
 kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==6.0.2
+pytest==6.1.1
 pytest-django==3.10.0
 pytest-cov==2.10.1
 pytest-xdist==2.1.0
 ipython==7.18.1
-factory-boy==3.0.1
+factory-boy==3.1.0
 freezegun==1.0.0
 requests-mock==1.8.0
-django-debug-toolbar==3.1
+django-debug-toolbar==3.1.1
 werkzeug==1.0.1  # Required by runserver_plus - useful for local dev
 pip-tools==4.5.1
 piprot==0.9.11
@@ -67,7 +67,7 @@ watchdog[watchmedo]==0.10.3
 pre-commit==2.7.1
 
 # Code static analysis
-flake8==3.8.3
+flake8==3.8.4
 flake8-blind-except==0.1.1
 flake8-bugbear==20.1.4
 flake8-commas==2.0.0
@@ -81,8 +81,8 @@ pep8-naming==0.11.1
 pydocstyle==5.1.1
 
 gunicorn==20.0.4
-gevent==20.6.2
+gevent==20.9.0
 mohawk==1.1.0
 requests==2.24.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.17.7
+sentry_sdk==0.18.0
