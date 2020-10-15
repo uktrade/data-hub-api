@@ -504,6 +504,11 @@ if REDIS_BASE_URL:
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
             'schedule': 30.0,  # Every 30 seconds
         }
+    if env.bool('ENABLE_MAILBOX_PROCESSING', False):
+        CELERY_BEAT_SCHEDULE['process_mailbox_emails'] = {
+            'task': 'datahub.email_ingestion.tasks.process_mailbox_emails',
+            'schedule': 30.0,  # Every 30 seconds
+        }
 
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
@@ -663,6 +668,12 @@ DOCUMENT_BUCKETS = {
         'aws_access_key_id': env('REPORT_AWS_ACCESS_KEY_ID', default=''),
         'aws_secret_access_key': env('REPORT_AWS_SECRET_ACCESS_KEY', default=''),
         'aws_region': env('REPORT_AWS_REGION', default=''),
+    },
+    'mailbox': {
+        'bucket': env('MAILBOX_BUCKET', default=''),
+        'aws_access_key_id': env('MAILBOX_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('MAILBOX_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('MAILBOX_AWS_REGION', default=''),
     }
 }
 
