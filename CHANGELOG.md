@@ -1,3 +1,11 @@
+# Data Hub API 35.11.0 (2020-10-15)
+
+
+## Internal changes
+
+- Email mailbox processing has been moved from Outlook to Amazon S3.
+
+
 # Data Hub API 35.10.0 (2020-09-24)
 
 
