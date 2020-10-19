@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
 
@@ -37,6 +38,7 @@ api_docs_urls = [
             description=API_DOCUMENTATION_DESCRIPTION,
             # JSONOpenAPIRenderer works better with IntEnum, StrEnum etc.
             renderer_classes=[JSONOpenAPIRenderer],
+            permission_classes=(IsAuthenticated,),
             authentication_classes=[SessionAuthentication],
         ),
         name='openapi-schema',
