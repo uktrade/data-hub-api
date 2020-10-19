@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 from django.test.utils import override_settings
-from mailparser.exceptions import MailParserError
 
 from datahub.email_ingestion import emails
 from datahub.email_ingestion.tasks import process_mailbox_emails
@@ -66,7 +65,7 @@ class TestMailbox:
         mock_query = mock.Mock(return_value=DOCUMENTS)
         mock_delete = mock.Mock()
         mock_process = mock.Mock()
-        mock_process.side_effect = MailParserError()
+        mock_process.side_effect = Exception()
         monkeypatch.setattr('datahub.email_ingestion.emails.get_mail_docs_in_bucket', mock_query)
         monkeypatch.setattr('datahub.documents.utils.delete_document', mock_delete)
         monkeypatch.setattr(
@@ -82,28 +81,6 @@ class TestMailbox:
         mock_delete.assert_called_with(
             bucket_id=emails.BUCKET_ID, document_key=DOCUMENTS[0]['source'],
         )
-
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
-    def test_mailbox_process_not_processed_with_no_deleted_docs(self, monkeypatch):
-        """
-        Tests processing of emails with error and no deleted documents.
-        """
-        mock_query = mock.Mock(return_value=DOCUMENTS)
-        mock_delete = mock.Mock()
-        mock_process = mock.Mock()
-        mock_process.side_effect = Exception()
-        monkeypatch.setattr('datahub.email_ingestion.emails.get_mail_docs_in_bucket', mock_query)
-        monkeypatch.setattr('datahub.documents.utils.delete_document', mock_delete)
-        monkeypatch.setattr(
-            'datahub.interaction.email_processors.processors.'
-            'CalendarInteractionEmailProcessor.process_email',
-            mock_process,
-        )
-
-        emails.process_ingestion_emails()
-        assert mock_query.call_count == 1
-        assert mock_process.call_count == 1
-        assert mock_delete.call_count == 0
 
 
 @pytest.mark.django_db
