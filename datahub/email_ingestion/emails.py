@@ -1,11 +1,9 @@
 import tempfile
-from email.errors import MessageParseError
 from logging import getLogger
 
 import mailparser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from mailparser.exceptions import MailParserError
 
 from datahub.documents import utils as documents
 from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
@@ -54,20 +52,23 @@ def process_ingestion_emails():
     for message in get_mail_docs_in_bucket():
         source = message['source']
         try:
+            documents.delete_document(bucket_id=BUCKET_ID, document_key=message['source'])
+        except Exception as e:
+            logger.exception('Error deleting message: "%s", error: "%s"', source, e)
+            continue
+
+        try:
             email = mailparser.parse_from_bytes(message['content'])
-            processed = processor.process_email(message=email)
-        except (MessageParseError, MailParserError):
-            processed = True
-            logger.exception('Error parsing message: %s', source)
-        except Exception:
-            return logger.exception('Error processing message: %s', source)
+            processed, reason = processor.process_email(message=email)
+            if not processed:
+                logger.error('Error parsing message: "%s", error: "%s"', source, reason)
+            else:
+                logger.info(reason)
+        except Exception as e:
+            logger.exception('Error processing message: "%s", error: "%s"', source, e)
 
-        if not processed:
-            return logger.error('Could not process message: %s', source)
-
-        documents.delete_document(bucket_id=BUCKET_ID, document_key=message['source'])
         logger.info(
-            'Successfully processed message %s and deleted document from bucket %s',
+            'Successfully processed message "%s" and deleted document from bucket "%s"',
             source,
             BUCKET_ID,
         )
