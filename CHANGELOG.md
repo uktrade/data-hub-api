@@ -1,3 +1,11 @@
+# Data Hub API 35.11.1 (2020-10-20)
+
+
+## Internal changes
+
+- Improved logging for email mailbox processing.
+
+
 # Data Hub API 35.11.0 (2020-10-15)
 
 
