@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.15.16
+boto3==1.16.4
 
 notifications-python-client==5.7.0
 
@@ -50,7 +50,7 @@ kombu==4.6.11  # Not used directly, but pinned as it has been a source of breaka
 
 # Testing and dev
 pytest==6.1.1
-pytest-django==3.10.0
+pytest-django==4.1.0
 pytest-cov==2.10.1
 pytest-xdist==2.1.0
 ipython==7.18.1
@@ -85,4 +85,4 @@ gevent==20.9.0
 mohawk==1.1.0
 requests==2.24.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.18.0
+sentry_sdk==0.19.1
