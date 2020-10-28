@@ -48,7 +48,7 @@ class TestReportAdmin(AdminTestMixin):
             one_list_tier=OneListTier.objects.first(),
             one_list_account_owner=AdviserFactory(),
         )
-        # ignored because headquarter_type is None
+        # a company with headquarter_type equal to None should appear in the report
         CompanyFactory(
             headquarter_type=None,
             one_list_tier=OneListTier.objects.first(),
@@ -78,8 +78,8 @@ class TestReportAdmin(AdminTestMixin):
         client = self.create_client(user=user)
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        # 3 = header + the first 2 companies
-        assert len(response.getvalue().decode('utf-8').splitlines()) == 3
+        # 4 = header + the first 3 companies
+        assert len(response.getvalue().decode('utf-8').splitlines()) == 4
 
 
 @freeze_time('2018-01-01 00:00:00')
@@ -120,11 +120,13 @@ def test_one_list_report_generation():
         ),
         one_list_account_owner=AdviserFactory(),
     )
-    # ignored because headquarter_type is None
-    CompanyFactory(
-        headquarter_type=None,
-        one_list_tier=OneListTier.objects.first(),
-        one_list_account_owner=AdviserFactory(),
+    # one list report should include companies that are not headquarters
+    companies.append(
+        CompanyFactory(
+            headquarter_type=None,
+            one_list_tier=OneListTier.objects.first(),
+            one_list_account_owner=AdviserFactory(),
+        ),
     )
     # ignored because one_list_tier is None
     CompanyFactory(
@@ -140,9 +142,11 @@ def test_one_list_report_generation():
     )
 
     report = OneListReport()
-    assert list(report.rows()) == [{
+    sorted_report = sorted(list(report.rows()), key=lambda k: k['url'])
+    expected_report = sorted([{
         'name': company.name,
         'one_list_tier__name': company.one_list_tier.name,
+        'headquarter_type__name': getattr(company.headquarter_type, 'name', None),
         'sector__segment': company.sector.segment,
         'primary_contact_name': company.one_list_account_owner.name,
         'one_list_account_owner__telephone_number':
@@ -151,4 +155,6 @@ def test_one_list_report_generation():
         'address_country__name': company.address_country.name,
         'address_town': company.address_town,
         'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
-    } for company in companies]
+    } for company in companies], key=lambda k: k['url'])
+
+    assert sorted_report == expected_report

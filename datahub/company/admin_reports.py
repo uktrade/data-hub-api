@@ -2,7 +2,6 @@ from django.db.models import BooleanField, Case, When
 
 from datahub.admin_report.report import QuerySetReport
 from datahub.company.models import Advisor, Company
-from datahub.core import constants
 from datahub.core.query_utils import get_front_end_url_expression, get_full_name_expression
 
 
@@ -45,7 +44,6 @@ class OneListReport(QuerySetReport):
     model = Company
     permissions_required = ('company.view_company',)
     queryset = Company.objects.filter(
-        headquarter_type_id=constants.HeadquarterType.ghq.value.id,
         one_list_tier_id__isnull=False,
         one_list_account_owner_id__isnull=False,
     ).annotate(
@@ -59,6 +57,7 @@ class OneListReport(QuerySetReport):
         'name': 'Account Name',
         'one_list_tier__name': 'Tier',
         'sector__segment': 'Sector',
+        'headquarter_type__name': 'Headquarter Type',
         'primary_contact_name': 'Primary Contact',
         'one_list_account_owner__telephone_number': 'Contact Number',
         'one_list_account_owner__contact_email': 'E-mail',
