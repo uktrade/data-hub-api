@@ -6,7 +6,7 @@ from reversion.models import Version
 
 from datahub.company.constants import OneListTierID
 from datahub.company.models import CompanyPermission, OneListTier
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, SubsidiaryFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.company.test.utils import random_non_ita_one_list_tier
 from datahub.core.test_utils import (
     APITestMixin,
@@ -132,20 +132,6 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                     ],
                 },
                 id='required',
-            ),
-            pytest.param(
-                lambda: SubsidiaryFactory(
-                    global_headquarters__one_list_tier=random_obj_for_model(OneListTier),
-                    global_headquarters__one_list_account_owner=AdviserFactory(),
-                ),
-                lambda: AdviserFactory().pk,
-                lambda: random_non_ita_one_list_tier().pk,
-                {
-                    api_settings.NON_FIELD_ERRORS_KEY: [
-                        'A subsidiary cannot be on One List.',
-                    ],
-                },
-                id='subsidiary-of-one-list-company',
             ),
             pytest.param(
                 lambda: CompanyFactory(

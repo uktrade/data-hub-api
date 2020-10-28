@@ -780,8 +780,6 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
     excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
 
     default_error_messages = {
-        'cannot_assign_subsidiary_to_one_list':
-            gettext_lazy('A subsidiary cannot be on One List.'),
         'cannot_assign_company_one_list_tier':
             gettext_lazy('A company can only have this One List tier assigned by ITA.'),
         'cannot_change_company_with_current_one_list_tier':
@@ -805,12 +803,6 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
         Validate that given one list tier and global account manager can be assigned to a company.
         """
         attrs = super().validate(attrs)
-
-        if self.instance.global_headquarters:
-            raise serializers.ValidationError(
-                self.error_messages['cannot_assign_subsidiary_to_one_list'],
-                code='cannot_assign_subsidiary_to_one_list',
-            )
 
         old_one_list_tier = self.instance.one_list_tier
         if old_one_list_tier and old_one_list_tier.id == self.excluded_one_list_tier_id:
