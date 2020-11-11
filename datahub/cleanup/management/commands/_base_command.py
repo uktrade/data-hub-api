@@ -99,15 +99,18 @@ class BaseCleanupCommand(BaseCommand):
             for field, filters in relation_filter_mapping.items()
         }
 
-        return get_unreferenced_objects_query(
+        query = get_unreferenced_objects_query(
             model,
             excluded_relations=config.excluded_relations,
             relation_exclusion_filter_mapping=relation_filter_kwargs,
         ).filter(
             _join_cleanup_filters(config.filters),
-        ).order_by(
-            f'-{config.filters[0].date_field}',
         )
+
+        if config.filters:
+            query = query.order_by(f'-{config.filters[0].date_field}')
+
+        return query
 
 
 def _print_query(model, qs, relation=None):

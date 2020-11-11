@@ -159,16 +159,10 @@ def create_orphanable_model(factory, config, date_value):
 @pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
 def test_configs(model_name, config):
     """
-    Test that configs for delete_orphans only specify a single filter, and do not specify any
-    relation filters.
-
+    Test that configs for delete_orphans don't specify any relation filters.
     These are not allowed as they are not currently needed for delete_orphans, and would
     complicate the tests.
     """
-    assert len(config.filters) == 1, (
-        f'Exactly one filter must be specified for the delete_orphans config for model '
-        f'{model_name}',
-    )
 
     assert not config.relation_filter_mapping, (
         f'Relation filters cannot be used for delete_orphan configs (one detected for the '
@@ -340,16 +334,18 @@ def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
     monkeypatch.setattr(QuerySet, 'delete', delete_mock)
 
     model_name, config = cleanup_configs
-    filter_config = config.filters[0]
     command = delete_orphans.Command()
 
     model = apps.get_model(model_name)
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
-    datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
-    for _ in range(3):
-        create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+    if config.filters:
+        filter_config = config.filters[0]
+        datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
+
+        for _ in range(3):
+            create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
     management.call_command(command, model_name, only_print_queries=True)
 
