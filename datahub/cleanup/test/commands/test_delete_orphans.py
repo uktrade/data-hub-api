@@ -15,6 +15,7 @@ from datahub.cleanup.test.commands.factories import (
     ShallowInvestmentProjectFactory,
 )
 from datahub.company.test.factories import (
+    AdviserFactory,
     CompanyFactory,
     ContactFactory,
     OneListCoreTeamMemberFactory,
@@ -23,10 +24,15 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory,
     OrderFactory,
 )
 from datahub.omis.quote.test.factories import QuoteFactory
@@ -84,6 +90,18 @@ MAPPINGS = {
             'event.Event_teams',
             'event.Event_related_programmes',
         ),
+        'ignored_models': (),
+    },
+    'metadata.Team': {
+        'factory': TeamFactory,
+        'dependent_models': (
+            (OrderAssigneeFactory, 'team'),
+            (InteractionDITParticipantFactory, 'team'),
+            (EventFactory, 'teams'),
+            (EventFactory, 'lead_team'),
+            (AdviserFactory, 'dit_team'),
+        ),
+        'implicit_related_models': (),
         'ignored_models': (),
     },
 }
@@ -163,7 +181,6 @@ def test_configs(model_name, config):
     These are not allowed as they are not currently needed for delete_orphans, and would
     complicate the tests.
     """
-
     assert not config.relation_filter_mapping, (
         f'Relation filters cannot be used for delete_orphan configs (one detected for the '
         f'{model_name} config)',
@@ -206,26 +223,35 @@ def test_run(
     # Set up the state before running the command
     command = delete_orphans.Command()
     model_factory = mapping['factory']
-    filter_config = config.filters[0]
 
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    datetime_within_threshold = filter_config.cut_off_date
-    datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
-
     with es_collector_context_manager as collector:
-        # this orphan should NOT get deleted because not old enough
-        create_orphanable_model(model_factory, filter_config, datetime_within_threshold)
+        if config.filters:
+            filter_config = config.filters[0]
+            datetime_within_threshold = filter_config.cut_off_date
+            datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(
+                days=1)
 
-        # this orphan should get deleted because old
-        create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+            # this orphan should NOT get deleted because not old enough
+            create_orphanable_model(model_factory, filter_config, datetime_within_threshold)
 
-        # this object should NOT get deleted because it has another object referencing it
-        non_orphan = create_orphanable_model(
-            model_factory,
-            filter_config,
-            datetime_older_than_threshold,
-        )
+            # this orphan should get deleted because old
+            create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+
+            # this object should NOT get deleted because it has another object referencing it
+            non_orphan = create_orphanable_model(
+                model_factory,
+                filter_config,
+                datetime_older_than_threshold,
+            )
+        else:
+            # should get deleted
+            model_factory()
+
+            # should NOT get deleted because it has another object referencing it
+            non_orphan = model_factory()
+
         is_m2m = dep_factory._meta.model._meta.get_field(dep_field_name).many_to_many
         dep_factory(
             **{dep_field_name: [non_orphan] if is_m2m else non_orphan},
@@ -234,7 +260,7 @@ def test_run(
         collector.flush_and_refresh()
 
     # 3 + 1 in case of self-references
-    total_model_records = 3 + (1 if dep_factory == model_factory else 0)
+    total_model_records = (3 if config.filters else 2) + (1 if dep_factory == model_factory else 0)
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
@@ -281,15 +307,23 @@ def test_simulate(
     # Set up the state before running the command
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
     model_name, config = cleanup_configs
-    filter_config = config.filters[0]
     command = delete_orphans.Command()
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
-    datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
     with es_collector_context_manager as collector:
         for _ in range(3):
-            create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
+            if config.filters:
+                filter_config = config.filters[0]
+                datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(
+                    days=1)
+                create_orphanable_model(
+                    model_factory,
+                    filter_config,
+                    datetime_older_than_threshold,
+                )
+            else:
+                model_factory()
 
         collector.flush_and_refresh()
 

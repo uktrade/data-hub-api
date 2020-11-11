@@ -43,4 +43,5 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),
             ),
         ),
+        'metadata.Team': ModelCleanupConfig(),
     }
