@@ -37,8 +37,8 @@ django-redis==4.12.1
 redis==3.5.3
 
 # ES
-elasticsearch==6.8.1
-elasticsearch-dsl==6.3.1
+elasticsearch==7.10.0
+elasticsearch-dsl==7.3.0
 
 # ES APM
 elastic-apm==5.9.0

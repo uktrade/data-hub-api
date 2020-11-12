@@ -1,7 +1,7 @@
 from elasticsearch_dsl import Date, Keyword
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 
 
 class ExportCountryHistory(BaseESModel):
@@ -29,11 +29,3 @@ class ExportCountryHistory(BaseESModel):
         'id': lambda obj: obj.history_id,  # Id required for indexing
         'date': lambda obj: obj.history_date,
     }
-
-    class Meta:
-        """Default document meta data."""
-
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE

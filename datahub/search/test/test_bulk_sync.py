@@ -7,7 +7,6 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import MockQuerySet
 from datahub.search.bulk_sync import sync_app, sync_objects
 from datahub.search.company import CompanySearchApp
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.signals import disable_search_signal_receivers
 from datahub.search.test.utils import create_mock_search_app
 
@@ -90,7 +89,6 @@ def test_sync_app_uses_latest_data(monkeypatch, es):
     company = mock_sync_objects.call_args_list[1][0][1][0]
     fetched_company = es.get(
         index=CompanySearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=company.pk,
     )
     assert fetched_company['_source']['name'] == 'new name'

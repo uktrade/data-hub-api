@@ -6,7 +6,6 @@ from elasticsearch.exceptions import NotFoundError
 from datahub.company.test.factories import CompanyFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search.large_investor_profile.apps import LargeInvestorProfileSearchApp
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 
 pytestmark = pytest.mark.django_db
 
@@ -14,7 +13,6 @@ pytestmark = pytest.mark.django_db
 def _get_es_document(setup_es, pk):
     return setup_es.get(
         index=LargeInvestorProfileSearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=pk,
     )
 
