@@ -94,6 +94,7 @@ MAPPINGS = {
     },
     'metadata.Team': {
         'factory': TeamFactory,
+        'has_no_search_app': True,
         'dependent_models': (
             (OrderAssigneeFactory, 'team'),
             (InteractionDITParticipantFactory, 'team'),
@@ -263,11 +264,12 @@ def test_run(
     total_model_records = (3 if config.filters else 2) + (1 if dep_factory == model_factory else 0)
 
     model = apps.get_model(model_name)
-    search_app = get_search_app_by_model(model)
-    read_alias = search_app.es_model.get_read_alias()
-
     assert model.objects.count() == total_model_records
-    assert es_with_signals.count(read_alias)['count'] == total_model_records
+
+    if not mapping.get('has_no_search_app'):
+        search_app = get_search_app_by_model(model)
+        read_alias = search_app.es_model.get_read_alias()
+        assert es_with_signals.count(read_alias)['count'] == total_model_records
 
     # Run the command
     management.call_command(command, model_name)
@@ -275,7 +277,9 @@ def test_run(
 
     # Check that the records have been deleted
     assert model.objects.count() == total_model_records - 1
-    assert es_with_signals.count(read_alias)['count'] == total_model_records - 1
+
+    if not mapping.get('has_no_search_app'):
+        assert es_with_signals.count(read_alias)['count'] == total_model_records - 1
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -328,11 +332,12 @@ def test_simulate(
         collector.flush_and_refresh()
 
     model = apps.get_model(model_name)
-    search_app = get_search_app_by_model(model)
-    read_alias = search_app.es_model.get_read_alias()
-
     assert model.objects.count() == 3
-    assert es_with_signals.count(read_alias)['count'] == 3
+
+    if not mapping.get('has_no_search_app'):
+        search_app = get_search_app_by_model(model)
+        read_alias = search_app.es_model.get_read_alias()
+        assert es_with_signals.count(read_alias)['count'] == 3
 
     # Run the command
     management.call_command(command, model_name, simulate=True)
@@ -353,7 +358,9 @@ def test_simulate(
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert es_with_signals.count(read_alias)['count'] == 3
+
+    if not mapping.get('has_no_search_app'):
+        assert es_with_signals.count(read_alias)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
