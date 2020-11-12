@@ -5,7 +5,7 @@ from elasticsearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, 
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText
 from datahub.search.inner_docs import IDNameTrigram, Person
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 
 
 def _contact_field():
@@ -136,11 +136,3 @@ class Interaction(BaseESModel):
         'dit_participants.team.name',
         'dit_participants.team.name.trigram',
     )
-
-    class Meta:
-        """Default document meta data."""
-
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE

@@ -6,27 +6,17 @@ from django.conf import settings
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 from datahub.search.test.utils import create_mock_search_app
 
 SAMPLE_APP_NAME = 'sample'
-
-
-class SampleModel(BaseESModel):
-    """Sample (dummy) search model."""
-
-    class Meta:
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE
 
 
 class SampleSearchApp(SearchApp):
     """Sample (dummy) search app."""
 
     name = SAMPLE_APP_NAME
-    es_model = SampleModel
+    es_model = BaseESModel
 
 
 @pytest.fixture

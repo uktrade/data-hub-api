@@ -12,7 +12,6 @@ from datahub.search.deletion import (
     delete_documents,
     update_es_after_deletions,
 )
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
@@ -26,9 +25,9 @@ def test_delete_documents(es_bulk, mock_es_client):
 
     index = 'test-index'
     es_docs = [
-        {'_type': DEFAULT_MAPPING_TYPE, '_id': 1},
-        {'_type': DEFAULT_MAPPING_TYPE, '_id': 2},
-        {'_type': DEFAULT_MAPPING_TYPE, '_id': 3},
+        {'_id': 1},
+        {'_id': 2},
+        {'_id': 3},
     ]
     delete_documents(index, es_docs)
 
@@ -61,7 +60,7 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
     )
 
     index = 'test-index'
-    es_docs = [{'_type': DEFAULT_MAPPING_TYPE, '_id': 1}]
+    es_docs = [{'_id': 1}]
 
     with pytest.raises(DataHubException) as excinfo:
         delete_documents(index, es_docs)

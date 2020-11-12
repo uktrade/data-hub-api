@@ -7,7 +7,6 @@ from django.db.models.signals import post_delete, pre_delete
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.elasticsearch import bulk, get_client
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.signals import SignalReceiver
 
 
@@ -167,6 +166,5 @@ def delete_document(model, document_id, indices=None, ignore_404_responses=True)
         client.delete(
             index=index,
             id=document_id,
-            doc_type=DEFAULT_MAPPING_TYPE,
             ignore=ignored_response_statuses,
         )
