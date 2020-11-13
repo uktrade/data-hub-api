@@ -1,3 +1,15 @@
+# Data Hub API 35.12.0 (2020-11-13)
+
+
+## Features
+
+- **Interactions** Amend the name of the DSO service type from `DSO interaction` to `UK Defence and Security Exports` for a more descriptive interaction title.
+- Add Export Academy
+
+  Add Specific DIT Export Service or Funding / Export Academy (Export interaction, Export service delivery)
+  Add Specific Service / Export Academy (Other interaction, Other service delivery)
+
+
 # Data Hub API 35.11.1 (2020-10-20)
 
 
