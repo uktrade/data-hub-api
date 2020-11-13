@@ -1,1 +1,0 @@
-Amend the name of the DSO service type from `DSO interaction` to `UK Defence and Security Exports` for a more descriptive interaction title.
