@@ -1,0 +1,24 @@
+- model: metadata.service
+  pk: e64d7719-0bd9-65df-55a9-f08d328bc467
+  fields:
+    disabled_on:
+    order: 623.0
+    segment: Export Academy
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 440b7770-62d2-e325-df93-cd7b62818405
+  fields:
+    disabled_on:
+    order: 624.0
+    segment: Export Academy
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction", "other_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
