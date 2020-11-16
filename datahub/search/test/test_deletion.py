@@ -126,12 +126,12 @@ def test_collector(monkeypatch, es_with_signals):
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 0
-    assert es_with_signals.count(read_alias)['count'] == 1
+    assert es_with_signals.count(index=read_alias)['count'] == 1
 
     collector.delete_from_es()
 
     es_with_signals.indices.refresh()
-    assert es_with_signals.count(read_alias)['count'] == 0
+    assert es_with_signals.count(index=read_alias)['count'] == 0
 
 
 @pytest.mark.django_db
@@ -149,10 +149,10 @@ def test_update_es_after_deletions(es_with_signals):
     read_alias = ESSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 1
-    assert es_with_signals.count(read_alias)['count'] == 1
+    assert es_with_signals.count(index=read_alias)['count'] == 1
 
     with update_es_after_deletions():
         obj.delete()
 
     es_with_signals.indices.refresh()
-    assert es_with_signals.count(read_alias)['count'] == 0
+    assert es_with_signals.count(index=read_alias)['count'] == 0
