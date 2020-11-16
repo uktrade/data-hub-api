@@ -1,3 +1,11 @@
+# Data Hub API 35.12.1 (2020-11-16)
+
+
+## Internal changes
+
+- Increase the time for processes to startup before running health checks.
+
+
 # Data Hub API 35.12.0 (2020-11-13)
 
 
