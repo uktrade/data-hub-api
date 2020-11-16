@@ -21,7 +21,7 @@ def delete_documents(index, es_docs):
     :raises DataHubException: in case of non 404 errors
     """
     delete_actions = (
-        _create_delete_action(index, es_doc['_type'], es_doc['_id'])
+        _create_delete_action(index, es_doc['_id'])
         for es_doc in es_docs
     )
 
@@ -40,11 +40,10 @@ def delete_documents(index, es_docs):
         )
 
 
-def _create_delete_action(_index, _type, _id):
+def _create_delete_action(_index, _id):
     return {
         '_op_type': 'delete',
         '_index': _index,
-        '_type': _type,
         '_id': _id,
     }
 
