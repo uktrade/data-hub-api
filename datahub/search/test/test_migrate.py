@@ -37,14 +37,18 @@ def test_migrate_apps(monkeypatch):
     assert {args[0][0] for args in migrate_app_mock.call_args_list} == apps
 
 
-def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client, sample_search_app):
+def test_migrate_app_with_uninitialised_app(
+    monkeypatch,
+    mock_connection_for_create_index,
+    sample_search_app,
+):
     """
     Test that migrate_app() creates an index and schedules an initial sync for an
     uninitialised search app.
     """
     sync_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.sync_model', sync_model_task_mock)
-    mock_client = mock_es_client.return_value
+    mock_client = mock_connection_for_create_index.return_value
     mock_client.indices.exists_alias.side_effect = [
         # No alias at first attempt
         False,
