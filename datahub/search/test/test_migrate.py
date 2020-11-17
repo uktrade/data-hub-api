@@ -59,7 +59,7 @@ def test_migrate_app_with_uninitialised_app(
     migrate_app(sample_search_app)
 
     expected_index_name = (
-        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-091a1c3a42f7e9fb3ff69b49a7b45881'
+        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-e8f30732b3051b52d19a699b069110d6'
     )
     assert mock_client.indices.create.call_args_list == [
         call(index=expected_index_name, body=ANY),
