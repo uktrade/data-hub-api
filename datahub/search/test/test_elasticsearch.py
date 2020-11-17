@@ -57,10 +57,11 @@ def test_creates_index(monkeypatch, mock_es_client):
             'testsetting1': 'testval1',
         },
     )
-    mapping = Mapping('test-mapping')
+    mapping = Mapping()
     mapping.field('test-field', Keyword())
     index = 'test-index'
     connection = mock_es_client.return_value
+
     elasticsearch.create_index(index, mapping, alias_names=('alias1', 'alias2'))
     connection.indices.create.assert_called_once_with(
         index='test-index',
@@ -119,11 +120,9 @@ def test_creates_index(monkeypatch, mock_es_client):
                 'alias2': {},
             },
             'mappings': {
-                'test-mapping': {
-                    'properties': {
-                        'test-field': {
-                            'type': 'keyword',
-                        },
+                'properties': {
+                    'test-field': {
+                        'type': 'keyword',
                     },
                 },
             },
