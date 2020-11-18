@@ -83,6 +83,6 @@ pydocstyle==5.1.1
 gunicorn==20.0.4
 gevent==20.9.0
 mohawk==1.1.0
-requests==2.24.0
+requests==2.25.0
 requests_toolbelt==0.9.1
 sentry_sdk==0.19.2
