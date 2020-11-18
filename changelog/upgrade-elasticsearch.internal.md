@@ -1,1 +1,0 @@
-Update support of ElasticSearch from v6.x to v7.x
