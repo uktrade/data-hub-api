@@ -28,7 +28,7 @@ def test_investment_project_auto_sync_to_es(es_with_signals):
         filter_data={'name': test_name},
     ).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
 
 
 def test_investment_project_auto_updates_to_es(es_with_signals):
@@ -45,7 +45,7 @@ def test_investment_project_auto_updates_to_es(es_with_signals):
         filter_data={'name': new_test_name},
     ).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
 
 
 @pytest.fixture
@@ -136,7 +136,7 @@ def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
         filter_data={'id': project.pk},
     ).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
     assert result.hits[0][field]['dit_team']['id'] == str(adviser.dit_team.id)
     assert result.hits[0][field]['dit_team']['name'] == adviser.dit_team.name
 
@@ -159,6 +159,6 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
         filter_data={'id': team_member.investment_project.pk},
     ).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
     assert result.hits[0]['team_members'][0]['dit_team']['id'] == str(adviser.dit_team.id)
     assert result.hits[0]['team_members'][0]['dit_team']['name'] == adviser.dit_team.name

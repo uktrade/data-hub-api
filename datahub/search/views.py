@@ -137,7 +137,7 @@ class SearchBasicAPIView(APIView):
         results = execute_search_query(query)
 
         response = {
-            'count': results.hits.total,
+            'count': results.hits.total.value,
             'results': [result.to_dict() for result in results.hits],
             'aggregations': [{'count': x['doc_count'], 'entity': x['key']}
                              for x in results.aggregations['count_by_type']['buckets']],
@@ -248,7 +248,7 @@ class SearchAPIView(APIView):
         results = execute_search_query(limited_query)
 
         response = {
-            'count': results.hits.total,
+            'count': results.hits.total.value,
             'results': [x.to_dict() for x in results.hits],
         }
 

@@ -42,7 +42,10 @@ services:
       - POSTGRES_PASSWORD=mi
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    environment:
+      - discovery.type=single-node
+      - http.port=9200
     restart: always
     ports:
       - "9200:9200"

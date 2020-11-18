@@ -1,3 +1,11 @@
+# Data Hub API 36.0.0 (2020-11-18)
+
+
+## Internal changes
+
+- Update support of ElasticSearch from v6.x to v7.x
+
+
 # Data Hub API 35.12.1 (2020-11-16)
 
 
