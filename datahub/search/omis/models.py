@@ -2,7 +2,7 @@ from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 
 
 class Order(BaseESModel):
@@ -103,11 +103,3 @@ class Order(BaseESModel):
         'total_cost.keyword',
         'subtotal_cost.keyword',
     )
-
-    class Meta:
-        """Default document meta data."""
-
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE

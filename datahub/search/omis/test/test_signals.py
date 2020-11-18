@@ -6,7 +6,6 @@ from datahub.omis.order.test.factories import (
     OrderSubscriberFactory,
     OrderWithOpenQuoteFactory,
 )
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.omis import OrderSearchApp
 
 pytestmark = pytest.mark.django_db
@@ -19,7 +18,6 @@ def test_creating_order_syncs_to_es(es_with_signals):
 
     assert es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
@@ -34,7 +32,6 @@ def test_updating_order_updates_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
     assert result['_source']['description'] == new_description
@@ -50,7 +47,6 @@ def test_accepting_quote_updates_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
     assert not result['_source']['payment_due_date']
@@ -60,7 +56,6 @@ def test_accepting_quote_updates_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
     assert result['_source']['payment_due_date'] == order.invoice.payment_due_date.isoformat()
@@ -77,7 +72,6 @@ def test_adding_subscribers_syncs_order_to_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
@@ -99,7 +93,6 @@ def test_removing_subscribers_syncs_order_to_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
@@ -120,7 +113,6 @@ def test_adding_assignees_syncs_order_to_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
@@ -142,7 +134,6 @@ def test_removing_assignees_syncs_order_to_es(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
 
@@ -162,7 +153,6 @@ def test_updating_company_name_updates_orders(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
     assert result['_source']['company']['name'] == new_company_name
@@ -182,7 +172,6 @@ def test_updating_contact_name_updates_orders(es_with_signals):
 
     result = es_with_signals.get(
         index=OrderSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=order.pk,
     )
     assert result['_source']['contact'] == {

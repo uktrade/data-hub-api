@@ -1,7 +1,7 @@
 from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import fields
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 
 
 class ESSimpleModel(BaseESModel):
@@ -20,11 +20,3 @@ class ESSimpleModel(BaseESModel):
         'name',
         'name.trigram',
     )
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Meta:
-        """Default document meta data."""
-
-        doc_type = DEFAULT_MAPPING_TYPE

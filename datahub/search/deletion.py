@@ -7,7 +7,6 @@ from django.db.models.signals import post_delete, pre_delete
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.elasticsearch import bulk, get_client
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.signals import SignalReceiver
 
 
@@ -22,7 +21,7 @@ def delete_documents(index, es_docs):
     :raises DataHubException: in case of non 404 errors
     """
     delete_actions = (
-        _create_delete_action(index, es_doc['_type'], es_doc['_id'])
+        _create_delete_action(index, es_doc['_id'])
         for es_doc in es_docs
     )
 
@@ -41,11 +40,10 @@ def delete_documents(index, es_docs):
         )
 
 
-def _create_delete_action(_index, _type, _id):
+def _create_delete_action(_index, _id):
     return {
         '_op_type': 'delete',
         '_index': _index,
-        '_type': _type,
         '_id': _id,
     }
 
@@ -167,6 +165,5 @@ def delete_document(model, document_id, indices=None, ignore_404_responses=True)
         client.delete(
             index=index,
             id=document_id,
-            doc_type=DEFAULT_MAPPING_TYPE,
             ignore=ignored_response_statuses,
         )
