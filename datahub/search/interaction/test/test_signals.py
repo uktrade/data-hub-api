@@ -7,7 +7,6 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
 )
 from datahub.search.interaction.apps import InteractionSearchApp
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 
 pytestmark = pytest.mark.django_db
 
@@ -19,7 +18,6 @@ def test_new_interaction_synced(es_with_signals):
 
     assert es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
 
@@ -34,7 +32,6 @@ def test_updated_interaction_synced(es_with_signals):
 
     result = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     assert result['_source']['subject'] == new_subject
@@ -50,7 +47,6 @@ def test_deleted_interaction_deleted_from_es(es_with_signals):
 
     assert es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
 
@@ -61,7 +57,6 @@ def test_deleted_interaction_deleted_from_es(es_with_signals):
     with pytest.raises(NotFoundError):
         assert es_with_signals.get(
             index=InteractionSearchApp.es_model.get_write_index(),
-            doc_type=DEFAULT_MAPPING_TYPE,
             id=interaction_id,
         ) is None
 
@@ -73,7 +68,6 @@ def test_interaction_synced_when_dit_participant_added(es_with_signals):
 
     doc = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     assert doc['_source']['dit_participants'] == []
@@ -83,7 +77,6 @@ def test_interaction_synced_when_dit_participant_added(es_with_signals):
 
     updated_doc = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     actual_dit_participants = updated_doc['_source']['dit_participants']
@@ -102,7 +95,6 @@ def test_updating_company_name_updates_interaction(es_with_signals):
 
     result = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     assert result['_source']['company']['name'] == new_company_name
@@ -121,7 +113,6 @@ def test_updating_contact_name_updates_interaction(es_with_signals):
 
     result = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     assert result['_source']['contacts'][0] == {
@@ -145,7 +136,6 @@ def test_updating_project_name_updates_interaction(es_with_signals):
 
     result = es_with_signals.get(
         index=InteractionSearchApp.es_model.get_write_index(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=interaction.pk,
     )
     assert result['_source']['investment_project']['name'] == new_project_name

@@ -3,7 +3,6 @@ import inspect
 import pytest
 from django.utils.functional import cached_property
 
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 from datahub.search.utils import get_model_field_names
@@ -31,7 +30,6 @@ class TestBaseESModel:
 
         expected_doc = {
             '_id': obj.pk,
-            '_type': DEFAULT_MAPPING_TYPE,
             **({'_index': ESSimpleModel.get_write_alias()} if include_index else {}),
             **({'_source': source} if include_source else {}),
         }

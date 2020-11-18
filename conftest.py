@@ -399,6 +399,15 @@ def mock_es_client(monkeypatch):
 
 
 @pytest.fixture
+def mock_connection_for_create_index(monkeypatch):
+    """Patches the Elasticsearch library so that a mock client is used."""
+    mock_client = Mock()
+    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
+    monkeypatch.setattr('elasticsearch_dsl.index.get_connection', mock_client)
+    yield mock_client
+
+
+@pytest.fixture
 def dnb_response_uk():
     """
     Returns a UK-based DNB company.

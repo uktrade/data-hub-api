@@ -60,13 +60,11 @@ class TestResyncAfterMigrate:
                 '_index': 'index2',
                 '_id': 1,
                 '_op_type': 'delete',
-                '_type': 'test-type',
             },
             {
                 '_index': 'index2',
                 '_id': 2,
                 '_op_type': 'delete',
-                '_type': 'test-type',
             },
         ]
 
