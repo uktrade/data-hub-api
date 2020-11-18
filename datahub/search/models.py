@@ -17,9 +17,6 @@ from datahub.search.utils import get_model_non_mapped_field_names, serialise_map
 
 logger = getLogger(__name__)
 
-# TODO: Remove this and all usages once we have upgraded to Elasticsearch 7
-DEFAULT_MAPPING_TYPE = '_doc'
-
 
 class BaseESModel(Document):
     """Helps convert Django models to dictionaries."""
@@ -149,7 +146,6 @@ class BaseESModel(Document):
         aren't required (e.g. when using `datahub.search.deletion.delete_documents()`).
         """
         doc = {
-            '_type': DEFAULT_MAPPING_TYPE,
             '_id': db_object.pk,
         }
 

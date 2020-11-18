@@ -5,7 +5,6 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.search.company.apps import CompanySearchApp
 from datahub.search.company.models import Company
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.query_builder import get_basic_search_query
 from datahub.search.test.utils import get_documents_by_ids
 
@@ -22,7 +21,7 @@ def test_company_auto_sync_to_es(es_with_signals):
 
     result = get_basic_search_query(Company, test_name).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
 
 
 def test_company_auto_updates_to_es(es_with_signals):
@@ -38,7 +37,7 @@ def test_company_auto_updates_to_es(es_with_signals):
 
     result = get_basic_search_query(Company, new_test_name).execute()
 
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
     assert result.hits[0].id == str(company.id)
 
 
@@ -103,7 +102,6 @@ def test_adding_interaction_updates_company(es_with_signals):
 
     doc = es_with_signals.get(
         index=CompanySearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=company.pk,
     )
     assert doc['_source']['name'] == test_name
@@ -118,7 +116,6 @@ def test_adding_interaction_updates_company(es_with_signals):
 
     updated_doc = es_with_signals.get(
         index=CompanySearchApp.es_model.get_read_alias(),
-        doc_type=DEFAULT_MAPPING_TYPE,
         id=company.pk,
     )
     assert updated_doc['_source']['name'] == test_name

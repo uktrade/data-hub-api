@@ -6,27 +6,17 @@ from django.conf import settings
 from datahub.core.exceptions import DataHubException
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
-from datahub.search.models import BaseESModel, DEFAULT_MAPPING_TYPE
+from datahub.search.models import BaseESModel
 from datahub.search.test.utils import create_mock_search_app
 
 SAMPLE_APP_NAME = 'sample'
-
-
-class SampleModel(BaseESModel):
-    """Sample (dummy) search model."""
-
-    class Meta:
-        doc_type = DEFAULT_MAPPING_TYPE
-
-    class Index:
-        doc_type = DEFAULT_MAPPING_TYPE
 
 
 class SampleSearchApp(SearchApp):
     """Sample (dummy) search app."""
 
     name = SAMPLE_APP_NAME
-    es_model = SampleModel
+    es_model = BaseESModel
 
 
 @pytest.fixture
@@ -47,14 +37,18 @@ def test_migrate_apps(monkeypatch):
     assert {args[0][0] for args in migrate_app_mock.call_args_list} == apps
 
 
-def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client, sample_search_app):
+def test_migrate_app_with_uninitialised_app(
+    monkeypatch,
+    mock_connection_for_create_index,
+    sample_search_app,
+):
     """
     Test that migrate_app() creates an index and schedules an initial sync for an
     uninitialised search app.
     """
     sync_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.sync_model', sync_model_task_mock)
-    mock_client = mock_es_client.return_value
+    mock_client = mock_connection_for_create_index.return_value
     mock_client.indices.exists_alias.side_effect = [
         # No alias at first attempt
         False,
@@ -65,7 +59,7 @@ def test_migrate_app_with_uninitialised_app(monkeypatch, mock_es_client, sample_
     migrate_app(sample_search_app)
 
     expected_index_name = (
-        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-091a1c3a42f7e9fb3ff69b49a7b45881'
+        f'{settings.ES_INDEX_PREFIX}-{SAMPLE_APP_NAME}-e8f30732b3051b52d19a699b069110d6'
     )
     assert mock_client.indices.create.call_args_list == [
         call(index=expected_index_name, body=ANY),

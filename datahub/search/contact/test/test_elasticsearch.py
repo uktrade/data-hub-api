@@ -2,7 +2,6 @@ from elasticsearch_dsl import Mapping
 
 from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.models import Contact as ESContact
-from datahub.search.models import DEFAULT_MAPPING_TYPE
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entities_query,
@@ -14,247 +13,244 @@ def test_mapping(es):
     """Test the ES mapping for a contact."""
     mapping = Mapping.from_es(
         ContactSearchApp.es_model.get_write_index(),
-        DEFAULT_MAPPING_TYPE,
     )
 
     assert mapping.to_dict() == {
-        DEFAULT_MAPPING_TYPE: {
-            'properties': {
-                '_document_type': {
-                    'type': 'keyword',
-                },
-                'address_1': {'type': 'text'},
-                'address_2': {'type': 'text'},
-                'address_country': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
+        'properties': {
+            '_document_type': {
+                'type': 'keyword',
+            },
+            'address_1': {'type': 'text'},
+            'address_2': {'type': 'text'},
+            'address_country': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
                     },
-                    'type': 'object',
                 },
-                'address_county': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
-                },
-                'address_postcode': {'type': 'text'},
-                'address_same_as_company': {'type': 'boolean'},
-                'address_town': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
-                },
-                'adviser': {
-                    'properties': {
-                        'first_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'id': {'type': 'keyword'},
-                        'last_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
+                'type': 'object',
+            },
+            'address_county': {
+                'normalizer': 'lowercase_asciifolding_normalizer',
+                'type': 'keyword',
+            },
+            'address_postcode': {'type': 'text'},
+            'address_same_as_company': {'type': 'boolean'},
+            'address_town': {
+                'normalizer': 'lowercase_asciifolding_normalizer',
+                'type': 'keyword',
+            },
+            'adviser': {
+                'properties': {
+                    'first_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'id': {'type': 'keyword'},
+                    'last_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'name': {
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
                             },
                         },
                     },
-                    'type': 'object',
                 },
-                'archived': {'type': 'boolean'},
-                'archived_by': {
-                    'properties': {
-                        'first_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'id': {'type': 'keyword'},
-                        'last_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
+                'type': 'object',
+            },
+            'archived': {'type': 'boolean'},
+            'archived_by': {
+                'properties': {
+                    'first_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'id': {'type': 'keyword'},
+                    'last_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'name': {
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
                             },
                         },
                     },
-                    'type': 'object',
                 },
-                'archived_on': {'type': 'date'},
-                'archived_reason': {'type': 'text'},
-                'company': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
+                'type': 'object',
+            },
+            'archived_on': {'type': 'date'},
+            'archived_reason': {'type': 'text'},
+            'company': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
                             },
-                        },
-                        'trading_names': {
-                            'type': 'text',
-                            'fields': {
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
                             },
                         },
                     },
-                    'type': 'object',
-                },
-                'company_sector': {
-                    'properties': {
-                        'ancestors': {
-                            'properties': {'id': {'type': 'keyword'}},
-                            'type': 'object',
-                        },
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                    },
-                    'type': 'object',
-                },
-                'company_uk_region': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                    },
-                    'type': 'object',
-                },
-                'created_by': {
-                    'properties': {
-                        'dit_team': {
-                            'properties': {
-                                'id': {'type': 'keyword'},
-                                'name': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                            },
-                            'type': 'object',
-                        },
-                        'first_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'id': {'type': 'keyword'},
-                        'last_name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'name': {
-                            'type': 'text',
-                            'fields': {
-                                'keyword': {
-                                    'normalizer': 'lowercase_asciifolding_normalizer',
-                                    'type': 'keyword',
-                                },
-                                'trigram': {
-                                    'analyzer': 'trigram_analyzer',
-                                    'type': 'text',
-                                },
+                    'trading_names': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
                             },
                         },
                     },
-                    'type': 'object',
                 },
-                'created_on': {'type': 'date'},
-                'email': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
+                'type': 'object',
+            },
+            'company_sector': {
+                'properties': {
+                    'ancestors': {
+                        'properties': {'id': {'type': 'keyword'}},
+                        'type': 'object',
+                    },
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
                 },
-                'email_alternative': {'type': 'text'},
-                'first_name': {
-                    'type': 'text',
-                    'fields': {
-                        'keyword': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
+                'type': 'object',
+            },
+            'company_uk_region': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                },
+                'type': 'object',
+            },
+            'created_by': {
+                'properties': {
+                    'dit_team': {
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                        },
+                        'type': 'object',
+                    },
+                    'first_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'id': {'type': 'keyword'},
+                    'last_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'name': {
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
+                            },
                         },
                     },
                 },
-                'id': {'type': 'keyword'},
-                'job_title': {
-                    'normalizer': 'lowercase_asciifolding_normalizer',
-                    'type': 'keyword',
-                },
-                'last_name': {
-                    'type': 'text',
-                    'fields': {
-                        'keyword': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
+                'type': 'object',
+            },
+            'created_on': {'type': 'date'},
+            'email': {
+                'normalizer': 'lowercase_asciifolding_normalizer',
+                'type': 'keyword',
+            },
+            'email_alternative': {'type': 'text'},
+            'first_name': {
+                'type': 'text',
+                'fields': {
+                    'keyword': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
                     },
-                },
-                'modified_on': {'type': 'date'},
-                'name': {
-                    'type': 'text',
-                    'fields': {
-                        'keyword': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                        'trigram': {
-                            'analyzer': 'trigram_analyzer',
-                            'type': 'text',
-                        },
-                    },
-                },
-                'notes': {
-                    'analyzer': 'english_analyzer',
-                    'type': 'text',
-                },
-                'primary': {'type': 'boolean'},
-                'telephone_alternative': {'type': 'text'},
-                'telephone_countrycode': {'type': 'keyword'},
-                'telephone_number': {'type': 'keyword'},
-                'title': {
-                    'properties': {
-                        'id': {'type': 'keyword'},
-                        'name': {
-                            'normalizer': 'lowercase_asciifolding_normalizer',
-                            'type': 'keyword',
-                        },
-                    },
-                    'type': 'object',
                 },
             },
-            'dynamic': 'false',
+            'id': {'type': 'keyword'},
+            'job_title': {
+                'normalizer': 'lowercase_asciifolding_normalizer',
+                'type': 'keyword',
+            },
+            'last_name': {
+                'type': 'text',
+                'fields': {
+                    'keyword': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                },
+            },
+            'modified_on': {'type': 'date'},
+            'name': {
+                'type': 'text',
+                'fields': {
+                    'keyword': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'trigram': {
+                        'analyzer': 'trigram_analyzer',
+                        'type': 'text',
+                    },
+                },
+            },
+            'notes': {
+                'analyzer': 'english_analyzer',
+                'type': 'text',
+            },
+            'primary': {'type': 'boolean'},
+            'telephone_alternative': {'type': 'text'},
+            'telephone_countrycode': {'type': 'keyword'},
+            'telephone_number': {'type': 'keyword'},
+            'title': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                },
+                'type': 'object',
+            },
         },
+        'dynamic': 'false',
     }
 
 
