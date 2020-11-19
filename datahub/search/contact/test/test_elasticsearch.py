@@ -452,6 +452,7 @@ def test_get_limited_search_by_entity_query():
             '_score',
             'id',
         ],
+        'track_total_hits': True,
         'from': 5,
         'size': 5,
     }

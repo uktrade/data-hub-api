@@ -348,6 +348,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                     },
                 },
                 'sort': ['_score', 'id'],
+                'track_total_hits': True,
             },
         ),
 
@@ -452,6 +453,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                     },
                     'id',
                 ],
+                'track_total_hits': True,
                 '_source': {
                     'includes': ['id'],
                     'excludes': ['name'],
@@ -562,6 +564,7 @@ def test_get_search_by_multiple_entities_query():
         'sort': [
             '_score', 'id',
         ],
+        'track_total_hits': True,
     }
     assert query.to_dict() == expected_query
     assert query._index == [
