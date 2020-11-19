@@ -1,3 +1,11 @@
+# Data Hub API 36.0.1 (2020-11-19)
+
+
+## Features
+
+- Add `track_total_hits` flag is set to `True` for all basic searches. This will ensure that the `total.hits.value` returns the accurate total value rather than the default limit set to `10000`.
+
+
 # Data Hub API 36.0.0 (2020-11-18)
 
 

@@ -349,6 +349,7 @@ def test_get_basic_search_query():
             '_score',
             'id',
         ],
+        'track_total_hits': True,
     }
 
 
