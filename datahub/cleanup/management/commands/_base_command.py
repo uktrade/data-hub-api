@@ -21,6 +21,7 @@ class BaseCleanupCommand(BaseCommand):
 
     CONFIGS = None
     requires_migrations_checks = True
+    model_name = None
 
     def __repr__(self):
         """Python representation (used for parametrised tests)."""
@@ -29,11 +30,12 @@ class BaseCleanupCommand(BaseCommand):
 
     def add_arguments(self, parser):
         """Define extra arguments."""
-        parser.add_argument(
-            'model_label',
-            choices=self.CONFIGS,
-            help='Model to clean up.',
-        )
+        if not self.model_name:
+            parser.add_argument(
+                'model_label',
+                choices=self.CONFIGS,
+                help='Model to clean up.',
+            )
         simulation_group = parser.add_mutually_exclusive_group()
         simulation_group.add_argument(
             '--simulate',
@@ -51,7 +53,7 @@ class BaseCleanupCommand(BaseCommand):
         """Main logic for the actual command."""
         is_simulation = options['simulate']
         only_print_queries = options['only_print_queries']
-        model_name = options['model_label']
+        model_name = self.model_name or options['model_label']
 
         model = apps.get_model(model_name)
         qs = self._get_query(model)
