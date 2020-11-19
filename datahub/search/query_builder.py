@@ -68,7 +68,7 @@ def get_basic_search_query(
     ).source(
         excludes=fields_to_exclude,
     ).extra(
-        track_total_hits=True
+        track_total_hits=True,
     )
 
     search.aggs.bucket(
