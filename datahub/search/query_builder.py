@@ -109,6 +109,8 @@ def get_search_by_entities_query(
         ],
     ).query(
         Bool(must=query),
+    ).extra(
+        track_total_hits=True,
     )
 
     permission_query = _build_entity_permission_query(permission_filters)
