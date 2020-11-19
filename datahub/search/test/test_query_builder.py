@@ -661,6 +661,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
             '_score',
             'id',
         ],
+        'track_total_hits': True,
         'from': 2,
         'size': 3,
     }
