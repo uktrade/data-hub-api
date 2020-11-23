@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.16.20
+boto3==1.16.23
 
 notifications-python-client==5.7.0
 
@@ -41,7 +41,7 @@ elasticsearch==7.10.0
 elasticsearch-dsl==7.3.0
 
 # ES APM
-elastic-apm==5.9.0
+elastic-apm==5.10.0
 
 # Celery
 celery[redis]==4.4.7
@@ -63,8 +63,8 @@ pip-tools==4.5.1
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==19.2.0
-watchdog[watchmedo]==0.10.3
-pre-commit==2.8.2
+pre-commit==2.9.0
+watchdog[watchmedo]==0.10.4
 
 # Code static analysis
 flake8==3.8.4
@@ -85,4 +85,4 @@ gevent==20.9.0
 mohawk==1.1.0
 requests==2.25.0
 requests_toolbelt==0.9.1
-sentry_sdk==0.19.3
+sentry_sdk==0.19.4
