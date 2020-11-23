@@ -88,7 +88,7 @@ pickleshare==0.7.5        # via ipython
 pip-tools==4.5.1          # via -r requirements.in
 piprot==0.9.11            # via -r requirements.in
 pluggy==0.13.1            # via pytest
-pre-commit==2.8.2         # via -r requirements.in
+pre-commit==2.9.0         # via -r requirements.in
 prompt-toolkit==3.0.5     # via ipython
 psycogreen==1.0.2         # via -r requirements.in
 psycopg2==2.8.6           # via -r requirements.in
