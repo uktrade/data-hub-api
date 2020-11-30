@@ -46,7 +46,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         response = self.client.get(change_url)
         assert update_url in response.rendered_content
         response = self.client.get(update_url)
-        response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_200_OK
 
     def test_get_view_permission_only(self):
         """
