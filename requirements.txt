@@ -14,8 +14,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.16.23            # via -r requirements.in
-botocore==1.19.23         # via boto3, s3transfer
+boto3==1.16.25            # via -r requirements.in
+botocore==1.19.25         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.6.20        # via elastic-apm, elasticsearch, requests, sentry-sdk
 cfgv==3.1.0               # via pre-commit
@@ -26,7 +26,7 @@ decorator==4.4.2          # via ipython, traitlets
 distlib==0.3.1            # via virtualenv
 django-debug-toolbar==3.1.1  # via -r requirements.in
 django-environ==0.4.5     # via -r requirements.in
-django-extensions==3.0.9  # via -r requirements.in
+django-extensions==3.1.0  # via -r requirements.in
 django-filter==2.4.0      # via -r requirements.in
 django-js-asset==1.2.2    # via django-mptt
 django-mptt==0.11.0       # via -r requirements.in
@@ -46,11 +46,11 @@ filelock==3.0.12          # via virtualenv
 flake8-blind-except==0.1.1  # via -r requirements.in
 flake8-bugbear==20.1.4    # via -r requirements.in
 flake8-commas==2.0.0      # via -r requirements.in
-flake8-debugger==3.2.1    # via -r requirements.in
+flake8-debugger==4.0.0    # via -r requirements.in
 flake8-docstrings==1.5.0  # via -r requirements.in
 flake8-import-order==0.18.1  # via -r requirements.in
 flake8-polyfill==1.0.2    # via pep8-naming
-flake8-print==3.1.4       # via -r requirements.in
+flake8-print==4.0.0       # via -r requirements.in
 flake8-quotes==3.2.0      # via -r requirements.in
 flake8-string-format==0.3.0  # via -r requirements.in
 flake8==3.8.4             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
@@ -64,14 +64,13 @@ identify==1.4.21          # via pre-commit
 idna==2.10                # via requests, yarl
 incremental==17.5.0       # via towncrier
 iniconfig==1.0.1          # via pytest
-ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.19.0           # via -r requirements.in
 jedi==0.17.1              # via ipython
 jinja2==2.11.2            # via towncrier
 jmespath==0.10.0          # via boto3, botocore
 kombu==4.6.11             # via -r requirements.in, celery
-mail-parser==3.12.0       # via -r requirements.in
+mail-parser==3.14.0       # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
@@ -88,7 +87,7 @@ pickleshare==0.7.5        # via ipython
 pip-tools==4.5.1          # via -r requirements.in
 piprot==0.9.11            # via -r requirements.in
 pluggy==0.13.1            # via pytest
-pre-commit==2.9.0         # via -r requirements.in
+pre-commit==2.9.2         # via -r requirements.in
 prompt-toolkit==3.0.5     # via ipython
 psycogreen==1.0.2         # via -r requirements.in
 psycopg2==2.8.6           # via -r requirements.in
@@ -117,7 +116,7 @@ s3transfer==0.3.3         # via boto3
 semantic_version==2.8.5   # via -r requirements.in
 sentry_sdk==0.19.4        # via -r requirements.in
 simplejson==3.17.0        # via mail-parser
-six==1.14.0               # via django-pglocks, elasticsearch-dsl, flake8-print, mail-parser, mohawk, packaging, pip-tools, piprot, python-dateutil, requests-mock, traitlets, virtualenv
+six==1.14.0               # via django-pglocks, elasticsearch-dsl, flake8-debugger, flake8-print, mail-parser, mohawk, packaging, pip-tools, piprot, python-dateutil, requests-mock, traitlets, virtualenv
 slackclient==2.9.3        # via -r requirements.in
 snowballstemmer==2.0.0    # via pydocstyle
 sqlparse==0.3.1           # via django, django-debug-toolbar
