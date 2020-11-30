@@ -64,14 +64,13 @@ identify==1.4.21          # via pre-commit
 idna==2.10                # via requests, yarl
 incremental==17.5.0       # via towncrier
 iniconfig==1.0.1          # via pytest
-ipaddress==1.0.23         # via mail-parser
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.19.0           # via -r requirements.in
 jedi==0.17.1              # via ipython
 jinja2==2.11.2            # via towncrier
 jmespath==0.10.0          # via boto3, botocore
 kombu==4.6.11             # via -r requirements.in, celery
-mail-parser==3.12.0       # via -r requirements.in
+mail-parser==3.14.0       # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
