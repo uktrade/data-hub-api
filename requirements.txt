@@ -50,7 +50,7 @@ flake8-debugger==3.2.1    # via -r requirements.in
 flake8-docstrings==1.5.0  # via -r requirements.in
 flake8-import-order==0.18.1  # via -r requirements.in
 flake8-polyfill==1.0.2    # via pep8-naming
-flake8-print==3.1.4       # via -r requirements.in
+flake8-print==4.0.0       # via -r requirements.in
 flake8-quotes==3.2.0      # via -r requirements.in
 flake8-string-format==0.3.0  # via -r requirements.in
 flake8==3.8.4             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
