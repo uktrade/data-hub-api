@@ -1,5 +1,7 @@
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import OuterRef, Subquery
 
+from datahub.core.constants import InvestmentProjectStage as Stage
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_empty_string_if_null_expression,
@@ -11,7 +13,10 @@ from datahub.dataset.core.views import BaseDatasetView
 from datahub.dataset.investment_project.pagination import (
     InvestmentProjectActivityDatasetViewCursorPagination,
 )
-from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.models import (
+    InvestmentProject,
+    InvestmentProjectStageLog,
+)
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.investment.project.report.spi import get_spi_report_queryset
 from datahub.metadata.query_utils import get_sector_name_subquery
@@ -54,6 +59,11 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             investor_company_sector=get_sector_name_subquery('investor_company__sector'),
             level_of_involvement_name=get_empty_string_if_null_expression(
                 'level_of_involvement__name',
+            ),
+            project_first_moved_to_won=Subquery(
+                InvestmentProjectStageLog.objects.filter(
+                    investment_project_id=OuterRef('pk'),
+                    stage_id=Stage.won.value.id).order_by('created_on').values('created_on')[:1],
             ),
             project_reference=get_project_code_expression(),
             strategic_driver_names=get_array_agg_subquery(
@@ -119,6 +129,7 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'other_business_activity',
             'project_arrived_in_triage_on',
             'project_assurance_adviser_id',
+            'project_first_moved_to_won',
             'project_manager_id',
             'project_reference',
             'proposal_deadline',
