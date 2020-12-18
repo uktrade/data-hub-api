@@ -1,3 +1,11 @@
+# Data Hub API 36.1.0 (2020-12-17)
+
+
+## Features
+
+- **Investment** A new field `project_won_date` is added to `InvestmentProjectsDatasetView`.
+
+
 # Data Hub API 36.0.2 (2020-11-19)
 
 

@@ -85,7 +85,7 @@ def propositions(ist_adviser):
     yield items
 
 
-def get_expected_data_from_project(project):
+def get_expected_data_from_project(project, won_date=None):
     """Returns expected dictionary based on given project"""
     return {
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
@@ -161,6 +161,7 @@ def get_expected_data_from_project(project):
         'project_arrived_in_triage_on': format_date_or_datetime(
             project.project_arrived_in_triage_on),
         'project_assurance_adviser_id': str_or_none(project.project_assurance_adviser_id),
+        'project_first_moved_to_won': won_date,
         'project_manager_id': str_or_none(project.project_manager_id),
         'project_reference': project.project_code,
         'proposal_deadline': format_date_or_datetime(project.proposal_deadline),
@@ -209,25 +210,29 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
     factory = InvestmentProjectFactory
 
     @pytest.mark.parametrize(
-        'project_factory',
+        'project_factory,won_date',
         (
-            InvestmentProjectFactory,
-            FDIInvestmentProjectFactory,
-            AssignPMInvestmentProjectFactory,
-            ActiveInvestmentProjectFactory,
-            VerifyWinInvestmentProjectFactory,
-            WonInvestmentProjectFactory,
+            (InvestmentProjectFactory, None),
+            (FDIInvestmentProjectFactory, None),
+            (AssignPMInvestmentProjectFactory, None),
+            (ActiveInvestmentProjectFactory, None),
+            (VerifyWinInvestmentProjectFactory, None),
+            (WonInvestmentProjectFactory, '2017-01-01T00:00:00Z'),
         ),
     )
-    def test_success(self, data_flow_api_client, project_factory):
+    def test_success(self, data_flow_api_client, project_factory, won_date):
         """Test that endpoint returns with expected data for a single project"""
-        project = project_factory()
+        with freeze_time('2017-01-01 00:00:00'):
+            project = project_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 1
         result = response_results[0]
-        expected_result = get_expected_data_from_project(project)
+        expected_result = get_expected_data_from_project(
+            project,
+            won_date=won_date,
+        )
         assert result == expected_result
 
     def test_with_team_members(self, data_flow_api_client):
