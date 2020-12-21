@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.16.35
+boto3==1.16.40
 
 notifications-python-client==5.7.0
 
@@ -49,7 +49,7 @@ billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of br
 kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==6.2.0
+pytest==6.2.1
 pytest-django==4.1.0
 pytest-cov==2.10.1
 pytest-xdist==2.2.0
@@ -84,6 +84,6 @@ pydocstyle==5.1.1
 gunicorn==20.0.4
 gevent==20.9.0
 mohawk==1.1.0
-requests==2.25.0
+requests==2.25.1
 requests_toolbelt==0.9.1
 sentry_sdk==0.19.5
