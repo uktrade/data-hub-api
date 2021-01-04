@@ -14,8 +14,8 @@ async-timeout==3.0.1      # via aiohttp
 attrs==19.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.16.40            # via -r requirements.in
-botocore==1.19.40         # via boto3, s3transfer
+boto3==1.16.47            # via -r requirements.in
+botocore==1.19.47         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.6.20        # via elastic-apm, elasticsearch, requests, sentry-sdk
 cfgv==3.1.0               # via pre-commit
@@ -40,7 +40,7 @@ elastic-apm==5.10.0       # via -r requirements.in
 elasticsearch-dsl==7.3.0  # via -r requirements.in
 elasticsearch==7.10.1     # via -r requirements.in, elasticsearch-dsl
 execnet==1.7.1            # via pytest-xdist
-factory-boy==3.1.0        # via -r requirements.in
+factory-boy==3.2.0        # via -r requirements.in
 faker==4.1.1              # via factory-boy
 filelock==3.0.12          # via virtualenv
 flake8-blind-except==0.1.1  # via -r requirements.in
@@ -56,7 +56,7 @@ flake8-string-format==0.3.0  # via -r requirements.in
 flake8==3.8.4             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
 freezegun==1.0.0          # via -r requirements.in
 future==0.18.2            # via notifications-python-client
-gevent==20.9.0            # via -r requirements.in
+gevent==20.12.1           # via -r requirements.in
 greenlet==0.4.17          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
 icalendar==4.0.7          # via -r requirements.in
@@ -77,7 +77,7 @@ mohawk==1.1.0             # via -r requirements.in
 monotonic==1.5            # via notifications-python-client
 multidict==4.7.6          # via aiohttp, yarl
 nodeenv==1.4.0            # via pre-commit
-notifications-python-client==5.7.0  # via -r requirements.in
+notifications-python-client==5.7.1  # via -r requirements.in
 packaging==20.4           # via pytest
 parso==0.7.0              # via jedi
 pep8-naming==0.11.1       # via -r requirements.in
