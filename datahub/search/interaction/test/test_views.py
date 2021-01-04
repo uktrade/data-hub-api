@@ -48,7 +48,11 @@ from datahub.investment.project.test.factories import ActiveInvestmentProjectFac
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.interaction import InteractionSearchApp
-from datahub.search.interaction.views import SearchInteractionExportAPIView
+from datahub.search.interaction.views import (
+    SearchInteractionExportAPIView,
+    SearchInteractionPolicyFeedbackExportAPIView,
+)
+
 
 pytestmark = [
     pytest.mark.django_db,
@@ -1080,6 +1084,167 @@ class TestInteractionExportView(APITestMixin):
 
         assert actual_row_data == format_csv_data(expected_row_data)
 
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            (None, '-date'),
+            ('date', 'date'),
+            ('company.name', 'company__name'),
+        ),
+    )
+    def test_policy_feedback_export(
+        self,
+        es_with_collector,
+        request_sortby,
+        orm_ordering,
+    ):
+        """
+        Test export of interaction policy feedback
+        """
+        # Faker generates job titles containing commas which complicates comparisons,
+        # so all contact job titles are explicitly set
+        company = CompanyFactory()
+        interaction = CompanyInteractionFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Engineer'),
+                ContactFactory(company=company, job_title=None),
+                ContactFactory(company=company, job_title=''),
+            ],
+        )
+        InteractionDITParticipantFactory.create_batch(2, interaction=interaction)
+        InteractionDITParticipantFactory(interaction=interaction, team=None)
+        InteractionDITParticipantFactory(
+            interaction=interaction,
+            adviser=None,
+            team=factory.SubFactory(TeamFactory),
+        )
+        EventServiceDeliveryFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Managing director'),
+            ],
+        )
+        InvestmentProjectInteractionFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Exports manager'),
+            ],
+        )
+        ServiceDeliveryFactory(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Sales director'),
+            ],
+        )
+        CompanyInteractionFactoryWithPolicyFeedback(
+            company=company,
+            contacts=[
+                ContactFactory(company=company, job_title='Business development manager'),
+            ],
+            policy_areas=PolicyArea.objects.order_by('?')[:2],
+            policy_issue_types=PolicyIssueType.objects.order_by('?')[:2],
+        )
+
+        es_with_collector.flush_and_refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        url = reverse('api-v3:search:interaction-policy-feedback')
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
+        )
+        sorted_interactions = Interaction.objects.order_by(
+            orm_ordering,
+            'pk',
+        )
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(
+            SearchInteractionPolicyFeedbackExportAPIView.field_titles.values(),
+        )
+
+        expected_row_data = [
+            {
+                'Date': interaction.date,
+                'Created date': interaction.created_on,
+                'Modified date': interaction.modified_on,
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
+                        f'/{interaction.pk}',
+                'Service': get_attr_or_none(interaction, 'service.name'),
+                'Subject': interaction.subject,
+                'Company': get_attr_or_none(interaction, 'company.name'),
+                'Parent': get_attr_or_none(interaction, 'company.global_headquarters.name'),
+                'Company country': get_attr_or_none(
+                    interaction,
+                    'company.address_country.name',
+                ),
+                'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
+                'One List Tier': get_attr_or_none(interaction, 'company.one_list_tier.name'),
+                'Company sector': get_attr_or_none(interaction, 'company.sector.name'),
+                'Company sector cluster': get_attr_or_none(
+                    interaction,
+                    'company.sector.sector_cluster.name',
+                ),
+                'turnover': get_attr_or_none(interaction, 'company.turnover'),
+                'number_of_employees': get_attr_or_none(
+                    interaction,
+                    'company.number_of_employees',
+                ),
+                'team_names': _format_expected_team_names(interaction),
+                'team_countries': _format_expected_team_countries(interaction),
+                'kind_name': interaction.get_kind_display(),
+                'Communication channel':
+                    get_attr_or_none(interaction, 'communication_channel.name'),
+                'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+                'Policy issue types': join_attr_values(
+                    interaction.policy_issue_types.order_by('name'),
+                ),
+                'Policy areas': join_attr_values(
+                    interaction.policy_areas.order_by('name'),
+                    separator='; ',
+                ),
+                'Policy feedback notes': interaction.policy_feedback_notes,
+                'advisers': _format_expected_advisers(interaction),
+                'adviser_emails': _format_expected_adviser_emails(interaction),
+                'created_by': interaction.created_by.name,
+                'tags_prediction': '',
+                'tag_1': '',
+                'probability_score_tag_1': '',
+                'tag_2': '',
+                'probability_score_tag_2': '',
+                'tag_3': '',
+                'probability_score_tag_3': '',
+                'tag_4': '',
+                'probability_score_tag_4': '',
+                'tag_5': '',
+                'probability_score_tag_5': '',
+
+                'Contacts': _format_expected_contacts(interaction),
+                'Event': get_attr_or_none(interaction, 'event.name'),
+                'Service delivery status': get_attr_or_none(
+                    interaction,
+                    'service_delivery_status.name',
+                ),
+                'Net company receipt': interaction.net_company_receipt,
+            }
+            for interaction in sorted_interactions
+        ]
+
+        # DictReader uses OrderedDicts, we convert them to normal dicts to get better errors
+        # when the assertion fails
+        actual_row_data = [dict(item) for item in reader]
+
+        assert actual_row_data == format_csv_data(expected_row_data)
+
 
 class TestInteractionBasicSearch(APITestMixin):
     """Tests searching for interactions via basic (global) search."""
@@ -1210,6 +1375,25 @@ def _format_expected_contact_name(contact):
     return f'{contact.name}'
 
 
+def _format_expected_team_names(interaction):
+    queryset = interaction.dit_participants.order_by(
+        'team__name',
+    )
+    return ', '.join(
+        dit_participant.team.name for dit_participant in queryset if dit_participant.team
+    )
+
+
+def _format_expected_team_countries(interaction):
+    queryset = interaction.dit_participants.order_by(
+        'team__name',
+    )
+
+    return ', '.join(
+        dit_participant.team.country.name for dit_participant in queryset if dit_participant.team
+    )
+
+
 def _format_expected_advisers(interaction):
     queryset = interaction.dit_participants.order_by(
         get_bracketed_concat_expression(
@@ -1221,6 +1405,14 @@ def _format_expected_advisers(interaction):
 
     return ', '.join(
         _format_expected_adviser_name(dit_participant) for dit_participant in queryset
+    )
+
+
+def _format_expected_adviser_emails(interaction):
+    queryset = interaction.dit_participants.order_by('adviser__email')
+
+    return ', '.join(
+        dit_participant.adviser.email for dit_participant in queryset if dit_participant.adviser
     )
 
 
