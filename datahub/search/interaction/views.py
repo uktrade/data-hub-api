@@ -219,6 +219,7 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'service_name': 'Service',
         'subject': 'Subject',
         'company__name': 'Company',
+        'company_link': 'Company link',
         'company__global_headquarters__name': 'Parent',
         'company__address_country__name': 'Company country',
         'company__uk_region__name': 'Company UK region',
