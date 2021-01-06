@@ -1,3 +1,20 @@
+# Data Hub API 36.2.0 (2021-01-06)
+
+
+## Features
+
+- **Interactions** A new `POST /v3/search/interaction/policy-feedback` endpoint has been added. It returns a CSV file with added columns to
+  match Data Workspace export.
+
+## Bug fixes
+
+- **Interactions** A missing "Company link" column has been added to the policy feedback export.
+
+## Internal changes
+
+- Updated GitHub Actions workflow for publishing releases.
+
+
 # Data Hub API 36.1.0 (2020-12-17)
 
 
