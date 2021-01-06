@@ -1182,6 +1182,9 @@ class TestInteractionExportView(APITestMixin):
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
                 'Company': get_attr_or_none(interaction, 'company.name'),
+                'Company link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                    f'/{interaction.company.pk}',
                 'Parent': get_attr_or_none(interaction, 'company.global_headquarters.name'),
                 'Company country': get_attr_or_none(
                     interaction,
