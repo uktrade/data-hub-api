@@ -1182,10 +1182,10 @@ class TestInteractionExportView(APITestMixin):
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
                 'Company': get_attr_or_none(interaction, 'company.name'),
-                'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}',
-                'Parent': get_attr_or_none(interaction, 'company.global_headquarters.name'),
+                'Parent company': get_attr_or_none(
+                    interaction,
+                    'company.global_headquarters.name',
+                ),
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.address_country.name',
@@ -1218,8 +1218,6 @@ class TestInteractionExportView(APITestMixin):
                 'Policy feedback notes': interaction.policy_feedback_notes,
                 'advisers': _format_expected_advisers(interaction),
                 'adviser_emails': _format_expected_adviser_emails(interaction),
-                'created_by': interaction.created_by.name,
-                'tags_prediction': '',
                 'tag_1': '',
                 'probability_score_tag_1': '',
                 'tag_2': '',
