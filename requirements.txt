@@ -15,11 +15,7 @@ async-timeout==3.0.1      # via aiohttp
 attrs==20.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-<<<<<<< HEAD
-boto3==1.16.47            # via -r requirements.in
-=======
 boto3==1.16.51            # via -r requirements.in
->>>>>>> Bump boto3 from 1.16.47 to 1.16.51
 botocore==1.19.51         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.12.5        # via elastic-apm, elasticsearch, requests, sentry-sdk
@@ -38,7 +34,7 @@ django-mptt==0.11.0       # via -r requirements.in
 django-pglocks==1.0.4     # via -r requirements.in
 django-redis==4.12.1      # via -r requirements.in
 django-reversion==3.0.8   # via -r requirements.in
-django==3.1.4             # via -r requirements.in, django-debug-toolbar, django-filter, django-mptt, django-redis, django-reversion, djangorestframework
+django==3.1.5             # via -r requirements.in, django-debug-toolbar, django-filter, django-mptt, django-redis, django-reversion, djangorestframework
 djangorestframework==3.12.2  # via -r requirements.in
 docopt==0.6.2             # via notifications-python-client
 elastic-apm==5.10.0       # via -r requirements.in
@@ -79,11 +75,11 @@ markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
 monotonic==1.5            # via notifications-python-client
+multidict==4.7.6          # via aiohttp, yarl
 nodeenv==1.5.0            # via pre-commit
+notifications-python-client==6.0.1  # via -r requirements.in
 packaging==20.8           # via pytest
 parso==0.8.1              # via jedi
-multidict==4.7.6          # via aiohttp, yarl
-notifications-python-client==6.0.1  # via -r requirements.in
 pep8-naming==0.11.1       # via -r requirements.in
 pexpect==4.8.0            # via ipython
 pickleshare==0.7.5        # via ipython
