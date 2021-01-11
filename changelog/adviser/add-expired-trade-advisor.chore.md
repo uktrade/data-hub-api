@@ -1,1 +1,0 @@
-An example trade advisor with `is_active` set to `false` has been added to the test fixture data to support `data-hub-frontend` e2e testing.

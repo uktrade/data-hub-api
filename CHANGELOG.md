@@ -1,3 +1,15 @@
+# Data Hub API 36.2.1 (2021-01-11)
+
+
+## Bug fixes
+
+- **Interactions** The columns of interaction business intelligence report have been updated to match Data Workspace report.
+
+## Internal changes
+
+- **Advisers** An example trade advisor with `is_active` set to `false` has been added to the test fixture data to support `data-hub-frontend` e2e testing.
+
+
 # Data Hub API 36.2.0 (2021-01-06)
 
 
