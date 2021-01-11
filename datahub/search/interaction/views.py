@@ -219,8 +219,7 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'service_name': 'Service',
         'subject': 'Subject',
         'company__name': 'Company',
-        'company_link': 'Company link',
-        'company__global_headquarters__name': 'Parent',
+        'company__global_headquarters__name': 'Parent company',
         'company__address_country__name': 'Company country',
         'company__uk_region__name': 'Company UK region',
         'company__one_list_tier__name': 'One List Tier',
@@ -236,12 +235,8 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'policy_issue_type_names': 'Policy issue types',
         'policy_area_names': 'Policy areas',
         'policy_feedback_notes': 'Policy feedback notes',
-
         'adviser_names': 'advisers',
         'adviser_emails': 'adviser_emails',
-        'created_by_name': 'created_by',
-
-        'tags_prediction': 'tags_prediction',
         'tag_1': 'tag_1',
         'probability_score_tag_1': 'probability_score_tag_1',
         'tag_2': 'tag_2',
@@ -252,7 +247,6 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'probability_score_tag_4': 'probability_score_tag_4',
         'tag_5': 'tag_5',
         'probability_score_tag_5': 'probability_score_tag_5',
-
         'contact_names': 'Contacts',
         'event__name': 'Event',
         'service_delivery_status__name': 'Service delivery status',
