@@ -15,7 +15,11 @@ async-timeout==3.0.1      # via aiohttp
 attrs==20.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
+<<<<<<< HEAD
 boto3==1.16.47            # via -r requirements.in
+=======
+boto3==1.16.51            # via -r requirements.in
+>>>>>>> Bump boto3 from 1.16.47 to 1.16.51
 botocore==1.19.51         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.12.5        # via elastic-apm, elasticsearch, requests, sentry-sdk
