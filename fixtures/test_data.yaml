@@ -15,6 +15,15 @@
     dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
 
 - model: company.advisor
+  pk: 95a99736-5402-11eb-ae93-0242ac130002
+  fields:
+    email: Ava.Walsh@example.com
+    first_name: Ava
+    last_name: Walsh
+    is_active: false
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+
+- model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
   fields:
     email: Puck.Head@example.com
