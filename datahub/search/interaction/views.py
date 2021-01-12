@@ -1,5 +1,6 @@
-from django.db.models import CharField, OuterRef, Value
+from django.db.models import CharField, OuterRef, Prefetch, Value
 
+from datahub.company.models import Contact
 from datahub.core.query_utils import (
     get_bracketed_concat_expression,
     get_choices_as_case_expression,
@@ -7,7 +8,7 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
-from datahub.interaction.models import Interaction as DBInteraction
+from datahub.interaction.models import Interaction as DBInteraction, InteractionDITParticipant
 from datahub.metadata.models import Sector
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.query_utils import get_service_name_subquery
@@ -147,7 +148,21 @@ class SearchInteractionPolicyFeedbackExportAPIView(
 ):
     """Filtered interaction policy feedback search export view."""
 
-    queryset = DBInteraction.objects.annotate(
+    queryset = DBInteraction.objects.select_related(
+        'company',
+        'company__global_headquarters',
+        'company__sector',
+    ).prefetch_related(
+        Prefetch('contacts', queryset=Contact.objects.order_by('pk')),
+        'policy_areas',
+        'policy_issue_types',
+        Prefetch(
+            'dit_participants',
+            queryset=(
+                InteractionDITParticipant.objects.order_by('pk').select_related('adviser', 'team')
+            ),
+        ),
+    ).annotate(
         company_link=get_front_end_url_expression('company', 'company__pk'),
         company_sector_name=get_sector_name_subquery('company__sector'),
         company_sector_cluster=Sector.objects.filter(
@@ -219,7 +234,8 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'service_name': 'Service',
         'subject': 'Subject',
         'company__name': 'Company',
-        'company__global_headquarters__name': 'Parent company',
+        'company__global_headquarters__name': 'Parent',
+        'company__global_headquarters__address_country__name': 'Parent country',
         'company__address_country__name': 'Company country',
         'company__uk_region__name': 'Company UK region',
         'company__one_list_tier__name': 'One List Tier',
