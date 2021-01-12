@@ -17,7 +17,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import OneListTier
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory, SubsidiaryFactory
 from datahub.core import constants
 from datahub.core.query_utils import get_bracketed_concat_expression, get_full_name_expression
 from datahub.core.test_utils import (
@@ -1103,7 +1103,7 @@ class TestInteractionExportView(APITestMixin):
         """
         # Faker generates job titles containing commas which complicates comparisons,
         # so all contact job titles are explicitly set
-        company = CompanyFactory()
+        company = SubsidiaryFactory()
         interaction = CompanyInteractionFactory(
             company=company,
             contacts=[
@@ -1182,9 +1182,13 @@ class TestInteractionExportView(APITestMixin):
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
                 'Company': get_attr_or_none(interaction, 'company.name'),
-                'Parent company': get_attr_or_none(
+                'Parent': get_attr_or_none(
                     interaction,
                     'company.global_headquarters.name',
+                ),
+                'Parent country': get_attr_or_none(
+                    interaction,
+                    'company.global_headquarters.address_country.name',
                 ),
                 'Company country': get_attr_or_none(
                     interaction,
