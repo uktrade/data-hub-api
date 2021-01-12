@@ -1,3 +1,11 @@
+# Data Hub API 36.2.2 (2021-01-12)
+
+
+## Bug fixes
+
+- **Interactions** A `Parent country` column has been added to business intelligence report.
+
+
 # Data Hub API 36.2.1 (2021-01-11)
 
 
