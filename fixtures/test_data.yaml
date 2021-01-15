@@ -1798,3 +1798,107 @@
     is_active: true
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
     created_on: '2018-01-23T00:00:00Z'
+
+- model: investor_profile.largecapitalinvestorprofile
+  pk: 04d9215f-f9f9-4183-af85-326e7cf5482b
+  fields:
+    asset_classes_of_interest:
+    - 66507830-595d-432e-8521-9daf11785265
+    - f2b6c1a7-4d4f-4fd9-884b-5e1f5b3525be
+    - 1536f225-f755-44d1-8bdd-e89a1964966b
+    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+    construction_risks:
+    - 79cc3963-9376-4771-9cba-c1b3cc0ade33
+    created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    created_on: '2021-01-14T11:23:23.125307+00:00'
+    deal_ticket_sizes:
+    - 56492c50-aa12-404d-a14e-1eaae24ac6ee
+    desired_deal_roles:
+    - 29d930e6-de2f-403d-87dc-764bc418d33a
+    global_assets_under_management: 12000000000
+    investable_capital: 6000000000
+    investment_types:
+    - 24826b7c-e3df-4a76-80d4-4fe2661b838e
+    - ef615dde-49d8-41dd-9ddd-a00c78004135
+    investor_company: 0fb3379c-341c-4da4-b825-bf8d47b26baa
+    investor_description: Here is the investor description.
+    investor_type: 113d864c-1657-4e01-b215-2fe8797cdf12
+    minimum_equity_percentage: f7b72f8b-399e-43b2-b7ef-f42a154ef916
+    minimum_return_rate: 6fec56ba-0be9-4931-bd76-16e11924ec55
+    modified_on: '2021-01-14T11:25:04.805742+00:00'
+    notes_on_locations: ''
+    other_countries_being_considered: []
+    required_checks_conducted: 02d6fc9b-fbb9-4621-b247-d86f2487898e
+    required_checks_conducted_by: 453a608e-84a4-11e6-ea22-56b6b6499622
+    restrictions:
+    - 5b4f5dc5-c836-4572-afd2-013776ed00c5
+    time_horizons:
+    - d2d1bdbb-c42a-459c-adaa-fce45ce08cc9
+    - d186343f-ed66-47e4-9ab0-258f583ff3cb
+    uk_region_locations: []
+
+- model: investor_profile.largecapitalinvestorprofile
+  pk: dab10369-81ff-40b9-addb-04afad44170d
+  fields:
+    asset_classes_of_interest: []
+    construction_risks: []
+    created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    created_on: '2021-01-01T11:25:29.711322+00:00'
+    deal_ticket_sizes: []
+    desired_deal_roles: []
+    global_assets_under_management: 3000000
+    investable_capital: 1000
+    investment_types: []
+    investor_company: 3cb006bb-c8bd-4062-bc8c-c086273b84e1
+    investor_description: description
+    investor_type: 1be9c7d0-3cc1-435d-ace5-8c7e3686e022
+    minimum_equity_percentage: null
+    minimum_return_rate: null
+    modified_on: '2021-01-10T11:26:03.680015+00:00'
+    notes_on_locations: ''
+    other_countries_being_considered: []
+    required_checks_conducted: 9beab8fc-1094-49b4-97d0-37bc7a9de631
+    required_checks_conducted_by: 453a608e-84a4-11e6-ea22-56b6b6499622
+    restrictions: []
+    time_horizons: []
+    uk_region_locations: []
+
+- model: investor_profile.largecapitalinvestorprofile
+  pk: e93a5088-cb72-42e7-b0c6-e84699b56a0e
+  fields:
+    asset_classes_of_interest:
+    - 096772cb-bd14-4bdf-bd5a-5b430e651048
+    - b4516edf-c151-47d6-9c12-1c2185cacff0
+    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+    construction_risks:
+    - 884deaf6-cb0c-4036-b78c-efd92cb10098
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2020-12-03T11:26:22.243842+00:00'
+    deal_ticket_sizes:
+    - 359f4183-5617-47a9-a2ac-39e2c60d5088
+    - e5ae2715-aa2c-4aa2-b047-f247625322a3
+    desired_deal_roles:
+    - 29d930e6-de2f-403d-87dc-764bc418d33a
+    global_assets_under_management: 1000000000000
+    investable_capital: 1000000
+    investment_types:
+    - 4170d99a-02fc-46ee-8fd4-3fe786717708
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_description: Some information
+    investor_type: ac294431-94ba-4318-9b27-75f0ada99c0d
+    minimum_equity_percentage: ec061f70-b287-41cf-aaf4-620aec79616b
+    minimum_return_rate: 65c9bc7a-af68-4549-a9c9-70cd73109617
+    modified_on: '2021-01-01T11:27:48.064811+00:00'
+    notes_on_locations: Here are some notes
+    other_countries_being_considered:
+    - 955f66a0-5d95-e211-a939-e4115bead28a
+    - a75f66a0-5d95-e211-a939-e4115bead28a
+    required_checks_conducted: 81fafe5a-ed32-4f46-bdc5-2cafedf828e8
+    restrictions:
+    - daa293d4-e18e-44af-b139-bd1b4c4a9067
+    - 7dad0891-9174-437d-bb30-b610ac1ecd0a
+    time_horizons:
+    - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
+    uk_region_locations:
+    - 844cd12a-6095-e211-a939-e4115bead28a
+    - 8e4cd12a-6095-e211-a939-e4115bead28a
