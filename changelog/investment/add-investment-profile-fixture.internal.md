@@ -1,1 +1,0 @@
-Example `investor_profile` data containing 3 example Large Capital investor profiles has been added to the text fixture data.
