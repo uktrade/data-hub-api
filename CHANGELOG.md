@@ -1,3 +1,11 @@
+# Data Hub API 36.2.3 (2021-01-15)
+
+
+## Internal changes
+
+- **Investment** Example `investor_profile` data containing 3 example Large Capital investor profiles has been added to the text fixture data.
+
+
 # Data Hub API 36.2.2 (2021-01-12)
 
 
