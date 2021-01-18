@@ -8,15 +8,14 @@ aiohttp==3.7.3            # via slackclient
 amqp==2.6.1               # via kombu
 apipkg==1.5               # via execnet
 appdirs==1.4.4            # via virtualenv
-appnope==0.1.2            # via ipython
 argh==0.26.2              # via watchdog
 asgiref==3.3.1            # via django
 async-timeout==3.0.1      # via aiohttp
 attrs==20.3.0             # via aiohttp, flake8-bugbear, pytest
 backcall==0.2.0           # via ipython
 billiard==3.6.3.0         # via -r requirements.in, celery
-boto3==1.16.51            # via -r requirements.in
-botocore==1.19.51         # via boto3, s3transfer
+boto3==1.16.56            # via -r requirements.in
+botocore==1.19.56         # via boto3, s3transfer
 celery[redis]==4.4.7      # via -r requirements.in
 certifi==2020.12.5        # via elastic-apm, elasticsearch, requests, sentry-sdk
 cfgv==3.2.0               # via pre-commit
@@ -56,7 +55,7 @@ flake8-string-format==0.3.0  # via -r requirements.in
 flake8==3.8.4             # via -r requirements.in, flake8-bugbear, flake8-commas, flake8-debugger, flake8-docstrings, flake8-polyfill, flake8-print, flake8-quotes, flake8-string-format
 freezegun==1.0.0          # via -r requirements.in
 future==0.18.2            # via notifications-python-client
-gevent==20.12.1           # via -r requirements.in
+gevent==21.1.0            # via -r requirements.in
 greenlet==0.4.17          # via gevent
 gunicorn==20.0.4          # via -r requirements.in
 icalendar==4.0.7          # via -r requirements.in
