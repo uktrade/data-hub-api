@@ -21,10 +21,11 @@ This project uses Docker compose to setup and run all the necessary components. 
     cd data-hub-api
     ```
 
-2.  Create a `.env` file from `sample.env`
+2.  Create `.env` files from `sample.env`
 
     ```shell
     cp sample.env .env
+    cp config/settings/sample.env config/settings/.env
     ```
 
     If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID`
