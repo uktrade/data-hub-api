@@ -29,15 +29,9 @@ billiard==3.6.3.0
     # via
     #   -r requirements.in
     #   celery
-<<<<<<< HEAD
 boto3==1.16.59
     # via -r requirements.in
 botocore==1.19.59
-=======
-boto3==1.16.56
-    # via -r requirements.in
-botocore==1.19.56
->>>>>>> Bump freezegun from 1.0.0 to 1.1.0
     # via
     #   boto3
     #   s3transfer
@@ -82,11 +76,7 @@ django-pglocks==1.0.4
     # via -r requirements.in
 django-redis==4.12.1
     # via -r requirements.in
-<<<<<<< HEAD
 django-reversion==3.0.9
-=======
-django-reversion==3.0.8
->>>>>>> Bump freezegun from 1.0.0 to 1.1.0
     # via -r requirements.in
 django==3.1.5
     # via
@@ -101,7 +91,7 @@ djangorestframework==3.12.2
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==5.10.0
+elastic-apm==5.10.1
     # via -r requirements.in
 elasticsearch-dsl==7.3.0
     # via -r requirements.in
@@ -146,11 +136,7 @@ flake8==3.8.4
     #   flake8-print
     #   flake8-quotes
     #   flake8-string-format
-<<<<<<< HEAD
-freezegun==1.0.0
-=======
 freezegun==1.1.0
->>>>>>> Bump freezegun from 1.0.0 to 1.1.0
     # via -r requirements.in
 future==0.18.2
     # via notifications-python-client
@@ -282,11 +268,7 @@ pytz==2020.5
     #   celery
     #   django
     #   icalendar
-<<<<<<< HEAD
 pyyaml==5.4.1
-=======
-pyyaml==5.3.1
->>>>>>> Bump freezegun from 1.0.0 to 1.1.0
     # via
     #   -r requirements.in
     #   pre-commit
