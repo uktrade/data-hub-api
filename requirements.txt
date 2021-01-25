@@ -140,7 +140,7 @@ freezegun==1.1.0
     # via -r requirements.in
 future==0.18.2
     # via notifications-python-client
-gevent==21.1.0
+gevent==21.1.2
     # via -r requirements.in
 greenlet==0.4.17
     # via gevent
