@@ -39,7 +39,11 @@ class TestIProjectSummaryView(APITestMixin):
             'adviser_id': str(self.user.id),
             'annual_summaries': [
                 {
-                    'financial_year': '2014-15',
+                    'financial_year': {
+                        'label': '2014-15',
+                        'start': '2014-04-01',
+                        'end': '2015-03-31',
+                    },
                     'totals': {
                         'prospect': 0,
                         'assign_pm': 0,
@@ -49,7 +53,11 @@ class TestIProjectSummaryView(APITestMixin):
                     },
                 },
                 {
-                    'financial_year': '2015-16',
+                    'financial_year': {
+                        'label': '2015-16',
+                        'start': '2015-04-01',
+                        'end': '2016-03-31',
+                    },
                     'totals': {
                         'prospect': 0,
                         'assign_pm': 0,

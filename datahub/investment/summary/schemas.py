@@ -17,7 +17,14 @@ class IProjectSummarySchema(AutoSchema):
                     'type': 'object',
                     'readOnly': True,
                     'properties': {
-                        'financial_year': {'type': 'string', 'example': '2020-21'},
+                        'financial_year': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string', 'example': '2020-21'},
+                                'start': {'type': 'date', 'example': '2020-04-01'},
+                                'end': {'type': 'date', 'example': '2021-03-31'},
+                            },
+                        },
                         'totals': {
                             'type': 'object',
                             'properties': {

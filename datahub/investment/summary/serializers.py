@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import Case, Count, F, Q, When
 from django.db.models.functions import Coalesce, Extract
 from django.utils import timezone
@@ -60,7 +62,11 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
         results = {}
         for financial_year in range(start_year, end_year):
             results[financial_year] = {
-                'financial_year': f'{financial_year}-{str(financial_year + 1)[-2:]}',
+                'financial_year': {
+                    'label': f'{financial_year}-{str(financial_year + 1)[-2:]}',
+                    'start': date(year=financial_year, month=4, day=1),
+                    'end': date(year=financial_year + 1, month=3, day=31),
+                },
                 'totals': {
                     'prospect': prospect_count,
                     'assign_pm': 0,
