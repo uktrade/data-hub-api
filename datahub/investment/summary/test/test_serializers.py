@@ -62,7 +62,11 @@ def projects(adviser):
 
 EXPECTED_ANNUAL_SUMMARIES = [
     {
-        'financial_year': '2014-15',
+        'financial_year': {
+            'label': '2014-15',
+            'start': date(2014, 4, 1),
+            'end': date(2015, 3, 31),
+        },
         'totals': {
             'prospect': 4,
             'assign_pm': 0,
@@ -72,7 +76,11 @@ EXPECTED_ANNUAL_SUMMARIES = [
         },
     },
     {
-        'financial_year': '2015-16',
+        'financial_year': {
+            'label': '2015-16',
+            'start': date(2015, 4, 1),
+            'end': date(2016, 3, 31),
+        },
         'totals': {
             'prospect': 4,
             'assign_pm': 3,
