@@ -38,5 +38,4 @@ class IProjectSummarySchema(AutoSchema):
                     },
                 },
             }
-        else:
-            return super().map_field(field)
+        return super().map_field(field)
