@@ -48,12 +48,12 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
                 land_date_year=Extract('land_date', 'year'),
                 land_date_month=Extract('land_date', 'month'),
                 financial_year=Case(
-                    When(land_date_month__gt=4, then=F('land_date_year')),
+                    When(land_date_month__gte=4, then=F('land_date_year')),
                     default=F('land_date_year') - 1,
                 ),
             )
             .exclude(stage=InvestmentProjectStage.prospect.value.id)
-            .filter(financial_year__gte=start_year - 1, financial_year__lt=end_year)
+            .filter(financial_year__gte=start_year, financial_year__lt=end_year)
             .values('financial_year', 'stage', 'stage__name')
             .annotate(count=Count('stage'))
             .order_by('financial_year')
