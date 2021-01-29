@@ -1,3 +1,11 @@
+# Data Hub API 36.3.0 (2021-01-29)
+
+
+## Features
+
+- **Investment** A new endpoint was added at `v4/adviser/<uuid>/investment-summary` to get a summary of an adviser's investment projects for the current and previous financial year. This shows the project counts at each of the following stages: `prospect`, `assign_pm`, `active`, `verify_win` and `won`.
+
+
 # Data Hub API 36.2.3 (2021-01-15)
 
 
