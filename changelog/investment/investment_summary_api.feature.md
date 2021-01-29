@@ -1,0 +1,1 @@
+A new endpoint was added at `v4/adviser/<uuid>/investment-summary` to get a summary of an adviser's investment projects for the current and previous financial year. This shows the project counts at each of the following stages: `prospect`, `assign_pm`, `active`, `verify_win` and `won`.
