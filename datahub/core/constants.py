@@ -267,6 +267,14 @@ class InvestmentProjectStage(Enum):
     )
     won = OrderedConstant('Won', '945ea6d1-eee3-4f5b-9144-84a75b71b8e6', 600.0)
 
+    @classmethod
+    def get_by_id(cls, item_id):
+        """Gets the corresponding item for a given id."""
+        return next(
+            (item for item in cls if str(item.value.id) == str(item_id)),
+            None,
+        )
+
 
 class InvestmentType(Enum):
     """Investment type constants."""
