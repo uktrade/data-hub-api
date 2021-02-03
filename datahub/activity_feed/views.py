@@ -26,6 +26,7 @@ class ActivityFeedView(APIView):
         'company_referral.view_companyreferral',
         'interaction.view_all_interaction',
         'investment.view_all_investmentproject',
+        'investor_profile.view_largecapitalinvestorprofile',
         'order.view_order',
     )
 
