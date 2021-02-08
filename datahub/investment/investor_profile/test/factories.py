@@ -92,6 +92,7 @@ class CompleteLargeCapitalInvestorProfileFactory(LargeCapitalInvestorProfileFact
     minimum_return_rate_id = ReturnRateConstant.up_to_five_percent.value.id
     minimum_equity_percentage_id = EquityPercentageConstant.zero_percent.value.id
     notes_on_locations = factory.Faker('text')
+    created_by = factory.SubFactory(AdviserFactory)
 
     @to_many_field
     def construction_risks(self):
