@@ -10,6 +10,7 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
 )
 from datahub.investment.summary.serializers import AdvisorIProjectSummarySerializer
+from datahub.metadata.models import InvestmentProjectStage as InvestmentProjectStageModel
 
 
 @pytest.fixture
@@ -166,6 +167,25 @@ class TestAdvisorIProjectSummarySerializer:
             InvestmentProjectFactory(
                 stage_id=InvestmentProjectStage.won.value.id,
                 client_relationship_manager=another_adviser,
+                actual_land_date=date(2015, 1, 1),
+            )
+
+        serializer = AdvisorIProjectSummarySerializer(adviser)
+        assert 'annual_summaries' in serializer.data
+        assert serializer.data == {
+            'adviser_id': str(adviser.id),
+            'annual_summaries': EXPECTED_ANNUAL_SUMMARIES,
+        }
+
+    def test_unexpected_stage_is_not_included(self, adviser, projects):
+        """
+        Annual Summaries should ignore unexpected stages.
+        """
+        bad_stage = InvestmentProjectStageModel.objects.create(name='Bad Stage')
+        for _index in range(2):
+            InvestmentProjectFactory(
+                stage_id=bad_stage.id,
+                client_relationship_manager=adviser,
                 actual_land_date=date(2015, 1, 1),
             )
 
