@@ -6,8 +6,8 @@ PROJECT_COUNT_SCHEMA = {
     'properties': {
         'label': {'type': 'string'},
         'id': {'type': 'string'},
-        'value': {'type': 'integer'}
-    }
+        'value': {'type': 'integer'},
+    },
 }
 
 

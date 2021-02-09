@@ -33,40 +33,40 @@ def test_annual_summaries_schema():
                             'properties': {
                                 'label': {'type': 'string'},
                                 'id': {'type': 'string'},
-                                'value': {'type': 'integer'}
-                            }
+                                'value': {'type': 'integer'},
+                            },
                         },
                         'assign_pm': {
                             'type': 'object',
                             'properties': {
                                 'label': {'type': 'string'},
                                 'id': {'type': 'string'},
-                                'value': {'type': 'integer'}
-                            }
+                                'value': {'type': 'integer'},
+                            },
                         },
                         'active': {
                             'type': 'object',
                             'properties': {
                                 'label': {'type': 'string'},
                                 'id': {'type': 'string'},
-                                'value': {'type': 'integer'}
-                            }
+                                'value': {'type': 'integer'},
+                            },
                         },
                         'verify_win': {
                             'type': 'object',
                             'properties': {
                                 'label': {'type': 'string'},
                                 'id': {'type': 'string'},
-                                'value': {'type': 'integer'}
-                            }
+                                'value': {'type': 'integer'},
+                            },
                         },
                         'won': {
                             'type': 'object',
                             'properties': {
                                 'label': {'type': 'string'},
                                 'id': {'type': 'string'},
-                                'value': {'type': 'integer'}
-                            }
+                                'value': {'type': 'integer'},
+                            },
                         },
                     },
                 },
