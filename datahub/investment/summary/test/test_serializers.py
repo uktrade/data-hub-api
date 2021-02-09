@@ -70,30 +70,70 @@ def projects(adviser):
 EXPECTED_ANNUAL_SUMMARIES = [
     {
         'financial_year': {
-            'label': '2014-15',
-            'start': date(2014, 4, 1),
-            'end': date(2015, 3, 31),
-        },
-        'totals': {
-            'prospect': 4,
-            'assign_pm': 0,
-            'active': 0,
-            'verify_win': 1,
-            'won': 2,
-        },
-    },
-    {
-        'financial_year': {
             'label': '2015-16',
             'start': date(2015, 4, 1),
             'end': date(2016, 3, 31),
         },
         'totals': {
-            'prospect': 4,
-            'assign_pm': 3,
-            'active': 2,
-            'verify_win': 0,
-            'won': 0,
+            'prospect': {
+                'label': 'Prospect',
+                'id': InvestmentProjectStage.prospect.value.id,
+                'value': 4,
+            },
+            'assign_pm': {
+                'label': 'Assigned',
+                'id': InvestmentProjectStage.assign_pm.value.id,
+                'value': 3,
+            },
+            'active': {
+                'label': 'Active',
+                'id': InvestmentProjectStage.active.value.id,
+                'value': 2,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            'won': {
+                'label': 'Won',
+                'id': InvestmentProjectStage.won.value.id,
+                'value': 0,
+            },
+        },
+    },
+    {
+        'financial_year': {
+            'label': '2014-15',
+            'start': date(2014, 4, 1),
+            'end': date(2015, 3, 31),
+        },
+        'totals': {
+            'prospect': {
+                'label': 'Prospect',
+                'id': InvestmentProjectStage.prospect.value.id,
+                'value': 4,
+            },
+            'assign_pm': {
+                'label': 'Assigned',
+                'id': InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            'active': {
+                'label': 'Active',
+                'id': InvestmentProjectStage.active.value.id,
+                'value': 0,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': InvestmentProjectStage.verify_win.value.id,
+                'value': 1,
+            },
+            'won': {
+                'label': 'Won',
+                'id': InvestmentProjectStage.won.value.id,
+                'value': 2,
+            },
         },
     },
 ]
@@ -153,11 +193,11 @@ class TestAdvisorIProjectSummarySerializer:
 
         assert 'annual_summaries' in serializer.data
         assert len(serializer.data['annual_summaries']) == 2
-        previous_summary, current_summary = serializer.data['annual_summaries']
+        current_summary, previous_summary = serializer.data['annual_summaries']
         assert previous_summary['financial_year']['label'] == '2014-15'
-        assert previous_summary['totals']['won'] == 0
+        assert previous_summary['totals']['won']['value'] == 0
         assert current_summary['financial_year']['label'] == '2015-16'
-        assert current_summary['totals']['won'] == 2
+        assert current_summary['totals']['won']['value'] == 2
 
     def test_financial_year_edges(self, adviser):
         """
@@ -184,30 +224,70 @@ class TestAdvisorIProjectSummarySerializer:
         assert serializer.data['annual_summaries'] == [
             {
                 'financial_year': {
-                    'label': '2014-15',
-                    'start': date(2014, 4, 1),
-                    'end': date(2015, 3, 31),
-                },
-                'totals': {
-                    'prospect': 0,
-                    'assign_pm': 0,
-                    'active': 0,
-                    'verify_win': 0,
-                    'won': 3,
-                },
-            },
-            {
-                'financial_year': {
                     'label': '2015-16',
                     'start': date(2015, 4, 1),
                     'end': date(2016, 3, 31),
                 },
                 'totals': {
-                    'prospect': 0,
-                    'assign_pm': 0,
-                    'active': 2,
-                    'verify_win': 0,
-                    'won': 0,
+                    'prospect': {
+                        'label': 'Prospect',
+                        'id': InvestmentProjectStage.prospect.value.id,
+                        'value': 0,
+                    },
+                    'assign_pm': {
+                        'label': 'Assigned',
+                        'id': InvestmentProjectStage.assign_pm.value.id,
+                        'value': 0,
+                    },
+                    'active': {
+                        'label': 'Active',
+                        'id': InvestmentProjectStage.active.value.id,
+                        'value': 2,
+                    },
+                    'verify_win': {
+                        'label': 'Verify Win',
+                        'id': InvestmentProjectStage.verify_win.value.id,
+                        'value': 0,
+                    },
+                    'won': {
+                        'label': 'Won',
+                        'id': InvestmentProjectStage.won.value.id,
+                        'value': 0,
+                    },
+                },
+            },
+            {
+                'financial_year': {
+                    'label': '2014-15',
+                    'start': date(2014, 4, 1),
+                    'end': date(2015, 3, 31),
+                },
+                'totals': {
+                    'prospect': {
+                        'label': 'Prospect',
+                        'id': InvestmentProjectStage.prospect.value.id,
+                        'value': 0,
+                    },
+                    'assign_pm': {
+                        'label': 'Assigned',
+                        'id': InvestmentProjectStage.assign_pm.value.id,
+                        'value': 0,
+                    },
+                    'active': {
+                        'label': 'Active',
+                        'id': InvestmentProjectStage.active.value.id,
+                        'value': 0,
+                    },
+                    'verify_win': {
+                        'label': 'Verify Win',
+                        'id': InvestmentProjectStage.verify_win.value.id,
+                        'value': 0,
+                    },
+                    'won': {
+                        'label': 'Won',
+                        'id': InvestmentProjectStage.won.value.id,
+                        'value': 3,
+                    },
                 },
             },
         ]

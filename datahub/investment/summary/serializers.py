@@ -60,7 +60,7 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
         )
 
         results = {}
-        for financial_year in range(start_year, end_year):
+        for financial_year in reversed(range(start_year, end_year)):
             results[financial_year] = {
                 'financial_year': {
                     'label': f'{financial_year}-{str(financial_year + 1)[-2:]}',
@@ -68,18 +68,38 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
                     'end': date(year=financial_year + 1, month=3, day=31),
                 },
                 'totals': {
-                    'prospect': prospect_count,
-                    'assign_pm': 0,
-                    'active': 0,
-                    'verify_win': 0,
-                    'won': 0,
+                    InvestmentProjectStage.prospect.name: {
+                        'label': 'Prospect',
+                        'id': InvestmentProjectStage.prospect.value.id,
+                        'value': prospect_count,
+                    },
+                    InvestmentProjectStage.assign_pm.name: {
+                        'label': 'Assigned',
+                        'id': InvestmentProjectStage.assign_pm.value.id,
+                        'value': 0,
+                    },
+                    InvestmentProjectStage.active.name: {
+                        'label': 'Active',
+                        'id': InvestmentProjectStage.active.value.id,
+                        'value': 0,
+                    },
+                    InvestmentProjectStage.verify_win.name: {
+                        'label': 'Verify Win',
+                        'id': InvestmentProjectStage.verify_win.value.id,
+                        'value': 0,
+                    },
+                    InvestmentProjectStage.won.name: {
+                        'label': 'Won',
+                        'id': InvestmentProjectStage.won.value.id,
+                        'value': 0,
+                    },
                 },
             }
 
         for project_summary in project_summaries:
             year = project_summary['financial_year']
             stage = InvestmentProjectStage.get_by_id(project_summary['stage'])
-            stage_name = None if stage is None else stage.name
-            results[year]['totals'][stage_name] = project_summary['count']
+            if stage is not None and stage.name in results[year]['totals']:
+                results[year]['totals'][stage.name]['value'] = project_summary['count']
 
         return list(results.values())
