@@ -1,6 +1,16 @@
 from rest_framework.schemas.openapi import AutoSchema
 
 
+PROJECT_COUNT_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'label': {'type': 'string'},
+        'id': {'type': 'string'},
+        'value': {'type': 'integer'},
+    },
+}
+
+
 class IProjectSummarySchema(AutoSchema):
     """
     Schema for Investment Project Summaries
@@ -28,11 +38,11 @@ class IProjectSummarySchema(AutoSchema):
                         'totals': {
                             'type': 'object',
                             'properties': {
-                                'prospect': {'type': 'integer'},
-                                'assign_pm': {'type': 'integer'},
-                                'active': {'type': 'integer'},
-                                'verify_win': {'type': 'integer'},
-                                'won': {'type': 'integer'},
+                                'prospect': PROJECT_COUNT_SCHEMA,
+                                'assign_pm': PROJECT_COUNT_SCHEMA,
+                                'active': PROJECT_COUNT_SCHEMA,
+                                'verify_win': PROJECT_COUNT_SCHEMA,
+                                'won': PROJECT_COUNT_SCHEMA,
                             },
                         },
                     },

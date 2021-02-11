@@ -28,11 +28,46 @@ def test_annual_summaries_schema():
                 'totals': {
                     'type': 'object',
                     'properties': {
-                        'prospect': {'type': 'integer'},
-                        'assign_pm': {'type': 'integer'},
-                        'active': {'type': 'integer'},
-                        'verify_win': {'type': 'integer'},
-                        'won': {'type': 'integer'},
+                        'prospect': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string'},
+                                'id': {'type': 'string'},
+                                'value': {'type': 'integer'},
+                            },
+                        },
+                        'assign_pm': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string'},
+                                'id': {'type': 'string'},
+                                'value': {'type': 'integer'},
+                            },
+                        },
+                        'active': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string'},
+                                'id': {'type': 'string'},
+                                'value': {'type': 'integer'},
+                            },
+                        },
+                        'verify_win': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string'},
+                                'id': {'type': 'string'},
+                                'value': {'type': 'integer'},
+                            },
+                        },
+                        'won': {
+                            'type': 'object',
+                            'properties': {
+                                'label': {'type': 'string'},
+                                'id': {'type': 'string'},
+                                'value': {'type': 'integer'},
+                            },
+                        },
                     },
                 },
             },
