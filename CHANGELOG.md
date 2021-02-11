@@ -1,3 +1,11 @@
+# Data Hub API 36.5.0 (2021-02-11)
+
+
+## Features
+
+- **Investment** The investment summary endpoint now includes the UUIDs of each stage with the project total counts.
+
+
 # Data Hub API 36.4.0 (2021-02-08)
 
 
