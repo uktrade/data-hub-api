@@ -43,6 +43,7 @@ from datahub.interaction.test.factories import (
     InvestmentProjectInteractionFactory,
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.evidence.test.factories import EvidenceDocumentFactory
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -68,7 +69,6 @@ INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
-
 
 MAPPING = {
     'company.Company': {
@@ -236,6 +236,14 @@ MAPPING = {
                             INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
                     },
                 ],
+            },
+            {
+                'factory': LargeCapitalOpportunityFactory,
+                'field': 'promoters',
+                'expired_objects_kwargs': [],
+                # Companies shouldn't be deleted if there is a related large capital
+                # opportunity (the opportunities have to expired and be deleted first).
+                'unexpired_objects_kwargs': [{}],
             },
         ],
     },
@@ -514,6 +522,14 @@ MAPPING = {
                             INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                     },
                 ],
+            },
+            {
+                'factory': LargeCapitalOpportunityFactory,
+                'field': 'investment_projects',
+                'expired_objects_kwargs': [],
+                # Investment Projects shouldn't be deleted if there is a related large capital
+                # opportunity (the opportunities have to expired and be deleted first).
+                'unexpired_objects_kwargs': [{}],
             },
         ],
     },
