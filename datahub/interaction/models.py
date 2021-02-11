@@ -183,6 +183,7 @@ class Interaction(ArchivableModel, BaseModel):
     class Theme(models.TextChoices):
         EXPORT = ('export', 'Export')
         INVESTMENT = ('investment', 'Investment')
+        LARGE_CAPITAL_OPPORTUNITY = ('large_capital_opportunity', 'Large capital opportunity')
         OTHER = ('other', 'Something else')
 
         __empty__ = 'Not set'
@@ -270,6 +271,17 @@ class Interaction(ArchivableModel, BaseModel):
         on_delete=models.CASCADE,
         help_text='For interactions only.',
     )
+
+    # Large capital opportunity
+    large_capital_opportunity = models.ForeignKey(
+        'opportunity.LargeCapitalOpportunity',
+        related_name='%(class)ss',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text='For interactions only.',
+    )
+
     # Grants
     grant_amount_offered = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
