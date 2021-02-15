@@ -1,0 +1,1 @@
+A new model `opportunity_largecapitalopportunity` was created to store large capital opportunities. 

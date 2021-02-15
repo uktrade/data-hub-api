@@ -1,0 +1,9 @@
+- model: opportunity.sourceoffunding
+  pk: 35cd0c71-5051-4e01-a609-09bb06f3039b
+  fields: {disabled_on: null, name: International, order: 100}
+- model: opportunity.sourceoffunding
+  pk: 92e533b0-4274-4253-9eea-f7ac6c9ae966
+  fields: {disabled_on: null, name: Domestic - Private, order: 200}
+- model: opportunity.sourceoffunding
+  pk: 65e54a75-e34e-460d-8727-3fb2d5e0f7f5
+  fields: {disabled_on: null, name: Domestic - Public, order: 300}
