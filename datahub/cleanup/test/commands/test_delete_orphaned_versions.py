@@ -21,6 +21,7 @@ from datahub.interaction.test.factories import (
     InteractionExportCountryFactory,
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import (
     InvestmentActivityFactory,
     InvestmentProjectFactory,
@@ -46,6 +47,7 @@ MAPPINGS = {
     'investment.InvestmentActivity': InvestmentActivityFactory,
     'investment.InvestmentSector': InvestmentSectorFactory,
     'investor_profile.LargeCapitalInvestorProfile': LargeCapitalInvestorProfileFactory,
+    'opportunity.LargeCapitalOpportunity': LargeCapitalOpportunityFactory,
     'metadata.Sector': SectorFactory,
     'order.Order': OrderFactory,
 }

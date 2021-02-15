@@ -1,0 +1,9 @@
+- model: opportunity.abandonmentreason
+  pk: 3a38ccff-69c5-40b0-af54-3426ad94e2cb
+  fields: {disabled_on: null, name: Promoter(s) abandoned the opportunity, order: 100}
+- model: opportunity.abandonmentreason
+  pk: 318e2459-aab9-45ae-8c4d-b279d9f1d959
+  fields: {disabled_on: null, name: Lack of interest from investors, order: 200}
+- model: opportunity.abandonmentreason
+  pk: c94b4852-1fdf-45f9-8619-b97a2f295011
+  fields: {disabled_on: null, name: Opportunity did not clear required checks, order: 300}

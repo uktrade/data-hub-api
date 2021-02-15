@@ -1,0 +1,6 @@
+- model: opportunity.opportunitytype
+  pk: c064e66a-a6bc-4ad6-9a88-0bdd69519f55
+  fields: {disabled_on: null, name: Large capital, order: 100}
+- model: opportunity.opportunitytype
+  pk: d3653613-4f00-4807-b09f-68502d15499c
+  fields: {disabled_on: null, name: Growth capital, order: 200}
