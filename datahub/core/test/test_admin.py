@@ -2,9 +2,13 @@ import io
 from unittest.mock import Mock
 
 import pytest
-from django.contrib import messages as django_messages
+from django.conf import settings
+from django.contrib import auth, messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
+from django.contrib.auth import get_user_model
+from django.test import Client, override_settings
 from django.urls import reverse
+from faker import Faker
 from rest_framework import status
 
 from datahub.core.admin import (
@@ -107,6 +111,7 @@ class TestRawIdWidget:
 
 def test_custom_view_permission():
     """Tests that the decorator correctly overrides has_view_permission()."""
+
     @custom_view_permission('custom_permission')
     class Admin:
         opts = Mock(app_label='admin')
@@ -165,6 +170,7 @@ class TestMaxUploadSize:
 
 def test_add_change_permission():
     """Tests that the decorator correctly overrides has_add_permission()."""
+
     @custom_add_permission('custom_permission')
     class Admin:
         opts = Mock(app_label='admin')
@@ -181,6 +187,7 @@ def test_add_change_permission():
 
 def test_custom_change_permission():
     """Tests that the decorator correctly overrides has_change_permission()."""
+
     @custom_change_permission('custom_permission')
     class Admin:
         opts = Mock(app_label='admin')
@@ -197,6 +204,7 @@ def test_custom_change_permission():
 
 def test_custom_delete_permission():
     """Tests that the decorator correctly overrides has_delete_permission()."""
+
     @custom_delete_permission('custom_permission')
     class Admin:
         opts = Mock(app_label='admin')
@@ -274,3 +282,59 @@ class TestFormatJsonAsHtml:
     def test_format_json_as_html(self, value, expected_output):
         """Test that various values are serialised and escaped as expected."""
         assert format_json_as_html(value) == expected_output
+
+
+class TestAdminAccountLockout:
+    """Tests for admin account lock-out mechanism."""
+
+    pytestmark = [pytest.mark.django_db, pytest.mark.skip]
+    COOLOFF_TIME = 600
+    PASSWORD = 'password'
+    INVALID_PASSWORD = 'PASSWORD'
+    SETTINGS = {
+        'ADMIN_OAUTH2_ENABLED': False,
+        'AXES_FAILURE_LIMIT': 4,
+        'AXES_COOLOFF_TIME': COOLOFF_TIME,
+        'MIDDLEWARE': settings.MIDDLEWARE + ['axes.middleware.AxesMiddleware'],
+        'AUTHENTICATION_BACKENDS': settings.AUTHENTICATION_BACKENDS + [
+            'axes.backends.AxesBackend',
+        ],
+    }
+
+    def create_admin_user(self, email=None, password=PASSWORD):
+        """Creates admin user"""
+        return get_user_model().objects.create_superuser(
+            email=email or Faker().email(), password=password,
+        )
+
+    @override_settings(**SETTINGS)
+    def test_admin_account_lock_out_successful_login(self):
+        """Tests if user account can successfully login"""
+        user = self.create_admin_user(email=Faker().email())
+        client = Client()
+
+        assert auth.get_user(client).is_authenticated is False
+        data = {'username': user.email, 'password': self.INVALID_PASSWORD}
+        client.post(path=reverse('admin:login'), data=data, follow=True)
+        assert auth.get_user(client).is_authenticated is False
+
+        assert auth.get_user(client).is_authenticated is False
+        data = {'username': user.email, 'password': self.PASSWORD}
+        client.post(path=reverse('admin:login'), data=data, follow=True)
+        assert auth.get_user(client).is_authenticated is True
+
+    @override_settings(**SETTINGS)
+    def test_admin_account_lock_out_after_too_many_attempts(self):
+        """Tests if user account is locked out after configured number of attempts"""
+        user = self.create_admin_user(email=Faker().email())
+        client = Client()
+        data = {'username': user.email, 'password': self.INVALID_PASSWORD}
+
+        for attempt in range(1, settings.AXES_FAILURE_LIMIT + 5):
+            response = client.post(path=reverse('admin:login'), data=data, follow=True)
+            assert response.status_code == (
+                status.HTTP_200_OK
+                if attempt < settings.AXES_FAILURE_LIMIT else
+                status.HTTP_403_FORBIDDEN
+            ), (attempt, settings.AXES_FAILURE_LIMIT)
+            assert auth.get_user(client).is_authenticated is False
