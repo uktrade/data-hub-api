@@ -1,1 +1,0 @@
-A new `opportunity` application has been added to `investment` that helps recording large capital opportunities.
