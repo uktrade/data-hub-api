@@ -1,1 +1,0 @@
-User account lockout mechanism has been implemented for admin pages. A user account should be locked out (prevented from making further login attempts) after a certain number of consecutive unsuccessful logon attempts.
