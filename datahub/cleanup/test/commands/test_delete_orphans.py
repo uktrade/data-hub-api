@@ -25,6 +25,7 @@ from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import (
     OrderFactory,
@@ -71,6 +72,7 @@ MAPPINGS = {
             (CompanyFactory, 'global_headquarters'),
             (OneListCoreTeamMemberFactory, 'company'),
             (LargeCapitalInvestorProfileFactory, 'investor_company'),
+            (LargeCapitalOpportunityFactory, 'promoters'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),

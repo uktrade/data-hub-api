@@ -1,0 +1,6 @@
+- model: opportunity.opportunityvaluetype
+  pk: 496379ec-7cd2-4746-98f7-143c905dd6aa
+  fields: {disabled_on: null, name: Capital expenditure, order: 100}
+- model: opportunity.opportunityvaluetype
+  pk: edeff484-2bd1-40e6-94ca-0437d6115886
+  fields: {disabled_on: null, name: Gross development value (GDV), order: 200}

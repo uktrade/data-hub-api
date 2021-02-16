@@ -1,3 +1,22 @@
+# Data Hub API 36.6.0 (2021-02-16)
+
+
+## Features
+
+- **Interactions** A new interaction theme has been added - `Large capital opportunity` so that it is now possible to store interactions 
+  related to large capital opportunities.
+- **Investment** A new `opportunity` application has been added to `investment` that helps recording large capital opportunities.
+
+## Internal changes
+
+- User account lockout mechanism has been implemented for admin pages. A user account should be locked out (prevented from making further login attempts) after a certain number of consecutive unsuccessful logon attempts.
+
+## Database schema
+
+- **Interactions** A new field `large_capital_opportunity` has been added to link interactions with large capital opportunities.
+- **Investment** A new model `opportunity_largecapitalopportunity` was created to store large capital opportunities.
+
+
 # Data Hub API 36.5.0 (2021-02-11)
 
 

@@ -437,6 +437,7 @@ class TestCompleteCompanyReferral(APITestMixin):
             'archived_documents_url_path': '',
             'archived_on': None,
             'archived_reason': None,
+            'large_capital_opportunity_id': None,
         }
 
         assert list(referral.interaction.contacts.all()) == [contact]
