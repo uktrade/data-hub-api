@@ -1,5 +1,6 @@
 """Company models."""
 import uuid
+import re
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -8,6 +9,7 @@ from django.core.validators import (
     MaxLengthValidator,
     MinLengthValidator,
     MinValueValidator,
+    RegexValidator,
 )
 from django.db import models, transaction
 from django.utils.timezone import now
@@ -83,7 +85,12 @@ class Company(ArchivableModel, BaseModel):
         __empty__ = 'No profile or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    name = models.CharField(max_length=MAX_LENGTH)
+    name = models.CharField(
+        max_length=MAX_LENGTH,
+        validators=[
+            RegexValidator(re.compile('^[=+-@]'), code='invalid', inverse_match=True, message='Enter a valid name')
+        ],
+    )
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
