@@ -51,6 +51,16 @@ else:
     _ADMIN_DJANGO_APP = ['django.contrib.admin']
     _ADMIN_OAUTH2_APP = []
 
+# axes settings (admin login lock-out: https://django-axes.readthedocs.io/)
+AXES_ENABLED = env.bool('AXES_ENABLED', True)
+AXES_VERBOSE = env.bool('AXES_VERBOSE', True)
+AXES_ONLY_ADMIN_SITE = env.bool('AXES_ONLY_ADMIN_SITE', True)
+AXES_COOLOFF_TIME = timedelta(seconds=60 * 30)
+AXES_FAILURE_LIMIT = env.int('AXES_FAILURE_LIMIT', 3)
+AXES_META_PRECEDENCE_ORDER = env.list(
+    'AXES_META_PRECEDENCE_ORDER', default=['HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR']
+)
+
 ES_APM_ENABLED = env.bool('ES_APM_ENABLED')
 
 _ES_APM_APP = []
@@ -76,6 +86,7 @@ THIRD_PARTY_APPS = [
     'reversion',
     'django_filters',
     'mptt',
+    'axes',
 ]
 
 LOCAL_APPS = [
@@ -93,6 +104,7 @@ LOCAL_APPS = [
     'datahub.investment.project.proposition',
     'datahub.investment.project.report',
     'datahub.investment.investor_profile',
+    'datahub.investment.opportunity',
     'datahub.metadata',
     'datahub.oauth',
     *_ADMIN_OAUTH2_APP,
@@ -270,6 +282,9 @@ if ADMIN_OAUTH2_ENABLED:
         authentication_middleware_index + 1,
         'datahub.oauth.admin_sso.middleware.OAuthSessionMiddleware',
     )
+else:
+    MIDDLEWARE.extend(['axes.middleware.AxesMiddleware'])
+    AUTHENTICATION_BACKENDS.extend(['axes.backends.AxesBackend'])
 
 # Staff SSO integration settings
 
@@ -750,6 +765,5 @@ if ES_APM_ENABLED:
         'ENVIRONMENT': env('ES_APM_ENVIRONMENT'),
         'SERVER_TIMEOUT': env('ES_APM_SERVER_TIMEOUT', default='20s'),
     }
-
 
 ALLOW_TEST_FIXTURE_SETUP = env('ALLOW_TEST_FIXTURE_SETUP', default=False)

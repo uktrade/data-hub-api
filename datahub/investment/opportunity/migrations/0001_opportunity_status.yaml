@@ -1,0 +1,15 @@
+- model: opportunity.opportunitystatus
+  pk: 1386d4f4-732d-44b9-af8e-dffe7dd07d7b
+  fields: {disabled_on: null, name: Seeking investment, order: 100}
+- model: opportunity.opportunitystatus
+  pk: f4f7cd58-3989-4d5c-82f3-c13443c4bc98
+  fields: {disabled_on: null, name: Part funded, order: 200}
+- model: opportunity.opportunitystatus
+  pk: d2d2f84c-bda2-4874-8aeb-308cbb9b9b77
+  fields: {disabled_on: null, name: Fully funded, order: 300}
+- model: opportunity.opportunitystatus
+  pk: 7a0180b7-ffe7-42c6-97d5-a89e0e5db75f
+  fields: {disabled_on: null, name: Suspended, order: 400}
+- model: opportunity.opportunitystatus
+  pk: c14547fb-a8ee-410b-a144-06c882167a41
+  fields: {disabled_on: null, name: Abandoned, order: 500}
