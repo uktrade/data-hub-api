@@ -1,6 +1,5 @@
 import environ
 
-
 environ.Env.read_env()  # reads the .env file
 env = environ.Env()
 
@@ -78,11 +77,11 @@ DISABLE_PAAS_IP_CHECK = False
 HAWK_RECEIVER_CREDENTIALS = {
     'some-id': {
         'key': 'some-secret',
-        'scopes': (HawkScope.activity_stream, ),
+        'scopes': (HawkScope.activity_stream,),
     },
     'test-id-with-scope': {
         'key': 'test-key-with-scope',
-        'scopes': (next(iter(HawkScope.__members__.values())), ),
+        'scopes': (next(iter(HawkScope.__members__.values())),),
     },
     'test-id-without-scope': {
         'key': 'test-key-without-scope',
@@ -94,15 +93,15 @@ HAWK_RECEIVER_CREDENTIALS = {
     },
     'test-id-with-metadata-scope': {
         'key': 'test-key-with-metadata-scope',
-        'scopes': (HawkScope.metadata, ),
+        'scopes': (HawkScope.metadata,),
     },
     'public-company-id': {
         'key': 'public-company-key',
-        'scopes': (HawkScope.public_company, ),
+        'scopes': (HawkScope.public_company,),
     },
     'data-flow-api-id': {
         'key': 'data-flow-api-key',
-        'scopes': (HawkScope.data_flow_api, ),
+        'scopes': (HawkScope.data_flow_api,),
     },
     'omis-public-id': {
         'key': 'omis-public-key',
@@ -178,3 +177,9 @@ EXPORT_WINS_HAWK_ID = 'some-id'
 EXPORT_WINS_HAWK_KEY = 'some-secret'
 
 ALLOW_TEST_FIXTURE_SETUP = True
+
+if ADMIN_OAUTH2_ENABLED:
+    if 'axes.middleware.AxesMiddleware' in MIDDLEWARE:
+        MIDDLEWARE.remove('axes.middleware.AxesMiddleware')
+    if 'axes.backends.AxesBackend' in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS.remove('axes.backends.AxesBackend')
