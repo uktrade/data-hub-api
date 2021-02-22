@@ -1,7 +1,6 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -215,7 +214,7 @@ class Interaction(ArchivableModel, BaseModel):
     #         "sha256": "<SHA-256 hash>"
     #     }
     # }
-    source = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
+    source = models.JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -243,7 +242,7 @@ class Interaction(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
     )
-    service_answers = JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
+    service_answers = models.JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
 
     subject = models.TextField()
     notes = models.TextField(max_length=10000, blank=True)
