@@ -107,7 +107,7 @@ class PipelineItem(ArchivableModel, BaseModel):
     )
     contacts = models.ManyToManyField(
         'company.Contact',
-        blank=True, null=True,
+        blank=True,
         related_name='pipeline_items_m2m',
         help_text='Preferred company contacts',
     )
