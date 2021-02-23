@@ -150,7 +150,6 @@ class LargeCapitalOpportunity(BaseModel):
         'opportunity.SourceOfFunding',
         related_name='+',
         blank=True,
-        null=True,
     )
 
     funding_supporting_details = models.TextField(blank=True)
