@@ -329,20 +329,6 @@ class Company(ArchivableModel, BaseModel):
         help_text='Last updated from D&B',
         db_index=True,
     )
-    export_segment = models.CharField(
-        max_length=MAX_LENGTH,
-        blank=True,
-        default='',
-        help_text='Segmentation of export',
-        choices=ExportSegment.choices,
-    )
-    export_sub_segment = models.CharField(
-        max_length=MAX_LENGTH,
-        blank=True,
-        default='',
-        help_text='Sub-Segmentation of export',
-        choices=ExportSubSegment.choices,
-    )
 
     def __str__(self):
         """Admin displayed human readable name."""
