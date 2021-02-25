@@ -1,0 +1,364 @@
+- model: metadata.countrystate
+  pk: 9309365-7aa7-49594-a5e5-7c758ea74235
+  fields:
+    disabled_on: null 
+    name: Alabama
+    country: 81756b9a-5d95-e211-a939-e4115bead28a
+    state_code: AL
+- model: metadata.countrystate
+  pk: 9d9fedab-9b6b-45cb-aed4-b1d10189f75b
+  fields:
+    disabled_on: null 
+    name: Alaska
+    country: 81756b9a-5d95-e211-a939-e4115bead28a 
+    state_code: AK
+- model: metadata.countrystate
+  pk: 477d1399-9fa5-432f-a29c-b92685db0ffa
+  fields:
+    disabled_on: null 
+    name: Arizona
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: AZ
+- model: metadata.countrystate
+  pk: 43f66386-f3b0-450f-b586-2120cafcb165
+  fields:
+    disabled_on: null 
+    name: Arkansas
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: AR
+- model: metadata.countrystate
+  pk: e3349715-d073-4a03-845a-a8f99f283859
+  fields:
+    disabled_on: null 
+    name: California
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: CA
+- model: metadata.countrystate
+  pk: 2fe58328-2fc3-4459-a4db-8c2831c36dc1
+  fields:
+    disabled_on: null 
+    name: Colorado
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: CO
+- model: metadata.countrystate
+  pk: 5bcc8836-e0cc-4d76-acc0-517803687d92
+  fields:
+    disabled_on: null 
+    name: Connecticut
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: CT
+- model: metadata.countrystate
+  pk: 5f9e3d40-9626-44ca-a5eb-180b6f0a1d34
+  fields:
+    disabled_on: null 
+    name: Delaware
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: DE
+- model: metadata.countrystate
+  pk: 779aca7f-64a7-4fea-aea0-a24c05314f63
+  fields:
+    disabled_on: null 
+    name: Florida
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: FL
+- model: metadata.countrystate
+  pk: 5f496749-c5a6-41d4-a934-73ad25f5daf6
+  fields:
+    disabled_on: null 
+    name: Georgia
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: GA
+- model: metadata.countrystate
+  pk: fd4edb17-cc08-4090-8438-4667f7c4efd8
+  fields:
+    disabled_on: null 
+    name: Hawaii
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: HI
+- model: metadata.countrystate
+  pk: 00be319f-df98-4c45-8244-e01c11dddea4
+  fields:
+    disabled_on: null 
+    name: Idaho
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: ID
+- model: metadata.countrystate
+  pk: e83168fe-39cb-4f54-9078-34f21300f1ff
+  fields:
+    disabled_on: null 
+    name: Illinois
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: IL
+- model: metadata.countrystate
+  pk: 68756112-cd2e-4dc3-9712-ef8aaaa6d3b3
+  fields:
+    disabled_on: null 
+    name: Indiana
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: IN
+- model: metadata.countrystate
+  pk: 66fd7fbc-1f61-44b3-a30f-65936015d29a
+  fields:
+    disabled_on: null 
+    name: Iowa
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: IA
+- model: metadata.countrystate
+  pk: 05e95784-5411-41e4-bc3f-22b39618f683
+  fields:
+    disabled_on: null 
+    name: Kansas
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: KS
+- model: metadata.countrystate
+  pk: a0b5bad2-59cc-406b-8cf7-a037b75e2179
+  fields:
+    disabled_on: null 
+    name: Kentucky
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: KY
+- model: metadata.countrystate
+  pk: 04c63cc9-db08-4b71-8f2b-e5688b1bcb22
+  fields:
+    disabled_on: null 
+    name: Louisiana
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: LA
+- model: metadata.countrystate
+  pk: 38063cb0-da1e-4c4b-abb0-918ffbb9bb78
+  fields:
+    disabled_on: null 
+    name: Maine
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: ME
+- model: metadata.countrystate
+  pk: 2cd9628d-199d-4c7d-a154-c65c7328b6e0
+  fields:
+    disabled_on: null 
+    name: Maryland
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MD
+- model: metadata.countrystate
+  pk: e1181ee0-460d-4f4f-96a5-9105435b2801
+  fields:
+    disabled_on: null 
+    name: Massachusetts
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MA
+- model: metadata.countrystate
+  pk: 5a9c0ee5-68c5-41ac-957f-085a975c4d57
+  fields:
+    disabled_on: null 
+    name: Michigan
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MI
+- model: metadata.countrystate
+  pk: cd3c4e03-852c-4f68-a4b6-dfad884da3b3
+  fields:
+    disabled_on: null 
+    name: Minnesota
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MN
+- model: metadata.countrystate
+  pk: 82c4cd0d-1100-4bef-8b1a-6f9374ad4608
+  fields:
+    disabled_on: null 
+    name: Mississippi
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MS
+- model: metadata.countrystate
+  pk: 69d28cb5-d708-4828-85da-6f11e0ad6cbc
+  fields:
+    disabled_on: null 
+    name: Missouri
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MO
+- model: metadata.countrystate
+  pk: a2d281ad-2cdc-49c3-8583-cb297874f8fc
+  fields:
+    disabled_on: null 
+    name: Montana
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: MT
+- model: metadata.countrystate
+  pk: 37170ab1-12b8-4821-96be-624920cf7d1a
+  fields:
+    disabled_on: null 
+    name: Nebraska
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NE
+- model: metadata.countrystate
+  pk: 865bff6e-97e9-467d-bb02-37b9687e26ef
+  fields:
+    disabled_on: null 
+    name: Nevada
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NV
+- model: metadata.countrystate
+  pk: 0714da85-62cd-400b-a6ab-007b9d3eac5e
+  fields:
+    disabled_on: null 
+    name: New Hampshire
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NH
+- model: metadata.countrystate
+  pk: 40305656-d8c9-41ea-832c-85e61717f3d3
+  fields:
+    disabled_on: null 
+    name: New Jersey
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NJ
+- model: metadata.countrystate
+  pk: 14c5ea43-bc3c-4894-a4b7-5405d73a8243
+  fields:
+    disabled_on: null 
+    name: New Mexico
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NM
+- model: metadata.countrystate
+  pk: 159efe60-3710-4c74-8f26-5f6a5b0687b7
+  fields:
+    disabled_on: null 
+    name: New York
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NY
+- model: metadata.countrystate
+  pk: 128c59dd-5c33-4b31-879e-5289f13d9211
+  fields:
+    disabled_on: null 
+    name: North Carolina
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: NC
+- model: metadata.countrystate
+  pk: 125cac58-410b-4a48-bced-864fb706f880
+  fields:
+    disabled_on: null 
+    name: North Dakota
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: ND
+- model: metadata.countrystate
+  pk: 66c8f3fb-ad98-4ffa-9939-9cf8c07447bf
+  fields:
+    disabled_on: null 
+    name: Ohio
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: OH
+- model: metadata.countrystate
+  pk: 2c99730a-a267-4206-a243-516f8b7fb115
+  fields:
+    disabled_on: null 
+    name: Oklahoma
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: OK
+- model: metadata.countrystate
+  pk: c5c3f0d9-18c3-4d6d-ae27-fcd4852db4ab
+  fields:
+    disabled_on: null 
+    name: Oregon
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: OR
+- model: metadata.countrystate
+  pk: 11bc6271-0666-447f-8a0d-432fa42f8c54
+  fields:
+    disabled_on: null 
+    name: Pennsylvania
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: PA
+- model: metadata.countrystate
+  pk: d0c8aa69-b429-47dc-b334-cdde08e066f9
+  fields:
+    disabled_on: null 
+    name: Puerto Rico
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: PR
+- model: metadata.countrystate
+  pk: f527e721-779c-40cb-b5b2-8b9498cedfac
+  fields:
+    disabled_on: null 
+    name: Rhode Island
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: RI
+- model: metadata.countrystate
+  pk: 6d0cde57-5ba5-4949-9804-a16343914660
+  fields:
+    disabled_on: null 
+    name: South Carolina
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: SC
+- model: metadata.countrystate
+  pk: 10fcf200-858f-4817-be94-f7d722f1e6c0
+  fields:
+    disabled_on: null 
+    name: South Dakota
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: SD
+- model: metadata.countrystate
+  pk: b7124099-5e4d-4481-b34c-1003d7138349
+  fields:
+    disabled_on: null 
+    name: Tennessee
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: TN
+- model: metadata.countrystate
+  pk: 3ac8b6af-89e8-44c4-9385-b0d8f4941232
+  fields:
+    disabled_on: null 
+    name: Texas
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: TX
+- model: metadata.countrystate
+  pk: fd19e359-f08d-4e7c-b8de-483cd82cb0e9
+  fields:
+    disabled_on: null 
+    name: Utah
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: UT
+- model: metadata.countrystate
+  pk: 9e704645-1f1f-4e7f-abe5-4d9d21ae2c5b
+  fields:
+    disabled_on: null 
+    name: Vermont
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: VT
+- model: metadata.countrystate
+  pk: 7f40243c-121a-4372-96bb-a5d281f0df07
+  fields:
+    disabled_on: null 
+    name: Virginia
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: VA
+- model: metadata.countrystate
+  pk: f1c79d98-5fc5-49fd-81b3-3928e68170c3
+  fields:
+    disabled_on: null 
+    name: Washington
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: WA
+- model: metadata.countrystate
+  pk: 9702fe25-50ce-45b3-ae15-7d4d929c48d0
+  fields:
+    disabled_on: null 
+    name: West Virginia
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: WV
+- model: metadata.countrystate
+  pk: 9e881c57-41bf-4353-a270-240e50fd9dbc
+  fields:
+    disabled_on: null 
+    name: Wisconsin
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: WI
+- model: metadata.countrystate
+  pk: ee5c2de0-4ee7-409e-b08b-61798f574ff4
+  fields:
+    disabled_on: null 
+    name: Wyoming
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: WY
+- model: metadata.countrystate
+  pk: 4ad22904-60b4-42af-a3b3-5db055d8f395
+  fields:
+    disabled_on: null 
+    name: District of Columbia
+    country: 81756b9a-5d95-e211-a939-e4115bead28a  
+    state_code: DC

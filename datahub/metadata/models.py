@@ -111,6 +111,20 @@ class Country(BaseConstantModel):
         verbose_name_plural = 'countries'
 
 
+class CountryState(BaseConstantModel):
+    """States within a country"""
+
+    state_code = models.CharField(max_length=2)
+    country = models.ForeignKey(
+        Country,
+        related_name='country_states',
+        on_delete=models.PROTECT,
+    )
+
+    class Meta(BaseConstantModel.Meta):
+        verbose_name_plural = 'country states'
+
+
 class AdministrativeArea(BaseConstantModel):
     """
     States, provinces etc. within a country.

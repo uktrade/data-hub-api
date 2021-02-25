@@ -114,6 +114,17 @@ class CountryAdmin(ViewOnlyAdmin):
     list_filter = (DisabledOnFilter, 'overseas_region')
 
 
+@admin.register(models.CountryState)
+class CountryStateAdmin(ViewOnlyAdmin):
+    """View-only admin for states."""
+
+    readonly_fields = ('pk',)
+    fields = ('pk', 'name', 'country', 'disabled_on', 'state_code')
+    list_display = ('name', 'country', 'disabled_on', 'state_code')
+    search_fields = ('name', 'pk', 'state_code')
+    list_filter = (DisabledOnFilter, 'country')
+
+
 class ServiceContextFilter(admin.SimpleListFilter):
     """
     Admin filter for the Service.contexts field.

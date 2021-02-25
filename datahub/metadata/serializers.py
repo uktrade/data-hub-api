@@ -37,6 +37,13 @@ class CountrySerializer(ConstantModelSerializer):
     iso_alpha2_code = serializers.ReadOnlyField()
 
 
+class CountryStateSerializer(ConstantModelSerializer):
+    """Serializer for states within a country."""
+
+    country = NestedRelatedField(Country, read_only=True)
+    state_code = serializers.ReadOnlyField()
+
+
 class ServiceAnswerOptionSerializer(serializers.ModelSerializer):
     """Serializer for service answer options (used in ServiceQuestionSerializer)."""
 

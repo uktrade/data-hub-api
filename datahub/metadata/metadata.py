@@ -4,6 +4,7 @@ from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
     AdministrativeAreaSerializer,
     CountrySerializer,
+    CountryStateSerializer,
     InvestmentProjectStageSerializer,
     SectorSerializer,
     ServiceSerializer,
@@ -56,6 +57,14 @@ registry.register(
         'order',
     ),
     serializer=ServiceSerializer,
+)
+registry.register(
+    metadata_id='state',
+    model=models.CountryState,
+    queryset=models.CountryState.objects.select_related(
+        'country',
+    ),
+    serializer=CountryStateSerializer,
 )
 registry.register(metadata_id='team-role', model=models.TeamRole)
 registry.register(
