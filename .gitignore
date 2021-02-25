@@ -79,3 +79,5 @@ docker-volumes/
 
 # celery
 celerybeat-schedule
+.idea
+
