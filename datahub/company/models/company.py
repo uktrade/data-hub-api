@@ -167,6 +167,15 @@ class Company(ArchivableModel, BaseModel):
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    address_state = models.CharField(max_length=MAX_LENGTH, blank=True)
+    # TODO: Uncomment when feature/cds-64 is ready
+    # address_state = models.ForeignKey(
+    #     metadata_models.State,
+    #     related_name='companies_with_state_registered_address',
+    #     blank=True,
+    #     null=True,
+    #     on_delete=models.SET_NULL,
+    # )
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_country = models.ForeignKey(
         metadata_models.Country,
@@ -180,6 +189,16 @@ class Company(ArchivableModel, BaseModel):
     registered_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_state = models.CharField(max_length=MAX_LENGTH, blank=True)
+    # TODO: Uncomment when feature/cds-64 is ready
+    # registered_state = models.ForeignKey(
+    #     metadata_models.State,
+    #     related_name='companies_with_state_registered_address',
+    #     blank=True,
+    #     null=True,
+    #     on_delete=models.SET_NULL,
+    # )
+
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
