@@ -125,6 +125,12 @@ class AdministrativeArea(BaseConstantModel):
     )
     area_code = models.CharField(blank=True, max_length=3)
 
+    def __str__(self):
+        """
+        To make this clearer for anyone using the admin drop down on this data
+        """
+        return f'{self.name} ({self.country.name})'
+
 
 class Title(BaseConstantModel):
     """Contact title."""
