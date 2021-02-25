@@ -1,0 +1,1 @@
+A new field `area_code` has been added to Administrative Areas under metadata.
