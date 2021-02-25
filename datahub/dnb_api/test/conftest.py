@@ -53,6 +53,7 @@ def dnb_response_non_uk():
                 'address_town': 'New York',
                 'address_county': '',
                 'address_postcode': '10033-1062',
+                'address_area': None,
                 'address_country': 'US',
                 'annual_sales': 1000000.0,
                 'annual_sales_currency': 'USD',
@@ -162,6 +163,7 @@ def base_company_dict():
     as a foundation for `model_to_dict` comparisons.
     """
     return {
+        'address_area': None,
         'archived': False,
         'archived_by': None,
         'archived_on': None,
@@ -184,6 +186,7 @@ def base_company_dict():
         'one_list_tier': None,
         'pending_dnb_investigation': False,
         'reference_code': '',
+        'registered_address_area': None,
         'sector': '',
         'trading_names': [],
         'transfer_reason': '',
