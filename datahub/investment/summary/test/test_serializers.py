@@ -30,6 +30,14 @@ def projects(adviser):
             stage_id=InvestmentProjectStage.prospect.value.id,
             client_relationship_manager=adviser,
         )
+
+    # 1 Assign PM in 2016-17
+    for _index in range(1):
+        InvestmentProjectFactory(
+            stage_id=InvestmentProjectStage.assign_pm.value.id,
+            project_assurance_adviser=adviser,
+            estimated_land_date=date(2017, 3, 1),
+        )
     # 3 Assign PM in 2015-16
     for _index in range(3):
         InvestmentProjectFactory(
@@ -37,6 +45,15 @@ def projects(adviser):
             project_assurance_adviser=adviser,
             estimated_land_date=date(2015, 4, 1),
         )
+
+    # 3 Active for 2016-17
+    for _index in range(3):
+        project = InvestmentProjectFactory(
+            stage_id=InvestmentProjectStage.active.value.id,
+            project_manager=adviser,
+            estimated_land_date=date(2016, 4, 1),
+        )
+        InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
     # 2 Active in 2015-16
     for _index in range(2):
         project = InvestmentProjectFactory(
@@ -45,6 +62,7 @@ def projects(adviser):
             estimated_land_date=date(2015, 5, 1),
         )
         InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
+
     # 1 Verify Win in 2014-15
     for _index in range(1):
         InvestmentProjectFactory(
@@ -52,6 +70,7 @@ def projects(adviser):
             project_manager=adviser,
             actual_land_date=date(2015, 3, 31),
         )
+
     # 2 Won in 2014-15
     for _index in range(2):
         InvestmentProjectFactory(
@@ -71,6 +90,40 @@ def projects(adviser):
 EXPECTED_ANNUAL_SUMMARIES = [
     {
         'financial_year': {
+            'label': '2016-17',
+            'start': date(2016, 4, 1),
+            'end': date(2017, 3, 31),
+        },
+        'totals': {
+            'prospect': {
+                'label': 'Prospect',
+                'id': InvestmentProjectStage.prospect.value.id,
+                'value': 4,
+            },
+            'assign_pm': {
+                'label': 'Assign PM',
+                'id': InvestmentProjectStage.assign_pm.value.id,
+                'value': 1,
+            },
+            'active': {
+                'label': 'Active',
+                'id': InvestmentProjectStage.active.value.id,
+                'value': 3,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            'won': {
+                'label': 'Won',
+                'id': InvestmentProjectStage.won.value.id,
+                'value': 0,
+            },
+        },
+    },
+    {
+        'financial_year': {
             'label': '2015-16',
             'start': date(2015, 4, 1),
             'end': date(2016, 3, 31),
@@ -82,7 +135,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
                 'value': 4,
             },
             'assign_pm': {
-                'label': 'Assigned',
+                'label': 'Assign PM',
                 'id': InvestmentProjectStage.assign_pm.value.id,
                 'value': 3,
             },
@@ -116,7 +169,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
                 'value': 4,
             },
             'assign_pm': {
-                'label': 'Assigned',
+                'label': 'Assign PM',
                 'id': InvestmentProjectStage.assign_pm.value.id,
                 'value': 0,
             },
@@ -212,12 +265,14 @@ class TestAdvisorIProjectSummarySerializer:
         serializer = AdvisorIProjectSummarySerializer(adviser)
 
         assert 'annual_summaries' in serializer.data
-        assert len(serializer.data['annual_summaries']) == 2
-        current_summary, previous_summary = serializer.data['annual_summaries']
+        assert len(serializer.data['annual_summaries']) == 3
+        next_summary, current_summary, previous_summary = serializer.data['annual_summaries']
         assert previous_summary['financial_year']['label'] == '2014-15'
         assert previous_summary['totals']['won']['value'] == 0
         assert current_summary['financial_year']['label'] == '2015-16'
         assert current_summary['totals']['won']['value'] == 2
+        assert next_summary['financial_year']['label'] == '2016-17'
+        assert next_summary['totals']['won']['value'] == 0
 
     def test_financial_year_edges(self, adviser):
         """
@@ -241,7 +296,8 @@ class TestAdvisorIProjectSummarySerializer:
         serializer = AdvisorIProjectSummarySerializer(adviser)
 
         assert 'annual_summaries' in serializer.data
-        assert serializer.data['annual_summaries'] == [
+        assert len(serializer.data['annual_summaries']) == 3
+        assert serializer.data['annual_summaries'][1:3] == [
             {
                 'financial_year': {
                     'label': '2015-16',
@@ -255,7 +311,7 @@ class TestAdvisorIProjectSummarySerializer:
                         'value': 0,
                     },
                     'assign_pm': {
-                        'label': 'Assigned',
+                        'label': 'Assign PM',
                         'id': InvestmentProjectStage.assign_pm.value.id,
                         'value': 0,
                     },
@@ -289,7 +345,7 @@ class TestAdvisorIProjectSummarySerializer:
                         'value': 0,
                     },
                     'assign_pm': {
-                        'label': 'Assigned',
+                        'label': 'Assign PM',
                         'id': InvestmentProjectStage.assign_pm.value.id,
                         'value': 0,
                     },
