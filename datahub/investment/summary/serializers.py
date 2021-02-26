@@ -28,7 +28,7 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
         """
         current_financial_year = get_financial_year(timezone.now())
         start_year = current_financial_year - 1
-        end_year = current_financial_year + 1
+        end_year = current_financial_year + 2
 
         # Get any projects where this adviser is involved
         projects = InvestmentProject.objects.filter(
@@ -74,7 +74,7 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
                         'value': prospect_count,
                     },
                     InvestmentProjectStage.assign_pm.name: {
-                        'label': 'Assigned',
+                        'label': 'Assign PM',
                         'id': InvestmentProjectStage.assign_pm.value.id,
                         'value': 0,
                     },
