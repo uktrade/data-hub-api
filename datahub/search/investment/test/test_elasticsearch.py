@@ -356,6 +356,13 @@ def test_mapping(es):
                 },
                 'type': 'object',
             },
+            'latest_interaction': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'date': {'type': 'date'},
+                    'subject': {'type': 'text'},
+                }
+            },
             'level_of_involvement': {
                 'properties': {
                     'id': {'type': 'keyword'},

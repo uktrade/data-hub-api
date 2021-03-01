@@ -1,6 +1,8 @@
+from datetime import datetime
 import pytest
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
 from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
@@ -162,3 +164,72 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
     assert result.hits.total.value == 1
     assert result.hits[0]['team_members'][0]['dit_team']['id'] == str(adviser.dit_team.id)
     assert result.hits[0]['team_members'][0]['dit_team']['name'] == adviser.dit_team.name
+
+
+def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
+    """Test investment project gets synced to Elasticsearch when an interaction is updated."""
+    investment_project = InvestmentProjectFactory()
+    interaction_date = "2018-05-05T00:00:00+00:00"
+    interaction_subject = "Did something interactive"
+    new_interaction = InvestmentProjectInteractionFactory(
+        investment_project=investment_project,
+        date=datetime.fromisoformat(interaction_date),
+        subject=interaction_subject,
+    )
+    es_with_signals.indices.refresh()
+
+    results = get_search_by_entities_query(
+        [InvestmentProject],
+        term='',
+        filter_data={},
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert result['latest_interaction'] == {
+        'id': str(new_interaction.id),
+        'subject': interaction_subject,
+        'date': interaction_date,
+    }
+
+
+def test_investment_project_interaction_deleted_sync_to_es(es_with_signals):
+    """Test investment project gets synced to Elasticsearch when an interaction is deleted."""
+    investment_project = InvestmentProjectFactory()
+    interaction_date = "2018-05-05T00:00:00+00:00"
+    interaction_subject = "Did something interactive"
+    new_interaction = InvestmentProjectInteractionFactory(
+        investment_project=investment_project,
+        date=datetime.fromisoformat(interaction_date),
+        subject=interaction_subject,
+    )
+    es_with_signals.indices.refresh()
+
+    results = get_search_by_entities_query(
+        [InvestmentProject],
+        term='',
+        filter_data={},
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert result['latest_interaction'] is not None
+
+    new_interaction.delete()
+    es_with_signals.indices.refresh()
+
+    results = get_search_by_entities_query(
+        [InvestmentProject],
+        term='',
+        filter_data={},
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert result['latest_interaction'] is None
+
+
+# TODO: Add another test for changing the project on an interaction
