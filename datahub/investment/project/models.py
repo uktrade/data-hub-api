@@ -263,6 +263,11 @@ class IProjectAbstract(models.Model):
 
         return self.Involvement.INVOLVED
 
+    @property
+    def latest_interaction(self):
+        """Return the most recent interaction."""
+        return self.interactions.order_by('-date').first()
+
 
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""
