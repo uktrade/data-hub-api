@@ -41,6 +41,40 @@ class TestIProjectSummaryView(APITestMixin):
             'annual_summaries': [
                 {
                     'financial_year': {
+                        'label': '2016-17',
+                        'start': '2016-04-01',
+                        'end': '2017-03-31',
+                    },
+                    'totals': {
+                        'prospect': {
+                            'label': 'Prospect',
+                            'id': InvestmentProjectStage.prospect.value.id,
+                            'value': 0,
+                        },
+                        'assign_pm': {
+                            'label': 'Assign PM',
+                            'id': InvestmentProjectStage.assign_pm.value.id,
+                            'value': 0,
+                        },
+                        'active': {
+                            'label': 'Active',
+                            'id': InvestmentProjectStage.active.value.id,
+                            'value': 0,
+                        },
+                        'verify_win': {
+                            'label': 'Verify Win',
+                            'id': InvestmentProjectStage.verify_win.value.id,
+                            'value': 0,
+                        },
+                        'won': {
+                            'label': 'Won',
+                            'id': InvestmentProjectStage.won.value.id,
+                            'value': 0,
+                        },
+                    },
+                },
+                {
+                    'financial_year': {
                         'label': '2015-16',
                         'start': '2015-04-01',
                         'end': '2016-03-31',
@@ -52,7 +86,7 @@ class TestIProjectSummaryView(APITestMixin):
                             'value': 0,
                         },
                         'assign_pm': {
-                            'label': 'Assigned',
+                            'label': 'Assign PM',
                             'id': InvestmentProjectStage.assign_pm.value.id,
                             'value': 0,
                         },
@@ -86,7 +120,7 @@ class TestIProjectSummaryView(APITestMixin):
                             'value': 0,
                         },
                         'assign_pm': {
-                            'label': 'Assigned',
+                            'label': 'Assign PM',
                             'id': InvestmentProjectStage.assign_pm.value.id,
                             'value': 0,
                         },
