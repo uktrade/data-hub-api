@@ -8,6 +8,31 @@ class LargeCapitalInvestorProfileActivitySerializer(ActivitySerializer):
     class Meta:
         model = LargeCapitalInvestorProfile
 
+    def _get_attributed_to(self, instance):
+        attributed_to = [
+            self._get_company(instance.investor_company),
+        ]
+
+        if instance.created_by:
+            attributed_to.append(
+                self._get_adviser_with_team_and_role(
+                    instance.created_by,
+                    'creator',
+                    'DataHubLargeCapitalInvestorProfile',
+                ),
+            )
+
+        if instance.modified_by:
+            attributed_to.append(
+                self._get_adviser_with_team_and_role(
+                    instance.modified_by,
+                    'modifier',
+                    'DataHubLargeCapitalInvestorProfile',
+                ),
+            )
+
+        return attributed_to
+
     def to_representation(self, instance):
         """
         Serialize the interaction as per Activity Stream spec:
@@ -23,17 +48,10 @@ class LargeCapitalInvestorProfileActivitySerializer(ActivitySerializer):
                 'id': investor_profile_id,
                 'type': ['dit:LargeCapitalInvestorProfile'],
                 'startTime': instance.created_on,
-                'attributedTo': [
-                    self._get_company(instance.investor_company),
-                ],
+                'attributedTo': self._get_attributed_to(instance),
                 'url': instance.get_absolute_url(),
             },
         }
-
-        if instance.created_by:
-            investor_profile['object']['attributedTo'].append(
-                self._get_adviser_with_team(instance.created_by, instance.created_by.dit_team),
-            )
 
         if instance.required_checks_conducted_by:
             investor_profile['object']['dit:requiredChecksConductedBy'] = (
