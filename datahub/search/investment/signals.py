@@ -3,6 +3,7 @@ from django.db.models.query_utils import Q
 from django.db.models.signals import post_delete, post_save
 
 from datahub.company.models import Advisor
+from datahub.interaction.models import Interaction
 from datahub.investment.project.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember,
@@ -17,6 +18,13 @@ def investment_project_sync_es(instance):
     def sync_es_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
+        elif isinstance(instance, Interaction):
+            if instance.investment_project is None:
+                return
+            pk = instance.investment_project.pk
+            # TODO: when investment_project is changed for an interaction, es
+            # does not update on the old investment_project - will probably
+            # need a pre_save signal
         else:
             pk = instance.pk
 
@@ -52,6 +60,8 @@ def investment_project_sync_es_adviser_change(instance):
 
 receivers = (
     SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_es),
+    SignalReceiver(post_save, Interaction, investment_project_sync_es),
+    SignalReceiver(post_delete, Interaction, investment_project_sync_es),
     SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_es),
     SignalReceiver(post_delete, InvestmentProjectTeamMember, investment_project_sync_es),
     SignalReceiver(post_save, Advisor, investment_project_sync_es_adviser_change),
