@@ -27,7 +27,7 @@ notifications-python-client==6.0.2
 statsd==3.3.0
 
 # Email
-mail-parser==3.14.0
+mail-parser==3.15.0
 icalendar==4.0.7
 
 # Slack

@@ -177,7 +177,7 @@ kombu==4.6.11
     # via
     #   -r requirements.in
     #   celery
-mail-parser==3.14.0
+mail-parser==3.15.0
     # via -r requirements.in
 markupsafe==1.1.1
     # via jinja2
