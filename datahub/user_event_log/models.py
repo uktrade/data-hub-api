@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.timezone import now
@@ -37,7 +36,7 @@ class UserEvent(models.Model):
         max_length=5000,
         db_index=True,
     )
-    data = JSONField(null=True, encoder=DjangoJSONEncoder)
+    data = models.JSONField(null=True, encoder=DjangoJSONEncoder)
 
     def __str__(self):
         """Human-friendly string representation."""

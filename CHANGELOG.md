@@ -1,3 +1,11 @@
+# Data Hub API 36.7.0 (2021-03-01)
+
+
+## Features
+
+- **Investment** The investment summaries endpoint now includes the upcoming financial year as well as the current and previous.
+
+
 # Data Hub API 36.6.0 (2021-02-16)
 
 

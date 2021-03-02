@@ -1,7 +1,7 @@
 # Django and django related
-django==3.1.6
+django==3.1.7
 djangorestframework==3.12.2
-django-axes==5.12.0
+django-axes==5.13.1
 django-environ==0.4.5
 django-extensions==3.1.1
 django-filter==2.4.0
@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.7
+boto3==1.17.17
 
 notifications-python-client==6.0.2
 
@@ -27,7 +27,7 @@ notifications-python-client==6.0.2
 statsd==3.3.0
 
 # Email
-mail-parser==3.14.0
+mail-parser==3.15.0
 icalendar==4.0.7
 
 # Slack
@@ -54,7 +54,7 @@ pytest==6.2.2
 pytest-django==4.1.0
 pytest-cov==2.11.1
 pytest-xdist==2.2.1
-ipython==7.20.0
+ipython==7.21.0
 factory-boy==3.2.0
 freezegun==1.1.0
 requests-mock==1.8.0
@@ -64,7 +64,7 @@ pip-tools==4.5.1
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==19.2.0
-watchdog[watchmedo]==2.0.0
+watchdog[watchmedo]==2.0.2
 pre-commit==2.10.1
 
 
@@ -86,4 +86,4 @@ gevent==21.1.2
 mohawk==1.1.0
 requests==2.25.1
 requests_toolbelt==0.9.1
-sentry_sdk==0.20.1
+sentry_sdk==0.20.3
