@@ -1,3 +1,17 @@
+# Data Hub API 36.8.0 (2021-03-02)
+
+
+## Internal changes
+
+- **Investment** It is now possible to use the `capital-investments-filters` feature flag
+  automatically during local development without manual setup.
+
+## API
+
+- **Investment** It is now possible to view the `modified_by` of a Large Capital Investment Profile in the activity-stream using 
+  the following URL `/v3/activity-stream/investment/large-capital-investor-profiles`.
+
+
 # Data Hub API 36.7.0 (2021-03-01)
 
 
