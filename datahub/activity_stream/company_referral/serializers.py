@@ -8,11 +8,6 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
     class Meta:
         model = CompanyReferral
 
-    def _get_adviser_with_team_and_role(self, adviser, role):
-        adviser = self._get_adviser_with_team(adviser, adviser.dit_team)
-        adviser['dit:DataHubCompanyReferral:role'] = role
-        return adviser
-
     def to_representation(self, instance):
         """
         Serialize the interaction as per Activity Stream spec:
@@ -32,8 +27,16 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
                 'dit:status': str(instance.status),
                 'attributedTo': [
                     self._get_company(instance.company),
-                    self._get_adviser_with_team_and_role(instance.created_by, 'sender'),
-                    self._get_adviser_with_team_and_role(instance.recipient, 'recipient'),
+                    self._get_adviser_with_team_and_role(
+                        instance.created_by,
+                        'sender',
+                        'DataHubCompanyReferral',
+                    ),
+                    self._get_adviser_with_team_and_role(
+                        instance.recipient,
+                        'recipient',
+                        'DataHubCompanyReferral',
+                    ),
                 ],
                 'url': instance.get_absolute_url(),
             },
@@ -42,7 +45,11 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
         if instance.completed_by:
             company_referral['object']['dit:completedOn'] = instance.completed_on
             company_referral['object']['attributedTo'].append(
-                self._get_adviser_with_team_and_role(instance.completed_by, 'completer'),
+                self._get_adviser_with_team_and_role(
+                    instance.completed_by,
+                    'completer',
+                    'DataHubCompanyReferral',
+                ),
             )
 
         if instance.contact:
