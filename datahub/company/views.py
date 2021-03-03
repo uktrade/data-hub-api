@@ -3,7 +3,6 @@ from django.contrib.auth.models import Group, Permission
 from django.db.models import Exists, Prefetch, Q
 from django.http import (
     Http404,
-    HttpResponse,
     JsonResponse,
 )
 from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
@@ -553,12 +552,7 @@ class ExportWinsForCompanyView(APIView):
             companies.append(company)
 
         matching_response = match_company(companies, request)
-        match_ids = self._extract_match_ids(matching_response)
-
-        if len(match_ids) == 0:
-            raise Http404
-
-        return match_ids
+        return self._extract_match_ids(matching_response)
 
     def get(self, request, pk):
         """
@@ -568,20 +562,30 @@ class ExportWinsForCompanyView(APIView):
         company = self._get_company(pk)
         try:
             match_ids = self._get_match_ids(company, request)
-            export_wins_results = get_export_wins(match_ids, request)
-            return JsonResponse(export_wins_results.json())
-
         except (
             CompanyMatchingServiceConnectionError,
             CompanyMatchingServiceTimeoutError,
             CompanyMatchingServiceHTTPError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        if not match_ids:
+            return JsonResponse(
+                {
+                    'count': 0,
+                    'next': None,
+                    'previous': None,
+                    'results': [],
+                },
+            )
+
+        try:
+            export_wins_results = get_export_wins(match_ids, request)
+        except (
             ExportWinsAPIConnectionError,
             ExportWinsAPITimeoutError,
             ExportWinsAPIHTTPError,
         ) as exc:
             raise APIUpstreamException(str(exc))
-        else:
-            return HttpResponse(
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type='application/json',
-            )
+
+        return JsonResponse(export_wins_results.json())
