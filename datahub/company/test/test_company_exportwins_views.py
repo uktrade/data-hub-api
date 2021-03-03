@@ -80,7 +80,7 @@ class TestGetCompanyExportWins(APITestMixin):
         requests_mock,
         match_response,
     ):
-        """Test that any issues with company matching service results in a 404."""
+        """Test that any issues with company matching service results in a 200 empty list."""
         company_dynamic_response = HawkMockJSONResponse(
             api_id=settings.COMPANY_MATCHING_HAWK_ID,
             api_key=settings.COMPANY_MATCHING_HAWK_KEY,
@@ -101,8 +101,13 @@ class TestGetCompanyExportWins(APITestMixin):
         company = CompanyFactory()
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
         response = api_client.get(url)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert response.json() == {'detail': 'Not found.'}
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'count': 0,
+            'next': None,
+            'previous': None,
+            'results': [],
+        }
 
     @pytest.mark.parametrize(
         'response_status',
