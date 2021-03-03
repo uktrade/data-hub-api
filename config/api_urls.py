@@ -15,6 +15,7 @@ from datahub.event import urls as event_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
+from datahub.investment.opportunity import urls as opportunity_urls
 from datahub.investment.project import urls as investment_urls
 from datahub.investment.project.proposition import urls as proposition_urls
 from datahub.investment.summary import urls as investment_summary_urls
@@ -70,6 +71,13 @@ v4_urls = [
         include(
             (investor_profile_urls, 'large-investor-profile'),
             namespace='large-investor-profile',
+        ),
+    ),
+    path(
+        '',
+        include(
+            (opportunity_urls, 'large-capital-opportunity'),
+            namespace='large-capital-opportunity',
         ),
     ),
     path('', include((activity_feed_urls, 'activity-feed'), namespace='activity-feed')),
