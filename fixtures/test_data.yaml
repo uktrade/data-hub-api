@@ -218,10 +218,12 @@
     address_1: 12 First Street
     address_town: New York
     address_postcode: 100413
+    address_state: aa65b701-244a-41fc-bd31-0a546303106a
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
     registered_address_town: New York
     registered_address_postcode: 100413
+    registered_address_state: aa65b701-244a-41fc-bd31-0a546303106a
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
     created_on: '2017-10-16T11:00:00Z'
@@ -293,11 +295,11 @@
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 1 Main Road
     address_town: Rome
-    address_postcode: '001122'
+    address_postcode: 001122
     address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
     registered_address_1: 1 Main Road
     registered_address_town: Rome
-    registered_address_postcode: '001122'
+    registered_address_postcode: 001122'
     registered_address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
     description: This is a dummy company for testing companies with DnB data
     duns_number: '000000001'
@@ -376,10 +378,12 @@
     address_1: 12 First Street
     address_town: New York
     address_postcode: 102413
+    address_state: aa65b701-244a-41fc-bd31-0a546303106a
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
     registered_address_town: New York
     registered_address_postcode: 102413
+    registered_address_state: aa65b701-244a-41fc-bd31-0a546303106a
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy duplicate company for testing
     created_on: '2017-03-05T12:00:00Z'
