@@ -124,6 +124,9 @@ class AdministrativeArea(BaseConstantModel):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return f"{self.name} ({self.country.name})"
+
 
 class Title(BaseConstantModel):
     """Contact title."""
