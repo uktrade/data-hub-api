@@ -123,6 +123,7 @@ class AdministrativeArea(BaseConstantModel):
         related_name='administrative_areas',
         on_delete=models.CASCADE,
     )
+    area_code = models.CharField(blank=True, max_length=3)
 
     def __str__(self):
         """

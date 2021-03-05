@@ -1803,6 +1803,15 @@
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
     created_on: '2018-01-23T00:00:00Z'
 
+- model: feature_flag.featureflag
+  pk: e14f907e-6488-4e43-8f9b-9089a02112a4
+  fields:
+    code: capital-investments-filters
+    description: This is a flag to show filters on CI profiles 
+    is_active: true
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2018-01-23T00:00:00Z'
+
 - model: investor_profile.largecapitalinvestorprofile
   pk: 04d9215f-f9f9-4183-af85-326e7cf5482b
   fields:
@@ -1829,6 +1838,7 @@
     investor_type: 113d864c-1657-4e01-b215-2fe8797cdf12
     minimum_equity_percentage: f7b72f8b-399e-43b2-b7ef-f42a154ef916
     minimum_return_rate: 6fec56ba-0be9-4931-bd76-16e11924ec55
+    modified_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
     modified_on: '2021-01-14T11:25:04.805742+00:00'
     notes_on_locations: ''
     other_countries_being_considered: []
@@ -1858,6 +1868,7 @@
     investor_type: 1be9c7d0-3cc1-435d-ace5-8c7e3686e022
     minimum_equity_percentage: null
     minimum_return_rate: null
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
     modified_on: '2021-01-10T11:26:03.680015+00:00'
     notes_on_locations: ''
     other_countries_being_considered: []
@@ -1892,6 +1903,7 @@
     investor_type: ac294431-94ba-4318-9b27-75f0ada99c0d
     minimum_equity_percentage: ec061f70-b287-41cf-aaf4-620aec79616b
     minimum_return_rate: 65c9bc7a-af68-4549-a9c9-70cd73109617
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
     modified_on: '2021-01-01T11:27:48.064811+00:00'
     notes_on_locations: Here are some notes
     other_countries_being_considered:

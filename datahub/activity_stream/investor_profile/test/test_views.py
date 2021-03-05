@@ -116,6 +116,22 @@ def test_complete_large_capital_investor_profile_activity(api_client):
                                 'type': ['Group', 'dit:Team'],
                                 'name': investor_profile.created_by.dit_team.name,
                             },
+                            'dit:DataHubLargeCapitalInvestorProfile:role': 'creator',
+                        },
+                        {
+                            'id': f'dit:DataHubAdviser:{investor_profile.modified_by.pk}',
+                            'type': ['Person', 'dit:Adviser'],
+                            'dit:emailAddress':
+                                investor_profile.modified_by.contact_email
+                                or investor_profile.modified_by.email,
+                            'name': investor_profile.modified_by.name,
+                            'dit:team': {
+                                'id':
+                                    f'dit:DataHubTeam:{investor_profile.modified_by.dit_team.pk}',
+                                'type': ['Group', 'dit:Team'],
+                                'name': investor_profile.modified_by.dit_team.name,
+                            },
+                            'dit:DataHubLargeCapitalInvestorProfile:role': 'modifier',
                         },
                     ],
                     'url': investor_profile.get_absolute_url(),

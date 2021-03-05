@@ -60,6 +60,11 @@ class ActivitySerializer(serializers.Serializer):
             adviser_with_team['dit:team'] = self._get_team(team)
         return adviser_with_team
 
+    def _get_adviser_with_team_and_role(self, adviser, role, type):
+        adviser = self._get_adviser_with_team(adviser, adviser.dit_team)
+        adviser[f'dit:{type}:role'] = role
+        return adviser
+
     def _get_team(self, team):
         return {} if team is None else {
             'id': f'dit:DataHubTeam:{team.pk}',
