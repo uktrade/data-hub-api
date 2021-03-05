@@ -368,7 +368,6 @@ class TestUpdateCompanyFromDNB:
         assert company.address_2 == formatted_dnb_company['address']['line_2']
         assert company.address_town == formatted_dnb_company['address']['town']
         assert company.address_county == formatted_dnb_company['address']['county']
-        assert company.address_state == formatted_dnb_company['address']['state']
         assert company.address_postcode == formatted_dnb_company['address']['postcode']
 
     def test_post_dnb_data_invalid(
