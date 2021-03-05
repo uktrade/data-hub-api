@@ -28,6 +28,7 @@ class AdministrativeAreaSerializer(ConstantModelSerializer):
     """Administrative area serializer."""
 
     country = NestedRelatedField(Country, read_only=True)
+    area_code = serializers.ReadOnlyField()
 
 
 class CountrySerializer(ConstantModelSerializer):
