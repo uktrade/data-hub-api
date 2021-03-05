@@ -1,5 +1,7 @@
 from datetime import datetime
+
 import pytest
+import reversion
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
@@ -14,6 +16,27 @@ from datahub.search.query_builder import (
 )
 
 pytestmark = pytest.mark.django_db
+
+
+def assert_project_search_latest_interaction(has_interaction=True, name=''):
+    """
+    Assert that a project on elastic search has or does not have a latest interaction.
+
+    :param has_interaction: whether to expect the latest interaction to exist or not
+    :param term: search term for elastic search
+    """
+    filter_data = {'name': name} if name else {}
+    results = get_search_by_entities_query(
+        [InvestmentProject],
+        term='',
+        filter_data=filter_data,
+    ).execute()
+    assert len(results) == 1
+    result = results[0]
+    if has_interaction:
+        assert result['latest_interaction'] is not None
+    else:
+        assert result['latest_interaction'] is None
 
 
 def test_investment_project_auto_sync_to_es(es_with_signals):
@@ -169,14 +192,16 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
 def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
     """Test investment project gets synced to Elasticsearch when an interaction is updated."""
     investment_project = InvestmentProjectFactory()
-    interaction_date = "2018-05-05T00:00:00+00:00"
-    interaction_subject = "Did something interactive"
+    interaction_date = '2018-05-05T00:00:00+00:00'
+    interaction_subject = 'Did something interactive'
     new_interaction = InvestmentProjectInteractionFactory(
         investment_project=investment_project,
         date=datetime.fromisoformat(interaction_date),
         subject=interaction_subject,
     )
     es_with_signals.indices.refresh()
+
+    assert_project_search_latest_interaction(has_interaction=True)
 
     results = get_search_by_entities_query(
         [InvestmentProject],
@@ -197,39 +222,50 @@ def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
 def test_investment_project_interaction_deleted_sync_to_es(es_with_signals):
     """Test investment project gets synced to Elasticsearch when an interaction is deleted."""
     investment_project = InvestmentProjectFactory()
-    interaction_date = "2018-05-05T00:00:00+00:00"
-    interaction_subject = "Did something interactive"
-    new_interaction = InvestmentProjectInteractionFactory(
+    interaction = InvestmentProjectInteractionFactory(
         investment_project=investment_project,
-        date=datetime.fromisoformat(interaction_date),
-        subject=interaction_subject,
     )
     es_with_signals.indices.refresh()
 
-    results = get_search_by_entities_query(
-        [InvestmentProject],
-        term='',
-        filter_data={},
-    ).execute()
+    assert_project_search_latest_interaction(has_interaction=True)
 
-    assert len(results) == 1
-    result = results[0]
-
-    assert result['latest_interaction'] is not None
-
-    new_interaction.delete()
+    interaction.delete()
     es_with_signals.indices.refresh()
 
-    results = get_search_by_entities_query(
-        [InvestmentProject],
-        term='',
-        filter_data={},
-    ).execute()
-
-    assert len(results) == 1
-    result = results[0]
-
-    assert result['latest_interaction'] is None
+    assert_project_search_latest_interaction(has_interaction=False)
 
 
-# TODO: Add another test for changing the project on an interaction
+def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
+    """
+    Test projects get synced to Elasticsearch when an interaction's project is changed.
+
+    When an interaction's project is switched to another project, both the old
+    and new project should be updated in Elasticsearch.
+    """
+    investment_project_a = InvestmentProjectFactory(name='alpha')
+    investment_project_b = InvestmentProjectFactory(name='beta')
+
+    with reversion.create_revision():
+        interaction = InvestmentProjectInteractionFactory(
+            investment_project=investment_project_a,
+        )
+
+    es_with_signals.indices.refresh()
+
+    for project_name, has_interaction in [('alpha', True), ('beta', False)]:
+        assert_project_search_latest_interaction(
+            has_interaction=has_interaction,
+            name=project_name,
+        )
+
+    interaction.investment_project = investment_project_b
+    with reversion.create_revision():
+        interaction.save()
+
+    es_with_signals.indices.refresh()
+
+    for project_name, has_interaction in [('alpha', False), ('beta', True)]:
+        assert_project_search_latest_interaction(
+            has_interaction=has_interaction,
+            name=project_name,
+        )
