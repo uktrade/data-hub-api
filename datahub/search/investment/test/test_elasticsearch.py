@@ -360,8 +360,12 @@ def test_mapping(es):
                 'properties': {
                     'id': {'type': 'keyword'},
                     'date': {'type': 'date'},
-                    'subject': {'type': 'text'},
-                }
+                    'subject': {
+                        'index': False,
+                        'type': 'text',
+                    },
+                },
+                'type': 'object',
             },
             'level_of_involvement': {
                 'properties': {

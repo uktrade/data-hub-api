@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_delete, post_save
+from reversion.models import Version
 
 from datahub.company.models import Advisor
 from datahub.interaction.models import Interaction
@@ -18,19 +19,40 @@ def investment_project_sync_es(instance):
     def sync_es_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
-        elif isinstance(instance, Interaction):
-            if instance.investment_project is None:
-                return
-            pk = instance.investment_project.pk
-            # TODO: when investment_project is changed for an interaction, es
-            # does not update on the old investment_project - will probably
-            # need a pre_save signal
         else:
             pk = instance.pk
 
         sync_object_async(InvestmentSearchApp, pk)
 
     transaction.on_commit(sync_es_wrapper)
+
+
+def investment_project_sync_es_interaction_change(instance):
+    """
+    Sync investment projects in elastic search when related investments change.
+
+    When an interaction changes, the elastic search index is also updated for
+    the related investment project. The previous version also needs to be
+    checked to make sure that if the investment project changes, the old
+    investment project is also updated in the index.
+    """
+    pks = []
+
+    if instance.investment_project is not None:
+        pks.append(instance.investment_project.pk)
+
+    previous_version = Version.objects.get_for_object(
+        instance,
+    ).order_by('-revision__date_created').first()
+
+    if (
+        previous_version is not None
+        and 'investment_project_id' in previous_version.field_dict
+    ):
+        pks.append(previous_version.field_dict['investment_project_id'])
+
+    for pk in set(pks):
+        sync_object_async(InvestmentSearchApp, pk)
 
 
 def investment_project_sync_es_adviser_change(instance):
@@ -60,8 +82,8 @@ def investment_project_sync_es_adviser_change(instance):
 
 receivers = (
     SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_es),
-    SignalReceiver(post_save, Interaction, investment_project_sync_es),
-    SignalReceiver(post_delete, Interaction, investment_project_sync_es),
+    SignalReceiver(post_save, Interaction, investment_project_sync_es_interaction_change),
+    SignalReceiver(post_delete, Interaction, investment_project_sync_es_interaction_change),
     SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_es),
     SignalReceiver(post_delete, InvestmentProjectTeamMember, investment_project_sync_es),
     SignalReceiver(post_save, Advisor, investment_project_sync_es_adviser_change),
