@@ -125,7 +125,10 @@ class AdministrativeArea(BaseConstantModel):
     )
 
     def __str__(self):
-        return f"{self.name} ({self.country.name})"
+        """
+        To make this clearer for anyone using the admin drop down on this data
+        """
+        return f'{self.name} ({self.country.name})'
 
 
 class Title(BaseConstantModel):
