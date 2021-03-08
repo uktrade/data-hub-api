@@ -5,7 +5,7 @@ django-axes==5.13.1
 django-environ==0.4.5
 django-extensions==3.1.1
 django-filter==2.4.0
-django-mptt==0.11.0
+django-mptt==0.12.0
 django-pglocks==1.0.4
 django-reversion==3.0.9
 uritemplate==3.0.1  # required for DRF schema features
@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.17
+boto3==1.17.22
 
 notifications-python-client==6.0.2
 
@@ -65,12 +65,12 @@ piprot==0.9.11
 semantic_version==2.8.5
 towncrier==19.2.0
 watchdog[watchmedo]==2.0.2
-pre-commit==2.10.1
+pre-commit==2.11.0
 
 
 # Code static analysis
 flake8==3.8.4
-flake8-bugbear==20.11.1
+flake8-bugbear==21.3.1
 flake8-commas==2.0.0
 flake8-debugger==4.0.0
 flake8-import-order==0.18.1
@@ -86,4 +86,4 @@ gevent==21.1.2
 mohawk==1.1.0
 requests==2.25.1
 requests_toolbelt==0.9.1
-sentry_sdk==0.20.3
+sentry_sdk==1.0.0
