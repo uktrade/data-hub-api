@@ -3,44 +3,47 @@
 from django.urls import path
 
 from datahub.investment.project.proposition.views import (
-    PropositionDocumentViewSet,
+    ProjectPropositionDocumentViewSet,
+    ProjectPropositionViewSet,
     PropositionViewSet,
 )
 
-proposition_collection = PropositionViewSet.as_view({
+proposition_collection = ProjectPropositionViewSet.as_view({
     'get': 'list',
     'post': 'create',
 })
 
-proposition_item = PropositionViewSet.as_view({
+proposition_item = ProjectPropositionViewSet.as_view({
     'get': 'retrieve',
 })
 
-proposition_complete = PropositionViewSet.as_view({
+proposition_complete = ProjectPropositionViewSet.as_view({
     'post': 'complete',
 })
 
-proposition_abandon = PropositionViewSet.as_view({
+proposition_abandon = ProjectPropositionViewSet.as_view({
     'post': 'abandon',
 })
 
-proposition_document_collection = PropositionDocumentViewSet.as_view({
+proposition_document_collection = ProjectPropositionDocumentViewSet.as_view({
     'get': 'list',
     'post': 'create',
 })
 
-proposition_document_item = PropositionDocumentViewSet.as_view({
+proposition_document_item = ProjectPropositionDocumentViewSet.as_view({
     'get': 'retrieve',
     'delete': 'destroy',
 })
 
-proposition_document_callback = PropositionDocumentViewSet.as_action_view(
+proposition_document_callback = ProjectPropositionDocumentViewSet.as_action_view(
     'upload_complete_callback',
 )
 
-proposition_document_download = PropositionDocumentViewSet.as_action_view('download')
+proposition_document_download = ProjectPropositionDocumentViewSet.as_action_view('download')
 
-urlpatterns = [
+
+# API V3
+urls_v3 = [
     path('proposition', proposition_collection, name='collection'),
     path('proposition/<uuid:proposition_pk>', proposition_item, name='item'),
     path('proposition/<uuid:proposition_pk>/complete', proposition_complete, name='complete'),
@@ -65,4 +68,13 @@ urlpatterns = [
         proposition_document_download,
         name='document-item-download',
     ),
+]
+
+# API V4
+proposition_collection_v4 = PropositionViewSet.as_view({
+    'get': 'list',
+})
+
+urls_v4 = [
+    path('proposition', proposition_collection_v4, name='collection'),
 ]
