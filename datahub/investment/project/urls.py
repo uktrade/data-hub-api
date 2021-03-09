@@ -3,7 +3,7 @@
 from django.urls import include, path
 
 from datahub.investment.project.evidence.urls import urlpatterns as evidence_urlpatterns
-from datahub.investment.project.proposition.urls import urlpatterns as proposition_urlpatterns
+from datahub.investment.project.proposition.urls import urls_v3 as proposition_urlpatterns
 from datahub.investment.project.views import (
     IProjectAuditViewSet,
     IProjectTeamMembersViewSet,
