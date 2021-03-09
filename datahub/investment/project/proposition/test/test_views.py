@@ -339,8 +339,9 @@ class TestUpdateProposition(APITestMixin):
 class TestListPropositions(APITestMixin):
     """Tests for the list propositions view."""
 
+    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
-    def test_non_restricted_user_can_list_propositions(self, permissions):
+    def test_non_restricted_user_can_list_propositions(self, permissions, api_version):
         """List of propositions by a non restricted user."""
         investment_project = InvestmentProjectFactory()
 
@@ -349,16 +350,20 @@ class TestListPropositions(APITestMixin):
             3, investment_project=investment_project,
         )
 
-        url = reverse(
-            'api-v3:investment:proposition:collection',
-            kwargs={
-                'project_pk': investment_project.pk,
-            },
-        )
-
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+
+        if api_version == 'v3':
+            url = reverse(
+                'api-v3:investment:proposition:collection',
+                kwargs={
+                    'project_pk': investment_project.pk,
+                },
+            )
+            response = api_client.get(url)
+        else:
+            url = reverse('api-v4:proposition:collection')
+            response = api_client.get(url, {'investment_project_id': investment_project.pk})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -385,7 +390,25 @@ class TestListPropositions(APITestMixin):
         response_data = response.json()
         assert response_data == {'detail': 'Not found.'}
 
-    def test_restricted_user_can_list_propositions(self):
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
+    def test_filter_by_non_existent_investment_project(self, permissions):
+        """Test user gets error when filtering by a non existent investment project."""
+        url = reverse('api-v4:proposition:collection')
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url, {'investment_project_id': uuid.uuid4()})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'investment_project_id': [
+                'Select a valid choice. That choice is not one of the available choices.',
+            ],
+        }
+
+    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    def test_restricted_user_can_list_propositions(self, api_version):
         """List of propositions by a restricted user."""
         PropositionFactory.create_batch(3)
 
@@ -397,13 +420,6 @@ class TestListPropositions(APITestMixin):
             3, investment_project=investment_project,
         )
 
-        url = reverse(
-            'api-v3:investment:proposition:collection',
-            kwargs={
-                'project_pk': investment_project.pk,
-            },
-        )
-
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.view_associated,
@@ -411,7 +427,18 @@ class TestListPropositions(APITestMixin):
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+
+        if api_version == 'v3':
+            url = reverse(
+                'api-v3:investment:proposition:collection',
+                kwargs={
+                    'project_pk': investment_project.pk,
+                },
+            )
+            response = api_client.get(url)
+        else:
+            url = reverse('api-v4:proposition:collection')
+            response = api_client.get(url, {'investment_project_id': investment_project.pk})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -420,7 +447,8 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
-    def test_restricted_user_cannot_list_non_associated_ip_propositions(self):
+    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    def test_restricted_user_cannot_list_non_associated_ip_propositions(self, api_version):
         """Restricted user cannot list non associated investment project propositions."""
         project_creator = AdviserFactory()
         investment_project = InvestmentProjectFactory(
@@ -430,13 +458,6 @@ class TestListPropositions(APITestMixin):
             3, investment_project=investment_project,
         )
 
-        url = reverse(
-            'api-v3:investment:proposition:collection',
-            kwargs={
-                'project_pk': investment_project.pk,
-            },
-        )
-
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.view_associated
@@ -444,7 +465,18 @@ class TestListPropositions(APITestMixin):
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+
+        if api_version == 'v3':
+            url = reverse(
+                'api-v3:investment:proposition:collection',
+                kwargs={
+                    'project_pk': investment_project.pk,
+                },
+            )
+            response = api_client.get(url)
+        else:
+            url = reverse('api-v4:proposition:collection')
+            response = api_client.get(url, {'investment_project_id': investment_project.pk})
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
@@ -452,7 +484,8 @@ class TestListPropositions(APITestMixin):
             'detail': 'You do not have permission to perform this action.',
         }
 
-    def test_filtered_by_adviser(self):
+    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    def test_filtered_by_adviser(self, api_version):
         """List of propositions filtered by assigned adviser."""
         adviser = AdviserFactory()
         investment_project = InvestmentProjectFactory()
@@ -466,17 +499,23 @@ class TestListPropositions(APITestMixin):
             investment_project=investment_project,
         )
 
-        url = reverse(
-            'api-v3:investment:proposition:collection',
-            kwargs={
-                'project_pk': investment_project.pk,
-            },
-        )
-        response = self.api_client.get(
-            url, {
-                'adviser_id': adviser.id,
-            },
-        )
+        if api_version == 'v3':
+            url = reverse(
+                'api-v3:investment:proposition:collection',
+                kwargs={
+                    'project_pk': investment_project.pk,
+                },
+            )
+            response = self.api_client.get(url, {'adviser_id': adviser.id})
+        else:
+            url = reverse('api-v4:proposition:collection')
+            response = self.api_client.get(
+                url,
+                {
+                    'adviser_id': adviser.id,
+                    'investment_project_id': investment_project.pk,
+                },
+            )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -485,6 +524,7 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
+    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
     @pytest.mark.parametrize(
         'proposition_status',
         (
@@ -493,7 +533,7 @@ class TestListPropositions(APITestMixin):
             PropositionStatus.COMPLETED,
         ),
     )
-    def test_filtered_by_status(self, proposition_status):
+    def test_filtered_by_status(self, proposition_status, api_version):
         """List of propositions filtered by status."""
         statuses = (
             PropositionStatus.ONGOING,
@@ -507,17 +547,23 @@ class TestListPropositions(APITestMixin):
             investment_project=investment_project,
         )
 
-        url = reverse(
-            'api-v3:investment:proposition:collection',
-            kwargs={
-                'project_pk': investment_project.pk,
-            },
-        )
-        response = self.api_client.get(
-            url, {
-                'status': proposition_status,
-            },
-        )
+        if api_version == 'v3':
+            url = reverse(
+                'api-v3:investment:proposition:collection',
+                kwargs={
+                    'project_pk': investment_project.pk,
+                },
+            )
+            response = self.api_client.get(url, {'status': proposition_status})
+        else:
+            url = reverse('api-v4:proposition:collection')
+            response = self.api_client.get(
+                url,
+                {
+                    'status': proposition_status,
+                    'investment_project_id': investment_project.pk,
+                },
+            )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
