@@ -199,6 +199,18 @@ def sector_dict(obj):
     }
 
 
+def interaction_dict(obj):
+    """Creates a dictionary for an interaction."""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'date': obj.date,
+        'subject': obj.subject,
+    }
+
+
 def _list_of_dicts(dict_factory, manager):
     """Creates a list of dicts with ID and name keys from a manager."""
     return [dict_factory(obj) for obj in manager.all()]

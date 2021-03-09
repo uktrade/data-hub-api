@@ -1,6 +1,6 @@
 from functools import partial
 
-from elasticsearch_dsl import Keyword, Object, Text
+from elasticsearch_dsl import Date, Keyword, Object, Text
 
 from datahub.search.elasticsearch import (
     lowercase_asciifolding_normalizer,
@@ -155,5 +155,16 @@ def sector_field():
             'id': Keyword(),
             'name': NormalizedKeyword(),
             'ancestors': ancestors,
+        },
+    )
+
+
+def interaction_field():
+    """Interaction field with id, subject and date."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'subject': Text(index=False),
+            'date': Date(),
         },
     )
