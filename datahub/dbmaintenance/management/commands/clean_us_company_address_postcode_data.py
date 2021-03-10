@@ -13,6 +13,9 @@ class Command(BaseCommand):
     Command to query for the ids of duns-linked companies for a particular set of
     one list tiers and (optionally) particular set of account managers.
     """
+    regex = r"'(\d{5}-\d{4})|(\d{5}\s–\s\d{4})" \
+            r"|(\d{5}\s-\s\d{4})|(\d{9})|(\d{5})|(\d{1}\s\d{4})'"
+    united_states_id = '81756b9a-5d95-e211-a939-e4115bead28a'
 
     def add_arguments(self, parser):
         """
@@ -32,16 +35,17 @@ class Command(BaseCommand):
         Does update on the postcode address table
         """
         with reversion.create_revision():
-            regex = r"'(\d{5}-\d{4})|(\d{5}\s–\s\d{4})" \
-                    r"|(\d{5}\s-\s\d{4})|(\d{9})|(\d{5})|(\d{1}\s\d{4})'"
-            united_states_id = '81756b9a-5d95-e211-a939-e4115bead28a'
-            sub = Command.get_error_postcodes(regex, united_states_id)
+            sub = Command.get_incorrect_formatted_postcodes(
+                Command.regex, Command.united_states_id)
             Command.update_address_postcode(sub)
 
             reversion.set_comment('Address Postcode Fix.')
 
     @staticmethod
-    def get_error_postcodes(regex, united_states_id):
+    def get_incorrect_formatted_postcodes(regex, united_states_id):
+        """
+        Get US Company records that have incorrect postcode formats
+        """
         sub = Company. \
             objects. \
             filter(address_country=united_states_id). \
@@ -66,11 +70,14 @@ class Command(BaseCommand):
         return sub
 
     @staticmethod
-    def update_address_postcode(sub):
-        if sub.count() > 0:
+    def update_address_postcode(subquery):
+        """
+        Update address postcodes where the subquery exists
+        """
+        if subquery.count() > 0:
             # Update the postcode
             Company. \
                 objects. \
-                update(address_postcode=Subquery(sub))
+                update(address_postcode=Subquery(subquery))
         else:
             logger.info('Nothing to update')
