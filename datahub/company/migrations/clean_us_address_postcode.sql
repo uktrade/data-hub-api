@@ -5,11 +5,8 @@
 update company_company cmpy
 set address_postcode = sub.fix
 from
-	(select company_fix.id,
-	 	(array_to_string(regexp_matches(replace(company_fix.address_postcode, ' ', ''),
-			'(\d{5}-\d{4})|(\d{5}\s–\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d{5})|(\d{1}\s\d{4})'
-			'g'),';')) as fix
-	from company_company company_fix
+	(
+		select company_fix.id,(array_to_string(regexp_matches(replace(company_fix.address_postcode, ' ', ''),'(\d{5}-\d{4})|(\d{5}\s–\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d{5})|(\d{1}\s\d{4})''g'),';')) as fix from company_company company_fix
 	) as sub
 where
 	cmpy.address_country_id = '81756b9a-5d95-e211-a939-e4115bead28a'
