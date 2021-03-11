@@ -19,6 +19,27 @@ def test_id_name_dict():
     }
 
 
+def test_interaction_dict():
+    """Interaction dict should serialize id, date and subject"""
+    obj = construct_mock(
+        id=1234,
+        date='2018-01-01',
+        subject='mock interaction',
+    )
+    res = dict_utils.interaction_dict(obj)
+    assert res == {
+        'id': str(obj.id),
+        'date': obj.date,
+        'subject': obj.subject,
+    }
+
+
+def test_interaction_dict_none():
+    """Interaction dict should return none for none input"""
+    res = dict_utils.interaction_dict(None)
+    assert res is None
+
+
 def test_id_name_list_of_dicts():
     """Test that id_name_list_of_dicts returns a list of dicts with ID and name keys."""
     data = [
