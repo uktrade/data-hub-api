@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 address_postcode=Func(
                     F('address_postcode'),
                     Value(Command.regex),
-                    Value(r'\1\2\3\4'),
+                    Value(r'\1\2\3\4\5'),
                     Value('gm'),
                     function='regexp_replace'))
 
@@ -70,6 +70,6 @@ class Command(BaseCommand):
                 registered_address_postcode=Func(
                     F('registered_address_postcode'),
                     Value(Command.regex),
-                    Value(r'\1\2\3\4'),
+                    Value(r'\1\2\3\4\5'),
                     Value('gm'),
                     function='regexp_replace'))
