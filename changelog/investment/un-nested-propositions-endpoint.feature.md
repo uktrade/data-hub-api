@@ -1,1 +1,0 @@
-A new propositions endpoint was added under `/v4/proposition` - this is a more flexible version of the existing `/v3/investment/<uuid>/proposition` endpoint, but does not require an investment project id.

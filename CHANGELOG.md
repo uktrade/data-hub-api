@@ -1,3 +1,20 @@
+# Data Hub API 36.9.0 (2021-03-11)
+
+
+## Features
+
+- **Investment** The latest interaction (with date and subject) was added to the investment projects search endpoint.
+- **Investment** A new propositions endpoint was added under `/v4/proposition` - this is a more flexible version of the existing `/v3/investment/<uuid>/proposition` endpoint, but does not require an investment project id.
+
+## Internal changes
+
+- **Companies** The company endpoint `company/<uuid:pk>/export-win` now returns an empty list HTTP 200, instead of throwing a HTTP 404 when it can't match a company via the Company Matching Service.
+
+## Database schema
+
+- A new field `area_code` has been added to Administrative Areas under metadata.
+
+
 # Data Hub API 36.8.0 (2021-03-02)
 
 
