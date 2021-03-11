@@ -33,30 +33,6 @@ def read_and_execute(file_name):
     return execute_sql_command(sql_statement)
 
 
-def run_clean_postcode_address_update(app, schema_editor):
-    """
-        Clean postcode address data
-    """
-    print(app, schema_editor)
-    read_and_execute('clean_us_address_postcode.sql')
-
-
-def run_clean_registered_postcode_address_update(app, schema_editor):
-    """
-        Clean registered postcode address data
-    """
-    print(app, schema_editor)
-    read_and_execute('clean_us_registered_address_postcode.sql')
-
-
-def run_us_state_data_migration(app, schema_editor):
-    """
-        Clean registered postcode address data
-    """
-    print(app, schema_editor)
-    read_and_execute('create_and_update_us_state_from_postcode_data.sql')
-
-
 def run_international_area_code_data_migration(app, schema_editor):
     """
         Clean registered postcode address data
@@ -71,8 +47,5 @@ class Migration(migrations.Migration):
         ('company', '0108_create_company_state_fk_base_model'),
     ]
     operations = [
-        migrations.RunPython(run_clean_postcode_address_update),
-        migrations.RunPython(run_clean_registered_postcode_address_update),
-        migrations.RunPython(run_us_state_data_migration),
         migrations.RunPython(run_international_area_code_data_migration),
     ]
