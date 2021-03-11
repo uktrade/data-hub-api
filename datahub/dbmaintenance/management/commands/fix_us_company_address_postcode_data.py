@@ -978,15 +978,21 @@ class Command(BaseCommand):
         """
 
         united_states_companies = Company\
-             .objects\
-             .filter(address_country=Command.united_states_id)
-        
+            .objects\
+            .filter(address_country=Command.united_states_id)
+
         for zip_prefix, area_code, area_name in UNIQUE_ZIP:
             administrative_area = Command.administrative_area_by_area(area_code)
-            if administrative_area == None:
-                logger.warn(f"Warning: area {area_code} for zip prefix {zip_prefix} does not exist in administrative_areas")
+            if administrative_area is None:
+                logger.warning(
+                    f"Warning: area {area_code} for zip prefix {zip_prefix}"
+                    " does not exist in administrative_areas"
+                )
             else:
-                Command.stateless_companies_by_address_postcode(united_states_companies, zip_prefix).\
+                Command.stateless_companies_by_address_postcode(
+                    united_states_companies,
+                    zip_prefix
+                ).\
                     update(address_area_id=administrative_area.id)
 
     @staticmethod
@@ -995,14 +1001,14 @@ class Command(BaseCommand):
             address_postcode__startswith=zip_prefix,
             address_area_id__isnull=True
         )
-    
+
     @staticmethod
     def administrative_area_by_area(area_code):
         return AdministrativeArea.objects.filter(
             country_id=Command.united_states_id,
             area_code=area_code
         ).first()
-    
+
     @staticmethod
     def update_address_postcode():
         """
