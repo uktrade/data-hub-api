@@ -15,8 +15,8 @@ class Command(BaseCommand):
     Example of executing this command locally:
         python manage.py fix_us_company_address_postcode_data
     """
-    # Note - Online Tests and interactions can be found here at https://regex101.com/r/yckIVj/2
-    regex = r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d\s?\d{4})).*?$'
+    # TODO (Move Tests Locally) at https://regex101.com/r/yckIVj/3
+    regex = r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'
     united_states_id = '81756b9a-5d95-e211-a939-e4115bead28a'
 
     def add_arguments(self, parser):
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 address_postcode=Func(
                     F('address_postcode'),
                     Value(Command.regex),
-                    Value(r'\1\2\3\4\5'),
+                    Value(r'\1\2\3\4\5\6'),
                     Value('gm'),
                     function='regexp_replace'))
 
@@ -70,6 +70,6 @@ class Command(BaseCommand):
                 registered_address_postcode=Func(
                     F('registered_address_postcode'),
                     Value(Command.regex),
-                    Value(r'\1\2\3\4\5'),
+                    Value(r'\1\2\3\4\5\6'),
                     Value('gm'),
                     function='regexp_replace'))
