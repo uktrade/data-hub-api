@@ -144,16 +144,15 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'address_2',
                     'address_town',
                     'address_county',
-                    'address_state',
+                    'address_area',
                     'address_postcode',
                     'address_country',
-
 
                     'registered_address_1',
                     'registered_address_2',
                     'registered_address_town',
                     'registered_address_county',
-                    'registered_address_state',
+                    'registered_address_area',
                     'registered_address_postcode',
                     'registered_address_country',
                 ),

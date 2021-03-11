@@ -264,7 +264,7 @@ class TestUpdateCompanyFromDNB:
             'address_2': '',
             'address_country': uk_country.id,
             'address_county': '',
-            'address_state': None,
+            'address_area': None,
             'address_postcode': 'UB6 0F2',
             'address_town': 'GREENFORD',
             'archived_documents_url_path': original_company.archived_documents_url_path,
