@@ -12,8 +12,10 @@ class Command(BaseCommand):
     """
     Command to query for the ids of duns-linked companies for a particular set of
     one list tiers and (optionally) particular set of account managers.
-    Note - Online Tests and interactions can be found here at https://regex101.com/r/yckIVj/2
+    Example of executing this command locally:
+        python manage.py fix_us_company_address_postcode_data
     """
+    # Note - Online Tests and interactions can be found here at https://regex101.com/r/yckIVj/2
     regex = r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d\s?\d{4})).*?$'
     united_states_id = '81756b9a-5d95-e211-a939-e4115bead28a'
 
