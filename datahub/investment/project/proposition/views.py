@@ -29,8 +29,8 @@ from datahub.user_event_log.utils import record_user_event
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class PropositionViewSet(CoreViewSet):
-    """ViewSet for public facing proposition endpoint."""
+class ProjectPropositionViewSet(CoreViewSet):
+    """ViewSet for public facing proposition endpoint (nested under investment project)."""
 
     non_existent_project_error_message = 'Specified investment project does not exist'
 
@@ -130,8 +130,8 @@ class PropositionViewSet(CoreViewSet):
         return data
 
 
-class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
-    """Proposition Document ViewSet."""
+class ProjectPropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
+    """Proposition Document ViewSet (nested under investment project)."""
 
     non_existent_proposition_error_message = 'Specified proposition does not exist'
 
@@ -183,3 +183,28 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
         data['proposition_id'] = entity_document.proposition_id
         record_user_event(request, UserEventType.PROPOSITION_DOCUMENT_DELETE, data=data)
         return super().destroy(request, *args, **kwargs)
+
+
+class PropositionViewSet(CoreViewSet):
+    """ViewSet for public facing proposition endpoint (with no nesting)."""
+
+    permission_classes = (
+        PropositionModelPermissions,
+    )
+    serializer_class = PropositionSerializer
+    queryset = Proposition.objects.select_related(
+        'investment_project',
+        'adviser',
+        'created_by',
+        'modified_by',
+    )
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_fields = ('adviser_id', 'status', 'investment_project_id')
+
+    lookup_url_kwarg = 'proposition_pk'
+
+    ordering_fields = ('deadline', 'created_on')
+    ordering = ('-deadline', '-created_on')

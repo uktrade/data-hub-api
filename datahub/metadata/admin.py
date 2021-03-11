@@ -98,9 +98,9 @@ admin.site.register(
 class AdministrativeAreaAdmin(ViewOnlyAdmin):
     """View-only admin for administrative areas (of countries)."""
 
-    fields = ('pk', 'name', 'country', 'disabled_on')
-    list_display = ('name', 'country', 'disabled_on')
-    search_fields = ('name', 'pk', 'country__name')
+    fields = ('pk', 'name', 'country', 'disabled_on', 'area_code')
+    list_display = ('name', 'country', 'disabled_on', 'area_code')
+    search_fields = ('name', 'pk', 'country__name', 'area_code')
     list_filter = (DisabledOnFilter, 'country')
 
 

@@ -123,6 +123,7 @@ class InvestmentProject(BaseESModel):
     uk_region_locations = fields.id_name_field()
     will_new_jobs_last_two_years = Boolean()
     level_of_involvement_simplified = Keyword()
+    latest_interaction = fields.interaction_field()
 
     gross_value_added = Double()
 
@@ -149,6 +150,7 @@ class InvestmentProject(BaseESModel):
         'investor_company': dict_utils.id_name_dict,
         'investor_company_country': dict_utils.id_name_dict,
         'investor_type': dict_utils.id_name_dict,
+        'latest_interaction': dict_utils.interaction_dict,
         'level_of_involvement': dict_utils.id_name_dict,
         'likelihood_to_land': dict_utils.id_name_dict,
         'project_assurance_adviser': dict_utils.adviser_dict_with_team,

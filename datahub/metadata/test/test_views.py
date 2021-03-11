@@ -156,6 +156,7 @@ def test_administrative_area_view(metadata_client):
             'name': administrative_area.country.name,
         },
         'disabled_on': format_date_or_datetime(administrative_area.disabled_on),
+        'area_code': administrative_area.area_code,
     }
 
 
