@@ -971,6 +971,38 @@ class Command(BaseCommand):
             Command.update_address_area()
             reversion.set_comment('Company Address Area Migration')
 
+        with reversion.create_revision():
+            Command.update_registered_address_area()
+            reversion.set_comment('Company Registered Address Area Migration')
+
+    @staticmethod
+    def update_registered_address_area():
+        """
+        Update company registered address area data
+        """
+
+        united_states_companies = Company \
+            .objects \
+            .filter(registered_address_country=Command.united_states_id)
+
+        for zip_prefix, area_code, area_name in UNIQUE_ZIP:
+            administrative_area = Command.us_administrative_area_by_code(area_code)
+            if administrative_area is None:
+                Command.log_area_not_found(area_code, zip_prefix)
+            else:
+                Command.no_area_companies_by_registered_address_postcode(
+                    united_states_companies,
+                    zip_prefix
+                ). \
+                    update(registered_address_area_id=administrative_area.id)
+
+    @staticmethod
+    def log_area_not_found(area_code, zip_prefix):
+        logger.warning(
+            f"Warning: area {area_code} for zip prefix {zip_prefix}"
+            " does not exist in administrative_areas"
+        )
+
     @staticmethod
     def update_address_area():
         """
@@ -982,28 +1014,32 @@ class Command(BaseCommand):
             .filter(address_country=Command.united_states_id)
 
         for zip_prefix, area_code, area_name in UNIQUE_ZIP:
-            administrative_area = Command.administrative_area_by_area(area_code)
+            administrative_area = Command.us_administrative_area_by_code(area_code)
             if administrative_area is None:
-                logger.warning(
-                    f"Warning: area {area_code} for zip prefix {zip_prefix}"
-                    " does not exist in administrative_areas"
-                )
+                Command.log_area_not_found(area_code, zip_prefix)
             else:
-                Command.stateless_companies_by_address_postcode(
+                Command.no_area_companies_by_address_postcode(
                     united_states_companies,
                     zip_prefix
                 ).\
                     update(address_area_id=administrative_area.id)
 
     @staticmethod
-    def stateless_companies_by_address_postcode(united_states_companies, zip_prefix):
+    def no_area_companies_by_registered_address_postcode(united_states_companies, zip_prefix):
+        return united_states_companies.filter(
+            registered_address_postcode__startswith=zip_prefix,
+            registered_address_area_id__isnull=True
+        )
+
+    @staticmethod
+    def no_area_companies_by_address_postcode(united_states_companies, zip_prefix):
         return united_states_companies.filter(
             address_postcode__startswith=zip_prefix,
             address_area_id__isnull=True
         )
 
     @staticmethod
-    def administrative_area_by_area(area_code):
+    def us_administrative_area_by_code(area_code):
         return AdministrativeArea.objects.filter(
             country_id=Command.united_states_id,
             area_code=area_code
