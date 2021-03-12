@@ -30,7 +30,7 @@ class CompanySearchApp(SearchApp):
         'turnover_range',
         'uk_region',
         'address_area',
-        'registered_address_area'
+        'registered_address_area',
     ).prefetch_related(
         'export_countries__country',
     ).annotate(

@@ -155,3 +155,31 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     assert current_company.registered_address_area is not None
     assert current_company.registered_address_area.area_code == area_code
     assert current_company.registered_address_postcode == post_code
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('post_code, expected_result',
+                         [('1 0402', '10402'),
+                          ('8520 7402', '07402'),
+                          ('CA90025', '90025'),
+                          ('NY 10174 – 4099', '10174 – 4099'),
+                          ('NY 10174 - 4099', '10174 - 4099'),
+                          ('NY 123456789', '123456789'),
+                          ])
+def test_command_fixes_invalid_postcodes_in_all_post_code_fields(post_code, expected_result, sut):
+    """
+    Test Patterns that need fixing in all postcode fields
+    @param post_code: Invalid Postcode Format
+    @param expected_result:  The expected result of the fix
+    @param sut: Command
+    """
+    USCompanyFactory.create(
+        address_postcode=post_code,
+        registered_address_postcode=post_code,
+    )
+
+    sut.handle(None, None)
+
+    current_company = Company.objects.first()
+    assert current_company.address_postcode == expected_result
+    assert current_company.registered_address_postcode == expected_result
