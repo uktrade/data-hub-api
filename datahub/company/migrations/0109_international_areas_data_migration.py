@@ -43,7 +43,8 @@ def run_international_area_code_data_migration(app, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('metadata', '0007_administrativearea_area_code')
+        ('metadata', '0007_administrativearea_area_code'),
+        ('company', '0108_create_company_state_fk_base_model'),
     ]
     operations = [
         migrations.RunPython(run_international_area_code_data_migration),

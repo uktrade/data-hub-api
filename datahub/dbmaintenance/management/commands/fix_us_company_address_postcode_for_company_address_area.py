@@ -1,7 +1,8 @@
-from django.db.models import F, Func, Value
-from django.core.management.base import BaseCommand
 from logging import getLogger
+
 import reversion
+from django.core.management.base import BaseCommand
+from django.db.models import F, Func, Value
 
 from datahub.company.models import Company
 from datahub.metadata.models import AdministrativeArea
@@ -11,7 +12,6 @@ logger = getLogger(__name__)
 UNIQUE_ZIP = (('005', 'NY', 'New York'),
               ('006', 'PR', 'Puerto Rico'),
               ('007', 'PR', 'Puerto Rico'),
-              ('008', 'VI', 'Virgin Islands'),
               ('009', 'PR', 'Puerto Rico'),
               ('010', 'MA', 'Massachusetts'),
               ('011', 'MA', 'Massachusetts'),
@@ -93,15 +93,6 @@ UNIQUE_ZIP = (('005', 'NY', 'New York'),
               ('087', 'NJ', 'New Jersey'),
               ('088', 'NJ', 'New Jersey'),
               ('089', 'NJ', 'New Jersey'),
-              ('090', 'AE', 'Armed Forces Europe'),
-              ('091', 'AE', 'Armed Forces Europe'),
-              ('092', 'AE', 'Armed Forces Europe'),
-              ('093', 'AE', 'Armed Forces Europe'),
-              ('094', 'AE', 'Armed Forces Europe'),
-              ('095', 'AE', 'Armed Forces Europe'),
-              ('096', 'AE', 'Armed Forces Europe'),
-              ('097', 'AE', 'Armed Forces Europe'),
-              ('098', 'AE', 'Armed Forces Europe'),
               ('100', 'NY', 'New York'),
               ('101', 'NY', 'New York'),
               ('102', 'NY', 'New York'),
@@ -339,7 +330,6 @@ UNIQUE_ZIP = (('005', 'NY', 'New York'),
               ('337', 'FL', 'Florida'),
               ('338', 'FL', 'Florida'),
               ('339', 'FL', 'Florida'),
-              ('340', 'AA', 'Armed Forces (the) Americas'),
               ('341', 'FL', 'Florida'),
               ('342', 'FL', 'Florida'),
               ('344', 'FL', 'Florida'),
@@ -895,14 +885,8 @@ UNIQUE_ZIP = (('005', 'NY', 'New York'),
               ('959', 'CA', 'California'),
               ('960', 'CA', 'California'),
               ('961', 'CA', 'California'),
-              ('962', 'AP', 'Armed Forces Pacific'),
-              ('963', 'AP', 'Armed Forces Pacific'),
-              ('964', 'AP', 'Armed Forces Pacific'),
-              ('965', 'AP', 'Armed Forces Pacific'),
-              ('966', 'AP', 'Armed Forces Pacific'),
               ('967', 'HI', 'Hawaii'),
               ('968', 'HI', 'Hawaii'),
-              ('969', 'GU', 'Guam'),
               ('970', 'OR', 'Oregon'),
               ('971', 'OR', 'Oregon'),
               ('972', 'OR', 'Oregon'),
@@ -941,9 +925,13 @@ class Command(BaseCommand):
     Example of executing this command locally:
         python manage.py fix_us_company_address_postcode_data
     """
-    # TODO (Move Tests Locally) at https://regex101.com/r/yckIVj/3
-    regex = r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'
-    united_states_id = '81756b9a-5d95-e211-a939-e4115bead28a'
+
+    # Visualise this @ https://regex101.com/r/yckIVj/3
+    US_POST_CODE_PATTERN = r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})' \
+                           r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'
+    UNITED_STATES_ID = '81756b9a-5d95-e211-a939-e4115bead28a'
+    REPLACEMENT = r'\1\2\3\4\5\6'
+    REGEX_OPTIONS = 'gm'
 
     def add_arguments(self, parser):
         """
@@ -955,10 +943,10 @@ class Command(BaseCommand):
         """
         Run the query and output the results as an info message to the log file.
         """
-        Command.fix_postcodes()
+        Command.fix_postcodes_and_address_areas()
 
     @staticmethod
-    def fix_postcodes():
+    def fix_postcodes_and_address_areas():
         """
         Does update on the postcode address table
         """
@@ -980,69 +968,73 @@ class Command(BaseCommand):
         """
         Update company registered address area data
         """
-
         united_states_companies = Company \
             .objects \
-            .filter(registered_address_country=Command.united_states_id)
+            .filter(registered_address_country=Command.UNITED_STATES_ID)
 
-        for zip_prefix, area_code, area_name in UNIQUE_ZIP:
+        for zip_prefix, area_code, _area_name in UNIQUE_ZIP:
             administrative_area = Command.us_administrative_area_by_code(area_code)
-            if administrative_area is None:
-                Command.log_area_not_found(area_code, zip_prefix)
-            else:
-                Command.no_area_companies_by_registered_address_postcode(
-                    united_states_companies,
-                    zip_prefix
-                ). \
-                    update(registered_address_area_id=administrative_area.id)
-
-    @staticmethod
-    def log_area_not_found(area_code, zip_prefix):
-        logger.warning(
-            f"Warning: area {area_code} for zip prefix {zip_prefix}"
-            " does not exist in administrative_areas"
-        )
+            Command.no_area_companies_by_registered_address_postcode(
+                united_states_companies,
+                zip_prefix,
+            ). \
+                update(registered_address_area_id=administrative_area.id)
 
     @staticmethod
     def update_address_area():
         """
         Update company address area data
         """
-
         united_states_companies = Company\
             .objects\
-            .filter(address_country=Command.united_states_id)
+            .filter(address_country=Command.UNITED_STATES_ID)
 
-        for zip_prefix, area_code, area_name in UNIQUE_ZIP:
+        for zip_prefix, area_code, _area_name in UNIQUE_ZIP:
             administrative_area = Command.us_administrative_area_by_code(area_code)
-            if administrative_area is None:
-                Command.log_area_not_found(area_code, zip_prefix)
-            else:
-                Command.no_area_companies_by_address_postcode(
-                    united_states_companies,
-                    zip_prefix
-                ).\
-                    update(address_area_id=administrative_area.id)
+            Command.no_area_companies_by_address_postcode(
+                united_states_companies,
+                zip_prefix,
+            ).\
+                update(address_area_id=administrative_area.id)
 
     @staticmethod
     def no_area_companies_by_registered_address_postcode(united_states_companies, zip_prefix):
+        """
+        Filters United States Countries by registered address postcode equal to zip-prefix
+        where no registered address area exists
+        @param united_states_companies: united states company query
+        @param zip_prefix: 3 digit zip prefix
+        @return: Filtered Company
+        """
         return united_states_companies.filter(
             registered_address_postcode__startswith=zip_prefix,
-            registered_address_area_id__isnull=True
+            registered_address_area_id__isnull=True,
         )
 
     @staticmethod
     def no_area_companies_by_address_postcode(united_states_companies, zip_prefix):
+        """
+        Filters United States Countries by address postcode equal to zip-prefix
+        where no address area exists
+        @param united_states_companies: united states company query
+        @param zip_prefix: 2 digit
+        @return:
+        """
         return united_states_companies.filter(
             address_postcode__startswith=zip_prefix,
-            address_area_id__isnull=True
+            address_area_id__isnull=True,
         )
 
     @staticmethod
     def us_administrative_area_by_code(area_code):
+        """
+        Gets United States Administrative Area by Area Code
+        @param area_code:
+        @return:First Administrative Area Found
+        """
         return AdministrativeArea.objects.filter(
-            country_id=Command.united_states_id,
-            area_code=area_code
+            country_id=Command.UNITED_STATES_ID,
+            area_code=area_code,
         ).first()
 
     @staticmethod
@@ -1052,13 +1044,13 @@ class Command(BaseCommand):
         """
         Company \
             .objects \
-            .filter(address_country=Command.united_states_id) \
+            .filter(address_country=Command.UNITED_STATES_ID) \
             .update(
                 address_postcode=Func(
                     F('address_postcode'),
-                    Value(Command.regex),
-                    Value(r'\1\2\3\4\5\6'),
-                    Value('gm'),
+                    Value(Command.US_POST_CODE_PATTERN),
+                    Value(Command.REPLACEMENT),
+                    Value(Command.REGEX_OPTIONS),
                     function='regexp_replace'))
 
     @staticmethod
@@ -1066,14 +1058,13 @@ class Command(BaseCommand):
         """
         Update registered address postcodes where the subquery exists
         """
-
         Company \
             .objects \
-            .filter(address_country=Command.united_states_id) \
+            .filter(address_country=Command.UNITED_STATES_ID) \
             .update(
                 registered_address_postcode=Func(
                     F('registered_address_postcode'),
-                    Value(Command.regex),
-                    Value(r'\1\2\3\4\5\6'),
-                    Value('gm'),
+                    Value(Command.US_POST_CODE_PATTERN),
+                    Value(Command.REPLACEMENT),
+                    Value(Command.REGEX_OPTIONS),
                     function='regexp_replace'))
