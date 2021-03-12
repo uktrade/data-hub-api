@@ -8,6 +8,7 @@ from datahub.dataset.company_export_country.views import (
 from datahub.dataset.company_export_country_history.views import (
     CompanyExportCountryHistoryDatasetView,
 )
+from datahub.dataset.company_list.views import PipelineItemsDatasetView
 from datahub.dataset.company_referral.views import CompanyReferralDatasetView
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
@@ -58,5 +59,10 @@ urlpatterns = [
         'company-referrals-dataset',
         CompanyReferralDatasetView.as_view(),
         name='company-referrals-dataset',
+    ),
+    path(
+        'pipeline-items-dataset',
+        PipelineItemsDatasetView.as_view(),
+        name='pipeline-items-dataset',
     ),
 ]
