@@ -145,6 +145,7 @@ def test_investment_project_to_dict(es):
         'country_lost_to',
         'country_investment_originates_from',
         'level_of_involvement_simplified',
+        'latest_interaction',
     }
 
     assert set(result.keys()) == keys
