@@ -125,34 +125,6 @@
       name: Santa Cruz
       area_code: SC
 - model: metadata.administrativearea
-  pk: 95d9dd8f-97cb-49a2-9420-209732f225f6
-  fields:
-      country: 8435c3a8-6e5e-43f2-a684-2d877028adce
-      disabled_on:
-      name: San Juan
-      area_code: SJ
-- model: metadata.administrativearea
-  pk: 309fb78c-bfd4-4ecc-a68e-4faee6e4516c
-  fields:
-      country: b5cd39ea-ade0-4c98-b54a-f9d6a4a359f1
-      disabled_on:
-      name: San Juan
-      area_code: SJ
-- model: metadata.administrativearea
-  pk: f409d178-3cd6-4404-8a86-ce41c11198a2
-  fields:
-      country: 4c888e6a-92a5-4df1-b09e-696d7eb9aea4
-      disabled_on:
-      name: Los Rios
-      area_code: LR
-- model: metadata.administrativearea
-  pk: a8930390-884e-4e6e-80f7-9b1866123862
-  fields:
-      country: 4c888e6a-92a5-4df1-b09e-696d7eb9aea4
-      disabled_on:
-      name: Santa Cruz
-      area_code: SC
-- model: metadata.administrativearea
   pk: 5c415c75-d04e-45b5-94c7-2eaad59bea83
   fields:
       country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
@@ -1315,26 +1287,12 @@
       name: Hidalgo
       area_code: HI
 - model: metadata.administrativearea
-  pk: ed46bf38-943a-4d49-a0df-fee5b651202c
-  fields:
-      country: bcfc1c68-515c-4ed1-8562-7061da5e3df7
-      disabled_on:
-      name: Palau
-      area_code: PW
-- model: metadata.administrativearea
   pk: e59311c8-801f-492b-9f53-fd301ac9fc0f
   fields:
       country: f2ff63fe-02e8-430d-bd06-a6af29f86acd
       disabled_on:
       name: Punjab
       area_code: PB
-- model: metadata.administrativearea
-  pk: fdb51bfc-38a3-47aa-9795-7a2ee6c1c006
-  fields:
-      country: 9020902f-60d4-4506-9d0f-81617036cce6
-      disabled_on:
-      name: Puebla
-      area_code: PU
 - model: metadata.administrativearea
   pk: ce20f331-e31f-4387-ac2d-2ac1cfa38238
   fields:
@@ -1434,13 +1392,6 @@
       name: Karnataka
       area_code: KA
 - model: metadata.administrativearea
-  pk: 99d2b7ce-8e42-47fe-a0ac-86c3e816b492
-  fields:
-      country: 19f8500a-bbf0-4533-a44e-bcbb0643fba0
-      disabled_on:
-      name: Manipur
-      area_code: MN
-- model: metadata.administrativearea
   pk: b3f28551-efb8-4b99-9057-b5d6654c0b2a
   fields:
       country: f10b425f-4cc4-4808-b0c5-c0ceab5f643c
@@ -1461,13 +1412,6 @@
       disabled_on:
       name: Punjab
       area_code: PB
-- model: metadata.administrativearea
-  pk: 97509ae7-a7ff-43bf-947a-8c30867ef2b4
-  fields:
-      country: 45910b6d-f717-4498-912c-a05b7ca2fc38
-      disabled_on:
-      name: Santa Cruz
-      area_code: SC
 - model: metadata.administrativearea
   pk: 7951c3ae-5af2-4b2d-91c2-a5e154aac8c9
   fields:
@@ -1623,13 +1567,6 @@
       name: Gävleborg
       area_code: X
 - model: metadata.administrativearea
-  pk: 7b77c034-a563-432d-a47b-9a4cea167882
-  fields:
-      country: 29f3dd20-ffea-4b7f-b585-6a3770cbc8ac
-      disabled_on:
-      name: Karnataka
-      area_code: KA
-- model: metadata.administrativearea
   pk: bea39511-6ece-4504-bb47-dc856ef147d3
   fields:
       country: 01e87d0a-d7a6-4699-bab4-4432d5abd754
@@ -1699,3 +1636,143 @@
       disabled_on:
       name: Florida
       area_code: FL
+- model: metadata.administrativearea
+  pk: 64dd26e4-1eb3-45a2-ab9c-1b3174fd9a79
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Aveiro
+    area_code: 01
+- model: metadata.administrativearea
+  pk: 52f30eb6-760b-409c-bcd8-8cf0efc428e4
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Beja
+    area_code: 02
+- model: metadata.administrativearea
+  pk: 3d84c05b-0c66-4e9e-8926-1c752f13a344
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Braga
+    area_code: 03
+- model: metadata.administrativearea
+  pk: b9319804-0125-4d1e-acec-65c16e24af8d
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Bragança
+    area_code: 04
+- model: metadata.administrativearea
+  pk: 3e905b51-6116-40fb-9fb2-7a88860d1fe0
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Castelo Branco
+    area_code: 05
+- model: metadata.administrativearea
+  pk: 3b5b70be-0bd4-40b1-9749-3429c0ab970e
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Coimbra
+    area_code: 06
+- model: metadata.administrativearea
+  pk: 7beff464-a3fe-4c18-963e-8e6ee8548701
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Évora
+    area_code: 07
+- model: metadata.administrativearea
+  pk: d4b13299-9333-456c-a0b0-d994fb5e1857
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Faro
+    area_code: 08
+- model: metadata.administrativearea
+  pk: 504797cc-c0b0-4d33-94d2-d7c38c4c4ea7
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Guarda
+    area_code: 09
+- model: metadata.administrativearea
+  pk: f8b57b94-0d5d-4dbc-b218-caf096d639fe
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Leiria
+    area_code: 10
+- model: metadata.administrativearea
+  pk: 45e344fe-1ea9-4726-a010-8dfdf23f3c52
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Lisboa
+    area_code: 11
+- model: metadata.administrativearea
+  pk: c0c3c78d-dec7-4eb3-afa7-28d5c1785f73
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Portalegre
+    area_code: 12
+- model: metadata.administrativearea
+  pk: 9313bcd5-b600-4c8c-9e6e-7484e4e9f84a
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Porto
+    area_code: 13
+- model: metadata.administrativearea
+  pk: 42f15799-2622-404b-89c1-46213fe873b0
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Santarém
+    area_code: 14
+- model: metadata.administrativearea
+  pk: d96bf9ee-b3b1-47d7-a685-2c3909cdcdda
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Setúbal
+    area_code: 15
+- model: metadata.administrativearea
+  pk: 442f9b32-b801-431f-a750-896ca26763b4
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Viana do Castelo
+    area_code: 16
+- model: metadata.administrativearea
+  pk: 551afe06-0d18-4527-aa09-9b107a81cb0a
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Vila Real
+    area_code: 17
+- model: metadata.administrativearea
+  pk: 4283ef82-9f88-4e42-bc01-58bda9867037
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Viseu
+    area_code: 18
+- model: metadata.administrativearea
+  pk: 29757fca-370f-44ba-8c0f-b9bc86ce90f3
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Região Autónoma dos Açores
+    area_code: 20
+- model: metadata.administrativearea
+  pk: 84f31e0b-60fd-4de6-b35c-293cec5d5e86
+  fields:
+    country: 45910b6d-f717-4498-912c-a05b7ca2fc38
+    disabled_on:
+    name: Região Autónoma da Madeira
+    area_code: 30

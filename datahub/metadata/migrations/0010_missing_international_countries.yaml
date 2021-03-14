@@ -118,26 +118,12 @@
     overseas_region: b97749fb-2273-4447-a239-62dd8fb29e01
     iso_alpha2_code: MO
 - model: metadata.country
-  pk: bcfc1c68-515c-4ed1-8562-7061da5e3df7
-  fields:
-    disabled_on: null
-    name: Northern Mariana Islands
-    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
-    iso_alpha2_code: MP
-- model: metadata.country
   pk: f2ff63fe-02e8-430d-bd06-a6af29f86acd
   fields:
     disabled_on: null
     name: Malaysia
     overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
     iso_alpha2_code: MY
-- model: metadata.country
-  pk: 9020902f-60d4-4506-9d0f-81617036cce6
-  fields:
-    disabled_on: null
-    name: New Caledonia
-    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
-    iso_alpha2_code: NC
 - model: metadata.country
   pk: 546ac7be-9000-48c6-8b9e-9fca89c525ab
   fields:
@@ -194,13 +180,6 @@
     name: Sweden
     overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
     iso_alpha2_code: SE
-- model: metadata.country
-  pk: 29f3dd20-ffea-4b7f-b585-6a3770cbc8ac
-  fields:
-    disabled_on: null
-    name: Singapore
-    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
-    iso_alpha2_code: SG
 - model: metadata.country
   pk: 01e87d0a-d7a6-4699-bab4-4432d5abd754
   fields:
