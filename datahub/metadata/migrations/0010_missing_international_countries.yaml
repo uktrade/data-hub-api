@@ -181,13 +181,6 @@
     overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
     iso_alpha2_code: SE
 - model: metadata.country
-  pk: 01e87d0a-d7a6-4699-bab4-4432d5abd754
-  fields:
-    disabled_on: null
-    name: Suriname
-    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
-    iso_alpha2_code: SR
-- model: metadata.country
   pk: fb2847a3-295f-44d0-b7a9-c4266d7f7bc8
   fields:
     disabled_on: null
