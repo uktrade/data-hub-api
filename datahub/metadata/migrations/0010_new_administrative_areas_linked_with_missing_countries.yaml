@@ -125,62 +125,6 @@
       name: Santa Cruz
       area_code: SC
 - model: metadata.administrativearea
-  pk: 5c415c75-d04e-45b5-94c7-2eaad59bea83
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Navarra
-      area_code: NC
-- model: metadata.administrativearea
-  pk: 2e1f4214-0598-4928-a694-a5db12e295a6
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Murcia
-      area_code: MC
-- model: metadata.administrativearea
-  pk: c3c7be77-93ae-47a6-ad27-19e77f2c17ce
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Cordoba
-      area_code: CB
-- model: metadata.administrativearea
-  pk: a8390280-851a-4a59-80f9-e38f405a48cc
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Valencia
-      area_code: VC
-- model: metadata.administrativearea
-  pk: 55bcadab-87c3-4eba-9988-8ba1960e3c7b
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Madrid
-      area_code: MD
-- model: metadata.administrativearea
-  pk: f67d8a20-dbed-4faf-a9f2-92a9c5ef0b1f
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Melilla
-      area_code: ML
-- model: metadata.administrativearea
-  pk: 872eeeb9-7c0f-4887-9e5c-96ef2b07e679
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Ceuta
-      area_code: CE
-- model: metadata.administrativearea
-  pk: 72c9f2ff-36a4-4fcd-bb3d-1b1ec51454bb
-  fields:
-      country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
-      disabled_on:
-      name: Asturias
-      area_code: AS
-- model: metadata.administrativearea
   pk: 491d2338-8708-4c6e-8f72-d8c47fa45b49
   fields:
       country: 1b13062c-619f-4a73-8a1e-9e71e7880133
@@ -1776,3 +1720,136 @@
     disabled_on:
     name: Região Autónoma da Madeira
     area_code: 30
+- model: metadata.administrativearea
+  pk: cd00b5e0-2511-42a9-a5a0-67e7b83adb58
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Andalusia
+    area_code: AN
+- model: metadata.administrativearea
+  pk: d90e76c0-2685-4a22-9cc0-6ae37a155d53
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Aragon
+    area_code: AR
+- model: metadata.administrativearea
+  pk: 2e72278b-82fb-4a8b-8c40-ff0969ea97e0
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Asturias
+    area_code: AS
+- model: metadata.administrativearea
+  pk: c79113c6-0f6a-4f61-b9b6-b47ddd9300de
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Canary Islands
+    area_code: CN
+- model: metadata.administrativearea
+  pk: 15a7db97-a3e7-48c2-a0e3-9bf571ae3dd6
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Cantabria
+    area_code: CB
+- model: metadata.administrativearea
+  pk: 68b43334-05c3-42c2-9fa4-d385319ee3e6
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Castile and León
+    area_code: CL
+- model: metadata.administrativearea
+  pk: 8e024610-6e72-4ba3-8ee0-74e914dbdd85
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Castile-La Mancha
+    area_code: CM
+- model: metadata.administrativearea
+  pk: 3d9c1a3d-b935-4cc5-ba17-5db0e4cde486
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Catalonia
+    area_code: CT
+- model: metadata.administrativearea
+  pk: 76943185-d3ef-4a14-9265-36ee4009fe2a
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Ceuta
+    area_code: CE
+- model: metadata.administrativearea
+  pk: 5959be3d-5575-47af-a43e-05fa5ae5a01a
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Extremadura
+    area_code: EX
+- model: metadata.administrativearea
+  pk: 2cfca177-2e12-435b-99df-84b8fdab1998
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Galicia
+    area_code: GA
+- model: metadata.administrativearea
+  pk: 6d00b82f-365e-4bb4-b7ff-7828ea4aaae3
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Balearic Islands
+    area_code: IB
+- model: metadata.administrativearea
+  pk: 499b5862-1407-45fc-96eb-12750a24e129
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: La Rioja
+    area_code: RI
+- model: metadata.administrativearea
+  pk: 7550890c-d11b-4dac-8398-846b6f1cd285
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Community of Madrid
+    area_code: MD
+- model: metadata.administrativearea
+  pk: fad8d456-3870-4fce-92be-a5118c7090ae
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Melilla
+    area_code: ML
+- model: metadata.administrativearea
+  pk: 0b9bd116-38c8-487d-b9eb-84e7c06f2de1
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Region of Murcia
+    area_code: MC
+- model: metadata.administrativearea
+  pk: adec7b55-e912-4fca-8771-2696d45a7f9a
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Chartered Community of Navarre
+    area_code: NC
+- model: metadata.administrativearea
+  pk: 7385e7ff-3c5f-40be-817d-bd339d167840
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Basque Country
+    area_code: PV
+- model: metadata.administrativearea
+  pk: 6acdf04f-65e7-4d59-a8f3-329cac22e4d6
+  fields:
+    country: 25f2c468-cafb-4aba-bacb-3df4272d78c5
+    disabled_on:
+    name: Valencian Community
+    area_code: VC
