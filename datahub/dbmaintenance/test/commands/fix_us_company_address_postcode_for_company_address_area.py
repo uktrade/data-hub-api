@@ -4,23 +4,12 @@ import pytest
 from pytest import fixture
 
 from datahub.company.models import Company
-from datahub.company.test.factories import CompanyFactory
-from datahub.core import constants
+from datahub.company.test.factories import USCompanyFactory
 from datahub. \
     dbmaintenance. \
     management. \
     commands. \
     fix_us_company_address_postcode_for_company_address_area import Command
-
-
-class USCompanyFactory(CompanyFactory):
-    """US Company factory with United States Settings"""
-
-    address_town = 'New York'
-    address_country_id = constants.Country.united_states.value.id
-    registered_address_town = 'New York'
-    registered_address_country_id = constants.Country.united_states.value.id
-    uk_region_id = None
 
 
 @fixture
