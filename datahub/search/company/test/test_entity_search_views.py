@@ -31,6 +31,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company import CompanySearchApp
+from datahub.search.company.test.utils import get_address_area_or_none
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = [
@@ -38,18 +39,6 @@ pytestmark = [
     # Index objects for this search app only
     pytest.mark.es_collector_apps.with_args(CompanySearchApp),
 ]
-
-
-def get_address_area_or_none(address_area):
-    """
-    Get Formatted Address Area Result
-    @param address_area: Address object returned on Company
-    @return: Address as an id name object or None
-    """
-    return address_area and {
-        'id': str(address_area.id),
-        'name': address_area.name,
-    } or None
 
 
 @pytest.fixture
