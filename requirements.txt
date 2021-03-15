@@ -29,9 +29,9 @@ billiard==3.6.3.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.17.22
+boto3==1.17.27
     # via -r requirements.in
-botocore==1.20.22
+botocore==1.20.27
     # via
     #   boto3
     #   s3transfer
@@ -112,7 +112,7 @@ faker==5.4.0
     # via factory-boy
 filelock==3.0.12
     # via virtualenv
-flake8-bugbear==21.3.1
+flake8-bugbear==21.3.2
     # via -r requirements.in
 flake8-commas==2.0.0
     # via -r requirements.in
@@ -130,7 +130,7 @@ flake8-quotes==3.2.0
     # via -r requirements.in
 flake8-string-format==0.3.0
     # via -r requirements.in
-flake8==3.8.4
+flake8==3.9.0
     # via
     #   -r requirements.in
     #   flake8-bugbear
@@ -203,13 +203,13 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==4.5.1
+pip-tools==6.0.0
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
-pre-commit==2.11.0
+pre-commit==2.11.1
     # via -r requirements.in
 prompt-toolkit==3.0.10
     # via ipython
@@ -223,7 +223,7 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pycodestyle==2.6.0
+pycodestyle==2.7.0
     # via
     #   flake8
     #   flake8-debugger
@@ -233,7 +233,7 @@ pydocstyle==5.1.1
     # via
     #   -r requirements.in
     #   flake8-docstrings
-pyflakes==2.2.0
+pyflakes==2.3.0
     # via flake8
 pygments==2.7.3
     # via ipython
@@ -309,7 +309,6 @@ six==1.15.0
     #   flake8-print
     #   mail-parser
     #   mohawk
-    #   pip-tools
     #   piprot
     #   python-dateutil
     #   requests-mock
@@ -368,4 +367,5 @@ zope.interface==5.2.0
     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
+# pip
 # setuptools
