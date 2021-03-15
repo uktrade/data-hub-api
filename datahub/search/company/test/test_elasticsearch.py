@@ -524,7 +524,7 @@ def test_limited_get_search_by_entity_query():
         'from': 5,
         'size': 5,
     }
-    
+
     date = '2017-06-13T09:44:31.062870'
     filter_data = {
         'name': 'Woodside',
