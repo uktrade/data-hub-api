@@ -129,8 +129,18 @@ class TestNormalizedField(APITestMixin):
                     'area': {
                         'type': 'object',
                         'properties': {
-                            'id': {'index': False, 'type': 'keyword'},
-                            'name': {'index': False, 'type': 'text'},
+                            'id': {
+                                'type': 'keyword'
+                            },
+                            'name': {
+                                'fields': {
+                                    'trigram': {
+                                        'analyzer': 'trigram_analyzer',
+                                        'type': 'text'
+                                    }
+                                },
+                                'type': 'text'
+                            }
                         },
                     },
                     'country': {
