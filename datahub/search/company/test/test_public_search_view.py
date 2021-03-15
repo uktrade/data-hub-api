@@ -126,6 +126,7 @@ class TestPublicCompanySearch:
                         'town': company.address_town,
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
+                        'area': self.get_address_area_or_none(company.address_area),
                         'country': {
                             'id': str(company.address_country.id),
                             'name': company.address_country.name,
@@ -137,6 +138,7 @@ class TestPublicCompanySearch:
                         'town': company.registered_address_town,
                         'county': company.registered_address_county or '',
                         'postcode': company.registered_address_postcode or '',
+                        'area': self.get_address_area_or_none(company.registered_address_area),
                         'country': {
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
@@ -187,6 +189,17 @@ class TestPublicCompanySearch:
                 },
             ],
         }
+
+    def get_address_area_or_none(self, address_area):
+        """
+        Get Formatted Address Area Result
+        @param address_area: Address object returned on Company
+        @return: Address as an id name object or None
+        """
+        return address_area and {
+            'id': str(address_area.id),
+            'name': address_area.name,
+        } or None
 
     def test_response_is_signed(self, es, public_company_api_client):
         """Test that responses are signed."""
