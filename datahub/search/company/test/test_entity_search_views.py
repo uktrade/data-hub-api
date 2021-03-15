@@ -17,7 +17,7 @@ from datahub.company.models import Company, CompanyExportCountry, CompanyPermiss
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
-    CompanyFactory,
+    CompanyFactory
 )
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -38,6 +38,18 @@ pytestmark = [
     # Index objects for this search app only
     pytest.mark.es_collector_apps.with_args(CompanySearchApp),
 ]
+
+
+def get_address_area_or_none(address_area):
+    """
+    Get Formatted Address Area Result
+    @param address_area: Address object returned on Company
+    @return: Address as an id name object or None
+    """
+    return address_area and {
+        'id': str(address_area.id),
+        'name': address_area.name,
+    } or None
 
 
 @pytest.fixture
@@ -274,6 +286,7 @@ class TestSearch(APITestMixin):
                         'town': company.address_town,
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
+                        'area': get_address_area_or_none(company.address_area),
                         'country': {
                             'id': str(company.address_country.id),
                             'name': company.address_country.name,
@@ -285,6 +298,7 @@ class TestSearch(APITestMixin):
                         'town': company.registered_address_town,
                         'county': company.registered_address_county or '',
                         'postcode': company.registered_address_postcode or '',
+                        'area': get_address_area_or_none(company.registered_address_area),
                         'country': {
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
