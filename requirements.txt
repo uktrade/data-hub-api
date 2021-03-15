@@ -203,7 +203,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==4.5.1
+pip-tools==6.0.0
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
@@ -309,7 +309,6 @@ six==1.15.0
     #   flake8-print
     #   mail-parser
     #   mohawk
-    #   pip-tools
     #   piprot
     #   python-dateutil
     #   requests-mock
@@ -368,4 +367,5 @@ zope.interface==5.2.0
     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
+# pip
 # setuptools
