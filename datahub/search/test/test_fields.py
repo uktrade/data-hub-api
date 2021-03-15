@@ -130,17 +130,17 @@ class TestNormalizedField(APITestMixin):
                         'type': 'object',
                         'properties': {
                             'id': {
-                                'type': 'keyword'
+                                'type': 'keyword',
                             },
                             'name': {
                                 'fields': {
                                     'trigram': {
                                         'analyzer': 'trigram_analyzer',
-                                        'type': 'text'
-                                    }
+                                        'type': 'text',
+                                    },
                                 },
-                                'type': 'text'
-                            }
+                                'type': 'text',
+                            },
                         },
                     },
                     'country': {

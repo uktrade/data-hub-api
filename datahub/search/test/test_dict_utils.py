@@ -139,7 +139,7 @@ def test_company_dict(obj, expected_dict):
                 address_county='',
                 address_postcode='',
                 address_country=None,
-                address_area=None
+                address_area=None,
             ),
             'address',
             None,
@@ -177,7 +177,7 @@ def test_company_dict(obj, expected_dict):
                     'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                     'name': 'United Kingdom',
                 },
-                'area': None
+                'area': None,
             },
         ),
 
@@ -207,7 +207,7 @@ def test_company_dict(obj, expected_dict):
                     'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                     'name': 'United Kingdom',
                 },
-                'area': None
+                'area': None,
             },
         ),
     ),
