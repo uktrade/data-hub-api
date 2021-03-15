@@ -1,7 +1,0 @@
-- model: metadata.country
-  pk: 0fc0a289-bf8f-49ba-af9d-eedea39847b5
-  fields:
-    disabled_on: null
-    name: Republic of Korea
-    overseas_region: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
-    iso_alpha2_code: KR
