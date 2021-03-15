@@ -216,14 +216,14 @@
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 12 First Street
-    address_town: New York
-    address_postcode: 10001
-    address_area: aa65b701-244a-41fc-bd31-0a546303106a
+    address_town: Virginia City
+    address_postcode: 73301
+    address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
-    registered_address_town: New York
-    registered_address_postcode: 10101
-    registered_address_area: aa65b701-244a-41fc-bd31-0a546303106a
+    registered_address_town: Virginia City
+    registered_address_postcode: 73301-1234
+    registered_address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
     created_on: '2017-10-16T11:00:00Z'
