@@ -775,11 +775,11 @@ def test_get_basic_search_query():
         ],
         'track_total_hits': True,
     }
-    
+
     query = get_basic_search_query(
         ESInvestmentProject, 'test', offset=5, limit=5,
     )
-    
+
     assert query.to_dict() == expected_query
 
 
