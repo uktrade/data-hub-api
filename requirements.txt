@@ -209,7 +209,7 @@ piprot==0.9.11
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
-pre-commit==2.11.0
+pre-commit==2.11.1
     # via -r requirements.in
 prompt-toolkit==3.0.10
     # via ipython
