@@ -13,7 +13,7 @@ from datahub. \
 
 
 @fixture
-def sut():
+def postcode_fix_command():
     """Provider Default Command"""
     return Command()
 
@@ -87,7 +87,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
         area_code,
         area_name,
-        sut):
+        postcode_fix_command):
     """
     Test postcode fixes and area generation a couple of valid Zip Codes using the real DB
     @param post_code: POSTCODE good
@@ -100,7 +100,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     )
     assert company.address_area is None
 
-    sut.handle(None, None)
+    postcode_fix_command.handle(None, None)
 
     current_company = Company.objects.first()
     assert current_company.address_area is not None
@@ -123,7 +123,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
         post_code,
         area_code,
         area_name,
-        sut):
+        postcode_fix_command):
     """
     Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
@@ -138,7 +138,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     )
     assert company.registered_address_area is None
 
-    sut.handle(None, None)
+    postcode_fix_command.handle(None, None)
 
     current_company = Company.objects.first()
     assert current_company.registered_address_area is not None
@@ -155,7 +155,10 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
                           ('NY 10174 - 4099', '10174 - 4099'),
                           ('NY 123456789', '123456789'),
                           ])
-def test_command_fixes_invalid_postcodes_in_all_post_code_fields(post_code, expected_result, sut):
+def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
+        post_code,
+        expected_result,
+        postcode_fix_command):
     """
     Test Patterns that need fixing in all postcode fields
     @param post_code: Invalid Postcode Format
@@ -167,7 +170,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(post_code, expe
         registered_address_postcode=post_code,
     )
 
-    sut.handle(None, None)
+    postcode_fix_command.handle(None, None)
 
     current_company = Company.objects.first()
     assert current_company.address_postcode == expected_result

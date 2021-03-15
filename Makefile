@@ -27,19 +27,12 @@ setup-flake8-hook:
 
 run-shell:
 	docker-compose run api bash
-# TODO: Delete everything below before pushin to DEVELOP
 
 run-command:
 	docker-compose run api python manage.py fix_us_company_address_postcode_for_company_address_area
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv datahub/search/company/test/test_elasticsearch.py
-
-run-test:
-	docker-compose run api pytest -vv datahub/search/company/test/test_elasticsearch.py
-
-run-test-verbose:
-	docker-compose run api pytest -vv
+	docker-compose run api pytest --reuse-db -vv <Add Test File Path>
 
 reindex-es:
 	docker-compose run api python manage.py sync_es
