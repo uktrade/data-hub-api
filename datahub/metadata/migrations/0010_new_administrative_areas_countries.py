@@ -15,7 +15,7 @@ def load_missing_international_countries(apps, schema_editor):
 def load_administrativearea_codes_associated_with_missing_countries(apps, schema_editor):
     load_yaml_data_in_migration(
         apps,
-        PurePath(__file__).parent / '0010_new_administrative_areas_linked_with_missing_countries.yaml'
+        PurePath(__file__).parent / '0010_new_administrative_areas.yaml'
     )
 
 
