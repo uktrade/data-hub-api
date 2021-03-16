@@ -146,7 +146,6 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     assert current_company.registered_address_postcode == post_code
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, expected_result',
                          [('1 0402', '10402'),
                           ('8520 7402', '07402'),
