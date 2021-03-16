@@ -11,6 +11,8 @@ from datahub. \
     commands. \
     fix_us_company_address_postcode_for_company_address_area import Command
 
+pytestmark = pytest.mark.django_db
+
 
 @fixture
 def postcode_fix_command():
@@ -72,7 +74,6 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
     assert actual_result == expected_result
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, area_code, area_name',
                          [('00589', 'NY', 'New York'),
                           ('00612-1234', 'PR', 'Puerto Rico'),
@@ -108,7 +109,6 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     assert current_company.address_postcode == post_code
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, area_code, area_name', [
     ('05512', 'MA', 'Massachusetts'),
     ('05612-1234', 'VT', 'Vermont'),

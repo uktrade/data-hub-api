@@ -54,9 +54,10 @@ class TestNormalizedField(APITestMixin):
 
 
 @pytest.mark.parametrize(
-    'index_country,expected_mapping',
+    'index_country, index_area, expected_mapping',
     (
         (
+            True,
             True,
             {
                 'type': 'object',
@@ -110,6 +111,7 @@ class TestNormalizedField(APITestMixin):
 
         (
             False,
+            False,
             {
                 'type': 'object',
                 'properties': {
@@ -129,18 +131,8 @@ class TestNormalizedField(APITestMixin):
                     'area': {
                         'type': 'object',
                         'properties': {
-                            'id': {
-                                'type': 'keyword',
-                            },
-                            'name': {
-                                'fields': {
-                                    'trigram': {
-                                        'analyzer': 'trigram_analyzer',
-                                        'type': 'text',
-                                    },
-                                },
-                                'type': 'text',
-                            },
+                            'id': {'index': False, 'type': 'keyword'},
+                            'name': {'index': False, 'type': 'text'},
                         },
                     },
                     'country': {
@@ -155,7 +147,7 @@ class TestNormalizedField(APITestMixin):
         ),
     ),
 )
-def test_address_field(index_country, expected_mapping):
+def test_address_field(index_country, index_area, expected_mapping):
     """Test for address_field."""
-    field_mapping = address_field(index_country=index_country, index_area=True)
+    field_mapping = address_field(index_country=index_country, index_area=index_area)
     assert field_mapping.to_dict() == expected_mapping
