@@ -1,7 +1,7 @@
 import re
 
 import pytest
-from pytest import fixture
+from django.core.management import call_command
 
 from datahub.company.models import Company
 from datahub.company.test.factories import USCompanyFactory
@@ -12,12 +12,6 @@ from datahub. \
     fix_us_company_address_postcode_for_company_address_area import Command
 
 pytestmark = pytest.mark.django_db
-
-
-@fixture
-def postcode_fix_command():
-    """Provider Default Command"""
-    return Command()
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -87,21 +81,20 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
 def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
         area_code,
-        area_name,
-        postcode_fix_command):
+        area_name):
     """
     Test postcode fixes and area generation a couple of valid Zip Codes using the real DB
     @param post_code: POSTCODE good
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
-    @param sut: Test
     """
     company = USCompanyFactory.create(
         address_postcode=post_code,
+        registered_address_postcode=post_code,
     )
     assert company.address_area is None
 
-    postcode_fix_command.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.address_area is not None
@@ -122,15 +115,13 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
         post_code,
         area_code,
-        area_name,
-        postcode_fix_command):
+        area_name):
     """
     Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
     @param post_code: POSTCODE good
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
-    @param sut: Test
     """
     company = USCompanyFactory.create(
         address_postcode=post_code,
@@ -138,7 +129,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     )
     assert company.registered_address_area is None
 
-    postcode_fix_command.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.registered_address_area is not None
@@ -156,20 +147,20 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
                           ])
 def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
         post_code,
-        expected_result,
-        postcode_fix_command):
+        expected_result):
     """
     Test Patterns that need fixing in all postcode fields
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
-    @param sut: Command
     """
-    USCompanyFactory.create(
+    company = USCompanyFactory.create(
         address_postcode=post_code,
         registered_address_postcode=post_code,
     )
+    assert company.address_postcode == post_code
+    assert company.registered_address_postcode == post_code
 
-    postcode_fix_command.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.address_postcode == expected_result
