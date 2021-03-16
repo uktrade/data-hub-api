@@ -88,8 +88,7 @@ class Command(BaseCommand):
             Command.no_area_companies_by_address_postcode(
                 united_states_companies,
                 zip_prefix,
-            ).\
-                update(address_area_id=administrative_area.id)
+            ).update(address_area_id=administrative_area.id)
 
     @staticmethod
     def no_area_companies_by_registered_address_postcode(united_states_companies, zip_prefix):
@@ -161,7 +160,7 @@ class Command(BaseCommand):
             .objects
             .filter(address_country=Command.UNITED_STATES_ID)
             .update(
-                address_postcode=Func(
+                registered_address_postcode=Func(
                     F('registered_address_postcode'),
                     Value(Command.US_POST_CODE_PATTERN),
                     Value(Command.REPLACEMENT),
