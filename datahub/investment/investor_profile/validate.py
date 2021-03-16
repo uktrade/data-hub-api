@@ -1,11 +1,10 @@
 from datahub.core.validate_utils import DataCombiner
-from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.investment.validate import field_incomplete
 
 
-def get_incomplete_fields(instance, fields):
+def get_incomplete_fields(instance, fields, model):
     """Returns a list of fields that are incomplete."""
-    combiner = DataCombiner(instance, {}, model=LargeCapitalInvestorProfile)
+    combiner = DataCombiner(instance, {}, model=model)
     incomplete_fields = []
     for field in fields:
         if field_incomplete(combiner, field):

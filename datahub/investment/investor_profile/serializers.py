@@ -310,15 +310,27 @@ class LargeCapitalInvestorProfileSerializer(RequiredChecksConductedSerializer):
 
     def get_incomplete_details_fields(self, instance):
         """Returns a list of all the detail fields that are incomplete."""
-        return get_incomplete_fields(instance, LARGE_CAPITAL_DETAILS_FIELDS)
+        return get_incomplete_fields(
+            instance,
+            LARGE_CAPITAL_DETAILS_FIELDS,
+            LargeCapitalInvestorProfile,
+        )
 
     def get_incomplete_requirements_fields(self, instance):
         """Returns a list of all the requirement fields that are incomplete."""
-        return get_incomplete_fields(instance, LARGE_CAPITAL_REQUIREMENTS_FIELDS)
+        return get_incomplete_fields(
+            instance,
+            LARGE_CAPITAL_REQUIREMENTS_FIELDS,
+            LargeCapitalInvestorProfile,
+        )
 
     def get_incomplete_location_fields(self, instance):
         """Returns a list of all the location fields that are incomplete."""
-        return get_incomplete_fields(instance, LARGE_CAPITAL_LOCATION_FIELDS)
+        return get_incomplete_fields(
+            instance,
+            LARGE_CAPITAL_LOCATION_FIELDS,
+            LargeCapitalInvestorProfile,
+        )
 
     def validate_investor_company(self, value):
         """
