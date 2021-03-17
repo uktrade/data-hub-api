@@ -929,6 +929,8 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         'registered_address_postcode': original_company.registered_address_postcode,
         'registered_address_town': original_company.registered_address_town,
         'sector': original_company.sector_id,
+        'segment': original_company.segment,
+        'sub_segment': original_company.sub_segment,
         'trading_names': original_company.trading_names,
         'turnover': original_company.turnover,
         'turnover_range': original_company.turnover_range_id,

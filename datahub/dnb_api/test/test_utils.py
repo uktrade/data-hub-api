@@ -281,6 +281,8 @@ class TestUpdateCompanyFromDNB:
             'name': 'FOO BICYCLE LIMITED',
             'number_of_employees': 260,
             'sector': original_company.sector.id,
+            'segment': original_company.segment,
+            'sub_segment': original_company.sub_segment,
             'turnover': 50651895,
             'turnover_range': original_company.turnover_range.id,
             'uk_region': original_company.uk_region.id,
