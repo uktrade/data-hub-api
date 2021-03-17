@@ -189,6 +189,8 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: hep
+    sub_segment: sustain_nurture_and_grow
     address_1: 12 Alpha Street
     address_town: Volcanus
     address_postcode: NE28 5AQ
@@ -215,6 +217,8 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: non_hep
+    sub_segment: reassure_nurture_and_grow
     address_1: 12 First Street
     address_town: New York
     address_postcode: 10001
@@ -242,6 +246,8 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: hep
+    sub_segment: reassure_change_the_game
     address_1: 12 St George's Road
     address_town: Paris
     address_postcode: 75001
@@ -293,6 +299,8 @@
     number_of_employees: 95
     is_number_of_employees_estimated: True
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: hep
+    sub_segment: promote_change_the_game
     address_1: 1 Main Road
     address_town: Rome
     address_postcode: 10443
@@ -312,6 +320,8 @@
     name: One List Subsidiary Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     sector: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+    segment: hep
+    sub_segment: challenge
     address_1: 100 Fordham Rd
     address_town: Hainault
     address_postcode: IG6 7SQ
@@ -335,6 +345,8 @@
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: hep
+    sub_segment: sustain_increase_competitiveness
     address_1: 16 Getabergsvagen
     address_town: Geta
     address_postcode: 22340
@@ -375,6 +387,8 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    segment: hep
+    sub_segment: sustain_increase_competitiveness
     address_1: 12 First Street
     address_town: New York
     address_postcode: 10001
