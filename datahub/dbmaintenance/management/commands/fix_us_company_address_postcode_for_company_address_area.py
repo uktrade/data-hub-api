@@ -97,7 +97,7 @@ class Command(BaseCommand):
         where no registered address area exists
         @param united_states_companies: united states company query
         @param zip_prefix: 3 digit zip prefix
-        @return: Filtered Company
+        @return: Filtered Company by zip prefix and no registered address area
         """
         return united_states_companies.filter(
             registered_address_postcode__startswith=zip_prefix,
@@ -111,7 +111,7 @@ class Command(BaseCommand):
         where no address area exists
         @param united_states_companies: united states company query
         @param zip_prefix: 2 digit
-        @return:
+        @return: Postcodes starting with the prefix with no address areas
         """
         return united_states_companies.filter(
             address_postcode__startswith=zip_prefix,
@@ -123,7 +123,7 @@ class Command(BaseCommand):
         """
         Gets United States Administrative Area by Area Code
         @param area_code:
-        @return:First Administrative Area Found
+        @return: First Administrative Area Found
         """
         return AdministrativeArea.objects.filter(
             country_id=Command.UNITED_STATES_ID,
