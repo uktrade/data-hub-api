@@ -92,7 +92,7 @@ class Company(ArchivableModel, BaseModel):
         SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow',
                                     'Sustain: nurture & grow')
         SUSTAIN_DEVELOP_EXPORT_CAPABILITY = ('sustain_develop_export_capability',
-                                             'Sustain: develop export Capability')
+                                             'Sustain: develop export capability')
         SUSTAIN_COMMUNICATE_BENEFITS = ('sustain_communicate_benefits',
                                         'Sustain: communicate benefits')
         SUSTAIN_INCREASE_COMPETITIVENESS = ('sustain_increase_competitiveness',

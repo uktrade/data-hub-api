@@ -307,7 +307,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
             url,
             content_type='application/json',
         )
-
         assert response.status_code == response_status_code
         assert json.loads(response.content) == response_data
 
@@ -416,6 +415,8 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'global_headquarters': None,
             'headquarter_type': None,
             'sector': None,
+            'export_segment': '',
+            'export_sub_segment': '',
             'uk_region': None,
             'vat_number': '',
             'archived': False,
