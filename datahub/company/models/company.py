@@ -89,19 +89,29 @@ class Company(ArchivableModel, BaseModel):
         __empty__ = 'No segment or not known'
 
     class SubSegment(models.TextChoices):
-        SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow', 'Sustain: Nurture & Grow')
-        SUSTAIN_DEVELOP_EXPORT_CAPABILITY = ('sustain_develop_export_capability', 'Sustain: Develop Export Capability')
-        SUSTAIN_COMMUNICATE_BENEFITS = ('sustain_communicate_benefits', 'Sustain: Communicate Benefits')
-        SUSTAIN_INCREASE_COMPETITIVENESS = ('sustain_increase_competitiveness', 'Sustain: Increase Competitiveness')
-        REASSURE_NURTURE_AND_GROW = ('reassure_nurture_and_grow', 'Reassure: Nurture & Grow')
+        SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow',
+                                    'Sustain: Nurture & Grow')
+        SUSTAIN_DEVELOP_EXPORT_CAPABILITY = ('sustain_develop_export_capability',
+                                             'Sustain: Develop Export Capability')
+        SUSTAIN_COMMUNICATE_BENEFITS = ('sustain_communicate_benefits',
+                                        'Sustain: Communicate Benefits')
+        SUSTAIN_INCREASE_COMPETITIVENESS = ('sustain_increase_competitiveness',
+                                            'Sustain: Increase Competitiveness')
+        REASSURE_NURTURE_AND_GROW = ('reassure_nurture_and_grow',
+                                     'Reassure: Nurture & Grow')
         REASSURE_DEVELOP_EXPORT_CAPABILITY = ('reassure_develop_export_capability',
                                               'Reassure: Develop Export Capability')
-        REASSURE_LEAVE_BE = ('reassure_leave_be', 'Reassure: Leave Be')
-        REASSURE_CHANGE_THE_GAME = ('reassure_change_the_game', "Reassure: Change the Game")
-        PROMOTE_DEVELOP_EXPORT_CAPABILITY = ('promote_develop_export_capability', 'Promote: Develop Export Capability')
-        PROMOTE_COMMUNICATE_BENEFITS = ('promote_communicate_benefits', 'Promote: Communicate Benefits')
-        PROMOTE_CHANGE_THE_GAME = ('promote_change_the_game', 'Promote: Change the Game')
-        CHALLENGE = ('challenge', "Challenge")
+        REASSURE_LEAVE_BE = ('reassure_leave_be',
+                             'Reassure: Leave Be')
+        REASSURE_CHANGE_THE_GAME = ('reassure_change_the_game',
+                                    'Reassure: Change the Game')
+        PROMOTE_DEVELOP_EXPORT_CAPABILITY = ('promote_develop_export_capability',
+                                             'Promote: Develop Export Capability')
+        PROMOTE_COMMUNICATE_BENEFITS = ('promote_communicate_benefits',
+                                        'Promote: Communicate Benefits')
+        PROMOTE_CHANGE_THE_GAME = ('promote_change_the_game',
+                                   'Promote: Change the Game')
+        CHALLENGE = ('challenge', 'Challenge')
 
         __empty__ = 'No Sub-Segment or not known'
 
@@ -331,7 +341,7 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         blank=True,
         choices=SubSegment.choices,
-        help_text='TODO: Get from Cathy'
+        help_text='TODO: Get from Cathy',
     )
 
     def __str__(self):
