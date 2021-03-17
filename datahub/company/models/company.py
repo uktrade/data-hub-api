@@ -83,8 +83,8 @@ class Company(ArchivableModel, BaseModel):
         __empty__ = 'No profile or not known'
 
     class Segment(models.TextChoices):
-        HEP = ('hep', 'Hep')
-        NON_HEP = ('non-hep', 'Non-Hep')
+        HEP = ('hep', 'HEP')
+        NON_HEP = ('non-hep', 'Non-HEP')
 
         __empty__ = 'No segment or not known'
 

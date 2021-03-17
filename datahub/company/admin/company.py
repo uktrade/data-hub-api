@@ -117,6 +117,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'one_list_tier',
                     'one_list_account_owner',
                     'dnb_investigation_id',
+                    'segment',
                 ),
             },
         ),

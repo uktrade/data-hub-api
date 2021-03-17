@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='segment',
-            field=models.CharField(blank=True, choices=[(None, 'No segment or not known'), ('hep', 'Hep'), ('non-hep', 'Non-Hep')], help_text='TODO: Get from Cathy', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[(None, 'No segment or not known'), ('hep', 'HEP'), ('non-hep', 'NON-HEP')], help_text='TODO: Get from Cathy', max_length=255, null=True),
         ),
     ]
