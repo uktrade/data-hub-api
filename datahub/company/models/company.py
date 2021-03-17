@@ -82,6 +82,12 @@ class Company(ArchivableModel, BaseModel):
 
         __empty__ = 'No profile or not known'
 
+    class Segment(models.TextChoices):
+        HEP = ('hep', 'Hep')
+        NON_HEP = ('non-hep', 'Non-Hep')
+
+        __empty__ = 'No segment or not known'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -295,6 +301,13 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         help_text='Last updated from D&B',
         db_index=True,
+    )
+    segment = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        choices=Segment.choices,
+        help_text='TODO: Get from Cathy',
     )
 
     def __str__(self):
