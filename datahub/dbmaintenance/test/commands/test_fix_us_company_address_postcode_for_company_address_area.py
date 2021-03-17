@@ -60,7 +60,7 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     actual_result = re.sub(
-        Command.US_POST_CODE_PATTERN,
+        Command.POST_CODE_PATTERN,
         Command.REPLACEMENT,
         post_code,
         0,

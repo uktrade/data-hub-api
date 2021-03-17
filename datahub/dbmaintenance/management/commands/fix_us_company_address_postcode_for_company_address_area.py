@@ -20,9 +20,9 @@ class Command(BaseCommand):
     """
 
     # Visualise this @ https://regex101.com/r/yckIVj/3
-    US_POST_CODE_PATTERN = (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
-                            r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$')
-    UNITED_STATES_ID = '81756b9a-5d95-e211-a939-e4115bead28a'
+    POST_CODE_PATTERN = (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
+                         r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$')
+    COUNTRY_ID = '81756b9a-5d95-e211-a939-e4115bead28a'
     REPLACEMENT = r'\1\2\3\4\5\6'
     REGEX_OPTIONS = 'gm'
 
@@ -61,10 +61,9 @@ class Command(BaseCommand):
         """
         Update company registered address area data
         """
-        united_states_companies = (Company
-                                   .objects
-                                   .filter(registered_address_country=Command.UNITED_STATES_ID)
-                                   )
+        united_states_companies = Company.objects.filter(
+            registered_address_country=Command.COUNTRY_ID,
+        )
 
         for zip_prefix, area_code, _area_name in US_ZIP_STATES:
             administrative_area = Command.us_administrative_area_by_code(area_code)
@@ -79,9 +78,9 @@ class Command(BaseCommand):
         """
         Update company address area data
         """
-        united_states_companies = Company\
-            .objects\
-            .filter(address_country=Command.UNITED_STATES_ID)
+        united_states_companies = Company.objects.filter(
+            address_country=Command.COUNTRY_ID,
+        )
 
         for zip_prefix, area_code, _area_name in US_ZIP_STATES:
             administrative_area = Command.us_administrative_area_by_code(area_code)
@@ -126,7 +125,7 @@ class Command(BaseCommand):
         @return: First Administrative Area Found
         """
         return AdministrativeArea.objects.filter(
-            country_id=Command.UNITED_STATES_ID,
+            country_id=Command.COUNTRY_ID,
             area_code=area_code,
         ).first()
 
@@ -135,18 +134,15 @@ class Command(BaseCommand):
         """
         Update address postcodes where the subquery exists
         """
-        (
-            Company
-            .objects
-            .filter(address_country=Command.UNITED_STATES_ID)
-            .update(
-                address_postcode=Func(
-                    F('address_postcode'),
-                    Value(Command.US_POST_CODE_PATTERN),
-                    Value(Command.REPLACEMENT),
-                    Value(Command.REGEX_OPTIONS),
-                    function='regexp_replace',
-                ),
+        Company.objects.filter(
+            address_country=Command.COUNTRY_ID,
+        ).update(
+            address_postcode=Func(
+                F('address_postcode'),
+                Value(Command.POST_CODE_PATTERN),
+                Value(Command.REPLACEMENT),
+                Value(Command.REGEX_OPTIONS),
+                function='regexp_replace',
             ),
         )
 
@@ -155,17 +151,14 @@ class Command(BaseCommand):
         """
         Update registered address postcodes where the subquery exists
         """
-        (
-            Company
-            .objects
-            .filter(address_country=Command.UNITED_STATES_ID)
-            .update(
-                registered_address_postcode=Func(
-                    F('registered_address_postcode'),
-                    Value(Command.US_POST_CODE_PATTERN),
-                    Value(Command.REPLACEMENT),
-                    Value(Command.REGEX_OPTIONS),
-                    function='regexp_replace',
-                ),
+        Company.objects.filter(
+            address_country=Command.COUNTRY_ID,
+        ).update(
+            registered_address_postcode=Func(
+                F('registered_address_postcode'),
+                Value(Command.POST_CODE_PATTERN),
+                Value(Command.REPLACEMENT),
+                Value(Command.REGEX_OPTIONS),
+                function='regexp_replace',
             ),
         )
