@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='segment',
-            field=models.CharField(blank=True, choices=[(None, 'No segment or not known'), ('hep', 'HEP'), ('non-hep', 'Non-HEP')], help_text='TODO: Get from Cathy', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[(None, 'No segment or not known'), ('hep', 'HEP'), ('non-hep', 'Non-HEP')], max_length=255, null=True),
         ),
         migrations.AddField(
             model_name='company',
             name='sub_segment',
-            field=models.CharField(blank=True, choices=[(None, 'No Sub-Segment or not known'), ('sustain_nurture_and_grow', 'Sustain: Nurture & Grow'), ('sustain_develop_export_capability', 'Sustain: Develop Export Capability'), ('sustain_communicate_benefits', 'Sustain: Communicate Benefits'), ('sustain_increase_competitiveness', 'Sustain: Increase Competitiveness'), ('reassure_nurture_and_grow', 'Reassure: Nurture & Grow'), ('reassure_develop_export_capability', 'Reassure: Develop Export Capability'), ('reassure_leave_be', 'Reassure: Leave Be'), ('reassure_change_the_game', 'Reassure: Change the Game'), ('promote_develop_export_capability', 'Promote: Develop Export Capability'), ('promote_communicate_benefits', 'Promote: Communicate Benefits'), ('promote_change_the_game', 'Promote: Change the Game'), ('challenge', 'Challenge')], help_text='TODO: Get from Cathy', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[(None, 'No Sub-Segment or not known'), ('sustain_nurture_and_grow', 'Sustain: Nurture & Grow'), ('sustain_develop_export_capability', 'Sustain: Develop Export Capability'), ('sustain_communicate_benefits', 'Sustain: Communicate Benefits'), ('sustain_increase_competitiveness', 'Sustain: Increase Competitiveness'), ('reassure_nurture_and_grow', 'Reassure: Nurture & Grow'), ('reassure_develop_export_capability', 'Reassure: Develop Export Capability'), ('reassure_leave_be', 'Reassure: Leave Be'), ('reassure_change_the_game', 'Reassure: Change the Game'), ('promote_develop_export_capability', 'Promote: Develop Export Capability'), ('promote_communicate_benefits', 'Promote: Communicate Benefits'), ('promote_change_the_game', 'Promote: Change the Game'), ('challenge', 'Challenge')], max_length=255, null=True),
         ),
     ]

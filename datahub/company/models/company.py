@@ -334,14 +334,12 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         blank=True,
         choices=Segment.choices,
-        help_text='TODO: Get from Cathy',
     )
     sub_segment = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         choices=SubSegment.choices,
-        help_text='TODO: Get from Cathy',
     )
 
     def __str__(self):
