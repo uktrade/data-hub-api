@@ -5,11 +5,7 @@ from django.core.management import call_command
 
 from datahub.company.models import Company
 from datahub.company.test.factories import USCompanyFactory
-from datahub. \
-    dbmaintenance. \
-    management. \
-    commands. \
-    fix_us_company_address_postcode_for_company_address_area import Command
+from datahub.core.constants import Country
 
 pytestmark = pytest.mark.django_db
 
@@ -60,8 +56,8 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     actual_result = re.sub(
-        Command.POST_CODE_PATTERN,
-        Command.REPLACEMENT,
+        Country.united_states.value.postcode_pattern,
+        Country.united_states.value.postcode_replacement,
         post_code,
         0,
         re.MULTILINE)

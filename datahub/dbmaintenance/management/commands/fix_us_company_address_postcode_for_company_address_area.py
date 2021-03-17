@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F, Func, Value
 
 from datahub.company.models import Company
-from datahub.core.constants import US_ZIP_STATES
+from datahub.core.constants import Country, US_ZIP_STATES
 from datahub.metadata.models import AdministrativeArea
 
 logger = getLogger(__name__)
@@ -18,13 +18,6 @@ class Command(BaseCommand):
     Example of executing this command locally:
         python manage.py fix_us_company_address_postcode_data
     """
-
-    # Visualise this @ https://regex101.com/r/yckIVj/3
-    POST_CODE_PATTERN = (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
-                         r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$')
-    COUNTRY_ID = '81756b9a-5d95-e211-a939-e4115bead28a'
-    REPLACEMENT = r'\1\2\3\4\5\6'
-    REGEX_OPTIONS = 'gm'
 
     def add_arguments(self, parser):
         """
@@ -62,7 +55,7 @@ class Command(BaseCommand):
         Update company registered address area data
         """
         united_states_companies = Company.objects.filter(
-            registered_address_country=Command.COUNTRY_ID,
+            registered_address_country=Country.united_states.value.id,
         )
 
         for zip_prefix, area_code, _area_name in US_ZIP_STATES:
@@ -79,7 +72,7 @@ class Command(BaseCommand):
         Update company address area data
         """
         united_states_companies = Company.objects.filter(
-            address_country=Command.COUNTRY_ID,
+            address_country=Country.united_states.value.id,
         )
 
         for zip_prefix, area_code, _area_name in US_ZIP_STATES:
@@ -125,7 +118,7 @@ class Command(BaseCommand):
         @return: First Administrative Area Found
         """
         return AdministrativeArea.objects.filter(
-            country_id=Command.COUNTRY_ID,
+            country_id=Country.united_states.value.id,
             area_code=area_code,
         ).first()
 
@@ -135,13 +128,13 @@ class Command(BaseCommand):
         Update address postcodes where the subquery exists
         """
         Company.objects.filter(
-            address_country=Command.COUNTRY_ID,
+            address_country=Country.united_states.value.id,
         ).update(
             address_postcode=Func(
                 F('address_postcode'),
-                Value(Command.POST_CODE_PATTERN),
-                Value(Command.REPLACEMENT),
-                Value(Command.REGEX_OPTIONS),
+                Value(Country.united_states.value.postcode_pattern),
+                Value(Country.united_states.value.postcode_replacement),
+                Value('gm'),
                 function='regexp_replace',
             ),
         )
@@ -152,13 +145,13 @@ class Command(BaseCommand):
         Update registered address postcodes where the subquery exists
         """
         Company.objects.filter(
-            address_country=Command.COUNTRY_ID,
+            address_country=Country.united_states.value.id,
         ).update(
             registered_address_postcode=Func(
                 F('registered_address_postcode'),
-                Value(Command.POST_CODE_PATTERN),
-                Value(Command.REPLACEMENT),
-                Value(Command.REGEX_OPTIONS),
+                Value(Country.united_states.value.postcode_pattern),
+                Value(Country.united_states.value.postcode_replacement),
+                Value('gm'),
                 function='regexp_replace',
             ),
         )
