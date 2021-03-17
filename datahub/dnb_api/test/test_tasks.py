@@ -88,6 +88,8 @@ def test_sync_company_with_dnb_all_fields(
         'name': 'FOO BICYCLE LIMITED',
         'number_of_employees': 260,
         'sector': original_company.sector_id,
+        'segment': original_company.segment,
+        'sub_segment': original_company.sub_segment,
         'turnover': 50651895,
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
