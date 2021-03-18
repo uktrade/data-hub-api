@@ -82,13 +82,13 @@ class Company(ArchivableModel, BaseModel):
 
         __empty__ = 'No profile or not known'
 
-    class Segment(models.TextChoices):
-        HEP = ('hep', 'HEP')
-        NON_HEP = ('non-hep', 'Non-HEP')
+    class ExportSegment(models.TextChoices):
+        HEP = ('hep', ' High Export Potential')
+        NON_HEP = ('non-hep', 'Non- High Export Potential')
 
-        __empty__ = 'No segment or not known'
+        __empty__ = 'No Export Segment or not known'
 
-    class SubSegment(models.TextChoices):
+    class ExportSubSegment(models.TextChoices):
         SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow',
                                     'Sustain: Nurture & Grow')
         SUSTAIN_DEVELOP_EXPORT_CAPABILITY = ('sustain_develop_export_capability',
@@ -113,7 +113,7 @@ class Company(ArchivableModel, BaseModel):
                                    'Promote: Change the Game')
         CHALLENGE = ('challenge', 'Challenge')
 
-        __empty__ = 'No Sub-Segment or not known'
+        __empty__ = 'No Sub-Export Segment or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
@@ -329,17 +329,17 @@ class Company(ArchivableModel, BaseModel):
         help_text='Last updated from D&B',
         db_index=True,
     )
-    segment = models.CharField(
+    export_segment = models.CharField(
         max_length=MAX_LENGTH,
-        null=True,
-        blank=True,
-        choices=Segment.choices,
+        default='',
+        help_text='Segmentation of export',
+        choices=ExportSegment.choices,
     )
-    sub_segment = models.CharField(
+    export_sub_segment = models.CharField(
         max_length=MAX_LENGTH,
-        null=True,
-        blank=True,
-        choices=SubSegment.choices,
+        default='',
+        help_text='Sub-Segmentation of export',
+        choices=ExportSubSegment.choices,
     )
 
     def __str__(self):
