@@ -83,34 +83,34 @@ class Company(ArchivableModel, BaseModel):
         __empty__ = 'No profile or not known'
 
     class ExportSegment(models.TextChoices):
-        HEP = ('hep', ' High Export Potential')
-        NON_HEP = ('non-hep', 'Non- High Export Potential')
+        HEP = ('hep', ' High export potential')
+        NON_HEP = ('non-hep', 'Not high export potential')
 
         __empty__ = 'No Export Segment or not known'
 
     class ExportSubSegment(models.TextChoices):
         SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow',
-                                    'Sustain: Nurture & Grow')
+                                    'Sustain: nurture & grow')
         SUSTAIN_DEVELOP_EXPORT_CAPABILITY = ('sustain_develop_export_capability',
-                                             'Sustain: Develop Export Capability')
+                                             'Sustain: develop export Capability')
         SUSTAIN_COMMUNICATE_BENEFITS = ('sustain_communicate_benefits',
-                                        'Sustain: Communicate Benefits')
+                                        'Sustain: communicate benefits')
         SUSTAIN_INCREASE_COMPETITIVENESS = ('sustain_increase_competitiveness',
-                                            'Sustain: Increase Competitiveness')
+                                            'Sustain: increase competitiveness')
         REASSURE_NURTURE_AND_GROW = ('reassure_nurture_and_grow',
-                                     'Reassure: Nurture & Grow')
+                                     'Reassure: nurture & grow')
         REASSURE_DEVELOP_EXPORT_CAPABILITY = ('reassure_develop_export_capability',
-                                              'Reassure: Develop Export Capability')
+                                              'Reassure: develop export capability')
         REASSURE_LEAVE_BE = ('reassure_leave_be',
-                             'Reassure: Leave Be')
+                             'Reassure: leave be')
         REASSURE_CHANGE_THE_GAME = ('reassure_change_the_game',
-                                    'Reassure: Change the Game')
+                                    'Reassure: change the game')
         PROMOTE_DEVELOP_EXPORT_CAPABILITY = ('promote_develop_export_capability',
-                                             'Promote: Develop Export Capability')
+                                             'Promote: develop export capability')
         PROMOTE_COMMUNICATE_BENEFITS = ('promote_communicate_benefits',
-                                        'Promote: Communicate Benefits')
+                                        'Promote: communicate benefits')
         PROMOTE_CHANGE_THE_GAME = ('promote_change_the_game',
-                                   'Promote: Change the Game')
+                                   'Promote: change the game')
         CHALLENGE = ('challenge', 'Challenge')
 
         __empty__ = 'No Sub-Export Segment or not known'
