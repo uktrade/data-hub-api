@@ -86,7 +86,7 @@ class Company(ArchivableModel, BaseModel):
         HEP = ('hep', ' High export potential')
         NON_HEP = ('non-hep', 'Not high export potential')
 
-        __empty__ = 'No Export Segment or not known'
+        __empty__ = 'No export segment or not known'
 
     class ExportSubSegment(models.TextChoices):
         SUSTAIN_NURTURE_AND_GROW = ('sustain_nurture_and_grow',
@@ -113,7 +113,7 @@ class Company(ArchivableModel, BaseModel):
                                    'Promote: change the game')
         CHALLENGE = ('challenge', 'Challenge')
 
-        __empty__ = 'No Sub-Export Segment or not known'
+        __empty__ = 'No sub export segment or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
