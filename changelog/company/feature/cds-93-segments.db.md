@@ -1,1 +1,1 @@
-The fields `segment` and `sub_segment` were added (endpoints to follow in a future release).
+The fields `export_segment` and `export_sub_segment` were added (endpoints to follow in a future release).
