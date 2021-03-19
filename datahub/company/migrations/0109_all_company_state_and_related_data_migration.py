@@ -68,7 +68,7 @@ def run_international_area_code_data_migration(app, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('metadata', '0007_administrativearea_area_code'),
-        ('company', '0111_fk_on_administrative_area_for_all_address_state_types'),
+        ('company', '0108_create_company_state_fk_base_model'),
     ]
     operations = [
         migrations.RunPython(run_clean_postcode_address_update),
