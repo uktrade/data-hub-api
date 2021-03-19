@@ -53,7 +53,6 @@ class CompaniesDatasetView(BaseDatasetView):
             'registered_address_postcode',
             'registered_address_area__name',
             'registered_address_area',
-            'registered_address_county',
             'registered_address_town',
             'sector_name',
             'trading_names',
