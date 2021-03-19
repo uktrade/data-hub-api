@@ -168,6 +168,21 @@ def test_mapping(es):
                             },
                         },
                     },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
+                            },
+                        },
+                    },
                     'country': {
                         'type': 'object',
                         'properties': {
@@ -198,6 +213,21 @@ def test_mapping(es):
                             'trigram': {
                                 'type': 'text',
                                 'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
                             },
                         },
                     },
@@ -324,7 +354,7 @@ def test_get_basic_search_query():
                             'fields': [
                                 'address.country.name.trigram',
                                 'address.postcode.trigram',
-                                'address_country.name.trigram',
+                                'address_area.name.trigram',
                                 'address_postcode.trigram',
                                 'company.name',
                                 'company.name.trigram',
@@ -352,6 +382,7 @@ def test_get_basic_search_query():
                                 'reference_code',
                                 'registered_address.country.name.trigram',
                                 'registered_address.postcode.trigram',
+                                'registered_address.area.name.trigram',
                                 'related_programmes.name',
                                 'related_programmes.name.trigram',
                                 'simpleton.name',
@@ -448,8 +479,10 @@ def test_limited_get_search_by_entity_query():
                                             'reference_code',
                                             'address.country.name.trigram',
                                             'address.postcode.trigram',
+                                            'address.area.name.trigram',
                                             'registered_address.country.name.trigram',
                                             'registered_address.postcode.trigram',
+                                            'registered_address.area.name.trigram',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',

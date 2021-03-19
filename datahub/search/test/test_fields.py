@@ -74,6 +74,21 @@ class TestNormalizedField(APITestMixin):
                             },
                         },
                     },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
+                            },
+                        },
+                    },
                     'country': {
                         'type': 'object',
                         'properties': {
@@ -111,6 +126,13 @@ class TestNormalizedField(APITestMixin):
                             },
                         },
                     },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'index': False, 'type': 'keyword'},
+                            'name': {'index': False, 'type': 'text'},
+                        },
+                    },
                     'country': {
                         'type': 'object',
                         'properties': {
@@ -125,5 +147,5 @@ class TestNormalizedField(APITestMixin):
 )
 def test_address_field(index_country, expected_mapping):
     """Test for address_field."""
-    field_mapping = address_field(index_country=index_country)
+    field_mapping = address_field(index_country=index_country, index_area=True)
     assert field_mapping.to_dict() == expected_mapping
