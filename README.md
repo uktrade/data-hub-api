@@ -231,6 +231,7 @@ pytest -m excluded_dependent_on_redis
 pytest -m "excluded_x or excluded_y"
 pytest -m "not (excluded_x or excluded_y)"
 ```
+**NOTE:** When testing, using the `--reuse-db` can speed up test runs by excluding migrations
 
 To run the linter:
 

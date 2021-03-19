@@ -11,6 +11,7 @@ from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.search.company import CompanySearchApp
+from datahub.search.company.test.utils import get_address_area_or_none
 
 # Index objects for this search app only
 pytestmark = pytest.mark.es_collector_apps.with_args(CompanySearchApp)
@@ -126,6 +127,7 @@ class TestPublicCompanySearch:
                         'town': company.address_town,
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
+                        'area': get_address_area_or_none(company.address_area),
                         'country': {
                             'id': str(company.address_country.id),
                             'name': company.address_country.name,
@@ -137,6 +139,7 @@ class TestPublicCompanySearch:
                         'town': company.registered_address_town,
                         'county': company.registered_address_county or '',
                         'postcode': company.registered_address_postcode or '',
+                        'area': get_address_area_or_none(company.registered_address_area),
                         'country': {
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
