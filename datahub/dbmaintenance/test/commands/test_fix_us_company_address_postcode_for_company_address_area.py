@@ -1,32 +1,13 @@
 import re
 
 import pytest
-from pytest import fixture
+from django.core.management import call_command
 
 from datahub.company.models import Company
-from datahub.company.test.factories import CompanyFactory
-from datahub.core import constants
-from datahub. \
-    dbmaintenance. \
-    management. \
-    commands. \
-    fix_us_company_address_postcode_for_company_address_area import Command
+from datahub.company.test.factories import USCompanyFactory
+from datahub.core.constants import Country
 
-
-class USCompanyFactory(CompanyFactory):
-    """US Company factory with United States Settings"""
-
-    address_town = 'New York'
-    address_country_id = constants.Country.united_states.value.id
-    registered_address_town = 'New York'
-    registered_address_country_id = constants.Country.united_states.value.id
-    uk_region_id = None
-
-
-@fixture
-def sut():
-    """Provider Default Command"""
-    return Command()
+pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -75,15 +56,14 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     actual_result = re.sub(
-        Command.US_POST_CODE_PATTERN,
-        Command.REPLACEMENT,
+        Country.united_states.value.postcode_pattern,
+        Country.united_states.value.postcode_replacement,
         post_code,
         0,
         re.MULTILINE)
     assert actual_result == expected_result
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, area_code, area_name',
                          [('00589', 'NY', 'New York'),
                           ('00612-1234', 'PR', 'Puerto Rico'),
@@ -97,21 +77,20 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
 def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
         area_code,
-        area_name,
-        sut):
+        area_name):
     """
     Test postcode fixes and area generation a couple of valid Zip Codes using the real DB
     @param post_code: POSTCODE good
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
-    @param sut: Test
     """
     company = USCompanyFactory.create(
         address_postcode=post_code,
+        registered_address_postcode=post_code,
     )
     assert company.address_area is None
 
-    sut.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.address_area is not None
@@ -119,7 +98,6 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     assert current_company.address_postcode == post_code
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, area_code, area_name', [
     ('05512', 'MA', 'Massachusetts'),
     ('05612-1234', 'VT', 'Vermont'),
@@ -133,15 +111,13 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
         post_code,
         area_code,
-        area_name,
-        sut):
+        area_name):
     """
     Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
     @param post_code: POSTCODE good
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
-    @param sut: Test
     """
     company = USCompanyFactory.create(
         address_postcode=post_code,
@@ -149,7 +125,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     )
     assert company.registered_address_area is None
 
-    sut.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.registered_address_area is not None
@@ -157,7 +133,6 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     assert current_company.registered_address_postcode == post_code
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize('post_code, expected_result',
                          [('1 0402', '10402'),
                           ('8520 7402', '07402'),
@@ -166,19 +141,22 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
                           ('NY 10174 - 4099', '10174 - 4099'),
                           ('NY 123456789', '123456789'),
                           ])
-def test_command_fixes_invalid_postcodes_in_all_post_code_fields(post_code, expected_result, sut):
+def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
+        post_code,
+        expected_result):
     """
     Test Patterns that need fixing in all postcode fields
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
-    @param sut: Command
     """
-    USCompanyFactory.create(
+    company = USCompanyFactory.create(
         address_postcode=post_code,
         registered_address_postcode=post_code,
     )
+    assert company.address_postcode == post_code
+    assert company.registered_address_postcode == post_code
 
-    sut.handle(None, None)
+    call_command('fix_us_company_address_postcode_for_company_address_area')
 
     current_company = Company.objects.first()
     assert current_company.address_postcode == expected_result
