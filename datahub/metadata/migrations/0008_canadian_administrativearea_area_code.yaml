@@ -1,0 +1,91 @@
+- model: metadata.administrativearea
+  pk: 75e337c3-23c9-4294-8085-6b1e8c43eb07
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Alberta
+    area_code: AB
+- model: metadata.administrativearea
+  pk: 351410eb-81b5-4a55-a76d-790b31a833fa
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: British Columbia
+    area_code: BC
+- model: metadata.administrativearea
+  pk: 070ccb13-a9be-4993-8c4d-354399cc9959
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Manitoba
+    area_code: MB
+- model: metadata.administrativearea
+  pk: 6db6bc19-e365-4291-a5c2-b6b74a8493d7
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: New Brunswick
+    area_code: NB
+- model: metadata.administrativearea
+  pk: c3d34e5f-8c4a-4ea0-bd8c-b663147b4f63
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Newfoundland and Labrador
+    area_code: NL
+- model: metadata.administrativearea
+  pk: 07e3b467-6119-4c64-a55b-55317dec9cf4
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Northwest Territories
+    area_code: NT
+- model: metadata.administrativearea
+  pk: a7874ee1-5fec-44bc-895a-c991ee596f29
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Nova Scotia
+    area_code: NS
+- model: metadata.administrativearea
+  pk: fc42583c-1595-436d-a41a-42fb9143c2d9
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Nunavut
+    area_code: NU
+- model: metadata.administrativearea
+  pk: 02bb0397-950b-4338-8193-35c69ee0c31c
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Prince Edward Island
+    area_code: PE
+- model: metadata.administrativearea
+  pk: 5fc4ea61-75fe-415d-8ff0-2a2034ff6c86
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Quebec
+    area_code: QC
+- model: metadata.administrativearea
+  pk: 9fa70673-02d0-42c3-b57b-111422812915
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Saskatchewan
+    area_code: SK
+- model: metadata.administrativearea
+  pk: 1141a776-df37-44e2-8513-2386fd5995c8
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Yukon
+    area_code: YT
+- model: metadata.administrativearea
+  pk: e6377674-055e-4833-a382-c9dd73b2e4cf
+  fields:
+    country: 5daf72a6-5d95-e211-a939-e4115bead28a
+    disabled_on:
+    name: Ontario
+    area_code: 'ON'
