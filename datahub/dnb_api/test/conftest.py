@@ -188,6 +188,8 @@ def base_company_dict():
         'reference_code': '',
         'registered_address_area': None,
         'sector': '',
+        'export_segment': '',
+        'export_sub_segment': '',
         'trading_names': [],
         'transfer_reason': '',
         'transferred_by': None,
