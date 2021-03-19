@@ -940,23 +940,23 @@ values
 ('998','AK','Alaska'),
 ('999','AK','Alaska');
 
--- Update registered_address_state_id
+-- Update registered_address_area_id
 update company_company cmpy
-set registered_address_state_id = maps.id
+set registered_address_area_id = maps.id
 from
 	(select mapz.state_name, mapz.zip_code, mets.id, mets.country_id, mets.name
 		from us_unique_zip_state_mapping mapz
 	    inner join metadata_administrativearea mets on mets.name = mapz.state_name
 	) as maps -- map state
 where cmpy.registered_address_country_id = '81756b9a-5d95-e211-a939-e4115bead28a'
-	and cmpy.registered_address_state_id is null
+	and cmpy.registered_address_area_id is null
 	and maps.zip_code = substring(cmpy.registered_address_postcode, 1, 3)
 	and maps.country_id = cmpy.registered_address_country_id
 	and cmpy.registered_address_postcode ~ e'^\\d{3}' = true;
 
--- Update address_address_state_id
+-- Update address_address_area_id
 update company_company cmpy
-set address_state_id = maps.id
+set address_area_id = maps.id
 from
 	(select mapz.state_name, mapz.zip_code, mets.id, mets.country_id, mets.name
 		from us_unique_zip_state_mapping mapz
@@ -964,7 +964,7 @@ from
 	) as maps -- map state
 where
 	cmpy.address_country_id = '81756b9a-5d95-e211-a939-e4115bead28a'
-	and cmpy.address_state_id is null
+	and cmpy.address_area_id is null
 	and maps.zip_code = substring(cmpy.address_postcode, 1, 3)
 	and maps.country_id = cmpy.address_country_id
 	and cmpy.address_postcode ~ e'^\\d{3}' = true;
