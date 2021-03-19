@@ -226,8 +226,7 @@
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
     registered_address_town: New York
-    registered_address_postcode: 10101
-    registered_address_area: aa65b701-244a-41fc-bd31-0a546303106a
+    registered_address_postcode: 765413
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
     created_on: '2017-10-16T11:00:00Z'
