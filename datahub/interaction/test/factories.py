@@ -14,6 +14,7 @@ from datahub.interaction.models import (
     PolicyIssueType,
     ServiceDeliveryStatus,
 )
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import Country
 from datahub.metadata.test.factories import ServiceFactory
@@ -151,6 +152,14 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
     )
+
+
+class LargeCapitalOpportunityInteractionFactory(InteractionFactoryBase):
+    """Factory for creating an interaction relating to a large capital opportunity."""
+
+    kind = Interaction.Kind.INTERACTION
+    theme = Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY
+    large_capital_opportunity = factory.SubFactory(LargeCapitalOpportunityFactory)
 
 
 class ServiceDeliveryFactory(InteractionFactoryBase):
