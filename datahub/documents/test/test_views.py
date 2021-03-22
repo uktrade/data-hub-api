@@ -15,7 +15,7 @@ from datahub.documents.test.my_entity_document.models import MyEntityDocument
 
 @pytest.fixture
 def test_urls():  # noqa: D403
-    """pytest fixture to override the ROOT_URLCONF with test views."""
+    """Pytest fixture to override the ROOT_URLCONF with test views."""
     with override_settings(ROOT_URLCONF='datahub.documents.test.my_entity_document.urls'):
         yield
 
