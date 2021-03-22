@@ -118,7 +118,7 @@ flake8-commas==2.0.0
     # via -r requirements.in
 flake8-debugger==4.0.0
     # via -r requirements.in
-flake8-docstrings==1.5.0
+flake8-docstrings==1.6.0
     # via -r requirements.in
 flake8-import-order==0.18.1
     # via -r requirements.in
