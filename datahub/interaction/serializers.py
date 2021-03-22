@@ -40,6 +40,7 @@ from datahub.interaction.validators import (
     ServiceAnswersValidator,
     StatusChangeValidator,
 )
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Country, Service, Team
 from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
@@ -165,6 +166,11 @@ class InteractionSerializer(serializers.ModelSerializer):
     is_event = serializers.BooleanField(required=False, allow_null=True)
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
+    large_capital_opportunity = NestedRelatedField(
+        LargeCapitalOpportunity,
+        required=False,
+        allow_null=True,
+    )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service, required=False, allow_null=True)
     service_answers = serializers.JSONField(required=False)
@@ -388,6 +394,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'communication_channel',
             'grant_amount_offered',
             'investment_project',
+            'large_capital_opportunity',
             'net_company_receipt',
             'service',
             'service_answers',
