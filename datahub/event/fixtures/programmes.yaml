@@ -82,3 +82,6 @@
 - model: event.programme
   pk: b86f3771-a784-e611-be23-e4115bead28a
   fields: {disabled_on: null, name: HVO Team Specialist contribution}
+- model: event.programme
+  pk: adf3f03e-a767-4453-ab81-75cd82471db5
+  fields: {disabled_on: null, name: Partnering with Japan}
