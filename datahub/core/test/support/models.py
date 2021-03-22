@@ -1,7 +1,7 @@
 from django.db import models
 
 from datahub.core.models import BaseConstantModel, BaseModel, DisableableModel
-from datahub.metadata.models import Country
+from datahub.metadata.models import AdministrativeArea, Country
 
 
 class MetadataModel(BaseConstantModel):
@@ -113,6 +113,13 @@ class MultiAddressModel(models.Model):
         blank=True,
         null=True,  # deliberately  null=True
     )
+    primary_address_area = models.ForeignKey(
+        AdministrativeArea,
+        related_name='++',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     primary_address_country = models.ForeignKey(
         Country,
         on_delete=models.PROTECT,
@@ -128,6 +135,13 @@ class MultiAddressModel(models.Model):
     )
     secondary_address_town = models.CharField(max_length=255, blank=True)
     secondary_address_county = models.CharField(max_length=255, blank=True)
+    secondary_address_area = models.ForeignKey(
+        AdministrativeArea,
+        related_name='++',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     secondary_address_country = models.ForeignKey(
         Country,
         null=True,
