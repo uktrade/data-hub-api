@@ -852,7 +852,7 @@ class TestAddressSerializer(APITestMixin):
         url = reverse('test-addresses-item', kwargs={'pk': instance.pk})
         response = self.api_client.patch(url, data=patch_data)
 
-        assert response.status_code == status.HTTP_200_OK        
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
