@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.27
+boto3==1.17.33
 
 notifications-python-client==6.0.2
 
@@ -60,7 +60,7 @@ freezegun==1.1.0
 requests-mock==1.8.0
 django-debug-toolbar==3.2
 werkzeug==1.0.1  # Required by runserver_plus - useful for local dev
-pip-tools==6.0.0
+pip-tools==6.0.1
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==19.2.0
@@ -74,12 +74,12 @@ flake8-bugbear==21.3.2
 flake8-commas==2.0.0
 flake8-debugger==4.0.0
 flake8-import-order==0.18.1
-flake8-docstrings==1.5.0
+flake8-docstrings==1.6.0
 flake8-print==4.0.0
 flake8-quotes==3.2.0
 flake8-string-format==0.3.0
 pep8-naming==0.11.1
-pydocstyle==5.1.1
+pydocstyle==6.0.0
 
 gunicorn==20.0.4
 gevent==21.1.2
