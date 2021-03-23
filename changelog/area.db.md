@@ -1,1 +1,0 @@
-DB migration for fixing company address data associated with postcode for US address data and other administrative area data

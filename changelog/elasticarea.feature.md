@@ -1,0 +1,1 @@
+Address area elastic data changes making address area searchable. 
