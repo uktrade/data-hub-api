@@ -158,7 +158,7 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
         'town': dnb_company.get(f'{prefix}_town') or '',
         'county': dnb_company.get(f'{prefix}_county') or '',
         'postcode': dnb_company.get(f'{prefix}_postcode') or '',
-        'area': 'None',
+        'area': None,
         'country': country.id if country else None,
     }
 

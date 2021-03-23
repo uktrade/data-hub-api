@@ -41,6 +41,7 @@ def update_from_dnb(model_admin, request, object_id):
     The `pending_dnb_investigation` field will
     be set to False.
     """
+    
     if not model_admin.has_change_permission(request):
         raise PermissionDenied()
 
@@ -82,6 +83,6 @@ def update_from_dnb(model_admin, request, object_id):
     try:
         update_company_from_dnb(dh_company, dnb_company, request.user)
         return HttpResponseRedirect(company_change_page)
-    except serializers.ValidationError:
+    except serializers.ValidationError as validation_error:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
         raise AdminException([message], company_change_page)
