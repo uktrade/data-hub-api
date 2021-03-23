@@ -325,6 +325,8 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.sector.id),
                 'name': company.sector.name,
             },
+            'export_segment': company.export_segment,
+            'export_sub_segment': company.export_sub_segment,
             'turnover_range': {
                 'id': str(company.turnover_range.id),
                 'name': company.turnover_range.name,

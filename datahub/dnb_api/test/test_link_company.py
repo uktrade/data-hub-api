@@ -63,6 +63,8 @@ def test_link_company_with_dnb_success(
         'reference_code': '',
         'registered_address_area': None,
         'sector': original_company.sector_id,
+        'export_segment': original_company.export_segment,
+        'export_sub_segment': original_company.export_sub_segment,
         'turnover': 50651895,
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,

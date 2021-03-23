@@ -539,6 +539,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_ultimate_duns_number',
             'dnb_modified_on',
             'export_countries',
+            'export_segment',
+            'export_sub_segment',
         )
         read_only_fields = (
             'archived',
@@ -961,6 +963,8 @@ class PublicCompanySerializer(CompanySerializer):
             'uk_region',
             'vat_number',
             'website',
+            'export_segment',
+            'export_sub_segment',
         )
         permissions = {}
         read_only_fields = fields

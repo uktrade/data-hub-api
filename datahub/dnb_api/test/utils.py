@@ -3,7 +3,7 @@ from django.forms import model_to_dict
 
 def model_to_dict_company(obj):
     """
-    Returns the dict represetnation of the given model object
+    Returns the dict representation of the given model object
     minus website and registered_address fields
     """
     field_to_filter = (
