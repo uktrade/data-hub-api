@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.utils import address_area_or_none
 from datahub.core.constants import Country
 from datahub.core.test_utils import format_date_or_datetime
 
@@ -99,6 +100,7 @@ class TestPublicCompanyViewSet:
                 'town': company.address_town,
                 'county': company.address_county or '',
                 'postcode': company.address_postcode or '',
+                'area': address_area_or_none(company.address_area),
                 'country': {
                     'id': str(company.address_country.id),
                     'name': company.address_country.name,
@@ -147,6 +149,7 @@ class TestPublicCompanyViewSet:
                 'town': company.registered_address_town,
                 'county': company.registered_address_county or '',
                 'postcode': company.registered_address_postcode or '',
+                'area': address_area_or_none(company.registered_address_area),
                 'country': {
                     'id': str(company.registered_address_country.id),
                     'name': company.registered_address_country.name,
