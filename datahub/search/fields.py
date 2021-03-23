@@ -110,32 +110,12 @@ def country_field():
     )
 
 
-def area_field():
-    """Area field with id, name and trigram."""
-    return Object(
-        properties={
-            'id': Keyword(),
-            'name': TextWithTrigram(),
-        },
-    )
-
-
-def address_field(index_country=True, index_area=True):
+def address_field(index_country=True):
     """Address field as nested object."""
     if index_country:
         nested_country_field = country_field()
     else:
         nested_country_field = Object(
-            properties={
-                'id': Keyword(index=False),
-                'name': Text(index=False),
-            },
-        )
-
-    if index_area:
-        nested_area_field = area_field()
-    else:
-        nested_area_field = Object(
             properties={
                 'id': Keyword(index=False),
                 'name': Text(index=False),
@@ -149,7 +129,6 @@ def address_field(index_country=True, index_area=True):
             'town': Text(index=False),
             'county': Text(index=False),
             'postcode': TextWithTrigram(),
-            'area': nested_area_field,
             'country': nested_country_field,
         },
     )

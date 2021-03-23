@@ -31,7 +31,6 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company import CompanySearchApp
-from datahub.search.company.test.utils import get_address_area_or_none
 from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = [
@@ -275,7 +274,6 @@ class TestSearch(APITestMixin):
                         'town': company.address_town,
                         'county': company.address_county or '',
                         'postcode': company.address_postcode or '',
-                        'area': get_address_area_or_none(company.address_area),
                         'country': {
                             'id': str(company.address_country.id),
                             'name': company.address_country.name,
@@ -287,7 +285,6 @@ class TestSearch(APITestMixin):
                         'town': company.registered_address_town,
                         'county': company.registered_address_county or '',
                         'postcode': company.registered_address_postcode or '',
-                        'area': get_address_area_or_none(company.registered_address_area),
                         'country': {
                             'id': str(company.registered_address_country.id),
                             'name': company.registered_address_country.name,
@@ -1024,7 +1021,6 @@ class TestCompanyExportView(APITestMixin):
                 'Name': company.name,
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}',
                 'Sector': get_attr_or_none(company, 'sector.name'),
-                'Area': get_attr_or_none(company, 'address_area.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Countries exported to': ', '.join([

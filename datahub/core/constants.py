@@ -3,8 +3,15 @@ from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
 OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
-CountryConstant = namedtuple('CountryConstant', ('name', 'id', 'postcode_pattern',
-                                                 'postcode_replacement'))
+CountryConstant = namedtuple(
+    'CountryConstant',
+    (
+        'name',
+        'id',
+        'postcode_pattern',
+        'postcode_replacement',
+    ),
+)
 
 US_ZIP_STATES = (
     ('005', 'NY', 'New York'),

@@ -256,7 +256,9 @@ def test_mapping(es):
 
 def test_get_basic_search_query():
     """Tests basic search query."""
-    expected_query = {
+    query = get_basic_search_query(ESContact, 'test', offset=5, limit=5)
+
+    assert query.to_dict() == {
         'query': {
             'bool': {
                 'should': [
@@ -272,7 +274,6 @@ def test_get_basic_search_query():
                         'multi_match': {
                             'query': 'test',
                             'fields': [
-                                'address.area.name.trigram',
                                 'address.country.name.trigram',
                                 'address.postcode.trigram',
                                 'address_country.name.trigram',
@@ -301,7 +302,6 @@ def test_get_basic_search_query():
                                 'project_code.trigram',
                                 'reference.trigram',
                                 'reference_code',
-                                'registered_address.area.name.trigram',
                                 'registered_address.country.name.trigram',
                                 'registered_address.postcode.trigram',
                                 'related_programmes.name',
@@ -351,10 +351,6 @@ def test_get_basic_search_query():
         ],
         'track_total_hits': True,
     }
-
-    query = get_basic_search_query(ESContact, 'test', offset=5, limit=5)
-
-    assert query.to_dict() == expected_query
 
 
 def test_get_limited_search_by_entity_query():

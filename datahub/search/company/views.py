@@ -46,7 +46,6 @@ class SearchCompanyAPIViewMixin:
         'name',
         'sector_descends',
         'country',
-        'area',
         'uk_based',
         'uk_region',
         'export_to_countries',
@@ -83,10 +82,6 @@ class SearchCompanyAPIViewMixin:
         'uk_postcode': [
             'uk_address_postcode',
             'uk_registered_address_postcode',
-        ],
-        'area': [
-            'address.area.id',
-            'registered_address.area.id',
         ],
     }
 
@@ -217,5 +212,4 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'number_of_employees_value': 'Number of employees',
         'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
-        'address_area__name': 'Area',
     }
