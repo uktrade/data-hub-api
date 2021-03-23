@@ -55,6 +55,8 @@ class CompaniesDatasetView(BaseDatasetView):
             'registered_address_area',
             'registered_address_town',
             'sector_name',
+            'export_segment',
+            'export_sub_segment',
             'trading_names',
             'turnover',
             'uk_region__name',
