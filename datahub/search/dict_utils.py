@@ -61,9 +61,6 @@ def address_dict(obj, prefix='address'):
         'town': _attrgetter_with_default(f'{prefix}_town', ''),
         'county': _attrgetter_with_default(f'{prefix}_county', ''),
         'postcode': _attrgetter_with_default(f'{prefix}_postcode', ''),
-        'area': lambda obj: id_name_dict(
-            getattr(obj, f'{prefix}_area'),
-        ),
         'country': lambda obj: id_name_dict(
             getattr(obj, f'{prefix}_country'),
         ),
