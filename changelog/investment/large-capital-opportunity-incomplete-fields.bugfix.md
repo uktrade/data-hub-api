@@ -1,2 +1,0 @@
-The endpoint `GET /v4/large-capital-opportunity/<uuid>` now has updated potential values for `incomplete_details_fields` and `incomplete_requirements_fields`. 
-Fixture data for this endpoint is also now available for front end developers.
