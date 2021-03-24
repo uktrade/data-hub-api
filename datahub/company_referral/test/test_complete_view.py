@@ -333,6 +333,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                 'created_on': format_date_or_datetime(referral.created_on),
                 'recipient': format_expected_adviser(referral.recipient),
             },
+            'large_capital_opportunity': None,
         }
 
         assert referral.status == CompanyReferral.Status.COMPLETE

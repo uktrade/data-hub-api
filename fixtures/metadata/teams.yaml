@@ -89,6 +89,18 @@
     - - export_largecapitalinvestorprofile
       - investor_profile
       - largecapitalinvestorprofile
+    - - add_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - change_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - delete_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - view_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
   model: auth.group
 - fields:
     name: DA
@@ -231,6 +243,18 @@
     - - export_largecapitalinvestorprofile
       - investor_profile
       - largecapitalinvestorprofile
+    - - add_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - change_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - delete_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - view_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
   model: auth.group
 - fields:
     name: DIT_staff
@@ -472,6 +496,18 @@
     - - export_largecapitalinvestorprofile
       - investor_profile
       - largecapitalinvestorprofile
+    - - add_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - change_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - delete_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - view_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
     - - view_companyexportcountry
       - company
       - companyexportcountry
