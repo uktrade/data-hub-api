@@ -1,1 +1,0 @@
-Exposed all Company, including public, export_segment and export_sub_segment rest values.

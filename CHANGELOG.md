@@ -1,3 +1,16 @@
+# Data Hub API 36.11.0 (2021-03-24)
+
+
+## Features
+
+- Exposed all Company, including public, export_segment and export_sub_segment rest values.
+- Extended Elasticsearch data to expose export segment and sub segment data.
+
+## Internal changes
+
+- Upgraded python version to 3.8.8.
+
+
 # Data Hub API 36.10.0 (2021-03-24)
 
 
