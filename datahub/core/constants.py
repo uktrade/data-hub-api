@@ -33,6 +33,35 @@ class Country(Enum):
     united_states = Constant('United States', '81756b9a-5d95-e211-a939-e4115bead28a')
 
 
+class AdministrativeArea(Enum):
+    """Administrative Areas"""
+
+    alabama = AdministrativeAreaConstant(
+        'Alabama',
+        '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea',
+        'AL',
+        Country.united_states.value.id,
+    )
+    alaska = AdministrativeAreaConstant(
+        'Alaska',
+        '68338f52-88ff-437d-93ef-790ec9505321',
+        'AK',
+        Country.united_states.value.id,
+    )
+    new_york = AdministrativeAreaConstant(
+        'New York',
+        'aa65b701-244a-41fc-bd31-0a546303106a',
+        'NY',
+        Country.united_states.value.id,
+    )
+    kansas = AdministrativeAreaConstant(
+        'Kansas',
+        'c8debb6d-a15c-4a77-a20c-5ab60a8c873b',
+        'KS',
+        Country.united_states.value.id,
+    )
+
+
 class SectorCluster(Enum):
     """Sector clusters."""
 
