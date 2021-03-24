@@ -318,6 +318,8 @@ class TestSearch(APITestMixin):
                         'id': str(company.export_experience_category.id),
                         'name': company.export_experience_category.name,
                     },
+                    'export_segment': company.export_segment,
+                    'export_sub_segment': company.export_sub_segment,
                     'export_to_countries': [],
                     'future_interest_countries': [],
                     'headquarter_type': company.headquarter_type,

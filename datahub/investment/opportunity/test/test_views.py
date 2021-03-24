@@ -20,11 +20,8 @@ from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.opportunity.test.constants import (
-    AbandonmentReason as AbandonmentReasonConstant,
     OpportunityStatus as OpportunityStatusConstant,
     OpportunityType as OpportunityTypeConstant,
-    OpportunityValueType as OpportunityValueTypeConstant,
-    SourceOfFunding as SourceOfFundingConstant,
 )
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -80,28 +77,21 @@ class TestCreateLargeCapitalOpportunityView(APITestMixin):
             response = self.api_client.post(url, data=request_data)
 
         expected_incomplete_details_fields = [
-            'opportunity_value_type',
-            'opportunity_value',
-            'required_checks_conducted',
-            'investment_projects',
-            'reasons_for_abandonment',
+            'uk_region_locations',
             'promoters',
+            'required_checks_conducted',
             'lead_dit_relationship_manager',
-            'other_dit_contacts',
-            'total_investment_sought',
-            'current_investment_secured',
+            'asset_classes',
+            'opportunity_value',
+            'construction_risks',
         ]
 
         expected_incomplete_requirements_fields = [
+            'total_investment_sought',
+            'current_investment_secured',
             'investment_types',
             'estimated_return_rate',
             'time_horizons',
-            'construction_risks',
-            'sources_of_funding',
-            'asset_classes',
-        ]
-        expected_incomplete_location_fields = [
-            'uk_region_locations',
         ]
 
         response_data = response.json()
@@ -111,7 +101,6 @@ class TestCreateLargeCapitalOpportunityView(APITestMixin):
             response_data['incomplete_requirements_fields']
             == expected_incomplete_requirements_fields
         )
-        assert response_data['incomplete_location_fields'] == expected_incomplete_location_fields
         assert response_data['created_on'] == '2017-04-28T17:35:00Z'
         assert response_data['modified_on'] == '2017-04-28T17:35:00Z'
 
@@ -185,28 +174,35 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
     def test_patch_large_capital_opportunity_all_details_fields(self):
         """Test updating the details fields for a large capital opportunity."""
         promoters = CompanyFactory.create_batch(2)
-        investment_project = InvestmentProjectFactory()
         lead_dit_relationship_manager = AdviserFactory()
-        other_dit_contacts = AdviserFactory.create_batch(2)
         required_checks_conducted_by = AdviserFactory()
         opportunity = LargeCapitalOpportunityFactory()
         url = reverse('api-v4:large-capital-opportunity:item', kwargs={'pk': opportunity.pk})
 
         request_data = {
-            'opportunity_value_type': OpportunityValueTypeConstant.capital_expenditure.value.id,
-            'opportunity_value': 5,
+            'description': 'Lorem ipsum',
+            'uk_region_locations': [
+                {'id': UKRegionConstant.north_east.value.id},
+                {'id': UKRegionConstant.north_west.value.id},
+            ],
+            'promoters': [{'id': promoter.pk} for promoter in promoters],
             'required_checks_conducted': {
                 'id': RequiredChecksConductedConstant.cleared.value.id,
             },
-            'investment_projects': [{'id': investment_project.pk}],
-            'reasons_for_abandonment': [{
-                'id': AbandonmentReasonConstant.promoter_abandoned_the_opportunity.value.id,
-            }],
-            'promoters': [{'id': promoter.pk} for promoter in promoters],
             'lead_dit_relationship_manager': lead_dit_relationship_manager.pk,
-            'other_dit_contacts': [{'id': contact.pk} for contact in other_dit_contacts],
-            'total_investment_sought': 10,
-            'current_investment_secured': 1,
+            'asset_classes': [
+                {'id': AssetClassInterestConstant.biofuel.value.id},
+                {'id': AssetClassInterestConstant.biomass.value.id},
+            ],
+            'opportunity_value': 5,
+            'construction_risks': [
+                {
+                    'id': ConstructionRiskConstant.greenfield.value.id,
+                },
+                {
+                    'id': ConstructionRiskConstant.brownfield.value.id,
+                },
+            ],
             'required_checks_conducted_on': '2019-01-05',
             'required_checks_conducted_by': required_checks_conducted_by.id,
         }
@@ -214,32 +210,40 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK, response_data
         assert response_data['incomplete_details_fields'] == []
-        assert response_data['opportunity_value_type']['id'] == \
-               str(OpportunityValueTypeConstant.capital_expenditure.value.id)
-        assert response_data['opportunity_value'] == '5'
+        expected_uk_region_locations = {
+            str(UKRegionConstant.north_east.value.id),
+            str(UKRegionConstant.north_west.value.id),
+        }
+
+        assert (
+            set(region['id'] for region in response_data['uk_region_locations'])
+            == expected_uk_region_locations
+        )
         assert (
             response_data['required_checks_conducted']['id']
             == str(RequiredChecksConductedConstant.cleared.value.id)
-        )
-        assert response_data['investment_projects'][0]['id'] == str(investment_project.pk)
-        assert (
-            response_data['reasons_for_abandonment'][0]['id']
-            == str(AbandonmentReasonConstant.promoter_abandoned_the_opportunity.value.id)
         )
         assert (
             response_data['lead_dit_relationship_manager']['id']
             == str(lead_dit_relationship_manager.pk)
         )
         assert (
-            set(contact['id'] for contact in response_data['other_dit_contacts'])
-            == set(str(contact.pk) for contact in other_dit_contacts)
+            set(asset['id'] for asset in response_data['asset_classes'])
+            == {
+                str(AssetClassInterestConstant.biofuel.value.id),
+                str(AssetClassInterestConstant.biomass.value.id),
+            }
         )
-        assert response_data['total_investment_sought'] == '10'
-        assert response_data['current_investment_secured'] == '1'
-        assert response_data['required_checks_conducted_on'] == '2019-01-05'
+        assert response_data['opportunity_value'] == '5'
         assert (
-            response_data['required_checks_conducted_by']['id']
-            == str(required_checks_conducted_by.id)
+            set(
+                construction_risk['id']
+                for construction_risk in response_data['construction_risks']
+            )
+            == {
+                str(ConstructionRiskConstant.greenfield.value.id),
+                str(ConstructionRiskConstant.brownfield.value.id),
+            }
         )
 
     @freeze_time('2019-05-01')
@@ -252,6 +256,8 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
         url = reverse('api-v4:large-capital-opportunity:item', kwargs={'pk': opportunity.pk})
 
         request_data = {
+            'total_investment_sought': 10,
+            'current_investment_secured': 1,
             'investment_types': [{'id': direct_investment_equity_id}],
             'estimated_return_rate': ReturnRateConstant.up_to_five_percent.value.id,
             'time_horizons': [
@@ -262,28 +268,13 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
                     'id': TimeHorizonConstant.five_to_nine_years.value.id,
                 },
             ],
-            'construction_risks': [
-                {
-                    'id': ConstructionRiskConstant.greenfield.value.id,
-                },
-                {
-                    'id': ConstructionRiskConstant.brownfield.value.id,
-                },
-            ],
-            'sources_of_funding': [
-                {
-                    'id': SourceOfFundingConstant.international.value.id,
-                },
-            ],
-            'asset_classes': [
-                {'id': AssetClassInterestConstant.biofuel.value.id},
-                {'id': AssetClassInterestConstant.biomass.value.id},
-            ],
         }
         response = self.api_client.patch(url, data=request_data)
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK, response_data
         assert response_data['incomplete_requirements_fields'] == []
+        assert response_data['total_investment_sought'] == '10'
+        assert response_data['current_investment_secured'] == '1'
         assert (
             response_data['investment_types'][0]['id']
             == str(direct_investment_equity_id)
@@ -298,52 +289,6 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
                 str(TimeHorizonConstant.up_to_five_years.value.id),
                 str(TimeHorizonConstant.five_to_nine_years.value.id),
             }
-        )
-        assert (
-            set(
-                construction_risk['id']
-                for construction_risk in response_data['construction_risks']
-            )
-            == {
-                str(ConstructionRiskConstant.greenfield.value.id),
-                str(ConstructionRiskConstant.brownfield.value.id),
-            }
-        )
-        assert (
-            response_data['sources_of_funding'][0]['id']
-            == str(SourceOfFundingConstant.international.value.id)
-        )
-        assert (
-            set(asset['id'] for asset in response_data['asset_classes'])
-            == {
-                str(AssetClassInterestConstant.biofuel.value.id),
-                str(AssetClassInterestConstant.biomass.value.id),
-            }
-        )
-
-    def test_patch_large_capital_opportunity_location_field(self):
-        """Test updating the location field for a large capital opportunity."""
-        opportunity = LargeCapitalOpportunityFactory()
-        url = reverse('api-v4:large-capital-opportunity:item', kwargs={'pk': opportunity.pk})
-        request_data = {
-            'uk_region_locations': [
-                {'id': UKRegionConstant.north_east.value.id},
-                {'id': UKRegionConstant.north_west.value.id},
-            ],
-        }
-        response = self.api_client.patch(url, data=request_data)
-        response_data = response.json()
-        assert response.status_code == status.HTTP_200_OK, response_data
-        assert response_data['incomplete_location_fields'] == []
-
-        expected_uk_region_locations = {
-            str(UKRegionConstant.north_east.value.id),
-            str(UKRegionConstant.north_west.value.id),
-        }
-
-        assert (
-            set(region['id'] for region in response_data['uk_region_locations'])
-            == expected_uk_region_locations
         )
 
 
@@ -376,26 +321,20 @@ class TestRetrieveLargeCapitalOpportunityView(APITestMixin):
             'description': opportunity.description,
             'dit_support_provided': opportunity.dit_support_provided,
             'incomplete_details_fields': [
-                'opportunity_value_type',
-                'opportunity_value',
-                'required_checks_conducted',
-                'investment_projects',
-                'reasons_for_abandonment',
+                'description',
+                'uk_region_locations',
                 'promoters',
-                'other_dit_contacts',
-                'total_investment_sought',
-                'current_investment_secured',
+                'required_checks_conducted',
+                'asset_classes',
+                'opportunity_value',
+                'construction_risks',
             ],
             'incomplete_requirements_fields': [
+                'total_investment_sought',
+                'current_investment_secured',
                 'investment_types',
                 'estimated_return_rate',
                 'time_horizons',
-                'construction_risks',
-                'sources_of_funding',
-                'asset_classes',
-            ],
-            'incomplete_location_fields': [
-                'uk_region_locations',
             ],
             'opportunity_value_type': None,
             'opportunity_value': None,
