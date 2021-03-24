@@ -1,3 +1,53 @@
+# Data Hub API 36.10.0 (2021-03-24)
+
+
+## Features
+
+- **Investment** A large capital opportunity has been added to the admin area.
+- Area can now be stored as a field in the company model.
+- Exposed all Company, including public, export_segment and export_sub_segment rest values.
+
+## API
+
+- **Interactions** `POST /v3/interaction`: It is now possible to create a large capital opportunity interactions, by adding:
+
+    ```json
+    {
+      ...
+      "large_capital_opportunity": {"id": <large_capital_opportunity_id>},
+      "theme": "large_capital_opportunity",
+      ...
+    }
+    ```
+- **Interactions** `GET /v3/interaction`, `GET /v3/interaction/<id>`: A `large_capital_opportunity` field was added to responses. 
+  If large capital opportunity interaction has been created, the field will have following structure:
+
+    ```json
+    {
+      ...
+      "large_capital_opportunity": {
+        "id": <large_capital_opportunity_id>,
+        "name": "Name of the opportunity",
+      }
+    }
+    ```
+
+    Otherwise, the value will be `null`.
+- **Interactions** `GET /v3/interaction`: It is now possible to filter interactions by large capital opportunity, 
+  by adding `large_capital_opportunity_id` to the request.
+- **Investment** A new endpoint `POST /v4/large-capital-opportunity` has been added. It creates a new large capital opportunity. Refer to the API documentation for the schema.
+- **Investment** A new endpoint `GET /v4/large-capital-opportunity/<uuid>` has been added. It retrieves a given large capital opportunity. Refer to the API documentation for the schema.
+- **Investment** A new endpoint `GET /v4/large-capital-opportunity` has been created that lists large capital opportunities.
+  Opportunities can be filtered by `investment_project__id` filter.
+  Refer to the API documentation for the schema.
+- **Investment** A new endpoint `PATCH /v4/large-capital-opportunity/<uuid>` has been added. It updates a given large capital opportunity. Refer to the API documentation for the schema.
+- A new pipeline item dataset endpoint (`GET /v4/dataset/pipeline-items-dataset`) was added to be consumed by data-flow and used in data-workspace.
+
+## Database schema
+
+- **Companies** The fields `export_segment` and `export_sub_segment` were added (endpoints to follow in a future release).
+
+
 # Data Hub API 36.9.0 (2021-03-11)
 
 
