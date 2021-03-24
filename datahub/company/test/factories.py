@@ -55,11 +55,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     address_town = 'Woodside'
     address_postcode = factory.Faker('postcode')
+    address_area_id = None
     address_country_id = constants.Country.united_kingdom.value.id
 
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_postcode = factory.Faker('postcode')
+    registered_address_area_id = None
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
@@ -108,6 +110,18 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.Company'
+
+
+class USCompanyFactory(CompanyFactory):
+    """US Company factory with United States Settings"""
+
+    address_town = 'New York'
+    address_country_id = constants.Country.united_states.value.id
+    address_area_id = constants.AdministrativeArea.new_york.value.id
+    registered_address_town = 'New York'
+    registered_address_country_id = constants.Country.united_states.value.id
+    registered_address_area_id = constants.AdministrativeArea.new_york.value.id
+    uk_region_id = None
 
 
 class SubsidiaryFactory(CompanyFactory):

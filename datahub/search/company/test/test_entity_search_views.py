@@ -18,6 +18,7 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
     CompanyFactory,
+    USCompanyFactory,
 )
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -226,6 +227,17 @@ def setup_interactions_data(es_with_collector):
         company=company_5,
     )
 
+    es_with_collector.flush_and_refresh()
+
+
+@pytest.fixture
+def setup_us_areas(es_with_collector):
+    """Sets up company data with New York and Alabama address areas"""
+    USCompanyFactory()
+    USCompanyFactory(
+        address_area_id=constants.AdministrativeArea.alabama.value.id,
+        registered_address_area_id=constants.AdministrativeArea.alabama.value.id,
+    )
     es_with_collector.flush_and_refresh()
 
 
@@ -674,7 +686,6 @@ class TestSearch(APITestMixin):
             registered_address_country_id=constants.Country.montserrat.value.id,
         )
         es_with_collector.flush_and_refresh()
-
         url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
@@ -928,6 +939,97 @@ class TestSearch(APITestMixin):
             result['latest_interaction_date']
             for result in response_data['results']
         ] == expected_dates
+
+    def test_address_area_filters_one_area(self, setup_us_areas):
+        """Test area filters on US company."""
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'area': [constants.AdministrativeArea.new_york.value.id],
+            },
+        )
+
+        address_area = response.data['results'][0]['address']['area']
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert address_area['id'] == constants.AdministrativeArea.new_york.value.id
+        assert address_area['name'] == constants.AdministrativeArea.new_york.value.name
+
+    def test_registered_address_area_filters_one_area(self, setup_us_areas):
+        """Test registered area filters on US company"""
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'area': [constants.AdministrativeArea.new_york.value.id],
+            },
+        )
+
+        registered_address_area = response.data['results'][0]['registered_address']['area']
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert registered_address_area['id'] == constants.AdministrativeArea.new_york.value.id
+        assert registered_address_area['name'] == constants.AdministrativeArea.new_york.value.name
+
+    def test_address_area_filters_two_areas(self, setup_us_areas):
+        """Test filters multiple areas for US Companies"""
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'area': [
+                    constants.AdministrativeArea.new_york.value.id,
+                    constants.AdministrativeArea.alabama.value.id,
+                ],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        for result in response.data['results']:
+            area = result['address']['area']
+            self.assert_area_in_alabama_or_new_york(area)
+
+    def test_registered_address_area_filters_two_areas(self, setup_us_areas):
+        """Test filters multiple areas for US Companies"""
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'area': [
+                    constants.AdministrativeArea.new_york.value.id,
+                    constants.AdministrativeArea.alabama.value.id,
+                ],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        for result in response.data['results']:
+            area = result['registered_address']['area']
+            self.assert_area_in_alabama_or_new_york(area)
+
+    def assert_area_in_alabama_or_new_york(self, area):
+        """Validate id and name has alabama or new york"""
+        ids = [
+            constants.AdministrativeArea.alabama.value.id,
+            constants.AdministrativeArea.new_york.value.id,
+        ]
+        names = [
+            constants.AdministrativeArea.alabama.value.name,
+            constants.AdministrativeArea.new_york.value.name,
+        ]
+        assert area['id'] in ids
+        assert area['name'] in names
 
 
 class TestCompanyExportView(APITestMixin):
