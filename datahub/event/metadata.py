@@ -8,6 +8,11 @@ registry.register(
 )
 
 registry.register(
+    metadata_id='trade-agreement',
+    model=models.TradeAgreement,
+)
+
+registry.register(
     metadata_id='event-type',
     model=models.EventType,
 )

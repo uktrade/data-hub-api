@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, DisabledOnFilter
-from datahub.event.models import Event, EventType, LocationType, Programme
+from datahub.event.models import Event, EventType, LocationType, Programme, TradeAgreement
 from datahub.metadata.admin import DisableableMetadataAdmin
 
 
@@ -62,6 +62,7 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
         'organiser',
         'lead_team',
         'teams',
+        'related_trade_agreements',
         'related_programmes',
         'service',
         'disabled_on',
@@ -124,4 +125,4 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
     enable_selected.short_description = 'Enable selected events'
 
 
-admin.site.register((EventType, LocationType, Programme), DisableableMetadataAdmin)
+admin.site.register((EventType, LocationType, Programme, TradeAgreement), DisableableMetadataAdmin)

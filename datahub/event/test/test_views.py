@@ -13,7 +13,7 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     random_obj_for_model,
 )
-from datahub.event.constants import EventType, LocationType, Programme
+from datahub.event.constants import EventType, LocationType, Programme, TradeAgreement
 from datahub.event.models import Event
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.metadata.models import Team as TeamModel
@@ -90,6 +90,10 @@ class TestGetEventView(APITestMixin):
                     'name': Team.crm.value.name,
                 },
             ],
+            'related_trade_agreements': [{
+                'id': TradeAgreement.uk_japan.value.id,
+                'name': TradeAgreement.uk_japan.value.name,
+            }],
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
@@ -147,6 +151,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': organiser.pk,
             'lead_team': team.pk,
             'teams': [team.pk],
+            'related_trade_agreements': [],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -188,6 +193,7 @@ class TestCreateEventView(APITestMixin):
                 'id': str(team.pk),
                 'name': team.name,
             }],
+            'related_trade_agreements': [],
             'related_programmes': [],
             'service': {
                 'id': Service.inbound_referral.value.id,
@@ -218,6 +224,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': str(organiser.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             'related_programmes': [Programme.great_branded.value.id],
             'service': Service.inbound_referral.value.id,
         }
@@ -274,6 +281,10 @@ class TestCreateEventView(APITestMixin):
                     'name': Team.crm.value.name,
                 },
             ],
+            'related_trade_agreements': [{
+                'id': TradeAgreement.uk_japan.value.id,
+                'name': TradeAgreement.uk_japan.value.name,
+            }],
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
@@ -302,6 +313,7 @@ class TestCreateEventView(APITestMixin):
             'teams': [team.pk],
             'service': Service.enquiry_or_referral_received.value.id,
             'start_date': '2010-09-12',
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -327,6 +339,7 @@ class TestCreateEventView(APITestMixin):
             'teams': [Team.healthcare_uk.value.id],
             'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -352,6 +365,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -378,6 +392,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -403,6 +418,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -429,6 +445,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -436,6 +453,32 @@ class TestCreateEventView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'end_date': ['End date cannot be before start date.'],
+        }
+
+    def test_create_omitted_trade_agreement(self):
+        """Tests specifying an end date before the start date."""
+        team = random_obj_for_model(TeamModel)
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'service': Service.inbound_referral.value.id,
+            'start_date': '2020-01-02',
+            'end_date': '2020-03-01',
+            'organiser': AdviserFactory().pk,
+            'lead_team': team.pk,
+            'teams': [team.pk],
+        }
+        response = self.api_client.post(url, data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'related_trade_agreements': ['This field is required.'],
         }
 
     def test_create_omitted_failure(self):
@@ -458,6 +501,7 @@ class TestCreateEventView(APITestMixin):
             'service': ['This field is required.'],
             'start_date': ['This field is required.'],
             'teams': ['This field is required.'],
+            'related_trade_agreements': ['This field is required.'],
         }
 
     def test_create_blank_failure(self):
@@ -492,6 +536,7 @@ class TestCreateEventView(APITestMixin):
             'service': ['This field may not be null.'],
             'start_date': ['This field may not be null.'],
             'teams': ['This list may not be empty.'],
+            'related_trade_agreements': ['This field is required.'],
         }
 
 
@@ -521,6 +566,7 @@ class TestUpdateEventView(APITestMixin):
             'organiser': str(organiser.pk),
             'lead_team': Team.food_from_britain.value.id,
             'teams': [Team.food_from_britain.value.id, Team.healthcare_uk.value.id],
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             'related_programmes': [Programme.great_challenge_fund.value.id],
             'service': Service.account_management.value.id,
         }
@@ -574,6 +620,10 @@ class TestUpdateEventView(APITestMixin):
                     'name': Team.food_from_britain.value.name,
                 },
             ],
+            'related_trade_agreements': [{
+                'id': TradeAgreement.uk_japan.value.id,
+                'name': TradeAgreement.uk_japan.value.name,
+            }],
             'related_programmes': [{
                 'id': Programme.great_challenge_fund.value.id,
                 'name': Programme.great_challenge_fund.value.name,
@@ -671,6 +721,7 @@ class TestEventVersioning(APITestMixin):
                 'organiser': AdviserFactory().pk,
                 'lead_team': team.pk,
                 'teams': [team.pk],
+                'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             },
         )
 
