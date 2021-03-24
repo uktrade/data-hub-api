@@ -4,7 +4,7 @@ from django.utils.timezone import utc
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
 from datahub.core.test.factories import to_many_field
-from datahub.event.constants import EventType, LocationType, Programme
+from datahub.event.constants import EventType, LocationType, Programme, TradeAgreement
 
 
 class EventFactory(factory.django.DjangoModelFactory):
@@ -36,6 +36,10 @@ class EventFactory(factory.django.DjangoModelFactory):
     @to_many_field
     def related_programmes(self):  # noqa: D102
         return [Programme.great_branded.value.id]
+
+    @to_many_field
+    def related_trade_agreements(self):  # noqa: D102
+        return [TradeAgreement.uk_japan.value.id]
 
     class Meta:
         model = 'event.Event'

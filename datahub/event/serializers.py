@@ -27,6 +27,9 @@ class EventSerializer(serializers.ModelSerializer):
     teams = NestedRelatedField('metadata.Team', many=True, allow_empty=False)
     address_country = NestedRelatedField('metadata.Country')
     uk_region = NestedRelatedField('metadata.UKRegion', required=False, allow_null=True)
+    related_trade_agreements = NestedRelatedField(
+        'event.TradeAgreement', many=True, required=True, allow_empty=True,
+    )
     related_programmes = NestedRelatedField(
         'event.Programme', many=True, required=False, allow_empty=True,
     )
@@ -115,6 +118,7 @@ class EventSerializer(serializers.ModelSerializer):
             'name',
             'notes',
             'organiser',
+            'related_trade_agreements',
             'related_programmes',
             'start_date',
             'teams',

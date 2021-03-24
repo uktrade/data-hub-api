@@ -19,4 +19,5 @@ class EventViewSet(CoreViewSet):
     ).prefetch_related(
         'teams',
         'related_programmes',
+        'related_trade_agreements',
     )
