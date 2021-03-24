@@ -60,6 +60,8 @@ class Company(BaseESModel):
     duns_number = Keyword()
     website = Text()
     latest_interaction_date = Date()
+    export_segment = Text()
+    export_sub_segment = Text()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),
