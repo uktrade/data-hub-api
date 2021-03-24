@@ -28,6 +28,8 @@ def get_required_company_form_data(company=None):
         company = CompanyFactory.build()
 
     data = {
+        'export_segment': '',
+        'export_sub_segment': '',
         'one_list_core_team_members-TOTAL_FORMS': 0,
         'one_list_core_team_members-INITIAL_FORMS': 0,
         'one_list_core_team_members-MIN_NUM_FORMS': 0,

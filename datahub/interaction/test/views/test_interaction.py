@@ -39,6 +39,7 @@ from datahub.interaction.test.factories import (
     CompanyReferralInteractionFactory,
     ExportCountriesInteractionFactory,
     InvestmentProjectInteractionFactory,
+    LargeCapitalOpportunityInteractionFactory,
 )
 from datahub.interaction.test.permissions import (
     NON_RESTRICTED_ADD_PERMISSIONS,
@@ -46,6 +47,7 @@ from datahub.interaction.test.permissions import (
     NON_RESTRICTED_VIEW_PERMISSIONS,
 )
 from datahub.interaction.test.views.utils import resolve_data
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata import models as meta_models
 from datahub.metadata.test.factories import TeamFactory
@@ -82,6 +84,10 @@ class TestAddInteraction(APITestMixin):
             {
                 'investment_project': InvestmentProjectFactory,
                 'notes': 'hello',
+            },
+            {
+                'theme': Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY,
+                'large_capital_opportunity': LargeCapitalOpportunityFactory,
             },
             # company interaction with policy feedback
             {
@@ -199,6 +205,7 @@ class TestAddInteraction(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'company_referral': None,
+            'large_capital_opportunity': request_data.get('large_capital_opportunity'),
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -355,6 +362,7 @@ class TestAddInteraction(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'company_referral': None,
+            'large_capital_opportunity': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -651,7 +659,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
@@ -675,7 +682,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                 },
@@ -698,7 +704,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
@@ -734,7 +739,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
 
@@ -761,7 +765,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -802,7 +805,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -832,7 +834,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -864,7 +865,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -897,7 +897,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -931,7 +930,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
@@ -972,7 +970,6 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
 
@@ -1495,6 +1492,7 @@ class TestGetInteraction(APITestMixin):
                 'created_on': '2017-04-18T13:25:30.986208Z',
                 'recipient': format_expected_adviser(company_referral.recipient),
             } if company_referral else None,
+            'large_capital_opportunity': None,
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1608,6 +1606,7 @@ class TestGetInteraction(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'company_referral': None,
+            'large_capital_opportunity': None,
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
@@ -2102,3 +2101,32 @@ class TestListInteractions(APITestMixin):
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in associated_project_interactions}
         assert actual_ids == expected_ids
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
+    def test_user_can_filter_by_large_capital_opportunities(self, permissions):
+        """Test that a user can filter interactions by large capital opportunity."""
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        opportunity = LargeCapitalOpportunityFactory()
+        CompanyInteractionFactory.create_batch(3)
+        opportunity_interactions = LargeCapitalOpportunityInteractionFactory.create_batch(
+            3,
+            large_capital_opportunity=opportunity,
+        )
+        url = reverse('api-v3:interaction:collection')
+        response = api_client.get(url, {
+            'large_capital_opportunity_id': opportunity.pk,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 3
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in opportunity_interactions}
+        assert actual_ids == expected_ids
+        for result in response_data['results']:
+            assert result['large_capital_opportunity'] == {
+                'id': str(opportunity.pk),
+                'name': opportunity.name,
+            }

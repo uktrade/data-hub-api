@@ -67,6 +67,8 @@ def get_expected_data_from_company(company):
         'registered_address_postcode': company.registered_address_postcode,
         'registered_address_town': company.registered_address_town,
         'sector_name': get_attr_or_none(company, 'sector.name'),
+        'export_segment': company.export_segment,
+        'export_sub_segment': company.export_sub_segment,
         'trading_names': company.trading_names,
         'turnover': company.turnover,
         'uk_region__name': get_attr_or_none(company, 'uk_region.name'),
