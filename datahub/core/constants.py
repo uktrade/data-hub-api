@@ -368,7 +368,7 @@ class ExportSegment(Enum):
     """ExportSegment type constants."""
 
     hep = Constant('hep', 'High export potential')
-    non_fdi = Constant('non-hep', 'Not high export potential')
+    non_hep = Constant('non-hep', 'Not high export potential')
 
 
 class ExportSubSegment(Enum):
