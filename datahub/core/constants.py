@@ -36,6 +36,7 @@ class Country(Enum):
 class AdministrativeArea(Enum):
     """Administrative Areas"""
 
+    # United States
     alabama = AdministrativeAreaConstant(
         'Alabama',
         '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea',
@@ -48,16 +49,304 @@ class AdministrativeArea(Enum):
         'AK',
         Country.united_states.value.id,
     )
-    new_york = AdministrativeAreaConstant(
-        'New York',
-        'aa65b701-244a-41fc-bd31-0a546303106a',
-        'NY',
+    arizona = AdministrativeAreaConstant(
+        'Arizona',
+        '3d963d27-1d03-4ebd-a3be-e22eba06a9e6',
+        'AZ',
+        Country.united_states.value.id,
+    )
+    arkansas = AdministrativeAreaConstant(
+        'Arkansas',
+        '2f0ebf4a-9306-4af4-b0de-206caaa2ed9e',
+        'AR',
+        Country.united_states.value.id,
+    )
+    california = AdministrativeAreaConstant(
+        'California',
+        'a88512e0-62d4-4808-95dc-d3beab05d0e9',
+        'CA',
+        Country.united_states.value.id,
+    )
+    colorado = AdministrativeAreaConstant(
+        'Colorado',
+        '6bf2c096-da79-4e5e-8685-2aef87fe8697',
+        'CO',
+        Country.united_states.value.id,
+    )
+    connecticut = AdministrativeAreaConstant(
+        'Connecticut',
+        '94e14d2d-bf07-49c9-bcb7-7401af5fbc2e',
+        'CT',
+        Country.united_states.value.id,
+    )
+    delaware = AdministrativeAreaConstant(
+        'Delaware',
+        'c81bda87-2ffa-471d-a894-9f40b7356dfd',
+        'DE',
+        Country.united_states.value.id,
+    )
+    district_of_columbia = AdministrativeAreaConstant(
+        'District of Columbia',
+        'cec98fb1-54c8-47f2-a170-5c89b653ee1e',
+        'DC',
+        Country.united_states.value.id,
+    )
+    florida = AdministrativeAreaConstant(
+        'Florida',
+        'aa259876-25fb-4813-b1de-bbacc2fa0fb0',
+        'FL',
+        Country.united_states.value.id,
+    )
+    georgia = AdministrativeAreaConstant(
+        'Georgia',
+        'b92720ec-8ed6-4c8d-a2b5-7f6b01dd33e2',
+        'GA',
+        Country.united_states.value.id,
+    )
+    hawaii = AdministrativeAreaConstant(
+        'Hawaii',
+        '25a2fa8c-a1a6-4622-8eb5-4f475b3f8bdc',
+        'HI',
+        Country.united_states.value.id,
+    )
+    idaho = AdministrativeAreaConstant(
+        'Idaho',
+        '70263e61-f866-44cd-89d0-dda4db637246',
+        'ID',
+        Country.united_states.value.id,
+    )
+    illinois = AdministrativeAreaConstant(
+        'Illinois',
+        '42662516-faf3-4bb0-abec-03167acce431',
+        'IL',
+        Country.united_states.value.id,
+    )
+    indiana = AdministrativeAreaConstant(
+        'Indiana',
+        '87c3dffc-12b7-4dc2-b71c-5a96c08d80ad',
+        'IN',
+        Country.united_states.value.id,
+    )
+    iowa = AdministrativeAreaConstant(
+        'Iowa',
+        '480f86a9-19c1-495b-8f00-323a7164d1a7',
+        'IA',
         Country.united_states.value.id,
     )
     kansas = AdministrativeAreaConstant(
         'Kansas',
         'c8debb6d-a15c-4a77-a20c-5ab60a8c873b',
         'KS',
+        Country.united_states.value.id,
+    )
+    kentucky = AdministrativeAreaConstant(
+        'Kentucky',
+        '65e05b38-d4eb-4358-a485-5693fab3668b',
+        'KY',
+        Country.united_states.value.id,
+    )
+    louisiana = AdministrativeAreaConstant(
+        'Louisiana',
+        '3472bbfc-fa50-4a97-a198-8bd83087c399',
+        'LA',
+        Country.united_states.value.id,
+    )
+    maine = AdministrativeAreaConstant(
+        'Maine',
+        '35940b3c-4fec-4b35-9220-3319bf3e22f3',
+        'ME',
+        Country.united_states.value.id,
+    )
+    maryland = AdministrativeAreaConstant(
+        'Maryland',
+        '88ec9fc2-f480-4b0a-b505-c8e1a87a9d04',
+        'MD',
+        Country.united_states.value.id,
+    )
+    massachusetts = AdministrativeAreaConstant(
+        'Massachusetts',
+        'fed8f33a-724e-423a-ae4a-af24446ed455',
+        'MA',
+        Country.united_states.value.id,
+    )
+    michigan = AdministrativeAreaConstant(
+        'Michigan',
+        '5531c86b-a271-45b0-afb0-a40e10331305',
+        'MI',
+        Country.united_states.value.id,
+    )
+    minnesota = AdministrativeAreaConstant(
+        'Minnesota',
+        '013754d5-3bee-4c72-bb2a-de41d7f3c1ca',
+        'MN',
+        Country.united_states.value.id,
+    )
+    mississippi = AdministrativeAreaConstant(
+        'Mississippi',
+        '060a9924-9d54-4a35-aec1-d1675c19ba0b',
+        'MS',
+        Country.united_states.value.id,
+    )
+    missouri = AdministrativeAreaConstant(
+        'Missouri',
+        'b94b4ce3-cecc-41d1-8d7f-bf7ae21bb44d',
+        'MO',
+        Country.united_states.value.id,
+    )
+    montana = AdministrativeAreaConstant(
+        'Montana',
+        '29a9e9f8-290e-4c24-8316-5771c53e2aa1',
+        'MT',
+        Country.united_states.value.id,
+    )
+    nebraska = AdministrativeAreaConstant(
+        'Nebraska',
+        '23f4663c-d16c-45c5-b156-7bac9ef2fea3',
+        'NE',
+        Country.united_states.value.id,
+    )
+    nevada = AdministrativeAreaConstant(
+        'Nevada',
+        'f8fea76d-68bf-41ab-9c6b-f5f623a3de70',
+        'NV',
+        Country.united_states.value.id,
+    )
+    new_hampshire = AdministrativeAreaConstant(
+        'New Hampshire',
+        '7aadceb0-6c56-435f-ad35-8b679aea7f21',
+        'NH',
+        Country.united_states.value.id,
+    )
+    new_jersey = AdministrativeAreaConstant(
+        'New Jersey',
+        '6bd63a2b-2192-4fda-955f-c8a41e15e85f',
+        'NJ',
+        Country.united_states.value.id,
+    )
+    new_mexico = AdministrativeAreaConstant(
+        'New Mexico',
+        '86d8319e-18c2-48ec-bc63-96a24dd88fd5',
+        'NM',
+        Country.united_states.value.id,
+    )
+    new_york = AdministrativeAreaConstant(
+        'New York',
+        'aa65b701-244a-41fc-bd31-0a546303106a',
+        'NY',
+        Country.united_states.value.id,
+    )
+    north_carolina = AdministrativeAreaConstant(
+        'North Carolina',
+        '76f340c5-5abf-41d8-8ce1-794fe7be4fa3',
+        'NC',
+        Country.united_states.value.id,
+    )
+    north_dakota = AdministrativeAreaConstant(
+        'North Dakota',
+        '8c3ab69e-2e97-4cdf-a315-e817df5778d1',
+        'ND',
+        Country.united_states.value.id,
+    )
+    ohio = AdministrativeAreaConstant(
+        'Ohio',
+        '4a285f68-bc5c-4cf9-b4fb-ff81b2354a36',
+        'OH',
+        Country.united_states.value.id,
+    )
+    oklahoma = AdministrativeAreaConstant(
+        'Oklahoma',
+        '6ac31850-a5c6-4219-8cb5-3f7f38a51d6c',
+        'OK',
+        Country.united_states.value.id,
+    )
+    oregon = AdministrativeAreaConstant(
+        'Oregon',
+        '4a46fce8-0304-4cb6-8109-36f6b6751f08',
+        'OR',
+        Country.united_states.value.id,
+    )
+    pennsylvania = AdministrativeAreaConstant(
+        'Pennsylvania',
+        '4da43433-ba09-4559-9860-0f5cc25dfc70',
+        'PA',
+        Country.united_states.value.id,
+    )
+    puerto_rico = AdministrativeAreaConstant(
+        'Puerto Rico',
+        '4a6f5211-9e54-42e9-ba25-7c67be785d1a',
+        'PR',
+        Country.united_states.value.id,
+    )
+    rhode_island = AdministrativeAreaConstant(
+        'Rhode Island',
+        'df23e1bd-255b-4626-aa31-07d94279ecfb',
+        'RI',
+        Country.united_states.value.id,
+    )
+    south_carolina = AdministrativeAreaConstant(
+        'South Carolina',
+        'fc27c16e-bec6-469f-91d6-b7dc455033c3',
+        'SC',
+        Country.united_states.value.id,
+    )
+    south_dakota = AdministrativeAreaConstant(
+        'South Dakota',
+        '66ee92f7-d762-4fa0-8bea-7331f402c4d2',
+        'SD',
+        Country.united_states.value.id,
+    )
+    tennessee = AdministrativeAreaConstant(
+        'Tennessee',
+        '4df9092d-d289-4b98-8352-01023d0fce52',
+        'TN',
+        Country.united_states.value.id,
+    )
+    texas = AdministrativeAreaConstant(
+        'Texas',
+        'c35c119a-bc4d-4e48-9ace-167dbe8cb695',
+        'TX',
+        Country.united_states.value.id,
+    )
+    utah = AdministrativeAreaConstant(
+        'Utah',
+        'e848b258-c71f-4489-a745-1008e945d832',
+        'UT',
+        Country.united_states.value.id,
+    )
+    vermont = AdministrativeAreaConstant(
+        'Vermont',
+        'cf1cf255-0984-40a1-b9fc-54b6b0cfadd2',
+        'VT',
+        Country.united_states.value.id,
+    )
+    virginia = AdministrativeAreaConstant(
+        'Virginia',
+        '85a05f4b-c064-48a0-b1b9-624acdbeb46d',
+        'VA',
+        Country.united_states.value.id,
+    )
+    washington = AdministrativeAreaConstant(
+        'Washington',
+        'ad6db3f6-52f7-4d7f-b989-ed559f6922df',
+        'WA',
+        Country.united_states.value.id,
+    )
+    west_virginia = AdministrativeAreaConstant(
+        'West Virginia',
+        '51c1ec10-15e7-4fb8-a73b-46ecffcc689e',
+        'WV',
+        Country.united_states.value.id,
+    )
+    wisconsin = AdministrativeAreaConstant(
+        'Wisconsin',
+        '4f02dad0-08f0-4c6a-8b4c-089aca1697c1',
+        'WI',
+        Country.united_states.value.id,
+    )
+    wyoming = AdministrativeAreaConstant(
+        'Wyoming',
+        '6de9750c-5191-44f1-b39b-fd87cdba506f',
+        'WY',
         Country.united_states.value.id,
     )
 
