@@ -29,49 +29,45 @@ BASE_FIELDS = [
     'type',
     'status',
     'name',
-    'description',
     'dit_support_provided',
 ]
 
 INCOMPLETE_LIST_FIELDS = [
     'incomplete_details_fields',
     'incomplete_requirements_fields',
-    'incomplete_location_fields',
 ]
 
 
 LARGE_CAPITAL_DETAILS_FIELDS = [
-    'opportunity_value_type',
-    'opportunity_value',
-    'required_checks_conducted',
-    'investment_projects',
-    'reasons_for_abandonment',
+    'description',
+    'uk_region_locations',
     'promoters',
+    'required_checks_conducted',
     'lead_dit_relationship_manager',
-    'other_dit_contacts',
-    'total_investment_sought',
-    'current_investment_secured',
+    'asset_classes',
+    'opportunity_value',
+    'construction_risks',
 ]
 
 LARGE_CAPITAL_ADDITIONAL_DETAILS_FIELDS = [
     'required_checks_conducted_on',
     'required_checks_conducted_by',
+    'opportunity_value_type',
+    'investment_projects',
+    'reasons_for_abandonment',
+    'other_dit_contacts',
+    'sources_of_funding',
 ]
 
 
 LARGE_CAPITAL_REQUIREMENTS_FIELDS = [
+    'total_investment_sought',
+    'current_investment_secured',
     'investment_types',
     'estimated_return_rate',
     'time_horizons',
-    'construction_risks',
-    'sources_of_funding',
-    'asset_classes',
 ]
 
-
-LARGE_CAPITAL_LOCATION_FIELDS = [
-    'uk_region_locations',
-]
 
 ALL_LARGE_CAPITAL_OPPORTUNITY_FIELDS = [
     *BASE_FIELDS,
@@ -79,7 +75,6 @@ ALL_LARGE_CAPITAL_OPPORTUNITY_FIELDS = [
     *LARGE_CAPITAL_DETAILS_FIELDS,
     *LARGE_CAPITAL_ADDITIONAL_DETAILS_FIELDS,
     *LARGE_CAPITAL_REQUIREMENTS_FIELDS,
-    *LARGE_CAPITAL_LOCATION_FIELDS,
 ]
 
 
@@ -185,8 +180,6 @@ class LargeCapitalOpportunitySerializer(RequiredChecksConductedSerializer):
 
     incomplete_requirements_fields = serializers.SerializerMethodField()
 
-    incomplete_location_fields = serializers.SerializerMethodField()
-
     def get_incomplete_details_fields(self, instance):
         """Returns a list of all the detail fields that are incomplete."""
         return get_incomplete_fields(
@@ -200,14 +193,6 @@ class LargeCapitalOpportunitySerializer(RequiredChecksConductedSerializer):
         return get_incomplete_fields(
             instance,
             LARGE_CAPITAL_REQUIREMENTS_FIELDS,
-            LargeCapitalOpportunity,
-        )
-
-    def get_incomplete_location_fields(self, instance):
-        """Returns a list of all the location fields that are incomplete."""
-        return get_incomplete_fields(
-            instance,
-            LARGE_CAPITAL_LOCATION_FIELDS,
             LargeCapitalOpportunity,
         )
 

@@ -55,6 +55,8 @@ class TestCompanyElasticModel:
             'vat_number',
             'duns_number',
             'website',
+            'export_segment',
+            'export_sub_segment',
         }
 
         assert set(result.keys()) == keys
