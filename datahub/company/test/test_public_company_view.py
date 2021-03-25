@@ -159,6 +159,8 @@ class TestPublicCompanyViewSet:
                 'id': str(company.sector.id),
                 'name': company.sector.name,
             },
+            'export_segment': company.export_segment,
+            'export_sub_segment': company.export_sub_segment,
             'trading_names': company.trading_names,
             'vat_number': company.vat_number,
             'uk_based': (

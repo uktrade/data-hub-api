@@ -142,6 +142,8 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
         'uk_region',
         'vat_number',
         'website',
+        'export_segment',
+        'export_sub_segment',
     )
 
     FILTER_FIELDS = (

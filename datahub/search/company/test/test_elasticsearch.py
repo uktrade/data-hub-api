@@ -93,6 +93,8 @@ def test_mapping(es):
                 },
                 'type': 'object',
             },
+            'export_segment': {'type': 'text'},
+            'export_sub_segment': {'type': 'text'},
             'export_to_countries': {
                 'properties': {
                     'id': {'type': 'keyword'},
@@ -596,4 +598,6 @@ def test_indexed_doc(es):
         'duns_number',
         'website',
         'latest_interaction_date',
+        'export_sub_segment',
+        'export_segment',
     }
