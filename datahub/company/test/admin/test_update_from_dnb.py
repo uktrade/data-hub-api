@@ -85,7 +85,6 @@ class TestUpdateFromDNB(AdminTestMixin):
             duns_number='123456789',
             pending_dnb_investigation=True,
         )
-        
         requests_mock.post(
             DNB_SEARCH_URL,
             json=dnb_response,
