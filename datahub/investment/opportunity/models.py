@@ -8,6 +8,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
+from datahub.core.utils import get_front_end_url
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -164,6 +165,20 @@ class LargeCapitalOpportunity(BaseModel):
 
     why_abandoned = models.TextField(blank=True)
     why_suspended = models.TextField(blank=True)
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.name}, Large capital investment opportunity'
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
+
+    @property
+    def country_of_origin(self):
+        """Returns the country of which the investment would originate from."""
+        if self.investor_company:
+            return self.investor_company.address_country
 
 
 class OpportunityStatus(BaseOrderedConstantModel):
