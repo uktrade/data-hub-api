@@ -21,12 +21,13 @@ class SignalReceiver:
     are automatically connected and disconnected as needed.
     """
 
-    def __init__(self, signal, sender, receiver_func):
+    def __init__(self, signal, sender, receiver_func, forward_kwargs=False):
         """Initialises the instance."""
         self.is_connected = False
         self.search_app = None
         self.signal = signal
         self.sender = sender
+        self.forward_kwargs = forward_kwargs
         self._receiver_func = receiver_func
         self._thread_locals = local()
 
@@ -85,7 +86,10 @@ class SignalReceiver:
     def on_signal_received(self, sender, instance, **kwargs):
         """Callback function passed to the signal."""
         if self.is_enabled:
-            self._receiver_func(instance)
+            if self.forward_kwargs:
+                self._receiver_func(instance, **kwargs)
+            else:
+                self._receiver_func(instance)
 
 
 @contextmanager
