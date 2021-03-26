@@ -7,6 +7,7 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.utils.functional import cached_property
 from mptt.fields import TreeForeignKey
 from reversion.models import Revision
 
@@ -21,6 +22,7 @@ from datahub.core.models import (
 )
 from datahub.core.utils import force_uuid, get_front_end_url, StrEnum
 from datahub.investment.project import constants
+from datahub.investment.project.validate import validate
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -542,6 +544,11 @@ class InvestmentProject(
             # For activity stream
             models.Index(fields=('created_on', 'id')),
         ]
+
+    @cached_property
+    def incomplete_fields(self):
+        """Fields that need to be completed to move to the next stage."""
+        return tuple(validate(instance=self, next_stage=True))
 
     def get_associated_advisers(self):
         """Get the advisers associated with the project."""

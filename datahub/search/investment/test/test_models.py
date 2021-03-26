@@ -94,6 +94,7 @@ def test_investment_project_to_dict(es):
         'approved_high_value',
         'approved_landed',
         'approved_non_fdi',
+        'incomplete_fields',
         'intermediate_company',
         'referral_source_activity_website',
         'referral_source_activity_marketing',
