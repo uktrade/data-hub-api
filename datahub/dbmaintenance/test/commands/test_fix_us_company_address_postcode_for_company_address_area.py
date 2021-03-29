@@ -4,10 +4,24 @@ import pytest
 from django.core.management import call_command
 
 from datahub.company.models import Company
-from datahub.company.test.factories import USCompanyFactory
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country
 
+
 pytestmark = pytest.mark.django_db
+
+
+def setup_us_company(post_code):
+    """Sets up US Company for tests"""
+    return CompanyFactory(
+        address_town='New York',
+        address_country_id=Country.united_states.value.id,
+        registered_address_town='New York',
+        registered_address_country_id=Country.united_states.value.id,
+        uk_region_id=None,
+        address_postcode=post_code,
+        registered_address_postcode=post_code,
+    )
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -84,10 +98,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = USCompanyFactory.create(
-        address_postcode=post_code,
-        registered_address_postcode=post_code,
-    )
+    company = setup_us_company(post_code)
     assert company.address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -119,10 +130,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = USCompanyFactory.create(
-        address_postcode=post_code,
-        registered_address_postcode=post_code,
-    )
+    company = setup_us_company(post_code)
     assert company.registered_address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -149,10 +157,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    company = USCompanyFactory.create(
-        address_postcode=post_code,
-        registered_address_postcode=post_code,
-    )
+    company = setup_us_company(post_code)
     assert company.address_postcode == post_code
     assert company.registered_address_postcode == post_code
 
