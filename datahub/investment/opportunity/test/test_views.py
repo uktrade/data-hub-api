@@ -1,14 +1,19 @@
 from datetime import datetime
 
 import pytest
+import reversion
+from django.utils.timezone import now
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import UKRegion as UKRegionConstant
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.investment.investor_profile.constants import (
     RequiredChecksConducted as RequiredChecksConductedConstant,
 )
@@ -361,3 +366,46 @@ class TestRetrieveLargeCapitalOpportunityView(APITestMixin):
         }
 
         assert response_data == expected_data
+
+
+class TestAuditLogView(APITestMixin):
+    """Tests for the audit log view."""
+
+    def test_audit_log_view(self):
+        """Test retrieval of audit log."""
+        initial_datetime = now()
+        with reversion.create_revision():
+            opportunity = LargeCapitalOpportunityFactory(
+                name='This amazing opportunity',
+            )
+
+            reversion.set_comment('Initial')
+            reversion.set_date_created(initial_datetime)
+            reversion.set_user(self.user)
+
+        changed_datetime = now()
+        with reversion.create_revision():
+            opportunity.name = 'That amazing opportunity'
+            opportunity.save()
+
+            reversion.set_comment('Changed')
+            reversion.set_date_created(changed_datetime)
+            reversion.set_user(self.user)
+
+        versions = Version.objects.get_for_object(opportunity)
+        version_id = versions[0].id
+        url = reverse('api-v4:large-capital-opportunity:audit-item', kwargs={'pk': opportunity.pk})
+
+        response = self.api_client.get(url)
+        response_data = response.json()['results']
+
+        # No need to test the whole response
+        assert len(response_data) == 1
+        entry = response_data[0]
+
+        assert entry['id'] == version_id
+        assert entry['user']['name'] == self.user.name
+        assert entry['comment'] == 'Changed'
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
+        assert entry['changes']['name'] == ['This amazing opportunity', 'That amazing opportunity']
+        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
