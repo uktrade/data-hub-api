@@ -29,9 +29,9 @@ billiard==3.6.3.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.17.33
+boto3==1.17.39
     # via -r requirements.in
-botocore==1.20.33
+botocore==1.20.39
     # via
     #   boto3
     #   s3transfer
@@ -92,7 +92,7 @@ django==3.1.7
     #   django-redis
     #   django-reversion
     #   djangorestframework
-djangorestframework==3.12.2
+djangorestframework==3.12.4
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
@@ -100,7 +100,7 @@ elastic-apm==6.0.0
     # via -r requirements.in
 elasticsearch-dsl==7.3.0
     # via -r requirements.in
-elasticsearch==7.11.0
+elasticsearch==7.12.0
     # via
     #   -r requirements.in
     #   elasticsearch-dsl
@@ -147,7 +147,7 @@ gevent==21.1.2
     # via -r requirements.in
 greenlet==0.4.17
     # via gevent
-gunicorn==20.0.4
+gunicorn==20.1.0
     # via -r requirements.in
 icalendar==4.0.7
     # via -r requirements.in
@@ -163,7 +163,7 @@ iniconfig==1.1.1
     # via pytest
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.21.0
+ipython==7.22.0
     # via -r requirements.in
 jedi==0.18.0
     # via ipython
