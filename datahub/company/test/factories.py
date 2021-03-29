@@ -77,6 +77,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     is_number_of_employees_estimated = True
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
+    export_segment = constants.ExportSegment.hep.value.id
+    export_sub_segment = constants.ExportSubSegment.challenge.value.id
 
     @to_many_field
     def export_to_countries(self):  # noqa: D102
