@@ -7,20 +7,10 @@ from django.db.models import Q
 
 from datahub.company.models import Company
 from datahub.core.constants import Country, US_ZIP_STATES
+from datahub.core.validate_utils import is_not_blank
 from datahub.metadata.models import AdministrativeArea
 
 logger = getLogger(__name__)
-
-
-def is_empty_or_space(value):
-    """
-    Checks a string to see if it is None or has whitespace
-    @param value:
-    @return:
-    """
-    if not type(value) is str:
-        raise TypeError('Only strings supported')
-    return not (value and not value.isspace())
 
 
 class Command(BaseCommand):
@@ -59,8 +49,8 @@ class Command(BaseCommand):
 
     def us_companies_with_no_areas(self):
         """United states companies with no areas"""
-        query = Q(address_area_id__isnull=True,)
-        query.add(Q(registered_address_area_id__isnull=True,), Q.OR)
+        query = Q(address_area_id__isnull=True)
+        query.add(Q(registered_address_area_id__isnull=True), Q.OR)
         query.add(Q(address_country=Country.united_states.value.id), Q.AND)
         return Company.objects.filter(query)
 
@@ -109,7 +99,7 @@ class Command(BaseCommand):
         Fix address postcode formatting the postcode into an expected format if possible
         @param us_company:
         """
-        if not is_empty_or_space(us_company.address_postcode) and us_company.address_area is None:
+        if is_not_blank(us_company.address_postcode) and us_company.address_area is None:
             log_message = f'Updating address postcode from "{us_company.address_postcode}"'
             us_company.address_postcode = re.sub(
                 Country.united_states.value.postcode_pattern,
@@ -128,7 +118,7 @@ class Command(BaseCommand):
         Fix registered address postcode formatting the postcode into an expected format if possible
         @param us_company:
         """
-        if not is_empty_or_space(us_company.registered_address_postcode) and \
+        if is_not_blank(us_company.registered_address_postcode) and \
                 us_company.registered_address_area is None:
             log_message = f'Updating registered postcode ' \
                           f'from "{us_company.registered_address_postcode}"'

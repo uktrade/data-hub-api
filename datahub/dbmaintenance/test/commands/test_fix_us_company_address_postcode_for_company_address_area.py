@@ -2,12 +2,11 @@ import re
 
 import pytest
 from django.core.management import call_command
-from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import Country
-
+from datahub.core.test_utils import has_reversion_version
 
 pytestmark = pytest.mark.django_db
 
@@ -25,15 +24,6 @@ def setup_us_company(post_code):
     )
 
 
-def has_reversion_version(model_db):
-    """
-    Check a model db object is stored as a reversion version
-    @param model_db:
-    """
-    versions = Version.objects.get_for_object(model_db)
-    return versions.count() >= 1
-
-
 @pytest.mark.parametrize('post_code, expected_result',
                          [('1 0402', '10402'),
                           ('123456789', '123456789'),
@@ -42,28 +32,21 @@ def has_reversion_version(model_db):
                           ('NY 10174 – 4099', '10174 – 4099'),
                           ('NY 10174 - 4099', '10174 - 4099'),
                           ('MC 5270 3800', '03800'),
-                          ('A1B 4H7', 'A1B 4H7'),
                           ('K1C1T1', 'K1C1T1'),
                           ('NY 1004', 'NY 1004'),
                           ('YO22 4PT', 'YO22 4PT'),
                           ('RH175NB', 'RH175NB'),
-                          ('MA 02 111', 'MA 02 111'),
-                          ('PO Box 2900', 'PO Box 2900'),
                           ('WA 6155', 'WA 6155'),
                           ('BT12 6RE', 'BT12 6RE'),
-                          ('5 Westheimer Road', '5 Westheimer Road'),
                           ('M2 4JB', 'M2 4JB'),
                           ('CA USA', 'CA USA'),
-                          ('NA', 'NA'),
                           ('n/a', 'n/a'),
                           ('MN5512', 'MN5512'),
                           ('BB12 7DY', 'BB12 7DY'),
                           ('PO6 3EZ', 'PO6 3EZ'),
                           ('Nw1 2Ew', 'Nw1 2Ew'),
                           ('WC1R 5NR', 'WC1R 5NR'),
-                          ('VA 2210', 'VA 2210'),
                           ('BH12 4NU', 'BH12 4NU'),
-                          ('tbc', 'tbc'),
                           ('CT 6506', 'CT 6506'),
                           ('ME9 0NA', 'ME9 0NA'),
                           ('DY14 0QU', 'DY14 0QU'),
@@ -176,6 +159,35 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     current_company = Company.objects.first()
     assert current_company.address_postcode == expected_result
     assert current_company.registered_address_postcode == expected_result
+
+
+@pytest.mark.parametrize('post_code, expected_result',
+                         [('A1B 4H7', 'A1B 4H7'),
+                          ('MA 02 111', 'MA 02 111'),
+                          ('PO Box 2900', 'PO Box 2900'),
+                          ('5 Westheimer Road', '5 Westheimer Road'),
+                          ('CA USA', 'CA USA'),
+                          ('n/a', 'n/a'),
+                          ('VA 2210', 'VA 2210'),
+                          ('tbc', 'tbc'),
+                          ])
+def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
+        post_code,
+        expected_result):
+    """
+    Test edge cases are preserved
+    @param post_code: Invalid Postcode Format
+    @param expected_result:  The expected result of the fix
+    """
+    setup_us_company(post_code)
+
+    call_command('fix_us_company_address_postcode_for_company_address_area')
+
+    current_company = Company.objects.first()
+    assert current_company.address_postcode == expected_result
+    assert current_company.registered_address_postcode == expected_result
+    assert current_company.address_area is None
+    assert current_company.registered_address_area is None
 
 
 @pytest.mark.parametrize('post_code, expected_result',
