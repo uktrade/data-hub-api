@@ -10,7 +10,7 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
 
     def _get_attributed_to(self, instance):
         attributed_to = [
-            *[self._get_companies(instance.promoters)],
+            *self._get_companies(instance.promoters),
         ]
 
         if instance.lead_dit_relationship_manager:
@@ -73,11 +73,8 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
             return first + ''.join(word.capitalize() for word in rest)
 
         optional_named_attributes = [
-            'status_id',
             'required_checks_conducted',
-            'required_checks_conducted_id',
             'opportunity_value_type',
-            'estimated_return_rate_id',
         ]
 
         for attr in optional_named_attributes:
@@ -108,8 +105,10 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
             'current_investment_secured',
             'opportunity_value',
             'required_checks_conducted_on',
-            'notes_on_locations',
             'dit_support_provided',
+            'status_id',
+            'required_checks_conducted_id',
+            'estimated_return_rate_id',
         ]
 
         for attr in optional_attributes:

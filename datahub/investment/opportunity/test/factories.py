@@ -116,7 +116,8 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
         OpportunityValueTypeConstant.capital_expenditure.value.id
     )
     estimated_return_rate_id = ReturnRateConstant.up_to_five_percent.value.id
-    estimated_return_rate = factory.Faker('text')
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
 
     @to_many_field
     def asset_classes(self):
@@ -133,7 +134,6 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
             InvestmentTypesConstant.direct_investment_in_project_equity.value.id,
         ]
 
-    required_checks_conducted = RequiredChecksConductedConstant.not_yet_checked.value.id
     required_checks_conducted_id = (
         RequiredChecksConductedConstant.issues_identified.value.id
     )
