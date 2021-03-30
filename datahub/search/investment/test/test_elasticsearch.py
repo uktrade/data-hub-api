@@ -297,6 +297,7 @@ def test_mapping(es):
             'government_assistance': {'type': 'boolean'},
             'gross_value_added': {'type': 'double'},
             'id': {'type': 'keyword'},
+            'incomplete_fields': {'type': 'text'},
             'intermediate_company': {
                 'properties': {
                     'id': {'type': 'keyword'},
