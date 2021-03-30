@@ -2,6 +2,7 @@ import re
 
 import pytest
 from django.core.management import call_command
+from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
@@ -22,6 +23,15 @@ def setup_us_company(post_code):
         address_postcode=post_code,
         registered_address_postcode=post_code,
     )
+
+
+def has_reversion_version(model_db):
+    """
+    Check a model db object is stored as a reversion version
+    @param model_db:
+    """
+    versions = Version.objects.get_for_object(model_db)
+    return versions.count() >= 1
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -166,3 +176,24 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     current_company = Company.objects.first()
     assert current_company.address_postcode == expected_result
     assert current_company.registered_address_postcode == expected_result
+
+
+@pytest.mark.parametrize('post_code, expected_result',
+                         [('1 0402', '10402'),
+                          ('8520 7402', '07402'),
+                          ('CA90025', '90025'),
+                          ])
+def test_audit_log(post_code, expected_result):
+    """
+    Verify auditable versions of the code are retained
+    @param post_code: Invalid Postcode Format
+    @param expected_result:  The expected result of the fix
+    """
+    original_company = setup_us_company(post_code)
+
+    call_command('fix_us_company_address_postcode_for_company_address_area')
+
+    altered_company = Company.objects.first()
+
+    assert has_reversion_version(original_company)
+    assert has_reversion_version(altered_company)
