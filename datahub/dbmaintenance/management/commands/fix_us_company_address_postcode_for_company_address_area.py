@@ -59,8 +59,8 @@ class Command(BaseCommand):
 
     def us_companies_with_no_areas(self):
         """United states companies with no areas"""
-        query = Q(address_area_id__isnull=True,)
-        query.add(Q(registered_address_area_id__isnull=True,), Q.OR)
+        query = Q(address_area_id__isnull=True)
+        query.add(Q(registered_address_area_id__isnull=True), Q.OR)
         query.add(Q(address_country=Country.united_states.value.id), Q.AND)
         return Company.objects.filter(query)
 
