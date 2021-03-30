@@ -54,11 +54,11 @@ class Command(BaseCommand):
                 area_code = self.get_area_code(us_company.address_postcode)
                 self.update_address_area(area_code, us_company)
             if self.fix_registered_address_postcode(us_company):
-                area_code = self.get_area_code(us_company.address_postcode)
+                area_code = self.get_area_code(us_company.registered_address_postcode)
                 self.update_registered_address_area(area_code, us_company)
 
     def us_companies_with_no_areas(self):
-        """United states companies"""
+        """United states companies with no areas"""
         query = Q(address_area_id__isnull=True,)
         query.add(Q(registered_address_area_id__isnull=True,), Q.OR)
         query.add(Q(address_country=Country.united_states.value.id), Q.AND)
@@ -69,14 +69,13 @@ class Command(BaseCommand):
         Update address area with administrative area
         @param area_code:
         @param us_company:
-        @return:
         """
         if area_code:
             administrative_area = self.us_administrative_area_by_code(area_code)
             if administrative_area:
                 us_company.address_area_id = administrative_area.id
                 us_company.save(force_update=True)
-                logger.info(f'Updated address area by "{area_code}"')
+                logger.info(f'Updated area "{area_code}" for "{us_company.address_postcode}"')
 
     def update_registered_address_area(self, area_code, us_company):
         """
@@ -90,7 +89,8 @@ class Command(BaseCommand):
             if administrative_area:
                 us_company.registered_address_area_id = administrative_area.id
                 us_company.save(force_update=True)
-                logger.info(f'Updated registered address area by "{area_code}"')
+                logger.info(f'Updated registered area "{area_code}"'
+                            f' for "{us_company.registered_address_postcode}"')
 
     def get_area_code(self, post_code):
         """
@@ -110,7 +110,7 @@ class Command(BaseCommand):
         @param us_company:
         """
         if not is_empty_or_space(us_company.address_postcode) and us_company.address_area is None:
-            logger.info(f'Updating address postcode from "{us_company.address_postcode}"')
+            log_message = f'Updating address postcode from "{us_company.address_postcode}"'
             us_company.address_postcode = re.sub(
                 Country.united_states.value.postcode_pattern,
                 Country.united_states.value.postcode_replacement,
@@ -118,7 +118,7 @@ class Command(BaseCommand):
                 0,
                 re.MULTILINE,
             )
-            logger.info(f'to address postcode "{us_company.address_postcode}"')
+            logger.info(f'{log_message} to address postcode "{us_company.address_postcode}"')
             us_company.save(force_update=True)
             return True
         return False
@@ -130,7 +130,8 @@ class Command(BaseCommand):
         """
         if not is_empty_or_space(us_company.registered_address_postcode) and \
                 us_company.registered_address_area is None:
-            logger.info(f'Updating registered postcode from "{us_company.address_postcode}"')
+            log_message = f'Updating registered postcode ' \
+                          f'from "{us_company.registered_address_postcode}"'
             us_company.registered_address_postcode = re.sub(
                 Country.united_states.value.postcode_pattern,
                 Country.united_states.value.postcode_replacement,
@@ -138,7 +139,8 @@ class Command(BaseCommand):
                 0,
                 re.MULTILINE,
             )
-            logger.info(f'to registered postcode "{us_company.registered_address_postcode}"')
+            logger.info(f'{log_message} to registered postcode '
+                        f'"{us_company.registered_address_postcode}"')
             us_company.save(force_update=True)
             return True
         return False

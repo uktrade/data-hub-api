@@ -194,6 +194,5 @@ def test_audit_log(post_code, expected_result):
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
     altered_company = Company.objects.first()
-
     assert has_reversion_version(original_company)
     assert has_reversion_version(altered_company)
