@@ -19,6 +19,3 @@
 - model: event.tradeagreement
   pk: 20e08a38-95a8-4250-bd5b-9d7f0dfc9387
   fields: {disabled_on: null, name: USA}
-- model: event.tradeagreement
-  pk: 0b371c90-e48a-40ea-a536-0968fb181f6c
-  fields: { disabled_on: null, name: No Trade Agreement }
