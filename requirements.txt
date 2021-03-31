@@ -237,7 +237,7 @@ pydocstyle==6.0.0
     #   flake8-docstrings
 pyflakes==2.3.0
     # via flake8
-pygments==2.7.3
+pygments==2.7.4
     # via ipython
 pyjwt==2.0.0
     # via notifications-python-client

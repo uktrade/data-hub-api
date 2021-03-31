@@ -11,7 +11,7 @@ from datahub.core.constants import (
     ReferralSourceActivity as Activity,
 )
 from datahub.core.validate_utils import DataCombiner
-from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project import models
 from datahub.investment.validate import field_incomplete
 
 REQUIRED_MESSAGE = 'This field is required.'
@@ -120,7 +120,7 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
     :param next_stage:  Perform validation for the next stage (rather than the current stage)
     :return:            dict containing errors for incomplete fields
     """
-    combiner = DataCombiner(instance, update_data, model=InvestmentProject)
+    combiner = DataCombiner(instance, update_data, model=models.InvestmentProject)
     desired_stage = combiner.get_value('stage') or Stage.prospect.value
     desired_stage_order = _get_desired_stage_order(desired_stage, next_stage)
 

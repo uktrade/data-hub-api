@@ -1,13 +1,22 @@
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal
 
 import pytest
 import reversion
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.core.constants import InvestmentProjectStage
 from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
+from datahub.investment.project.models import InvestmentDeliveryPartner
 from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
+)
+from datahub.metadata.models import (
+    Country,
+    InvestmentBusinessActivity,
+    InvestmentStrategicDriver,
+    UKRegion,
 )
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.investment.models import InvestmentProject
@@ -16,6 +25,15 @@ from datahub.search.query_builder import (
 )
 
 pytestmark = pytest.mark.django_db
+
+
+def search_investment_project_by_id(pk):
+    """Search for an investment project with the given id"""
+    return get_search_by_entities_query(
+        [InvestmentProject],
+        term='',
+        filter_data={'id': pk},
+    ).execute()
 
 
 def assert_project_search_latest_interaction(has_interaction=True, name=''):
@@ -155,11 +173,7 @@ def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
 
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entities_query(
-        [InvestmentProject],
-        term='',
-        filter_data={'id': project.pk},
-    ).execute()
+    result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1
     assert result.hits[0][field]['dit_team']['id'] == str(adviser.dit_team.id)
@@ -178,11 +192,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
 
     es_with_signals.indices.refresh()
 
-    result = get_search_by_entities_query(
-        [InvestmentProject],
-        term='',
-        filter_data={'id': team_member.investment_project.pk},
-    ).execute()
+    result = search_investment_project_by_id(team_member.investment_project.pk)
 
     assert result.hits.total.value == 1
     assert result.hits[0]['team_members'][0]['dit_team']['id'] == str(adviser.dit_team.id)
@@ -269,3 +279,140 @@ def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
             has_interaction=has_interaction,
             name=project_name,
         )
+
+
+def test_incomplete_fields_syncs_when_project_changes(es_with_signals):
+    """
+    When project fields change, the incomplete fields should update accordingly.
+    """
+    project = InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id)
+    adviser = AdviserFactory()
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits.total.value == 1
+    assert result.hits[0]['incomplete_fields'] == [
+        'client_cannot_provide_total_investment',
+        'number_new_jobs',
+        'strategic_drivers',
+        'client_requirements',
+        'client_considering_other_countries',
+        'project_manager',
+        'project_assurance_adviser',
+        'client_cannot_provide_foreign_investment',
+        'government_assistance',
+        'number_safeguarded_jobs',
+        'r_and_d_budget',
+        'non_fdi_r_and_d_budget',
+        'new_tech_to_uk',
+        'export_revenue',
+        'address_1',
+        'address_town',
+        'address_postcode',
+        'actual_uk_regions',
+        'delivery_partners',
+        'actual_land_date',
+        'total_investment',
+        'uk_region_locations',
+        'foreign_equity_investment',
+    ]
+
+    project.client_cannot_provide_total_investment = False
+    project.number_new_jobs = 3
+    project.client_requirements = 'things'
+    project.client_considering_other_countries = True
+    project.project_manager = adviser
+    project.project_assurance_adviser = adviser
+    project.client_cannot_provide_foreign_investment = True
+    project.government_assistance = True
+    project.number_safeguarded_jobs = 10
+    project.r_and_d_budget = True
+    project.non_fdi_r_and_d_budget = True
+    project.new_tech_to_uk = True
+    project.export_revenue = True
+    project.address_1 = 'Downing Street'
+    project.address_town = 'London'
+    project.address_postcode = 'SW1A 2AA'
+    project.actual_land_date = date(2020, 1, 1)
+    project.total_investment = Decimal('100.00')
+    project.foreign_equity_investment = Decimal('50.00')
+
+    project.save()
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits[0]['incomplete_fields'] == [
+        'strategic_drivers',
+        'actual_uk_regions',
+        'delivery_partners',
+        'competitor_countries',
+        'uk_region_locations',
+        'average_salary',
+        'associated_non_fdi_r_and_d_project',
+    ]
+
+
+@pytest.mark.parametrize(
+    'field,get_field_values',
+    (
+        ('competitor_countries', lambda: Country.objects.all()[:3]),
+        ('uk_region_locations', lambda: UKRegion.objects.all()[:3]),
+        ('actual_uk_regions', lambda: UKRegion.objects.all()[:2]),
+        ('delivery_partners', lambda: InvestmentDeliveryPartner.objects.all()[:2]),
+        ('strategic_drivers', lambda: InvestmentStrategicDriver.objects.all()[:1]),
+    ),
+)
+def test_incomplete_fields_syncs_when_m2m_changes(es_with_signals, field, get_field_values):
+    """
+    When an m2m field is updated, the incomplete fields should be updated accordingly.
+    """
+    project = InvestmentProjectFactory(
+        stage_id=InvestmentProjectStage.won.value.id,
+        client_considering_other_countries=True,
+    )
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits.total.value == 1
+    incomplete_fields = result.hits[0]['incomplete_fields']
+
+    assert field in incomplete_fields
+
+    getattr(project, field).add(*get_field_values())
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits.total.value == 1
+    incomplete_fields = result.hits[0]['incomplete_fields']
+
+    assert field not in incomplete_fields
+
+
+def test_incomplete_fields_syncs_when_business_activities_changes(es_with_signals):
+    """
+    When business activities are updated the incomplete fields should be updated accordingly.
+
+    Specifically, when 'other' is added as a business activity, 'other_business_activity'
+    should show as an incomplete field.
+    """
+    project = InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id)
+    conditional_field = 'other_business_activity'
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits.total.value == 1
+    assert conditional_field not in result.hits[0]['incomplete_fields']
+
+    business_activities = InvestmentBusinessActivity.objects.all()
+    project.business_activities.add(*business_activities)
+
+    es_with_signals.indices.refresh()
+    result = search_investment_project_by_id(project.pk)
+
+    assert result.hits.total.value == 1
+    assert conditional_field in result.hits[0]['incomplete_fields']
