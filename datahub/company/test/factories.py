@@ -112,18 +112,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         model = 'company.Company'
 
 
-class USCompanyFactory(CompanyFactory):
-    """US Company factory with United States Settings"""
-
-    address_town = 'New York'
-    address_country_id = constants.Country.united_states.value.id
-    address_area_id = constants.AdministrativeArea.new_york.value.id
-    registered_address_town = 'New York'
-    registered_address_country_id = constants.Country.united_states.value.id
-    registered_address_area_id = constants.AdministrativeArea.new_york.value.id
-    uk_region_id = None
-
-
 class SubsidiaryFactory(CompanyFactory):
     """Subsidiary factory."""
 
