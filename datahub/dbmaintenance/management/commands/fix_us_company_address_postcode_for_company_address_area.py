@@ -52,6 +52,7 @@ class Command(BaseCommand):
         query = Q(address_area_id__isnull=True)
         query.add(Q(registered_address_area_id__isnull=True), Q.OR)
         query.add(Q(address_country=Country.united_states.value.id), Q.AND)
+        query.add(Q(registered_address_country=Country.united_states.value.id), Q.OR)
         return Company.objects.filter(query)
 
     def update_address_area(self, area_code, us_company):
