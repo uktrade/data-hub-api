@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='event',
-            name='related_trade_agreements_exist',
+            name='has_related_trade_agreements',
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AddField(

@@ -28,7 +28,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     lead_team_id = Team.crm.value.id
     service_id = Service.inbound_referral.value.id
     archived_documents_url_path = factory.Faker('uri_path')
-    related_trade_agreements_exist = True
+    has_related_trade_agreements = True
 
     @to_many_field
     def teams(self):  # noqa: D102

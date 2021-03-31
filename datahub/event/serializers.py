@@ -123,7 +123,7 @@ class EventSerializer(BaseEventSerializer):
             'name',
             'notes',
             'organiser',
-            'related_trade_agreements_exist',
+            'has_related_trade_agreements',
             'related_trade_agreements',
             'related_programmes',
             'start_date',
@@ -140,7 +140,7 @@ class EventSerializer(BaseEventSerializer):
 class EventSerializerV4(BaseEventSerializer):
     """Event serialiser for V4 endpoint."""
 
-    related_trade_agreements_exist = serializers.BooleanField(required=True)
+    has_related_trade_agreements = serializers.BooleanField(required=True)
     related_trade_agreements = NestedRelatedField(
         'event.TradeAgreement', many=True, required=True, allow_empty=True,
     )
@@ -165,7 +165,7 @@ class EventSerializerV4(BaseEventSerializer):
             'name',
             'notes',
             'organiser',
-            'related_trade_agreements_exist',
+            'has_related_trade_agreements',
             'related_trade_agreements',
             'related_programmes',
             'start_date',
