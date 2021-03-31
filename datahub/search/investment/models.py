@@ -65,6 +65,7 @@ class InvestmentProject(BaseESModel):
     fdi_value = fields.id_name_field()
     foreign_equity_investment = Double()
     government_assistance = Boolean()
+    incomplete_fields = Text()
     intermediate_company = fields.id_name_field()
     investor_company = fields.id_name_partial_field()
     investor_company_country = fields.id_name_field()
