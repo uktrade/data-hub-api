@@ -152,7 +152,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': organiser.pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exists': None,
+            'related_trade_agreements_exist': None,
             'related_trade_agreements': [],
         }
         response = self.api_client.post(url, data=request_data)
