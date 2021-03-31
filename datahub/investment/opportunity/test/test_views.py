@@ -24,10 +24,6 @@ from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
 )
-from datahub.investment.opportunity.test.constants import (
-    OpportunityStatus as OpportunityStatusConstant,
-    OpportunityType as OpportunityTypeConstant,
-)
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
@@ -61,27 +57,18 @@ class TestCreateLargeCapitalOpportunityView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'name': ['This field is required.'],
-            'description': ['This field is required.'],
-            'status': ['This field is required.'],
-            'type': ['This field is required.'],
-            'dit_support_provided': ['This field is required.'],
         }
 
     def test_create_large_capital_opportunity_with_minimum_required_values(self):
         """Test creating a large capital opportunity with minimum required fields."""
         url = reverse('api-v4:large-capital-opportunity:collection')
 
-        request_data = {
-            'name': 'test',
-            'description': 'Lorem ipsum',
-            'type': OpportunityTypeConstant.large_capital.value.id,
-            'status': OpportunityStatusConstant.seeking_investment.value.id,
-            'dit_support_provided': False,
-        }
+        request_data = {'name': 'test'}
         with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
             response = self.api_client.post(url, data=request_data)
 
         expected_incomplete_details_fields = [
+            'description',
             'uk_region_locations',
             'promoters',
             'required_checks_conducted',

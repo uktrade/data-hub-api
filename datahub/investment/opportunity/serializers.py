@@ -12,6 +12,10 @@ from datahub.investment.investor_profile.models import (
 )
 from datahub.investment.investor_profile.serializers import RequiredChecksConductedSerializer
 from datahub.investment.investor_profile.validate import get_incomplete_fields
+from datahub.investment.opportunity.constants import (
+    OpportunityStatus as OpportunityStatusConstant,
+    OpportunityType as OpportunityTypeConstant,
+)
 from datahub.investment.opportunity.models import (
     AbandonmentReason,
     LargeCapitalOpportunity,
@@ -78,16 +82,26 @@ ALL_LARGE_CAPITAL_OPPORTUNITY_FIELDS = [
 ]
 
 
+def _get_default_opportunity_type():
+    return OpportunityType.objects.get(id=OpportunityTypeConstant.large_capital.value.id)
+
+
+def _get_default_opportunity_status():
+    return OpportunityStatus.objects.get(id=OpportunityStatusConstant.seeking_investments.value.id)
+
+
 class LargeCapitalOpportunitySerializer(RequiredChecksConductedSerializer):
     """Large capital opportunity serializer."""
 
     type = NestedRelatedField(
         OpportunityType,
         allow_null=False,
+        default=_get_default_opportunity_type,
     )
     status = NestedRelatedField(
         OpportunityStatus,
         allow_null=False,
+        default=_get_default_opportunity_status,
     )
 
     created_on = serializers.DateTimeField(
@@ -198,4 +212,13 @@ class LargeCapitalOpportunitySerializer(RequiredChecksConductedSerializer):
 
     class Meta(RequiredChecksConductedSerializer.Meta):
         model = LargeCapitalOpportunity
+        extra_kwargs = {
+            'dit_support_provided': {
+                'default': False,
+            },
+            'description': {
+                'allow_blank': True,
+                'required': False,
+            },
+        }
         fields = ALL_LARGE_CAPITAL_OPPORTUNITY_FIELDS
