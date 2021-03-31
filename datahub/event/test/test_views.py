@@ -90,7 +90,7 @@ class TestGetEventView(APITestMixin):
                     'name': Team.crm.value.name,
                 },
             ],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [{
                 'id': TradeAgreement.uk_japan.value.id,
                 'name': TradeAgreement.uk_japan.value.name,
@@ -152,7 +152,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': organiser.pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exist': None,
+            'has_related_trade_agreements': None,
             'related_trade_agreements': [],
         }
         response = self.api_client.post(url, data=request_data)
@@ -195,7 +195,7 @@ class TestCreateEventView(APITestMixin):
                 'id': str(team.pk),
                 'name': team.name,
             }],
-            'related_trade_agreements_exist': None,
+            'has_related_trade_agreements': None,
             'related_trade_agreements': [],
             'related_programmes': [],
             'service': {
@@ -227,7 +227,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': str(organiser.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             'related_programmes': [Programme.great_branded.value.id],
             'service': Service.inbound_referral.value.id,
@@ -285,7 +285,7 @@ class TestCreateEventView(APITestMixin):
                     'name': Team.crm.value.name,
                 },
             ],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [{
                 'id': TradeAgreement.uk_japan.value.id,
                 'name': TradeAgreement.uk_japan.value.name,
@@ -318,7 +318,7 @@ class TestCreateEventView(APITestMixin):
             'teams': [team.pk],
             'service': Service.enquiry_or_referral_received.value.id,
             'start_date': '2010-09-12',
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -345,7 +345,7 @@ class TestCreateEventView(APITestMixin):
             'teams': [Team.healthcare_uk.value.id],
             'service': Service.inbound_referral.value.id,
             'start_date': '2010-09-12',
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -372,7 +372,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -400,7 +400,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -427,7 +427,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -455,7 +455,7 @@ class TestCreateEventView(APITestMixin):
             'organiser': AdviserFactory().pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
@@ -549,7 +549,7 @@ class TestUpdateEventView(APITestMixin):
             'organiser': str(organiser.pk),
             'lead_team': Team.food_from_britain.value.id,
             'teams': [Team.food_from_britain.value.id, Team.healthcare_uk.value.id],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             'related_programmes': [Programme.great_challenge_fund.value.id],
             'service': Service.account_management.value.id,
@@ -604,7 +604,7 @@ class TestUpdateEventView(APITestMixin):
                     'name': Team.food_from_britain.value.name,
                 },
             ],
-            'related_trade_agreements_exist': True,
+            'has_related_trade_agreements': True,
             'related_trade_agreements': [{
                 'id': TradeAgreement.uk_japan.value.id,
                 'name': TradeAgreement.uk_japan.value.name,
