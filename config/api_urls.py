@@ -12,7 +12,6 @@ from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
 from datahub.event import urls as event_urls
-from datahub.event import urlsv4 as event_urls_v4
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
@@ -44,7 +43,7 @@ v3_urls = [
         ),
     ),
     path('', include((contact_urls.urls_v3, 'contact'), namespace='contact')),
-    path('', include((event_urls, 'event'), namespace='event')),
+    path('', include((event_urls.urls_v3, 'event'), namespace='event')),
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
@@ -93,5 +92,5 @@ v4_urls = [
     ),
     path('dataset/', include((dataset_urls, 'dataset'), namespace='dataset')),
     path('metadata/', include((metadata_urls, 'metadata'), namespace='metadata')),
-    path('', include((event_urls_v4, 'event'), namespace='event')),
+    path('', include((event_urls.urls_v4, 'event'), namespace='event')),
 ]

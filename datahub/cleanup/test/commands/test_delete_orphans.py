@@ -287,7 +287,7 @@ def test_simulate(
     Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
-    # Set up the state before running the command
+    # Set up uthe state before running the command
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
     model_name, config = cleanup_configs
     filter_config = config.filters[0]
