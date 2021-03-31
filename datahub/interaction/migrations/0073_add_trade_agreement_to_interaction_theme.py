@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interaction',
             name='theme',
-            field=models.CharField(blank=True, choices=[(None, 'Not set'), ('export', 'Export'), ('investment', 'Investment'), ('large_capital_opportunity', 'Large capital opportunity'), ('trade_agreement', 'Trade Agreement'), ('other', 'Something else')], max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[(None, 'Not set'), ('export', 'Export'), ('investment', 'Investment'), ('large_capital_opportunity', 'Large capital opportunity'), ('trade_agreement', 'Trade agreement'), ('other', 'Something else')], max_length=255, null=True),
         ),
     ]

@@ -243,7 +243,7 @@ class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
         )
         TRADE_AGREEMENT_INTERACTION = (
             'trade_agreement_interaction',
-            'Trade Agreement Interaction',
+            'Trade agreement interaction',
         )
         # For interactions added to a company that are about not about export or investment
         OTHER_INTERACTION = ('other_interaction', 'Other interaction')
