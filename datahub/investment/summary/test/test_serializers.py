@@ -20,17 +20,29 @@ def adviser():
 
 
 @pytest.fixture
-def projects(adviser):
-    """
-    A number of projects at different stages associated to an adviser.
-    """
-    # 4 Prospects with no dates set
-    for _index in range(4):
-        InvestmentProjectFactory(
-            stage_id=InvestmentProjectStage.prospect.value.id,
-            client_relationship_manager=adviser,
-        )
+def prospect_projects(adviser):
+    """Mock prospect projects"""
+    # 5 Prospects created in 2014-15
+    with freeze_time('2015-03-31 12:30:00'):
+        for _index in range(5):
+            InvestmentProjectFactory(
+                stage_id=InvestmentProjectStage.prospect.value.id,
+                client_relationship_manager=adviser,
+                estimated_land_date=date(2016, 4, 1),
+            )
+    # 6 Prospects created in 2015-16
+    with freeze_time('2015-04-01 12:30:00'):
+        for _index in range(6):
+            InvestmentProjectFactory(
+                stage_id=InvestmentProjectStage.prospect.value.id,
+                client_relationship_manager=adviser,
+                estimated_land_date=date(2015, 5, 1),
+            )
 
+
+@pytest.fixture
+def assign_pm_projects(adviser):
+    """Mock assign pm projects"""
     # 1 Assign PM in 2016-17
     for _index in range(1):
         InvestmentProjectFactory(
@@ -46,6 +58,10 @@ def projects(adviser):
             estimated_land_date=date(2015, 4, 1),
         )
 
+
+@pytest.fixture
+def active_projects(adviser):
+    """Mock active projects"""
     # 3 Active for 2016-17
     for _index in range(3):
         project = InvestmentProjectFactory(
@@ -63,6 +79,10 @@ def projects(adviser):
         )
         InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
 
+
+@pytest.fixture
+def verify_win_projects(adviser):
+    """Mock verify win projects"""
     # 1 Verify Win in 2014-15
     for _index in range(1):
         InvestmentProjectFactory(
@@ -70,7 +90,18 @@ def projects(adviser):
             project_manager=adviser,
             actual_land_date=date(2015, 3, 31),
         )
+    # 3 Verify Win in 2015-16
+    for _index in range(3):
+        InvestmentProjectFactory(
+            stage_id=InvestmentProjectStage.verify_win.value.id,
+            project_manager=adviser,
+            actual_land_date=date(2016, 3, 31),
+        )
 
+
+@pytest.fixture
+def won_projects(adviser):
+    """Mock won projects"""
     # 2 Won in 2014-15
     for _index in range(2):
         InvestmentProjectFactory(
@@ -87,6 +118,18 @@ def projects(adviser):
         )
 
 
+@pytest.fixture
+def projects(
+    prospect_projects,
+    assign_pm_projects,
+    active_projects,
+    verify_win_projects,
+    won_projects,
+):
+    """A number of projects at different stages associated to an adviser."""
+    pass
+
+
 EXPECTED_ANNUAL_SUMMARIES = [
     {
         'financial_year': {
@@ -98,7 +141,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
             'prospect': {
                 'label': 'Prospect',
                 'id': InvestmentProjectStage.prospect.value.id,
-                'value': 4,
+                'value': 11,
             },
             'assign_pm': {
                 'label': 'Assign PM',
@@ -132,7 +175,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
             'prospect': {
                 'label': 'Prospect',
                 'id': InvestmentProjectStage.prospect.value.id,
-                'value': 4,
+                'value': 11,
             },
             'assign_pm': {
                 'label': 'Assign PM',
@@ -147,7 +190,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
             'verify_win': {
                 'label': 'Verify Win',
                 'id': InvestmentProjectStage.verify_win.value.id,
-                'value': 0,
+                'value': 3,
             },
             'won': {
                 'label': 'Won',
@@ -166,7 +209,7 @@ EXPECTED_ANNUAL_SUMMARIES = [
             'prospect': {
                 'label': 'Prospect',
                 'id': InvestmentProjectStage.prospect.value.id,
-                'value': 4,
+                'value': 5,
             },
             'assign_pm': {
                 'label': 'Assign PM',

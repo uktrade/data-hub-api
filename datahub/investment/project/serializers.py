@@ -305,7 +305,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         ),
     }
 
-    incomplete_fields = serializers.SerializerMethodField()
     project_code = serializers.CharField(read_only=True)
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
@@ -490,12 +489,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         if errors:
             raise serializers.ValidationError(errors)
 
-    def get_incomplete_fields(self, instance):
-        """Returns the names of the fields that still need to be completed in order to
-        move to the next stage.
-        """
-        return tuple(validate(instance=instance, next_stage=True))
-
     def get_value_complete(self, instance):
         """Whether the value fields required to move to the next stage are complete."""
         return not validate(
@@ -529,8 +522,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             'archived_reason',
             'archived_documents_url_path',
             'comments',
-            'project_manager_requested_on',
             'gross_value_added',
+            'incomplete_fields',
+            'project_manager_requested_on',
         )
 
 
