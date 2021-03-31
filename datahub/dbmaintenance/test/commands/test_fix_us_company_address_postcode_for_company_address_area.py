@@ -11,35 +11,47 @@ from datahub.core.test_utils import has_reversion_version
 pytestmark = pytest.mark.django_db
 
 
-def setup_us_company_with_all_address(post_code):
+def setup_us_company_with_all_addresses(post_code):
     """Sets up US Company for tests"""
     return CompanyFactory(
         address_town='New York',
         address_country_id=Country.united_states.value.id,
         address_postcode=post_code,
+        address_area_id=None,
         registered_address_town='New York',
         registered_address_country_id=Country.united_states.value.id,
         registered_address_postcode=post_code,
+        registered_address_area_id=None,
         uk_region_id=None,
     )
 
 
-def setup_us_company_with_address(post_code):
+def setup_us_company_with_address_only(post_code):
     """Sets up US Company with address only for tests"""
     return CompanyFactory(
         address_town='New York',
         address_country_id=Country.united_states.value.id,
         address_postcode=post_code,
+        address_area_id=None,
+        registered_address_town='',
+        registered_address_country_id=None,
+        registered_address_postcode='',
+        registered_address_area_id=None,
         uk_region_id=None,
     )
 
 
-def setup_us_company_with_registered_address(post_code):
+def setup_us_company_with_registered_address_only(post_code):
     """Sets up US Company with registered address only for tests"""
     return CompanyFactory(
         registered_address_town='New York',
         registered_address_country_id=Country.united_states.value.id,
         registered_address_postcode=post_code,
+        registered_address_area_id=None,
+        address_town='',
+        address_country_id=None,
+        address_postcode='',
+        address_area_id=None,
         uk_region_id=None,
     )
 
@@ -107,7 +119,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = setup_us_company_with_all_address(post_code)
+    company = setup_us_company_with_all_addresses(post_code)
     assert company.address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -134,7 +146,7 @@ def test_us_company_with_address_data_only_will_generate_address_area(
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = setup_us_company_with_address(post_code)
+    company = setup_us_company_with_address_only(post_code)
     assert company.address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -162,7 +174,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = setup_us_company_with_all_address(post_code)
+    company = setup_us_company_with_all_addresses(post_code)
     assert company.registered_address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -189,7 +201,7 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
     """
-    company = setup_us_company_with_registered_address(post_code)
+    company = setup_us_company_with_registered_address_only(post_code)
     assert company.registered_address_area is None
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
@@ -216,7 +228,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    company = setup_us_company_with_all_address(post_code)
+    company = setup_us_company_with_all_addresses(post_code)
     assert company.address_postcode == post_code
     assert company.registered_address_postcode == post_code
 
@@ -245,7 +257,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    setup_us_company_with_all_address(post_code)
+    setup_us_company_with_all_addresses(post_code)
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
@@ -267,7 +279,7 @@ def test_audit_log(post_code, expected_result):
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    original_company = setup_us_company_with_all_address(post_code)
+    original_company = setup_us_company_with_all_addresses(post_code)
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
