@@ -17,7 +17,6 @@ fixtures = [
     PurePath(__file__).parent / '0001_initial_services.yaml',
     PurePath(__file__).parent / '0001_initial_overseas_region.yaml',
     PurePath(__file__).parent / '0001_sector_clusters.yaml',
-    PurePath(__file__).parent / '0001_administrative_areas.yaml',
 ]
 
 
