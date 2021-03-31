@@ -5,7 +5,7 @@ from django.core.management import call_command
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
-from datahub.core.constants import Country
+from datahub.core.constants import Country, CountryPostcodeFormat
 from datahub.core.test_utils import has_reversion_version
 
 pytestmark = pytest.mark.django_db
@@ -63,8 +63,8 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     actual_result = re.sub(
-        Country.united_states.value.postcode_pattern,
-        Country.united_states.value.postcode_replacement,
+        CountryPostcodeFormat.united_states.value.postcode_pattern,
+        CountryPostcodeFormat.united_states.value.postcode_replacement,
         post_code,
         0,
         re.MULTILINE)

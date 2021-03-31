@@ -3,11 +3,10 @@ from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
 OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
-CountryConstant = namedtuple(
-    'CountryConstant',
+CountryPostcodeConstant = namedtuple(
+    'CountryPostcodeConstant',
     (
-        'name',
-        'id',
+        'country_id',
         'postcode_pattern',
         'postcode_replacement',
     ),
@@ -939,9 +938,14 @@ class Country(Enum):
     japan = Constant('Japan', '85756b9a-5d95-e211-a939-e4115bead28a')
     montserrat = Constant('Montserrat', '1350bdb8-5d95-e211-a939-e4115bead28a')
     united_kingdom = Constant('United Kingdom', '80756b9a-5d95-e211-a939-e4115bead28a')
-    united_states = CountryConstant(
-        'United States',
-        '81756b9a-5d95-e211-a939-e4115bead28a',
+    united_states = Constant('United States', '81756b9a-5d95-e211-a939-e4115bead28a')
+
+
+class CountryPostcodeFormat(Enum):
+    """Country Postcode Replacement Format"""
+
+    united_states = CountryPostcodeConstant(
+        Country.united_states.value.id,
         (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
          r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'),
         r'\1\2\3\4\5\6',

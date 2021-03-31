@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from datahub.company.models import Company
-from datahub.core.constants import Country, US_ZIP_STATES
+from datahub.core.constants import Country, CountryPostcodeFormat, US_ZIP_STATES
 from datahub.core.validate_utils import is_not_blank
 from datahub.metadata.models import AdministrativeArea
 
@@ -102,8 +102,8 @@ class Command(BaseCommand):
         if is_not_blank(us_company.address_postcode) and us_company.address_area is None:
             log_message = f'Updating address postcode from "{us_company.address_postcode}"'
             us_company.address_postcode = re.sub(
-                Country.united_states.value.postcode_pattern,
-                Country.united_states.value.postcode_replacement,
+                CountryPostcodeFormat.united_states.value.postcode_pattern,
+                CountryPostcodeFormat.united_states.value.postcode_replacement,
                 us_company.address_postcode,
                 0,
                 re.MULTILINE,
@@ -123,8 +123,8 @@ class Command(BaseCommand):
             log_message = f'Updating registered postcode ' \
                           f'from "{us_company.registered_address_postcode}"'
             us_company.registered_address_postcode = re.sub(
-                Country.united_states.value.postcode_pattern,
-                Country.united_states.value.postcode_replacement,
+                CountryPostcodeFormat.united_states.value.postcode_pattern,
+                CountryPostcodeFormat.united_states.value.postcode_replacement,
                 us_company.registered_address_postcode,
                 0,
                 re.MULTILINE,
