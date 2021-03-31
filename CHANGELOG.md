@@ -1,3 +1,22 @@
+# Data Hub API 36.12.0 (2021-03-31)
+
+
+## Features
+
+- **Investment** Incomplete fields were added to the investment search endpoint (`POST /v3/search/investment_project`)
+- Added Canada administrative area data.
+- Added event program for partnering with Japan.
+
+## Bug fixes
+
+- **Investment** The investment summary API endpoint was adjusted to only count prospects from the date they were created.
+
+## API
+
+- **Investment** A new endpoint `GET /v4/large-capital-opportunity/<uuid:pk>/audit` has been added that lists changes to a given 
+  opportunity. Refer to the API documentation for the schema.
+
+
 # Data Hub API 36.11.0 (2021-03-24)
 
 

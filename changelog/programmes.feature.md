@@ -1,1 +1,0 @@
-Added event program for partnering with Japan.
