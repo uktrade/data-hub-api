@@ -183,7 +183,7 @@ class Interaction(ArchivableModel, BaseModel):
         EXPORT = ('export', 'Export')
         INVESTMENT = ('investment', 'Investment')
         LARGE_CAPITAL_OPPORTUNITY = ('large_capital_opportunity', 'Large capital opportunity')
-        TRADE_AGREEMENT = ('trade_agreement', 'Trade Agreement')
+        TRADE_AGREEMENT = ('trade_agreement', 'Trade agreement')
         OTHER = ('other', 'Something else')
 
         __empty__ = 'Not set'
