@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.db.models import Case, Count, F, Q, When
 from django.db.models.functions import Coalesce, Extract
@@ -38,10 +38,6 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
             | Q(team_members__id=obj.id),
         )
 
-        prospect_count = projects.filter(
-            stage=InvestmentProjectStage.prospect.value.id,
-        ).count()
-
         project_summaries = (
             projects.annotate(
                 land_date=Coalesce('actual_land_date', 'estimated_land_date'),
@@ -61,6 +57,15 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
 
         results = {}
         for financial_year in reversed(range(start_year, end_year)):
+            prospect_count = projects.filter(
+                stage=InvestmentProjectStage.prospect.value.id,
+                created_on__lt=datetime(
+                    year=financial_year + 1,
+                    month=4,
+                    day=1,
+                    tzinfo=timezone.utc,
+                ),
+            ).count()
             results[financial_year] = {
                 'financial_year': {
                     'label': f'{financial_year}-{str(financial_year + 1)[-2:]}',
