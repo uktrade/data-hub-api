@@ -18,7 +18,6 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
     CompanyFactory,
-    USCompanyFactory,
 )
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -233,10 +232,23 @@ def setup_interactions_data(es_with_collector):
 @pytest.fixture
 def setup_us_areas(es_with_collector):
     """Sets up company data with New York and Alabama address areas"""
-    USCompanyFactory()
-    USCompanyFactory(
+    CompanyFactory(
+        address_town='New York',
+        address_country_id=constants.Country.united_states.value.id,
+        address_area_id=constants.AdministrativeArea.new_york.value.id,
+        registered_address_town='New York',
+        registered_address_country_id=constants.Country.united_states.value.id,
+        registered_address_area_id=constants.AdministrativeArea.new_york.value.id,
+        uk_region_id=None,
+    )
+    CompanyFactory(
+        address_town='Alabama',
+        address_country_id=constants.Country.united_states.value.id,
         address_area_id=constants.AdministrativeArea.alabama.value.id,
+        registered_address_town='Alabama',
+        registered_address_country_id=constants.Country.united_states.value.id,
         registered_address_area_id=constants.AdministrativeArea.alabama.value.id,
+        uk_region_id=None,
     )
     es_with_collector.flush_and_refresh()
 
