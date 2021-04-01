@@ -57,8 +57,9 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
             },
         }
         if instance.promoters:
-            investment_opportunity['object']['dit:promoters'] = \
+            investment_opportunity['object']['dit:promoters'] = (
                 self._get_companies(instance.promoters)
+            )
 
         if instance.required_checks_conducted_by:
             investment_opportunity['object']['dit:requiredChecksConductedBy'] = (
