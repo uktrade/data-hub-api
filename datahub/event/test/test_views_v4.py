@@ -359,6 +359,72 @@ class TestCreateEventView(APITestMixin):
             'lead_team': ['Lead team must be in teams array.'],
         }
 
+    def test_has_no_trade_agreements_but_should(self):
+        """
+        Tests for validation failure when there are no related
+        trade agreements but has_related_trade_agreements is true.
+        """
+        url = reverse('api-v4:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'lead_team': Team.crm.value.id,
+            'organiser': AdviserFactory().pk,
+            'teams': [Team.crm.value.id],
+            'service': Service.inbound_referral.value.id,
+            'start_date': '2010-09-12',
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': [],
+        }
+        response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response_data == {
+            'related_trade_agreements': [
+                "'Related trade agreements' is inconsistent"
+                " with 'Has related trade agreements?'",
+            ],
+        }
+
+    def test_trade_agreements_but_shouldnt(self):
+        """
+        Tests for validation failure when there are no related
+        trade agreements but has_related_trade_agreements is true.
+        """
+        url = reverse('api-v4:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'lead_team': Team.crm.value.id,
+            'organiser': AdviserFactory().pk,
+            'teams': [Team.crm.value.id],
+            'service': Service.inbound_referral.value.id,
+            'start_date': '2010-09-12',
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
+        }
+        response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response_data == {
+            'related_trade_agreements': [
+                "'Related trade agreements' is inconsistent"
+                " with 'Has related trade agreements?'",
+            ],
+        }
+
     def test_create_uk_no_uk_region(self):
         """Tests UK region requirement for UK events."""
         team = random_obj_for_model(TeamModel)
