@@ -7,8 +7,15 @@ from datahub.activity_stream.investor_profile.views import (
     LargeCapitalInvestorProfileActivityViewSet,
 )
 from datahub.activity_stream.omis.views import OMISOrderAddedViewSet
+from datahub.activity_stream.opportunity.views import LargeCapitalOpportunityActivityViewSet
+
 
 activity_stream_urls = [
+    path(
+        'activity-stream/investment/large-capital-opportunity',
+        LargeCapitalOpportunityActivityViewSet.as_view({'get': 'list'}),
+        name='large-capital-opportunity',
+    ),
     path(
         'activity-stream/company-referral',
         CompanyReferralActivityViewSet.as_view({'get': 'list'}),

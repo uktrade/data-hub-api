@@ -21,6 +21,15 @@ class ActivitySerializer(serializers.Serializer):
             'name': company.name,
         }
 
+    def _get_companies(self, companies):
+        """
+        Get a serialized representation of a list of Companies.
+        """
+        return [
+            self._get_company(company)
+            for company in companies.order_by('pk')
+        ]
+
     def _get_contact(self, contact):
         """
         Get a serialized representation of a contact.
