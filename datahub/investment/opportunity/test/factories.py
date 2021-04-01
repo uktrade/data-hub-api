@@ -112,8 +112,12 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
     total_investment_sought = 10000
     current_investment_secured = 5000
     opportunity_value = 50000
-    opportunity_value_type_id = OpportunityValueTypeConstant.capital_expenditure.value.id
+    opportunity_value_type_id = (
+        OpportunityValueTypeConstant.capital_expenditure.value.id
+    )
     estimated_return_rate_id = ReturnRateConstant.up_to_five_percent.value.id
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
 
     @to_many_field
     def asset_classes(self):
@@ -130,7 +134,9 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
             InvestmentTypesConstant.direct_investment_in_project_equity.value.id,
         ]
 
-    required_checks_conducted_id = RequiredChecksConductedConstant.issues_identified.value.id
+    required_checks_conducted_id = (
+        RequiredChecksConductedConstant.issues_identified.value.id
+    )
     required_checks_conducted_by = factory.SubFactory(AdviserFactory)
     required_checks_conducted_on = date(2020, 1, 1)
 
@@ -159,6 +165,7 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
     def sources_of_funding(self):
         """Sources of funding."""
         return [SourceOfFundingConstant.international.value.id]
+
     funding_supporting_details = factory.Faker('text')
 
     @to_many_field
