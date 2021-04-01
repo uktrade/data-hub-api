@@ -566,6 +566,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
     'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects',
     'largecapitalinvestorprofile': f'{DATAHUB_FRONTEND_BASE_URL}/investments/profiles',
+    'largecapitalopportunity': f'{DATAHUB_FRONTEND_BASE_URL}/investments/opportunities',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 
     'mi_fdi_dashboard_country': (
