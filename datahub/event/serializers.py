@@ -140,10 +140,48 @@ class EventSerializer(BaseEventSerializer):
 class EventSerializerV4(BaseEventSerializer):
     """Event serialiser for V4 endpoint."""
 
+    default_error_messages = {
+        'related_trade_agreements':
+            gettext_lazy(
+                "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
+            ),
+    }
+
     has_related_trade_agreements = serializers.BooleanField(required=True)
     related_trade_agreements = NestedRelatedField(
         'event.TradeAgreement', many=True, required=True, allow_empty=True,
     )
+
+    def validate(self, attrs):
+        """Performs cross-field validation."""
+        attrs = super().validate(attrs)
+
+        errors = {}
+        combiner = DataCombiner(self.instance, attrs)
+
+        validators = (
+            self._validate_related_trade_agreements,
+        )
+        for validator in validators:
+            errors.update(validator(combiner))
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
+    def _validate_related_trade_agreements(self, combiner):
+        """Validates trade agreement state for consistency with has_related_trade_agreements"""
+        errors = {}
+        related_trade_agreements_count = len(
+            combiner.get_value_to_many('related_trade_agreements'),
+        )
+        has_related_trade_agreements = combiner.get_value('has_related_trade_agreements')
+
+        if (related_trade_agreements_count == 0 and has_related_trade_agreements) or (
+                related_trade_agreements_count > 0 and not has_related_trade_agreements):
+            errors['related_trade_agreements'] = self.error_messages['related_trade_agreements']
+        return errors
 
     class Meta:
         model = Event
