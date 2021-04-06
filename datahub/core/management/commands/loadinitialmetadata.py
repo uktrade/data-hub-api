@@ -25,6 +25,7 @@ EVENTS_FIXTURES = (
     EVENTS_FIXTURE_DIR / 'programmes.yaml',
     EVENTS_FIXTURE_DIR / 'location_types.yaml',
     EVENTS_FIXTURE_DIR / 'event_types.yaml',
+    EVENTS_FIXTURE_DIR / 'trade_agreements.yaml',
 )
 
 
