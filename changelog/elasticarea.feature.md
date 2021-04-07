@@ -1,1 +1,1 @@
-Address area elastic data changes making address area searchable. 
+Companies are now searchable by administrative area.
