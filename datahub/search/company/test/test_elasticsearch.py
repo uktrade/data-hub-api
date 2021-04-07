@@ -170,6 +170,21 @@ def test_mapping(es):
                             },
                         },
                     },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
+                            },
+                        },
+                    },
                     'country': {
                         'type': 'object',
                         'properties': {
@@ -200,6 +215,21 @@ def test_mapping(es):
                             'trigram': {
                                 'type': 'text',
                                 'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'area': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'keyword'},
+                            'name': {
+                                'type': 'text',
+                                'fields': {
+                                    'trigram': {
+                                        'type': 'text',
+                                        'analyzer': 'trigram_analyzer',
+                                    },
+                                },
                             },
                         },
                     },
@@ -324,6 +354,7 @@ def test_get_basic_search_query():
                         'multi_match': {
                             'query': 'test',
                             'fields': [
+                                'address.area.name.trigram',
                                 'address.country.name.trigram',
                                 'address.postcode.trigram',
                                 'address_country.name.trigram',
@@ -352,6 +383,7 @@ def test_get_basic_search_query():
                                 'project_code.trigram',
                                 'reference.trigram',
                                 'reference_code',
+                                'registered_address.area.name.trigram',
                                 'registered_address.country.name.trigram',
                                 'registered_address.postcode.trigram',
                                 'related_programmes.name',
@@ -405,25 +437,7 @@ def test_get_basic_search_query():
 
 def test_limited_get_search_by_entity_query():
     """Tests search by entity."""
-    date = '2017-06-13T09:44:31.062870'
-    filter_data = {
-        'name': 'Woodside',
-        'address.country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
-        'archived_before': date,
-        'archived_after': date,
-    }
-    query = get_search_by_entities_query(
-        [ESCompany],
-        term='test',
-        filter_data=filter_data,
-    )
-    query = limit_search_query(
-        query,
-        offset=5,
-        limit=5,
-    )
-
-    assert query.to_dict() == {
+    expected_query = {
         'query': {
             'bool': {
                 'must': [
@@ -450,8 +464,10 @@ def test_limited_get_search_by_entity_query():
                                             'reference_code',
                                             'address.country.name.trigram',
                                             'address.postcode.trigram',
+                                            'address.area.name.trigram',
                                             'registered_address.country.name.trigram',
                                             'registered_address.postcode.trigram',
+                                            'registered_address.area.name.trigram',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',
@@ -510,6 +526,26 @@ def test_limited_get_search_by_entity_query():
         'from': 5,
         'size': 5,
     }
+
+    date = '2017-06-13T09:44:31.062870'
+    filter_data = {
+        'name': 'Woodside',
+        'address.country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
+        'archived_before': date,
+        'archived_after': date,
+    }
+    query = get_search_by_entities_query(
+        [ESCompany],
+        term='test',
+        filter_data=filter_data,
+    )
+    query = limit_search_query(
+        query,
+        offset=5,
+        limit=5,
+    )
+
+    assert query.to_dict() == expected_query
 
 
 @pytest.mark.django_db
