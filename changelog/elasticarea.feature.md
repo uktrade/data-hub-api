@@ -1,0 +1,1 @@
+Companies are now searchable by administrative area.
