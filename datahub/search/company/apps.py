@@ -29,6 +29,8 @@ class CompanySearchApp(SearchApp):
         'sector__parent__parent',
         'turnover_range',
         'uk_region',
+        'address_area',
+        'registered_address_area',
     ).prefetch_related(
         'export_countries__country',
     ).annotate(

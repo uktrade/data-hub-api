@@ -220,14 +220,14 @@
     export_segment: non_hep
     export_sub_segment: reassure_nurture_and_grow
     address_1: 12 First Street
-    address_town: New York
-    address_postcode: 10001
-    address_area: aa65b701-244a-41fc-bd31-0a546303106a
+    address_town: Virginia City
+    address_postcode: 73301
+    address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     registered_address_1: 12 First Street
-    registered_address_town: New York
-    registered_address_postcode: 10101
-    registered_address_area: aa65b701-244a-41fc-bd31-0a546303106a
+    registered_address_town: Virginia City
+    registered_address_postcode: 73301-1234
+    registered_address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
     created_on: '2017-10-16T11:00:00Z'
@@ -1821,7 +1821,7 @@
   pk: e14f907e-6488-4e43-8f9b-9089a02112a4
   fields:
     code: capital-investments-filters
-    description: This is a flag to show filters on CI profiles 
+    description: This is a flag to show filters on CI profiles
     is_active: true
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
     created_on: '2018-01-23T00:00:00Z'

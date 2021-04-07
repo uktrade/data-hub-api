@@ -3,6 +3,15 @@ from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
 OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
+AdministrativeAreaConstant = namedtuple(
+    'AdministrativeAreaConstant',
+    (
+        'name',
+        'id',
+        'area_code',
+        'country_id',
+    ),
+)
 
 
 class Country(Enum):
@@ -22,6 +31,30 @@ class Country(Enum):
     montserrat = Constant('Montserrat', '1350bdb8-5d95-e211-a939-e4115bead28a')
     united_kingdom = Constant('United Kingdom', '80756b9a-5d95-e211-a939-e4115bead28a')
     united_states = Constant('United States', '81756b9a-5d95-e211-a939-e4115bead28a')
+
+
+class AdministrativeArea(Enum):
+    """Administrative Areas"""
+
+    # United States
+    alabama = AdministrativeAreaConstant(
+        'Alabama',
+        '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea',
+        'AL',
+        Country.united_states.value.id,
+    )
+    new_york = AdministrativeAreaConstant(
+        'New York',
+        'aa65b701-244a-41fc-bd31-0a546303106a',
+        'NY',
+        Country.united_states.value.id,
+    )
+    texas = AdministrativeAreaConstant(
+        'Texas',
+        'c35c119a-bc4d-4e48-9ace-167dbe8cb695',
+        'TX',
+        Country.united_states.value.id,
+    )
 
 
 class SectorCluster(Enum):
