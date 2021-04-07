@@ -1,3 +1,20 @@
+# Data Hub API 36.13.0 (2021-04-07)
+
+
+## Features
+
+- **Investment** An Activity Stream endpoint was added for large capital investment opportunities `GET /v3/activity-stream/investment/large-capital-opportunity`.
+- **Investment** The `POST /v4/large-capital-opportunity` endpoint has been updated, so that it only requires a `name` parameter 
+  to create a new opportunity.
+
+## Database schema
+
+- **Events** Two new fields: `has_related_trade_agreements` and `related_trade_agreements` have been added to the events model.
+  These fields are not required on the existing v3 events endpoint.
+
+  A new v4 events has been added where these two fields are marked as required.
+
+
 # Data Hub API 36.12.0 (2021-03-31)
 
 
