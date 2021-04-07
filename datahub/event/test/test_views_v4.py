@@ -28,14 +28,14 @@ class TestGetEventView(APITestMixin):
         event = EventFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get(self):
         """Test getting a single event."""
         event = DisabledEventFactory()
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -115,14 +115,14 @@ class TestListEventView(APITestMixin):
         """Should return 403"""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list(self):
         """Tests listing events."""
         EventFactory.create_batch(2)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
 
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -138,7 +138,7 @@ class TestCreateEventView(APITestMixin):
         """Tests successfully creating an event with only the required fields."""
         organiser = AdviserFactory()
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
 
         request_data = {
             'name': 'Grand exhibition',
@@ -152,8 +152,8 @@ class TestCreateEventView(APITestMixin):
             'organiser': organiser.pk,
             'lead_team': team.pk,
             'teams': [team.pk],
-            'has_related_trade_agreements': None,
-            'related_trade_agreements': [],
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
         }
         response = self.api_client.post(url, data=request_data)
 
@@ -195,8 +195,11 @@ class TestCreateEventView(APITestMixin):
                 'id': str(team.pk),
                 'name': team.name,
             }],
-            'has_related_trade_agreements': None,
-            'related_trade_agreements': [],
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': [{
+                'id': TradeAgreement.uk_japan.value.id,
+                'name': TradeAgreement.uk_japan.value.name,
+            }],
             'related_programmes': [],
             'service': {
                 'id': Service.inbound_referral.value.id,
@@ -209,7 +212,7 @@ class TestCreateEventView(APITestMixin):
         """Tests successfully creating an event with all fields completed."""
         organiser = AdviserFactory()
 
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
@@ -304,7 +307,7 @@ class TestCreateEventView(APITestMixin):
     def test_create_service_with_children(self):
         """Tests specifying a service with children."""
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'end_date': '2010-09-12',
@@ -331,7 +334,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_lead_team_not_in_teams(self):
         """Tests specifying a lead team that isn't in the teams array."""
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'end_date': '2010-09-12',
@@ -356,10 +359,76 @@ class TestCreateEventView(APITestMixin):
             'lead_team': ['Lead team must be in teams array.'],
         }
 
+    def test_has_no_trade_agreements_but_should(self):
+        """
+        Tests for validation failure when there are no related
+        trade agreements but has_related_trade_agreements is true.
+        """
+        url = reverse('api-v4:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'lead_team': Team.crm.value.id,
+            'organiser': AdviserFactory().pk,
+            'teams': [Team.crm.value.id],
+            'service': Service.inbound_referral.value.id,
+            'start_date': '2010-09-12',
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': [],
+        }
+        response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response_data == {
+            'related_trade_agreements': [
+                "'Related trade agreements' is inconsistent"
+                " with 'Has related trade agreements?'",
+            ],
+        }
+
+    def test_trade_agreements_but_shouldnt(self):
+        """
+        Tests for validation failure when there are no related
+        trade agreements but has_related_trade_agreements is true.
+        """
+        url = reverse('api-v4:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+            'lead_team': Team.crm.value.id,
+            'organiser': AdviserFactory().pk,
+            'teams': [Team.crm.value.id],
+            'service': Service.inbound_referral.value.id,
+            'start_date': '2010-09-12',
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
+        }
+        response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response_data == {
+            'related_trade_agreements': [
+                "'Related trade agreements' is inconsistent"
+                " with 'Has related trade agreements?'",
+            ],
+        }
+
     def test_create_uk_no_uk_region(self):
         """Tests UK region requirement for UK events."""
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'end_date': '2010-09-12',
@@ -386,7 +455,7 @@ class TestCreateEventView(APITestMixin):
     def test_create_non_uk_with_uk_region(self):
         """Tests creating a non-UK event with a UK region."""
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
@@ -414,7 +483,7 @@ class TestCreateEventView(APITestMixin):
     def test_create_end_date_without_start_date(self):
         """Tests specifying an end date without a start date."""
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
@@ -441,7 +510,7 @@ class TestCreateEventView(APITestMixin):
     def test_create_end_date_before_start_date(self):
         """Tests specifying an end date before the start date."""
         team = random_obj_for_model(TeamModel)
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
@@ -468,7 +537,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_omitted_failure(self):
         """Tests creating an event without required fields."""
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {}
         response = self.api_client.post(url, data=request_data)
 
@@ -486,11 +555,13 @@ class TestCreateEventView(APITestMixin):
             'service': ['This field is required.'],
             'start_date': ['This field is required.'],
             'teams': ['This field is required.'],
+            'has_related_trade_agreements': ['This field is required.'],
+            'related_trade_agreements': ['This field is required.'],
         }
 
     def test_create_blank_failure(self):
         """Tests creating an event with blank required fields."""
-        url = reverse('api-v3:event:collection')
+        url = reverse('api-v4:event:collection')
         request_data = {
             'address_1': '',
             'address_country': None,
@@ -520,6 +591,8 @@ class TestCreateEventView(APITestMixin):
             'service': ['This field may not be null.'],
             'start_date': ['This field may not be null.'],
             'teams': ['This list may not be empty.'],
+            'has_related_trade_agreements': ['This field is required.'],
+            'related_trade_agreements': ['This field is required.'],
         }
 
 
@@ -530,7 +603,7 @@ class TestUpdateEventView(APITestMixin):
         """Test updating an event."""
         event = EventFactory()
         organiser = AdviserFactory()
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
 
         request_data = {
             'name': 'Annual exhibition',
@@ -623,7 +696,7 @@ class TestUpdateEventView(APITestMixin):
     def test_patch_lead_team_success(self):
         """Test updating an event's lead team."""
         event = EventFactory()
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
 
         request_data = {
             'lead_team': Team.healthcare_uk.value.id,
@@ -637,7 +710,7 @@ class TestUpdateEventView(APITestMixin):
     def test_patch_null_end_date_failure(self):
         """Test updating an event's end date with null."""
         event = EventFactory(end_date=None)
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
 
         request_data = {
             'end_date': None,
@@ -651,7 +724,7 @@ class TestUpdateEventView(APITestMixin):
     def test_patch_lead_team_failure(self):
         """Test updating an event's lead team to an invalid team."""
         event = EventFactory()
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
 
         request_data = {
             'lead_team': Team.food_from_britain.value.id,
@@ -668,7 +741,7 @@ class TestUpdateEventView(APITestMixin):
         """Test updating read-only fields."""
         event = DisabledEventFactory(archived_documents_url_path='old_path')
 
-        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        url = reverse('api-v4:event:item', kwargs={'pk': event.pk})
         response = self.api_client.patch(
             url,
             data={
@@ -693,7 +766,7 @@ class TestEventVersioning(APITestMixin):
         team = random_obj_for_model(TeamModel)
 
         response = self.api_client.post(
-            reverse('api-v3:event:collection'),
+            reverse('api-v4:event:collection'),
             data={
                 'name': 'Grand exhibition',
                 'event_type': EventType.seminar.value.id,
@@ -706,6 +779,7 @@ class TestEventVersioning(APITestMixin):
                 'organiser': AdviserFactory().pk,
                 'lead_team': team.pk,
                 'teams': [team.pk],
+                'has_related_trade_agreements': True,
                 'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
             },
         )
@@ -727,7 +801,7 @@ class TestEventVersioning(APITestMixin):
         assert Version.objects.count() == 0
 
         response = self.api_client.post(
-            reverse('api-v3:event:collection'),
+            reverse('api-v4:event:collection'),
             data={'name': 'Grand exhibition'},
         )
 
@@ -741,7 +815,7 @@ class TestEventVersioning(APITestMixin):
         assert Version.objects.get_for_object(event).count() == 0
 
         response = self.api_client.patch(
-            reverse('api-v3:event:item', kwargs={'pk': event.pk}),
+            reverse('api-v4:event:item', kwargs={'pk': event.pk}),
             data={'name': 'Annual exhibition'},
         )
         assert response.status_code == status.HTTP_200_OK
@@ -760,7 +834,7 @@ class TestEventVersioning(APITestMixin):
         assert Version.objects.get_for_object(event).count() == 0
 
         response = self.api_client.patch(
-            reverse('api-v3:event:item', kwargs={'pk': event.pk}),
+            reverse('api-v4:event:item', kwargs={'pk': event.pk}),
             data={'event_type': 'invalid'},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST

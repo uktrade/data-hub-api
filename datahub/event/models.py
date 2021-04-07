@@ -57,6 +57,8 @@ class Event(BaseModel, DisableableModel):
         related_name='+',
     )
     teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
+    has_related_trade_agreements = models.BooleanField(null=True, blank=True)
+    related_trade_agreements = models.ManyToManyField('TradeAgreement', blank=True)
     related_programmes = models.ManyToManyField('Programme', blank=True)
     service = TreeForeignKey(
         'metadata.Service',
@@ -83,6 +85,10 @@ class Event(BaseModel, DisableableModel):
     def __str__(self):
         """Human-readable representation"""
         return self.name
+
+
+class TradeAgreement(BaseConstantModel):
+    """Trade agreements for events"""
 
 
 class Programme(BaseConstantModel):
