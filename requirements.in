@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.39
+boto3==1.17.44
 
 notifications-python-client==6.0.2
 
@@ -42,15 +42,15 @@ elasticsearch==7.12.0
 elasticsearch-dsl==7.3.0
 
 # ES APM
-elastic-apm==6.0.0
+elastic-apm==6.1.0
 
 # Celery
 celery[redis]==4.4.7
-billiard==3.6.3.0  # Not used directly, but pinned as it has been a source of breakage in the past
+billiard==3.6.4.0  # Not used directly, but pinned as it has been a source of breakage in the past
 kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==6.2.2
+pytest==6.2.3
 pytest-django==4.1.0
 pytest-cov==2.11.1
 pytest-xdist==2.2.1
@@ -70,7 +70,7 @@ pre-commit==2.11.1
 
 # Code static analysis
 flake8==3.9.0
-flake8-bugbear==21.3.2
+flake8-bugbear==21.4.3
 flake8-commas==2.0.0
 flake8-debugger==4.0.0
 flake8-import-order==0.18.1
