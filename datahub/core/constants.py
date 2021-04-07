@@ -11,6 +11,15 @@ CountryPostcodeConstant = namedtuple(
         'postcode_replacement',
     ),
 )
+AdministrativeAreaConstant = namedtuple(
+    'AdministrativeAreaConstant',
+    (
+        'name',
+        'id',
+        'area_code',
+        'country_id',
+    ),
+)
 
 US_ZIP_STATES = (
     ('005', 'NY', 'New York'),
@@ -949,6 +958,30 @@ class CountryPostcodeFormat(Enum):
         (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
          r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'),
         r'\1\2\3\4\5\6',
+    )
+
+
+class AdministrativeArea(Enum):
+    """Administrative Areas"""
+
+    # United States
+    alabama = AdministrativeAreaConstant(
+        'Alabama',
+        '8ad3f33a-ace8-40ec-bd2c-638fdc3024ea',
+        'AL',
+        Country.united_states.value.id,
+    )
+    new_york = AdministrativeAreaConstant(
+        'New York',
+        'aa65b701-244a-41fc-bd31-0a546303106a',
+        'NY',
+        Country.united_states.value.id,
+    )
+    texas = AdministrativeAreaConstant(
+        'Texas',
+        'c35c119a-bc4d-4e48-9ace-167dbe8cb695',
+        'TX',
+        Country.united_states.value.id,
     )
 
 

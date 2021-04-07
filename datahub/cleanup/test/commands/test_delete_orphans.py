@@ -85,6 +85,7 @@ MAPPINGS = {
         'implicit_related_models': (
             'event.Event_teams',
             'event.Event_related_programmes',
+            'event.Event_related_trade_agreements',
         ),
         'ignored_models': (),
     },
