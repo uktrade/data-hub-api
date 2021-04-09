@@ -370,6 +370,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         meta_models.InvestmentStrategicDriver, many=True, required=False,
     )
     uk_company = NestedRelatedField(Company, required=False, allow_null=True)
+    incomplete_fields = serializers.ListField(child=serializers.CharField(), read_only=True)
     requirements_complete = serializers.SerializerMethodField()
 
     # Team fields
@@ -523,7 +524,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             'archived_documents_url_path',
             'comments',
             'gross_value_added',
-            'incomplete_fields',
             'project_manager_requested_on',
         )
 

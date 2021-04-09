@@ -24,3 +24,9 @@ load-metadata:
 setup-flake8-hook:
 	python3 -m venv env
 	. env/bin/activate && pip install pre-commit && pre-commit install && git config --bool flake8.strict true
+
+run-shell:
+	docker-compose run api bash
+
+reindex-es:
+	docker-compose run api python manage.py sync_es
