@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0008_tradeagreement'),
+        ('metadata', '0009_tradeagreement'),
         ('event', '0017_add_related_trade_agreement_fields'),
     ]
 

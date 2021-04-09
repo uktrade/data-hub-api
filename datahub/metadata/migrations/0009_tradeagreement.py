@@ -7,7 +7,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0007_administrativearea_area_code'),
+        ('metadata', '0008_update_services'),
     ]
 
     operations = [
