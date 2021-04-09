@@ -1,3 +1,20 @@
+# Data Hub API 36.14.0 (2021-04-09)
+
+
+## Features
+
+- Companies are now searchable by administrative area.
+
+## Bug fixes
+
+- **Investment** The investment project summary schema now shows specifies the start and end dates with the proper data schema.
+- **Investment** The investment project schema now shows "incomplete_fields" correctly as an array of strings (instead of a plain string).
+
+## Internal changes
+
+- SSO Auth Admin client was updated.
+
+
 # Data Hub API 36.13.0 (2021-04-07)
 
 
