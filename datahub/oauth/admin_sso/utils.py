@@ -22,9 +22,9 @@ def get_access_token(code, redirect_uri, request=None):
         'redirect_uri': redirect_uri,
     }
     response = _get_api_client(request=request).request(
-        'POST',
-        settings.ADMIN_OAUTH2_TOKEN_FETCH_PATH,
-        params=oauth_params,
+        method='POST',
+        path=settings.ADMIN_OAUTH2_TOKEN_FETCH_PATH,
+        data=oauth_params,
     )
 
     access_token_data = response.json()
