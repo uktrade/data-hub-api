@@ -39,7 +39,7 @@ class Command(BaseCommand):
         """
         Does update on the postcode address table
         """
-        for us_company in self.us_companies_with_no_areas():
+        for us_company in self.get_us_companies_with_no_areas():
             if self.fix_address_postcode(us_company):
                 area_code = self.get_area_code(us_company.address_postcode)
                 self.update_address_area(area_code, us_company)
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 area_code = self.get_area_code(us_company.registered_address_postcode)
                 self.update_registered_address_area(area_code, us_company)
 
-    def us_companies_with_no_areas(self):
+    def get_us_companies_with_no_areas(self):
         """United states companies with no areas"""
         query = Q(address_area_id__isnull=True)
         query.add(Q(registered_address_area_id__isnull=True), Q.OR)
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         @param us_company:
         """
         if area_code:
-            administrative_area = self.us_administrative_area_by_code(area_code)
+            administrative_area = self.get_us_administrative_area_by_code(area_code)
             if administrative_area:
                 us_company.address_area_id = administrative_area.id
                 us_company.save(force_update=True)
@@ -76,7 +76,7 @@ class Command(BaseCommand):
         @return:
         """
         if area_code:
-            administrative_area = self.us_administrative_area_by_code(area_code)
+            administrative_area = self.get_us_administrative_area_by_code(area_code)
             if administrative_area:
                 us_company.registered_address_area_id = administrative_area.id
                 us_company.save(force_update=True)
@@ -98,17 +98,11 @@ class Command(BaseCommand):
     def fix_address_postcode(self, us_company):
         """
         Fix address postcode formatting the postcode into an expected format if possible
-        @param us_company:
+        @param us_company: Company record
         """
-        if is_not_blank(us_company.address_postcode) and us_company.address_area is None:
+        if is_not_blank(us_company.address_postcode):
             log_message = f'Updating address postcode from "{us_company.address_postcode}"'
-            us_company.address_postcode = re.sub(
-                CountryPostcodeFormat.united_states.value.postcode_pattern,
-                CountryPostcodeFormat.united_states.value.postcode_replacement,
-                us_company.address_postcode,
-                0,
-                re.MULTILINE,
-            )
+            us_company.address_postcode = self.format_postcode(us_company.address_postcode)
             logger.info(f'{log_message} to address postcode "{us_company.address_postcode}"')
             us_company.save(force_update=True)
             return True
@@ -119,24 +113,32 @@ class Command(BaseCommand):
         Fix registered address postcode formatting the postcode into an expected format if possible
         @param us_company:
         """
-        if is_not_blank(us_company.registered_address_postcode) and \
-                us_company.registered_address_area is None:
+        if is_not_blank(us_company.registered_address_postcode):
             log_message = f'Updating registered postcode ' \
                           f'from "{us_company.registered_address_postcode}"'
-            us_company.registered_address_postcode = re.sub(
-                CountryPostcodeFormat.united_states.value.postcode_pattern,
-                CountryPostcodeFormat.united_states.value.postcode_replacement,
-                us_company.registered_address_postcode,
-                0,
-                re.MULTILINE,
-            )
+            us_company.registered_address_postcode = self.format_postcode(
+                us_company.registered_address_postcode)
             logger.info(f'{log_message} to registered postcode '
                         f'"{us_company.registered_address_postcode}"')
             us_company.save(force_update=True)
             return True
         return False
 
-    def us_administrative_area_by_code(self, area_code):
+    def format_postcode(self, postcode):
+        """
+        Format postcode with postcode pattern for united states
+        @param postcode:
+        @return: Formatted us postcode value
+        """
+        return re.sub(
+            CountryPostcodeFormat.united_states.value.postcode_pattern,
+            CountryPostcodeFormat.united_states.value.postcode_replacement,
+            postcode,
+            0,
+            re.MULTILINE,
+        )
+
+    def get_us_administrative_area_by_code(self, area_code):
         """
         Gets United States Administrative Area by Area Code
         @param area_code:
