@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from urllib import parse
 
 import pytest
 from django.conf import settings
@@ -44,9 +44,10 @@ def test_get_access_token(requests_mock):
     }
 
     assert requests_mock.call_count == 1
-    expected_url = f'{settings.ADMIN_OAUTH2_TOKEN_FETCH_PATH}?{urlencode(oauth_params)}'
-    assert requests_mock.request_history[-1].url == expected_url
-
+    assert requests_mock.request_history[-1].url == settings.ADMIN_OAUTH2_TOKEN_FETCH_PATH
+    assert dict(
+        parse.parse_qsl(parse.urlsplit(requests_mock.request_history[-1]._request.body).path),
+    ) == oauth_params
     assert access_token_data == token_data
 
 
