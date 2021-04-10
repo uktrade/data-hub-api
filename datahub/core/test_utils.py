@@ -19,7 +19,7 @@ from django.utils.timezone import now
 from faker import Faker
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
-from reversion.models import Version, Revision
+from reversion.models import Revision, Version
 
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
