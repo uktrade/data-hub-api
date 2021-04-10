@@ -6,7 +6,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from datahub.company.models import Company
-from datahub.core.constants import Country, CountryPostcodeFormat, US_ZIP_STATES
+from datahub.core.constants import Country
+from datahub.core.postcode_constants import CountryPostcodeReplacement, US_ZIP_STATES
 from datahub.core.validate_utils import is_not_blank
 from datahub.metadata.models import AdministrativeArea
 
@@ -131,8 +132,8 @@ class Command(BaseCommand):
         @return: Formatted us postcode value
         """
         return re.sub(
-            CountryPostcodeFormat.united_states.value.postcode_pattern,
-            CountryPostcodeFormat.united_states.value.postcode_replacement,
+            CountryPostcodeReplacement.united_states.value.postcode_pattern,
+            CountryPostcodeReplacement.united_states.value.postcode_replacement,
             postcode,
             0,
             re.MULTILINE,

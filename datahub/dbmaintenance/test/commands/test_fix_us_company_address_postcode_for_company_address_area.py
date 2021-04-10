@@ -3,10 +3,10 @@ import re
 import pytest
 from django.core.management import call_command
 
-from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
-from datahub.core.constants import Country, CountryPostcodeFormat
-from datahub.core.test_utils import has_reversion_version
+from datahub.core.constants import Country
+from datahub.core.postcode_constants import CountryPostcodeReplacement
+from datahub.core.test_utils import has_reversion_comment, has_reversion_version
 
 pytestmark = pytest.mark.django_db
 
@@ -95,8 +95,8 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     actual_result = re.sub(
-        CountryPostcodeFormat.united_states.value.postcode_pattern,
-        CountryPostcodeFormat.united_states.value.postcode_replacement,
+        CountryPostcodeReplacement.united_states.value.postcode_pattern,
+        CountryPostcodeReplacement.united_states.value.postcode_replacement,
         post_code,
         0,
         re.MULTILINE)
@@ -114,7 +114,8 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
         area_code,
         area_name):
     """
-    Test postcode fixes and area generation a couple of valid Zip Codes using the real DB
+    Test postcode is fixed for the purpose of admin area
+    generation with valid zip codes format
     @param post_code: POSTCODE good
     @param area_code: Area Code to be generated from Command
     @param area_name: Area Name to describe area code
@@ -124,10 +125,10 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.address_area is not None
-    assert current_company.address_area.area_code == area_code
-    assert current_company.address_postcode == post_code
+    company.refresh_from_db()
+    assert company.address_area is not None
+    assert company.address_area.area_code == area_code
+    assert company.address_postcode == post_code
 
 
 @pytest.mark.parametrize('post_code, area_code, area_name',
@@ -151,10 +152,10 @@ def test_us_company_with_address_data_only_will_generate_address_area(
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.address_area is not None
-    assert current_company.address_area.area_code == area_code
-    assert current_company.address_postcode == post_code
+    company.refresh_from_db()
+    assert company.address_area is not None
+    assert company.address_area.area_code == area_code
+    assert company.address_postcode == post_code
 
 
 @pytest.mark.parametrize('post_code, area_code, area_name', [
@@ -179,10 +180,10 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.registered_address_area is not None
-    assert current_company.registered_address_area.area_code == area_code
-    assert current_company.registered_address_postcode == post_code
+    company.refresh_from_db()
+    assert company.registered_address_area is not None
+    assert company.registered_address_area.area_code == area_code
+    assert company.registered_address_postcode == post_code
 
 
 @pytest.mark.parametrize('post_code, area_code, area_name', [
@@ -206,10 +207,10 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.registered_address_area is not None
-    assert current_company.registered_address_area.area_code == area_code
-    assert current_company.registered_address_postcode == post_code
+    company.refresh_from_db()
+    assert company.registered_address_area is not None
+    assert company.registered_address_area.area_code == area_code
+    assert company.registered_address_postcode == post_code
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -234,9 +235,9 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.address_postcode == expected_result
-    assert current_company.registered_address_postcode == expected_result
+    company.refresh_from_db()
+    assert company.address_postcode == expected_result
+    assert company.registered_address_postcode == expected_result
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -257,15 +258,15 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    setup_us_company_with_all_addresses(post_code)
+    company = setup_us_company_with_all_addresses(post_code)
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    current_company = Company.objects.first()
-    assert current_company.address_postcode == expected_result
-    assert current_company.registered_address_postcode == expected_result
-    assert current_company.address_area is None
-    assert current_company.registered_address_area is None
+    company.refresh_from_db()
+    assert company.address_postcode == expected_result
+    assert company.registered_address_postcode == expected_result
+    assert company.address_area is None
+    assert company.registered_address_area is None
 
 
 @pytest.mark.parametrize('post_code, expected_result',
@@ -279,10 +280,10 @@ def test_audit_log(post_code, expected_result):
     @param post_code: Invalid Postcode Format
     @param expected_result:  The expected result of the fix
     """
-    original_company = setup_us_company_with_all_addresses(post_code)
+    company = setup_us_company_with_all_addresses(post_code)
 
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
-    altered_company = Company.objects.first()
-    assert has_reversion_version(original_company)
-    assert has_reversion_version(altered_company)
+    company.refresh_from_db()
+    assert has_reversion_version(company)
+    assert has_reversion_comment('US Area and postcode Fix.')
