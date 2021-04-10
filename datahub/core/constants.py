@@ -3,7 +3,6 @@ from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
 OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
-
 AdministrativeAreaConstant = namedtuple(
     'AdministrativeAreaConstant',
     (
