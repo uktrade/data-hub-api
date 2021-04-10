@@ -19,7 +19,7 @@ from django.utils.timezone import now
 from faker import Faker
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
-from reversion.models import Version
+from reversion.models import Version, Revision
 
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
@@ -487,6 +487,14 @@ def has_reversion_version(model_db):
     """
     versions = Version.objects.get_for_object(model_db)
     return versions.count() >= 1
+
+
+def has_reversion_comment(comment):
+    """
+    Check for comment in the version
+    """
+    revisions = Revision.objects.filter(comment__icontains=comment)
+    return revisions.count() > 0
 
 
 class HawkMockJSONResponse:
