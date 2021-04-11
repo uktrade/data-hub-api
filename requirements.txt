@@ -50,8 +50,11 @@ chardet==3.0.4
     #   -r requirements.in
     #   aiohttp
     #   requests
+click-default-group==1.2.2
+    # via towncrier
 click==7.1.2
     # via
+    #   click-default-group
     #   pip-tools
     #   towncrier
 coverage==5.3.1
@@ -333,7 +336,7 @@ toml==0.10.2
     #   pre-commit
     #   pytest
     #   towncrier
-towncrier==19.2.0
+towncrier==21.3.0
     # via -r requirements.in
 traitlets==5.0.5
     # via ipython
