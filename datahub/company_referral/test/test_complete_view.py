@@ -334,6 +334,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                 'recipient': format_expected_adviser(referral.recipient),
             },
             'large_capital_opportunity': None,
+            'related_trade_agreements': [],
         }
 
         assert referral.status == CompanyReferral.Status.COMPLETE
@@ -439,6 +440,7 @@ class TestCompleteCompanyReferral(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'large_capital_opportunity_id': None,
+            'related_trade_agreements': [],
         }
 
         assert list(referral.interaction.contacts.all()) == [contact]

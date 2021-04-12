@@ -206,6 +206,7 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': request_data.get('large_capital_opportunity'),
+            'related_trade_agreements': [],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -363,6 +364,7 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'related_trade_agreements': [],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1493,6 +1495,7 @@ class TestGetInteraction(APITestMixin):
                 'recipient': format_expected_adviser(company_referral.recipient),
             } if company_referral else None,
             'large_capital_opportunity': None,
+            'related_trade_agreements': [],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1607,6 +1610,7 @@ class TestGetInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'related_trade_agreements': [],
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
