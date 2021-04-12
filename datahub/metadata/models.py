@@ -111,6 +111,10 @@ class Country(BaseConstantModel):
         verbose_name_plural = 'countries'
 
 
+class TradeAgreement(BaseConstantModel):
+    """Trade agreements for events"""
+
+
 class AdministrativeArea(BaseConstantModel):
     """
     States, provinces etc. within a country.
