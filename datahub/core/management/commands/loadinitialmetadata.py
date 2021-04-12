@@ -19,13 +19,13 @@ SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'teams.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'titles.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'uk_regions.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'trade_agreements.yaml',
 )
 
 EVENTS_FIXTURES = (
     EVENTS_FIXTURE_DIR / 'programmes.yaml',
     EVENTS_FIXTURE_DIR / 'location_types.yaml',
     EVENTS_FIXTURE_DIR / 'event_types.yaml',
-    EVENTS_FIXTURE_DIR / 'trade_agreements.yaml',
 )
 
 
