@@ -1,7 +1,6 @@
 from elasticsearch_dsl import Date, Keyword, Long
 
-from datahub.search import dict_utils
-from datahub.search import fields
+from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
