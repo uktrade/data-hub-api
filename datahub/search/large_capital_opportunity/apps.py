@@ -14,6 +14,7 @@ class LargeCapitalOpportunitySearchApp(SearchApp):
     view_permissions = (
         f'opportunity.{LargeCapitalOpportunityPermission.view_large_capital_opportunity}',
     )
+    export_permission = f'opportunity.{LargeCapitalOpportunityPermission.export}'
     exclude_from_global_search = True
     queryset = DBLargeCapitalOpportunity.objects.select_related(
         'lead_dit_relationship_manager',

@@ -166,6 +166,12 @@ class LargeCapitalOpportunity(BaseModel):
     why_abandoned = models.TextField(blank=True)
     why_suspended = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name_plural = 'large capital opportunities'
+        permissions = (
+            ('export_largecapitalopportunity', 'Can export large capital opportunity'),
+        )
+
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
