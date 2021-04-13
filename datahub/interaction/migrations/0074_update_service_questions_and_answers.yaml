@@ -1,0 +1,65 @@
+# Providing Other Advice & Information
+- model: interaction.servicequestion
+  pk: d3496456-8e07-469b-8307-3c47e9668467
+  fields:
+    disabled_on:
+    name: What did you give advice about?
+    service_id: 5836a53c-a588-4c67-a510-47d0cfff8a24
+    order: 100.0
+
+- model: interaction.serviceansweroption
+  pk: a5ba5f67-619f-4c27-a92c-5db1a229060e
+  fields:
+    disabled_on:
+    name: Banking & Funding
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 100.0
+- model: interaction.serviceansweroption
+  pk: f8186dcb-2504-45a0-87fa-bae2ea0be516
+  fields:
+    disabled_on:
+    name: DIT or Government Services
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 200.0
+- model: interaction.serviceansweroption
+  pk: 5ce36b9c-6f6a-42aa-90b5-44253c35c6c9
+  fields:
+    disabled_on:
+    name: Documents & Regulations
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 300.0
+- model: interaction.serviceansweroption
+  pk: f9d96987-1a41-4b54-8ae7-2c12cfb693b4
+  fields:
+    disabled_on:
+    name: General
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 400.0
+- model: interaction.serviceansweroption
+  pk: 1b894289-ccfe-4399-a7e7-0391b48e6144
+  fields:
+    disabled_on:
+    name: Marketing & Communication
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 500.0
+- model: interaction.serviceansweroption
+  pk: 27b8d2ac-a3c0-4e91-8550-04326bd6951d
+  fields:
+    disabled_on:
+    name: Markets & Sectors
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 600.0
+- model: interaction.serviceansweroption
+  pk: c413f76e-9bf0-4553-94c2-10adc33b3696
+  fields:
+    disabled_on:
+    name: Skills & Recruitment
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 700.0
+- model: interaction.serviceansweroption
+  pk: 564c8f6d-0523-4204-b9e9-468e03fcfeb0
+  fields:
+    disabled_on:
+    name: UK Locations
+    question_id: d3496456-8e07-469b-8307-3c47e9668467
+    order: 800.0

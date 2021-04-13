@@ -1,0 +1,24 @@
+- model: metadata.tradeagreement
+  pk: af704a93-5404-4bc6-adda-381756993902
+  fields: {disabled_on: null, name: 'Comprehensive and Progressive Agreement for Trans-Pacific Partnership'}
+- model: metadata.tradeagreement
+  pk: 50370070-71f9-4ada-ae2c-cd0a737ba5e2
+  fields: {disabled_on: null, name: 'UK-Australia Mutual Recognition Agreement'}
+- model: metadata.tradeagreement
+  pk: 50cf99fd-1150-421d-9e1c-b23750ebf5ca
+  fields: {disabled_on: null, name: 'UK-Canada Trade Continuity Agreement'}
+- model: metadata.tradeagreement
+  pk: 95ca9dcb-0da5-4bc2-a139-3e5b55c882f7
+  fields: {disabled_on: null, name: UK-India Free Trade Agreement}
+- model: metadata.tradeagreement
+  pk: 05587f64-b976-425e-8763-3557c7936632
+  fields: {disabled_on: null, name: 'UK-Japan Comprehensive Economic Partnership Agreement'}
+- model: metadata.tradeagreement
+  pk: 09787712-0d94-4137-a5f3-3f9131e681f0
+  fields: {disabled_on: null, name: 'UK-Mexico Trade Continuity Agreement'}
+- model: metadata.tradeagreement
+  pk: f42da892-2b03-4f88-8a61-9efd8b132776
+  fields: {disabled_on: null, name: 'UK-New Zealand Mutual Recognition Agreement'}
+- model: metadata.tradeagreement
+  pk: 20e08a38-95a8-4250-bd5b-9d7f0dfc9387
+  fields: {disabled_on: null, name: 'UK-United States Mutual Recognition Agreement'}
