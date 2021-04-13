@@ -1,0 +1,523 @@
+# Trade Agreement Implementation Activity
+- model: metadata.service
+  pk: 51c9de65-f170-4bdf-adcf-473913429db7
+  fields:
+    disabled_on:
+    order: 0.0
+    segment: Trade Agreement Implementation Activity
+    parent:
+    contexts: []
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: e087cda2-6d3a-41bd-95ab-a9fc77083385
+  fields:
+    disabled_on:
+    order: 1000.0
+    segment: One-to-one with investors explaining new trade agreement opportunities, messages and resources
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 269dfdcd-aacf-40f0-9dda-2b01898b08ae
+  fields:
+    disabled_on:
+    order: 1001.0
+    segment: One-to-one with exporters explaining new trade agreement opportunities, messages and resources
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 11b1d6e6-dc9d-4794-b54f-79920b095288
+  fields:
+    disabled_on:
+    order: 1002.0
+    segment: Informing key stakeholder groups of opportunities & gathering business intelligence
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 8d3abcc6-59a9-42a9-a9ce-9d25dc9fe5ee
+  fields:
+    disabled_on:
+    order: 1003.0
+    segment: Engagement with Local Enterprise Partnerships
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 155f0df9-e13b-445a-96cd-e1071a001fea
+  fields:
+    disabled_on:
+    order: 1004.0
+    segment: Lobbying businesses for Trade Agreements
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 4cd20b7d-2b33-4a10-96a0-51f056861a97
+  fields:
+    disabled_on:
+    order: 1005.0
+    segment: Engaging with Devolved Authorities on Trade Agreements
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 8d098d19-5988-4afd-8c0b-cc5652eccb26
+  fields:
+    disabled_on:
+    order: 1006.0
+    segment: Civil Society meetings
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: f6a8a746-c297-4e55-b444-0609b0c63555
+  fields:
+    disabled_on:
+    order: 1007.0
+    segment: Working cross-Whitehall (including with UKEF)
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 69fff5a5-6405-4bc6-9b52-25f4ee103359
+  fields:
+    disabled_on:
+    order: 1008.0
+    segment: Negotiating rounds - pre-ratification and negotiating amendments
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 0839a7db-44e1-4090-a131-93ea95ef6a6a
+  fields:
+    disabled_on:
+    order: 1009.0
+    segment: Partner country interaction - post-ratification (Trade Agreement related)
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 81408b2e-a22e-4901-8d3a-b981bf5592ff
+  fields:
+    disabled_on:
+    order: 1010.0
+    segment: Partner country interaction - related to Market Access Barriers
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 7a8a9b21-07ae-4e46-93e8-50549c1e1411
+  fields:
+    disabled_on:
+    order: 1011.0
+    segment: Meetings with other countries
+    parent: 51c9de65-f170-4bdf-adcf-473913429db7
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+# Account Management
+- model: metadata.service
+  pk: 9484b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 510.0
+    segment: General
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["export_interaction", "export_service_delivery", "investment_interaction", "investment_project_interaction", "other_interaction", "other_service_delivery", "interaction", "trade_agreement_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 1
+    level: 1
+# A Specific Service
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    order: 661.0
+    segment: Digital Trade Advisers One-to-One
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_service_delivery", "interaction", "trade_agreement_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 440b7770-62d2-e325-df93-cd7b62818405
+  fields:
+    disabled_on:
+    order: 624.0
+    segment: Export Academy
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction", "other_service_delivery", "trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    disabled_on:
+    order: 660.0
+    segment: Great International Trade Campaign
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["event", "other_interaction", "trade_agreement_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    disabled_on:
+    order: 664.0
+    segment: Language and Culture Advisers One-to-One
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 58da3eec-a906-48eb-b258-bd3fb0717e7a
+  fields:
+    disabled_on:
+    order: 662.0
+    segment: Significant Assistance
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_service_delivery", "interaction", "trade_agreement_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 663.0
+    segment: UK Region Local
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["event", "other_service_delivery", "trade_agreement_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 3
+    level: 1
+- model: metadata.service
+  pk: cb94ecf4-5d71-4366-bafb-5eda8139c96e
+  fields:
+    disabled_on:
+    order: 1012.0
+    segment: European Regional Development Fund (ERDF)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: c17ab57e-1f37-4941-84ac-cc4cb5eb1370
+  fields:
+    disabled_on:
+    order: 1013.0
+    segment: Export Opportunities
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 913244df-a720-4df7-bf74-beff01c0cfa7
+  fields:
+    disabled_on:
+    order: 1014.0
+    segment: Global Growth Service
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 2c5fe1c9-2f55-4443-bfb7-a43c84eae83e
+  fields:
+    disabled_on:
+    order: 1015.0
+    segment: Overseas Business Network Chargeable Services (OBN)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 28136f4e-1da5-437e-b921-5111d70d3eaa
+  fields:
+    disabled_on:
+    order: 1016.0
+    segment: Overseas Market Introduction Service (OMIS)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 090761aa-8861-4858-b7f3-b5d12f3f5ec7
+  fields:
+    disabled_on:
+    order: 1017.0
+    segment: Tradeshow Access Programme (TAP)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 209b01e0-31da-48a7-b65c-6fee54740da1
+  fields:
+    disabled_on:
+    order: 1018.0
+    segment: Trade Development Fund (TDF)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 8108e8bb-9366-4133-b8d8-1a5a7d49efa3
+  fields:
+    disabled_on:
+    order: 1019.0
+    segment: UK Defence and Security Exports
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+# Enquiry or Referral Received
+- model: metadata.service
+  pk: fc142e9b-b9eb-47fc-9c58-3b3186457ab1
+  fields:
+    disabled_on:
+    order: 250.0
+    segment: General Enquiry
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 8
+    level: 1
+- model: metadata.service
+  pk: 65dc115c-dcd8-4441-9d3a-76285a979aa4
+  fields:
+    disabled_on:
+    order: 220.0
+    segment: Other Inbound Referral
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 8
+    level: 1
+# Events
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 691.0
+    segment: Market Visit
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 692.0
+    segment: Inward Mission
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 690.0
+    segment: Outward Mission
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 694.0
+    segment: UK Based
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: ccf9b82b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on:
+    order: 697.0
+    segment: Overseas
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 11
+    level: 1
+- model: metadata.service
+  pk: 510a4016-4bb9-e211-a646-e4115bead28a
+  fields:
+    disabled_on:
+    order: 693.0
+    segment: Webinar
+    parent: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+    contexts: ["event", "export_service_delivery", "other_service_delivery", "service_delivery", "trade_agreement_interaction"]
+    lft: 12
+    rght: 13
+    tree_id: 11
+    level: 1
+# Making Other Introductions
+- model: metadata.service
+  pk: e9dd3bfe-0c1e-427b-a91a-31e60ca580e5
+  fields:
+    disabled_on:
+    order: 365.0
+    segment: Another Government Department
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: b2455298-5ccb-4ecb-96f6-86cf61aab4d2
+  fields:
+    disabled_on:
+    order: 362.0
+    segment: Business Partners (e.g. distributors or manufacturers)
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 4
+    rght: 5
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: cd5ebe29-d5d2-4bf8-836d-7c0d3ea019d0
+  fields:
+    disabled_on:
+    order: 363.0
+    segment: Customers
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: 735da232-8058-44a5-be69-5c0e2bec0b7e
+  fields:
+    disabled_on:
+    order: 361.0
+    segment: Financial and Professional Service Providers
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 8
+    rght: 9
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: d44c334c-0ac7-4151-890e-4a3a5aa47aed
+  fields:
+    disabled_on:
+    order: 364.0
+    segment: Someone else in DIT
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 10
+    rght: 11
+    tree_id: 59
+    level: 1
+- model: metadata.service
+  pk: 6fd4b203-8e73-4a39-96ea-188bdb623b69
+  fields:
+    disabled_on:
+    order: 120.0
+    segment: UK Export Finance (UKEF)
+    parent: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+# Providing Other Advice & Information
+- model: metadata.service
+  pk: 5836a53c-a588-4c67-a510-47d0cfff8a24
+  fields:
+    disabled_on:
+    order: 121.0
+    segment: Providing Other Advice & Information
+    parent:
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0

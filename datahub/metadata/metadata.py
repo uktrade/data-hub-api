@@ -11,6 +11,11 @@ from datahub.metadata.serializers import (
 )
 
 registry.register(
+    metadata_id='trade-agreement',
+    model=models.TradeAgreement,
+)
+
+registry.register(
     metadata_id='administrative-area',
     model=models.AdministrativeArea,
     queryset=models.AdministrativeArea.objects.select_related(
